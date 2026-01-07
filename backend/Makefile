@@ -87,15 +87,6 @@ test-unit:
 	@$(MAKE) test-summary-detailed
 
 # ------------------------
-# Integration tests
-# ------------------------
-test-integration:
-	@echo "$(BOLD)Running integration tests...$(NC)"
-	@echo "========================================"
-	@go test ./internal/service/... -v $(NO_CACHE) 2>&1 | tee test_output.log
-	@$(MAKE) test-summary-detailed
-
-# ------------------------
 # DB tests
 # ------------------------
 test-db:
