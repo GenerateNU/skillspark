@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
-	"skillspark/internal/service/handler/session"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
 
@@ -71,17 +70,7 @@ func SetupApp(config config.Config, repo *storage.Repository) *fiber.App {
 		return c.SendStatus(http.StatusOK)
 	})
 
-	// Setup API routes
-	setupAPIRoutes(apiV1, repo)
+	//setup app routes below
 
 	return app
-}
-
-// setupAPIRoutes configures all API v1 routes
-// this will get moved outside of this file later by @josh-torre
-func setupAPIRoutes(router fiber.Router, repo *storage.Repository) {
-	sessionHandler := session.NewHandler(repo.Session)
-	router.Route("/sessions", func(r fiber.Router) {
-		r.Get("/", sessionHandler.GetSessions)
-	})
 }

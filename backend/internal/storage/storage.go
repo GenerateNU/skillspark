@@ -1,20 +1,11 @@
 package storage
 
 import (
-	"context"
-	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/schema"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type SessionRepository interface {
-	GetSessions(ctx context.Context) ([]models.Session, error)
-}
-
 type Repository struct {
-	db      *pgxpool.Pool
-	Session SessionRepository
+	db *pgxpool.Pool
 }
 
 func (r *Repository) Close() error {
@@ -28,7 +19,6 @@ func (r *Repository) GetDB() *pgxpool.Pool {
 
 func NewRepository(db *pgxpool.Pool) *Repository {
 	return &Repository{
-		db:      db,
-		Session: schema.NewSessionRepository(db),
+		db: db,
 	}
 }
