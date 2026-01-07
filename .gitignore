@@ -1,0 +1,16 @@
+.task/
+
+.idea/
+
+.env
+node_modules
+.vscode/
+
+.DS_STORE
+
+.next/
+
+backend/.env
+
+backend/internal/supabase/.branches/
+backend/internal/supabase/.temp/

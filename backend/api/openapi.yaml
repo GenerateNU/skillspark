@@ -1,0 +1,48 @@
+openapi: 3.0.3
+info:
+  title: SkillSpark API
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Development server
+
+tags:
+  - name: Health
+    description: Health check operations
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Check if the API is running and healthy
+      tags: [Health]
+      responses:
+        '200':
+          description: API is healthy (status code only)
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          description: HTTP status code
+          example: 500
+        message:
+          anyOf:
+            - type: string
+            - type: object
+          description: Error message or validation errors
+          example: "Internal server error"
+           
