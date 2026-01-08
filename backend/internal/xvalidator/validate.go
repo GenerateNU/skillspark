@@ -31,7 +31,7 @@ func (v XValidator) Validate(data interface{}) []ErrorResponse {
 	errs := Validate.Struct(data)
 	if errs != nil {
 		for _, err := range errs.(validator.ValidationErrors) {
-			// In this case data object is actually holding the User struct
+			// In this case data holds the struct being validated
 			var elem ErrorResponse
 
 			elem.FailedField = err.Field() // Export struct field name
