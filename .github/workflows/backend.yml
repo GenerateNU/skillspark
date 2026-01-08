@@ -52,13 +52,13 @@ jobs:
       - name: Run Tests
         run: |
           cd backend
-          make test-ci
+          make test
       
       # Generate coverage using Makefile target
       - name: Generate Coverage Report
         run: |
           cd backend
-          make test-coverage-ci
+          make test-coverage
           
       # Extract coverage percentage
       - name: Extract Coverage Info
