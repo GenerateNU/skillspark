@@ -1,12 +1,15 @@
+// Package xvalidator provides validation utilities for struct validation using go-playground/validator
 package xvalidator
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
 
+// ErrorResponse represents a validation error with detailed information
 type ErrorResponse struct {
 	Error       bool
 	FailedField string
@@ -15,37 +18,44 @@ type ErrorResponse struct {
 	Value       interface{}
 }
 
+// XValidator wraps the validator instance for struct validation
 type XValidator struct {
 	Validator *validator.Validate
 }
 
+// GlobalErrorHandlerResp represents a global error response structure
 type GlobalErrorHandlerResp struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 }
 
+// Validate is the global validator instance
 var Validate = validator.New()
 
+// Validate validates the given struct and returns a slice of validation errors
 func (v XValidator) Validate(data interface{}) []ErrorResponse {
 	var validationErrors []ErrorResponse
 
 	errs := Validate.Struct(data)
 	if errs != nil {
-		for _, err := range errs.(validator.ValidationErrors) {
-			// In this case data holds the struct being validated
-			var elem ErrorResponse
+		// Use errors.As to safely check for ValidationErrors
+		var validationErrs validator.ValidationErrors
+		if errors.As(errs, &validationErrs) {
+			for _, err := range validationErrs {
+				// In this case data holds the struct being validated
+				var elem ErrorResponse
+				elem.FailedField = err.Field() // Export struct field name
+				elem.Tag = err.Tag()           // Export struct tag
+				elem.Param = err.Param()       // Export tag parameter
+				elem.Value = err.Value()       // Export field value
+				elem.Error = true
 
-			elem.FailedField = err.Field() // Export struct field name
-			elem.Tag = err.Tag()           // Export struct tag
-			elem.Param = err.Param()       // Export tag parameter
-			elem.Value = err.Value()       // Export field value
-			elem.Error = true
+				if param := err.Param(); param != "" {
+					elem.Tag = fmt.Sprintf("%s:%s", elem.Tag, param)
+				}
 
-			if param := err.Param(); param != "" {
-				elem.Tag = fmt.Sprintf("%s:%s", elem.Tag, param)
+				validationErrors = append(validationErrors, elem)
 			}
-
-			validationErrors = append(validationErrors, elem)
 		}
 	}
 
@@ -101,6 +111,7 @@ func getErrorMessage(err ErrorResponse) string {
 	}
 }
 
+// Validator is the global XValidator instance
 var Validator = &XValidator{
 	Validator: Validate,
 }

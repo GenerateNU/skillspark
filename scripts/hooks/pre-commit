@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Set PATH to include common locations
+export PATH="/opt/homebrew/bin:/usr/local/bin:$(go env GOPATH)/bin:$PATH"
+
+echo "🔍 Running pre-commit checks..."
+
+# Get all staged .go files
+STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$')
+
+if [ -z "$STAGED_GO_FILES" ]; then
+    echo "✅ No Go files to check"
+    exit 0
+fi
+
+# Run go fmt (from repo root)
+echo "📝 Running go fmt..."
+gofmt -w $STAGED_GO_FILES
+git add $STAGED_GO_FILES
+
+# Change to backend directory for go commands
+cd backend || exit 1
+
+# Run golangci-lint
+echo "🔍 Running golangci-lint..."
+if ! command -v golangci-lint &> /dev/null; then
+    echo "⚠️  golangci-lint not found. Install it with:"
+    echo "   brew install golangci-lint"
+    echo "   OR go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+    exit 1
+fi
+
+golangci-lint run
+if [ $? -ne 0 ]; then
+    echo "❌ golangci-lint failed"
+    exit 1
+fi
+
+# Run go mod tidy
+echo "🧹 Running go mod tidy..."
+go mod tidy
+git add go.mod go.sum
+
+echo "✅ All checks passed!"
+exit 0

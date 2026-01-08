@@ -1,4 +1,3 @@
-// testutil/shared_db.go
 package testutil
 
 import (

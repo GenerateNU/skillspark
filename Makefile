@@ -2,7 +2,7 @@
         docker-build docker-clean docker-prune \
         up down stop restart logs build clean \
         up-backend up-frontend logs-backend logs-frontend \
-        build-backend build-frontend shell-backend shell-frontend
+        build-backend build-frontend shell-backend shell-frontend setup-hooks
 
 # Default target - show help
 .DEFAULT_GOAL := help
@@ -214,3 +214,8 @@ else
 	@echo "$(YELLOW)Watch is built into 'make up' on Unix systems$(NC)"
 	@echo "Use 'make up' to start with hot reload enabled"
 endif
+
+setup-hooks:
+	@echo "Installing git hooks..."
+	@ln -sf ../../scripts/hooks/pre-commit .git/hooks/pre-commit
+	@echo "✅ Hooks installed!"

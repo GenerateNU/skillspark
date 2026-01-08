@@ -287,16 +287,16 @@ endif
 # ------------------------
 dev:
 	@echo "$(BOLD)Starting development server...$(NC)"
-	@go run cmd/server/main.go
+	@go run cmd/main.go
 
 run:
 	@echo "$(BOLD)Starting server...$(NC)"
-	@go run cmd/server/main.go
+	@go run cmd/main.go
 
 build:
 	@echo "$(BOLD)Building application...$(NC)"
 	@$(MKDIR) bin 2>/dev/null || true
-	@go build -o bin/server cmd/server/main.go
+	@go build -o bin/server cmd/main.go
 	@echo "$(GREEN)Build complete: bin/server$(NC)"
 
 # ------------------------
