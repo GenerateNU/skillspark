@@ -123,6 +123,9 @@ test-coverage:
 	@echo "$(GREEN)Coverage report: coverage.html$(NC)"
 	@go tool cover -func=coverage.out | $(GREP) total
 
+coverage-percentage:
+	@go tool cover -func=coverage.out | $(FIND) -E "total" | awk '{print substr($$3, 1, length($$3)-1)}'
+
 test-one:
 	@if [ -z "$(TEST)" ]; then \
 		echo "$(RED)Please specify a test: make test-one TEST=TestName$(NC)"; \
