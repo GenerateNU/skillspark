@@ -31,10 +31,8 @@ jobs:
   #   steps:
   #     - name: Checkout
   #       uses: actions/checkout@v3
-  #     - name: Use Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: "22"
+  #     - name: Use Bun
+  #       uses: actions/setup-bun@v3
   #     - name: Install dependencies
   #       run: bun install
   #     - name: Lint
@@ -50,10 +48,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "22"
+      - name: Use Bun
+        uses: actions/setup-bun@v3
       - name: Install dependencies
         run: bun install
       - name: Build
