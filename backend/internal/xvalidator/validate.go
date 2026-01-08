@@ -67,8 +67,8 @@ func ConvertToMessages(errors []ErrorResponse) map[string]string {
 }
 
 func extractOtherField(tag string) string {
-	parts := strings.Split(tag, " ")
-	if len(parts) > 1 {
+	parts := strings.Split(tag, ":")
+	if len(parts) == 2 {
 		return parts[1]
 	}
 	return "the referenced field"
