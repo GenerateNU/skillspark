@@ -1,23 +1,15 @@
 services:
-  frontend:
+  web-frontend:
     build:
-      context: ./frontend
+      context: ./frontend/web
       dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
     ports:
-      - "3000:3000"
+      - "80:80"
     depends_on:
       - backend
-    command: npm run dev
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./frontend
-          target: /app
     networks:
       - app-network
-    container_name: frontend
+    container_name: web-frontend
 
   backend:
     build:
