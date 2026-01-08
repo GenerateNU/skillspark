@@ -6,7 +6,7 @@
 node_modules
 .vscode/
 backend/.vscode/
-*/.vscode/*
+**/.vscode/
 
 .DS_STORE
 
