@@ -11,6 +11,7 @@ type ErrorResponse struct {
 	Error       bool
 	FailedField string
 	Tag         string
+	Param       string
 	Value       interface{}
 }
 
@@ -36,6 +37,7 @@ func (v XValidator) Validate(data interface{}) []ErrorResponse {
 
 			elem.FailedField = err.Field() // Export struct field name
 			elem.Tag = err.Tag()           // Export struct tag
+			elem.Param = err.Param()       // Export tag parameter
 			elem.Value = err.Value()       // Export field value
 			elem.Error = true
 
@@ -85,9 +87,9 @@ func getErrorMessage(err ErrorResponse) string {
 	case "max":
 		return fmt.Sprintf("%s is too long", field)
 	case "gte":
-		return fmt.Sprintf("%s must be greater than or equal to %v", field, err.Value)
+		return fmt.Sprintf("%s must be greater than or equal to %v", field, err.Param)
 	case "lte":
-		return fmt.Sprintf("%s must be less than or equal to %v", field, err.Value)
+		return fmt.Sprintf("%s must be less than or equal to %v", field, err.Param)
 	case "email":
 		return fmt.Sprintf("%s must be a valid email address", field)
 	case "url":
