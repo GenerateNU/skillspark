@@ -2,7 +2,7 @@
 
 ## Overview
 
-`xvalidator` is a Go validation wrapper around the popular `go-playground/validator` library that provides business-level request validation with user-friendly error messages. It simplifies the process of validating incoming API requests and converting technical validation errors into human-readable messages.
+`xvalidator` is a Go validation wrapper around the popular `go-playground/validator` library that provides business-level request validation with user-friendly error messages. It simplifies the process of validating incoming API requests and converting technical validation errors into human-readable messages. See the [official validator package documentation](https://pkg.go.dev/github.com/go-playground/validator/v10) for more details.
 
 ## Purpose
 
