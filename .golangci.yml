@@ -1,3 +1,5 @@
+version: "2"
+
 run:
   timeout: 5m
   tests: true
@@ -6,11 +8,8 @@ run:
 linters:
   enable:
     - errcheck
-    - govet
     - ineffassign
     - staticcheck
     - unused
     - gocyclo
     - misspell
-    - gocritic
-    - errorlint

@@ -1,48 +1,303 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: SkillSpark API
-  version: 0.1.0
-
+  description: API for the SkillSpark application
+  contact:
+    name: SkillSpark Team
+  version: 1.0.0
 servers:
-  - url: http://localhost:8080/api/v1
-    description: Development server
-
-tags:
-  - name: Health
-    description: Health check operations
-
+  - url: http://localhost:8080
+    description: Local development server
 paths:
-  /health:
+  /api/v1/greet/{name}:
     get:
-      summary: Health check
-      description: Check if the API is running and healthy
-      tags: [Health]
+      tags:
+        - Examples
+      summary: Get a greeting
+      description: Returns a personalized greeting message
+      operationId: get-greeting
+      parameters:
+        - name: name
+          in: path
+          description: Name to greet
+          required: true
+          schema:
+            type: string
+            description: Name to greet
+            maxLength: 30
       responses:
-        '200':
-          description: API is healthy (status code only)
-        '500':
-          description: Internal server error
+        "200":
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-
+                $ref: '#/components/schemas/GreetingOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/users:
+    get:
+      tags:
+        - Users
+      summary: List all users
+      description: Returns a list of all registered users
+      operationId: list-users
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListUsersOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    post:
+      tags:
+        - Users
+      summary: Create a new user
+      description: Creates a new user account with the provided information
+      operationId: create-user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Returns a single user by their ID
+      operationId: get-user
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+            description: User ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    delete:
+      tags:
+        - Users
+      summary: Delete a user
+      description: Deletes a user account by ID
+      operationId: delete-user
+      parameters:
+        - name: id
+          in: path
+          description: User ID to delete
+          required: true
+          schema:
+            type: string
+            description: User ID to delete
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
-    Error:
+    CreateUserInputBody:
       type: object
-      required:
-        - code
-        - message
+      additionalProperties: false
       properties:
-        code:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateUserInputBody.json
+          readOnly: true
+        email:
+          type: string
+          description: User email address
+          format: email
+        full_name:
+          type: string
+          description: Full name (optional)
+        username:
+          type: string
+          description: Username
+          minLength: 3
+          maxLength: 50
+      required:
+        - email
+        - username
+    ErrorDetail:
+      type: object
+      additionalProperties: false
+      properties:
+        location:
+          type: string
+          description: Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
+        message:
+          type: string
+          description: Error message text
+        value:
+          description: The value at the given location
+    ErrorModel:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ErrorModel.json
+          readOnly: true
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem.
+          examples:
+            - Property foo is required but is missing.
+        errors:
+          type: array
+          description: Optional list of individual error details
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence of the problem.
+          format: uri
+          examples:
+            - https://example.com/error-log/abc123
+        status:
           type: integer
           description: HTTP status code
-          example: 500
+          format: int64
+          examples:
+            - 400
+        title:
+          type: string
+          description: A short, human-readable summary of the problem type. This value should not change between occurrences of the error.
+          examples:
+            - Bad Request
+        type:
+          type: string
+          description: A URI reference to human-readable documentation for the error.
+          format: uri
+          default: about:blank
+          examples:
+            - https://example.com/errors/example
+    GreetingOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GreetingOutputBody.json
+          readOnly: true
         message:
-          anyOf:
-            - type: string
-            - type: object
-          description: Error message or validation errors
-          example: "Internal server error"
-           
+          type: string
+          description: Greeting message
+        timestamp:
+          type: string
+          description: Server timestamp
+      required:
+        - message
+        - timestamp
+    Item:
+      type: object
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+        id:
+          type: string
+        username:
+          type: string
+      required:
+        - id
+        - email
+        - username
+    ListUsersOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ListUsersOutputBody.json
+          readOnly: true
+        total:
+          type: integer
+          format: int64
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+      required:
+        - users
+        - total
+    UserOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UserOutputBody.json
+          readOnly: true
+        email:
+          type: string
+          description: User email
+        full_name:
+          type: string
+          description: Full name
+        id:
+          type: string
+          description: User ID
+        username:
+          type: string
+          description: Username
+      required:
+        - id
+        - email
+        - username

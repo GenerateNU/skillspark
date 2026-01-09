@@ -78,6 +78,11 @@ help:
 	@echo "  make run               - Run server"
 	@echo "  make build             - Build the application"
 	@echo "  make clean             - Clean build artifacts and test files"
+	@echo "$(BLUE)API Documentation:$(NC)"
+	@echo "  make api-gen           - Generate OpenAPI YAML specification"
+	@echo "  make api-validate      - Validate OpenAPI spec"
+	@echo "  make api-preview       - Preview spec in Scalar Editor"
+	@echo ""
 
 # ------------------------
 # Testing
@@ -308,3 +313,36 @@ clean:
 	@$(RM) coverage.out coverage.html test_output.log 2>/dev/null || true
 	@go clean -testcache
 	@echo "$(GREEN)Cleaned$(NC)"
+
+# ------------------------
+# API Documentation
+# ------------------------
+api-gen:
+	@echo "$(BOLD)Generating OpenAPI specification...$(NC)"
+	@go run cmd/genapi/main.go
+	@echo "$(GREEN)OpenAPI spec generated: api/openapi.yaml$(NC)"
+
+api-validate:
+	@echo "$(BOLD)Validating OpenAPI specification...$(NC)"
+	@if [ ! -f api/openapi.yaml ]; then \
+		echo "$(RED)api/openapi.yaml not found. Run 'make api-gen' first.$(NC)"; \
+		exit 1; \
+	fi
+	@if command -v openapi-generator-cli >/dev/null 2>&1; then \
+		openapi-generator-cli validate -i api/openapi.yaml; \
+		echo "$(GREEN)OpenAPI spec is valid$(NC)"; \
+	else \
+		echo "$(YELLOW)openapi-generator-cli not installed. Skipping validation.$(NC)"; \
+		echo "Install: npm install @openapitools/openapi-generator-cli -g"; \
+	fi
+
+api-preview:
+	@echo "$(BOLD)Opening Scalar API documentation...$(NC)"
+ifeq ($(OS),Windows_NT)
+	@start http://localhost:8080/docs
+else ifeq ($(OS),Darwin)
+	@open http://localhost:8080/docs
+else
+	@xdg-open http://localhost:8080/docs 2>/dev/null || echo "$(GREEN)Visit: http://localhost:8080/docs$(NC)"
+endif
+	@echo "$(YELLOW)Note: Make sure your dev server is running (make dev)$(NC)"

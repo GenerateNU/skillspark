@@ -7,6 +7,7 @@ require (
 	github.com/goccy/go-json v0.10.5
 	github.com/gofiber/fiber/v2 v2.52.9
 	github.com/jackc/pgx/v5 v5.8.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -66,7 +67,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	google.golang.org/grpc v1.78.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
