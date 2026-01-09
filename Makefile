@@ -76,6 +76,19 @@ ifeq ($(OS),Windows_NT)
 else
 	@$(DOCKER_COMPOSE) up --build $(WATCH_FLAG)
 endif
+	@sleep 2
+	@echo ""
+	@echo "$(GREEN)✓ Services started successfully!$(NC)"
+	@echo ""
+	@echo "$(BOLD)Access your application:$(NC)"
+	@echo "  $(BLUE)Frontend:$(NC) http://localhost"
+	@echo "  $(BLUE)Backend:$(NC)  http://localhost:8080"
+	@echo ""
+	@echo "$(BOLD)Useful commands:$(NC)"
+	@echo "  $(YELLOW)make logs$(NC)      - View logs"
+	@echo "  $(YELLOW)make down$(NC)      - Stop services"
+	@echo "  $(YELLOW)make restart$(NC)   - Restart services"
+	@echo ""
 
 down:
 	@echo "$(BOLD)Stopping all services...$(NC)"
