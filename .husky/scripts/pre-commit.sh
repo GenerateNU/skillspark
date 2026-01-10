@@ -22,7 +22,7 @@ if [ -n "$STAGED_GO_FILES" ]; then
 
   # Check and install golangci-lint if needed
   GOLANGCI_LINT_VERSION="latest"
-  if ! golangci-lint version 2>&1 | grep -q "$GOLANGCI_LINT_VERSION"; then
+  if ! command -v golangci-lint >/dev/null 2>&1; then
     echo "📦 Installing golangci-lint $GOLANGCI_LINT_VERSION..."
     go install github.com/golangci/golangci-lint/cmd/golangci-lint@$GOLANGCI_LINT_VERSION
   fi
