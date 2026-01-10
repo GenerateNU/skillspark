@@ -59,7 +59,7 @@ if [ -n "$STAGED_FRONTEND_FILES" ]; then
   
   # Run ESLint if configured
   if [ -f "package.json" ] && grep -q "\"lint\"" package.json; then
-    npm run lint
+    bun run lint
     if [ $? -ne 0 ]; then
       echo "❌ Frontend linting failed"
       exit 1
