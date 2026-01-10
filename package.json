@@ -1,0 +1,17 @@
+{
+  "name": "skillspark",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && go run .",
+    "install:all": "cd frontend && npm install"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  },
+  "workspaces": [
+    "frontend"
+  ]
+}
