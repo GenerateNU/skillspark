@@ -26,19 +26,19 @@ type GetLocationByIDInput struct {
 
 type CreateLocationInput struct {
 	Body struct {
-		Latitude float64 `json:"latitude" db:"latitude" doc:"Latitude of the location" validate:"required,gte=-90,lte=90"`
+		Latitude float64 `json:"latitude" db:"latitude" doc:"Latitude of the location" minimum:"-90" maximum:"90"`
 
-		Longitude float64 `json:"longitude" db:"longitude" doc:"Longitude of the location" validate:"required,gte=-180,lte=180"`
+		Longitude float64 `json:"longitude" db:"longitude" doc:"Longitude of the location" minimum:"-180" maximum:"180"`
 
-		Address string `json:"address" db:"address" doc:"Street address of the location" validate:"required,min=3,max=255"`
+		Address string `json:"address" db:"address" doc:"Street address of the location" minLength:"3" maxLength:"255"`
 
-		City string `json:"city" db:"city" doc:"City of the location" validate:"required,min=2,max=100"`
+		City string `json:"city" db:"city" doc:"City of the location" minLength:"2" maxLength:"100"`
 
-		State string `json:"state" db:"state" doc:"State of the location" validate:"required,min=2,max=50"`
+		State string `json:"state" db:"state" doc:"State of the location" minLength:"2" maxLength:"50"`
 
-		ZipCode string `json:"zip_code" db:"zip_code" doc:"ZIP code of the location" validate:"required,min=3,max=20"`
+		ZipCode string `json:"zip_code" db:"zip_code" doc:"ZIP code of the location" minLength:"3" maxLength:"20"`
 
-		Country string `json:"country" db:"country" doc:"Country of the location" validate:"required,min=2,max=100"`
+		Country string `json:"country" db:"country" doc:"Country of the location" minLength:"2" maxLength:"100"`
 	}
 }
 
