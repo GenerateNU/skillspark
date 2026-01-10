@@ -25,6 +25,14 @@ type App struct {
 	API    huma.API
 }
 
+// Health check types
+type HealthOutput struct {
+	Body struct {
+		Status  string `json:"status" doc:"Health status" example:"ok"`
+		Version string `json:"version" doc:"API version" example:"1.0.0"`
+	}
+}
+
 // Example request/response types for testing
 type GreetingInput struct {
 	Name string `path:"name" maxLength:"30" doc:"Name to greet"`
@@ -127,13 +135,7 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 		return c.Status(fiber.StatusOK).SendString("Welcome to SkillSpark!")
 	})
 
-	// API v1 routes
-	apiV1 := app.Group("/api/v1")
-	apiV1.Get("/health", func(c *fiber.Ctx) error {
-		return c.SendStatus(http.StatusOK)
-	})
-
-	// Register Huma example endpoints
+	// Register Huma endpoints
 	setupHumaRoutes(humaAPI, repo)
 
 	return app, humaAPI
@@ -141,6 +143,21 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 
 // Setup example Huma routes for testing
 func setupHumaRoutes(api huma.API, repo *storage.Repository) {
+	// Health check endpoint
+	huma.Register(api, huma.Operation{
+		OperationID: "health-check",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/health",
+		Summary:     "Health check",
+		Description: "Check if the API is running and healthy",
+		Tags:        []string{"Health"},
+	}, func(ctx context.Context, input *struct{}) (*HealthOutput, error) {
+		resp := &HealthOutput{}
+		resp.Body.Status = "ok"
+		resp.Body.Version = "1.0.0"
+		return resp, nil
+	})
+
 	// Example 1: Simple greeting endpoint with path parameter
 	huma.Register(api, huma.Operation{
 		OperationID: "get-greeting",
@@ -152,7 +169,7 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository) {
 	}, func(ctx context.Context, input *GreetingInput) (*GreetingOutput, error) {
 		resp := &GreetingOutput{}
 		resp.Body.Message = "Hello, " + input.Name + "!"
-		resp.Body.Timestamp = ctx.Value("timestamp").(string)
+		resp.Body.Timestamp = "2024-01-01T00:00:00Z" // Fixed for example
 		return resp, nil
 	})
 
