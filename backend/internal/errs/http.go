@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -52,7 +53,10 @@ func InvalidJSON() HTTPError {
 	return NewHTTPError(http.StatusBadRequest, errors.New("invalid json"))
 }
 
-func InternalServerError() HTTPError {
+func InternalServerError(optionalMessage ...string) HTTPError {
+	if len(optionalMessage) > 0 {
+		return NewHTTPError(http.StatusInternalServerError, errors.New("internal server error: "+strings.Join(optionalMessage, ", ")))
+	}
 	return NewHTTPError(http.StatusInternalServerError, errors.New("internal server error"))
 }
 
