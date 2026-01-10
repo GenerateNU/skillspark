@@ -26,6 +26,14 @@ type App struct {
 	API    huma.API
 }
 
+// Health check types
+type HealthOutput struct {
+	Body struct {
+		Status  string `json:"status" doc:"Health status" example:"ok"`
+		Version string `json:"version" doc:"API version" example:"1.0.0"`
+	}
+}
+
 // Initialize the App union type containing a fiber app and repository.
 func InitApp(config config.Config) *App {
 	ctx := context.Background()
@@ -81,13 +89,7 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 		return c.Status(fiber.StatusOK).SendString("Welcome to SkillSpark!")
 	})
 
-	// API v1 routes
-	apiV1 := app.Group("/api/v1")
-	apiV1.Get("/health", func(c *fiber.Ctx) error {
-		return c.SendStatus(http.StatusOK)
-	})
-
-	// Register Huma example endpoints
+	// Register Huma endpoints
 	setupHumaRoutes(humaAPI, repo)
 
 	return app, humaAPI
@@ -95,6 +97,20 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 
 // Setup example Huma routes for testing
 func setupHumaRoutes(api huma.API, repo *storage.Repository) {
+	// Health check endpoint
+	huma.Register(api, huma.Operation{
+		OperationID: "health-check",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/health",
+		Summary:     "Health check",
+		Description: "Check if the API is running and healthy",
+		Tags:        []string{"Health"},
+	}, func(ctx context.Context, input *struct{}) (*HealthOutput, error) {
+		resp := &HealthOutput{}
+		resp.Body.Status = "ok"
+		resp.Body.Version = "1.0.0"
+		return resp, nil
+	})
 
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)

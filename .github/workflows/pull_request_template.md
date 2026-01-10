@@ -19,4 +19,4 @@ Please provide screenshots of manual testing (Scalar, frontend pages, etc.)
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have written unit tests for my code and tested it manually
 - [ ] New and existing unit tests pass locally with my changes
-- [ ] I have updated the OpenAPI spec, if needed
+- [ ] I have run make api-validate and make api-gen to keep the openAPI spec up to date
