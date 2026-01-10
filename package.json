@@ -12,6 +12,6 @@
     "husky": "^9.1.7"
   },
   "workspaces": [
-    "frontend"
+    "frontend/web"
   ]
 }
