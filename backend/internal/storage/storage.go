@@ -4,7 +4,7 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-	schema "skillspark/internal/storage/postgres/schema/location/getLocationByID"
+	"skillspark/internal/storage/postgres/schema/location"
 
 	"github.com/google/uuid"
 
@@ -14,6 +14,7 @@ import (
 // Repository provides methods to interact with the database
 type LocationRepository interface {
 	GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, *errs.HTTPError)
+	CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, *errs.HTTPError)
 }
 
 type Repository struct {
@@ -36,6 +37,6 @@ func (r *Repository) GetDB() *pgxpool.Pool {
 func NewRepository(db *pgxpool.Pool) *Repository {
 	return &Repository{
 		db:       db,
-		Location: schema.NewLocationRepository(db),
+		Location: location.NewLocationRepository(db),
 	}
 }

@@ -1,4 +1,4 @@
-package schema
+package location
 
 import (
 	"context"
@@ -9,19 +9,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type LocationRepository struct {
-	db *pgxpool.Pool
-}
-
-func NewLocationRepository(db *pgxpool.Pool) *LocationRepository {
-	return &LocationRepository{db}
-}
-
 func (r *LocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, *errs.HTTPError) {
-	query, err := schema.ReadSQLBaseScript("location/getLocationByID/baseQuery.sql")
+	query, err := schema.ReadSQLBaseScript("location/sql/get_by_id.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

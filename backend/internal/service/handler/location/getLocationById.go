@@ -19,5 +19,6 @@ func (h *Handler) GetLocationById(ctx context.Context, input *models.GetLocation
 	if httpErr != nil {
 		return nil, httpErr
 	}
+
 	return location, nil
 }

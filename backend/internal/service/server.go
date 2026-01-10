@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"net/http"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/service/routes"
@@ -24,14 +23,6 @@ type App struct {
 	Server *fiber.App
 	Repo   *storage.Repository
 	API    huma.API
-}
-
-// Health check types
-type HealthOutput struct {
-	Body struct {
-		Status  string `json:"status" doc:"Health status" example:"ok"`
-		Version string `json:"version" doc:"API version" example:"1.0.0"`
-	}
 }
 
 // Initialize the App union type containing a fiber app and repository.
@@ -62,7 +53,7 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 	}))
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000,http://localhost:8080",
+		AllowOrigins:     "http://localhost:3000,http://localhost:8080,https://cdn.scalar.com,http://127.0.0.1:8080",
 		AllowMethods:     "GET,POST,PUT,PATCH,DELETE,OPTIONS",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
@@ -95,23 +86,9 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 	return app, humaAPI
 }
 
-// Setup example Huma routes for testing
+// Setup Huma routes
 func setupHumaRoutes(api huma.API, repo *storage.Repository) {
-	// Health check endpoint
-	huma.Register(api, huma.Operation{
-		OperationID: "health-check",
-		Method:      http.MethodGet,
-		Path:        "/api/v1/health",
-		Summary:     "Health check",
-		Description: "Check if the API is running and healthy",
-		Tags:        []string{"Health"},
-	}, func(ctx context.Context, input *struct{}) (*HealthOutput, error) {
-		resp := &HealthOutput{}
-		resp.Body.Status = "ok"
-		resp.Body.Version = "1.0.0"
-		return resp, nil
-	})
-
+	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
 }

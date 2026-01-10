@@ -139,11 +139,6 @@ Install these essential VS Code extensions for the best development experience:
 
    Edit `.env` and fill in the required values:
 
-3. **Install Git hooks** (optional but recommended):
-   ```bash
-   make setup-hooks
-   ```
-
 ---
 
 ## Running the Application

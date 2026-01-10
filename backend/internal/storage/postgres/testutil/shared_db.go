@@ -198,7 +198,7 @@ func runMigrations(pool *pgxpool.Pool) error {
 	return nil
 }
 
-// findMigrationsPath finds the /supabase/migrations directory
+// findMigrationsPath finds the /internal/supabase/migrations directory
 // It searches upward from the current directory until it finds it
 func findMigrationsPath() (string, error) {
 	// Start from current working directory
@@ -210,7 +210,7 @@ func findMigrationsPath() (string, error) {
 	// Search up the directory tree
 	currentPath := cwd
 	for {
-		migrationsPath := filepath.Join(currentPath, "supabase", "migrations")
+		migrationsPath := filepath.Join(currentPath, "internal", "supabase", "migrations")
 		if _, err := os.Stat(migrationsPath); err == nil {
 			return migrationsPath, nil
 		}
@@ -224,10 +224,10 @@ func findMigrationsPath() (string, error) {
 		currentPath = parentPath
 	}
 
-	return "", fmt.Errorf("could not find /supabase/migrations directory (searched from %s)", cwd)
+	return "", fmt.Errorf("could not find /internal/supabase/migrations directory (searched from %s)", cwd)
 }
 
-// runSeedFiles reads and executes all seed files from /supabase/seed
+// runSeedFiles reads and executes all seed files from /internal/supabase/seed
 func runSeedFiles(pool *pgxpool.Pool) error {
 	ctx := context.Background()
 
@@ -239,7 +239,7 @@ func runSeedFiles(pool *pgxpool.Pool) error {
 	fmt.Println("projectRoot: ", projectRoot)
 	log.Printf("Project root: %s", projectRoot)
 	// Find the seed directory
-	seedPath := filepath.Join(projectRoot, "supabase", "seed")
+	seedPath := filepath.Join(projectRoot, "internal", "supabase", "seed")
 
 	log.Printf("Reading seed files from: %s", seedPath)
 

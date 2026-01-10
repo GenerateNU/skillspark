@@ -23,3 +23,14 @@ func (m *MockLocationRepository) GetLocationByID(ctx context.Context, id uuid.UU
 	}
 	return args.Get(0).(*models.Location), nil
 }
+
+func (m *MockLocationRepository) CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, *errs.HTTPError) {
+	args := m.Called(ctx, location)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Location), nil
+}
