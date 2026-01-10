@@ -84,6 +84,7 @@ func ConnectDatabase(ctx context.Context, dbConfig config.DB) (*pgxpool.Pool, er
 	return conn, nil
 }
 
+// NewRepository creates a new Repository instance connected to PostgreSQL
 func NewRepository(ctx context.Context, dbConfig config.DB) *storage.Repository {
 	db, err := ConnectDatabase(ctx, dbConfig)
 	if err != nil {

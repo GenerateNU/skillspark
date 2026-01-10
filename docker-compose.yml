@@ -10,6 +10,8 @@ services:
     networks:
       - app-network
     container_name: web-frontend
+    labels:
+      - "description=Frontend available at http://localhost"
 
   backend:
     build:
@@ -28,6 +30,8 @@ services:
     networks:
       - app-network
     container_name: backend
+    labels:
+      - "description=Backend available at http://localhost:8080"
 
 networks:
   app-network:
