@@ -1,14 +1,13 @@
 package location
 
 import (
-	"net/http/httptest"
+	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"testing"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -16,15 +15,16 @@ import (
 
 func TestHandler_GetLocationById(t *testing.T) {
 	tests := []struct {
-		id             string
-		mockSetup      func(*repomocks.MockLocationRepository)
-		expectedStatus int
-		wantErr        bool
+		name      string
+		id        string
+		mockSetup func(*repomocks.MockLocationRepository)
+		wantErr   bool
 	}{
 		{
-			id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+			name: "successful get location by id",
+			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 			mockSetup: func(m *repomocks.MockLocationRepository) {
-				m.On("GetLocationByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.Location{
+				m.On("GetLocationByID", mock.Anything, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")).Return(&models.Location{
 					ID:        uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 					Latitude:  40.7128,
 					Longitude: -74.0060,
@@ -37,42 +37,130 @@ func TestHandler_GetLocationById(t *testing.T) {
 					UpdatedAt: time.Now(),
 				}, nil)
 			},
-			expectedStatus: 200,
-			wantErr:        false,
+			wantErr: false,
 		},
 		{
-			id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19",
+			name: "internal server error",
+			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19",
 			mockSetup: func(m *repomocks.MockLocationRepository) {
-				m.On("GetLocationByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(nil, &errs.HTTPError{
+				m.On("GetLocationByID", mock.Anything, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19")).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Internal server error").Code,
 					Message: "Internal server error",
 				})
 			},
-			expectedStatus: 500,
-			wantErr:        true,
-		}}
+			wantErr: true,
+		},
+	}
 
 	for _, tt := range tests {
-		t.Run(tt.id, func(t *testing.T) {
-			app := fiber.New(fiber.Config{
-				ErrorHandler: errs.ErrorHandler,
-			})
+		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
 			handler := NewHandler(mockRepo)
-			app.Get("/locations/:id", func(c *fiber.Ctx) error {
-				location, err := handler.GetLocationById(c.Context(), &models.GetLocationByIDInput{ID: uuid.MustParse(c.Params("id"))})
-				if err != nil {
-					return err
-				}
-				return c.Status(fiber.StatusOK).JSON(location)
-			})
+			ctx := context.Background()
 
-			req := httptest.NewRequest("GET", "/locations/"+tt.id, nil)
-			res, _ := app.Test(req, -1)
+			input := &models.GetLocationByIDInput{
+				ID: uuid.MustParse(tt.id),
+			}
 
-			assert.Equal(t, tt.expectedStatus, res.StatusCode)
+			location, err := handler.GetLocationById(ctx, input)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, location)
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, location)
+				assert.Equal(t, tt.id, location.ID.String())
+			}
+
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHandler_CreateLocation(t *testing.T) {
+	tests := []struct {
+		name      string
+		input     *models.CreateLocationInput
+		mockSetup func(*repomocks.MockLocationRepository)
+		wantErr   bool
+	}{
+		{
+			name: "successful create location",
+			input: func() *models.CreateLocationInput {
+				input := &models.CreateLocationInput{}
+				input.Body.Latitude = 40.7128
+				input.Body.Longitude = -74.0060
+				input.Body.Address = "123 Broadway"
+				input.Body.City = "New York"
+				input.Body.State = "NY"
+				input.Body.ZipCode = "10001"
+				input.Body.Country = "USA"
+				return input
+			}(),
+			mockSetup: func(m *repomocks.MockLocationRepository) {
+				m.On("CreateLocation", mock.Anything, mock.AnythingOfType("*models.CreateLocationInput")).Return(&models.Location{
+					ID:        uuid.New(),
+					Latitude:  40.7128,
+					Longitude: -74.0060,
+					Address:   "123 Broadway",
+					City:      "New York",
+					State:     "NY",
+					ZipCode:   "10001",
+					Country:   "USA",
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
+			},
+			wantErr: false,
+		},
+		{
+			name: "internal server error",
+			input: func() *models.CreateLocationInput {
+				input := &models.CreateLocationInput{}
+				input.Body.Latitude = 40.7128
+				input.Body.Longitude = -74.0060
+				input.Body.Address = "123 Broadway"
+				input.Body.City = "New York"
+				input.Body.State = "NY"
+				input.Body.ZipCode = "10001"
+				input.Body.Country = "USA"
+				return input
+			}(),
+			mockSetup: func(m *repomocks.MockLocationRepository) {
+				m.On("CreateLocation", mock.Anything, mock.AnythingOfType("*models.CreateLocationInput")).Return(nil, &errs.HTTPError{
+					Code:    errs.InternalServerError("Internal server error").Code,
+					Message: "Internal server error",
+				})
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := new(repomocks.MockLocationRepository)
+			tt.mockSetup(mockRepo)
+
+			handler := NewHandler(mockRepo)
+			ctx := context.Background()
+
+			location, err := handler.CreateLocation(ctx, tt.input)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, location)
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, location)
+				assert.Equal(t, tt.input.Body.Address, location.Address)
+				assert.Equal(t, tt.input.Body.City, location.City)
+				assert.Equal(t, tt.input.Body.Latitude, location.Latitude)
+				assert.Equal(t, tt.input.Body.Longitude, location.Longitude)
+			}
+
 			mockRepo.AssertExpectations(t)
 		})
 	}

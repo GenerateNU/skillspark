@@ -49,8 +49,13 @@ func InvalidRequestData(errors map[string]string) HTTPError {
 	}
 }
 
-func InvalidJSON() HTTPError {
-	return NewHTTPError(http.StatusBadRequest, errors.New("invalid json"))
+// InvalidJSON accepts optional custom message
+func InvalidJSON(msg ...string) HTTPError {
+	message := "invalid json"
+	if len(msg) > 0 && msg[0] != "" {
+		message = msg[0]
+	}
+	return NewHTTPError(http.StatusBadRequest, errors.New(message))
 }
 
 func InternalServerError(optionalMessage ...string) HTTPError {
