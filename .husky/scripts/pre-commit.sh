@@ -9,7 +9,7 @@ echo "🔍 Running pre-commit checks..."
 STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$')
 
 # Check for staged frontend files
-STAGED_FRONTEND_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^frontend/.*\.(ts|tsx|js|jsx)$')
+STAGED_FRONTEND_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^frontend/web/.*\.(ts|tsx|js|jsx)$')
 
 # Run Go checks if there are staged Go files
 if [ -n "$STAGED_GO_FILES" ]; then
@@ -55,11 +55,11 @@ fi
 # Run frontend checks if there are staged frontend files
 if [ -n "$STAGED_FRONTEND_FILES" ]; then
   echo "🎨 Running frontend linting..."
-  cd frontend || exit 1
+  cd frontend/web || exit 1
   
   # Run ESLint if configured
   if [ -f "package.json" ] && grep -q "\"lint\"" package.json; then
-    npm run lint
+    bun run lint
     if [ $? -ne 0 ]; then
       echo "❌ Frontend linting failed"
       exit 1
