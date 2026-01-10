@@ -55,7 +55,7 @@ fi
 # Run frontend checks if there are staged frontend files
 if [ -n "$STAGED_FRONTEND_FILES" ]; then
   echo "🎨 Running frontend linting..."
-  cd frontend || exit 1
+  cd frontend/web || exit 1
   
   # Run ESLint if configured
   if [ -f "package.json" ] && grep -q "\"lint\"" package.json; then
