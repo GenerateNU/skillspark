@@ -9,7 +9,7 @@ echo "🔍 Running pre-commit checks..."
 STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$')
 
 # Check for staged frontend files
-STAGED_FRONTEND_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^frontend/.*\.(ts|tsx|js|jsx)$')
+STAGED_FRONTEND_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^frontend/web/.*\.(ts|tsx|js|jsx)$')
 
 # Run Go checks if there are staged Go files
 if [ -n "$STAGED_GO_FILES" ]; then
