@@ -32,6 +32,7 @@ The following pathway allows you to make and test schema changes locally via mig
 
    - This is a connection string for the local DB
    - Make sure to switch this back to what it was when you make your PR!
+
 10. When done, run `supabase stop` to stop the local instance of the DB.
 
 Only After script is approved/merged:

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
+	"skillspark/internal/models"
+	"skillspark/internal/service/handler/location"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
 
@@ -141,6 +143,25 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 
 // Setup example Huma routes for testing
 func setupHumaRoutes(api huma.API, repo *storage.Repository) {
+	locationHandler := location.NewHandler(repo.Location)
+	huma.Register(api, huma.Operation{
+		OperationID: "get-location-by-id",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/locations/{id}",
+		Summary:     "Get a location by id",
+		Description: "Returns a location by id",
+		Tags:        []string{"Examples"},
+	}, func(ctx context.Context, input *models.GetLocationByIDInput) (*models.Location, error) {
+		resp := &models.Location{}
+
+		location, err := locationHandler.GetLocationById(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		resp = location
+		return resp, nil
+	})
+
 	// Example 1: Simple greeting endpoint with path parameter
 	huma.Register(api, huma.Operation{
 		OperationID: "get-greeting",
