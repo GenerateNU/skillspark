@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -230,16 +231,15 @@ func findMigrationsPath() (string, error) {
 func runSeedFiles(pool *pgxpool.Pool) error {
 	ctx := context.Background()
 
-	currdir, err := os.Getwd()
+	projectRoot, err := GetProjectRoot()
 	if err != nil {
-		return fmt.Errorf("failed to get current directory: %w", err)
+		return fmt.Errorf("failed to get project root: %w", err)
 	}
 
-	projectRoot := strings.Split(currdir, "/skillspark")[0] + "/skillspark"
-
+	fmt.Println("projectRoot: ", projectRoot)
 	log.Printf("Project root: %s", projectRoot)
 	// Find the seed directory
-	seedPath := filepath.Join(projectRoot, "backend", "supabase", "seed")
+	seedPath := filepath.Join(projectRoot, "supabase", "seed")
 
 	log.Printf("Reading seed files from: %s", seedPath)
 
@@ -350,6 +350,25 @@ func (db *SharedTestDB) CleanupTestData(t testing.TB) {
 	// Run all seed files to populate the database with test data
 	if err := runSeedFiles(db.Pool); err != nil {
 		t.Fatalf("Failed to run seed files: %v", err)
+	}
+}
+
+func GetProjectRoot() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", errors.New("could not find project root (no go.mod found)")
+		}
+		dir = parent
 	}
 }
 

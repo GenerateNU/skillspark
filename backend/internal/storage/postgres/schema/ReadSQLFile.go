@@ -2,8 +2,10 @@ package schema
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
+	"skillspark/internal/storage/postgres/testutil"
 	"strings"
 )
 
@@ -13,14 +15,12 @@ func ReadSQLBaseScript(path string) (string, error) {
 		return "", errors.New("file is not a SQL file: " + path)
 	}
 
-	currdir, err := os.Getwd()
+	projectRoot, err := testutil.GetProjectRoot()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to get project root: %w", err)
 	}
 
-	projectRoot := strings.Split(currdir, "/skillspark")[0] + "/skillspark"
-
-	path = filepath.Join(projectRoot, "backend", "internal", "storage", "postgres", "schema", path)
+	path = filepath.Join(projectRoot, "internal", "storage", "postgres", "schema", path)
 
 	content, err := os.ReadFile(path)
 	if err != nil {
