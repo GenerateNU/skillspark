@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"skillspark/internal/config"
 	"skillspark/internal/service"
-	"skillspark/internal/storage" // ← Add this import
+	"skillspark/internal/storage"
 
 	"gopkg.in/yaml.v3"
 )
@@ -19,10 +19,10 @@ func main() {
 
 	// Create an empty repository for API generation
 	// The handlers won't be called, so nil fields are fine
-	repo := &storage.Repository{} // ← Change this line
+	repo := &storage.Repository{}
 
 	// Initialize app to get Huma API
-	_, humaAPI := service.SetupApp(cfg, repo) // ← Pass repo instead of nil
+	_, humaAPI := service.SetupApp(cfg, repo)
 
 	// Get OpenAPI spec
 	openAPI := humaAPI.OpenAPI()
