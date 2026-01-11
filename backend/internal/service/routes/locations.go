@@ -19,7 +19,7 @@ func SetupLocationsRoutes(api huma.API, repo *storage.Repository) {
 		Path:        "/api/v1/locations/{id}",
 		Summary:     "Get a location by id",
 		Description: "Returns a location by id",
-		Tags:        []string{"Locations"}, // Changed from "Examples"
+		Tags:        []string{"Locations"},
 	}, func(ctx context.Context, input *models.GetLocationByIDInput) (*models.GetLocationByIDOutput, error) {
 		location, err := locationHandler.GetLocationById(ctx, input)
 		if err != nil {
