@@ -31,7 +31,79 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GreetingOutputBody'
+                $ref: '#/components/schemas/GetGreetingOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Check if the API is running and healthy
+      operationId: health-check
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/locations:
+    post:
+      tags:
+        - Locations
+      summary: Create a new location
+      description: Creates a new location
+      operationId: post-location
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLocationInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/locations/{id}:
+    get:
+      tags:
+        - Locations
+      summary: Get a location by id
+      description: Returns a location by id
+      operationId: get-location-by-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
         default:
           description: Error
           content:
@@ -136,6 +208,48 @@ paths:
                 $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
+    CreateLocationInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateLocationInputBody.json
+          readOnly: true
+        address:
+          type: string
+          description: Street address of the location
+        city:
+          type: string
+          description: City of the location
+        country:
+          type: string
+          description: Country of the location
+        latitude:
+          type: number
+          description: Latitude of the location
+          format: double
+        longitude:
+          type: number
+          description: Longitude of the location
+          format: double
+        state:
+          type: string
+          description: State of the location
+        zip_code:
+          type: string
+          description: ZIP code of the location
+      required:
+        - latitude
+        - longitude
+        - address
+        - city
+        - state
+        - zip_code
+        - country
     CreateUserInputBody:
       type: object
       additionalProperties: false
@@ -219,7 +333,7 @@ components:
           default: about:blank
           examples:
             - https://example.com/errors/example
-    GreetingOutputBody:
+    GetGreetingOutputBody:
       type: object
       additionalProperties: false
       properties:
@@ -228,7 +342,7 @@ components:
           description: A URL to the JSON Schema for this object.
           format: uri
           examples:
-            - http://localhost:8080/schemas/GreetingOutputBody.json
+            - http://localhost:8080/schemas/GetGreetingOutputBody.json
           readOnly: true
         message:
           type: string
@@ -239,6 +353,30 @@ components:
       required:
         - message
         - timestamp
+    HealthOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/HealthOutputBody.json
+          readOnly: true
+        status:
+          type: string
+          description: Health status
+          examples:
+            - ok
+        version:
+          type: string
+          description: API version
+          examples:
+            - 1.0.0
+      required:
+        - status
+        - version
     Item:
       type: object
       additionalProperties: false
@@ -274,6 +412,52 @@ components:
       required:
         - users
         - total
+    Location:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Location.json
+          readOnly: true
+        address:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        state:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        zip_code:
+          type: string
+      required:
+        - id
+        - latitude
+        - longitude
+        - address
+        - city
+        - state
+        - zip_code
+        - country
+        - created_at
+        - updated_at
     UserOutputBody:
       type: object
       additionalProperties: false
