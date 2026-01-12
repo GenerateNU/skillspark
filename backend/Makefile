@@ -292,11 +292,11 @@ endif
 # ------------------------
 dev:
 	@echo "$(BOLD)Starting development server...$(NC)"
-	@go run cmd/main.go
+	@set -a; source .env; set +a; go run cmd/main.go
 
 run:
 	@echo "$(BOLD)Starting server...$(NC)"
-	@go run cmd/main.go
+	@set -a; source .env; set +a; go run cmd/main.go
 
 build:
 	@echo "$(BOLD)Building application...$(NC)"
