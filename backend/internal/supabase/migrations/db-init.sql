@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS registration (
     child_id UUID NOT NULL REFERENCES child(id),
     guardian_id UUID NOT NULL REFERENCES guardian(id),
     event_occurrence_id UUID NOT NULL REFERENCES event_occurrence(id),
-    status enum registration_status NOT NULL,
+    status registration_status NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
