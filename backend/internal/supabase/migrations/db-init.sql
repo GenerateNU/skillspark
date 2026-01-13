@@ -1,5 +1,7 @@
+DROP TABLE IF EXISTS locations;
+
 -- initial migration to set up users table
-CREATE TABLE IF NOT EXISTS user (
+CREATE TABLE IF NOT EXISTS profiles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
@@ -12,7 +14,7 @@ CREATE TABLE IF NOT EXISTS user (
 -- initial migration to set up customers table
 CREATE TABLE IF NOT EXISTS guardian (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES user(id),
+    user_id UUID NOT NULL REFERENCES profiles(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -25,7 +27,7 @@ CREATE TABLE IF NOT EXISTS school (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-create type enum category as enum ('science', 'math', 'music', 'art', 'sports', 'technology', 'language', 'other');
+create type category as enum ('science', 'math', 'music', 'art', 'sports', 'technology', 'language', 'other');
 
 -- initial migration to set up users table
 CREATE TABLE IF NOT EXISTS child (
@@ -40,7 +42,7 @@ CREATE TABLE IF NOT EXISTS child (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-create type enum org_type as enum ('educational', 'musical', 'artistic', 'physical', 'other');
+create type org_type as enum ('educational', 'musical', 'artistic', 'physical', 'other');
 
 -- initial migration to set up organizations table which represents a business that offers skills sessions
 create table if not exists organization (
@@ -56,8 +58,8 @@ create table if not exists organization (
 -- initial migration to set up providers table which represents a user who can offer skills sessions within an organization
 CREATE TABLE IF NOT EXISTS manager (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES user(id),
-    organization_id UUID NOT NULL REFERENCES organization(id),
+    user_id UUID NOT NULL REFERENCES profiles(id),
+    organization_id UUID REFERENCES organization(id),
     role TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -111,7 +113,7 @@ create table if not exists event_occurrence (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TYPE enum registration_status AS ENUM ('registered', 'cancelled');
+CREATE TYPE registration_status AS ENUM ('registered', 'cancelled');
 
 CREATE TABLE IF NOT EXISTS registration (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -133,8 +135,8 @@ END;
 $$ language 'plpgsql';
 
 -- Create triggers for each table to update updated_at on row modification
-CREATE TRIGGER update_user_updated_at
-BEFORE UPDATE ON user
+CREATE TRIGGER update_profiles_updated_at
+BEFORE UPDATE ON profiles
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
