@@ -1,5 +1,6 @@
 package config
 
+// Supabase holds Supabase-related configuration
 type Supabase struct {
 	URL            string `env:"SUPABASE_URL, required"`
 	AnonKey        string `env:"SUPABASE_ANON_KEY, required"`

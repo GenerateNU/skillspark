@@ -2,7 +2,7 @@
         docker-build docker-clean docker-prune \
         up down stop restart logs build clean \
         up-backend up-frontend logs-backend logs-frontend \
-        build-backend build-frontend shell-backend shell-frontend
+        build-backend build-frontend shell-backend shell-frontend setup-hooks
 
 # Default target - show help
 .DEFAULT_GOAL := help
@@ -76,6 +76,19 @@ ifeq ($(OS),Windows_NT)
 else
 	@$(DOCKER_COMPOSE) up --build $(WATCH_FLAG)
 endif
+	@sleep 2
+	@echo ""
+	@echo "$(GREEN)✓ Services started successfully!$(NC)"
+	@echo ""
+	@echo "$(BOLD)Access your application:$(NC)"
+	@echo "  $(BLUE)Frontend:$(NC) http://localhost"
+	@echo "  $(BLUE)Backend:$(NC)  http://localhost:8080"
+	@echo ""
+	@echo "$(BOLD)Useful commands:$(NC)"
+	@echo "  $(YELLOW)make logs$(NC)      - View logs"
+	@echo "  $(YELLOW)make down$(NC)      - Stop services"
+	@echo "  $(YELLOW)make restart$(NC)   - Restart services"
+	@echo ""
 
 down:
 	@echo "$(BOLD)Stopping all services...$(NC)"
@@ -214,3 +227,8 @@ else
 	@echo "$(YELLOW)Watch is built into 'make up' on Unix systems$(NC)"
 	@echo "Use 'make up' to start with hot reload enabled"
 endif
+
+setup-hooks:
+	@echo "Installing git hooks..."
+	@ln -sf ../../scripts/hooks/pre-commit .git/hooks/pre-commit
+	@echo "✅ Hooks installed!"

@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// DB holds database configuration
 type DB struct {
 	Host     string `env:"DB_HOST, required"`
 	Port     string `env:"DB_PORT, required"`
@@ -19,6 +20,7 @@ type DB struct {
 	ConnMaxLifetime int `env:"DB_CONN_MAX_LIFETIME"`                      // connection lifetime in seconds
 }
 
+// Connection builds the PostgreSQL connection string
 func (db *DB) Connection() string {
 	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require",
 		db.Host, db.User, db.Password, db.Name, db.Port)

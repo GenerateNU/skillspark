@@ -1,5 +1,6 @@
 package config
 
+// Application holds application-level configuration
 type Application struct {
 	Port           string `env:"PORT, default=8080"`
 	Environment    string `env:"ENVIRONMENT, default=development"`

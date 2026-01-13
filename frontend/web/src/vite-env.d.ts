@@ -1,3 +1,3 @@
 /// <reference types="vite/client" />
 
-declare module '@tailwindcss/vite';
+declare module "@tailwindcss/vite";
