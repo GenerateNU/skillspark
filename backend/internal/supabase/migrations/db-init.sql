@@ -19,6 +19,22 @@ CREATE TABLE IF NOT EXISTS guardian (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- initial migration to set up locations for an organization
+create table if not exists location (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    latitude DECIMAL(10, 8) not null,
+    longitude DECIMAL(11, 8) not null,
+    street_number TEXT not null,
+    street_name TEXT not null,
+    secondary_address TEXT,
+    city TEXT not null,
+    state TEXT not null,
+    postal_code TEXT not null,
+    country TEXT not null,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS school (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
@@ -61,22 +77,6 @@ CREATE TABLE IF NOT EXISTS manager (
     user_id UUID NOT NULL REFERENCES profiles(id),
     organization_id UUID REFERENCES organization(id),
     role TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- initial migration to set up locations for an organization
-create table if not exists location (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    latitude DECIMAL(10, 8) not null,
-    longitude DECIMAL(11, 8) not null,
-    street_number TEXT not null,
-    street_name TEXT not null,
-    secondary_address TEXT,
-    city TEXT not null,
-    state TEXT not null,
-    postal_code TEXT not null,
-    country TEXT not null,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
