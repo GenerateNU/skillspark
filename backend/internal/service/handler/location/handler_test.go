@@ -30,7 +30,7 @@ func TestHandler_GetLocationById(t *testing.T) {
 					Longitude:        -74.0060,
 					StreetNumber:     "123",
 					StreetName:       "Broadway",
-					SecondaryAddress: "",
+					SecondaryAddress: nil,
 					City:             "New York",
 					State:            "NY",
 					PostalCode:       "10001",
@@ -97,7 +97,7 @@ func TestHandler_CreateLocation(t *testing.T) {
 				input.Body.Longitude = -74.0060
 				input.Body.StreetNumber = "123"
 				input.Body.StreetName = "Broadway"
-				input.Body.SecondaryAddress = ""
+				input.Body.SecondaryAddress = nil
 				input.Body.City = "New York"
 				input.Body.State = "NY"
 				input.Body.PostalCode = "10001"
@@ -111,7 +111,7 @@ func TestHandler_CreateLocation(t *testing.T) {
 					Longitude:        -74.0060,
 					StreetNumber:     "123",
 					StreetName:       "Broadway",
-					SecondaryAddress: "",
+					SecondaryAddress: nil,
 					City:             "New York",
 					State:            "NY",
 					PostalCode:       "10001",
@@ -130,7 +130,7 @@ func TestHandler_CreateLocation(t *testing.T) {
 				input.Body.Longitude = -74.0060
 				input.Body.StreetNumber = "123"
 				input.Body.StreetName = "Broadway"
-				input.Body.SecondaryAddress = ""
+				input.Body.SecondaryAddress = nil
 				input.Body.City = "New York"
 				input.Body.State = "NY"
 				input.Body.PostalCode = "10001"

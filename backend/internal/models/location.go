@@ -13,7 +13,7 @@ type Location struct {
 	Longitude        float64   `json:"longitude" db:"longitude"`
 	StreetNumber     string    `json:"street_number" db:"street_number"`
 	StreetName       string    `json:"street_name" db:"street_name"`
-	SecondaryAddress string    `json:"secondary_address" db:"secondary_address"`
+	SecondaryAddress *string   `json:"secondary_address" db:"secondary_address"`
 	City             string    `json:"city" db:"city"`
 	State            string    `json:"state" db:"state"`
 	PostalCode       string    `json:"postal_code" db:"postal_code"`
@@ -36,7 +36,7 @@ type CreateLocationInput struct {
 
 		StreetName string `json:"street_name" db:"street_name" doc:"Street name of the location" minLength:"2" maxLength:"100"`
 
-		SecondaryAddress string `json:"secondary_address" db:"secondary_address" doc:"Secondary address of the location" minLength:"0" maxLength:"100"`
+		SecondaryAddress *string `json:"secondary_address" db:"secondary_address" doc:"Secondary address of the location" minLength:"0" maxLength:"100"`
 
 		City string `json:"city" db:"city" doc:"City of the location" minLength:"2" maxLength:"100"`
 

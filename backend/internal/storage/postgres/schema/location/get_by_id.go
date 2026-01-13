@@ -6,8 +6,11 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
+	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
+
 	"github.com/jackc/pgx/v5"
 )
 
@@ -20,7 +23,9 @@ func (r *LocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) 
 
 	row := r.db.QueryRow(ctx, query, id)
 	var location models.Location
-	err = row.Scan(&location.ID, &location.Latitude, &location.Longitude, &location.StreetNumber, &location.StreetName, &location.SecondaryAddress, &location.City, &location.State, &location.PostalCode, &location.Country, &location.CreatedAt, &location.UpdatedAt)
+	var secondary pgtype.Text // Use pgtype.Text to handle NULL values
+
+	err = row.Scan(&location.ID, &location.Latitude, &location.Longitude, &location.StreetNumber, &location.StreetName, &secondary, &location.City, &location.State, &location.PostalCode, &location.Country, &location.CreatedAt, &location.UpdatedAt)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -31,5 +36,6 @@ func (r *LocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) 
 		return nil, &err
 	}
 
+	location.SecondaryAddress = utils.TextPtr(secondary)
 	return &location, nil
 }

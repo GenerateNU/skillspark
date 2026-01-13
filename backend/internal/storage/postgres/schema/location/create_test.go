@@ -24,7 +24,7 @@ func TestLocationRepository_Create(t *testing.T) {
 		input.Body.Longitude = -74.0060
 		input.Body.StreetNumber = "123"
 		input.Body.StreetName = "Broadway"
-		input.Body.SecondaryAddress = ""
+		input.Body.SecondaryAddress = nil
 		input.Body.City = "New York"
 		input.Body.State = "NY"
 		input.Body.PostalCode = "10001"
@@ -42,7 +42,7 @@ func TestLocationRepository_Create(t *testing.T) {
 	assert.Equal(t, "USA", location.Country)
 	assert.Equal(t, "123", location.StreetNumber)
 	assert.Equal(t, "Broadway", location.StreetName)
-	assert.Equal(t, "", location.SecondaryAddress)
+	assert.Equal(t, nil, location.SecondaryAddress)
 
 	id := location.ID
 

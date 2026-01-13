@@ -28,7 +28,7 @@ func TestLocationRepository_GetLocationByID(t *testing.T) {
 	assert.Equal(t, "USA", location.Country)
 	assert.Equal(t, "123", location.StreetNumber)
 	assert.Equal(t, "Broadway", location.StreetName)
-	assert.Equal(t, "", location.SecondaryAddress)
+	assert.Equal(t, nil, location.SecondaryAddress)
 	assert.Equal(t, "New York", location.City)
 	assert.Equal(t, "NY", location.State)
 	assert.Equal(t, "10001", location.PostalCode)
@@ -44,7 +44,7 @@ func TestLocationRepository_GetLocationByID(t *testing.T) {
 	assert.Equal(t, "USA", location2.Country)
 	assert.Equal(t, "600", location2.StreetNumber)
 	assert.Equal(t, "Boylston Street", location2.StreetName)
-	assert.Equal(t, "", location2.SecondaryAddress)
+	assert.Equal(t, nil, location2.SecondaryAddress)
 
 	location3, err := repo.GetLocationByID(ctx, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a20"))
 
