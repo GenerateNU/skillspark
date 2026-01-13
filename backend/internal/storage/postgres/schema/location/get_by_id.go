@@ -20,7 +20,7 @@ func (r *LocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) 
 
 	row := r.db.QueryRow(ctx, query, id)
 	var location models.Location
-	err = row.Scan(&location.ID, &location.Latitude, &location.Longitude, &location.Address, &location.City, &location.State, &location.ZipCode, &location.Country, &location.CreatedAt, &location.UpdatedAt)
+	err = row.Scan(&location.ID, &location.Latitude, &location.Longitude, &location.StreetNumber, &location.StreetName, &location.SecondaryAddress, &location.City, &location.State, &location.PostalCode, &location.Country, &location.CreatedAt, &location.UpdatedAt)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

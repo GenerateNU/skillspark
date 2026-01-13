@@ -22,10 +22,12 @@ func TestLocationRepository_Create(t *testing.T) {
 		input := &models.CreateLocationInput{}
 		input.Body.Latitude = 40.7128
 		input.Body.Longitude = -74.0060
-		input.Body.Address = "123 Broadway"
+		input.Body.StreetNumber = "123"
+		input.Body.StreetName = "Broadway"
+		input.Body.SecondaryAddress = ""
 		input.Body.City = "New York"
 		input.Body.State = "NY"
-		input.Body.ZipCode = "10001"
+		input.Body.PostalCode = "10001"
 		input.Body.Country = "USA"
 		return input
 	}()
@@ -36,9 +38,11 @@ func TestLocationRepository_Create(t *testing.T) {
 	assert.NotNil(t, location)
 	assert.Equal(t, "New York", location.City)
 	assert.Equal(t, "NY", location.State)
-	assert.Equal(t, "10001", location.ZipCode)
+	assert.Equal(t, "10001", location.PostalCode)
 	assert.Equal(t, "USA", location.Country)
-	assert.Equal(t, "123 Broadway", location.Address)
+	assert.Equal(t, "123", location.StreetNumber)
+	assert.Equal(t, "Broadway", location.StreetName)
+	assert.Equal(t, "", location.SecondaryAddress)
 
 	id := location.ID
 
@@ -50,7 +54,9 @@ func TestLocationRepository_Create(t *testing.T) {
 	assert.Equal(t, location.ID, retrievedLocation.ID)
 	assert.Equal(t, location.City, retrievedLocation.City)
 	assert.Equal(t, location.State, retrievedLocation.State)
-	assert.Equal(t, location.ZipCode, retrievedLocation.ZipCode)
+	assert.Equal(t, location.PostalCode, retrievedLocation.PostalCode)
 	assert.Equal(t, location.Country, retrievedLocation.Country)
-	assert.Equal(t, location.Address, retrievedLocation.Address)
+	assert.Equal(t, location.StreetNumber, retrievedLocation.StreetNumber)
+	assert.Equal(t, location.StreetName, retrievedLocation.StreetName)
+	assert.Equal(t, location.SecondaryAddress, retrievedLocation.SecondaryAddress)
 }
