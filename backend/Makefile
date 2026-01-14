@@ -121,6 +121,7 @@ test-db:
 	@echo "$(BOLD)Running database tests...$(NC)"
 	@go test ./internal/storage/postgres/... -v $(NO_CACHE)
 
+# Run tests with coverage
 test-coverage:
 	@echo "$(BOLD)Running tests with coverage...$(NC)"
 	@go test ./... -v -coverprofile=coverage.out $(NO_CACHE)
@@ -128,8 +129,9 @@ test-coverage:
 	@echo "$(GREEN)Coverage report: coverage.html$(NC)"
 	@go tool cover -func=coverage.out | $(GREP) total
 
+# Print coverage percentage as number only
 coverage-percentage:
-	@go tool cover -func=coverage.out | $(FIND) -E "total" | awk '{print substr($$3, 1, length($$3)-1)}'
+	@go tool cover -func=coverage.out | $(GREP) total | awk '{print substr($$3, 1, length($$3)-1)}'
 
 test-one:
 	@if [ -z "$(TEST)" ]; then \
