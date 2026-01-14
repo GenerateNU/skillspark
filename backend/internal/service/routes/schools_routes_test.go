@@ -47,22 +47,11 @@ func TestGetAllSchools_Success(t *testing.T) {
 
 	expectedSchools := []models.School{
 		{
-			ID:   schoolID,
-			Name: "Test School",
-			Location: models.Location{
-				ID:        locationID,
-				Latitude:  40.7128,
-				Longitude: -74.0060,
-				Address:   "123 Main St",
-				City:      "New York",
-				State:     "NY",
-				ZipCode:   "10001",
-				Country:   "USA",
-				CreatedAt: now,
-				UpdatedAt: now,
-			},
-			CreatedAt: now,
-			UpdatedAt: now,
+			ID:         schoolID,
+			Name:       "Test School",
+			LocationID: locationID,
+			CreatedAt:  now,
+			UpdatedAt:  now,
 		},
 	}
 
@@ -86,7 +75,7 @@ func TestGetAllSchools_Success(t *testing.T) {
 	assert.Len(t, decoded, 1)
 	assert.Equal(t, expectedSchools[0].ID, decoded[0].ID)
 	assert.Equal(t, expectedSchools[0].Name, decoded[0].Name)
-	assert.Equal(t, expectedSchools[0].Location.City, decoded[0].Location.City)
+	assert.Equal(t, expectedSchools[0].LocationID, decoded[0].LocationID)
 
 	mockRepo.AssertExpectations(t)
 }
