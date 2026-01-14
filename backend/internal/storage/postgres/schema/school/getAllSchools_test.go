@@ -51,11 +51,11 @@ func TestSchoolRepository_GetAllSchools(t *testing.T) {
 
 		if s.ID == nySchoolID {
 			assert.Equal(t, "NY High School", s.Name)
-			assert.Equal(t, newYorkLocationID, s.Location.ID)
+			assert.Equal(t, newYorkLocationID, s.LocationID)
 		}
 		if s.ID == bostonSchoolID {
 			assert.Equal(t, "Boston High School", s.Name)
-			assert.Equal(t, bostonLocationID, s.Location.ID)
+			assert.Equal(t, bostonLocationID, s.LocationID)
 		}
 	}
 
@@ -65,4 +65,3 @@ func TestSchoolRepository_GetAllSchools(t *testing.T) {
 	assert.True(t, hasNY, "expected NY High School to be returned")
 	assert.True(t, hasBoston, "expected Boston High School to be returned")
 }
-

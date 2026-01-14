@@ -7,11 +7,11 @@ import (
 )
 
 type School struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	Name      string    `json:"name" db:"name"`
-	Location  Location  `json:"location" db:"location"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	ID         uuid.UUID `json:"id" db:"id"`
+	Name       string    `json:"name" db:"name"`
+	LocationID uuid.UUID `json:"location_id" db:"location_id"`
+	CreatedAt  time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type GetAllSchoolsOutput struct {
