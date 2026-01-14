@@ -6,10 +6,10 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$(go env GOPATH)/bin:$PATH"
 echo "🔍 Running pre-commit checks..."
 
 # Check for staged Go files
-STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$')
+STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$' || true)
 
 # Check for staged frontend files
-STAGED_FRONTEND_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^frontend/web/.*\.(ts|tsx|js|jsx)$')
+STAGED_FRONTEND_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^frontend/web/.*\.(ts|tsx|js|jsx)$' || true)
 
 # Run Go checks if there are staged Go files
 if [ -n "$STAGED_GO_FILES" ]; then
@@ -20,23 +20,17 @@ if [ -n "$STAGED_GO_FILES" ]; then
   # Change to backend directory for go commands
   cd backend || exit 1
 
-  # Check and install golangci-lint if needed
+  # Install golangci-lint if not installed or wrong version
   GOLANGCI_LINT_VERSION="v1.64.2"
-  if ! golangci-lint version 2>&1 | grep -q "$GOLANGCI_LINT_VERSION"; then
+  if ! command -v golangci-lint &> /dev/null || ! golangci-lint version | grep -q "$GOLANGCI_LINT_VERSION"; then
     echo "📦 Installing golangci-lint $GOLANGCI_LINT_VERSION..."
     go install github.com/golangci/golangci-lint/cmd/golangci-lint@$GOLANGCI_LINT_VERSION
+    export PATH="$(go env GOPATH)/bin:$PATH"
   fi
 
-  # Run golangci-lint
+  # Run golangci-lint without requiring version in config
   echo "🔍 Running golangci-lint..."
-  if ! command -v golangci-lint &> /dev/null; then
-    echo "⚠️  golangci-lint not found. Install it with:"
-    echo "   brew install golangci-lint"
-    echo "   OR go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
-    exit 1
-  fi
-
-  golangci-lint run
+  golangci-lint run --timeout 5m
   if [ $? -ne 0 ]; then
     echo "❌ golangci-lint failed"
     exit 1
@@ -66,7 +60,7 @@ if [ -n "$STAGED_FRONTEND_FILES" ]; then
     fi
   fi
   
-  cd ..
+  cd ../..
 else
   echo "✅ No frontend files to check"
 fi
