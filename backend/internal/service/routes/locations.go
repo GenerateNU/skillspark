@@ -12,7 +12,6 @@ import (
 
 func SetupLocationsRoutes(api huma.API, repo *storage.Repository) {
 	locationHandler := location.NewHandler(repo.Location)
-
 	huma.Register(api, huma.Operation{
 		OperationID: "get-location-by-id",
 		Method:      http.MethodGet,

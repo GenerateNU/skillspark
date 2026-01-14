@@ -3,6 +3,8 @@
 # Set PATH to include common locations
 export PATH="/opt/homebrew/bin:/usr/local/bin:$(go env GOPATH)/bin:$PATH"
 
+ROOT_DIR=$(git rev-parse --show-toplevel)
+
 echo "🔍 Running pre-commit checks..."
 
 # Check for staged Go files
@@ -11,6 +13,9 @@ STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$'
 # Check for staged frontend files
 STAGED_FRONTEND_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^frontend/web/.*\.(ts|tsx|js|jsx)$' || true)
 
+# Check for staged mobile files
+STAGED_MOBILE_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^frontend/mobile/.*\.(ts|tsx|js|jsx)$')
+
 # Run Go checks if there are staged Go files
 if [ -n "$STAGED_GO_FILES" ]; then
   echo "📝 Running go fmt..."
@@ -18,7 +23,7 @@ if [ -n "$STAGED_GO_FILES" ]; then
   git add $STAGED_GO_FILES
 
   # Change to backend directory for go commands
-  cd backend || exit 1
+  pushd "$ROOT_DIR/backend" > /dev/null || exit 1
 
   # Install golangci-lint if not installed or wrong version
   GOLANGCI_LINT_VERSION="v1.64.2"
@@ -38,10 +43,8 @@ if [ -n "$STAGED_GO_FILES" ]; then
 
   # Run go mod tidy
   echo "🧹 Running go mod tidy..."
-  go mod tidy
-  git add go.mod go.sum
-  
-  cd ..
+  go mod tidy && git add go.mod go.sum
+  popd > /dev/null
 else
   echo "✅ No Go files to check"
 fi
@@ -49,7 +52,7 @@ fi
 # Run frontend checks if there are staged frontend files
 if [ -n "$STAGED_FRONTEND_FILES" ]; then
   echo "🎨 Running frontend linting..."
-  cd frontend/web || exit 1
+  pushd "$ROOT_DIR/frontend/web" > /dev/null || exit 1
   
   # Run ESLint if configured
   if [ -f "package.json" ] && grep -q "\"lint\"" package.json; then
@@ -58,11 +61,28 @@ if [ -n "$STAGED_FRONTEND_FILES" ]; then
       echo "❌ Frontend linting failed"
       exit 1
     fi
-  fi
-  
-  cd ../..
+  fi  
+  popd > /dev/null
 else
   echo "✅ No frontend files to check"
+fi
+
+# Run mobile checks if there are staged mobile files
+if [ -n "$STAGED_MOBILE_FILES" ]; then
+  echo "📱 Running mobile linting..."
+  pushd "$ROOT_DIR/frontend/mobile" > /dev/null || exit 1
+
+  if [ -f "package.json" ] && grep -q "\"lint\"" package.json; then
+    bun run lint
+    if [ $? -ne 0 ]; then
+      echo "❌ Mobile linting failed"
+      exit 1
+    fi
+  fi
+
+  popd > /dev/null
+else
+  echo "✅ No mobile files to check"
 fi
 
 echo "✅ All checks passed!"

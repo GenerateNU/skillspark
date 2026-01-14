@@ -4,6 +4,9 @@
 
 .env
 node_modules
+package-lock.json
+bun.lockb
+bun.lock
 .vscode/
 backend/.vscode/
 **/.vscode/
