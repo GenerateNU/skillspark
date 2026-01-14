@@ -270,7 +270,7 @@ db-link:
 db-push:
 	@echo "$(BOLD)Pushing migrations to remote database...$(NC)"
 	@echo "$(YELLOW)⚠️  This will modify the production database!$(NC)"
-	@echo "Make sure your migrations are tested and approved."
+	@echo "Make sure your migrations are tested and approved by a TL."
 ifeq ($(OS),Windows_NT)
 	@set /p CONFIRM="Continue? [y/N]: " && if /i "!CONFIRM!" neq "y" ( \
 		echo $(YELLOW)Cancelled$(NC) && exit /b 1 \
