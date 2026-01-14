@@ -79,15 +79,14 @@ func TestGetAllSchools_Success(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	var decoded models.GetAllSchoolsOutput
+	var decoded []models.School
 	err = json.NewDecoder(resp.Body).Decode(&decoded)
 	assert.NoError(t, err)
 
-	assert.Len(t, decoded.Body, 1)
-	assert.Equal(t, expectedSchools[0].ID, decoded.Body[0].ID)
-	assert.Equal(t, expectedSchools[0].Name, decoded.Body[0].Name)
-	assert.Equal(t, expectedSchools[0].Location.City, decoded.Body[0].Location.City)
+	assert.Len(t, decoded, 1)
+	assert.Equal(t, expectedSchools[0].ID, decoded[0].ID)
+	assert.Equal(t, expectedSchools[0].Name, decoded[0].Name)
+	assert.Equal(t, expectedSchools[0].Location.City, decoded[0].Location.City)
 
 	mockRepo.AssertExpectations(t)
 }
-
