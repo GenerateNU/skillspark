@@ -1,4 +1,4 @@
-INSERT INTO location (id, latitude, longitude, address, city, state, zip_code, country, created_at, updated_at) VALUES
+INSERT INTO locations (id, latitude, longitude, address, city, state, zip_code, country, created_at, updated_at) VALUES
 -- New York location
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 40.7128, -74.0060, '123 Broadway', 'New York', 'NY', '10001', 'USA', NOW(), NOW()),
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 40.7589, -73.9851, '456 Times Square', 'New York', 'NY', '10036', 'USA', NOW(), NOW()),
@@ -25,4 +25,4 @@ INSERT INTO location (id, latitude, longitude, address, city, state, zip_code, c
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a20', 37.7749, -122.4194, '700 Market Street', 'San Francisco', 'CA', '94102', 'USA', NOW(), NOW());
 
 -- Verify the inserted data
-SELECT COUNT(*) as total_locations FROM location;
+SELECT COUNT(*) as total_locations FROM locations;
