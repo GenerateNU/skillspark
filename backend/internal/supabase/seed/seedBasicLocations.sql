@@ -1,12 +1,12 @@
-INSERT INTO locations (id, latitude, longitude, address, city, state, zip_code, country, created_at, updated_at) VALUES
--- New York locations
+INSERT INTO location (id, latitude, longitude, address, city, state, zip_code, country, created_at, updated_at) VALUES
+-- New York location
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 40.7128, -74.0060, '123 Broadway', 'New York', 'NY', '10001', 'USA', NOW(), NOW()),
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 40.7589, -73.9851, '456 Times Square', 'New York', 'NY', '10036', 'USA', NOW(), NOW()),
 
--- Los Angeles locations
+-- Los Angeles location
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 34.0522, -118.2437, '789 Hollywood Blvd', 'Los Angeles', 'CA', '90028', 'USA', NOW(), NOW()),
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14', 34.0195, -118.4912, '101 Santa Monica Pier', 'Santa Monica', 'CA', '90401', 'USA', NOW(), NOW()),
--- Chicago locations
+-- Chicago location
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15', 41.8781, -87.6298, '200 Michigan Avenue', 'Chicago', 'IL', '60601', 'USA', NOW(), NOW()),
 
 -- Miami location
@@ -25,4 +25,4 @@ INSERT INTO locations (id, latitude, longitude, address, city, state, zip_code, 
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a20', 37.7749, -122.4194, '700 Market Street', 'San Francisco', 'CA', '94102', 'USA', NOW(), NOW());
 
 -- Verify the inserted data
-SELECT COUNT(*) as total_locations FROM locations;
+SELECT COUNT(*) as total_locations FROM location;

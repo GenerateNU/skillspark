@@ -1,3 +1,3 @@
 SELECT id, latitude, longitude, address, city, state, zip_code, country, created_at, updated_at
-FROM locations
+FROM location
 WHERE id = $1

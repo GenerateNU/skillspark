@@ -3,7 +3,7 @@
 -- Enable UUID generation extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-create table if not exists locations (
+create table if not exists location (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     latitude DECIMAL(10, 8) not null,
     longitude DECIMAL(11, 8) not null,
