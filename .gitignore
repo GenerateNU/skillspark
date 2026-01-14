@@ -19,3 +19,8 @@ backend/.env
 
 backend/internal/supabase/.branches/
 backend/internal/supabase/.temp/
+
+backend/coverage.out
+backend/coverage.html
+backend/test_output.log
+backend/test_output_verbose.log

@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -197,7 +198,7 @@ func runMigrations(pool *pgxpool.Pool) error {
 	return nil
 }
 
-// findMigrationsPath finds the /supabase/migrations directory
+// findMigrationsPath finds the /internal/supabase/migrations directory
 // It searches upward from the current directory until it finds it
 func findMigrationsPath() (string, error) {
 	// Start from current working directory
@@ -209,7 +210,7 @@ func findMigrationsPath() (string, error) {
 	// Search up the directory tree
 	currentPath := cwd
 	for {
-		migrationsPath := filepath.Join(currentPath, "supabase", "migrations")
+		migrationsPath := filepath.Join(currentPath, "internal", "supabase", "migrations")
 		if _, err := os.Stat(migrationsPath); err == nil {
 			return migrationsPath, nil
 		}
@@ -223,10 +224,80 @@ func findMigrationsPath() (string, error) {
 		currentPath = parentPath
 	}
 
-	return "", fmt.Errorf("could not find /supabase/migrations directory (searched from %s)", cwd)
+	return "", fmt.Errorf("could not find /internal/supabase/migrations directory (searched from %s)", cwd)
 }
 
-// CleanupTestData truncates all tables efficiently
+// runSeedFiles reads and executes all seed files from /internal/supabase/seed
+func runSeedFiles(pool *pgxpool.Pool) error {
+	ctx := context.Background()
+
+	projectRoot, err := GetProjectRoot()
+	if err != nil {
+		return fmt.Errorf("failed to get project root: %w", err)
+	}
+
+	fmt.Println("projectRoot: ", projectRoot)
+	log.Printf("Project root: %s", projectRoot)
+	// Find the seed directory
+	seedPath := filepath.Join(projectRoot, "internal", "supabase", "seed")
+
+	log.Printf("Reading seed files from: %s", seedPath)
+
+	// Read all .sql files from the seed directory
+	files, err := os.ReadDir(seedPath)
+	if err != nil {
+		return fmt.Errorf("failed to read seed directory: %w", err)
+	}
+
+	// Filter and sort seed files
+	var seedFiles []string
+	for _, file := range files {
+		if !file.IsDir() && strings.HasSuffix(file.Name(), ".sql") {
+			seedFiles = append(seedFiles, file.Name())
+		}
+	}
+
+	if len(seedFiles) == 0 {
+		log.Printf("No seed files found in %s", seedPath)
+		return nil
+	}
+
+	// Sort files to ensure they run in order
+	sort.Strings(seedFiles)
+
+	log.Printf("Found %d seed files", len(seedFiles))
+
+	// Execute each seed file
+	for _, filename := range seedFiles {
+		log.Printf("Running seed: %s", filename)
+
+		filePath := filepath.Join(seedPath, filename)
+		content, err := os.ReadFile(filePath)
+		if err != nil {
+			return fmt.Errorf("failed to read seed file %s: %w", filename, err)
+		}
+
+		// Execute the seed file in a transaction
+		tx, err := pool.Begin(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to begin transaction for %s: %w", filename, err)
+		}
+
+		if _, err := tx.Exec(ctx, string(content)); err != nil {
+			_ = tx.Rollback(ctx)
+			return fmt.Errorf("failed to execute seed %s: %w", filename, err)
+		}
+
+		if err := tx.Commit(ctx); err != nil {
+			return fmt.Errorf("failed to commit seed %s: %w", filename, err)
+		}
+	}
+
+	log.Println("All seed files executed successfully")
+	return nil
+}
+
+// CleanupTestData truncates all tables efficiently and re-seeds the database
 // This is much faster than DELETE and resets auto-increment counters
 func (db *SharedTestDB) CleanupTestData(t testing.TB) {
 	t.Helper()
@@ -274,6 +345,30 @@ func (db *SharedTestDB) CleanupTestData(t testing.TB) {
 
 	if _, err := db.Pool.Exec(ctx, truncateSQL); err != nil {
 		t.Fatalf("Failed to cleanup test data: %v", err)
+	}
+
+	// Run all seed files to populate the database with test data
+	if err := runSeedFiles(db.Pool); err != nil {
+		t.Fatalf("Failed to run seed files: %v", err)
+	}
+}
+
+func GetProjectRoot() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", errors.New("could not find project root (no go.mod found)")
+		}
+		dir = parent
 	}
 }
 

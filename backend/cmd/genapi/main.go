@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"skillspark/internal/config"
 	"skillspark/internal/service"
+	"skillspark/internal/storage"
 
 	"gopkg.in/yaml.v3"
 )
@@ -16,8 +17,12 @@ func main() {
 		// Add minimal config needed for service setup
 	}
 
+	// Create an empty repository for API generation
+	// The handlers won't be called, so nil fields are fine
+	repo := &storage.Repository{}
+
 	// Initialize app to get Huma API
-	_, humaAPI := service.SetupApp(cfg, nil)
+	_, humaAPI := service.SetupApp(cfg, repo)
 
 	// Get OpenAPI spec
 	openAPI := humaAPI.OpenAPI()
