@@ -110,6 +110,29 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/schools:
+    get:
+      tags:
+        - Schools
+      summary: Get all schools
+      description: Returns all schools
+      operationId: get-all-schools
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of all schools in the database
+                items:
+                  $ref: '#/components/schemas/School'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/users:
     get:
       tags:
@@ -222,26 +245,40 @@ components:
         address:
           type: string
           description: Street address of the location
+          minLength: 3
+          maxLength: 255
         city:
           type: string
           description: City of the location
+          minLength: 2
+          maxLength: 100
         country:
           type: string
           description: Country of the location
+          minLength: 2
+          maxLength: 100
         latitude:
           type: number
           description: Latitude of the location
           format: double
+          minimum: -90
+          maximum: 90
         longitude:
           type: number
           description: Longitude of the location
           format: double
+          minimum: -180
+          maximum: 180
         state:
           type: string
           description: State of the location
+          minLength: 2
+          maxLength: 50
         zip_code:
           type: string
           description: ZIP code of the location
+          minLength: 3
+          maxLength: 20
       required:
         - latitude
         - longitude
@@ -456,6 +493,28 @@ components:
         - state
         - zip_code
         - country
+        - created_at
+        - updated_at
+    School:
+      type: object
+      additionalProperties: false
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        name:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - location
         - created_at
         - updated_at
     UserOutputBody:
