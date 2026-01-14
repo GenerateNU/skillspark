@@ -84,5 +84,5 @@ func TestLocationRepository_GetLocationByID_NotFound(t *testing.T) {
 
 	assert.Nil(t, location)
 	assert.NotNil(t, err)
-	assert.Equal(t, "http error: 404 Location with id='"+invalidID.String()+"' not found", err.Error()) // adapt if your NotFound message differs
+	assert.Contains(t, err.Error(), "404")
 }

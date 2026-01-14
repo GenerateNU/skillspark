@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -71,9 +72,11 @@ func baseConnString() string {
 }
 
 func createTemplateDB(ctx context.Context) error {
-	_, _ = adminPool.Exec(ctx, fmt.Sprintf(`DROP DATABASE IF EXISTS %s`, templateDB))
+	dbIdent := pgx.Identifier{templateDB}.Sanitize()
 
-	_, err := adminPool.Exec(ctx, fmt.Sprintf(`CREATE DATABASE %s`, templateDB))
+	_, _ = adminPool.Exec(ctx, fmt.Sprintf(`DROP DATABASE IF EXISTS %s`, dbIdent))
+
+	_, err := adminPool.Exec(ctx, fmt.Sprintf(`CREATE DATABASE %s`, dbIdent))
 	if err != nil {
 		return err
 	}
@@ -114,7 +117,7 @@ func applyFastSettings(pool *pgxpool.Pool) {
 }
 
 func runSQLDir(pool *pgxpool.Pool, dir string) error {
-	root, err := findProjectRoot()
+	root, err := GetProjectRoot()
 	if err != nil {
 		return err
 	}
@@ -146,19 +149,6 @@ func runSQLDir(pool *pgxpool.Pool, dir string) error {
 	return nil
 }
 
-func findProjectRoot() (string, error) {
-	dir, _ := os.Getwd()
-	for {
-		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
-			return dir, nil
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			return "", fmt.Errorf("project root not found")
-		}
-		dir = parent
-	}
-}
 func GetProjectRoot() (string, error) {
 	dir, err := os.Getwd()
 	if err != nil {

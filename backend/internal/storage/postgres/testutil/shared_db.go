@@ -3,10 +3,12 @@ package testutil
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/testcontainers/testcontainers-go"
 )
@@ -33,17 +35,22 @@ func SetupTestDB(t *testing.T) *pgxpool.Pool {
 	}
 
 	ctx := context.Background()
-	dbName := fmt.Sprintf("test_%d", time.Now().UnixNano())
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	dbName := fmt.Sprintf("test_%d_%d", time.Now().UnixNano(), rng.Intn(1_000_000))
+
+	dbIdent := pgx.Identifier{dbName}.Sanitize()
+	templateIdent := pgx.Identifier{templateDB}.Sanitize()
 
 	// Create a fresh test DB from the template
-	_, err := adminPool.Exec(ctx,
-		fmt.Sprintf(`CREATE DATABASE %s TEMPLATE %s`, dbName, templateDB),
+	_, err := adminPool.Exec(
+		ctx,
+		fmt.Sprintf(`CREATE DATABASE %s TEMPLATE %s`, dbIdent, templateIdent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create test db: %v", err)
 	}
 
-	// === NEW: parse the URL and override database ===
+	// Parse base connection string and override database
 	config, err := pgxpool.ParseConfig(baseConnString())
 	if err != nil {
 		t.Fatalf("failed to parse base connection string: %v", err)
@@ -57,7 +64,10 @@ func SetupTestDB(t *testing.T) *pgxpool.Pool {
 
 	t.Cleanup(func() {
 		pool.Close()
-		_, _ = adminPool.Exec(ctx, fmt.Sprintf(`DROP DATABASE IF EXISTS %s`, dbName))
+		_, _ = adminPool.Exec(
+			ctx,
+			fmt.Sprintf(`DROP DATABASE IF EXISTS %s`, dbIdent),
+		)
 	})
 
 	return pool
