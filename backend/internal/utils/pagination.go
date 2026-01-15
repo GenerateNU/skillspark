@@ -1,8 +1,8 @@
 package utils
 
 type Pagination struct {
-	Page  int `query:"page" validate:"gte=1"`
-	Limit int `query:"limit" validate:"gte=1"`
+	Page  int `query:"page" minimum:"1" default:"1" doc:"Page number for pagination"`
+	Limit int `query:"limit" minimum:"1" maximum:"100" default:"100" doc:"Number of items per page"`
 }
 
 const (
