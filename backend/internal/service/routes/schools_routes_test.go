@@ -11,6 +11,7 @@ import (
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -24,15 +25,11 @@ func setupSchoolsTestAPI(
 	schoolRepo *repomocks.MockSchoolRepository,
 ) (*fiber.App, huma.API) {
 	app := fiber.New()
-
 	api := humafiber.New(app, huma.DefaultConfig("Test Schools API", "1.0.0"))
-
 	repo := &storage.Repository{
 		School: schoolRepo,
 	}
-
 	routes.SetupSchoolsRoutes(api, repo)
-
 	return app, api
 }
 
@@ -40,7 +37,6 @@ func TestGetAllSchools_Success(t *testing.T) {
 	t.Parallel()
 
 	mockRepo := new(repomocks.MockSchoolRepository)
-
 	now := time.Now()
 	schoolID := uuid.New()
 	locationID := uuid.New()
@@ -55,10 +51,13 @@ func TestGetAllSchools_Success(t *testing.T) {
 		},
 	}
 
-	mockRepo.On("GetAllSchools", mock.Anything).Return(expectedSchools, (*errs.HTTPError)(nil))
+	// Update mock to expect context and pagination parameters
+	mockRepo.On("GetAllSchools", mock.Anything, mock.AnythingOfType("utils.Pagination")).
+		Return(expectedSchools, (*errs.HTTPError)(nil))
 
 	app, _ := setupSchoolsTestAPI(mockRepo)
 
+	// Test with default pagination
 	req, err := http.NewRequest(http.MethodGet, "/api/v1/schools", nil)
 	assert.NoError(t, err)
 
@@ -76,6 +75,57 @@ func TestGetAllSchools_Success(t *testing.T) {
 	assert.Equal(t, expectedSchools[0].ID, decoded[0].ID)
 	assert.Equal(t, expectedSchools[0].Name, decoded[0].Name)
 	assert.Equal(t, expectedSchools[0].LocationID, decoded[0].LocationID)
+
+	mockRepo.AssertExpectations(t)
+}
+
+func TestGetAllSchools_WithPagination(t *testing.T) {
+	t.Parallel()
+
+	mockRepo := new(repomocks.MockSchoolRepository)
+	now := time.Now()
+
+	expectedSchools := []models.School{
+		{
+			ID:         uuid.New(),
+			Name:       "School 1",
+			LocationID: uuid.New(),
+			CreatedAt:  now,
+			UpdatedAt:  now,
+		},
+		{
+			ID:         uuid.New(),
+			Name:       "School 2",
+			LocationID: uuid.New(),
+			CreatedAt:  now,
+			UpdatedAt:  now,
+		},
+	}
+
+	// Mock with specific pagination expectations
+	mockRepo.On("GetAllSchools",
+		mock.Anything,
+		mock.MatchedBy(func(p utils.Pagination) bool {
+			return p.Page == 2 && p.Limit == 5
+		})).
+		Return(expectedSchools, (*errs.HTTPError)(nil))
+
+	app, _ := setupSchoolsTestAPI(mockRepo)
+
+	req, err := http.NewRequest(http.MethodGet, "/api/v1/schools?page=2&limit=5", nil)
+	assert.NoError(t, err)
+
+	resp, err := app.Test(req)
+	assert.NoError(t, err)
+	defer func() { _ = resp.Body.Close() }()
+
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var decoded []models.School
+	err = json.NewDecoder(resp.Body).Decode(&decoded)
+	assert.NoError(t, err)
+
+	assert.Len(t, decoded, 2)
 
 	mockRepo.AssertExpectations(t)
 }
