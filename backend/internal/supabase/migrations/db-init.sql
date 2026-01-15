@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS school;
 DROP TABLE IF EXISTS locations;
 
 -- initial migration to set up users table

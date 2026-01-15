@@ -2,19 +2,20 @@ package location
 
 import (
 	"context"
-	"skillspark/internal/storage/postgres/testutil"
 	"testing"
+
+	"skillspark/internal/storage/postgres/testutil"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLocationRepository_GetLocationByID(t *testing.T) {
+func TestLocationRepository_GetLocationByID_NewYork(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
 
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	repo := NewLocationRepository(testDB)
 	ctx := context.Background()
 

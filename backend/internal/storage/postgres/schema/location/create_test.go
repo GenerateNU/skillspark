@@ -2,19 +2,21 @@ package location
 
 import (
 	"context"
+	"testing"
+
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/testutil"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLocationRepository_Create(t *testing.T) {
+// -------------------- New York --------------------
+func TestLocationRepository_Create_NewYork(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
 
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	repo := NewLocationRepository(testDB)
 	ctx := context.Background()
 
@@ -33,7 +35,6 @@ func TestLocationRepository_Create(t *testing.T) {
 	}()
 
 	location, err := repo.CreateLocation(ctx, locationInput)
-
 	assert.Nil(t, err)
 	assert.NotNil(t, location)
 	assert.Equal(t, "10001", location.PostalCode)
@@ -45,7 +46,6 @@ func TestLocationRepository_Create(t *testing.T) {
 
 	// Verify we can retrieve the created location
 	retrievedLocation, err := repo.GetLocationByID(ctx, id)
-
 	assert.Nil(t, err)
 	assert.NotNil(t, retrievedLocation)
 	assert.Equal(t, location.ID, retrievedLocation.ID)
