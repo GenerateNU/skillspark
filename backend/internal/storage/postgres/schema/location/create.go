@@ -14,11 +14,11 @@ func (r *LocationRepository) CreateLocation(ctx context.Context, location *model
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, location.Body.Latitude, location.Body.Longitude, location.Body.Address, location.Body.City, location.Body.State, location.Body.ZipCode, location.Body.Country)
+	row := r.db.QueryRow(ctx, query, location.Body.Latitude, location.Body.Longitude, location.Body.AddressLine1, location.Body.AddressLine2, location.Body.Subdistrict, location.Body.District, location.Body.Province, location.Body.PostalCode, location.Body.Country)
 
 	var createdLocation models.Location
 
-	err = row.Scan(&createdLocation.ID, &createdLocation.Latitude, &createdLocation.Longitude, &createdLocation.Address, &createdLocation.City, &createdLocation.State, &createdLocation.ZipCode, &createdLocation.Country, &createdLocation.CreatedAt, &createdLocation.UpdatedAt)
+	err = row.Scan(&createdLocation.ID, &createdLocation.Latitude, &createdLocation.Longitude, &createdLocation.AddressLine1, &createdLocation.AddressLine2, &createdLocation.Subdistrict, &createdLocation.District, &createdLocation.Province, &createdLocation.PostalCode, &createdLocation.Country, &createdLocation.CreatedAt, &createdLocation.UpdatedAt)
 	if err != nil {
 		err := errs.InternalServerError("Failed to create location: ", err.Error())
 		return nil, &err

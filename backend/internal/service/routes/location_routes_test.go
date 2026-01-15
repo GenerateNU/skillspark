@@ -3,6 +3,7 @@ package routes_test
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -49,13 +50,15 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
-				"latitude":  40.7128,
-				"longitude": -74.0060,
-				"address":   "123 Broadway",
-				"city":      "New York",
-				"state":     "NY",
-				"zip_code":  "10001",
-				"country":   "USA",
+				"latitude":      40.7128,
+				"longitude":     -74.0060,
+				"address_line1": "123 Broadway",
+				"address_line2": nil,
+				"district":      "New York",
+				"subdistrict":   "Manhattan",
+				"province":      "NY",
+				"postal_code":   "10001",
+				"country":       "USA",
 			},
 			mockSetup: func(m *repomocks.MockLocationRepository) {
 				m.On(
@@ -63,16 +66,18 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 					mock.Anything,
 					mock.AnythingOfType("*models.CreateLocationInput"),
 				).Return(&models.Location{
-					ID:        uuid.New(),
-					Latitude:  40.7128,
-					Longitude: -74.0060,
-					Address:   "123 Broadway",
-					City:      "New York",
-					State:     "NY",
-					ZipCode:   "10001",
-					Country:   "USA",
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+					ID:           uuid.New(),
+					Latitude:     40.7128,
+					Longitude:    -74.0060,
+					AddressLine1: "123 Broadway",
+					AddressLine2: nil,
+					Subdistrict:  "Manhattan",
+					District:     "New York",
+					Province:     "NY",
+					PostalCode:   "10001",
+					Country:      "USA",
+					CreatedAt:    time.Now(),
+					UpdatedAt:    time.Now(),
 				}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -80,12 +85,13 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 		{
 			name: "missing city",
 			payload: map[string]interface{}{
-				"latitude":  40.7128,
-				"longitude": -74.0060,
-				"address":   "123 Broadway",
-				"state":     "NY",
-				"zip_code":  "10001",
-				"country":   "USA",
+				"latitude":      40.7128,
+				"longitude":     -74.0060,
+				"address_line1": "123 Broadway",
+				"district":      "New York",
+				"subdistrict":   "Manhattan",
+				"postal_code":   "10001",
+				"country":       "USA",
 			},
 			mockSetup:  func(*repomocks.MockLocationRepository) {},
 			statusCode: http.StatusUnprocessableEntity, // Huma returns 422 for validation errors
@@ -93,13 +99,14 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 		{
 			name: "latitude out of range",
 			payload: map[string]interface{}{
-				"latitude":  123.456,
-				"longitude": -74.0060,
-				"address":   "123 Broadway",
-				"city":      "New York",
-				"state":     "NY",
-				"zip_code":  "10001",
-				"country":   "USA",
+				"latitude":      123.456,
+				"longitude":     -74.0060,
+				"address_line1": "123 Broadway",
+				"district":      "New York",
+				"subdistrict":   "Manhattan",
+				"province":      "NY",
+				"postal_code":   "10001",
+				"country":       "USA",
 			},
 			mockSetup:  func(*repomocks.MockLocationRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
@@ -131,6 +138,12 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 			assert.NoError(t, err)
 			defer func() { _ = resp.Body.Close() }()
 
+			// Add this debugging code
+			if tt.statusCode != resp.StatusCode {
+				bodyBytes, _ := io.ReadAll(resp.Body)
+				t.Logf("Response body: %s", string(bodyBytes))
+			}
+
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRepo.AssertExpectations(t)
 		})
@@ -156,7 +169,7 @@ func TestHumaValidation_GetLocationByID(t *testing.T) {
 					uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 				).Return(&models.Location{
 					ID:        uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
-					City:      "New York",
+					District:  "New York",
 					Latitude:  40.7128,
 					Longitude: -74.0060,
 				}, nil)

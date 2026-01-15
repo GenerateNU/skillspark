@@ -28,4 +28,3 @@ func (m *MockSchoolRepository) GetAllSchools(ctx context.Context) ([]models.Scho
 
 	return schools, httpErr
 }
-

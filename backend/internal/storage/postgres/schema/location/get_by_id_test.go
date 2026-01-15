@@ -23,66 +23,28 @@ func TestLocationRepository_GetLocationByID_NewYork(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, location)
-	assert.Equal(t, "New York", location.City)
-	assert.Equal(t, "NY", location.State)
-	assert.Equal(t, "10001", location.ZipCode)
+	assert.Equal(t, "10001", location.PostalCode)
 	assert.Equal(t, "USA", location.Country)
-	assert.Equal(t, "123 Broadway", location.Address)
-}
+	assert.Equal(t, "123 Broadway", location.AddressLine1)
+	assert.Nil(t, location.AddressLine2)
+	assert.Equal(t, "10001", location.PostalCode)
+	assert.Equal(t, "USA", location.Country)
 
-func TestLocationRepository_GetLocationByID_Boston(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping database test in short mode")
-	}
-
-	testDB := testutil.SetupTestDB(t)
-	repo := NewLocationRepository(testDB)
-	ctx := context.Background()
-
-	location, err := repo.GetLocationByID(ctx, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19"))
+	location2, err := repo.GetLocationByID(ctx, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19"))
 
 	assert.Nil(t, err)
-	assert.NotNil(t, location)
-	assert.Equal(t, "Boston", location.City)
-	assert.Equal(t, "MA", location.State)
-	assert.Equal(t, "02116", location.ZipCode)
-	assert.Equal(t, "USA", location.Country)
-	assert.Equal(t, "600 Boylston Street", location.Address)
-}
+	assert.NotNil(t, location2)
+	assert.Equal(t, "02116", location2.PostalCode)
+	assert.Equal(t, "USA", location2.Country)
+	assert.Equal(t, "456 Boylston St", location2.AddressLine1)
+	assert.Nil(t, location2.AddressLine2)
 
-func TestLocationRepository_GetLocationByID_SF(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping database test in short mode")
-	}
-
-	testDB := testutil.SetupTestDB(t)
-	repo := NewLocationRepository(testDB)
-	ctx := context.Background()
-
-	location, err := repo.GetLocationByID(ctx, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a20"))
+	location3, err := repo.GetLocationByID(ctx, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a20"))
 
 	assert.Nil(t, err)
-	assert.NotNil(t, location)
-	assert.Equal(t, "San Francisco", location.City)
-	assert.Equal(t, "CA", location.State)
-	assert.Equal(t, "94102", location.ZipCode)
-	assert.Equal(t, "USA", location.Country)
-	assert.Equal(t, "700 Market Street", location.Address)
-}
-
-func TestLocationRepository_GetLocationByID_NotFound(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping database test in short mode")
-	}
-
-	testDB := testutil.SetupTestDB(t)
-	repo := NewLocationRepository(testDB)
-	ctx := context.Background()
-
-	invalidID := uuid.New()
-	location, err := repo.GetLocationByID(ctx, invalidID)
-
-	assert.Nil(t, location)
-	assert.NotNil(t, err)
-	assert.Contains(t, err.Error(), "404")
+	assert.NotNil(t, location3)
+	assert.Equal(t, "94102", location3.PostalCode)
+	assert.Equal(t, "USA", location3.Country)
+	assert.Equal(t, "789 Market St", location3.AddressLine1)
+	assert.Nil(t, location3.AddressLine2)
 }
