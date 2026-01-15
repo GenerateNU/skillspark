@@ -22,16 +22,10 @@ func TestLocationRepository_GetLocationByID(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, location)
-	assert.Equal(t, "New York", location.City)
-	assert.Equal(t, "NY", location.State)
 	assert.Equal(t, "10001", location.PostalCode)
 	assert.Equal(t, "USA", location.Country)
-	assert.Equal(t, "123", location.StreetNumber)
-	assert.Equal(t, "Broadway", location.StreetName)
-
-	assert.Nil(t, location.SecondaryAddress)
-	assert.Equal(t, "New York", location.City)
-	assert.Equal(t, "NY", location.State)
+	assert.Equal(t, "123 Broadway", location.AddressLine1)
+	assert.Nil(t, location.AddressLine2)
 	assert.Equal(t, "10001", location.PostalCode)
 	assert.Equal(t, "USA", location.Country)
 
@@ -39,22 +33,17 @@ func TestLocationRepository_GetLocationByID(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, location2)
-	assert.Equal(t, "Boston", location2.City)
-	assert.Equal(t, "MA", location2.State)
 	assert.Equal(t, "02116", location2.PostalCode)
 	assert.Equal(t, "USA", location2.Country)
-	assert.Equal(t, "600", location2.StreetNumber)
-	assert.Equal(t, "Boylston Street", location2.StreetName)
-	assert.Nil(t, location2.SecondaryAddress)
+	assert.Equal(t, "456 Boylston St", location2.AddressLine1)
+	assert.Nil(t, location2.AddressLine2)
 
 	location3, err := repo.GetLocationByID(ctx, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a20"))
 
 	assert.Nil(t, err)
 	assert.NotNil(t, location3)
-	assert.Equal(t, "San Francisco", location3.City)
-	assert.Equal(t, "CA", location3.State)
 	assert.Equal(t, "94102", location3.PostalCode)
 	assert.Equal(t, "USA", location3.Country)
-	assert.Equal(t, "700", location3.StreetNumber)
-	assert.Equal(t, "Market Street", location3.StreetName)
+	assert.Equal(t, "789 Market St", location3.AddressLine1)
+	assert.Nil(t, location3.AddressLine2)
 }
