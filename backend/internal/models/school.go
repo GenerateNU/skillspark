@@ -17,3 +17,8 @@ type School struct {
 type GetAllSchoolsOutput struct {
 	Body []School `json:"body" doc:"List of all schools in the database"`
 }
+
+type GetAllSchoolsInput struct {
+	Page  int `query:"page" minimum:"1" default:"1"`
+	Limit int `query:"limit" minimum:"1" maximum:"100" default:"100"`
+}

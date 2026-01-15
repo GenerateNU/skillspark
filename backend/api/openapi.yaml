@@ -117,6 +117,24 @@ paths:
       summary: Get all schools
       description: Returns all schools
       operationId: get-all-schools
+      parameters:
+        - name: page
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 100
+            minimum: 1
+            maximum: 100
       responses:
         "200":
           description: OK
@@ -242,19 +260,24 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateLocationInputBody.json
           readOnly: true
-        address:
+        address_line1:
           type: string
-          description: Street address of the location
-          minLength: 3
-          maxLength: 255
-        city:
+          description: Primary address line of the location
+          minLength: 5
+          maxLength: 200
+        address_line2:
           type: string
-          description: City of the location
-          minLength: 2
-          maxLength: 100
+          description: Secondary address line of the location
+          minLength: 5
+          maxLength: 200
         country:
           type: string
           description: Country of the location
+          minLength: 2
+          maxLength: 100
+        district:
+          type: string
+          description: District of the location
           minLength: 2
           maxLength: 100
         latitude:
@@ -269,23 +292,30 @@ components:
           format: double
           minimum: -180
           maximum: 180
-        state:
+        postal_code:
           type: string
-          description: State of the location
-          minLength: 2
-          maxLength: 50
-        zip_code:
-          type: string
-          description: ZIP code of the location
+          description: Postal code of the location
           minLength: 3
           maxLength: 20
+        province:
+          type: string
+          description: Province/State of the location
+          minLength: 2
+          maxLength: 100
+        subdistrict:
+          type: string
+          description: Subdistrict of the location
+          minLength: 2
+          maxLength: 100
       required:
         - latitude
         - longitude
-        - address
-        - city
-        - state
-        - zip_code
+        - address_line1
+        - address_line2
+        - subdistrict
+        - district
+        - province
+        - postal_code
         - country
     CreateUserInputBody:
       type: object
@@ -460,15 +490,17 @@ components:
           examples:
             - http://localhost:8080/schemas/Location.json
           readOnly: true
-        address:
+        address_line1:
           type: string
-        city:
+        address_line2:
           type: string
         country:
           type: string
         created_at:
           type: string
           format: date-time
+        district:
+          type: string
         id:
           type: string
         latitude:
@@ -477,21 +509,25 @@ components:
         longitude:
           type: number
           format: double
-        state:
+        postal_code:
+          type: string
+        province:
+          type: string
+        subdistrict:
           type: string
         updated_at:
           type: string
           format: date-time
-        zip_code:
-          type: string
       required:
         - id
         - latitude
         - longitude
-        - address
-        - city
-        - state
-        - zip_code
+        - address_line1
+        - address_line2
+        - subdistrict
+        - district
+        - province
+        - postal_code
         - country
         - created_at
         - updated_at
@@ -504,8 +540,8 @@ components:
           format: date-time
         id:
           type: string
-        location:
-          $ref: '#/components/schemas/Location'
+        location_id:
+          type: string
         name:
           type: string
         updated_at:
@@ -514,7 +550,7 @@ components:
       required:
         - id
         - name
-        - location
+        - location_id
         - created_at
         - updated_at
     UserOutputBody:

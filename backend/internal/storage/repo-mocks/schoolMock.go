@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	"skillspark/internal/utils"
 
 	"github.com/stretchr/testify/mock"
 )
@@ -12,8 +13,8 @@ type MockSchoolRepository struct {
 	mock.Mock
 }
 
-func (m *MockSchoolRepository) GetAllSchools(ctx context.Context) ([]models.School, *errs.HTTPError) {
-	args := m.Called(ctx)
+func (m *MockSchoolRepository) GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, *errs.HTTPError) {
+	args := m.Called(ctx, pagination)
 
 	// Handle nil slice and/or error safely
 	var schools []models.School
