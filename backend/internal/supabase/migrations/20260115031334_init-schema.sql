@@ -1,8 +1,10 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 DROP TABLE IF EXISTS school;
-DROP TABLE IF EXISTS locations;
+DROP TABLE IF EXISTS location;
 
 -- initial migration to set up users table
-CREATE TABLE IF NOT EXISTS profiles (
+CREATE TABLE IF NOT EXISTS profile (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
@@ -16,7 +18,7 @@ CREATE TABLE IF NOT EXISTS profiles (
 -- initial migration to set up customers table
 CREATE TABLE IF NOT EXISTS guardian (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES profiles(id),
+    user_id UUID NOT NULL REFERENCES profile(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -80,7 +82,7 @@ create table if not exists organization (
 -- initial migration to set up providers table which represents a user who can offer skills sessions within an organization
 CREATE TABLE IF NOT EXISTS manager (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES profiles(id),
+    user_id UUID NOT NULL REFERENCES profile(id),
     organization_id UUID REFERENCES organization(id),
     role TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -141,8 +143,8 @@ END;
 $$ language 'plpgsql';
 
 -- Create triggers for each table to update updated_at on row modification
-CREATE TRIGGER update_profiles_updated_at
-BEFORE UPDATE ON profiles
+CREATE TRIGGER update_profile_updated_at
+BEFORE UPDATE ON profile
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
