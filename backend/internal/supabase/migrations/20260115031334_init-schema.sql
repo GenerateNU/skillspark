@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS location;
 
 -- initial migration to set up users table
 CREATE TABLE IF NOT EXISTS profile (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     username TEXT NOT NULL UNIQUE,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS profile (
 
 -- initial migration to set up customers table
 CREATE TABLE IF NOT EXISTS guardian (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES profile(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS guardian (
 
 -- initial migration to set up locations for an organization
 create table if not exists location (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     latitude DECIMAL(10, 8) not null,
     longitude DECIMAL(11, 8) not null,
     -- building_name TEXT,
@@ -44,7 +44,7 @@ create table if not exists location (
 );
 
 CREATE TABLE IF NOT EXISTS school (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     location_id UUID REFERENCES location(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -55,7 +55,7 @@ create type category as enum ('science', 'math', 'music', 'art', 'sports', 'tech
 
 -- initial migration to set up users table
 CREATE TABLE IF NOT EXISTS child (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     school_id UUID REFERENCES school(id),
     birth_month INT NOT NULL,
@@ -70,7 +70,7 @@ create type org_type as enum ('educational', 'musical', 'artistic', 'physical', 
 
 -- initial migration to set up organizations table which represents a business that offers skills sessions
 create table if not exists organization (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     active BOOLEAN NOT NULL DEFAULT FALSE,
     pfp_s3_key TEXT,
@@ -81,7 +81,7 @@ create table if not exists organization (
 
 -- initial migration to set up providers table which represents a user who can offer skills sessions within an organization
 CREATE TABLE IF NOT EXISTS manager (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES profile(id),
     organization_id UUID REFERENCES organization(id),
     role TEXT NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS manager (
 
 -- initial migration to set up events table which represents a specific event for an organization
 create table if not exists event (  
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
     description TEXT NOT NULL,
     organization_id UUID NOT NULL REFERENCES organization(id),
@@ -108,7 +108,7 @@ create table if not exists event (
 
 -- initial migration to set up event occurrences table which represents a specific instance of an event with a provider and a start and end time
 create table if not exists event_occurrence (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),    
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),    
     manager_id UUID REFERENCES manager(id),
     event_id UUID NOT NULL REFERENCES event(id),
     location_id UUID NOT NULL REFERENCES location(id),
@@ -124,7 +124,7 @@ create table if not exists event_occurrence (
 CREATE TYPE registration_status AS ENUM ('registered', 'cancelled');
 
 CREATE TABLE IF NOT EXISTS registration (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     child_id UUID NOT NULL REFERENCES child(id),
     guardian_id UUID NOT NULL REFERENCES guardian(id),
     event_occurrence_id UUID NOT NULL REFERENCES event_occurrence(id),
