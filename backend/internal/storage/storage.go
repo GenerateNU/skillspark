@@ -6,6 +6,7 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/school"
+	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -19,7 +20,7 @@ type LocationRepository interface {
 }
 
 type SchoolRepository interface {
-	GetAllSchools(ctx context.Context) ([]models.School, *errs.HTTPError)
+	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, *errs.HTTPError)
 }
 
 type Repository struct {
