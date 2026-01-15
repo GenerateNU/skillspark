@@ -18,5 +18,15 @@ func NewPagination() Pagination {
 }
 
 func (p *Pagination) GetOffset() int {
-	return (p.Page - 1) * p.Limit
+	page := p.Page
+	limit := p.Limit
+
+	if page < 1 {
+		page = defaultPage
+	}
+	if limit < 1 {
+		limit = defaultLimit
+	}
+
+	return (page - 1) * limit
 }
