@@ -163,6 +163,7 @@ func TestHandler_CreateLocation(t *testing.T) {
 				input.Body.Longitude = -71.0589
 				input.Body.AddressLine1 = "600 Boylston Street"
 				input.Body.District = "Boston"
+				input.Body.Subdistrict = "Back Bay"
 				input.Body.Province = "MA"
 				input.Body.PostalCode = "02116"
 				input.Body.Country = "USA"
@@ -175,6 +176,7 @@ func TestHandler_CreateLocation(t *testing.T) {
 					Longitude:    -71.0589,
 					AddressLine1: "600 Boylston Street",
 					District:     "Boston",
+					Subdistrict:  "Back Bay",
 					Province:     "MA",
 					PostalCode:   "02116",
 					Country:      "USA",
