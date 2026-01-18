@@ -9,7 +9,8 @@
     "install:all": "cd frontend && npm install"
   },
   "devDependencies": {
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "supabase": "^2.72.7"
   },
   "workspaces": [
     "frontend/web"
