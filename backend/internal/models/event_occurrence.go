@@ -9,9 +9,9 @@ import (
 // database model for a specific instance of an event 
 type EventOccurrence struct {
 	ID 				uuid.UUID 	`json:"id" db:"id"`
-	ManagerId		uuid.UUID 	`json:"manager(id)"`   
-	EventId 		uuid.UUID 	`json:"event_id"`
- 	LocationId 		uuid.UUID 	`json:"location_id" db:"location_id"`
+	ManagerId		uuid.UUID 	`json:"manager_id" db:"manager_id"` // embed info
+	EventId 		uuid.UUID 	`json:"event_id" db:"event_id"` // embed info
+ 	LocationId 		uuid.UUID 	`json:"location_id" db:"location_id"` // embed info
    	StartTime 		time.Time 	`json:"start_time" db:"start_time"`
    	EndTime 		time.Time 	`json:"end_time" db:"end_time"`
   	MaxAttendees 	int			`json:"max_attendees" db:"max_attendees"`
