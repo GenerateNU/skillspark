@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/utils"
@@ -23,10 +24,19 @@ type SchoolRepository interface {
 	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, *errs.HTTPError)
 }
 
+type ChildRepository interface {
+	GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, *errs.HTTPError)
+	GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, *errs.HTTPError)
+	UpdateChildByID(ctx context.Context, childID uuid.UUID, child *models.UpdateChildInput) (*models.Child, *errs.HTTPError)
+	CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, *errs.HTTPError)
+	DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, *errs.HTTPError)
+}
+
 type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
 	School   SchoolRepository
+	Child    ChildRepository
 }
 
 // Close closes the database connection pool
@@ -46,5 +56,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		db:       db,
 		Location: location.NewLocationRepository(db),
 		School:   school.NewSchoolRepository(db),
+		Child:    child.NewChildRepository(db),
 	}
 }
