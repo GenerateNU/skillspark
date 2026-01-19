@@ -23,10 +23,17 @@ type SchoolRepository interface {
 	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, *errs.HTTPError)
 }
 
+type EventRepository interface {
+	CreateEvent(ctx context.Context, location *models.CreateEventInput) (*models.Event, *errs.HTTPError)
+	PatchEvent(ctx context.Context, location *models.PatchEventInput) (*models.Event, *errs.HTTPError)
+	DeleteEvent(ctx context.Context, id uuid.UUID) (*struct{}, error)
+}
+
 type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
 	School   SchoolRepository
+	Event    EventRepository
 }
 
 // Close closes the database connection pool
