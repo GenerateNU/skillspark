@@ -39,7 +39,7 @@ func SetupManagerRoutes(api huma.API, repo *storage.Repository) {
 	huma.Register(api, huma.Operation{
 		OperationID: "get-manager-by-org-id",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/manager/{organization_id}",
+		Path:        "/api/v1/manager/org/{organization_id}",
 		Summary:     "Get a manager by organization id",
 		Description: "Returns a manager by organization id",
 		Tags:        []string{"Managers"},
@@ -56,8 +56,62 @@ func SetupManagerRoutes(api huma.API, repo *storage.Repository) {
 
 	// create manager here
 
+	huma.Register(api, huma.Operation{
+		OperationID: "post manager",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/manager/create",
+		Summary:     "posts a manager",
+		Description: "Returns a manager by id",
+		Tags:        []string{"Managers"},
+	}, func(ctx context.Context, input *models.CreateManagerInput) (*models.CreateManagerOutput, error) {
+		manager, err := managerHandler.CreateManager(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.CreateManagerOutput{
+			Body: manager,
+		}, nil
+	})
+
 	// delete manager here
 
+	huma.Register(api, huma.Operation{
+		OperationID: "delete manager",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/manager/delete/{id}",
+		Summary:     "Deletes a manager by id",
+		Description: "Returns a manager by id",
+		Tags:        []string{"Managers"},
+	}, func(ctx context.Context, input *models.DeleteManagerInput) (*models.DeleteManagerOutput, error) {
+		manager, err := managerHandler.DeleteManager(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.DeleteManagerOutput{
+			Body: manager,
+		}, nil
+	})
+
 	// patch manager here
+
+	huma.Register(api, huma.Operation{
+		OperationID: "patch/update manager",
+		Method:      http.MethodPatch,
+		Path:        "/api/v1/manager/update/{id}",
+		Summary:     "Updates a manager by id",
+		Description: "Returns a manager by id",
+		Tags:        []string{"Managers"},
+	}, func(ctx context.Context, input *models.PatchManagerInput) (*models.PatchManagerOutput, error) {
+		manager, err := managerHandler.PatchManager(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.PatchManagerOutput{
+			Body: manager,
+		}, nil
+	})
 
 }

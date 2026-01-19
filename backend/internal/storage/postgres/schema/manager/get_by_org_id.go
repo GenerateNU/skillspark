@@ -28,7 +28,7 @@ func (r *ManagerRepository) GetManagerByOrgID(ctx context.Context, org_id uuid.U
 			err := errs.NotFound("Location", "id", org_id)
 			return nil, &err
 		}
-		err := errs.InternalServerError("Failed to fetch location by id: ", err.Error())
+		err := errs.InternalServerError("Failed to fetch manager by organization_id: ", err.Error())
 		return nil, &err
 	}
 

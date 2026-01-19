@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// GetManagerById handles GET /managers/:id
+// GetManagerByOrgId handles GET /managers/:organization_id
 func (h *Handler) GetManagerByOrgID(ctx context.Context, input *models.GetManagerByOrgIDInput) (*models.Manager, error) {
 	id, err := uuid.Parse(input.OrganizationID.String())
 	if err != nil {

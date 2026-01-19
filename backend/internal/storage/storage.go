@@ -27,6 +27,9 @@ type SchoolRepository interface {
 type ManagerRepository interface {
 	GetManagerByID(ctx context.Context, id uuid.UUID) (*models.Manager, *errs.HTTPError)
 	GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, *errs.HTTPError)
+	DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, *errs.HTTPError)
+	CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, *errs.HTTPError)
+	PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, *errs.HTTPError)
 }
 
 type Repository struct {
