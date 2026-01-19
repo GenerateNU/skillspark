@@ -53,31 +53,12 @@ type GetEventOccurrencesByEventIDOutput struct {
 type CreateEventOccurrenceInput struct {
 	Body struct {
 		ManagerId uuid.UUID `json:"manager_id"`
-		Event struct {
-			Title string
-			Description string
-			OrganizationID uuid.UUID
-			AgeRangeMin int
-			AgeRangeMax int
-			Category string
-			HeaderImageS3Key string
-		} `json:"event"`
-		Location struct {
-			Latitude float64 `json:"latitude" db:"latitude" doc:"Latitude of the location" minimum:"-90" maximum:"90"`
-			Longitude float64 `json:"longitude" db:"longitude" doc:"Longitude of the location" minimum:"-180" maximum:"180"`
-			AddressLine1 string `json:"address_line1" db:"address_line1" doc:"Primary address line of the location" minLength:"5" maxLength:"200"`
-			AddressLine2 *string `json:"address_line2" db:"address_line2" doc:"Secondary address line of the location" minLength:"5" maxLength:"200"`
-			Subdistrict string `json:"subdistrict" db:"subdistrict" doc:"Subdistrict of the location" minLength:"2" maxLength:"100"`
-			District string `json:"district" db:"district" doc:"District of the location" minLength:"2" maxLength:"100"`
-			Province string `json:"province" db:"province" doc:"Province/State of the location" minLength:"2" maxLength:"100"`
-			PostalCode string `json:"postal_code" db:"postal_code" doc:"Postal code of the location" minLength:"3" maxLength:"20"`
-			Country string `json:"country" db:"country" doc:"Country of the location" minLength:"2" maxLength:"100"`
-		} `json:"location"`
+		EventId uuid.UUID `json:"event"`
+		LocationId uuid.UUID `json:"location"`
 		StartTime time.Time `json:"start_time"`
 		EndTime time.Time `json:"end_time"`
 		MaxAttendees int `json:"max_attendees"`
 		Language string	`json:"language"`  
-		CurrEnrolled int `json:"curr_enrolled"`
 	} `json:"body" doc:"New event occurrence to add"`
 }
 
