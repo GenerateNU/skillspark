@@ -13,7 +13,7 @@ import (
 
 func (r *ChildRepository) UpdateChildByID(ctx context.Context, childID uuid.UUID, child *models.UpdateChildInput) (*models.Child, *errs.HTTPError) {
 
-	query, err := schema.ReadSQLBaseScript("child/sql/get_by_id.sql")
+	query, err := schema.ReadSQLBaseScript("child/sql/update_by_id.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
