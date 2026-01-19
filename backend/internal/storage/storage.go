@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/utils"
@@ -53,5 +54,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		db:       db,
 		Location: location.NewLocationRepository(db),
 		School:   school.NewSchoolRepository(db),
+		Event:    event.NewEventRepository(db),
 	}
 }
