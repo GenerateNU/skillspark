@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestManagerRepository_GetManagerByID(t *testing.T) {
+func TestManagerRepository_GetManagerByOrgID(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
@@ -19,7 +19,7 @@ func TestManagerRepository_GetManagerByID(t *testing.T) {
 	repo := NewManagerRepository(testDB)
 	ctx := context.Background()
 
-	manager, err := repo.GetManagerByID(ctx, uuid.MustParse("50000000-0000-0000-0000-000000000001"))
+	manager, err := repo.GetManagerByOrgID(ctx, uuid.MustParse("40000000-0000-0000-0000-000000000001"))
 
 	assert.Nil(t, err)
 	assert.NotNil(t, manager)
@@ -27,7 +27,7 @@ func TestManagerRepository_GetManagerByID(t *testing.T) {
 	assert.Equal(t, uuid.MustParse("40000000-0000-0000-0000-000000000001"), manager.OrganizationID)
 	assert.Equal(t, "Director", manager.Role)
 
-	managerTwo, err := repo.GetManagerByID(ctx, uuid.MustParse("50000000-0000-0000-0000-000000000002"))
+	managerTwo, err := repo.GetManagerByOrgID(ctx, uuid.MustParse("40000000-0000-0000-0000-000000000002"))
 
 	assert.Nil(t, err)
 	assert.NotNil(t, managerTwo)
@@ -35,7 +35,7 @@ func TestManagerRepository_GetManagerByID(t *testing.T) {
 	assert.Equal(t, uuid.MustParse("40000000-0000-0000-0000-000000000002"), managerTwo.OrganizationID)
 	assert.Equal(t, "Head Coach", managerTwo.Role)
 
-	managerThree, err := repo.GetManagerByID(ctx, uuid.MustParse("00000000-0000-0000-0000-000000000000"))
+	managerThree, err := repo.GetManagerByOrgID(ctx, uuid.MustParse("00000000-0000-0000-0000-000000000000"))
 
 	assert.NotNil(t, err)
 	assert.Nil(t, managerThree)

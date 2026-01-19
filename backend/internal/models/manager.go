@@ -15,17 +15,56 @@ type Manager struct {
 	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
 }
 
+// get by id
 type GetManagerByIDInput struct {
 	ID uuid.UUID `path:"id"`
 }
 type GetManagerByIDOutput struct {
-	Body Manager `json:"body"`
+	Body *Manager `json:"body"`
 }
 
+// get by org id
 type GetManagerByOrgIDInput struct {
 	OrganizationID uuid.UUID `path:"organization_id"`
 }
 
 type GetManagerByOrgIDOutput struct {
-	Body Manager `json:"body"`
+	Body *Manager `json:"body"`
+}
+
+// create
+type CreateManagerInput struct {
+	Body struct {
+		UserID         uuid.UUID `json:"user_id" db:"user_id" doc:"user id of the manager"`
+		OrganizationID uuid.UUID `json:"organization_id" db:"organization_id" doc:"organization id of the organization the manager is associated with"`
+		Role           string    `json:"role" db:"role" doc:"role of the manager being created"`
+	}
+}
+
+type CreateManagerOutput struct {
+	Body *Manager `json:"body"`
+}
+
+// delete
+
+type DeleteManagerInput struct {
+	ID uuid.UUID `path:"id"`
+}
+
+type DeleteManagerOutput struct {
+	Body *Manager `json:"body"`
+}
+
+//patch/update
+
+type PatchManagerInput struct {
+	Body struct {
+		UserID         uuid.UUID `json:"user_id" db:"user_id" doc:"user id of the manager"`
+		OrganizationID uuid.UUID `json:"organization_id" db:"organization_id" doc:"organization id of the organization the manager is associated with"`
+		Role           string    `json:"role" db:"role" doc:"role of the manager being created"`
+	}
+}
+
+type PatchManagerOutput struct {
+	Body *Manager `json:"body"`
 }
