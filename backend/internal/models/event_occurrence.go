@@ -42,7 +42,7 @@ type GetEventOccurrenceByIDOutput struct {
 
 // get by event id
 type GetEventOccurrencesByEventIDInput struct {
-	ID uuid.UUID `path:"id" doc:"ID of an event"`
+	ID uuid.UUID `path:"event_id" doc:"ID of an event"`
 }
 
 type GetEventOccurrencesByEventIDOutput struct {
