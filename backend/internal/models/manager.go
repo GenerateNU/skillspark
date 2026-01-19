@@ -21,3 +21,11 @@ type GetManagerByIDInput struct {
 type GetManagerByIDOutput struct {
 	Body Manager `json:"body"`
 }
+
+type GetManagerByOrgIDInput struct {
+	OrganizationID uuid.UUID `path:"organization_id"`
+}
+
+type GetManagerByOrgIDOutput struct {
+	Body Manager `json:"body"`
+}
