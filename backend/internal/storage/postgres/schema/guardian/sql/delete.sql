@@ -1,0 +1,1 @@
+DELETE FROM guardian WHERE id = $1;

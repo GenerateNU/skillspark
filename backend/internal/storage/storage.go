@@ -23,10 +23,19 @@ type SchoolRepository interface {
 	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, *errs.HTTPError)
 }
 
+type GuardianRepository interface {
+	CreateGuardian(ctx context.Context, guardian *models.CreateGuardianInput) (*models.Guardian, *errs.HTTPError)
+	GetGuardianByChildID(ctx context.Context, childID uuid.UUID) (*models.Guardian, *errs.HTTPError)
+	GetGuardianByID(ctx context.Context, id uuid.UUID) (*models.Guardian, *errs.HTTPError)
+	UpdateGuardian(ctx context.Context, guardian *models.Guardian) (*models.Guardian, *errs.HTTPError)
+	DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, *errs.HTTPError)
+}
+
 type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
 	School   SchoolRepository
+	Guardian GuardianRepository
 }
 
 // Close closes the database connection pool
