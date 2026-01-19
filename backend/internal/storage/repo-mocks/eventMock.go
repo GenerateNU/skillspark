@@ -24,7 +24,7 @@ func (m *MockEventRepository) CreateEvent(ctx context.Context, input *models.Cre
 	return args.Get(0).(*models.Event), nil
 }
 
-func (m *MockEventRepository) PatchEvent(ctx context.Context, input *models.PatchEventInput) (*models.Event, *errs.HTTPError) {
+func (m *MockEventRepository) UpdateEvent(ctx context.Context, input *models.UpdateEventInput) (*models.Event, *errs.HTTPError) {
 	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {

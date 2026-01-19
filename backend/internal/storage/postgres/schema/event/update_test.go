@@ -12,7 +12,7 @@ import (
 )
 
 // -------------------- Junior Robotics Workshop --------------------
-func TestEventRepository_Patch_JuniorRoboticsWorkshop(t *testing.T) {
+func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
@@ -42,22 +42,22 @@ func TestEventRepository_Patch_JuniorRoboticsWorkshop(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, createdEvent)
 
-	patchInput := &models.PatchEventInput{}
-	patchInput.ID = createdEvent.ID
+	updateInput := &models.UpdateEventInput{}
+	updateInput.ID = createdEvent.ID
 
 	newAgeMin := 10
 	newAgeMax := 14
 	imageKey := "events/robotics_workshop.jpg"
 
-	patchInput.Body.Title = "Advanced Robotics Workshop"
-	patchInput.Body.Description = "Learn the basics of robotics."
-	patchInput.Body.OrganizationID = createdEvent.OrganizationID
-	patchInput.Body.AgeRangeMin = &newAgeMin
-	patchInput.Body.AgeRangeMax = &newAgeMax
-	patchInput.Body.Category = []string{"science", "technology", "engineering"}
-	patchInput.Body.HeaderImageS3Key = &imageKey
+	updateInput.Body.Title = "Advanced Robotics Workshop"
+	updateInput.Body.Description = "Learn the basics of robotics."
+	updateInput.Body.OrganizationID = createdEvent.OrganizationID
+	updateInput.Body.AgeRangeMin = &newAgeMin
+	updateInput.Body.AgeRangeMax = &newAgeMax
+	updateInput.Body.Category = []string{"science", "technology", "engineering"}
+	updateInput.Body.HeaderImageS3Key = &imageKey
 
-	updatedEvent, err := repo.PatchEvent(ctx, patchInput)
+	updatedEvent, err := repo.UpdateEvent(ctx, updateInput)
 	assert.Nil(t, err)
 	assert.NotNil(t, updatedEvent)
 
@@ -76,7 +76,7 @@ func TestEventRepository_Patch_JuniorRoboticsWorkshop(t *testing.T) {
 	assert.True(t, updatedEvent.UpdatedAt.After(createdEvent.CreatedAt) || updatedEvent.UpdatedAt.Equal(createdEvent.CreatedAt))
 }
 
-func TestEventRepository_Patch_NotFound(t *testing.T) {
+func TestEventRepository_Update_NotFound(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
@@ -85,12 +85,12 @@ func TestEventRepository_Patch_NotFound(t *testing.T) {
 	repo := NewEventRepository(testDB)
 	ctx := context.Background()
 
-	patchInput := &models.PatchEventInput{}
-	patchInput.ID = uuid.New()
-	patchInput.Body.Title = "Non-existent Event"
-	patchInput.Body.OrganizationID = uuid.New()
+	updateInput := &models.UpdateEventInput{}
+	updateInput.ID = uuid.New()
+	updateInput.Body.Title = "Non-existent Event"
+	updateInput.Body.OrganizationID = uuid.New()
 
-	updatedEvent, err := repo.PatchEvent(ctx, patchInput)
+	updatedEvent, err := repo.UpdateEvent(ctx, updateInput)
 	assert.Nil(t, updatedEvent)
 	assert.NotNil(t, err)
 }

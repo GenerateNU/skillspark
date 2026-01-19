@@ -99,23 +99,23 @@ func TestHandler_CreateEvent(t *testing.T) {
 	}
 }
 
-func TestHandler_PatchEvent(t *testing.T) {
+func TestHandler_UpdateEvent(t *testing.T) {
 	tests := []struct {
 		name      string
-		input     *models.PatchEventInput
+		input     *models.UpdateEventInput
 		mockSetup func(*repomocks.MockEventRepository)
 		wantErr   bool
 	}{
 		{
-			name: "successful patch event",
-			input: func() *models.PatchEventInput {
-				input := &models.PatchEventInput{}
+			name: "successful update event",
+			input: func() *models.UpdateEventInput {
+				input := &models.UpdateEventInput{}
 				input.ID = uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 				input.Body.Title = "Updated Robotics"
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				m.On("PatchEvent", mock.Anything, mock.AnythingOfType("*models.PatchEventInput")).Return(&models.Event{
+				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput")).Return(&models.Event{
 					ID:          uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 					Title:       "Updated Robotics",
 					Description: "Intro to robotics", // Unchanged field example
@@ -127,13 +127,13 @@ func TestHandler_PatchEvent(t *testing.T) {
 		},
 		{
 			name: "event not found",
-			input: func() *models.PatchEventInput {
-				input := &models.PatchEventInput{}
+			input: func() *models.UpdateEventInput {
+				input := &models.UpdateEventInput{}
 				input.ID = uuid.MustParse("00000000-0000-0000-0000-000000000000")
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				m.On("PatchEvent", mock.Anything, mock.AnythingOfType("*models.PatchEventInput")).
+				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput")).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("Event", "id", "00000000-0000-0000-0000-000000000000").Code,
 						Message: "Not found",
@@ -154,7 +154,7 @@ func TestHandler_PatchEvent(t *testing.T) {
 			handler := NewHandler(mockRepo)
 			ctx := context.Background()
 
-			event, err := handler.PatchEvent(ctx, tt.input)
+			event, err := handler.UpdateEvent(ctx, tt.input)
 
 			if tt.wantErr {
 				assert.Error(t, err)

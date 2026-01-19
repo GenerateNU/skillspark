@@ -34,19 +34,19 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository) {
 
 	// PATCH /api/v1/events/{id}
 	huma.Register(api, huma.Operation{
-		OperationID: "patch-event",
+		OperationID: "update-event",
 		Method:      http.MethodPatch,
 		Path:        "/api/v1/events/{id}",
 		Summary:     "Update an existing event",
 		Description: "Updates an existing event",
 		Tags:        []string{"Events"},
-	}, func(ctx context.Context, input *models.PatchEventInput) (*models.PatchEventOutput, error) {
-		event, err := eventHandler.PatchEvent(ctx, input)
+	}, func(ctx context.Context, input *models.UpdateEventInput) (*models.UpdateEventOutput, error) {
+		event, err := eventHandler.UpdateEvent(ctx, input)
 		if err != nil {
 			return nil, err
 		}
 
-		return &models.PatchEventOutput{
+		return &models.UpdateEventOutput{
 			Body: event,
 		}, nil
 	})

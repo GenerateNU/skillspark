@@ -42,7 +42,7 @@ type CreateEventOutput struct {
 	Body *Event `json:"body"`
 }
 
-type PatchEventInput struct {
+type UpdateEventInput struct {
 	ID   uuid.UUID `path:"id"`
 	Body struct {
 		Title string `json:"title" db:"title" doc:"Title of the event" minLength:"2" maxLength:"100"`
@@ -61,7 +61,7 @@ type PatchEventInput struct {
 	}
 }
 
-type PatchEventOutput struct {
+type UpdateEventOutput struct {
 	Body *Event `json:"body"`
 }
 

@@ -126,7 +126,7 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 	}
 }
 
-func TestHumaValidation_PatchEvent(t *testing.T) {
+func TestHumaValidation_UpdateEvent(t *testing.T) {
 	t.Parallel()
 
 	validID := uuid.New().String()
@@ -139,16 +139,16 @@ func TestHumaValidation_PatchEvent(t *testing.T) {
 		statusCode int
 	}{
 		{
-			name:    "valid patch",
+			name:    "valid update",
 			eventID: validID,
 			payload: map[string]interface{}{
 				"title": "Advanced Robotics",
 			},
 			mockSetup: func(m *repomocks.MockEventRepository) {
 				m.On(
-					"PatchEvent",
+					"UpdateEvent",
 					mock.Anything,
-					mock.MatchedBy(func(input *models.PatchEventInput) bool {
+					mock.MatchedBy(func(input *models.UpdateEventInput) bool {
 						return input.ID.String() == validID && input.Body.Title == "Advanced Robotics"
 					}),
 				).Return(&models.Event{

@@ -7,8 +7,8 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *EventRepository) PatchEvent(ctx context.Context, input *models.PatchEventInput) (*models.Event, *errs.HTTPError) {
-	query, err := schema.ReadSQLBaseScript("event/sql/patch.sql")
+func (r *EventRepository) UpdateEvent(ctx context.Context, input *models.UpdateEventInput) (*models.Event, *errs.HTTPError) {
+	query, err := schema.ReadSQLBaseScript("event/sql/update.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
@@ -20,7 +20,7 @@ func (r *EventRepository) PatchEvent(ctx context.Context, input *models.PatchEve
 
 	err = row.Scan(&event.ID, &event.Title, &event.Description, &event.OrganizationID, &event.AgeRangeMin, &event.AgeRangeMax, &event.Category, &event.HeaderImageS3Key, &event.CreatedAt, &event.UpdatedAt)
 	if err != nil {
-		err := errs.InternalServerError("Failed to patch event: ", err.Error())
+		err := errs.InternalServerError("Failed to update event: ", err.Error())
 		return nil, &err
 	}
 
