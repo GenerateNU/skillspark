@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// -------------------- Science Academy Events --------------------
-func TestEventRepository_Create_ScienceEvent(t *testing.T) {
+// -------------------- Junior Robotics Workshop --------------------
+func TestEventRepository_Create_JuniorRoboticsWorkshop(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
@@ -22,12 +22,11 @@ func TestEventRepository_Create_ScienceEvent(t *testing.T) {
 	ctx := context.Background()
 
 	eventInput := func() *models.CreateEventInput {
-
+		input := &models.CreateEventInput{}
 		ageMin := 8
 		ageMax := 12
 		headerImage := "events/robotics_workshop.jpg"
 
-		input := &models.CreateEventInput{}
 		input.Body.Title = "Junior Robotics Workshop"
 		input.Body.Description = "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!"
 		input.Body.OrganizationID = uuid.MustParse("40000000-0000-0000-0000-000000000001")
