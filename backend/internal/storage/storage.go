@@ -23,6 +23,13 @@ type SchoolRepository interface {
 	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, *errs.HTTPError)
 }
 
+type EventOccurrenceRepository interface {
+	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination) ([]models.EventOccurrence, *errs.HTTPError)
+	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, *errs.HTTPError)
+	GetEventOccurrencesByEventID(ctx context.Context, id uuid.UUID) ([]models.EventOccurrence, *errs.HTTPError)
+	CreateEventOccurrence(ctx context.Context, eventoccurrence *models.CreateEventOccurrenceInput) (*models.EventOccurrence, *errs.HTTPError)
+}
+
 type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
