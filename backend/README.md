@@ -47,3 +47,5 @@ For further development and testing, install [Postman](https://www.postman.com/d
 - [Supabase](https://supabase.com/docs) - database hosting service, with Auth service alongside.  
 
 This tech stack is totally flexible--suggestions are welcome!
+
+kkl
