@@ -149,7 +149,7 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 					"UpdateEvent",
 					mock.Anything,
 					mock.MatchedBy(func(input *models.UpdateEventInput) bool {
-						return input.ID.String() == validID && input.Body.Title == "Advanced Robotics"
+						return input.ID.String() == validID && input.Body.Title != nil && *input.Body.Title == "Advanced Robotics"
 					}),
 				).Return(&models.Event{
 					ID:    uuid.MustParse(validID),

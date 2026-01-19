@@ -45,17 +45,17 @@ type CreateEventOutput struct {
 type UpdateEventInput struct {
 	ID   uuid.UUID `path:"id"`
 	Body struct {
-		Title string `json:"title" db:"title" doc:"Title of the event" minLength:"2" maxLength:"100"`
+		Title *string `json:"title" db:"title" doc:"Title of the event" minLength:"2" maxLength:"100"`
 
-		Description string `json:"description" db:"description" doc:"Description of the event" minLength:"2" maxLength:"200"`
+		Description *string `json:"description" db:"description" doc:"Description of the event" minLength:"2" maxLength:"200"`
 
-		OrganizationID uuid.UUID `json:"organization_id" db:"organization_id" doc:"ID of the hosting organization"`
+		OrganizationID *uuid.UUID `json:"organization_id" db:"organization_id" doc:"ID of the hosting organization"`
 
 		AgeRangeMin *int `json:"age_range_min" db:"age_range_min" doc:"Minimum age for the event" minimum:"0" maximum:"100"`
 
 		AgeRangeMax *int `json:"age_range_max" db:"age_range_max" doc:"Max age for the event" minimum:"0" maximum:"100"`
 
-		Category []string `json:"category" db:"category" doc:"Category of the event"`
+		Category *[]string `json:"category" db:"category" doc:"Category of the event"`
 
 		HeaderImageS3Key *string `json:"header_image_s3_key" db:"header_image_s3_key" doc:"S3 key for the header image"`
 	}

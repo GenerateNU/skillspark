@@ -14,7 +14,7 @@ func (r *EventRepository) UpdateEvent(ctx context.Context, input *models.UpdateE
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, input.Body.Title, input.Body.Description, input.Body.OrganizationID, input.Body.AgeRangeMin, input.Body.AgeRangeMax, input.Body.Category, input.Body.HeaderImageS3Key)
+	row := r.db.QueryRow(ctx, query, input.ID, input.Body.Title, input.Body.Description, input.Body.OrganizationID, input.Body.AgeRangeMin, input.Body.AgeRangeMax, input.Body.Category, input.Body.HeaderImageS3Key)
 
 	var event models.Event
 

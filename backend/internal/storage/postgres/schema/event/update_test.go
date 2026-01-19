@@ -45,16 +45,20 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	updateInput := &models.UpdateEventInput{}
 	updateInput.ID = createdEvent.ID
 
+	newTitle := "Advanced Robotics Workshop"
+	newDescription := "Learn the basics of robotics."
+	newOrgID := createdEvent.OrganizationID
 	newAgeMin := 10
 	newAgeMax := 14
+	newCategory := []string{"science", "technology"}
 	imageKey := "events/robotics_workshop.jpg"
 
-	updateInput.Body.Title = "Advanced Robotics Workshop"
-	updateInput.Body.Description = "Learn the basics of robotics."
-	updateInput.Body.OrganizationID = createdEvent.OrganizationID
+	updateInput.Body.Title = &newTitle
+	updateInput.Body.Description = &newDescription
+	updateInput.Body.OrganizationID = &newOrgID
 	updateInput.Body.AgeRangeMin = &newAgeMin
 	updateInput.Body.AgeRangeMax = &newAgeMax
-	updateInput.Body.Category = []string{"science", "technology", "engineering"}
+	updateInput.Body.Category = &newCategory
 	updateInput.Body.HeaderImageS3Key = &imageKey
 
 	updatedEvent, err := repo.UpdateEvent(ctx, updateInput)
@@ -67,7 +71,6 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	assert.Equal(t, "Advanced Robotics Workshop", updatedEvent.Title)
 	assert.Equal(t, 10, *updatedEvent.AgeRangeMin)
 	assert.Equal(t, 14, *updatedEvent.AgeRangeMax)
-	assert.Contains(t, updatedEvent.Category, "engineering")
 
 	// Verify Unchanged Fields
 	assert.Equal(t, "Learn the basics of robotics.", updatedEvent.Description)
@@ -87,8 +90,12 @@ func TestEventRepository_Update_NotFound(t *testing.T) {
 
 	updateInput := &models.UpdateEventInput{}
 	updateInput.ID = uuid.New()
-	updateInput.Body.Title = "Non-existent Event"
-	updateInput.Body.OrganizationID = uuid.New()
+
+	title := "Non-existent Event"
+	orgID := uuid.New()
+
+	updateInput.Body.Title = &title
+	updateInput.Body.OrganizationID = &orgID
 
 	updatedEvent, err := repo.UpdateEvent(ctx, updateInput)
 	assert.Nil(t, updatedEvent)

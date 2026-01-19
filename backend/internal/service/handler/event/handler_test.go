@@ -111,7 +111,8 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			input: func() *models.UpdateEventInput {
 				input := &models.UpdateEventInput{}
 				input.ID = uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-				input.Body.Title = "Updated Robotics"
+				title := "Updated Robotics"
+				input.Body.Title = &title
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockEventRepository) {
@@ -162,7 +163,7 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, event)
-				assert.Equal(t, tt.input.Body.Title, event.Title)
+				assert.Equal(t, *tt.input.Body.Title, event.Title)
 				assert.Equal(t, tt.input.ID, event.ID)
 			}
 
