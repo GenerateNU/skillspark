@@ -8,22 +8,22 @@ import (
 
 // DB holds database configuration
 type DB struct {
-	Host     string `env:"DB_HOST, required"`
-	Port     string `env:"DB_PORT, required"`
-	User     string `env:"DB_USER, required"`
-	Password string `env:"DB_PASSWORD, required"`
-	Name     string `env:"DB_NAME, required"`
-	// Add these:
-	MaxOpenConns    int `env:"DB_MAX_OPEN_CONNS" envDefault:"50"`         // max connections to keep open
-	MaxIdleConns    int `env:"DB_MAX_IDLE_CONNS" envDefault:"5"`          // max idle connections
-	MaxConnIdleTime int `env:"DB_CONN_MAX_IDLE_TIME" envDefault:"100000"` // max idle time in seconds
-	ConnMaxLifetime int `env:"DB_CONN_MAX_LIFETIME"`                      // connection lifetime in seconds
+	Host            string `env:"DB_HOST, required"`
+	Port            string `env:"DB_PORT, required"`
+	User            string `env:"DB_USER, required"`
+	Password        string `env:"DB_PASSWORD, required"`
+	Name            string `env:"DB_NAME, required"`
+	MaxOpenConns    int    `env:"DB_MAX_OPEN_CONNS" envDefault:"50"`
+	MaxIdleConns    int    `env:"DB_MAX_IDLE_CONNS" envDefault:"5"`
+	MaxConnIdleTime int    `env:"DB_CONN_MAX_IDLE_TIME" envDefault:"100000"`
+	ConnMaxLifetime int    `env:"DB_CONN_MAX_LIFETIME"`
+	SSLMode         string `env:"DB_SSLMODE, default=require"`
 }
 
 // Connection builds the PostgreSQL connection string
 func (db *DB) Connection() string {
-	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require",
-		db.Host, db.User, db.Password, db.Name, db.Port)
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		db.Host, db.User, db.Password, db.Name, db.Port, db.SSLMode)
 }
 
 // New method to configure the pool

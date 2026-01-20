@@ -6,23 +6,19 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"skillspark/internal/config"
 	"skillspark/internal/service"
 	"syscall"
 	"time"
-
-	"github.com/sethvargo/go-envconfig"
 )
 
 func main() {
-	// Load configuration from environment variables
-	var cfg config.Config
-	if err := envconfig.Process(context.Background(), &cfg); err != nil {
-		log.Fatalln("Error processing .env file: ", err)
+	cfg, err := LoadConfig()
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
 	}
 
 	// Initialize application with config
-	app := service.InitApp(cfg)
+	app := service.InitApp(*cfg)
 
 	// Close database connection when main exits
 	defer func() {
