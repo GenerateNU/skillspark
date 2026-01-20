@@ -9,7 +9,7 @@ import (
 
 func (r *ChildRepository) CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, *errs.HTTPError) {
 
-	query, err := schema.ReadSQLBaseScript("child/sql/get_by_id.sql")
+	query, err := schema.ReadSQLBaseScript("child/sql/create.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
@@ -26,7 +26,7 @@ func (r *ChildRepository) CreateChild(ctx context.Context, child *models.CreateC
 
 	var createdChild models.Child
 
-	err = row.Scan(&createdChild.ID, &createdChild.SchoolID, &createdChild.SchoolName, &createdChild.BirthMonth, &createdChild.BirthYear, &createdChild.Interests, &createdChild.GuardianID, &createdChild.CreatedAt, &createdChild.UpdatedAt)
+	err = row.Scan(&createdChild.ID, &createdChild.Name, &createdChild.SchoolID, &createdChild.SchoolName, &createdChild.BirthMonth, &createdChild.BirthYear, &createdChild.Interests, &createdChild.GuardianID, &createdChild.CreatedAt, &createdChild.UpdatedAt)
 
 	if err != nil {
 		err := errs.InternalServerError("Failed to create child: ", err.Error())

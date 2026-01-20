@@ -32,7 +32,7 @@ func CreateTestChild(
 	input.Body.SchoolID = schoolID
 	input.Body.BirthMonth = 5
 	input.Body.BirthYear = 2019
-	input.Body.Interests = []models.Interest{"soccer", "art"}
+	input.Body.Interests = []string{"soccer", "art"}
 	input.Body.GuardianID = guardianID
 
 	child, err := repo.CreateChild(ctx, input)
@@ -59,7 +59,7 @@ func TestChildRepository_CreateChild(t *testing.T) {
 		input.Body.SchoolID = sampleChild.SchoolID
 		input.Body.BirthMonth = 5
 		input.Body.BirthYear = 2019
-		input.Body.Interests = []models.Interest{"soccer", "football"}
+		input.Body.Interests = []string{"soccer", "football"}
 		input.Body.GuardianID = sampleChild.GuardianID
 		return input
 	}()
@@ -79,7 +79,7 @@ func TestChildRepository_CreateChild(t *testing.T) {
 
 	assert.ElementsMatch(
 		t,
-		[]models.Interest{"soccer", "football"},
+		[]string{"soccer", "football"},
 		child.Interests,
 	)
 

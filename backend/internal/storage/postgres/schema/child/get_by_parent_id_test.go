@@ -30,7 +30,7 @@ func CreateTestChildren(
 	input1.Body.SchoolID = schoolID
 	input1.Body.BirthMonth = 5
 	input1.Body.BirthYear = 2019
-	input1.Body.Interests = []models.Interest{"soccer"}
+	input1.Body.Interests = []string{"soccer"}
 	input1.Body.GuardianID = guardianID
 
 	child1, err := repo.CreateChild(ctx, input1)
@@ -42,7 +42,7 @@ func CreateTestChildren(
 	input2.Body.SchoolID = schoolID
 	input2.Body.BirthMonth = 8
 	input2.Body.BirthYear = 2021
-	input2.Body.Interests = []models.Interest{"climbing"}
+	input2.Body.Interests = []string{"climbing"}
 	input2.Body.GuardianID = guardianID
 
 	child2, err := repo.CreateChild(ctx, input2)

@@ -22,7 +22,7 @@ func (r *ChildRepository) DeleteChildByID(ctx context.Context, childID uuid.UUID
 	row := r.db.QueryRow(ctx, query, childID)
 
 	var deletedChild models.Child
-	err = row.Scan(&deletedChild.ID, &deletedChild.SchoolID, &deletedChild.SchoolName, &deletedChild.BirthMonth, &deletedChild.BirthYear, &deletedChild.Interests, &deletedChild.GuardianID, &deletedChild.CreatedAt, &deletedChild.UpdatedAt)
+	err = row.Scan(&deletedChild.ID, &deletedChild.Name, &deletedChild.SchoolID, &deletedChild.SchoolName, &deletedChild.BirthMonth, &deletedChild.BirthYear, &deletedChild.Interests, &deletedChild.GuardianID, &deletedChild.CreatedAt, &deletedChild.UpdatedAt)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

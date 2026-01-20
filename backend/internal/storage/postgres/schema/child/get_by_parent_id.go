@@ -13,7 +13,7 @@ import (
 
 func (r *ChildRepository) GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, *errs.HTTPError) {
 
-	query, err := schema.ReadSQLBaseScript("child/sql/get_my_parent_id.sql")
+	query, err := schema.ReadSQLBaseScript("child/sql/get_by_parent_id.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
@@ -25,7 +25,7 @@ func (r *ChildRepository) GetChildrenByParentID(ctx context.Context, parentID uu
 		rows,
 		func(row pgx.CollectableRow) (models.Child, error) {
 			var child models.Child
-			err = row.Scan(&child.ID, &child.SchoolID, &child.SchoolName, &child.BirthMonth, &child.BirthYear, &child.Interests, &child.GuardianID, &child.CreatedAt, &child.UpdatedAt)
+			err = row.Scan(&child.ID, &child.Name, &child.SchoolID, &child.SchoolName, &child.BirthMonth, &child.BirthYear, &child.Interests, &child.GuardianID, &child.CreatedAt, &child.UpdatedAt)
 			return child, err
 		},
 	)

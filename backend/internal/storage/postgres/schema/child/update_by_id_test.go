@@ -26,16 +26,15 @@ func TestChildRepository_UpdateChildByID(t *testing.T) {
 	name := "Updated Child"
 	month := 11
 	year := 2000
-	interests := []models.Interest{"walking"}
+	interests := []string{"math"}
 
 	// all pointers here
 	input.Body.Name = &name
 	input.Body.BirthMonth = &month
 	input.Body.BirthYear = &year
 	input.Body.Interests = &interests
-	input.Body.ID = testChild.ID
 
-	updatedChild, err := repo.UpdateChildByID(ctx, input)
+	updatedChild, err := repo.UpdateChildByID(ctx, testChild.ID, input)
 
 	require.NoError(t, err)
 	require.NotNil(t, updatedChild)
@@ -43,7 +42,7 @@ func TestChildRepository_UpdateChildByID(t *testing.T) {
 	assert.Equal(t, "Updated Child", updatedChild.Name)
 	assert.Equal(t, 11, updatedChild.BirthMonth)
 	assert.Equal(t, 2000, updatedChild.BirthYear)
-	assert.ElementsMatch(t, []models.Interest{"walking"}, updatedChild.Interests)
+	assert.ElementsMatch(t, []string{"math"}, updatedChild.Interests)
 
 	assert.Equal(t, testChild.GuardianID, updatedChild.GuardianID)
 	assert.Equal(t, testChild.SchoolID, updatedChild.SchoolID)

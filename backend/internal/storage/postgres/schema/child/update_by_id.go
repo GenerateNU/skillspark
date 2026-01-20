@@ -7,10 +7,11 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *ChildRepository) UpdateChildByID(ctx context.Context, child *models.UpdateChildInput) (*models.Child, *errs.HTTPError) {
+func (r *ChildRepository) UpdateChildByID(ctx context.Context, childID uuid.UUID, child *models.UpdateChildInput) (*models.Child, *errs.HTTPError) {
 
 	query, err := schema.ReadSQLBaseScript("child/sql/update_by_id.sql")
 	if err != nil {
@@ -27,14 +28,25 @@ func (r *ChildRepository) UpdateChildByID(ctx context.Context, child *models.Upd
 		child.Body.BirthYear,
 		child.Body.Interests,
 		child.Body.GuardianID,
-		child.Body.ID)
+		childID)
 
 	var updatedChild models.Child
-	err = row.Scan(&updatedChild.ID, &updatedChild.SchoolID, &updatedChild.SchoolName, &updatedChild.BirthMonth, &updatedChild.BirthYear, &updatedChild.Interests, &updatedChild.GuardianID, &updatedChild.CreatedAt, &updatedChild.UpdatedAt)
+	err = row.Scan(
+		&updatedChild.ID,
+		&updatedChild.Name,
+		&updatedChild.SchoolID,
+		&updatedChild.SchoolName,
+		&updatedChild.BirthMonth,
+		&updatedChild.BirthYear,
+		&updatedChild.Interests,
+		&updatedChild.GuardianID,
+		&updatedChild.CreatedAt,
+		&updatedChild.UpdatedAt,
+	)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			err := errs.NotFound("Child", "id", child.Body.ID)
+			err := errs.NotFound("Child", "id", childID)
 			return nil, &err
 		}
 		err := errs.InternalServerError("Failed to fetch child by id: ", err.Error())

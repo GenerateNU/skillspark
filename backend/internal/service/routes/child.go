@@ -77,7 +77,7 @@ func SetupChildRoutes(api huma.API, repo *storage.Repository) {
 		Description: "Updates a child by ID",
 		Tags:        []string{"Child"},
 	}, func(ctx context.Context, input *models.UpdateChildInput) (*models.ChildOutput, error) {
-		child, err := childHandler.UpdateChildByID(ctx, input)
+		child, err := childHandler.UpdateChildByID(ctx, input.ID, input)
 		if err != nil {
 			return nil, err
 		}
@@ -90,9 +90,9 @@ func SetupChildRoutes(api huma.API, repo *storage.Repository) {
 	huma.Register(api, huma.Operation{
 		OperationID: "create-child",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/child/{id}",
-		Summary:     "Updates a child",
-		Description: "Updates a child by ID",
+		Path:        "/api/v1/child",
+		Summary:     "Creates a child",
+		Description: "Creates a child",
 		Tags:        []string{"Child"},
 	}, func(ctx context.Context, input *models.CreateChildInput) (*models.ChildOutput, error) {
 		child, err := childHandler.CreateChild(ctx, input)

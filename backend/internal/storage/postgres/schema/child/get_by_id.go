@@ -20,7 +20,7 @@ func (r *ChildRepository) GetChildByID(ctx context.Context, childID uuid.UUID) (
 
 	row := r.db.QueryRow(ctx, query, childID)
 	var child models.Child
-	err = row.Scan(&child.ID, &child.SchoolID, &child.SchoolName, &child.BirthMonth, &child.BirthYear, &child.Interests, &child.GuardianID, &child.CreatedAt, &child.UpdatedAt)
+	err = row.Scan(&child.ID, &child.Name, &child.SchoolID, &child.SchoolName, &child.BirthMonth, &child.BirthYear, &child.Interests, &child.GuardianID, &child.CreatedAt, &child.UpdatedAt)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

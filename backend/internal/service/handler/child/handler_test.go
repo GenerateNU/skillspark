@@ -34,7 +34,7 @@ func TestHandler_GetChildByID(t *testing.T) {
 						SchoolID:   uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 						BirthMonth: 3,
 						BirthYear:  2016,
-						Interests:  []models.Interest{"science", "technology", "math"},
+						Interests:  []string{"science", "technology", "math"},
 						GuardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
 						CreatedAt:  time.Now(),
 						UpdatedAt:  time.Now(),
@@ -102,7 +102,7 @@ func TestHandler_GetChildrenByParentID(t *testing.T) {
 							SchoolID:   uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 							BirthMonth: 3,
 							BirthYear:  2016,
-							Interests:  []models.Interest{"science", "technology", "math"},
+							Interests:  []string{"science", "technology", "math"},
 							GuardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
 							CreatedAt:  time.Now(),
 							UpdatedAt:  time.Now(),
@@ -164,22 +164,20 @@ func TestHandler_UpdateChildByID(t *testing.T) {
 			name: "successful update child",
 			input: func() *models.UpdateChildInput {
 				in := &models.UpdateChildInput{}
-				in.Body.ID = uuid.MustParse("30000000-0000-0000-0000-000000000001")
 				in.Body.Name = ptrString("Updated Emily")
 				in.Body.BirthMonth = ptrInt(5)
 				in.Body.BirthYear = ptrInt(2017)
-				in.Body.Interests = &[]models.Interest{"science", "math"}
+				in.Body.Interests = &[]string{"science", "math"}
 				return in
 			}(),
 			mockSetup: func(m *repomocks.MockChildRepository) {
 				m.On("UpdateChildByID", mock.Anything, mock.AnythingOfType("*models.UpdateChildInput")).
 					Return(&models.Child{
-						ID:         uuid.MustParse("30000000-0000-0000-0000-000000000001"),
 						Name:       "Updated Emily",
 						SchoolID:   uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 						BirthMonth: 5,
 						BirthYear:  2017,
-						Interests:  []models.Interest{"science", "math"},
+						Interests:  []string{"science", "math"},
 						GuardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
 						CreatedAt:  time.Now(),
 						UpdatedAt:  time.Now(),
@@ -191,7 +189,6 @@ func TestHandler_UpdateChildByID(t *testing.T) {
 			name: "update non-existent child",
 			input: func() *models.UpdateChildInput {
 				in := &models.UpdateChildInput{}
-				in.Body.ID = uuid.MustParse("00000000-0000-0000-0000-000000000000")
 				return in
 			}(),
 			mockSetup: func(m *repomocks.MockChildRepository) {
@@ -215,7 +212,7 @@ func TestHandler_UpdateChildByID(t *testing.T) {
 			handler := NewHandler(mockRepo)
 			ctx := context.Background()
 
-			child, err := handler.UpdateChildByID(ctx, tt.input)
+			child, err := handler.UpdateChildByID(ctx, tt.input.ID, tt.input)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -249,7 +246,7 @@ func TestHandler_DeleteChildByID(t *testing.T) {
 						SchoolID:   uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 						BirthMonth: 3,
 						BirthYear:  2016,
-						Interests:  []models.Interest{"science", "technology", "math"},
+						Interests:  []string{"science", "technology", "math"},
 						GuardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
 						CreatedAt:  time.Now(),
 						UpdatedAt:  time.Now(),
@@ -313,7 +310,7 @@ func TestHandler_CreateChild(t *testing.T) {
 				in.Body.SchoolID = uuid.MustParse("20000000-0000-0000-0000-000000000001")
 				in.Body.BirthMonth = 3
 				in.Body.BirthYear = 2016
-				in.Body.Interests = []models.Interest{"science", "technology", "math"}
+				in.Body.Interests = []string{"science", "technology", "math"}
 				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
 				return in
 			}(),
@@ -325,7 +322,7 @@ func TestHandler_CreateChild(t *testing.T) {
 						SchoolID:   uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 						BirthMonth: 3,
 						BirthYear:  2016,
-						Interests:  []models.Interest{"science", "technology", "math"},
+						Interests:  []string{"science", "technology", "math"},
 						GuardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
 						CreatedAt:  time.Now(),
 						UpdatedAt:  time.Now(),
@@ -341,7 +338,7 @@ func TestHandler_CreateChild(t *testing.T) {
 				// missing school ID
 				in.Body.BirthMonth = 5
 				in.Body.BirthYear = 2017
-				in.Body.Interests = []models.Interest{"soccer"}
+				in.Body.Interests = []string{"soccer"}
 				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
 				return in
 			}(),
