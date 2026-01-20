@@ -5,6 +5,7 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	"skillspark/internal/utils"
 	"testing"
 	"time"
 
@@ -12,9 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
-
-func ptrString(s string) *string { return &s }
-func ptrInt(i int) *int          { return &i }
 
 func TestHandler_GetChildByID(t *testing.T) {
 	tests := []struct {
@@ -164,9 +162,9 @@ func TestHandler_UpdateChildByID(t *testing.T) {
 			name: "successful update child",
 			input: func() *models.UpdateChildInput {
 				in := &models.UpdateChildInput{}
-				in.Body.Name = ptrString("Updated Emily")
-				in.Body.BirthMonth = ptrInt(5)
-				in.Body.BirthYear = ptrInt(2017)
+				in.Body.Name = utils.PtrString("Updated Emily")
+				in.Body.BirthMonth = utils.PtrInt(5)
+				in.Body.BirthYear = utils.PtrInt(2017)
 				in.Body.Interests = &[]string{"science", "math"}
 				return in
 			}(),
