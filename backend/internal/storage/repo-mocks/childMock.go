@@ -13,27 +13,57 @@ type MockChildRepository struct {
 	mock.Mock
 }
 
-func (m *MockChildRepository) GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, *errs.HTTPError) {
-	args := m.Called(ctx, childID)
-	return args.Get(0).(*models.Child), args.Get(1).(*errs.HTTPError)
+func (m *MockChildRepository) GetChildByID(ctx context.Context, id uuid.UUID) (*models.Child, *errs.HTTPError) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Child), nil
 }
 
-func (m *MockChildRepository) GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, *errs.HTTPError) {
-	args := m.Called(ctx, parentID)
-	return args.Get(0).([]models.Child), args.Get(1).(*errs.HTTPError)
+func (m *MockChildRepository) GetChildrenByParentID(ctx context.Context, id uuid.UUID) ([]models.Child, *errs.HTTPError) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).([]models.Child), nil
 }
 
-func (m *MockChildRepository) UpdateChildByID(ctx context.Context, childID uuid.UUID, child *models.UpdateChildInput) (*models.Child, *errs.HTTPError) {
-	args := m.Called(ctx, childID, child)
-	return args.Get(0).(*models.Child), args.Get(1).(*errs.HTTPError)
+func (m *MockChildRepository) DeleteChildByID(ctx context.Context, id uuid.UUID) (*models.Child, *errs.HTTPError) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Child), nil
+}
+
+func (m *MockChildRepository) UpdateChildByID(ctx context.Context, id uuid.UUID, input *models.UpdateChildInput) (*models.Child, *errs.HTTPError) {
+	args := m.Called(ctx, id, input)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Child), nil
 }
 
 func (m *MockChildRepository) CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, *errs.HTTPError) {
 	args := m.Called(ctx, child)
-	return args.Get(0).(*models.Child), args.Get(1).(*errs.HTTPError)
-}
-
-func (m *MockChildRepository) DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, *errs.HTTPError) {
-	args := m.Called(ctx, childID)
-	return args.Get(0).(*models.Child), args.Get(1).(*errs.HTTPError)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Child), nil
 }

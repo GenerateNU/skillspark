@@ -171,18 +171,23 @@ func TestHandler_UpdateChildByID(t *testing.T) {
 				return in
 			}(),
 			mockSetup: func(m *repomocks.MockChildRepository) {
-				m.On("UpdateChildByID", mock.Anything, mock.AnythingOfType("*models.UpdateChildInput")).
-					Return(&models.Child{
-						Name:       "Updated Emily",
-						SchoolID:   uuid.MustParse("20000000-0000-0000-0000-000000000001"),
-						BirthMonth: 5,
-						BirthYear:  2017,
-						Interests:  []string{"science", "math"},
-						GuardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
-						CreatedAt:  time.Now(),
-						UpdatedAt:  time.Now(),
-					}, nil)
+				m.On(
+					"UpdateChildByID",
+					mock.Anything,
+					mock.Anything,
+					mock.AnythingOfType("*models.UpdateChildInput"),
+				).Return(&models.Child{
+					Name:       "Updated Emily",
+					SchoolID:   uuid.MustParse("20000000-0000-0000-0000-000000000001"),
+					BirthMonth: 5,
+					BirthYear:  2017,
+					Interests:  []string{"science", "math"},
+					GuardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+					CreatedAt:  time.Now(),
+					UpdatedAt:  time.Now(),
+				}, nil)
 			},
+
 			wantErr: false,
 		},
 		{
@@ -192,12 +197,17 @@ func TestHandler_UpdateChildByID(t *testing.T) {
 				return in
 			}(),
 			mockSetup: func(m *repomocks.MockChildRepository) {
-				m.On("UpdateChildByID", mock.Anything, mock.AnythingOfType("*models.UpdateChildInput")).
-					Return(nil, &errs.HTTPError{
-						Code:    errs.NotFound("Child", "id", "00000000-0000-0000-0000-000000000000").Code,
-						Message: "Not found",
-					})
+				m.On(
+					"UpdateChildByID",
+					mock.Anything, // context.Context
+					mock.Anything, // uuid.UUID
+					mock.AnythingOfType("*models.UpdateChildInput"),
+				).Return(nil, &errs.HTTPError{
+					Code:    errs.NotFound("Child", "id", "00000000-0000-0000-0000-000000000000").Code,
+					Message: "Not found",
+				})
 			},
+
 			wantErr: true,
 		},
 	}
