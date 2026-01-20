@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *ChildRepository) GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, *errs.HTTPError) {
+func (r *ChildRepository) GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error) {
 	query, err := schema.ReadSQLBaseScript("child/sql/get_by_id.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())

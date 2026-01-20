@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *ChildRepository) DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, *errs.HTTPError) {
+func (r *ChildRepository) DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error) {
 
 	query, err := schema.ReadSQLBaseScript("child/sql/delete_by_id.sql")
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *ChildRepository) GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, *errs.HTTPError) {
+func (r *ChildRepository) GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, error) {
 
 	query, err := schema.ReadSQLBaseScript("child/sql/get_by_parent_id.sql")
 	if err != nil {

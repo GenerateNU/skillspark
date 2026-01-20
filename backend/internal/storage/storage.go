@@ -24,11 +24,11 @@ type SchoolRepository interface {
 }
 
 type ChildRepository interface {
-	GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, *errs.HTTPError)
-	GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, *errs.HTTPError)
-	UpdateChildByID(ctx context.Context, childID uuid.UUID, child *models.UpdateChildInput) (*models.Child, *errs.HTTPError)
-	CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, *errs.HTTPError)
-	DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, *errs.HTTPError)
+	GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error)
+	GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, error)
+	UpdateChildByID(ctx context.Context, childID uuid.UUID, child *models.UpdateChildInput) (*models.Child, error)
+	CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, error)
+	DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error)
 }
 
 type Repository struct {

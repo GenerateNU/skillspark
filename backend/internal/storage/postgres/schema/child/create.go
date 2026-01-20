@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *ChildRepository) CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, *errs.HTTPError) {
+func (r *ChildRepository) CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, error) {
 
 	query, err := schema.ReadSQLBaseScript("child/sql/create.sql")
 	if err != nil {
