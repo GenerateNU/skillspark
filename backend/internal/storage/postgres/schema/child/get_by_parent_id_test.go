@@ -30,7 +30,7 @@ func CreateTestChildren(
 	input1.Body.SchoolID = schoolID
 	input1.Body.BirthMonth = 5
 	input1.Body.BirthYear = 2019
-	input1.Body.Interests = []string{"soccer"}
+	input1.Body.Interests = []string{"math"}
 	input1.Body.GuardianID = guardianID
 
 	child1, err := repo.CreateChild(ctx, input1)

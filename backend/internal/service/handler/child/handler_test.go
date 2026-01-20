@@ -338,7 +338,7 @@ func TestHandler_CreateChild(t *testing.T) {
 				// missing school ID
 				in.Body.BirthMonth = 5
 				in.Body.BirthYear = 2017
-				in.Body.Interests = []string{"soccer"}
+				in.Body.Interests = []string{"math"}
 				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
 				return in
 			}(),

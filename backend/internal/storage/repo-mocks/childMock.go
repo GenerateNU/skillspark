@@ -35,7 +35,7 @@ func (m *MockChildRepository) GetChildrenByParentID(ctx context.Context, parentI
 	return args.Get(0).([]models.Child), nil
 }
 
-func (m *MockChildRepository) UpdateChildByID(ctx context.Context, child *models.UpdateChildInput) (*models.Child, *errs.HTTPError) {
+func (m *MockChildRepository) UpdateChildByID(ctx context.Context, childID uuid.UUID, child *models.UpdateChildInput) (*models.Child, *errs.HTTPError) {
 	args := m.Called(ctx, child)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
