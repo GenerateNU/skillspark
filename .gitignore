@@ -19,6 +19,7 @@ backend/.env
 
 backend/internal/supabase/.branches/
 backend/internal/supabase/.temp/
+backend/.local.env
 
 backend/coverage.out
 backend/coverage.html

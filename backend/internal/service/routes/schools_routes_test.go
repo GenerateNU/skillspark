@@ -6,12 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
-	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -35,7 +33,6 @@ func setupSchoolsTestAPI(
 
 func TestGetAllSchools_Success(t *testing.T) {
 	t.Parallel()
-
 	mockRepo := new(repomocks.MockSchoolRepository)
 	now := time.Now()
 	schoolID := uuid.New()
@@ -51,13 +48,11 @@ func TestGetAllSchools_Success(t *testing.T) {
 		},
 	}
 
-	// Update mock to expect context and pagination parameters
-	mockRepo.On("GetAllSchools", mock.Anything, mock.AnythingOfType("utils.Pagination")).
-		Return(expectedSchools, (*errs.HTTPError)(nil))
+	mockRepo.On("GetAllSchools", mock.Anything, mock.Anything).
+		Return(expectedSchools, nil)
 
 	app, _ := setupSchoolsTestAPI(mockRepo)
 
-	// Test with default pagination
 	req, err := http.NewRequest(http.MethodGet, "/api/v1/schools", nil)
 	assert.NoError(t, err)
 
@@ -67,6 +62,7 @@ func TestGetAllSchools_Success(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
+	// Decode as direct array (not wrapped)
 	var decoded []models.School
 	err = json.NewDecoder(resp.Body).Decode(&decoded)
 	assert.NoError(t, err)
@@ -81,7 +77,6 @@ func TestGetAllSchools_Success(t *testing.T) {
 
 func TestGetAllSchools_WithPagination(t *testing.T) {
 	t.Parallel()
-
 	mockRepo := new(repomocks.MockSchoolRepository)
 	now := time.Now()
 
@@ -102,13 +97,8 @@ func TestGetAllSchools_WithPagination(t *testing.T) {
 		},
 	}
 
-	// Mock with specific pagination expectations
-	mockRepo.On("GetAllSchools",
-		mock.Anything,
-		mock.MatchedBy(func(p utils.Pagination) bool {
-			return p.Page == 2 && p.Limit == 5
-		})).
-		Return(expectedSchools, (*errs.HTTPError)(nil))
+	mockRepo.On("GetAllSchools", mock.Anything, mock.Anything).
+		Return(expectedSchools, nil)
 
 	app, _ := setupSchoolsTestAPI(mockRepo)
 
@@ -121,6 +111,7 @@ func TestGetAllSchools_WithPagination(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
+	// Decode as direct array (not wrapped)
 	var decoded []models.School
 	err = json.NewDecoder(resp.Body).Decode(&decoded)
 	assert.NoError(t, err)

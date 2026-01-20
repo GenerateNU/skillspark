@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/location"
@@ -16,12 +15,12 @@ import (
 
 // Repository provides methods to interact with the database
 type LocationRepository interface {
-	GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, *errs.HTTPError)
-	CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, *errs.HTTPError)
+	GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, error)
+	CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, error)
 }
 
 type SchoolRepository interface {
-	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, *errs.HTTPError)
+	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error)
 }
 
 type EventRepository interface {
