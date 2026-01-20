@@ -32,7 +32,7 @@ SELECT
     l.country,
     l.created_at,
     l.updated_at
-FROM event_occurrences eo
-JOIN events e ON e.id = eo.event_id
-JOIN locations l ON l.id = eo.location_id
-WHERE id = $1;
+FROM event_occurrence eo
+JOIN event e ON e.id = eo.event_id
+JOIN location l ON l.id = eo.location_id
+WHERE eo.id = $1;

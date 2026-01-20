@@ -1,6 +1,9 @@
-INSERT INTO event_occurrence (manager_id, event_id, location_id, start_time, end_time, max_attendees, language)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING 
+WITH new_row AS (
+    INSERT INTO event_occurrence (manager_id, event_id, location_id, start_time, end_time, max_attendees, language)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    RETURNING id, manager_id, event_id, location_id, start_time, end_time, max_attendees, language, curr_enrolled, created_at, updated_at
+) 
+SELECT 
     eo.id,
     eo.manager_id,
     eo.start_time,
@@ -34,6 +37,6 @@ RETURNING
     l.country,
     l.created_at,
     l.updated_at
-FROM event_occurrences eo
-JOIN events e ON e.id = eo.event_id
-JOIN locations l ON l.id = eo.location_id;
+FROM new_row eo
+JOIN event e ON e.id = eo.event_id
+JOIN location l ON l.id = eo.location_id;

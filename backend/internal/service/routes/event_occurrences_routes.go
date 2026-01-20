@@ -65,7 +65,7 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 	huma.Register(api, huma.Operation{
 		OperationID: "get-event-occurrences-by-event-id",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/event-occurrences/{event_id}",
+		Path:        "/api/v1/events/{event_id}/event-occurrences/",
 		Summary:     "Get event occurrences by event ID",
 		Description: "Returns event occurrences that match the event ID",
 		Tags:        []string{"Event Occurrences"},

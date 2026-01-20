@@ -10,9 +10,9 @@ import (
 // stores full type information for Event and Location
 type EventOccurrence struct {
 	ID 				uuid.UUID 	`json:"id" db:"id"`
-	ManagerId		uuid.UUID 	`json:"manager_id" db:"manager_id"`
-	Event	 		Event 		`json:"event"`
- 	Location 		Location 	`json:"location"`
+	ManagerId		*uuid.UUID 	`json:"manager_id" db:"manager_id"`
+	Event	 		Event 		`json:"event" db:"-"`
+ 	Location 		Location 	`json:"location" db:"-"`
    	StartTime 		time.Time 	`json:"start_time" db:"start_time"`
    	EndTime 		time.Time 	`json:"end_time" db:"end_time"`
   	MaxAttendees 	int			`json:"max_attendees" db:"max_attendees"`
@@ -54,8 +54,8 @@ type GetEventOccurrencesByEventIDOutput struct {
 type CreateEventOccurrenceInput struct {
 	Body struct {
 		ManagerId uuid.UUID `json:"manager_id" doc:"ID of a manager in the database"`
-		EventId uuid.UUID `json:"event" doc:"ID of an event in the database"`
-		LocationId uuid.UUID `json:"location" doc:"ID of a location in the database"`
+		EventId uuid.UUID `json:"event_id" doc:"ID of an event in the database"`
+		LocationId uuid.UUID `json:"location_id" doc:"ID of a location in the database"`
 		StartTime time.Time `json:"start_time" doc:"Start time of the event occurrence"`
 		EndTime time.Time `json:"end_time" doc:"End time of the event occurrence"`
 		MaxAttendees int `json:"max_attendees" doc:"Maximum number of attendees" minimum:"1" maximum:"100"`

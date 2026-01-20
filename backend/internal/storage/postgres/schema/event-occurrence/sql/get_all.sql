@@ -32,8 +32,8 @@ SELECT
     l.country,
     l.created_at,
     l.updated_at
-FROM event_occurrences eo
-JOIN events e ON e.id = eo.event_id
-JOIN locations l ON l.id = eo.location_id
-ORDER BY created_at DESC
+FROM event_occurrence eo
+JOIN event e ON e.id = eo.event_id
+JOIN location l ON l.id = eo.location_id
+ORDER BY eo.id
 LIMIT $1 OFFSET $2;

@@ -9,6 +9,134 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 paths:
+  /api/v1/event-occurrences:
+    get:
+      tags:
+        - Event Occurrences
+      summary: Get all event occurrences
+      description: Returns a list of all event occurrences in the database
+      operationId: get-all-event-occurrences
+      parameters:
+        - name: page
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 100
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of all event occurrences in the database
+                items:
+                  $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    post:
+      tags:
+        - Event Occurrences
+      summary: Create an event occurrence
+      description: Creates a new event occurrence in the database
+      operationId: post-event-occurrence
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: New event occurrence to add
+              $ref: '#/components/schemas/CreateEventOccurrenceInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Created event occurrence
+                $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/event-occurrences/{id}:
+    get:
+      tags:
+        - Event Occurrences
+      summary: Get an event occurrence by ID
+      description: Returns an event occurrence that matches the ID
+      operationId: get-event-occurrences-by-id
+      parameters:
+        - name: id
+          in: path
+          description: ID of an event occurrence
+          required: true
+          schema:
+            type: string
+            description: ID of an event occurrence
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Event occurrence in the database that matches the ID
+                $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/events/{event_id}/event-occurrences/:
+    get:
+      tags:
+        - Event Occurrences
+      summary: Get event occurrences by event ID
+      description: Returns event occurrences that match the event ID
+      operationId: get-event-occurrences-by-event-id
+      parameters:
+        - name: event_id
+          in: path
+          description: ID of an event
+          required: true
+          schema:
+            type: string
+            description: ID of an event
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of event occurrences in the database that match the event ID
+                items:
+                  $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/greet/{name}:
     get:
       tags:
@@ -249,6 +377,53 @@ paths:
                 $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
+    CreateEventOccurrenceInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateEventOccurrenceInputBody.json
+          readOnly: true
+        end_time:
+          type: string
+          description: End time of the event occurrence
+          format: date-time
+        event_id:
+          type: string
+          description: ID of an event in the database
+        language:
+          type: string
+          description: Primary language used for the event occurrence
+          minLength: 2
+          maxLength: 30
+        location_id:
+          type: string
+          description: ID of a location in the database
+        manager_id:
+          type: string
+          description: ID of a manager in the database
+        max_attendees:
+          type: integer
+          description: Maximum number of attendees
+          format: int64
+          minimum: 1
+          maximum: 100
+        start_time:
+          type: string
+          description: Start time of the event occurrence
+          format: date-time
+      required:
+        - manager_id
+        - event_id
+        - location_id
+        - start_time
+        - end_time
+        - max_attendees
+        - language
     CreateLocationInputBody:
       type: object
       additionalProperties: false
@@ -400,6 +575,96 @@ components:
           default: about:blank
           examples:
             - https://example.com/errors/example
+    Event:
+      type: object
+      additionalProperties: false
+      properties:
+        AgeRangeMax:
+          type: integer
+          format: int64
+        AgeRangeMin:
+          type: integer
+          format: int64
+        Category:
+          type: string
+        CreatedAt:
+          type: string
+          format: date-time
+        Description:
+          type: string
+        HeaderImageS3Key:
+          type: string
+        ID:
+          type: string
+        OrganizationId:
+          type: string
+        Title:
+          type: string
+        UpdatedAt:
+          type: string
+          format: date-time
+      required:
+        - ID
+        - Title
+        - Description
+        - OrganizationId
+        - AgeRangeMin
+        - AgeRangeMax
+        - Category
+        - HeaderImageS3Key
+        - CreatedAt
+        - UpdatedAt
+    EventOccurrence:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/EventOccurrence.json
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        curr_enrolled:
+          type: integer
+          format: int64
+        end_time:
+          type: string
+          format: date-time
+        event:
+          $ref: '#/components/schemas/Event'
+        id:
+          type: string
+        language:
+          type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        manager_id:
+          type: string
+        max_attendees:
+          type: integer
+          format: int64
+        start_time:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - manager_id
+        - event
+        - location
+        - start_time
+        - end_time
+        - max_attendees
+        - language
+        - curr_enrolled
+        - created_at
+        - updated_at
     GetGreetingOutputBody:
       type: object
       additionalProperties: false
