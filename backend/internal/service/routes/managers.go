@@ -78,7 +78,7 @@ func SetupManagerRoutes(api huma.API, repo *storage.Repository) {
 
 	huma.Register(api, huma.Operation{
 		OperationID: "delete manager",
-		Method:      http.MethodPost,
+		Method:      http.MethodDelete,
 		Path:        "/api/v1/manager/{id}",
 		Summary:     "Deletes a manager by id",
 		Description: "Returns a manager by id",
