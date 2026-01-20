@@ -8,7 +8,7 @@ import (
 )
 
 func (r *ManagerRepository) CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, *errs.HTTPError) {
-	query, err := schema.ReadSQLBaseScript("location/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("manager/sql/create.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
@@ -20,7 +20,7 @@ func (r *ManagerRepository) CreateManager(ctx context.Context, manager *models.C
 
 	err = row.Scan(&createdManager.ID, &createdManager.UserID, &createdManager.OrganizationID, &createdManager.Role, &createdManager.CreatedAt, &createdManager.UpdatedAt)
 	if err != nil {
-		err := errs.InternalServerError("Failed to create location: ", err.Error())
+		err := errs.InternalServerError("Failed to create manager: ", err.Error())
 		return nil, &err
 	}
 

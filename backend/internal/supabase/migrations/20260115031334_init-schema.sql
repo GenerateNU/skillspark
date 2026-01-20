@@ -81,6 +81,7 @@ create table if not exists organization (
 
 -- initial migration to set up providers table which represents a user who can offer skills sessions within an organization
 CREATE TABLE IF NOT EXISTS manager (
+    -- on delete id deletion should cascade
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES profile(id),
     organization_id UUID REFERENCES organization(id),
@@ -109,7 +110,8 @@ create table if not exists event (
 -- initial migration to set up event occurrences table which represents a specific instance of an event with a provider and a start and end time
 create table if not exists event_occurrence (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),    
-    manager_id UUID REFERENCES manager(id),
+    -- cascading null here
+    manager_id UUID REFERENCES manager(id) ON DELETE SET NULL,
     event_id UUID NOT NULL REFERENCES event(id),
     location_id UUID NOT NULL REFERENCES location(id),
     start_time TIMESTAMPTZ NOT NULL,

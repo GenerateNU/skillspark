@@ -59,7 +59,7 @@ func SetupManagerRoutes(api huma.API, repo *storage.Repository) {
 	huma.Register(api, huma.Operation{
 		OperationID: "post manager",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/manager/create",
+		Path:        "/api/v1/manager/{id}",
 		Summary:     "posts a manager",
 		Description: "Returns a manager by id",
 		Tags:        []string{"Managers"},
@@ -79,7 +79,7 @@ func SetupManagerRoutes(api huma.API, repo *storage.Repository) {
 	huma.Register(api, huma.Operation{
 		OperationID: "delete manager",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/manager/delete/{id}",
+		Path:        "/api/v1/manager/{id}",
 		Summary:     "Deletes a manager by id",
 		Description: "Returns a manager by id",
 		Tags:        []string{"Managers"},
@@ -99,7 +99,7 @@ func SetupManagerRoutes(api huma.API, repo *storage.Repository) {
 	huma.Register(api, huma.Operation{
 		OperationID: "patch/update manager",
 		Method:      http.MethodPatch,
-		Path:        "/api/v1/manager/update/{id}",
+		Path:        "/api/v1/manager//{id}",
 		Summary:     "Updates a manager by id",
 		Description: "Returns a manager by id",
 		Tags:        []string{"Managers"},

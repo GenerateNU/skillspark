@@ -8,19 +8,19 @@ import (
 )
 
 func (r *ManagerRepository) PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, *errs.HTTPError) {
-	query, err := schema.ReadSQLBaseScript("location/sql/update.sql")
+	query, err := schema.ReadSQLBaseScript("manager/sql/update.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, manager.Body.UserID, manager.Body.OrganizationID, manager.Body.Role)
+	row := r.db.QueryRow(ctx, query, manager.Body.ID, manager.Body.UserID, manager.Body.OrganizationID, manager.Body.Role)
 
 	var createdManager models.Manager
 
 	err = row.Scan(&createdManager.ID, &createdManager.UserID, &createdManager.OrganizationID, &createdManager.Role, &createdManager.CreatedAt, &createdManager.UpdatedAt)
 	if err != nil {
-		err := errs.InternalServerError("Failed to update location: ", err.Error())
+		err := errs.InternalServerError("Failed to update manager: ", err.Error())
 		return nil, &err
 	}
 
