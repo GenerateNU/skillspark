@@ -8,15 +8,15 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) GetChildrenByParentID(ctx context.Context, input *models.GuardianIDInput) ([]models.Child, error) {
+func (h *Handler) GetChildrenByParentID(ctx context.Context, input *models.GuardianIDInput) ([]models.Child, *errs.HTTPError) {
 	id, err := uuid.Parse(input.ID.String())
 	if err != nil {
-		return nil, errs.BadRequest("Invalid ID format")
+		return nil, &errs.HTTPError{Code: 400, Message: "Invalid ID format"}
 	}
 
 	children, httpErr := h.ChildRepository.GetChildrenByParentID(ctx, id)
 	if httpErr != nil {
-		return nil, httpErr
+		return nil, httpErr.(*errs.HTTPError)
 	}
 	return children, nil
 }

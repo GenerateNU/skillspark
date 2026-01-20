@@ -8,15 +8,15 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) DeleteChildByID(ctx context.Context, input *models.ChildIDInput) (*models.Child, error) {
+func (h *Handler) DeleteChildByID(ctx context.Context, input *models.ChildIDInput) (*models.Child, *errs.HTTPError) {
 	id, err := uuid.Parse(input.ID.String())
 	if err != nil {
-		return nil, errs.BadRequest("Invalid ID format")
+		return nil, &errs.HTTPError{Code: 400, Message: "Invalid ID format"}
 	}
 
 	child, httpErr := h.ChildRepository.DeleteChildByID(ctx, id)
 	if httpErr != nil {
-		return nil, httpErr
+		return nil, httpErr.(*errs.HTTPError)
 	}
 	return child, nil
 }
