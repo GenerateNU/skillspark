@@ -194,8 +194,9 @@ func TestHandler_DeleteEvent(t *testing.T) {
 			name: "event not found",
 			id:   uuid.MustParse("00000000-0000-0000-0000-000000000000"),
 			mockSetup: func(m *repomocks.MockEventRepository) {
+				httpErr := errs.NotFound("Event", "id", "00000000-0000-0000-0000-000000000000")
 				m.On("DeleteEvent", mock.Anything, uuid.MustParse("00000000-0000-0000-0000-000000000000")).
-					Return(nil, errs.NotFound("Event", "id", "00000000-0000-0000-0000-000000000000"))
+					Return(nil, &httpErr)
 			},
 			wantErr: true,
 		},
@@ -215,9 +216,9 @@ func TestHandler_DeleteEvent(t *testing.T) {
 			err := handler.DeleteEvent(ctx, tt.id)
 
 			if tt.wantErr {
-				assert.Error(t, err)
+				assert.NotNil(t, err)
 			} else {
-				assert.NoError(t, err)
+				assert.Nil(t, err)
 			}
 
 			mockRepo.AssertExpectations(t)
