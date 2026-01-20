@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *LocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, *errs.HTTPError) {
+func (r *LocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, error) {
 	query, err := schema.ReadSQLBaseScript("location/sql/get_by_id.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())

@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *SchoolRepository) GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, *errs.HTTPError) {
+func (r *SchoolRepository) GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error) {
 	//Get base query
 	query, err := schema.ReadSQLBaseScript("school/sql/get_all_schools.sql")
 	if err != nil {

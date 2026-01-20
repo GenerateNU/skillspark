@@ -102,10 +102,10 @@ func TestHandler_GetLocationById(t *testing.T) {
 			location, err := handler.GetLocationById(ctx, input)
 
 			if tt.wantErr {
-				assert.Error(t, err)
+				assert.NotNil(t, err)
 				assert.Nil(t, location)
 			} else {
-				assert.NoError(t, err)
+				assert.Nil(t, err)
 				assert.NotNil(t, location)
 				assert.Equal(t, tt.id, location.ID.String())
 			}
@@ -225,10 +225,10 @@ func TestHandler_CreateLocation(t *testing.T) {
 			location, err := handler.CreateLocation(ctx, tt.input)
 
 			if tt.wantErr {
-				assert.Error(t, err)
+				assert.NotNil(t, err)
 				assert.Nil(t, location)
 			} else {
-				assert.NoError(t, err)
+				assert.Nil(t, err)
 				assert.NotNil(t, location)
 				assert.Equal(t, tt.input.Body.AddressLine1, location.AddressLine1)
 				if tt.input.Body.AddressLine2 != nil {
