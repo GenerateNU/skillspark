@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *LocationRepository) CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, *errs.HTTPError) {
+func (r *LocationRepository) CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, error) {
 	query, err := schema.ReadSQLBaseScript("location/sql/create.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
