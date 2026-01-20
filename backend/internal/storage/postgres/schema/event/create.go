@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *EventRepository) CreateEvent(ctx context.Context, event *models.CreateEventInput) (*models.Event, *errs.HTTPError) {
+func (r *EventRepository) CreateEvent(ctx context.Context, event *models.CreateEventInput) (*models.Event, error) {
 	query, err := schema.ReadSQLBaseScript("event/sql/create.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

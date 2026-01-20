@@ -3,12 +3,13 @@ package event
 import (
 	"context"
 	"github.com/google/uuid"
+	"skillspark/internal/errs"
 )
 
-func (h *Handler) DeleteEvent(ctx context.Context, id uuid.UUID) error {
+func (h *Handler) DeleteEvent(ctx context.Context, id uuid.UUID) *errs.HTTPError {
 	_, err := h.EventRepository.DeleteEvent(ctx, id)
 	if err != nil {
-		return err
+		return err.(*errs.HTTPError)
 	}
 
 	return nil

@@ -24,8 +24,8 @@ type SchoolRepository interface {
 }
 
 type EventRepository interface {
-	CreateEvent(ctx context.Context, location *models.CreateEventInput) (*models.Event, *errs.HTTPError)
-	UpdateEvent(ctx context.Context, location *models.UpdateEventInput) (*models.Event, *errs.HTTPError)
+	CreateEvent(ctx context.Context, location *models.CreateEventInput) (*models.Event, error)
+	UpdateEvent(ctx context.Context, location *models.UpdateEventInput) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) (*struct{}, error)
 }
 

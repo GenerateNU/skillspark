@@ -2,7 +2,6 @@ package repomocks
 
 import (
 	"context"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 
 	"github.com/google/uuid"
@@ -13,24 +12,24 @@ type MockEventRepository struct {
 	mock.Mock
 }
 
-func (m *MockEventRepository) CreateEvent(ctx context.Context, input *models.CreateEventInput) (*models.Event, *errs.HTTPError) {
+func (m *MockEventRepository) CreateEvent(ctx context.Context, input *models.CreateEventInput) (*models.Event, error) {
 	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Event), nil
 }
 
-func (m *MockEventRepository) UpdateEvent(ctx context.Context, input *models.UpdateEventInput) (*models.Event, *errs.HTTPError) {
+func (m *MockEventRepository) UpdateEvent(ctx context.Context, input *models.UpdateEventInput) (*models.Event, error) {
 	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Event), nil
 }
