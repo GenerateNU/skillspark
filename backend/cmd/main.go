@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"log/slog"
 	"os"
@@ -11,18 +12,18 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/sethvargo/go-envconfig"
 )
 
 func main() {
-	// Load configuration from environment variables
-	var cfg config.Config
-	if err := envconfig.Process(context.Background(), &cfg); err != nil {
-		log.Fatalln("Error processing .env file: ", err)
+	cfg, err := LoadConfig()
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
 	}
 
 	// Initialize application with config
-	app := service.InitApp(cfg)
+	app := service.InitApp(*cfg)
 
 	// Close database connection when main exits
 	defer func() {
@@ -58,4 +59,33 @@ func main() {
 	}
 
 	slog.Info("Server shutdown complete")
+}
+
+func LoadConfig() (*config.Config, error) {
+	environment := os.Getenv("ENVIRONMENT")
+
+	var cfg config.Config
+	switch environment {
+	case "production":
+		// Load configuration from environment variables for production
+		err := envconfig.Process(context.Background(), &cfg)
+		if err != nil {
+			log.Fatalln("Error processing environment variables: ", err)
+		}
+	case "development":
+		// Load configuration from environment variables for development
+		err := godotenv.Overload("../.local.env")
+		if err != nil {
+			log.Fatalln("Error loading .local.env file: ", err)
+		}
+		err = envconfig.Process(context.Background(), &cfg)
+		if err != nil {
+			log.Fatalln("Error processing environment variables: ", err)
+		}
+	default:
+		log.Fatalln("Invalid environment name: ", environment, "The environment name must be one of either production or development")
+		return nil, fmt.Errorf("invalid environment name: %s", environment)
+	}
+
+	return &cfg, nil
 }
