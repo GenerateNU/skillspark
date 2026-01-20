@@ -9,14 +9,14 @@ import (
 )
 
 func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput) ([]models.EventOccurrence, error) {
-	id, err := uuid.Parse(input.ID.String())
-	if err != nil {
+	id, parse_err := uuid.Parse(input.ID.String())
+	if parse_err != nil {
 		return nil, errs.BadRequest("Invalid ID format")
 	}
 	
-	eventOccurrence, errr := h.EventOccurrenceRepository.GetEventOccurrencesByEventID(ctx, id)
-	if errr != nil {
-		return nil, errr
+	eventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrencesByEventID(ctx, id)
+	if err != nil {
+		return nil, err
 	}
 	return eventOccurrence, nil
 }

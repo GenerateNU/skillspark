@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, *errs.HTTPError) {
+func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error) {
 	query, err := schema.ReadSQLBaseScript("event-occurrence/sql/create.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

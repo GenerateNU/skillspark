@@ -8,7 +8,7 @@ import (
 	"skillspark/internal/utils"
 )
 
-func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination) ([]models.EventOccurrence, *errs.HTTPError) {
+func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination) ([]models.EventOccurrence, error) {
 	query, err := schema.ReadSQLBaseScript("event-occurrence/sql/get_all.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

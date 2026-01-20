@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, *errs.HTTPError) {
+func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error) {
 	query, err := schema.ReadSQLBaseScript("event-occurrence/sql/get_by_id.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

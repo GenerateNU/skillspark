@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *EventOccurrenceRepository) GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, *errs.HTTPError) {
+func (r *EventOccurrenceRepository) GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error) {
 	query, err := schema.ReadSQLBaseScript("event-occurrence/sql/get_by_event_id.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
