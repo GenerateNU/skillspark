@@ -85,10 +85,10 @@ func TestHandler_CreateEvent(t *testing.T) {
 			event, err := handler.CreateEvent(ctx, tt.input)
 
 			if tt.wantErr {
-				assert.Error(t, err)
+				assert.NotNil(t, err)
 				assert.Nil(t, event)
 			} else {
-				assert.NoError(t, err)
+				assert.Nil(t, err)
 				assert.NotNil(t, event)
 				assert.Equal(t, tt.input.Body.Title, event.Title)
 				assert.Equal(t, tt.input.Body.OrganizationID, event.OrganizationID)
@@ -158,10 +158,10 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			event, err := handler.UpdateEvent(ctx, tt.input)
 
 			if tt.wantErr {
-				assert.Error(t, err)
+				assert.NotNil(t, err)
 				assert.Nil(t, event)
 			} else {
-				assert.NoError(t, err)
+				assert.Nil(t, err)
 				assert.NotNil(t, event)
 				assert.Equal(t, *tt.input.Body.Title, event.Title)
 				assert.Equal(t, tt.input.ID, event.ID)
