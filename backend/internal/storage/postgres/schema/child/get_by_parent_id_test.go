@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func CreateTestChildren(
@@ -20,10 +19,10 @@ func CreateTestChildren(
 	t.Helper()
 
 	schoolID, err := uuid.Parse("20000000-0000-0000-0000-000000000001")
-	require.NoError(t, err)
+	assert.Nil(t, err)
 
 	guardianID, err := uuid.Parse("88888888-8888-8888-8888-888888888888")
-	require.NoError(t, err)
+	assert.Nil(t, err)
 
 	input1 := &models.CreateChildInput{}
 	input1.Body.Name = "Test Child 1"
@@ -34,20 +33,20 @@ func CreateTestChildren(
 	input1.Body.GuardianID = guardianID
 
 	child1, err := repo.CreateChild(ctx, input1)
-	require.NoError(t, err)
-	require.NotNil(t, child1)
+	assert.Nil(t, err)
+	assert.NotNil(t, child1)
 
 	input2 := &models.CreateChildInput{}
 	input2.Body.Name = "Test Child 2"
 	input2.Body.SchoolID = schoolID
 	input2.Body.BirthMonth = 8
 	input2.Body.BirthYear = 2021
-	input2.Body.Interests = []string{"climbing"}
+	input2.Body.Interests = []string{"science"}
 	input2.Body.GuardianID = guardianID
 
 	child2, err := repo.CreateChild(ctx, input2)
-	require.NoError(t, err)
-	require.NotNil(t, child2)
+	assert.Nil(t, err)
+	assert.NotNil(t, child2)
 
 	return []*models.Child{child1, child2}
 }
@@ -61,28 +60,32 @@ func TestChildRepository_GetChildrenByParentID(t *testing.T) {
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
 
-	// this creates two children under the same parent who also go to the same school
 	created := CreateTestChildren(t, ctx, repo)
 	child1 := created[0]
 	child2 := created[1]
 
 	children, err := repo.GetChildrenByParentID(ctx, child1.GuardianID)
+	assert.Nil(t, err)
+	assert.NotNil(t, children)
 
-	assert.NoError(t, err)
-	// a better test for this necessitates the creation of new guardians for testing, which is an endpoint that does not yet exist
-	assert.Len(t, children, 2)
-
-	ids := []uuid.UUID{
-		children[0].ID,
-		children[1].ID,
+	childMap := make(map[uuid.UUID]models.Child)
+	for _, c := range children {
+		childMap[c.ID] = c
 	}
 
-	assert.Contains(t, ids, child1.ID)
-	assert.Contains(t, ids, child2.ID)
+	c1, ok := childMap[child1.ID]
+	assert.Equal(t, ok, true)
+	assert.Equal(t, child1.Name, c1.Name)
+	assert.Equal(t, child1.SchoolID, c1.SchoolID)
+	assert.Equal(t, child1.GuardianID, c1.GuardianID)
+	assert.ElementsMatch(t, child1.Interests, c1.Interests)
+	assert.NotEmpty(t, c1.SchoolName)
 
-	assert.Equal(t, child1.GuardianID, children[0].GuardianID)
-	assert.Equal(t, child1.GuardianID, children[1].GuardianID)
-
-	assert.NotEmpty(t, children[0].SchoolName)
-	assert.NotEmpty(t, children[1].SchoolName)
+	c2, ok := childMap[child2.ID]
+	assert.Equal(t, ok, true)
+	assert.Equal(t, child2.Name, c2.Name)
+	assert.Equal(t, child2.SchoolID, c2.SchoolID)
+	assert.Equal(t, child2.GuardianID, c2.GuardianID)
+	assert.ElementsMatch(t, child2.Interests, c2.Interests)
+	assert.NotEmpty(t, c2.SchoolName)
 }

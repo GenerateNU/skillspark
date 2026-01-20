@@ -8,7 +8,6 @@ import (
 	"skillspark/internal/storage/postgres/testutil"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestChildRepository_UpdateChildByID(t *testing.T) {
@@ -36,8 +35,8 @@ func TestChildRepository_UpdateChildByID(t *testing.T) {
 
 	updatedChild, err := repo.UpdateChildByID(ctx, testChild.ID, input)
 
-	require.NoError(t, err)
-	require.NotNil(t, updatedChild)
+	assert.Nil(t, err)
+	assert.NotNil(t, updatedChild)
 
 	assert.Equal(t, "Updated Child", updatedChild.Name)
 	assert.Equal(t, 11, updatedChild.BirthMonth)

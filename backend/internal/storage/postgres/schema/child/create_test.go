@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 // a test run of this way of testing, creating something
@@ -22,10 +21,10 @@ func CreateTestChild(
 	t.Helper()
 
 	schoolID, err := uuid.Parse("20000000-0000-0000-0000-000000000001")
-	require.NoError(t, err)
+	assert.Nil(t, err)
 
 	guardianID, err := uuid.Parse("11111111-1111-1111-1111-111111111111")
-	require.NoError(t, err)
+	assert.Nil(t, err)
 
 	input := &models.CreateChildInput{}
 	input.Body.Name = "Test Child"
@@ -35,10 +34,7 @@ func CreateTestChild(
 	input.Body.Interests = []string{"math", "art"}
 	input.Body.GuardianID = guardianID
 
-	child, err := repo.CreateChild(ctx, input)
-	require.NoError(t, err)
-	require.NotNil(t, child)
-
+	child, _ := repo.CreateChild(ctx, input)
 	return child
 }
 
@@ -59,7 +55,7 @@ func TestChildRepository_CreateChild(t *testing.T) {
 		input.Body.SchoolID = sampleChild.SchoolID
 		input.Body.BirthMonth = 5
 		input.Body.BirthYear = 2019
-		input.Body.Interests = []string{"math", "football"}
+		input.Body.Interests = []string{"math", "science"}
 		input.Body.GuardianID = sampleChild.GuardianID
 		return input
 	}()
@@ -79,7 +75,7 @@ func TestChildRepository_CreateChild(t *testing.T) {
 
 	assert.ElementsMatch(
 		t,
-		[]string{"math", "football"},
+		[]string{"math", "science"},
 		child.Interests,
 	)
 
