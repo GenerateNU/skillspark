@@ -10,9 +10,17 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type HTTPErrorInterface interface {
+	GetStatus() int
+}
+
 type HTTPError struct {
 	Code    int `json:"code"`
 	Message any `json:"message"`
+}
+
+func (e HTTPError) GetStatus() int {
+	return e.Code
 }
 
 func (e HTTPError) Error() string {
