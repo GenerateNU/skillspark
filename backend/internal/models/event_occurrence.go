@@ -7,6 +7,7 @@ import (
 )
 
 // database model for a specific instance of an event 
+// stores full type information for Event and Location
 type EventOccurrence struct {
 	ID 				uuid.UUID 	`json:"id" db:"id"`
 	ManagerId		uuid.UUID 	`json:"manager_id" db:"manager_id"`
@@ -52,16 +53,16 @@ type GetEventOccurrencesByEventIDOutput struct {
 // post
 type CreateEventOccurrenceInput struct {
 	Body struct {
-		ManagerId uuid.UUID `json:"manager_id"`
-		EventId uuid.UUID `json:"event"`
-		LocationId uuid.UUID `json:"location"`
-		StartTime time.Time `json:"start_time"`
-		EndTime time.Time `json:"end_time"`
-		MaxAttendees int `json:"max_attendees"`
-		Language string	`json:"language"`  
+		ManagerId uuid.UUID `json:"manager_id" doc:"ID of a manager in the database"`
+		EventId uuid.UUID `json:"event" doc:"ID of an event in the database"`
+		LocationId uuid.UUID `json:"location" doc:"ID of a location in the database"`
+		StartTime time.Time `json:"start_time" doc:"Start time of the event occurrence"`
+		EndTime time.Time `json:"end_time" doc:"End time of the event occurrence"`
+		MaxAttendees int `json:"max_attendees" doc:"Maximum number of attendees" minimum:"1" maximum:"100"`
+		Language string	`json:"language" doc:"Primary language used for the event occurrence" minLength:"2" maxLength:"30"`  
 	} `json:"body" doc:"New event occurrence to add"`
 }
 
 type CreateEventOccurrenceOutput struct {
-	Body *EventOccurrence `json:"body"`
+	Body *EventOccurrence `json:"body" doc:"Created event occurrence"`
 }

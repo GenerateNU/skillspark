@@ -20,10 +20,11 @@ func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, 
 
 	row := r.db.QueryRow(ctx, query, id)
 	var eventOccurrence models.EventOccurrence
-	err = row.Scan(&eventOccurrence.ID, 
+	// populate data in struct, embedding event and location data
+	err = row.Scan(
+		// event occurrence fields
+		&eventOccurrence.ID,
 		&eventOccurrence.ManagerId,
-		&eventOccurrence.Event.ID,
-		&eventOccurrence.Location.ID,
 		&eventOccurrence.StartTime,
 		&eventOccurrence.EndTime,
 		&eventOccurrence.MaxAttendees,
@@ -31,6 +32,32 @@ func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, 
 		&eventOccurrence.CurrEnrolled,
 		&eventOccurrence.CreatedAt,
 		&eventOccurrence.UpdatedAt,
+
+		// event fields
+		&eventOccurrence.Event.ID,
+		&eventOccurrence.Event.Title,
+		&eventOccurrence.Event.Description,
+		&eventOccurrence.Event.OrganizationId,
+		&eventOccurrence.Event.AgeRangeMin,
+		&eventOccurrence.Event.AgeRangeMax,
+		&eventOccurrence.Event.Category,
+		&eventOccurrence.Event.HeaderImageS3Key,
+		&eventOccurrence.Event.CreatedAt,
+		&eventOccurrence.Event.UpdatedAt,
+
+		// location fields
+		&eventOccurrence.Location.ID,
+		&eventOccurrence.Location.Latitude,
+		&eventOccurrence.Location.Longitude,
+		&eventOccurrence.Location.AddressLine1,
+		&eventOccurrence.Location.AddressLine2,
+		&eventOccurrence.Location.Subdistrict,
+		&eventOccurrence.Location.District,
+		&eventOccurrence.Location.Province,
+		&eventOccurrence.Location.PostalCode,
+		&eventOccurrence.Location.Country,
+		&eventOccurrence.Location.CreatedAt,
+		&eventOccurrence.Location.UpdatedAt,
 	)
 
 	if err != nil {

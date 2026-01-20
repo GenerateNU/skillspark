@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, eventoccurrence *models.CreateEventOccurrenceInput) (*models.EventOccurrence, *errs.HTTPError) {
+func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, *errs.HTTPError) {
 	query, err := schema.ReadSQLBaseScript("event-occurrence/sql/create.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -16,19 +16,21 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, e
 
 	row := r.db.QueryRow(ctx, 
 		query, 
-		eventoccurrence.Body.ManagerId,
-		eventoccurrence.Body.EventId,
-		eventoccurrence.Body.LocationId,
-		eventoccurrence.Body.StartTime,
-		eventoccurrence.Body.EndTime,
-		eventoccurrence.Body.MaxAttendees,
-		eventoccurrence.Body.Language,
+		input.Body.ManagerId,
+		input.Body.EventId,
+		input.Body.LocationId,
+		input.Body.StartTime,
+		input.Body.EndTime,
+		input.Body.MaxAttendees,
+		input.Body.Language,
 	)
 	var createdEventOccurrence models.EventOccurrence
-	err = row.Scan(&createdEventOccurrence.ID, 
+
+	// populate data in struct, embedding event and location data
+	err = row.Scan(
+		// event occurrence fields
+		&createdEventOccurrence.ID,
 		&createdEventOccurrence.ManagerId,
-		&createdEventOccurrence.Event.ID,
-		&createdEventOccurrence.Location.ID,
 		&createdEventOccurrence.StartTime,
 		&createdEventOccurrence.EndTime,
 		&createdEventOccurrence.MaxAttendees,
@@ -36,7 +38,34 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, e
 		&createdEventOccurrence.CurrEnrolled,
 		&createdEventOccurrence.CreatedAt,
 		&createdEventOccurrence.UpdatedAt,
+
+		// event fields
+		&createdEventOccurrence.Event.ID,
+		&createdEventOccurrence.Event.Title,
+		&createdEventOccurrence.Event.Description,
+		&createdEventOccurrence.Event.OrganizationId,
+		&createdEventOccurrence.Event.AgeRangeMin,
+		&createdEventOccurrence.Event.AgeRangeMax,
+		&createdEventOccurrence.Event.Category,
+		&createdEventOccurrence.Event.HeaderImageS3Key,
+		&createdEventOccurrence.Event.CreatedAt,
+		&createdEventOccurrence.Event.UpdatedAt,
+
+		// location fields
+		&createdEventOccurrence.Location.ID,
+		&createdEventOccurrence.Location.Latitude,
+		&createdEventOccurrence.Location.Longitude,
+		&createdEventOccurrence.Location.AddressLine1,
+		&createdEventOccurrence.Location.AddressLine2,
+		&createdEventOccurrence.Location.Subdistrict,
+		&createdEventOccurrence.Location.District,
+		&createdEventOccurrence.Location.Province,
+		&createdEventOccurrence.Location.PostalCode,
+		&createdEventOccurrence.Location.Country,
+		&createdEventOccurrence.Location.CreatedAt,
+		&createdEventOccurrence.Location.UpdatedAt,
 	)
+
 	if err != nil {
 		err := errs.InternalServerError("Failed to create event occurrence: ", err.Error())
 		return nil, &err
