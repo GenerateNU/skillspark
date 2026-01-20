@@ -2,6 +2,7 @@ package location
 
 import (
 	"context"
+	"net/http"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
@@ -14,11 +15,17 @@ import (
 )
 
 func TestHandler_GetLocationById(t *testing.T) {
+	statusCodeNotFound := http.StatusNotFound
+	messageSubstringNotFound := "Not found"
+	statusCodeInternalServerError := http.StatusInternalServerError
+	messageSubstringInternalServerError := "Internal server error"
 	tests := []struct {
-		name      string
-		id        string
-		mockSetup func(*repomocks.MockLocationRepository)
-		wantErr   bool
+		name             string
+		id               string
+		mockSetup        func(*repomocks.MockLocationRepository)
+		wantErr          bool
+		statusCode       *int
+		messageSubstring *string
 	}{
 		{
 			name: "successful get location by id - New York",
@@ -71,7 +78,9 @@ func TestHandler_GetLocationById(t *testing.T) {
 						Message: "Not found",
 					})
 			},
-			wantErr: true,
+			wantErr:          true,
+			statusCode:       &statusCodeNotFound,
+			messageSubstring: &messageSubstringNotFound,
 		},
 		{
 			name: "internal server error",
@@ -83,7 +92,9 @@ func TestHandler_GetLocationById(t *testing.T) {
 						Message: "Internal server error",
 					})
 			},
-			wantErr: true,
+			wantErr:          true,
+			statusCode:       &statusCodeInternalServerError,
+			messageSubstring: &messageSubstringInternalServerError,
 		},
 	}
 
@@ -104,6 +115,8 @@ func TestHandler_GetLocationById(t *testing.T) {
 			if tt.wantErr {
 				assert.NotNil(t, err)
 				assert.Nil(t, location)
+				assert.Equal(t, *tt.statusCode, err.Code)
+				assert.Contains(t, err.Message, *tt.messageSubstring)
 			} else {
 				assert.Nil(t, err)
 				assert.NotNil(t, location)
