@@ -181,7 +181,7 @@ func TestHumaValidation_GetLocationByID(t *testing.T) {
 			name:       "invalid UUID",
 			locationID: "not-a-uuid",
 			mockSetup:  func(*repomocks.MockLocationRepository) {},
-			statusCode: http.StatusUnprocessableEntity, // Huma returns 422
+			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
 			name:       "location not found",
@@ -192,7 +192,7 @@ func TestHumaValidation_GetLocationByID(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse("00000000-0000-0000-0000-000000000000"),
 				).Return(nil, &errs.HTTPError{
-					Code:    errs.NotFound("Location", "id", "00000000-0000-0000-0000-000000000000").Code,
+					Code:    errs.NotFound("Location", "id", "00000000-0000-0000-0000-000000000000").GetStatus(),
 					Message: "Not found",
 				})
 			},
