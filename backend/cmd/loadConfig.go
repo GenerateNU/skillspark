@@ -11,8 +11,7 @@ import (
 	"github.com/sethvargo/go-envconfig"
 )
 
-func loadConfig() (*config.Config, error) {
-
+func LoadConfig() (*config.Config, error) {
 	environment := os.Getenv("ENVIRONMENT")
 
 	var cfg config.Config
