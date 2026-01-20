@@ -31,6 +31,7 @@ type CreateChildInput struct {
 
 type UpdateChildInput struct {
 	Body struct {
+		ID         uuid.UUID   `json:"id" path:"id"`
 		Name       *string     `json:"name" db:"name" doc:"Name of the child" minLength:"1" maxLength:"200"`
 		SchoolID   *uuid.UUID  `json:"school_id" db:"school_id" doc:"ID of the school the child goes to"`
 		BirthMonth *int        `json:"birth_month" db:"birth_month" doc:"Birth month of the child" minimum:"1" maximum:"12"`
@@ -38,6 +39,24 @@ type UpdateChildInput struct {
 		Interests  *[]Interest `json:"interests" db:"interests" doc:"Interests of the child"`
 		GuardianID *uuid.UUID  `json:"guardian_id" db:"guardian_id" doc:"ID of the child's guardian"`
 	}
+}
+
+// unify the input type that queries a child by the ID
+type ChildIDInput struct {
+	ID uuid.UUID `path:"id"`
+}
+
+type GuardianIDInput struct {
+	ID uuid.UUID `path:"id"`
+}
+
+// unify the input type that outputs a child object
+type ChildOutput struct {
+	Body *Child `json:"body"`
+}
+
+type ChildrenOutput struct {
+	Body []Child `json:"body"`
 }
 
 type Child struct {

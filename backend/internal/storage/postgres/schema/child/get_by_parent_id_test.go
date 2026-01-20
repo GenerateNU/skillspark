@@ -25,7 +25,6 @@ func CreateTestChildren(
 	guardianID, err := uuid.Parse("88888888-8888-8888-8888-888888888888")
 	require.NoError(t, err)
 
-	// ---- Child 1 ----
 	input1 := &models.CreateChildInput{}
 	input1.Body.Name = "Test Child 1"
 	input1.Body.SchoolID = schoolID
@@ -38,7 +37,6 @@ func CreateTestChildren(
 	require.NoError(t, err)
 	require.NotNil(t, child1)
 
-	// ---- Child 2 ----
 	input2 := &models.CreateChildInput{}
 	input2.Body.Name = "Test Child 2"
 	input2.Body.SchoolID = schoolID

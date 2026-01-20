@@ -33,8 +33,9 @@ func TestChildRepository_UpdateChildByID(t *testing.T) {
 	input.Body.BirthMonth = &month
 	input.Body.BirthYear = &year
 	input.Body.Interests = &interests
+	input.Body.ID = testChild.ID
 
-	updatedChild, err := repo.UpdateChildByID(ctx, testChild.ID, input)
+	updatedChild, err := repo.UpdateChildByID(ctx, input)
 
 	require.NoError(t, err)
 	require.NotNil(t, updatedChild)
