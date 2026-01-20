@@ -230,7 +230,7 @@ func TestHumaValidation_DeleteEvent(t *testing.T) {
 					uuid.MustParse(validID),
 				).Return(&struct{}{}, nil)
 			},
-			statusCode: http.StatusNoContent, // Assuming 204 for successful delete with no content
+			statusCode: http.StatusOK,
 		},
 		{
 			name:       "invalid UUID",

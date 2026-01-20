@@ -59,13 +59,19 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository) {
 		Summary:     "Delete an existing event by id",
 		Description: "Deletes an existing event by id",
 		Tags:        []string{"Events"},
-	}, func(ctx context.Context, input *models.DeleteEventInput) (*struct{}, error) {
+	}, func(ctx context.Context, input *models.DeleteEventInput) (*models.DeleteEventOutput, error) {
 		err := eventHandler.DeleteEvent(ctx, input.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		return nil, nil
+		return &models.DeleteEventOutput{
+			Body: struct {
+				Message string `json:"message" doc:"Success message"`
+			}{
+				Message: "Event successfully deleted.",
+			},
+		}, nil
 	})
 
 }

@@ -68,3 +68,9 @@ type UpdateEventOutput struct {
 type DeleteEventInput struct {
 	ID uuid.UUID `path:"id"`
 }
+
+type DeleteEventOutput struct {
+	Body struct {
+		Message string `json:"message" doc:"Success message"`
+	} `json:"body"`
+}
