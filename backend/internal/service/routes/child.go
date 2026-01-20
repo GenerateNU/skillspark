@@ -23,20 +23,20 @@ func SetupChildRoutes(api huma.API, repo *storage.Repository) {
 		Description: "Returns a child by id",
 		Tags:        []string{"Child"},
 	}, func(ctx context.Context, input *models.ChildIDInput) (*models.ChildOutput, error) {
-		location, err := childHandler.GetChildByID(ctx, input)
+		child, err := childHandler.GetChildByID(ctx, input)
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.ChildOutput{
-			Body: location,
+			Body: child,
 		}, nil
 	})
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-children-by-guardian-id",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/guardians/{id}/children",
+		Path:        "/api/v1/children/{id}",
 		Summary:     "Get all children for a guardian",
 		Description: "Returns the list of children associated with a given guardian ID",
 		Tags:        []string{"Child"},
