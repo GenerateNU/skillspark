@@ -119,7 +119,7 @@ func TestHandler_UpdateEvent(t *testing.T) {
 				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput")).Return(&models.Event{
 					ID:          uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 					Title:       "Updated Robotics",
-					Description: "Intro to robotics", // Unchanged field example
+					Description: "Intro to robotics",
 					CreatedAt:   time.Now(),
 					UpdatedAt:   time.Now(),
 				}, nil)

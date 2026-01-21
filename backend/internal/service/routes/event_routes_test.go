@@ -70,7 +70,7 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 			statusCode: http.StatusOK,
 		},
 		{
-			name: "missing title", // Required field
+			name: "missing title",
 			payload: map[string]interface{}{
 				"description":     "Introduction to robotics",
 				"organization_id": orgID.String(),
