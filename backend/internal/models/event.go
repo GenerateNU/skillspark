@@ -42,22 +42,20 @@ type CreateEventOutput struct {
 	Body *Event `json:"body"`
 }
 
+type UpdateEventBody struct {
+	Title            *string    `json:"title,omitempty" db:"title" doc:"Title of the event" minLength:"2" maxLength:"100"`
+	Description      *string    `json:"description,omitempty" db:"description" doc:"Description of the event" minLength:"2" maxLength:"200"`
+	OrganizationID   *uuid.UUID `json:"organization_id,omitempty" db:"organization_id" doc:"ID of the hosting organization"`
+	AgeRangeMin      *int       `json:"age_range_min,omitempty" db:"age_range_min" doc:"Minimum age for the event" minimum:"0" maximum:"100"`
+	AgeRangeMax      *int       `json:"age_range_max,omitempty" db:"age_range_max" doc:"Max age for the event" minimum:"0" maximum:"100"`
+	Category         *[]string  `json:"category,omitempty" db:"category" doc:"Category of the event"`
+	HeaderImageS3Key *string    `json:"header_image_s3_key,omitempty" db:"header_image_s3_key" doc:"S3 key for the header image"`
+}
+
 type UpdateEventInput struct {
 	ID   uuid.UUID `path:"id"`
 	Body struct {
-		Title *string `json:"title,omitempty" db:"title" doc:"Title of the event" minLength:"2" maxLength:"100"`
-
-		Description *string `json:"description,omitempty" db:"description" doc:"Description of the event" minLength:"2" maxLength:"200"`
-
-		OrganizationID *uuid.UUID `json:"organization_id,omitempty" db:"organization_id" doc:"ID of the hosting organization"`
-
-		AgeRangeMin *int `json:"age_range_min,omitempty" db:"age_range_min" doc:"Minimum age for the event" minimum:"0" maximum:"100"`
-
-		AgeRangeMax *int `json:"age_range_max,omitempty" db:"age_range_max" doc:"Max age for the event" minimum:"0" maximum:"100"`
-
-		Category *[]string `json:"category,omitempty" db:"category" doc:"Category of the event"`
-
-		HeaderImageS3Key *string `json:"header_image_s3_key,omitempty" db:"header_image_s3_key" doc:"S3 key for the header image"`
+		UpdateEventBody
 	}
 }
 
