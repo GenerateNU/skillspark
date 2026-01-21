@@ -12,7 +12,7 @@ func TestExecute(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
-	org, err := Execute(ctx, testDB, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"))
+	org, err := Execute(ctx, testDB, uuid.MustParse("40000000-0000-0000-0000-000000000004"))
 
 	assert.Nil(t, err)
 	assert.NotNil(t, org)
@@ -24,7 +24,7 @@ func TestExecute_SecondOrganization(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
-	org, err := Execute(ctx, testDB, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"))
+	org, err := Execute(ctx, testDB, uuid.MustParse("40000000-0000-0000-0000-000000000001"))
 
 	assert.Nil(t, err)
 	assert.NotNil(t, org)

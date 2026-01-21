@@ -30,7 +30,6 @@ func TestExecute(t *testing.T) {
 	createErr := createorganization.Execute(ctx, testDB, org)
 	assert.Nil(t, createErr)
 
-	// Delete it
 	deleteErr := Execute(ctx, testDB, orgID)
 	assert.Nil(t, deleteErr)
 
