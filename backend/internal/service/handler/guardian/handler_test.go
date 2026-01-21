@@ -326,7 +326,7 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 		wantErr   bool
 	}{
 		{
-			name: "successful delete guardian - Sarah Johnson",
+			name: "successful delete guardian - Sarah Johnson",  // assume guardian has no children
 			id:   "11111111-1111-1111-1111-111111111111",
 			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("DeleteGuardian", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111111")).Return(&models.Guardian{
