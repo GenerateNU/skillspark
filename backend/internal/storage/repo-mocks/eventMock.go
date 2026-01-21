@@ -34,10 +34,7 @@ func (m *MockEventRepository) UpdateEvent(ctx context.Context, input *models.Upd
 	return args.Get(0).(*models.Event), nil
 }
 
-func (m *MockEventRepository) DeleteEvent(ctx context.Context, id uuid.UUID) (*struct{}, error) {
+func (m *MockEventRepository) DeleteEvent(ctx context.Context, id uuid.UUID) error {
 	args := m.Called(ctx, id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*struct{}), args.Error(1)
+	return args.Error(0)
 }

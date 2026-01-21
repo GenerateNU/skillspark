@@ -7,7 +7,7 @@ import (
 )
 
 func (h *Handler) DeleteEvent(ctx context.Context, id uuid.UUID) *errs.HTTPError {
-	_, err := h.EventRepository.DeleteEvent(ctx, id)
+	err := h.EventRepository.DeleteEvent(ctx, id)
 	if err != nil {
 		return err.(*errs.HTTPError)
 	}

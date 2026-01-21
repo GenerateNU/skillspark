@@ -41,10 +41,9 @@ func TestEventRepository_Delete_JuniorRoboticsWorkshop(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, event)
 
-	result, delErr := repo.DeleteEvent(ctx, event.ID)
+	delErr := repo.DeleteEvent(ctx, event.ID)
 	assert.Nil(t, delErr)
-	assert.Nil(t, result)
 
-	_, delErr2 := repo.DeleteEvent(ctx, event.ID)
+	delErr2 := repo.DeleteEvent(ctx, event.ID)
 	assert.NotNil(t, delErr2, "Expected error when deleting an already deleted event")
 }

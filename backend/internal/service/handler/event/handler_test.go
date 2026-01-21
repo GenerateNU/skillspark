@@ -183,10 +183,8 @@ func TestHandler_DeleteEvent(t *testing.T) {
 			name: "successful delete event",
 			id:   uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				// Note: Ensure the mock signature matches the repo interface.
-				// Based on your repo implementation, DeleteEvent usually returns (*struct{}, error)
 				m.On("DeleteEvent", mock.Anything, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")).
-					Return(&struct{}{}, nil)
+					Return(nil)
 			},
 			wantErr: false,
 		},
@@ -196,7 +194,7 @@ func TestHandler_DeleteEvent(t *testing.T) {
 			mockSetup: func(m *repomocks.MockEventRepository) {
 				httpErr := errs.NotFound("Event", "id", "00000000-0000-0000-0000-000000000000")
 				m.On("DeleteEvent", mock.Anything, uuid.MustParse("00000000-0000-0000-0000-000000000000")).
-					Return(nil, &httpErr)
+					Return(&httpErr)
 			},
 			wantErr: true,
 		},
