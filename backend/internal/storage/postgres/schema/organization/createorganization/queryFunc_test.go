@@ -13,7 +13,7 @@ import (
 
 func TestExecute(t *testing.T) {
 
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	org := &models.Organization{
@@ -31,7 +31,7 @@ func TestExecute(t *testing.T) {
 
 func TestExecute_WithLocation(t *testing.T) {
 
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
@@ -51,7 +51,7 @@ func TestExecute_WithLocation(t *testing.T) {
 
 func TestExecute_DuplicateID(t *testing.T) {
 
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	orgID := uuid.New()

@@ -9,7 +9,7 @@ import (
 )
 
 func TestExecute_BasicPagination(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	orgs, totalCount, err := Execute(ctx, testDB, 0, 10, nil, nil)
@@ -21,7 +21,7 @@ func TestExecute_BasicPagination(t *testing.T) {
 }
 
 func TestExecute_SecondPage(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	firstPageOrgs, totalCount, err := Execute(ctx, testDB, 0, 2, nil, nil)
@@ -42,7 +42,7 @@ func TestExecute_SecondPage(t *testing.T) {
 }
 
 func TestExecute_SmallPageSize(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	orgs, totalCount, err := Execute(ctx, testDB, 0, 2, nil, nil)
@@ -54,7 +54,7 @@ func TestExecute_SmallPageSize(t *testing.T) {
 }
 
 func TestExecute_SingleItemPerPage(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	orgs, totalCount, err := Execute(ctx, testDB, 0, 1, nil, nil)
@@ -66,7 +66,7 @@ func TestExecute_SingleItemPerPage(t *testing.T) {
 }
 
 func TestExecute_PageBeyondData(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	
@@ -79,7 +79,7 @@ func TestExecute_PageBeyondData(t *testing.T) {
 }
 
 func TestExecute_AllDataOnePage(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	orgs, totalCount, err := Execute(ctx, testDB, 0, 100, nil, nil)
@@ -91,7 +91,7 @@ func TestExecute_AllDataOnePage(t *testing.T) {
 }
 
 func TestExecute_OrderByCreatedAt(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	orgs, _, err := Execute(ctx, testDB, 0, 10, nil, nil)
@@ -108,7 +108,7 @@ func TestExecute_OrderByCreatedAt(t *testing.T) {
 }
 
 func TestExecute_ZeroOffset(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	orgs, totalCount, err := Execute(ctx, testDB, 0, 3, nil, nil)

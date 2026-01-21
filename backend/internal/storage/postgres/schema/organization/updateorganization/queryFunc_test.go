@@ -14,7 +14,7 @@ import (
 )
 
 func TestExecute(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	// Create an organization first
@@ -46,7 +46,7 @@ func TestExecute(t *testing.T) {
 }
 
 func TestExecute_UpdateExisting(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	// Get existing test organization
@@ -68,7 +68,7 @@ func TestExecute_UpdateExisting(t *testing.T) {
 }
 
 func TestExecute_NotFound(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	// Try to update non-existent organization

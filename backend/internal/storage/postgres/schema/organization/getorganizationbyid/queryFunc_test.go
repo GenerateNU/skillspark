@@ -9,7 +9,7 @@ import (
 )
 
 func TestExecute(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	org, err := Execute(ctx, testDB, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"))
@@ -21,7 +21,7 @@ func TestExecute(t *testing.T) {
 }
 
 func TestExecute_SecondOrganization(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	org, err := Execute(ctx, testDB, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"))
@@ -33,7 +33,7 @@ func TestExecute_SecondOrganization(t *testing.T) {
 }
 
 func TestExecute_InactiveOrganization(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	org, err := Execute(ctx, testDB, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13"))
@@ -45,7 +45,7 @@ func TestExecute_InactiveOrganization(t *testing.T) {
 }
 
 func TestExecute_NotFound(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	org, err := Execute(ctx, testDB, uuid.New())

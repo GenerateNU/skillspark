@@ -14,7 +14,7 @@ import (
 )
 
 func TestExecute(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	// Create an organization to delete
@@ -41,7 +41,7 @@ func TestExecute(t *testing.T) {
 }
 
 func TestExecute_NotFound(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	// Try to delete non-existent organization
@@ -51,7 +51,7 @@ func TestExecute_NotFound(t *testing.T) {
 }
 
 func TestExecute_AlreadyDeleted(t *testing.T) {
-	testDB := testutil.SetupTestWithCleanup(t)
+	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 
 	// Create and delete
