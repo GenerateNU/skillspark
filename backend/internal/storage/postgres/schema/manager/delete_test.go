@@ -28,7 +28,7 @@ func TestManagerRepository_Delete_Director(t *testing.T) {
 		input.Body.Role = "Assistant Manager"
 		return input
 	}()
-	createdManager, err := repo.CreateManager(ctx, managerInput)
+	createdManager, _ := repo.CreateManager(ctx, managerInput)
 	manager, err := repo.DeleteManager(ctx, createdManager.ID)
 
 	assert.Nil(t, err)
