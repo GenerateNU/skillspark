@@ -89,3 +89,20 @@ func TestChildRepository_GetChildrenByParentID(t *testing.T) {
 	assert.ElementsMatch(t, child2.Interests, c2.Interests)
 	assert.NotEmpty(t, c2.SchoolName)
 }
+
+func TestChildRepository_GetChildrenByParentID_NotFound(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+
+	testDB := testutil.SetupTestDB(t)
+	repo := NewChildRepository(testDB)
+	ctx := context.Background()
+
+	nonExistentID := uuid.New()
+
+	child, err := repo.GetChildrenByParentID(ctx, nonExistentID)
+
+	assert.Nil(t, child)
+	assert.NotNil(t, err)
+}

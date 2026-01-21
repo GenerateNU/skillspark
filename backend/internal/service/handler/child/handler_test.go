@@ -197,8 +197,8 @@ func TestHandler_UpdateChildByID(t *testing.T) {
 			mockSetup: func(m *repomocks.MockChildRepository) {
 				m.On(
 					"UpdateChildByID",
-					mock.Anything, // context.Context
-					mock.Anything, // uuid.UUID
+					mock.Anything,
+					mock.Anything,
 					mock.AnythingOfType("*models.UpdateChildInput"),
 				).Return(nil, &errs.HTTPError{
 					Code:    errs.NotFound("Child", "id", "00000000-0000-0000-0000-000000000000").Code,
