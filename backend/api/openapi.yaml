@@ -49,8 +49,12 @@ paths:
           schema:
             type: string
       responses:
-        "204":
-          description: No Content
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteEventOutputBody'
         default:
           description: Error
           content:
@@ -62,7 +66,7 @@ paths:
         - Events
       summary: Update an existing event
       description: Updates an existing event
-      operationId: patch-event
+      operationId: update-event
       parameters:
         - name: id
           in: path
@@ -73,7 +77,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchEventInputBody'
+              $ref: '#/components/schemas/UpdateEventInputBody'
         required: true
       responses:
         "200":
@@ -474,6 +478,22 @@ components:
       required:
         - email
         - username
+    DeleteEventOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DeleteEventOutputBody.json
+          readOnly: true
+        message:
+          type: string
+          description: Success message
+      required:
+        - message
     ErrorDetail:
       type: object
       additionalProperties: false
@@ -710,7 +730,29 @@ components:
         - country
         - created_at
         - updated_at
-    PatchEventInputBody:
+    School:
+      type: object
+      additionalProperties: false
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+        location_id:
+          type: string
+        name:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - location_id
+        - created_at
+        - updated_at
+    UpdateEventInputBody:
       type: object
       additionalProperties: false
       properties:
@@ -719,7 +761,7 @@ components:
           description: A URL to the JSON Schema for this object.
           format: uri
           examples:
-            - http://localhost:8080/schemas/PatchEventInputBody.json
+            - http://localhost:8080/schemas/UpdateEventInputBody.json
           readOnly: true
         age_range_max:
           type: integer
@@ -754,36 +796,6 @@ components:
           description: Title of the event
           minLength: 2
           maxLength: 100
-      required:
-        - title
-        - description
-        - organization_id
-        - age_range_min
-        - age_range_max
-        - category
-        - header_image_s3_key
-    School:
-      type: object
-      additionalProperties: false
-      properties:
-        created_at:
-          type: string
-          format: date-time
-        id:
-          type: string
-        location_id:
-          type: string
-        name:
-          type: string
-        updated_at:
-          type: string
-          format: date-time
-      required:
-        - id
-        - name
-        - location_id
-        - created_at
-        - updated_at
     UserOutputBody:
       type: object
       additionalProperties: false
