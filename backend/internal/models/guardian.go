@@ -17,6 +17,14 @@ type GetGuardianByIDInput struct {
 	ID uuid.UUID `path:"id"`
 }
 
+type DeleteGuardianInput struct {
+	ID uuid.UUID `path:"id"`
+}
+
+type DeleteGuardianOutput struct {
+	Body *Guardian `json:"body"`
+}
+
 type GetGuardianByChildIDInput struct {
 	ChildID uuid.UUID `path:"child_id"`
 }
@@ -32,6 +40,10 @@ type UpdateGuardianInput struct {
 	Body struct {
 		UserID uuid.UUID `json:"user_id" doc:"The associated user ID of the guardian"`
 	}
+}
+
+type UpdateGuardianOutput struct {
+	Body *Guardian `json:"body"`
 }
 
 type CreateGuardianOutput struct {
