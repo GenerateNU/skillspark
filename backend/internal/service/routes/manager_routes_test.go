@@ -1,8 +1,12 @@
 package routes_test
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
@@ -149,6 +153,310 @@ func TestHumaValidation_GetManagerByOrgID(t *testing.T) {
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
 			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHumaValidation_CreateManager(t *testing.T) {
+	t.Parallel()
+
+	orgID := "40000000-0000-0000-0000-000000000006"
+
+	tests := []struct {
+		name       string
+		payload    map[string]interface{}
+		mockSetup  func(*repomocks.MockManagerRepository)
+		statusCode int
+	}{
+		{
+			name: "valid payload",
+			payload: map[string]interface{}{
+				"user_id":         "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+				"organization_id": orgID,
+				"role":            "Assistant Director",
+			},
+			mockSetup: func(m *repomocks.MockManagerRepository) {
+				m.On(
+					"CreateManager",
+					mock.Anything,
+					mock.AnythingOfType("*models.CreateManagerInput"),
+				).Return(&models.Manager{
+					ID:             uuid.New(),
+					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
+					OrganizationID: uuid.MustParse(orgID),
+					Role:           "Assistant Director",
+					CreatedAt:      time.Now(),
+					UpdatedAt:      time.Now(),
+				}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "missing user_id",
+			payload: map[string]interface{}{
+				"organization_id": orgID,
+				"role":            "Assistant Director",
+			},
+			mockSetup:  func(*repomocks.MockManagerRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "missing role",
+			payload: map[string]interface{}{
+				"user_id":         "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+				"organization_id": orgID,
+			},
+			mockSetup:  func(*repomocks.MockManagerRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockManagerRepository)
+			tt.mockSetup(mockRepo)
+
+			app, _ := setupmanagerTestAPI(mockRepo)
+
+			bodyBytes, err := json.Marshal(tt.payload)
+			assert.NoError(t, err)
+
+			req, err := http.NewRequest(
+				http.MethodPost,
+				"/api/v1/manager",
+				bytes.NewBuffer(bodyBytes),
+			)
+			assert.NoError(t, err)
+			req.Header.Set("Content-Type", "application/json")
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			if tt.statusCode != resp.StatusCode {
+				bodyBytes, _ := io.ReadAll(resp.Body)
+				t.Logf("Response body: %s", string(bodyBytes))
+			}
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHumaValidation_PatchManager(t *testing.T) {
+	t.Parallel()
+
+	orgID := "40000000-0000-0000-0000-000000000006"
+	managerID := "50000000-0000-0000-0000-000000000001"
+
+	tests := []struct {
+		name       string
+		payload    map[string]interface{}
+		mockSetup  func(*repomocks.MockManagerRepository)
+		statusCode int
+	}{
+		{
+			name: "valid payload",
+			payload: map[string]interface{}{
+				"id":              managerID,
+				"user_id":         "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+				"organization_id": orgID,
+				"role":            "Senior Director",
+			},
+			mockSetup: func(m *repomocks.MockManagerRepository) {
+				m.On(
+					"PatchManager",
+					mock.Anything,
+					mock.AnythingOfType("*models.PatchManagerInput"),
+				).Return(&models.Manager{
+					ID:             uuid.MustParse(managerID),
+					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
+					OrganizationID: uuid.MustParse(orgID),
+					Role:           "Senior Director",
+					CreatedAt:      time.Now(),
+					UpdatedAt:      time.Now(),
+				}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "valid payload without organization",
+			payload: map[string]interface{}{
+				"id":      managerID,
+				"user_id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+				"role":    "Manager",
+			},
+			mockSetup: func(m *repomocks.MockManagerRepository) {
+				m.On(
+					"PatchManager",
+					mock.Anything,
+					mock.AnythingOfType("*models.PatchManagerInput"),
+				).Return(&models.Manager{
+					ID:             uuid.MustParse(managerID),
+					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
+					OrganizationID: uuid.Nil,
+					Role:           "Manager",
+					CreatedAt:      time.Now(),
+					UpdatedAt:      time.Now(),
+				}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "missing id",
+			payload: map[string]interface{}{
+				"user_id":         "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+				"organization_id": orgID,
+				"role":            "Director",
+			},
+			mockSetup:  func(*repomocks.MockManagerRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "missing user_id",
+			payload: map[string]interface{}{
+				"id":              managerID,
+				"organization_id": orgID,
+				"role":            "Director",
+			},
+			mockSetup:  func(*repomocks.MockManagerRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "missing role",
+			payload: map[string]interface{}{
+				"id":              managerID,
+				"user_id":         "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+				"organization_id": orgID,
+			},
+			mockSetup:  func(*repomocks.MockManagerRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "invalid id format",
+			payload: map[string]interface{}{
+				"id":      "not-a-valid-uuid",
+				"user_id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+				"role":    "Director",
+			},
+			mockSetup:  func(*repomocks.MockManagerRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockManagerRepository)
+			tt.mockSetup(mockRepo)
+
+			app, _ := setupmanagerTestAPI(mockRepo)
+
+			bodyBytes, err := json.Marshal(tt.payload)
+			assert.NoError(t, err)
+
+			req, err := http.NewRequest(
+				http.MethodPatch,
+				"/api/v1/manager",
+				bytes.NewBuffer(bodyBytes),
+			)
+			assert.NoError(t, err)
+			req.Header.Set("Content-Type", "application/json")
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			if tt.statusCode != resp.StatusCode {
+				bodyBytes, _ := io.ReadAll(resp.Body)
+				t.Logf("Response body: %s", string(bodyBytes))
+			}
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHumaValidation_DeleteManager(t *testing.T) {
+	t.Parallel()
+
+	managerID := "50000000-0000-0000-0000-000000000001"
+	orgID := "40000000-0000-0000-0000-000000000006"
+
+	tests := []struct {
+		name       string
+		id         string
+		mockSetup  func(*repomocks.MockManagerRepository)
+		statusCode int
+	}{
+		{
+			name: "valid id",
+			id:   managerID,
+			mockSetup: func(m *repomocks.MockManagerRepository) {
+				m.On(
+					"DeleteManager",
+					mock.Anything,
+					uuid.MustParse(managerID),
+				).Return(&models.Manager{
+					ID:             uuid.MustParse(managerID),
+					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
+					OrganizationID: uuid.MustParse(orgID),
+					Role:           "Director",
+					CreatedAt:      time.Now(),
+					UpdatedAt:      time.Now(),
+				}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:       "invalid id format",
+			id:         "not-a-valid-uuid",
+			mockSetup:  func(*repomocks.MockManagerRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name:       "empty id",
+			id:         "",
+			mockSetup:  func(*repomocks.MockManagerRepository) {},
+			statusCode: http.StatusMethodNotAllowed,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockManagerRepository)
+			tt.mockSetup(mockRepo)
+
+			app, _ := setupmanagerTestAPI(mockRepo)
+
+			req, err := http.NewRequest(
+				http.MethodDelete,
+				"/api/v1/manager/"+tt.id,
+				nil,
+			)
+			assert.NoError(t, err)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			if tt.statusCode != resp.StatusCode {
+				bodyBytes, _ := io.ReadAll(resp.Body)
+				t.Logf("Response body: %s", string(bodyBytes))
+			}
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRepo.AssertExpectations(t)
