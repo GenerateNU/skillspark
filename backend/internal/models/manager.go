@@ -35,9 +35,9 @@ type GetManagerByOrgIDOutput struct {
 // create
 type CreateManagerInput struct {
 	Body struct {
-		UserID         uuid.UUID `json:"user_id" db:"user_id" doc:"user id of the manager"`
-		OrganizationID uuid.UUID `json:"organization_id" db:"organization_id" doc:"organization id of the organization the manager is associated with"`
-		Role           string    `json:"role" db:"role" doc:"role of the manager being created"`
+		UserID         uuid.UUID  `json:"user_id" db:"user_id" doc:"user id of the manager"`
+		OrganizationID *uuid.UUID `json:"organization_id,omitempty" db:"organization_id" doc:"organization id of the organization the manager is associated with"`
+		Role           string     `json:"role" db:"role" doc:"role of the manager being created"`
 	}
 }
 
@@ -59,10 +59,10 @@ type DeleteManagerOutput struct {
 
 type PatchManagerInput struct {
 	Body struct {
-		ID             uuid.UUID `json:"id" db:"id" doc:"id of the manager"`
-		UserID         uuid.UUID `json:"user_id" db:"user_id" doc:"user id of the manager"`
-		OrganizationID uuid.UUID `json:"organization_id" db:"organization_id" doc:"organization id of the organization the manager is associated with"`
-		Role           string    `json:"role" db:"role" doc:"role of the manager being created"`
+		ID             uuid.UUID  `json:"id" db:"id" doc:"id of the manager"`
+		UserID         uuid.UUID  `json:"user_id" db:"user_id" doc:"user id of the manager"`
+		OrganizationID *uuid.UUID `json:"organization_id,,omitempty" db:"organization_id" doc:"organization id of the organization the manager is associated with"`
+		Role           string     `json:"role" db:"role" doc:"role of the manager being created"`
 	}
 }
 

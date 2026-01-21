@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// CreateManager handles DELETE /manager
+// DeleteManager handles DELETE /manager
 func (h *Handler) DeleteManager(ctx context.Context, input *models.DeleteManagerInput) (*models.Manager, error) {
 	// Input is already parsed and validated by Huma!
 	// Just pass it to the repository

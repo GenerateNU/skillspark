@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *ManagerRepository) GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, *errs.HTTPError) {
+func (r *ManagerRepository) GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error) {
 	query, err := schema.ReadSQLBaseScript("manager/sql/get_by_org_id.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())

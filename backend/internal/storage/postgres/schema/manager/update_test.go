@@ -20,12 +20,12 @@ func TestManagerRepository_Update_AssistantDirector(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewManagerRepository(testDB)
 	ctx := context.Background()
-
+	ptr := uuid.MustParse("40000000-0000-0000-0000-000000000001")
 	managerInput := func() *models.PatchManagerInput {
 		input := &models.PatchManagerInput{}
 		input.Body.ID = uuid.MustParse("50000000-0000-0000-0000-000000000001")
 		input.Body.UserID = uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f")
-		input.Body.OrganizationID = uuid.MustParse("40000000-0000-0000-0000-000000000001")
+		input.Body.OrganizationID = &ptr
 		input.Body.Role = "Assistant Director"
 		return input
 	}()

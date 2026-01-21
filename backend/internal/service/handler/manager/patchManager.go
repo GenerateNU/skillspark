@@ -5,7 +5,7 @@ import (
 	"skillspark/internal/models"
 )
 
-// CreateManager handles POST /manager
+// PatchManager handles POST /manager
 func (h *Handler) PatchManager(ctx context.Context, input *models.PatchManagerInput) (*models.Manager, error) {
 	// Input is already parsed and validated by Huma!
 	// Just pass it to the repository

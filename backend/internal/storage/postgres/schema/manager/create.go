@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *ManagerRepository) CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, *errs.HTTPError) {
+func (r *ManagerRepository) CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error) {
 	query, err := schema.ReadSQLBaseScript("manager/sql/create.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

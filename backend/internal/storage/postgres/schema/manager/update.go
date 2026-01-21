@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *ManagerRepository) PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, *errs.HTTPError) {
+func (r *ManagerRepository) PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, error) {
 	query, err := schema.ReadSQLBaseScript("manager/sql/update.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

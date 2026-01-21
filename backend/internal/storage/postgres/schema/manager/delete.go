@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *ManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, *errs.HTTPError) {
+func (r *ManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, error) {
 	query, err := schema.ReadSQLBaseScript("manager/sql/delete.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -24,7 +24,7 @@ func (r *ManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID) (*m
 		&deletedManager.CreatedAt, &deletedManager.UpdatedAt)
 
 	if err != nil {
-		err := errs.InternalServerError("Failed to create location: ", err.Error())
+		err := errs.InternalServerError("Failed to delete manager: ", err.Error())
 		return nil, &err
 	}
 

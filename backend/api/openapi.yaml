@@ -110,33 +110,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
-  /api/v1/manager/{id}:
-    get:
-      tags:
-        - Managers
-      summary: Get a manager by id
-      description: Returns a manager by id
-      operationId: get-manager-by-id
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Manager'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
-  /api/v1/manager/create:
+  /api/v1/manager:
     post:
       tags:
         - Managers
@@ -162,13 +136,63 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
-  /api/v1/manager/delete/{id}:
-    post:
+    delete:
       tags:
         - Managers
       summary: Deletes a manager by id
       description: Returns a manager by id
       operationId: delete manager
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    patch:
+      tags:
+        - Managers
+      summary: Updates a manager by id
+      description: Returns a manager by id
+      operationId: patch/update manager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchManagerInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/manager/{id}:
+    get:
+      tags:
+        - Managers
+      summary: Get a manager by id
+      description: Returns a manager by id
+      operationId: get-manager-by-id
       parameters:
         - name: id
           in: path
@@ -201,32 +225,6 @@ paths:
           required: true
           schema:
             type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Manager'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
-  /api/v1/manager/update/{id}:
-    patch:
-      tags:
-        - Managers
-      summary: Updates a manager by id
-      description: Returns a manager by id
-      operationId: patch/update manager
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchManagerInputBody'
-        required: true
       responses:
         "200":
           description: OK
@@ -728,6 +726,9 @@ components:
           examples:
             - http://localhost:8080/schemas/PatchManagerInputBody.json
           readOnly: true
+        id:
+          type: string
+          description: id of the manager
         organization_id:
           type: string
           description: organization id of the organization the manager is associated with
@@ -738,6 +739,7 @@ components:
           type: string
           description: user id of the manager
       required:
+        - id
         - user_id
         - organization_id
         - role
