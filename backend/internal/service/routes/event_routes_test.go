@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
@@ -79,7 +80,7 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name: "title too short", // MinLength: 2
+			name: "title too short",
 			payload: map[string]interface{}{
 				"title":           "A",
 				"description":     "Introduction to robotics",
@@ -168,7 +169,7 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name:    "invalid validation in body", // Title too short
+			name:    "invalid validation in body",
 			eventID: validID,
 			payload: map[string]interface{}{
 				"title": "A",
@@ -213,6 +214,7 @@ func TestHumaValidation_DeleteEvent(t *testing.T) {
 	t.Parallel()
 
 	validID := uuid.New().String()
+	notFoundID := "00000000-0000-0000-0000-000000000000"
 
 	tests := []struct {
 		name       string
@@ -228,9 +230,22 @@ func TestHumaValidation_DeleteEvent(t *testing.T) {
 					"DeleteEvent",
 					mock.Anything,
 					uuid.MustParse(validID),
-				).Return(&struct{}{}, nil)
+				).Return(nil)
 			},
 			statusCode: http.StatusOK,
+		},
+		{
+			name:    "event not found",
+			eventID: notFoundID,
+			mockSetup: func(m *repomocks.MockEventRepository) {
+				httpErr := errs.NotFound("Event", "id", uuid.MustParse(notFoundID))
+				m.On(
+					"DeleteEvent",
+					mock.Anything,
+					uuid.MustParse(notFoundID),
+				).Return(&httpErr)
+			},
+			statusCode: http.StatusNotFound,
 		},
 		{
 			name:       "invalid UUID",
