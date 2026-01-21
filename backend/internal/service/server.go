@@ -114,4 +114,6 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository) {
 
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
+	routes.SetupOrganizationRoutes(api, repo)
+
 }

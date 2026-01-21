@@ -4,7 +4,8 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-	schema "skillspark/internal/storage/postgres/schema/location/getLocationByID"
+	locationSchema "skillspark/internal/storage/postgres/schema/location/getLocationByID"
+	organizationSchema "skillspark/internal/storage/postgres/schema/organization"
 
 	"github.com/google/uuid"
 
@@ -16,9 +17,18 @@ type LocationRepository interface {
 	GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, *errs.HTTPError)
 }
 
+type OrganizationRepository interface {
+	CreateOrganization(ctx context.Context, org *models.Organization) *errs.HTTPError
+	GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
+	GetAllOrganizations(ctx context.Context, offset, pageSize int) ([]models.Organization, int, *errs.HTTPError)
+	UpdateOrganization(ctx context.Context, org *models.Organization) *errs.HTTPError
+	DeleteOrganization(ctx context.Context, id uuid.UUID) *errs.HTTPError
+}
+
 type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
+	Organization OrganizationRepository
 }
 
 // Close closes the database connection pool
@@ -36,6 +46,7 @@ func (r *Repository) GetDB() *pgxpool.Pool {
 func NewRepository(db *pgxpool.Pool) *Repository {
 	return &Repository{
 		db:       db,
-		Location: schema.NewLocationRepository(db),
+		Location: locationSchema.NewLocationRepository(db),
+		Organization: organizationSchema.NewOrganizationRepository(db),
 	}
 }
