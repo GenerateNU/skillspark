@@ -2,7 +2,6 @@ package repomocks
 
 import (
 	"context"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/utils"
 
@@ -22,10 +21,10 @@ func (m *MockSchoolRepository) GetAllSchools(ctx context.Context, pagination uti
 		schools = v.([]models.School)
 	}
 
-	var httpErr *errs.HTTPError
+	var err error
 	if v := args.Get(1); v != nil {
-		httpErr = v.(*errs.HTTPError)
+		err = v.(error)
 	}
 
-	return schools, httpErr
+	return schools, err
 }

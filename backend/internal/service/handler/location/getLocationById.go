@@ -9,15 +9,15 @@ import (
 )
 
 // GetLocationById handles GET /locations/:id
-func (h *Handler) GetLocationById(ctx context.Context, input *models.GetLocationByIDInput) (*models.Location, error) {
+func (h *Handler) GetLocationById(ctx context.Context, input *models.GetLocationByIDInput) (*models.Location, *errs.HTTPError) {
 	id, err := uuid.Parse(input.ID.String())
 	if err != nil {
-		return nil, errs.BadRequest("Invalid ID format")
+		return nil, &errs.HTTPError{Code: 400, Message: "Invalid ID format"}
 	}
 
-	location, httpErr := h.LocationRepository.GetLocationByID(ctx, id)
-	if httpErr != nil {
-		return nil, httpErr
+	location, err := h.LocationRepository.GetLocationByID(ctx, id)
+	if err != nil {
+		return nil, err.(*errs.HTTPError)
 	}
 	return location, nil
 }

@@ -2,7 +2,6 @@ package repomocks
 
 import (
 	"context"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 
 	"github.com/google/uuid"
@@ -19,7 +18,7 @@ func (m *MockLocationRepository) GetLocationByID(ctx context.Context, id uuid.UU
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Location), nil
 }
@@ -30,7 +29,7 @@ func (m *MockLocationRepository) CreateLocation(ctx context.Context, location *m
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Location), nil
 }

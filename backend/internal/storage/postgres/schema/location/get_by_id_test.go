@@ -2,8 +2,11 @@ package location
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 	"testing"
 
+	"skillspark/internal/errs"
 	"skillspark/internal/storage/postgres/testutil"
 
 	"github.com/google/uuid"
@@ -47,4 +50,14 @@ func TestLocationRepository_GetLocationByID_NewYork(t *testing.T) {
 	assert.Equal(t, "USA", location3.Country)
 	assert.Equal(t, "789 Market St", location3.AddressLine1)
 	assert.Nil(t, location3.AddressLine2)
+
+	location4, err := repo.GetLocationByID(ctx, uuid.MustParse("a0111c99-9c0b-4ef8-bb6d-6bb9bd380a20"))
+
+	assert.NotNil(t, err)
+	assert.Nil(t, location4)
+	fmt.Println(err)
+	fmt.Println(errs.NotFound("Location", "id", uuid.MustParse("a0111c99-9c0b-4ef8-bb6d-6bb9bd380a20")))
+	assert.Equal(t, http.StatusNotFound, err.(*errs.HTTPError).Code)
+	assert.Contains(t, err.(*errs.HTTPError).Message, "Location")
+	assert.Contains(t, err.(*errs.HTTPError).Message, "a0111c99-9c0b-4ef8-bb6d-6bb9bd380a20")
 }
