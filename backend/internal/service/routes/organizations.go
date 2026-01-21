@@ -11,10 +11,8 @@ import (
 )
 
 func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
-	// Initialize handler
 	orgHandler := organization.NewHandler(repo.Organization, repo.Location)
 
-	// POST /api/v1/organizations - Create Organization
 	huma.Register(api, huma.Operation{
 		OperationID: "create-organization",
 		Method:      http.MethodPost,
@@ -26,7 +24,6 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		return orgHandler.CreateOrganization(ctx, input)
 	})
 
-	// GET /api/v1/organizations/{id} - Get Organization by ID
 	huma.Register(api, huma.Operation{
 		OperationID: "get-organization",
 		Method:      http.MethodGet,
@@ -38,7 +35,6 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		return orgHandler.GetOrganizationById(ctx, input)
 	})
 
-	// GET /api/v1/organizations - Get All Organizations (Paginated)
 	huma.Register(api, huma.Operation{
 		OperationID: "list-organizations",
 		Method:      http.MethodGet,
@@ -50,7 +46,6 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		return orgHandler.GetAllOrganizations(ctx, input)
 	})
 
-	// PATCH /api/v1/organizations/{id} - Update Organization
 	huma.Register(api, huma.Operation{
 		OperationID: "update-organization",
 		Method:      http.MethodPatch,
@@ -62,7 +57,6 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		return orgHandler.UpdateOrganization(ctx, input)
 	})
 
-	// DELETE /api/v1/organizations/{id} - Delete Organization
 	huma.Register(api, huma.Operation{
 		OperationID: "delete-organization",
 		Method:      http.MethodDelete,
