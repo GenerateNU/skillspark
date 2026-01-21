@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/storage"
+	"time"
 
 	"github.com/danielgtaylor/huma/v2"
 )
@@ -67,7 +68,7 @@ func SetupExamplesRoutes(api huma.API, repo *storage.Repository) {
 	}, func(ctx context.Context, input *GetGreetingInput) (*GetGreetingOutput, error) {
 		resp := &GetGreetingOutput{}
 		resp.Body.Message = "Hello, " + input.Name + "!"
-		resp.Body.Timestamp = ctx.Value("timestamp").(string)
+		resp.Body.Timestamp = time.Now().Format(time.RFC3339)
 		return resp, nil
 	})
 
