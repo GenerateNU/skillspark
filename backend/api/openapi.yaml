@@ -579,41 +579,43 @@ components:
       type: object
       additionalProperties: false
       properties:
-        AgeRangeMax:
+        age_range_max:
           type: integer
           format: int64
-        AgeRangeMin:
+        age_range_min:
           type: integer
           format: int64
-        Category:
-          type: string
-        CreatedAt:
+        category:
+          type: array
+          items:
+            type: string
+        created_at:
           type: string
           format: date-time
-        Description:
+        description:
           type: string
-        HeaderImageS3Key:
+        header_image_s3_key:
           type: string
-        ID:
+        id:
           type: string
-        OrganizationId:
+        organization_id:
           type: string
-        Title:
+        title:
           type: string
-        UpdatedAt:
+        updated_at:
           type: string
           format: date-time
       required:
-        - ID
-        - Title
-        - Description
-        - OrganizationId
-        - AgeRangeMin
-        - AgeRangeMax
-        - Category
-        - HeaderImageS3Key
-        - CreatedAt
-        - UpdatedAt
+        - id
+        - title
+        - description
+        - organization_id
+        - age_range_min
+        - age_range_max
+        - category
+        - header_image_s3_key
+        - created_at
+        - updated_at
     EventOccurrence:
       type: object
       additionalProperties: false
