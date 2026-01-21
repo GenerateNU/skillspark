@@ -43,7 +43,7 @@ func (r *EventOccurrenceRepository) GetEventOccurrencesByEventID(ctx context.Con
 			&createdEventOccurrence.Event.ID,
 			&createdEventOccurrence.Event.Title,
 			&createdEventOccurrence.Event.Description,
-			&createdEventOccurrence.Event.OrganizationId,
+			&createdEventOccurrence.Event.OrganizationID,
 			&createdEventOccurrence.Event.AgeRangeMin,
 			&createdEventOccurrence.Event.AgeRangeMax,
 			&createdEventOccurrence.Event.Category,
