@@ -20,11 +20,7 @@ func SetupGuardiansRoutes(api huma.API, repo *storage.Repository) {
 		Description: "Returns a guardian by id",
 		Tags:        []string{"Guardians"},
 	}, func(ctx context.Context, input *models.GetGuardianByIDInput) (*models.GetGuardianByIDOutput, error) {
-		print("At the route level")
-		print(guardianHandler == nil)
-		print(input == nil)
 		guardian, err := guardianHandler.GetGuardianById(ctx, input)
-		print("here")
 		if err != nil {
 			return nil, err
 		}
