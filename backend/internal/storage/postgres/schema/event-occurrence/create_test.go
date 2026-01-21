@@ -23,7 +23,8 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 
 	eventOccurrenceInput := func() *models.CreateEventOccurrenceInput {
 		input := &models.CreateEventOccurrenceInput{}
-		input.Body.ManagerId = uuid.MustParse("50000000-0000-0000-0000-000000000001")
+		mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
+		input.Body.ManagerId = &mid
 		input.Body.EventId = uuid.MustParse("60000000-0000-0000-0000-000000000001")
 		input.Body.LocationId = uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 		start, _ := time.Parse(time.RFC3339, "2026-02-01T00:00:00Z")
