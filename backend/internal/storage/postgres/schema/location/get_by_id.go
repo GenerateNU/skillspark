@@ -1,4 +1,4 @@
-package schema
+package location
 
 import (
 	"context"
@@ -9,19 +9,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type LocationRepository struct {
-	db *pgxpool.Pool
-}
-
-func NewLocationRepository(db *pgxpool.Pool) *LocationRepository {
-	return &LocationRepository{db}
-}
-
-func (r *LocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, *errs.HTTPError) {
-	query, err := schema.ReadSQLBaseScript("location/getLocationByID/baseQuery.sql")
+func (r *LocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, error) {
+	query, err := schema.ReadSQLBaseScript("location/sql/get_by_id.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
@@ -29,7 +20,7 @@ func (r *LocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) 
 
 	row := r.db.QueryRow(ctx, query, id)
 	var location models.Location
-	err = row.Scan(&location.ID, &location.Latitude, &location.Longitude, &location.Address, &location.City, &location.State, &location.ZipCode, &location.Country, &location.CreatedAt, &location.UpdatedAt)
+	err = row.Scan(&location.ID, &location.Latitude, &location.Longitude, &location.AddressLine1, &location.AddressLine2, &location.Subdistrict, &location.District, &location.Province, &location.PostalCode, &location.Country, &location.CreatedAt, &location.UpdatedAt)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

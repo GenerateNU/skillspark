@@ -4,8 +4,10 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-	locationSchema "skillspark/internal/storage/postgres/schema/location/getLocationByID"
+	locationSchema "skillspark/internal/storage/postgres/schema/location"
 	organizationSchema "skillspark/internal/storage/postgres/schema/organization"
+	"skillspark/internal/storage/postgres/schema/school"
+	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -14,7 +16,12 @@ import (
 
 // Repository provides methods to interact with the database
 type LocationRepository interface {
-	GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, *errs.HTTPError)
+	GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, error)
+	CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, error)
+}
+
+type SchoolRepository interface {
+	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error)
 }
 
 type OrganizationRepository interface {
@@ -29,6 +36,7 @@ type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
 	Organization OrganizationRepository
+	School   SchoolRepository
 }
 
 // Close closes the database connection pool
@@ -48,5 +56,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		db:       db,
 		Location: locationSchema.NewLocationRepository(db),
 		Organization: organizationSchema.NewOrganizationRepository(db),
+		School:   school.NewSchoolRepository(db),
 	}
 }

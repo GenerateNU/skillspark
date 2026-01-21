@@ -31,7 +31,120 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GreetingOutputBody'
+                $ref: '#/components/schemas/GetGreetingOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Check if the API is running and healthy
+      operationId: health-check
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/locations:
+    post:
+      tags:
+        - Locations
+      summary: Create a new location
+      description: Creates a new location
+      operationId: post-location
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLocationInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/locations/{id}:
+    get:
+      tags:
+        - Locations
+      summary: Get a location by id
+      description: Returns a location by id
+      operationId: get-location-by-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/schools:
+    get:
+      tags:
+        - Schools
+      summary: Get all schools
+      description: Returns all schools
+      operationId: get-all-schools
+      parameters:
+        - name: page
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 100
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of all schools in the database
+                items:
+                  $ref: '#/components/schemas/School'
         default:
           description: Error
           content:
@@ -136,6 +249,74 @@ paths:
                 $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
+    CreateLocationInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateLocationInputBody.json
+          readOnly: true
+        address_line1:
+          type: string
+          description: Primary address line of the location
+          minLength: 5
+          maxLength: 200
+        address_line2:
+          type: string
+          description: Secondary address line of the location
+          minLength: 5
+          maxLength: 200
+        country:
+          type: string
+          description: Country of the location
+          minLength: 2
+          maxLength: 100
+        district:
+          type: string
+          description: District of the location
+          minLength: 2
+          maxLength: 100
+        latitude:
+          type: number
+          description: Latitude of the location
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          description: Longitude of the location
+          format: double
+          minimum: -180
+          maximum: 180
+        postal_code:
+          type: string
+          description: Postal code of the location
+          minLength: 3
+          maxLength: 20
+        province:
+          type: string
+          description: Province/State of the location
+          minLength: 2
+          maxLength: 100
+        subdistrict:
+          type: string
+          description: Subdistrict of the location
+          minLength: 2
+          maxLength: 100
+      required:
+        - latitude
+        - longitude
+        - address_line1
+        - address_line2
+        - subdistrict
+        - district
+        - province
+        - postal_code
+        - country
     CreateUserInputBody:
       type: object
       additionalProperties: false
@@ -219,7 +400,7 @@ components:
           default: about:blank
           examples:
             - https://example.com/errors/example
-    GreetingOutputBody:
+    GetGreetingOutputBody:
       type: object
       additionalProperties: false
       properties:
@@ -228,7 +409,7 @@ components:
           description: A URL to the JSON Schema for this object.
           format: uri
           examples:
-            - http://localhost:8080/schemas/GreetingOutputBody.json
+            - http://localhost:8080/schemas/GetGreetingOutputBody.json
           readOnly: true
         message:
           type: string
@@ -239,6 +420,30 @@ components:
       required:
         - message
         - timestamp
+    HealthOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/HealthOutputBody.json
+          readOnly: true
+        status:
+          type: string
+          description: Health status
+          examples:
+            - ok
+        version:
+          type: string
+          description: API version
+          examples:
+            - 1.0.0
+      required:
+        - status
+        - version
     Item:
       type: object
       additionalProperties: false
@@ -274,6 +479,80 @@ components:
       required:
         - users
         - total
+    Location:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Location.json
+          readOnly: true
+        address_line1:
+          type: string
+        address_line2:
+          type: string
+        country:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        district:
+          type: string
+        id:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        postal_code:
+          type: string
+        province:
+          type: string
+        subdistrict:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - latitude
+        - longitude
+        - address_line1
+        - address_line2
+        - subdistrict
+        - district
+        - province
+        - postal_code
+        - country
+        - created_at
+        - updated_at
+    School:
+      type: object
+      additionalProperties: false
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+        location_id:
+          type: string
+        name:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - location_id
+        - created_at
+        - updated_at
     UserOutputBody:
       type: object
       additionalProperties: false
