@@ -131,6 +131,7 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 	t.Parallel()
 
 	validID := uuid.New().String()
+	notFoundID := "00000000-0000-0000-0000-000000000000"
 
 	tests := []struct {
 		name       string
@@ -158,6 +159,24 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 				}, nil)
 			},
 			statusCode: http.StatusOK,
+		},
+		{
+			name:    "event not found",
+			eventID: notFoundID,
+			payload: map[string]interface{}{
+				"title": "Advanced Robotics",
+			},
+			mockSetup: func(m *repomocks.MockEventRepository) {
+				httpErr := errs.NotFound("Event", "id", uuid.MustParse(notFoundID))
+				m.On(
+					"UpdateEvent",
+					mock.Anything,
+					mock.MatchedBy(func(input *models.UpdateEventInput) bool {
+						return input.ID.String() == notFoundID
+					}),
+				).Return(nil, &httpErr)
+			},
+			statusCode: http.StatusNotFound,
 		},
 		{
 			name:    "invalid UUID",
