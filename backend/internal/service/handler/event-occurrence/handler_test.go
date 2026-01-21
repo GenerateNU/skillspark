@@ -75,9 +75,9 @@ func TestHandler_CreateEventOccurrence(t *testing.T) {
 				m.On(
 					"CreateEventOccurrence",
 					mock.Anything,
-					uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+					mock.AnythingOfType("*models.CreateEventOccurrenceInput"),
 				).Return(&models.EventOccurrence{
-					ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+					ID:        		uuid.New(),
 					ManagerId: 		&mid,
 					Event: 			event,
 					Location: 		location,
