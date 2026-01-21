@@ -13,7 +13,7 @@ type MockLocationRepository struct {
 	mock.Mock
 }
 
-func (m *MockLocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, *errs.HTTPError) {
+func (m *MockLocationRepository) GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
@@ -24,7 +24,7 @@ func (m *MockLocationRepository) GetLocationByID(ctx context.Context, id uuid.UU
 	return args.Get(0).(*models.Location), nil
 }
 
-func (m *MockLocationRepository) CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, *errs.HTTPError) {
+func (m *MockLocationRepository) CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, error) {
 	args := m.Called(ctx, location)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {

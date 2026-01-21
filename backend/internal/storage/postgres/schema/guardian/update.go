@@ -8,7 +8,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, *errs.HTTPError) {
+func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error) {
 	query, err := schema.ReadSQLBaseScript("guardian/sql/update.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

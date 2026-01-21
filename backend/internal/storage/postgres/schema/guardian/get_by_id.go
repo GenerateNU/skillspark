@@ -12,7 +12,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *GuardianRepository) GetGuardianByID(ctx context.Context, id uuid.UUID) (*models.Guardian, *errs.HTTPError) {
+func (r *GuardianRepository) GetGuardianByID(ctx context.Context, id uuid.UUID) (*models.Guardian, error) {
 	query, err := schema.ReadSQLBaseScript("guardian/sql/get_by_id.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

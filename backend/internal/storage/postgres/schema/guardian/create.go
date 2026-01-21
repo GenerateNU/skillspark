@@ -8,7 +8,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *GuardianRepository) CreateGuardian(ctx context.Context, guardian *models.CreateGuardianInput) (*models.Guardian, *errs.HTTPError) {
+func (r *GuardianRepository) CreateGuardian(ctx context.Context, guardian *models.CreateGuardianInput) (*models.Guardian, error) {
 	query, err := schema.ReadSQLBaseScript("guardian/sql/create.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

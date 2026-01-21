@@ -13,7 +13,7 @@ type MockSchoolRepository struct {
 	mock.Mock
 }
 
-func (m *MockSchoolRepository) GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, *errs.HTTPError) {
+func (m *MockSchoolRepository) GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error) {
 	args := m.Called(ctx, pagination)
 
 	// Handle nil slice and/or error safely
