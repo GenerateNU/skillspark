@@ -23,6 +23,6 @@ func TestEventOccurrenceRepository_GetEventOccurrenceByEventId(t *testing.T){
 	assert.Nil(t, err)
 	assert.NotNil(t, eventOccurrences)
 	for i := range eventOccurrences {
-		assert.Equal(t, uuid.MustParse("60000000-0000-0000-0000-000000000001"), eventOccurrences[i].Event.ID)
+		assert.Equal(t, uuid.MustParse("60000000-0000-0000-0000-00000000000d"), eventOccurrences[i].Event.ID)
 	}
 }

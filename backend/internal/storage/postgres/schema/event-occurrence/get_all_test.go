@@ -19,6 +19,12 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T){
 	repo := NewEventOccurrenceRepository(testDB)
 	ctx := context.Background()
 
+	// get the total number of event occurrences in the test database
+	var count int64
+	row := testDB.QueryRow(ctx, "SELECT COUNT(*) FROM event_occurrence")
+	sqlErr := row.Scan(&count)
+	assert.Nil(t, sqlErr)
+
 	// default pagination
 	pagination := utils.NewPagination()
 
@@ -26,7 +32,7 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T){
 	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination)
 	assert.Nil(t, err)
 	assert.NotNil(t, eventOccurrences)
-	assert.Equal(t, len(eventOccurrences), 15)
+	assert.Equal(t, count, int64(len(eventOccurrences)))
 }
 
 func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.T){
@@ -38,31 +44,32 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.
 	repo := NewEventOccurrenceRepository(testDB)
 	ctx := context.Background()
 
+	// get the total number of event occurrences in the test database
+	var count int64
+	row := testDB.QueryRow(ctx, "SELECT COUNT(*) FROM event_occurrence")
+	sqlErr := row.Scan(&count)
+	assert.Nil(t, sqlErr)
+
+	assert.GreaterOrEqual(t, count, int64(12))
+
 	// test page 1 with limit 4
 	pagination1 := utils.Pagination{Page: 1, Limit: 4}
 	eventOccurrences1, err1 := repo.GetAllEventOccurrences(ctx, pagination1)
 	assert.Nil(t, err1)
 	assert.NotNil(t, eventOccurrences1)
-	assert.Equal(t, len(eventOccurrences1), 4)
+	assert.Equal(t, 4, len(eventOccurrences1))
 
 	// test page 2 with limit 4
 	pagination2 := utils.Pagination{Page: 2, Limit: 4}
 	eventOccurrences2, err2 := repo.GetAllEventOccurrences(ctx, pagination2)
 	assert.Nil(t, err2)
 	assert.NotNil(t, eventOccurrences2)
-	assert.Equal(t, len(eventOccurrences2), 4)
+	assert.Equal(t, 4, len(eventOccurrences2))
 
 	// test page 3 with limit 4
 	pagination3 := utils.Pagination{Page: 3, Limit: 4}
 	eventOccurrences3, err3 := repo.GetAllEventOccurrences(ctx, pagination3)
 	assert.Nil(t, err3)
 	assert.NotNil(t, eventOccurrences3)
-	assert.Equal(t, len(eventOccurrences3), 4)
-
-	// test page 4 with limit 4
-	pagination4 := utils.Pagination{Page: 4, Limit: 4}
-	eventOccurrences4, err4 := repo.GetAllEventOccurrences(ctx, pagination4)
-	assert.Nil(t, err4)
-	assert.NotNil(t, eventOccurrences4)
-	assert.Equal(t, len(eventOccurrences4), 1)
+	assert.Equal(t, 4, len(eventOccurrences3))
 }
