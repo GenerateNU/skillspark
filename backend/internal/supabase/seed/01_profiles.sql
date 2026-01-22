@@ -1,8 +1,8 @@
 -- ============================================
--- 1. PROFILES (User Accounts)
+-- 1. user (User Accounts)
 -- ============================================
 -- First, enable UUID extension if not already enabled
-INSERT INTO profile (id, name, email, username, profile_picture_s3_key, language_preference) VALUES
+INSERT INTO "user" (id, name, email, username, profile_picture_s3_key, language_preference) VALUES
 ('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'Sarah Johnson', 'sarah.johnson@email.com', 'sarahj', 'profiles/sarah_johnson.jpg', 'en'),
 ('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 'Michael Chen', 'michael.chen@email.com', 'mchen', 'profiles/michael_chen.jpg', 'en'),
 ('c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f', 'Priya Patel', 'priya.patel@email.com', 'priyap', 'profiles/priya_patel.jpg', 'en'),
