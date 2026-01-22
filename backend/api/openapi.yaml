@@ -166,6 +166,34 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/guardians/{id}/children:
+    get:
+      tags:
+        - Child
+      summary: Get all children for a guardian
+      description: Returns the list of children associated with a given guardian ID
+      operationId: get-children-by-guardian-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Child'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/health:
     get:
       tags:
@@ -820,6 +848,45 @@ components:
         - location_id
         - created_at
         - updated_at
+    UpdateChildInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateChildInputBody.json
+          readOnly: true
+        birth_month:
+          type: integer
+          description: Birth month of the child
+          format: int64
+          minimum: 1
+          maximum: 12
+        birth_year:
+          type: integer
+          description: Birth year of the child
+          format: int64
+          minimum: 2000
+          maximum: 2026
+        guardian_id:
+          type: string
+          description: ID of the child's guardian
+        interests:
+          type: array
+          description: Interests of the child
+          items:
+            type: string
+        name:
+          type: string
+          description: Name of the child
+          minLength: 1
+          maxLength: 200
+        school_id:
+          type: string
+          description: ID of the school the child goes to
     UserOutputBody:
       type: object
       additionalProperties: false
