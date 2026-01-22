@@ -1,4 +1,4 @@
-package eventoccurrence
+package event
 
 import (
 	"context"
@@ -14,7 +14,7 @@ func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *model
 		return nil, errs.BadRequest("Invalid ID format")
 	}
 	
-	eventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrencesByEventID(ctx, id)
+	eventOccurrence, err := h.EventRepository.GetEventOccurrencesByEventID(ctx, id)
 	if err != nil {
 		return nil, err
 	}

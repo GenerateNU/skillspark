@@ -41,15 +41,6 @@ type GetEventOccurrenceByIDOutput struct {
 	Body *EventOccurrence `json:"body" doc:"Event occurrence in the database that matches the ID"`
 }
 
-// get by event id
-type GetEventOccurrencesByEventIDInput struct {
-	ID uuid.UUID `path:"event_id" doc:"ID of an event"`
-}
-
-type GetEventOccurrencesByEventIDOutput struct {
-	Body []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
-}
-
 // post
 type CreateEventOccurrenceInput struct {
 	Body struct {

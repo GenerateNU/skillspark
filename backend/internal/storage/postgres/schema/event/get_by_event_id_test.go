@@ -1,4 +1,4 @@
-package eventoccurrence
+package event
 
 import (
 	"context"
@@ -9,13 +9,13 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestEventOccurrenceRepository_GetEventOccurrenceByEventId(t *testing.T){
+func TestEventRepository_GetEventOccurrenceByEventId(t *testing.T){
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
 
 	testDB := testutil.SetupTestDB(t)
-	repo := NewEventOccurrenceRepository(testDB)
+	repo := NewEventRepository(testDB)
 	ctx := context.Background()
 
 	// check that get by event id returns multiple event occurrences with the same event id

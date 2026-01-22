@@ -48,6 +48,7 @@ type EventRepository interface {
 	CreateEvent(ctx context.Context, location *models.CreateEventInput) (*models.Event, error)
 	UpdateEvent(ctx context.Context, location *models.UpdateEventInput) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
+	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
 }
 
 type ChildRepository interface {
@@ -61,7 +62,6 @@ type ChildRepository interface {
 type EventOccurrenceRepository interface {
 	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination) ([]models.EventOccurrence, error)
 	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error)
-	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
 	CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error)
 }
 

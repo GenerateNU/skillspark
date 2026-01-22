@@ -72,3 +72,12 @@ type DeleteEventOutput struct {
 		Message string `json:"message" doc:"Success message"`
 	} `json:"body"`
 }
+
+// get by event id
+type GetEventOccurrencesByEventIDInput struct {
+	ID uuid.UUID `path:"event_id" doc:"ID of an event"`
+}
+
+type GetEventOccurrencesByEventIDOutput struct {
+	Body []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
+}
