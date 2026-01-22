@@ -117,6 +117,34 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/children/{id}:
+    get:
+      tags:
+        - Child
+      summary: Get all children for a guardian
+      description: Returns the list of children associated with a given guardian ID
+      operationId: get-children-by-guardian-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Child'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/greet/{name}:
     get:
       tags:
@@ -140,34 +168,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetGreetingOutputBody'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
-  /api/v1/guardians/{id}/children:
-    get:
-      tags:
-        - Child
-      summary: Get all children for a guardian
-      description: Returns the list of children associated with a given guardian ID
-      operationId: get-children-by-guardian-id
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Child'
         default:
           description: Error
           content:
@@ -240,6 +240,164 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Location'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/organizations:
+    get:
+      tags:
+        - Organizations
+      summary: List all organizations
+      description: Returns a paginated list of organizations with optional filtering
+      operationId: list-organizations
+      parameters:
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: page_size
+          in: query
+          description: Number of items per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of items per page
+            format: int64
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllOrganizationsOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    post:
+      tags:
+        - Organizations
+      summary: Create a new organization
+      description: Creates a new organization with the provided information
+      operationId: create-organization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/organizations/{id}:
+    get:
+      tags:
+        - Organizations
+      summary: Get organization by ID
+      description: Returns a single organization by their ID
+      operationId: get-organization
+      parameters:
+        - name: id
+          in: path
+          description: Organization ID
+          required: true
+          schema:
+            type: string
+            description: Organization ID
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    delete:
+      tags:
+        - Organizations
+      summary: Delete an organization
+      description: Deletes an organization by ID
+      operationId: delete-organization
+      parameters:
+        - name: id
+          in: path
+          description: Organization ID
+          required: true
+          schema:
+            type: string
+            description: Organization ID
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteOrganizationOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    patch:
+      tags:
+        - Organizations
+      summary: Update an organization
+      description: Updates an existing organization with the provided fields (partial update)
+      operationId: update-organization
+      parameters:
+        - name: id
+          in: path
+          description: Organization ID
+          required: true
+          schema:
+            type: string
+            description: Organization ID
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrganizationInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
         default:
           description: Error
           content:
@@ -547,6 +705,35 @@ components:
         - province
         - postal_code
         - country
+    CreateOrganizationInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateOrganizationInputBody.json
+          readOnly: true
+        active:
+          type: boolean
+          description: Active status (defaults to true)
+        location_id:
+          type: string
+          description: Associated location ID
+          format: uuid
+        name:
+          type: string
+          description: Organization name
+          minLength: 1
+          maxLength: 255
+        pfp_s3_key:
+          type: string
+          description: S3 key for profile picture
+          maxLength: 500
+      required:
+        - name
     CreateUserInputBody:
       type: object
       additionalProperties: false
@@ -573,6 +760,26 @@ components:
       required:
         - email
         - username
+    DeleteOrganizationOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DeleteOrganizationOutputBody.json
+          readOnly: true
+        id:
+          type: string
+          description: Deleted organization ID
+        message:
+          type: string
+          description: Confirmation message
+      required:
+        - message
+        - id
     ErrorDetail:
       type: object
       additionalProperties: false
@@ -630,6 +837,44 @@ components:
           default: about:blank
           examples:
             - https://example.com/errors/example
+    GetAllOrganizationsOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GetAllOrganizationsOutputBody.json
+          readOnly: true
+        organizations:
+          type: array
+          description: List of organizations
+          items:
+            $ref: '#/components/schemas/Organization'
+        page:
+          type: integer
+          description: Current page number
+          format: int64
+        page_size:
+          type: integer
+          description: Items per page
+          format: int64
+        total_count:
+          type: integer
+          description: Total number of organizations
+          format: int64
+        total_pages:
+          type: integer
+          description: Total number of pages
+          format: int64
+      required:
+        - organizations
+        - page
+        - page_size
+        - total_count
+        - total_pages
     GetGreetingOutputBody:
       type: object
       additionalProperties: false
@@ -761,6 +1006,39 @@ components:
         - country
         - created_at
         - updated_at
+    Organization:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Organization.json
+          readOnly: true
+        active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+        location_id:
+          type: string
+        name:
+          type: string
+        pfp_s3_key:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - active
+        - created_at
+        - updated_at
     School:
       type: object
       additionalProperties: false
@@ -822,6 +1100,33 @@ components:
         school_id:
           type: string
           description: ID of the school the child goes to
+    UpdateOrganizationInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateOrganizationInputBody.json
+          readOnly: true
+        active:
+          type: boolean
+          description: Active status
+        location_id:
+          type: string
+          description: Associated location ID
+          format: uuid
+        name:
+          type: string
+          description: Organization name
+          minLength: 1
+          maxLength: 255
+        pfp_s3_key:
+          type: string
+          description: S3 key for profile picture
+          maxLength: 500
     UserOutputBody:
       type: object
       additionalProperties: false
