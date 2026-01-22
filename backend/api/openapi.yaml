@@ -145,6 +145,89 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/events:
+    post:
+      tags:
+        - Events
+      summary: Create a new event
+      description: Creates a new event
+      operationId: create-event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/events/{id}:
+    delete:
+      tags:
+        - Events
+      summary: Delete an existing event by id
+      description: Deletes an existing event by id
+      operationId: delete-event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteEventOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    patch:
+      tags:
+        - Events
+      summary: Update an existing event
+      description: Updates an existing event
+      operationId: update-event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/greet/{name}:
     get:
       tags:
@@ -386,7 +469,7 @@ paths:
         - Managers
       summary: posts a manager
       description: Returns a manager by id
-      operationId: post manager
+      operationId: post-manager
       requestBody:
         content:
           application/json:
@@ -406,37 +489,12 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
-    delete:
-      tags:
-        - Managers
-      summary: Deletes a manager by id
-      description: Returns a manager by id
-      operationId: delete manager
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Manager'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
     patch:
       tags:
         - Managers
       summary: Updates a manager by id
       description: Returns a manager by id
-      operationId: patch/update manager
+      operationId: patch-manager
       requestBody:
         content:
           application/json:
@@ -463,6 +521,31 @@ paths:
       summary: Get a manager by id
       description: Returns a manager by id
       operationId: get-manager-by-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    delete:
+      tags:
+        - Managers
+      summary: Deletes a manager by id
+      description: Returns a manager by id
+      operationId: delete-manager
       parameters:
         - name: id
           in: path
@@ -741,6 +824,58 @@ components:
         - birth_year
         - interests
         - guardian_id
+    CreateEventInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateEventInputBody.json
+          readOnly: true
+        age_range_max:
+          type: integer
+          description: Max age for the event
+          format: int64
+          minimum: 0
+          maximum: 100
+        age_range_min:
+          type: integer
+          description: Minimum age for the event
+          format: int64
+          minimum: 0
+          maximum: 100
+        category:
+          type: array
+          description: Category of the event
+          items:
+            type: string
+        description:
+          type: string
+          description: Description of the event
+          minLength: 2
+          maxLength: 200
+        header_image_s3_key:
+          type: string
+          description: S3 key for the header image
+        organization_id:
+          type: string
+          description: ID of the hosting organization
+        title:
+          type: string
+          description: Title of the event
+          minLength: 2
+          maxLength: 100
+      required:
+        - title
+        - description
+        - organization_id
+        - age_range_min
+        - age_range_max
+        - category
+        - header_image_s3_key
     CreateGuardianInputBody:
       type: object
       additionalProperties: false
@@ -847,7 +982,6 @@ components:
           description: user id of the manager
       required:
         - user_id
-        - organization_id
         - role
     CreateUserInputBody:
       type: object
@@ -875,6 +1009,22 @@ components:
       required:
         - email
         - username
+    DeleteEventOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DeleteEventOutputBody.json
+          readOnly: true
+        message:
+          type: string
+          description: Success message
+      required:
+        - message
     ErrorDetail:
       type: object
       additionalProperties: false
@@ -932,6 +1082,54 @@ components:
           default: about:blank
           examples:
             - https://example.com/errors/example
+    Event:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Event.json
+          readOnly: true
+        age_range_max:
+          type: integer
+          format: int64
+        age_range_min:
+          type: integer
+          format: int64
+        category:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        description:
+          type: string
+        header_image_s3_key:
+          type: string
+        id:
+          type: string
+        organization_id:
+          type: string
+        title:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - description
+        - organization_id
+        - age_range_min
+        - age_range_max
+        - category
+        - header_image_s3_key
+        - created_at
+        - updated_at
     GetGreetingOutputBody:
       type: object
       additionalProperties: false
@@ -1147,7 +1345,6 @@ components:
       required:
         - id
         - user_id
-        - organization_id
         - role
     School:
       type: object
@@ -1210,6 +1407,50 @@ components:
         school_id:
           type: string
           description: ID of the school the child goes to
+    UpdateEventInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateEventInputBody.json
+          readOnly: true
+        age_range_max:
+          type: integer
+          description: Max age for the event
+          format: int64
+          minimum: 0
+          maximum: 100
+        age_range_min:
+          type: integer
+          description: Minimum age for the event
+          format: int64
+          minimum: 0
+          maximum: 100
+        category:
+          type: array
+          description: Category of the event
+          items:
+            type: string
+        description:
+          type: string
+          description: Description of the event
+          minLength: 2
+          maxLength: 200
+        header_image_s3_key:
+          type: string
+          description: S3 key for the header image
+        organization_id:
+          type: string
+          description: ID of the hosting organization
+        title:
+          type: string
+          description: Title of the event
+          minLength: 2
+          maxLength: 100
     UpdateGuardianInputBody:
       type: object
       additionalProperties: false

@@ -7,8 +7,8 @@ import (
 )
 
 type Guardian struct {
-	ID uuid.UUID `json:"id" db:"id"`
-	UserID uuid.UUID `json:"user_id" db:"user_id"`
+	ID        uuid.UUID `json:"id" db:"id"`
+	UserID    uuid.UUID `json:"user_id" db:"user_id"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -36,7 +36,7 @@ type CreateGuardianInput struct {
 }
 
 type UpdateGuardianInput struct {
-	ID uuid.UUID `path:"id"`
+	ID   uuid.UUID `path:"id"`
 	Body struct {
 		UserID uuid.UUID `json:"user_id" doc:"The associated user ID of the guardian"`
 	}

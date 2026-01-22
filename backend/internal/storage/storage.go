@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
+	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
@@ -42,6 +43,12 @@ type GuardianRepository interface {
 	DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
 }
 
+type EventRepository interface {
+	CreateEvent(ctx context.Context, location *models.CreateEventInput) (*models.Event, error)
+	UpdateEvent(ctx context.Context, location *models.UpdateEventInput) (*models.Event, error)
+	DeleteEvent(ctx context.Context, id uuid.UUID) error
+}
+
 type ChildRepository interface {
 	GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error)
 	GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, error)
@@ -56,6 +63,7 @@ type Repository struct {
 	School   SchoolRepository
 	Manager  ManagerRepository
 	Guardian GuardianRepository
+	Event    EventRepository
 	Child    ChildRepository
 }
 
@@ -78,6 +86,7 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		School:   school.NewSchoolRepository(db),
 		Manager:  manager.NewManagerRepository(db),
 		Guardian: guardian.NewGuardianRepository(db),
+		Event:    event.NewEventRepository(db),
 		Child:    child.NewChildRepository(db),
 	}
 }

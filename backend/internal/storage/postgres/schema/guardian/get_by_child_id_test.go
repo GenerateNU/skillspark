@@ -19,7 +19,7 @@ func TestGuardianRepository_GetGuardianByChildID(t *testing.T) {
 	repo := NewGuardianRepository(testDB)
 	ctx := context.Background()
 
-	// get a guardian by a child id 
+	// get a guardian by a child id
 	guardianFromChildID, err := repo.GetGuardianByChildID(ctx, uuid.MustParse("30000000-0000-0000-0000-000000000009"))
 	if err != nil {
 		t.Fatalf("Failed to get guardian by child id: %v", err)
@@ -30,7 +30,7 @@ func TestGuardianRepository_GetGuardianByChildID(t *testing.T) {
 	assert.NotNil(t, guardianFromChildID.CreatedAt)
 	assert.NotNil(t, guardianFromChildID.UpdatedAt)
 
-	// pull guardian by the actual id 
+	// pull guardian by the actual id
 	guardian, err := repo.GetGuardianByID(ctx, uuid.MustParse("66666666-6666-6666-6666-666666666666"))
 	if err != nil {
 		t.Fatalf("Failed to get guardian by id: %v", err)
