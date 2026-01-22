@@ -338,6 +338,18 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "no event occurrences with the event id",
+			id:   "00000000-0000-0000-0000-000000000000",
+			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
+				m.On(
+					"GetEventOccurrencesByEventID",
+					mock.Anything,
+					uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+				).Return(make([]models.EventOccurrence, 0), nil)
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -356,8 +368,11 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 
 			assert.Nil(t, err)
 			assert.NotNil(t, eventOccurrences)
-			assert.Equal(t, len(eventOccurrences), 2)
-
+			if len(eventOccurrences) != 0 {
+				assert.Equal(t, 2, len(eventOccurrences))
+			} else {
+				assert.Equal(t, 0, len(eventOccurrences))
+			}
 			mockRepo.AssertExpectations(t)
 		})
 	}

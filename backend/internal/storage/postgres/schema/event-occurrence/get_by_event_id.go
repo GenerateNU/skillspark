@@ -7,6 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 func (r *EventOccurrenceRepository) GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error) {
@@ -23,57 +24,9 @@ func (r *EventOccurrenceRepository) GetEventOccurrencesByEventID(ctx context.Con
 	}
 	defer rows.Close()
 
-	eventOccurrences := make([]models.EventOccurrence, 0)
-	// populate data from each row individually
-	for rows.Next() {
-		var createdEventOccurrence models.EventOccurrence
-		err := rows.Scan(
-			// event occurrence fields
-			&createdEventOccurrence.ID,
-			&createdEventOccurrence.ManagerId,
-			&createdEventOccurrence.StartTime,
-			&createdEventOccurrence.EndTime,
-			&createdEventOccurrence.MaxAttendees,
-			&createdEventOccurrence.Language,
-			&createdEventOccurrence.CurrEnrolled,
-			&createdEventOccurrence.CreatedAt,
-			&createdEventOccurrence.UpdatedAt,
-
-			// event fields
-			&createdEventOccurrence.Event.ID,
-			&createdEventOccurrence.Event.Title,
-			&createdEventOccurrence.Event.Description,
-			&createdEventOccurrence.Event.OrganizationID,
-			&createdEventOccurrence.Event.AgeRangeMin,
-			&createdEventOccurrence.Event.AgeRangeMax,
-			&createdEventOccurrence.Event.Category,
-			&createdEventOccurrence.Event.HeaderImageS3Key,
-			&createdEventOccurrence.Event.CreatedAt,
-			&createdEventOccurrence.Event.UpdatedAt,
-
-			// location fields
-			&createdEventOccurrence.Location.ID,
-			&createdEventOccurrence.Location.Latitude,
-			&createdEventOccurrence.Location.Longitude,
-			&createdEventOccurrence.Location.AddressLine1,
-			&createdEventOccurrence.Location.AddressLine2,
-			&createdEventOccurrence.Location.Subdistrict,
-			&createdEventOccurrence.Location.District,
-			&createdEventOccurrence.Location.Province,
-			&createdEventOccurrence.Location.PostalCode,
-			&createdEventOccurrence.Location.Country,
-			&createdEventOccurrence.Location.CreatedAt,
-			&createdEventOccurrence.Location.UpdatedAt,
-		)
-		if err != nil {
-			err := errs.InternalServerError("Failed to scan event occurrence: ", err.Error())
-			return nil, &err
-		}
-		eventOccurrences = append(eventOccurrences, createdEventOccurrence)
-	}
-
+	eventOccurrences, err := pgx.CollectRows(rows, scanEventOccurrence)
 	if err := rows.Err(); err != nil {
-		err := errs.InternalServerError("Row iteration error: ", err.Error())
+		err := errs.InternalServerError("Failed to scan all event occurrences: ", err.Error())
 		return nil, &err
 	}
 	return eventOccurrences, nil
