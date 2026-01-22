@@ -111,7 +111,7 @@ create table if not exists event (
 create table if not exists event_occurrence (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),    
     -- cascading null here
-    manager_id UUID REFERENCES manager(id) ON DELETE SET NULL,
+    manager_id UUID REFERENCES manager(id),
     event_id UUID NOT NULL REFERENCES event(id),
     location_id UUID NOT NULL REFERENCES location(id),
     start_time TIMESTAMPTZ NOT NULL,
