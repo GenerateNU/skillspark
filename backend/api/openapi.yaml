@@ -380,6 +380,134 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/manager:
+    post:
+      tags:
+        - Managers
+      summary: posts a manager
+      description: Returns a manager by id
+      operationId: post manager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateManagerInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    delete:
+      tags:
+        - Managers
+      summary: Deletes a manager by id
+      description: Returns a manager by id
+      operationId: delete manager
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    patch:
+      tags:
+        - Managers
+      summary: Updates a manager by id
+      description: Returns a manager by id
+      operationId: patch/update manager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchManagerInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/manager/{id}:
+    get:
+      tags:
+        - Managers
+      summary: Get a manager by id
+      description: Returns a manager by id
+      operationId: get-manager-by-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/manager/org/{organization_id}:
+    get:
+      tags:
+        - Managers
+      summary: Get a manager by organization id
+      description: Returns a manager by organization id
+      operationId: get-manager-by-org-id
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/schools:
     get:
       tags:
@@ -697,6 +825,30 @@ components:
         - province
         - postal_code
         - country
+    CreateManagerInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateManagerInputBody.json
+          readOnly: true
+        organization_id:
+          type: string
+          description: organization id of the organization the manager is associated with
+        role:
+          type: string
+          description: role of the manager being created
+        user_id:
+          type: string
+          description: user id of the manager
+      required:
+        - user_id
+        - organization_id
+        - role
     CreateUserInputBody:
       type: object
       additionalProperties: false
@@ -937,6 +1089,66 @@ components:
         - country
         - created_at
         - updated_at
+    Manager:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Manager.json
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+        organization_id:
+          type: string
+        role:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        user_id:
+          type: string
+      required:
+        - id
+        - user_id
+        - organization_id
+        - role
+        - created_at
+        - updated_at
+    PatchManagerInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/PatchManagerInputBody.json
+          readOnly: true
+        id:
+          type: string
+          description: id of the manager
+        organization_id:
+          type: string
+          description: organization id of the organization the manager is associated with
+        role:
+          type: string
+          description: role of the manager being created
+        user_id:
+          type: string
+          description: user id of the manager
+      required:
+        - id
+        - user_id
+        - organization_id
+        - role
     School:
       type: object
       additionalProperties: false

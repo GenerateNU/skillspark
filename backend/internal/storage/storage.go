@@ -3,9 +3,10 @@ package storage
 import (
 	"context"
 	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/child"
+	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/location"
+	"skillspark/internal/storage/postgres/schema/manager"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/utils"
 
@@ -24,6 +25,13 @@ type SchoolRepository interface {
 	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error)
 }
 
+type ManagerRepository interface {
+	GetManagerByID(ctx context.Context, id uuid.UUID) (*models.Manager, error)
+	GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error)
+	DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, error)
+	CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error)
+	PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, error)
+}
 
 type GuardianRepository interface {
 	CreateGuardian(ctx context.Context, guardian *models.CreateGuardianInput) (*models.Guardian, error)
@@ -46,6 +54,7 @@ type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
 	School   SchoolRepository
+	Manager  ManagerRepository
 	Guardian GuardianRepository
 	Child    ChildRepository
 }
@@ -67,6 +76,7 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		db:       db,
 		Location: location.NewLocationRepository(db),
 		School:   school.NewSchoolRepository(db),
+		Manager:  manager.NewManagerRepository(db),
 		Guardian: guardian.NewGuardianRepository(db),
 		Child:    child.NewChildRepository(db),
 	}
