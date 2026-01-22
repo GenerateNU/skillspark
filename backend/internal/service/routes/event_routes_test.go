@@ -346,13 +346,13 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 	tests := []struct {
 		name       	string
 		eventID 	string
-		mockSetup  	func(*repomocks.MockEventOccurrenceRepository)
+		mockSetup  	func(*repomocks.MockEventRepository)
 		statusCode 	int
 	}{
 		{
 			name:      	"valid UUID",
 			eventID: 	"60000000-0000-0000-0000-000000000001",
-			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
+			mockSetup: func(m *repomocks.MockEventRepository) {
 				m.On(
 					"GetEventOccurrencesByEventID",
 					mock.Anything,
@@ -391,7 +391,7 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 		{
 			name:       "invalid UUID",
 			eventID: 	"not-a-uuid",
-			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
+			mockSetup:  func(*repomocks.MockEventRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 	}
@@ -401,10 +401,10 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			mockRepo := new(repomocks.MockEventOccurrenceRepository)
+			mockRepo := new(repomocks.MockEventRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo)
+			app, _ := setupEventTestAPI(mockRepo)
 
 			req, err := http.NewRequest(
 				http.MethodGet,

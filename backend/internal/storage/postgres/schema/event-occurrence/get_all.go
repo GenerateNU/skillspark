@@ -25,7 +25,7 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 	defer rows.Close()
 	
 	eventOccurrences, err := pgx.CollectRows(rows, scanEventOccurrence)
-	if err := rows.Err(); err != nil {
+	if err != nil {
 		err := errs.InternalServerError("Failed to scan all event occurrences: ", err.Error())
 		return nil, &err
 	}
