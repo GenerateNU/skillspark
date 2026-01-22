@@ -60,7 +60,7 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository) {
 		Description: "Deletes an existing event by id",
 		Tags:        []string{"Events"},
 	}, func(ctx context.Context, input *models.DeleteEventInput) (*models.DeleteEventOutput, error) {
-		err := eventHandler.DeleteEvent(ctx, input.ID)
+		msg, err := eventHandler.DeleteEvent(ctx, input.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +69,7 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository) {
 			Body: struct {
 				Message string `json:"message" doc:"Success message"`
 			}{
-				Message: "Event successfully deleted.",
+				Message: msg,
 			},
 		}, nil
 	})

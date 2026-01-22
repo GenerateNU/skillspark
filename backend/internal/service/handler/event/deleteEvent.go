@@ -6,11 +6,11 @@ import (
 	"skillspark/internal/errs"
 )
 
-func (h *Handler) DeleteEvent(ctx context.Context, id uuid.UUID) *errs.HTTPError {
+func (h *Handler) DeleteEvent(ctx context.Context, id uuid.UUID) (string, *errs.HTTPError) {
 	err := h.EventRepository.DeleteEvent(ctx, id)
 	if err != nil {
-		return err.(*errs.HTTPError)
+		return "", err.(*errs.HTTPError)
 	}
 
-	return nil
+	return "Event successfully deleted.", nil
 }
