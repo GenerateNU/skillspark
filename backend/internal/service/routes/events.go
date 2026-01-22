@@ -74,4 +74,21 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository) {
 		}, nil
 	})
 
+	huma.Register(api, huma.Operation{
+		OperationID: "get-event-occurrences-by-event-id",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/events/{event_id}/event-occurrences/",
+		Summary:     "Get event occurrences by event ID",
+		Description: "Returns event occurrences that match the event ID",
+		Tags:        []string{"Events"},
+	}, func(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput) (*models.GetEventOccurrencesByEventIDOutput, error) {
+		eventOccurrences, err := eventHandler.GetEventOccurrencesByEventID(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetEventOccurrencesByEventIDOutput{
+			Body: eventOccurrences,
+		}, nil
+	})
 }

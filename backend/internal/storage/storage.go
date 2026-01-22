@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/guardian"
@@ -47,6 +48,7 @@ type EventRepository interface {
 	CreateEvent(ctx context.Context, location *models.CreateEventInput) (*models.Event, error)
 	UpdateEvent(ctx context.Context, location *models.UpdateEventInput) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
+	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
 }
 
 type ChildRepository interface {
@@ -57,6 +59,12 @@ type ChildRepository interface {
 	DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error)
 }
 
+type EventOccurrenceRepository interface {
+	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination) ([]models.EventOccurrence, error)
+	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error)
+	CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error)
+}
+
 type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
@@ -65,6 +73,7 @@ type Repository struct {
 	Guardian GuardianRepository
 	Event    EventRepository
 	Child    ChildRepository
+	EventOccurrence EventOccurrenceRepository
 }
 
 // Close closes the database connection pool
@@ -88,5 +97,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Guardian: guardian.NewGuardianRepository(db),
 		Event:    event.NewEventRepository(db),
 		Child:    child.NewChildRepository(db),
+		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
 	}
 }
