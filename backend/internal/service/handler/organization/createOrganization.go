@@ -13,7 +13,7 @@ func (h *Handler) CreateOrganization(ctx context.Context, input *models.CreateOr
 	org := models.Organization{
 		ID:         uuid.New(),
 		Name:       input.Body.Name,
-		Active:     true, // default
+		Active:     true,
 		PfpS3Key:   input.Body.PfpS3Key,
 		LocationID: input.Body.LocationID,
 		CreatedAt:  time.Now(),
