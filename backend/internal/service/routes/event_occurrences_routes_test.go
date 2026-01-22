@@ -207,7 +207,7 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 			eventID: 	"60000000-0000-0000-0000-000000000001",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
 				m.On(
-					"GetEventOccurrenceByEventID",
+					"GetEventOccurrencesByEventID",
 					mock.Anything,
 					uuid.MustParse("60000000-0000-0000-0000-000000000001"),
 				).Return([]models.EventOccurrence{
@@ -324,8 +324,8 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			name: "valid payload with null manager id",
 			payload: map[string]interface{}{
 				"manager_id": nil,
-				"event_id": uuid.MustParse("60000000-0000-0000-0000-000000000001"), 
-				"location_id": uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"), 
+				"event_id": event.ID, 
+				"location_id": location.ID, 
 				"start_time": start, 
 				"end_time": end, 
 				"max_attendees": 10, 
