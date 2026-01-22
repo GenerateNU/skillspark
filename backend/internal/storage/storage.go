@@ -5,7 +5,9 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/event"
+	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/location"
+	"skillspark/internal/storage/postgres/schema/manager"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/utils"
 
@@ -22,6 +24,23 @@ type LocationRepository interface {
 
 type SchoolRepository interface {
 	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error)
+}
+
+type ManagerRepository interface {
+	GetManagerByID(ctx context.Context, id uuid.UUID) (*models.Manager, error)
+	GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error)
+	DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, error)
+	CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error)
+	PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, error)
+}
+
+type GuardianRepository interface {
+	CreateGuardian(ctx context.Context, guardian *models.CreateGuardianInput) (*models.Guardian, error)
+	GetGuardianByChildID(ctx context.Context, childID uuid.UUID) (*models.Guardian, error)
+	GetGuardianByID(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
+	GetGuardianByUserID(ctx context.Context, userID uuid.UUID) (*models.Guardian, error)
+	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
+	DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
 }
 
 type EventRepository interface {
@@ -42,6 +61,8 @@ type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
 	School   SchoolRepository
+	Manager  ManagerRepository
+	Guardian GuardianRepository
 	Event    EventRepository
 	Child    ChildRepository
 }
@@ -63,6 +84,8 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		db:       db,
 		Location: location.NewLocationRepository(db),
 		School:   school.NewSchoolRepository(db),
+		Manager:  manager.NewManagerRepository(db),
+		Guardian: guardian.NewGuardianRepository(db),
 		Event:    event.NewEventRepository(db),
 		Child:    child.NewChildRepository(db),
 	}

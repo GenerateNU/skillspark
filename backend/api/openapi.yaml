@@ -257,6 +257,140 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/guardians:
+    post:
+      tags:
+        - Guardians
+      summary: Create a new guardian
+      description: Creates a new guardian
+      operationId: post-guardian
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGuardianInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guardian'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/guardians/{id}:
+    get:
+      tags:
+        - Guardians
+      summary: Get a guardian by id
+      description: Returns a guardian by id
+      operationId: get-guardian-by-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guardian'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    put:
+      tags:
+        - Guardians
+      summary: Update a guardian by id
+      description: Updates a guardian by id
+      operationId: update-guardian
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGuardianInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guardian'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    delete:
+      tags:
+        - Guardians
+      summary: Delete a guardian by id
+      description: Deletes a guardian by id
+      operationId: delete-guardian
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guardian'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/guardians/child/{child_id}:
+    get:
+      tags:
+        - Guardians
+      summary: Get a guardian by child id
+      description: Returns a guardian by child id
+      operationId: get-guardian-by-child-id
+      parameters:
+        - name: child_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guardian'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/health:
     get:
       tags:
@@ -323,6 +457,134 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Location'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/manager:
+    post:
+      tags:
+        - Managers
+      summary: posts a manager
+      description: Returns a manager by id
+      operationId: post-manager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateManagerInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    patch:
+      tags:
+        - Managers
+      summary: Updates a manager by id
+      description: Returns a manager by id
+      operationId: patch-manager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchManagerInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/manager/{id}:
+    get:
+      tags:
+        - Managers
+      summary: Get a manager by id
+      description: Returns a manager by id
+      operationId: get-manager-by-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    delete:
+      tags:
+        - Managers
+      summary: Deletes a manager by id
+      description: Returns a manager by id
+      operationId: delete-manager
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/manager/org/{organization_id}:
+    get:
+      tags:
+        - Managers
+      summary: Get a manager by organization id
+      description: Returns a manager by organization id
+      operationId: get-manager-by-org-id
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
         default:
           description: Error
           content:
@@ -614,6 +876,22 @@ components:
         - age_range_max
         - category
         - header_image_s3_key
+    CreateGuardianInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateGuardianInputBody.json
+          readOnly: true
+        user_id:
+          type: string
+          description: The associated user ID of the guardian
+      required:
+        - user_id
     CreateLocationInputBody:
       type: object
       additionalProperties: false
@@ -682,6 +960,29 @@ components:
         - province
         - postal_code
         - country
+    CreateManagerInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateManagerInputBody.json
+          readOnly: true
+        organization_id:
+          type: string
+          description: organization id of the organization the manager is associated with
+        role:
+          type: string
+          description: role of the manager being created
+        user_id:
+          type: string
+          description: user id of the manager
+      required:
+        - user_id
+        - role
     CreateUserInputBody:
       type: object
       additionalProperties: false
@@ -849,6 +1150,32 @@ components:
       required:
         - message
         - timestamp
+    Guardian:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Guardian.json
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        user_id:
+          type: string
+      required:
+        - id
+        - user_id
+        - created_at
+        - updated_at
     HealthOutputBody:
       type: object
       additionalProperties: false
@@ -960,6 +1287,65 @@ components:
         - country
         - created_at
         - updated_at
+    Manager:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Manager.json
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+        organization_id:
+          type: string
+        role:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        user_id:
+          type: string
+      required:
+        - id
+        - user_id
+        - organization_id
+        - role
+        - created_at
+        - updated_at
+    PatchManagerInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/PatchManagerInputBody.json
+          readOnly: true
+        id:
+          type: string
+          description: id of the manager
+        organization_id:
+          type: string
+          description: organization id of the organization the manager is associated with
+        role:
+          type: string
+          description: role of the manager being created
+        user_id:
+          type: string
+          description: user id of the manager
+      required:
+        - id
+        - user_id
+        - role
     School:
       type: object
       additionalProperties: false
@@ -1065,6 +1451,22 @@ components:
           description: Title of the event
           minLength: 2
           maxLength: 100
+    UpdateGuardianInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateGuardianInputBody.json
+          readOnly: true
+        user_id:
+          type: string
+          description: The associated user ID of the guardian
+      required:
+        - user_id
     UserOutputBody:
       type: object
       additionalProperties: false
