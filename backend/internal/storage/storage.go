@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/guardian"
+	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/utils"
@@ -23,6 +24,7 @@ type SchoolRepository interface {
 	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error)
 }
 
+
 type GuardianRepository interface {
 	CreateGuardian(ctx context.Context, guardian *models.CreateGuardianInput) (*models.Guardian, error)
 	GetGuardianByChildID(ctx context.Context, childID uuid.UUID) (*models.Guardian, error)
@@ -32,11 +34,20 @@ type GuardianRepository interface {
 	DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
 }
 
+type ChildRepository interface {
+	GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error)
+	GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, error)
+	UpdateChildByID(ctx context.Context, childID uuid.UUID, child *models.UpdateChildInput) (*models.Child, error)
+	CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, error)
+	DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error)
+}
+
 type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
 	School   SchoolRepository
 	Guardian GuardianRepository
+	Child    ChildRepository
 }
 
 // Close closes the database connection pool
@@ -57,5 +68,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Location: location.NewLocationRepository(db),
 		School:   school.NewSchoolRepository(db),
 		Guardian: guardian.NewGuardianRepository(db),
+		Child:    child.NewChildRepository(db),
 	}
 }
