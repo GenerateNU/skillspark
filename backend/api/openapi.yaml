@@ -9,6 +9,142 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 paths:
+  /api/v1/child:
+    post:
+      tags:
+        - Child
+      summary: Creates a child
+      description: Creates a child
+      operationId: create-child
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChildInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/child/{id}:
+    get:
+      tags:
+        - Child
+      summary: Get a child by id
+      description: Returns a child by id
+      operationId: get-child-by-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    delete:
+      tags:
+        - Child
+      summary: Delete a child
+      description: Deletes a child by ID
+      operationId: delete-child
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    patch:
+      tags:
+        - Child
+      summary: Updates a child
+      description: Updates a child by ID
+      operationId: update-child
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChildInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/children/{id}:
+    get:
+      tags:
+        - Child
+      summary: Get all children for a guardian
+      description: Returns the list of children associated with a given guardian ID
+      operationId: get-children-by-guardian-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Child'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/events:
     post:
       tags:
@@ -332,6 +468,100 @@ paths:
                 $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
+    Child:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Child.json
+          readOnly: true
+        birth_month:
+          type: integer
+          format: int64
+        birth_year:
+          type: integer
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+        guardian_id:
+          type: string
+        id:
+          type: string
+        interests:
+          type: array
+          items:
+            type: string
+        name:
+          type: string
+        school_id:
+          type: string
+        school_name:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - school_id
+        - school_name
+        - birth_month
+        - birth_year
+        - interests
+        - guardian_id
+        - created_at
+        - updated_at
+    CreateChildInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateChildInputBody.json
+          readOnly: true
+        birth_month:
+          type: integer
+          description: Birth month of the child
+          format: int64
+          minimum: 1
+          maximum: 12
+        birth_year:
+          type: integer
+          description: Birth year of the child
+          format: int64
+          minimum: 2000
+          maximum: 2026
+        guardian_id:
+          type: string
+          description: ID of the child's guardian
+        interests:
+          type: array
+          description: Interests of the child
+          items:
+            type: string
+        name:
+          type: string
+          description: Name of the child
+          minLength: 1
+          maxLength: 200
+        school_id:
+          type: string
+          description: ID of the school the child goes to
+      required:
+        - name
+        - school_id
+        - birth_month
+        - birth_year
+        - interests
+        - guardian_id
     CreateEventInputBody:
       type: object
       additionalProperties: false
@@ -752,6 +982,45 @@ components:
         - location_id
         - created_at
         - updated_at
+    UpdateChildInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateChildInputBody.json
+          readOnly: true
+        birth_month:
+          type: integer
+          description: Birth month of the child
+          format: int64
+          minimum: 1
+          maximum: 12
+        birth_year:
+          type: integer
+          description: Birth year of the child
+          format: int64
+          minimum: 2000
+          maximum: 2026
+        guardian_id:
+          type: string
+          description: ID of the child's guardian
+        interests:
+          type: array
+          description: Interests of the child
+          items:
+            type: string
+        name:
+          type: string
+          description: Name of the child
+          minLength: 1
+          maxLength: 200
+        school_id:
+          type: string
+          description: ID of the school the child goes to
     UpdateEventInputBody:
       type: object
       additionalProperties: false

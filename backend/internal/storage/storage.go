@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/school"
@@ -29,11 +30,20 @@ type EventRepository interface {
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 }
 
+type ChildRepository interface {
+	GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error)
+	GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, error)
+	UpdateChildByID(ctx context.Context, childID uuid.UUID, child *models.UpdateChildInput) (*models.Child, error)
+	CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, error)
+	DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error)
+}
+
 type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
 	School   SchoolRepository
 	Event    EventRepository
+	Child    ChildRepository
 }
 
 // Close closes the database connection pool
@@ -54,5 +64,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Location: location.NewLocationRepository(db),
 		School:   school.NewSchoolRepository(db),
 		Event:    event.NewEventRepository(db),
+		Child:    child.NewChildRepository(db),
 	}
 }
