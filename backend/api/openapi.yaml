@@ -117,6 +117,34 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/children/{id}:
+    get:
+      tags:
+        - Child
+      summary: Get all children for a guardian
+      description: Returns the list of children associated with a given guardian ID
+      operationId: get-children-by-guardian-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Child'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/greet/{name}:
     get:
       tags:
@@ -146,13 +174,39 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
-  /api/v1/guardians/{id}/children:
+  /api/v1/guardians:
+    post:
+      tags:
+        - Guardians
+      summary: Create a new guardian
+      description: Creates a new guardian
+      operationId: post-guardian
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGuardianInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guardian'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/guardians/{id}:
     get:
       tags:
-        - Child
-      summary: Get all children for a guardian
-      description: Returns the list of children associated with a given guardian ID
-      operationId: get-children-by-guardian-id
+        - Guardians
+      summary: Get a guardian by id
+      description: Returns a guardian by id
+      operationId: get-guardian-by-id
       parameters:
         - name: id
           in: path
@@ -165,9 +219,89 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Child'
+                $ref: '#/components/schemas/Guardian'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    put:
+      tags:
+        - Guardians
+      summary: Update a guardian by id
+      description: Updates a guardian by id
+      operationId: update-guardian
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGuardianInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guardian'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    delete:
+      tags:
+        - Guardians
+      summary: Delete a guardian by id
+      description: Deletes a guardian by id
+      operationId: delete-guardian
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guardian'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/guardians/child/{child_id}:
+    get:
+      tags:
+        - Guardians
+      summary: Get a guardian by child id
+      description: Returns a guardian by child id
+      operationId: get-guardian-by-child-id
+      parameters:
+        - name: child_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guardian'
         default:
           description: Error
           content:
@@ -479,6 +613,22 @@ components:
         - birth_year
         - interests
         - guardian_id
+    CreateGuardianInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateGuardianInputBody.json
+          readOnly: true
+        user_id:
+          type: string
+          description: The associated user ID of the guardian
+      required:
+        - user_id
     CreateLocationInputBody:
       type: object
       additionalProperties: false
@@ -650,6 +800,32 @@ components:
       required:
         - message
         - timestamp
+    Guardian:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Guardian.json
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        user_id:
+          type: string
+      required:
+        - id
+        - user_id
+        - created_at
+        - updated_at
     HealthOutputBody:
       type: object
       additionalProperties: false
@@ -822,6 +998,22 @@ components:
         school_id:
           type: string
           description: ID of the school the child goes to
+    UpdateGuardianInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateGuardianInputBody.json
+          readOnly: true
+        user_id:
+          type: string
+          description: The associated user ID of the guardian
+      required:
+        - user_id
     UserOutputBody:
       type: object
       additionalProperties: false
