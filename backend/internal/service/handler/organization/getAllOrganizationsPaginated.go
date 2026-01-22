@@ -2,7 +2,6 @@ package organization
 
 import (
 	"context"
-	"log"
 	"skillspark/internal/models"
 )
 
