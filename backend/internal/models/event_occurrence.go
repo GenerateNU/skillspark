@@ -53,7 +53,7 @@ type GetEventOccurrencesByEventIDOutput struct {
 // post
 type CreateEventOccurrenceInput struct {
 	Body struct {
-		ManagerId *uuid.UUID `json:"manager_id, omitempty" doc:"ID of a manager in the database"`
+		ManagerId *uuid.UUID `json:"manager_id,omitempty" doc:"ID of a manager in the database"`
 		EventId uuid.UUID `json:"event_id" doc:"ID of an event in the database"`
 		LocationId uuid.UUID `json:"location_id" doc:"ID of a location in the database"`
 		StartTime time.Time `json:"start_time" doc:"Start time of the event occurrence"`
