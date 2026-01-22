@@ -917,6 +917,32 @@ components:
       required:
         - message
         - timestamp
+    Guardian:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Guardian.json
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        user_id:
+          type: string
+      required:
+        - id
+        - user_id
+        - created_at
+        - updated_at
     HealthOutputBody:
       type: object
       additionalProperties: false
@@ -1089,6 +1115,22 @@ components:
         school_id:
           type: string
           description: ID of the school the child goes to
+    UpdateGuardianInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateGuardianInputBody.json
+          readOnly: true
+        user_id:
+          type: string
+          description: The associated user ID of the guardian
+      required:
+        - user_id
     UserOutputBody:
       type: object
       additionalProperties: false
