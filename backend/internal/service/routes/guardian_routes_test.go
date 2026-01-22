@@ -58,10 +58,10 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 					mock.Anything,
 					mock.AnythingOfType("*models.CreateGuardianInput"),
 				).Return(&models.Guardian{
-					ID:          uuid.New(),
-					UserID:      uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e"),
-					CreatedAt:   time.Now(),
-					UpdatedAt:   time.Now(),
+					ID:        uuid.New(),
+					UserID:    uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e"),
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
 				}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -192,10 +192,10 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 						return input.ID == uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 					}),
 				).Return(&models.Guardian{
-					ID:          uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
-					UserID:      uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e"),
-					CreatedAt:   time.Now(),
-					UpdatedAt:   time.Now(),
+					ID:        uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+					UserID:    uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e"),
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
 				}, nil)
 			},
 			statusCode: http.StatusOK,

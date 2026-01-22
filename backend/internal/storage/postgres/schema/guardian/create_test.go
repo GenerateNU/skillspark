@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
 func TestGuardianRepository_Create_David_Kim(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
@@ -47,4 +46,3 @@ func TestGuardianRepository_Create_David_Kim(t *testing.T) {
 	assert.NotNil(t, retrievedGuardian)
 	assert.Equal(t, guardianInput.Body.UserID, retrievedGuardian.UserID)
 }
-	
