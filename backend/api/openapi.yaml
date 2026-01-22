@@ -271,7 +271,7 @@ paths:
   /api/v1/events/{event_id}/event-occurrences/:
     get:
       tags:
-        - Event Occurrences
+        - Events
       summary: Get event occurrences by event ID
       description: Returns event occurrences that match the event ID
       operationId: get-event-occurrences-by-event-id

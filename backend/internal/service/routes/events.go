@@ -80,7 +80,7 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository) {
 		Path:        "/api/v1/events/{event_id}/event-occurrences/",
 		Summary:     "Get event occurrences by event ID",
 		Description: "Returns event occurrences that match the event ID",
-		Tags:        []string{"Event Occurrences"},
+		Tags:        []string{"Events"},
 	}, func(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput) (*models.GetEventOccurrencesByEventIDOutput, error) {
 		eventOccurrences, err := eventHandler.GetEventOccurrencesByEventID(ctx, input)
 		if err != nil {
