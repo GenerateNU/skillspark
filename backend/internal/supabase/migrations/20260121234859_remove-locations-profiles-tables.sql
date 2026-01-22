@@ -1,4 +1,4 @@
-drop table if exists "location";
+drop table if exists "locations";
 
 ALTER TABLE manager DROP CONSTRAINT IF EXISTS manager_user_id_fkey;
 ALTER TABLE guardian DROP CONSTRAINT IF EXISTS guardian_user_id_fkey;
@@ -17,7 +17,9 @@ CREATE TABLE IF NOT EXISTS "user" (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TRIGGER IF NOT EXISTS update_user_updated_at
+DROP TRIGGER IF EXISTS update_user_updated_at ON "user";
+CREATE TRIGGER update_user_updated_at
+
 BEFORE UPDATE ON "user"
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
