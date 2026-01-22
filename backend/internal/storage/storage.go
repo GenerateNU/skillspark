@@ -3,6 +3,8 @@ package storage
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/guardian"
+	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
 	"skillspark/internal/storage/postgres/schema/school"
@@ -29,6 +31,22 @@ type ManagerRepository interface {
 	DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, error)
 	CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error)
 	PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, error)
+
+type GuardianRepository interface {
+	CreateGuardian(ctx context.Context, guardian *models.CreateGuardianInput) (*models.Guardian, error)
+	GetGuardianByChildID(ctx context.Context, childID uuid.UUID) (*models.Guardian, error)
+	GetGuardianByID(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
+	GetGuardianByUserID(ctx context.Context, userID uuid.UUID) (*models.Guardian, error)
+	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
+	DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
+}
+
+type ChildRepository interface {
+	GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error)
+	GetChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]models.Child, error)
+	UpdateChildByID(ctx context.Context, childID uuid.UUID, child *models.UpdateChildInput) (*models.Child, error)
+	CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, error)
+	DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error)
 }
 
 type Repository struct {
@@ -36,6 +54,8 @@ type Repository struct {
 	Location LocationRepository
 	School   SchoolRepository
 	Manager  ManagerRepository
+	Guardian GuardianRepository
+	Child    ChildRepository
 }
 
 // Close closes the database connection pool
@@ -56,5 +76,7 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Location: location.NewLocationRepository(db),
 		School:   school.NewSchoolRepository(db),
 		Manager:  manager.NewManagerRepository(db),
+		Guardian: guardian.NewGuardianRepository(db),
+		Child:    child.NewChildRepository(db),
 	}
 }
