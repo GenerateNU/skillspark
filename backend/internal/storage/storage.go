@@ -30,11 +30,11 @@ type SchoolRepository interface {
 }
 
 type OrganizationRepository interface {
-	CreateOrganization(ctx context.Context, org *models.Organization) *errs.HTTPError
+	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput) (*models.Organization, *errs.HTTPError)
 	GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
 	GetAllOrganizations(ctx context.Context, offset, pageSize int) ([]models.Organization, int, *errs.HTTPError)
-	UpdateOrganization(ctx context.Context, org *models.Organization) *errs.HTTPError
-	DeleteOrganization(ctx context.Context, id uuid.UUID) *errs.HTTPError
+	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput) (*models.Organization, *errs.HTTPError)
+	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
 }
 
 type ManagerRepository interface {

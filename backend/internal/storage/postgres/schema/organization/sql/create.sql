@@ -1,2 +1,3 @@
-INSERT INTO organization (id, name, active, pfp_s3_key, location_id, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO organization (name, active, pfp_s3_key, location_id)
+VALUES ($1, $2, $3, $4)
+RETURNING id, name, active, pfp_s3_key, location_id, created_at, updated_at

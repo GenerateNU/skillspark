@@ -13,12 +13,15 @@ type MockOrganizationRepository struct {
 	mock.Mock
 }
 
-func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, org *models.Organization) *errs.HTTPError {
-	args := m.Called(ctx, org)
+func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput) (*models.Organization, *errs.HTTPError) {
+	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
-		return nil
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
 	}
-	return args.Get(0).(*errs.HTTPError)
+	return args.Get(0).(*models.Organization), nil
 }
 
 func (m *MockOrganizationRepository) GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError) {
@@ -43,18 +46,24 @@ func (m *MockOrganizationRepository) GetAllOrganizations(ctx context.Context, of
 	return args.Get(0).([]models.Organization), args.Get(1).(int), nil
 }
 
-func (m *MockOrganizationRepository) UpdateOrganization(ctx context.Context, org *models.Organization) *errs.HTTPError {
-	args := m.Called(ctx, org)
+func (m *MockOrganizationRepository) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput) (*models.Organization, *errs.HTTPError) {
+	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
-		return nil
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
 	}
-	return args.Get(0).(*errs.HTTPError)
+	return args.Get(0).(*models.Organization), nil
 }
 
-func (m *MockOrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID) *errs.HTTPError {
+func (m *MockOrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
-		return nil
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
 	}
-	return args.Get(0).(*errs.HTTPError)
+	return args.Get(0).(*models.Organization), nil
 }

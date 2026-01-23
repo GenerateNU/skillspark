@@ -38,6 +38,7 @@ func (r *OrganizationRepository) GetAllOrganizations(ctx context.Context, offset
 	defer rows.Close()
 
 	orgs := []models.Organization{}
+	
 	for rows.Next() {
 		var org models.Organization
 		err := rows.Scan(

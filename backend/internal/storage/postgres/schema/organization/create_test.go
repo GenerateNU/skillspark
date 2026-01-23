@@ -5,79 +5,125 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestCreate(t *testing.T) {
-
+func TestCreateOrganization(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	org := &models.Organization{
-		ID:        uuid.New(),
-		Name:      "Test Corp",
-		Active:    true,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
+	active := true
+	input := func() *models.CreateOrganizationInput {
+		i := &models.CreateOrganizationInput{}
+		i.Body.Name = "Test Corp"
+		i.Body.Active = &active
+		return i
+	}()
 
-	err := repo.CreateOrganization(ctx, org)
+	created, err := repo.CreateOrganization(ctx, input)
 
-	assert.Nil(t, err)
+	require.Nil(t, err)
+	require.NotNil(t, created)
+	assert.Equal(t, "Test Corp", created.Name)
+	assert.True(t, created.Active)
+	assert.NotEqual(t, uuid.Nil, created.ID)
 }
 
-func TestExecute_WithLocation(t *testing.T) {
-
+func TestCreateOrganization_WithLocation(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
+	active := true
 	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-	org := &models.Organization{
-		ID:         uuid.New(),
-		Name:       "Test Corp with Location",
-		Active:     true,
-		LocationID: &locationID,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
-	}
+	input := func() *models.CreateOrganizationInput {
+		i := &models.CreateOrganizationInput{}
+		i.Body.Name = "Test Corp with Location"
+		i.Body.Active = &active
+		i.Body.LocationID = &locationID
+		return i
+	}()
 
-	err := repo.CreateOrganization(ctx, org)
+	created, err := repo.CreateOrganization(ctx, input)
 
-	assert.Nil(t, err)
+	require.Nil(t, err)
+	require.NotNil(t, created)
+	assert.Equal(t, "Test Corp with Location", created.Name)
+	assert.True(t, created.Active)
+	assert.Equal(t, &locationID, created.LocationID)
 }
 
-func TestExecute_DuplicateID(t *testing.T) {
-
+func TestCreateOrganization_WithPfp(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgID := uuid.New()
-	org1 := &models.Organization{
-		ID:        orgID,
-		Name:      "First Org",
-		Active:    true,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
+	active := true
+	pfpKey := "orgs/test_corp.jpg"
+	input := func() *models.CreateOrganizationInput {
+		i := &models.CreateOrganizationInput{}
+		i.Body.Name = "Test Corp with Profile"
+		i.Body.Active = &active
+		i.Body.PfpS3Key = &pfpKey
+		return i
+	}()
 
-	err := repo.CreateOrganization(ctx, org1)
-	assert.Nil(t, err)
+	created, err := repo.CreateOrganization(ctx, input)
 
-	// Try to create another with same ID
-	org2 := &models.Organization{
-		ID:        orgID,
-		Name:      "Second Org",
-		Active:    true,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
+	require.Nil(t, err)
+	require.NotNil(t, created)
+	assert.Equal(t, "Test Corp with Profile", created.Name)
+	assert.Equal(t, &pfpKey, created.PfpS3Key)
+}
 
-	err2 := repo.CreateOrganization(ctx, org2)
-	assert.NotNil(t, err2)
+func TestCreateOrganization_Inactive(t *testing.T) {
+	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
+	ctx := context.Background()
+
+	active := false
+	input := func() *models.CreateOrganizationInput {
+		i := &models.CreateOrganizationInput{}
+		i.Body.Name = "Inactive Corp"
+		i.Body.Active = &active
+		return i
+	}()
+
+	created, err := repo.CreateOrganization(ctx, input)
+
+	require.Nil(t, err)
+	require.NotNil(t, created)
+	assert.Equal(t, "Inactive Corp", created.Name)
+	assert.False(t, created.Active)
+}
+
+func TestCreateOrganization_FullDetails(t *testing.T) {
+	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
+	ctx := context.Background()
+
+	active := true
+	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	pfpKey := "orgs/full_corp.jpg"
+	input := func() *models.CreateOrganizationInput {
+		i := &models.CreateOrganizationInput{}
+		i.Body.Name = "Full Details Corp"
+		i.Body.Active = &active
+		i.Body.PfpS3Key = &pfpKey
+		i.Body.LocationID = &locationID
+		return i
+	}()
+
+	created, err := repo.CreateOrganization(ctx, input)
+
+	require.Nil(t, err)
+	require.NotNil(t, created)
+	assert.Equal(t, "Full Details Corp", created.Name)
+	assert.True(t, created.Active)
+	assert.Equal(t, &pfpKey, created.PfpS3Key)
+	assert.Equal(t, &locationID, created.LocationID)
 }

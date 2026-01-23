@@ -14,14 +14,11 @@ func (h *Handler) DeleteOrganization(ctx context.Context, input *models.DeleteOr
 		return nil, errs.BadRequest("Invalid ID format")
 	}
 
-	httpErr := h.OrganizationRepository.DeleteOrganization(ctx, id)
+	deleted, httpErr := h.OrganizationRepository.DeleteOrganization(ctx, id)
 	if httpErr != nil {
 		return nil, httpErr
 	}
 
-	resp := &models.DeleteOrganizationOutput{}
-	resp.Body.Message = "Organization deleted successfully"
-	resp.Body.ID = id.String()
 
-	return resp, nil
+	return &models.DeleteOrganizationOutput{Body: *deleted}, nil
 }

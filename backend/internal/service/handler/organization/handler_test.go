@@ -105,7 +105,13 @@ func TestHandler_CreateOrganization(t *testing.T) {
 				},
 			},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.Organization")).Return(nil)
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput")).Return(&models.Organization{
+					ID:        uuid.New(),
+					Name:      "Tech Corp",
+					Active:    true,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
 			},
 			wantErr: false,
 		},
@@ -126,7 +132,13 @@ func TestHandler_CreateOrganization(t *testing.T) {
 				locRepo.On("GetLocationByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.Location{
 					ID: uuid.New(),
 				}, nil)
-				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.Organization")).Return(nil)
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput")).Return(&models.Organization{
+					ID:        uuid.New(),
+					Name:      "Tech Corp",
+					Active:    true,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
 			},
 			wantErr: false,
 		},
@@ -164,7 +176,7 @@ func TestHandler_CreateOrganization(t *testing.T) {
 				},
 			},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.Organization")).Return(&errs.HTTPError{
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput")).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Database error").Code,
 					Message: "Database error",
 				})
@@ -221,14 +233,13 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 				},
 			},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, existingID).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, existingID, mock.AnythingOfType("*models.UpdateOrganizationInput")).Return(&models.Organization{
 					ID:        existingID,
-					Name:      "Old Name",
+					Name:      "Updated Name",
 					Active:    true,
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.Organization")).Return(nil)
 			},
 			wantErr: false,
 		},
@@ -247,14 +258,13 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 				},
 			},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, existingID).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, existingID, mock.AnythingOfType("*models.UpdateOrganizationInput")).Return(&models.Organization{
 					ID:        existingID,
-					Name:      "Old Name",
-					Active:    true,
+					Name:      "Updated Name",
+					Active:    false,
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.Organization")).Return(nil)
 			},
 			wantErr: false,
 		},
@@ -272,8 +282,8 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 				},
 			},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, existingID).Return(nil, &errs.HTTPError{
-					Code:    errs.InternalServerError("Organization not found").Code,
+				orgRepo.On("UpdateOrganization", mock.Anything, existingID, mock.AnythingOfType("*models.UpdateOrganizationInput")).Return(nil, &errs.HTTPError{
+					Code:    errs.NotFound("Organization", "id", existingID.String()).Code,
 					Message: "Organization not found",
 				})
 			},
@@ -293,13 +303,6 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 				},
 			},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, existingID).Return(&models.Organization{
-					ID:        existingID,
-					Name:      "Old Name",
-					Active:    true,
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
-				}, nil)
 				locRepo.On("GetLocationByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Location not found").Code,
 					Message: "Location not found",
@@ -345,7 +348,13 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 			name: "successful delete",
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("DeleteOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(nil)
+				orgRepo.On("DeleteOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.Organization{
+					ID:        uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+					Name:      "Deleted Org",
+					Active:    true,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
 			},
 			wantErr: false,
 		},
@@ -353,8 +362,8 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 			name: "organization not found",
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19",
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("DeleteOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&errs.HTTPError{
-					Code:    errs.InternalServerError("Organization not found").Code,
+				orgRepo.On("DeleteOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(nil, &errs.HTTPError{
+					Code:    errs.NotFound("Organization", "id", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19").Code,
 					Message: "Organization not found",
 				})
 			},
@@ -378,7 +387,7 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, tt.id, output.Body.ID)
+				assert.Equal(t, tt.id, output.Body.ID.String())
 			}
 
 			mockOrgRepo.AssertExpectations(t)

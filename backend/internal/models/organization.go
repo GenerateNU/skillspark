@@ -76,8 +76,5 @@ type DeleteOrganizationInput struct {
 }
 
 type DeleteOrganizationOutput struct {
-	Body struct {
-		Message string `json:"message" doc:"Confirmation message"`
-		ID      string `json:"id" doc:"Deleted organization ID"`
-	}
+	Body Organization `json:"body" doc:"The deleted organization"`
 }
