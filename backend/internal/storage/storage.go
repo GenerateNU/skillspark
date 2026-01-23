@@ -2,12 +2,14 @@ package storage
 
 import (
 	"context"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/schema/event-occurrence"
+	"skillspark/internal/storage/postgres/schema/location"
+	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/child"
+	"skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/guardian"
-	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/utils"
@@ -25,6 +27,14 @@ type LocationRepository interface {
 
 type SchoolRepository interface {
 	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error)
+}
+
+type OrganizationRepository interface {
+	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput) (*models.Organization, *errs.HTTPError)
+	GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
+	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, *errs.HTTPError)
+	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput) (*models.Organization, *errs.HTTPError)
+	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
 }
 
 type ManagerRepository interface {
@@ -68,6 +78,7 @@ type EventOccurrenceRepository interface {
 type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
+	Organization OrganizationRepository
 	School   SchoolRepository
 	Manager  ManagerRepository
 	Guardian GuardianRepository
@@ -92,6 +103,7 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 	return &Repository{
 		db:       db,
 		Location: location.NewLocationRepository(db),
+		Organization: organization.NewOrganizationRepository(db),
 		School:   school.NewSchoolRepository(db),
 		Manager:  manager.NewManagerRepository(db),
 		Guardian: guardian.NewGuardianRepository(db),
