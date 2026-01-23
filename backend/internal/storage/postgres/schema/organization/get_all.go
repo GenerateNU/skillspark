@@ -1,23 +1,21 @@
-package getallorganizationspaginated
+package organization
 
 import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Execute(ctx context.Context, db *pgxpool.Pool, offset, pageSize int, active *bool, search *string) ([]models.Organization, int, *errs.HTTPError) {
+func (r *OrganizationRepository) GetAllOrganizations(ctx context.Context, offset, pageSize int) ([]models.Organization, int, *errs.HTTPError) {
 	
-	baseQuery, err := schema.ReadSQLBaseScript("organization/getallorganizationspaginated/baseQuery.sql")
+	baseQuery, err := schema.ReadSQLBaseScript("organization/sql/get_all.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, 0, &errr
 	}
 
-	countQuery, err := schema.ReadSQLBaseScript("organization/getallorganizationspaginated/countQuery.sql")
+	countQuery, err := schema.ReadSQLBaseScript("organization/sql/count_all.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read count query: ", err.Error())
 		return nil, 0, &errr
@@ -25,14 +23,14 @@ func Execute(ctx context.Context, db *pgxpool.Pool, offset, pageSize int, active
 
 	// Get total count
 	var totalCount int
-	err = db.QueryRow(ctx, countQuery).Scan(&totalCount)
+	err = r.db.QueryRow(ctx, countQuery).Scan(&totalCount)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to count organizations: ", err.Error())
 		return nil, 0, &errr
 	}
 
 	// Execute query with pagination
-	rows, err := db.Query(ctx, baseQuery, pageSize, offset)
+	rows, err := r.db.Query(ctx, baseQuery, pageSize, offset)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to get organizations: ", err.Error())
 		return nil, 0, &errr

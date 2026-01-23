@@ -1,4 +1,4 @@
-package createorganization
+package organization
 
 import (
 	"context"
@@ -6,17 +6,16 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Execute(ctx context.Context, db *pgxpool.Pool, org *models.Organization) *errs.HTTPError {
-	query, err := schema.ReadSQLBaseScript("organization/createorganization/baseQuery.sql")
+func (r *OrganizationRepository) CreateOrganization(ctx context.Context, org *models.Organization) *errs.HTTPError {
+	query, err := schema.ReadSQLBaseScript("organization/sql/create.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return &errr
 	}
 
-	_, err = db.Exec(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		org.ID,
 		org.Name,
 		org.Active,

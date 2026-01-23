@@ -1,4 +1,4 @@
-package getorganizationbyid
+package organization
 
 import (
 	"context"
@@ -9,17 +9,16 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Execute(ctx context.Context, db *pgxpool.Pool, id uuid.UUID) (*models.Organization, *errs.HTTPError) {
-	query, err := schema.ReadSQLBaseScript("organization/getorganizationbyid/baseQuery.sql")
+func (r *OrganizationRepository) GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError) {
+	query, err := schema.ReadSQLBaseScript("organization/sql/get_by_id.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
 	}
 
-	row := db.QueryRow(ctx, query, id)
+	row := r.db.QueryRow(ctx, query, id)
 	var org models.Organization
 	err = row.Scan(
 		&org.ID,

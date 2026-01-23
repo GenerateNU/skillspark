@@ -1,4 +1,4 @@
-package getorganizationbyid
+package organization
 
 import (
 	"context"
@@ -10,11 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestExecute(t *testing.T) {
+func TestGetById(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	org, err := Execute(ctx, testDB, uuid.MustParse("40000000-0000-0000-0000-000000000004"))
+	org, err := repo.GetOrganizationByID(ctx, uuid.MustParse("40000000-0000-0000-0000-000000000004"))
 
 	require.Nil(t,err)
 	assert.Equal(t, "Harmony Music School", org.Name)
@@ -23,9 +24,10 @@ func TestExecute(t *testing.T) {
 
 func TestExecute_SecondOrganization(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	org, err := Execute(ctx, testDB, uuid.MustParse("40000000-0000-0000-0000-000000000003"))
+	org, err := repo.GetOrganizationByID(ctx, uuid.MustParse("40000000-0000-0000-0000-000000000003"))
 
 	require.Nil(t, err)
 	require.NotNil(t, org)
@@ -35,9 +37,10 @@ func TestExecute_SecondOrganization(t *testing.T) {
 
 func TestExecute_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)	
 	ctx := context.Background()
 
-	org, err := Execute(ctx, testDB, uuid.New())
+	org, err := repo.GetOrganizationByID(ctx, uuid.New())
 
 	require.Error(t, err)
 	assert.Nil(t, org)

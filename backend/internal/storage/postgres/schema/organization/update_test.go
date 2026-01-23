@@ -1,10 +1,8 @@
-package updateorganization
+package organization
 
 import (
 	"context"
 	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/schema/organization/createorganization"
-	"skillspark/internal/storage/postgres/schema/organization/getorganizationbyid"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 	"time"
@@ -13,8 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExecute(t *testing.T) {
+func TestUpdate(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
 	// Create an organization first
@@ -27,7 +26,7 @@ func TestExecute(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	createErr := createorganization.Execute(ctx, testDB, org)
+	createErr := repo.CreateOrganization(ctx, org)
 	assert.Nil(t, createErr)
 
 	// Update it
@@ -35,11 +34,11 @@ func TestExecute(t *testing.T) {
 	org.Active = false
 	org.UpdatedAt = time.Now()
 
-	updateErr := Execute(ctx, testDB, org)
+	updateErr := repo.UpdateOrganization(ctx, org)
 	assert.Nil(t, updateErr)
 
 	// Verify update
-	updated, getErr := getorganizationbyid.Execute(ctx, testDB, orgID)
+	updated, getErr := repo.GetOrganizationByID(ctx, orgID)
 	assert.Nil(t, getErr)
 	assert.Equal(t, "Updated Name", updated.Name)
 	assert.Equal(t, false, updated.Active)
@@ -47,28 +46,30 @@ func TestExecute(t *testing.T) {
 
 func TestExecute_UpdateExisting(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
 	// Get existing test organization
 	orgID := uuid.MustParse("40000000-0000-0000-0000-000000000004")
-	org, err := getorganizationbyid.Execute(ctx, testDB, orgID)
+	org, err := repo.GetOrganizationByID(ctx, orgID)
 	assert.Nil(t, err)
 
 	// Update it
 	org.Name = "Babel Street Updated"
 	org.UpdatedAt = time.Now()
 
-	updateErr := Execute(ctx, testDB, org)
+	updateErr := repo.UpdateOrganization(ctx, org)
 	assert.Nil(t, updateErr)
 
 	// Verify
-	updated, getErr := getorganizationbyid.Execute(ctx, testDB, orgID)
+	updated, getErr := repo.GetOrganizationByID(ctx, orgID)
 	assert.Nil(t, getErr)
 	assert.Equal(t, "Babel Street Updated", updated.Name)
 }
 
-func TestExecute_NotFound(t *testing.T) {
+func TestUpdate_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
 	// Try to update non-existent organization
@@ -79,7 +80,7 @@ func TestExecute_NotFound(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	err := Execute(ctx, testDB, org)
+	err := repo.UpdateOrganization(ctx, org)
 
 	assert.NotNil(t, err)
 }

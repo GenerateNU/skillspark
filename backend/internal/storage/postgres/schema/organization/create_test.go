@@ -1,4 +1,4 @@
-package createorganization
+package organization
 
 import (
 	"context"
@@ -11,9 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExecute(t *testing.T) {
+func TestCreate(t *testing.T) {
 
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
 	org := &models.Organization{
@@ -24,7 +25,7 @@ func TestExecute(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	err := Execute(ctx, testDB, org)
+	err := repo.CreateOrganization(ctx, org)
 
 	assert.Nil(t, err)
 }
@@ -32,6 +33,7 @@ func TestExecute(t *testing.T) {
 func TestExecute_WithLocation(t *testing.T) {
 
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
 	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
@@ -44,7 +46,7 @@ func TestExecute_WithLocation(t *testing.T) {
 		UpdatedAt:  time.Now(),
 	}
 
-	err := Execute(ctx, testDB, org)
+	err := repo.CreateOrganization(ctx, org)
 
 	assert.Nil(t, err)
 }
@@ -52,6 +54,7 @@ func TestExecute_WithLocation(t *testing.T) {
 func TestExecute_DuplicateID(t *testing.T) {
 
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
 	orgID := uuid.New()
@@ -63,7 +66,7 @@ func TestExecute_DuplicateID(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	err := Execute(ctx, testDB, org1)
+	err := repo.CreateOrganization(ctx, org1)
 	assert.Nil(t, err)
 
 	// Try to create another with same ID
@@ -75,6 +78,6 @@ func TestExecute_DuplicateID(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	err2 := Execute(ctx, testDB, org2)
+	err2 := repo.CreateOrganization(ctx, org2)
 	assert.NotNil(t, err2)
 }

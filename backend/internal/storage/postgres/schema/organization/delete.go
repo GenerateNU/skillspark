@@ -1,22 +1,20 @@
-package deleteorganization
+package organization
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"skillspark/internal/errs"
 	"skillspark/internal/storage/postgres/schema"
-
-	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Execute(ctx context.Context, db *pgxpool.Pool, id uuid.UUID) *errs.HTTPError {
-	query, err := schema.ReadSQLBaseScript("organization/deleteorganization/baseQuery.sql")
+func (r *OrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID) *errs.HTTPError {
+	query, err := schema.ReadSQLBaseScript("organization/sql/delete.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return &errr
 	}
 
-	result, err := db.Exec(ctx, query, id)
+	result, err := r.db.Exec(ctx, query, id)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to delete organization: ", err.Error())
 		return &errr

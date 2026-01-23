@@ -1,4 +1,4 @@
-package getallorganizationspaginated
+package organization
 
 import (
 	"context"
@@ -10,9 +10,10 @@ import (
 
 func TestExecute_BasicPagination(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, totalCount, err := Execute(ctx, testDB, 0, 10, nil, nil)
+	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 10)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, orgs)
@@ -22,13 +23,14 @@ func TestExecute_BasicPagination(t *testing.T) {
 
 func TestExecute_SecondPage(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	firstPageOrgs, totalCount, err := Execute(ctx, testDB, 0, 2, nil, nil)
+	firstPageOrgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 2)
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(firstPageOrgs))
 
-	secondPageOrgs, totalCount2, err := Execute(ctx, testDB, 2, 2, nil, nil)
+	secondPageOrgs, totalCount2, err := repo.GetAllOrganizations(ctx, 2, 2)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, secondPageOrgs)
@@ -43,9 +45,10 @@ func TestExecute_SecondPage(t *testing.T) {
 
 func TestExecute_SmallPageSize(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, totalCount, err := Execute(ctx, testDB, 0, 2, nil, nil)
+	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 2)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, orgs)
@@ -55,9 +58,10 @@ func TestExecute_SmallPageSize(t *testing.T) {
 
 func TestExecute_SingleItemPerPage(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, totalCount, err := Execute(ctx, testDB, 0, 1, nil, nil)
+	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 1)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, orgs)
@@ -67,10 +71,11 @@ func TestExecute_SingleItemPerPage(t *testing.T) {
 
 func TestExecute_PageBeyondData(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
 	
-	orgs, totalCount, err := Execute(ctx, testDB, 1000, 10, nil, nil)
+	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 1000, 10)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, orgs)
@@ -80,9 +85,10 @@ func TestExecute_PageBeyondData(t *testing.T) {
 
 func TestExecute_AllDataOnePage(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, totalCount, err := Execute(ctx, testDB, 0, 100, nil, nil)
+	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 100)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, orgs)
@@ -92,9 +98,10 @@ func TestExecute_AllDataOnePage(t *testing.T) {
 
 func TestExecute_OrderByCreatedAt(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, _, err := Execute(ctx, testDB, 0, 10, nil, nil)
+	orgs, _, err := repo.GetAllOrganizations(ctx, 0, 10)
 
 	assert.Nil(t, err)
 	assert.GreaterOrEqual(t, len(orgs), 2)
@@ -109,9 +116,10 @@ func TestExecute_OrderByCreatedAt(t *testing.T) {
 
 func TestExecute_ZeroOffset(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, totalCount, err := Execute(ctx, testDB, 0, 3, nil, nil)
+	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 3)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, orgs)

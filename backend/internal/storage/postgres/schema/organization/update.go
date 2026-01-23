@@ -1,22 +1,20 @@
-package updateorganization
+package organization
 
 import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Execute(ctx context.Context, db *pgxpool.Pool, org *models.Organization) *errs.HTTPError {
-	query, err := schema.ReadSQLBaseScript("organization/updateorganization/baseQuery.sql")
+func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, org *models.Organization) *errs.HTTPError {
+	query, err := schema.ReadSQLBaseScript("organization/sql/update.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return &errr
 	}
 
-	result, err := db.Exec(ctx, query,
+	result, err := r.db.Exec(ctx, query,
 		org.Name,
 		org.Active,
 		org.PfpS3Key,

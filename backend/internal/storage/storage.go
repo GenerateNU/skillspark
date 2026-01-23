@@ -4,8 +4,8 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-	locationSchema "skillspark/internal/storage/postgres/schema/location"
-	organizationSchema "skillspark/internal/storage/postgres/schema/organization"
+	"skillspark/internal/storage/postgres/schema/location"
+	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/event"
@@ -102,8 +102,8 @@ func (r *Repository) GetDB() *pgxpool.Pool {
 func NewRepository(db *pgxpool.Pool) *Repository {
 	return &Repository{
 		db:       db,
-		Location: locationSchema.NewLocationRepository(db),
-		Organization: organizationSchema.NewOrganizationRepository(db),
+		Location: location.NewLocationRepository(db),
+		Organization: organization.NewOrganizationRepository(db),
 		School:   school.NewSchoolRepository(db),
 		Manager:  manager.NewManagerRepository(db),
 		Guardian: guardian.NewGuardianRepository(db),

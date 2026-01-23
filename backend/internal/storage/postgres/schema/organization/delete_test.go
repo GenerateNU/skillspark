@@ -1,10 +1,8 @@
-package deleteorganization
+package organization
 
 import (
 	"context"
 	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/schema/organization/createorganization"
-	"skillspark/internal/storage/postgres/schema/organization/getorganizationbyid"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 	"time"
@@ -13,8 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExecute(t *testing.T) {
+func TestDelete(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
 	// Create an organization to delete
@@ -27,33 +26,34 @@ func TestExecute(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	createErr := createorganization.Execute(ctx, testDB, org)
+	createErr := repo.CreateOrganization(ctx, org)
 	assert.Nil(t, createErr)
 
-	deleteErr := Execute(ctx, testDB, orgID)
+	deleteErr := repo.DeleteOrganization(ctx, orgID)
 	assert.Nil(t, deleteErr)
 
 	// Verify it's gone
-	deleted, getErr := getorganizationbyid.Execute(ctx, testDB, orgID)
+	deleted, getErr := repo.GetOrganizationByID(ctx, orgID)
 	assert.NotNil(t, getErr)
 	assert.Nil(t, deleted)
 }
 
-func TestExecute_NotFound(t *testing.T) {
+func TestDelete_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
 	// Try to delete non-existent organization
-	err := Execute(ctx, testDB, uuid.New())
+	err := repo.DeleteOrganization(ctx, uuid.New())
 
 	assert.NotNil(t, err)
 }
 
 func TestExecute_AlreadyDeleted(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	// Create and delete
 	orgID := uuid.New()
 	org := &models.Organization{
 		ID:        orgID,
@@ -63,13 +63,12 @@ func TestExecute_AlreadyDeleted(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	createErr := createorganization.Execute(ctx, testDB, org)
+	createErr := repo.CreateOrganization(ctx, org)
 	assert.Nil(t, createErr)
 
-	deleteErr1 := Execute(ctx, testDB, orgID)
+	deleteErr1 := repo.DeleteOrganization(ctx, orgID)
 	assert.Nil(t, deleteErr1)
 
-	// Try to delete again
-	deleteErr2 := Execute(ctx, testDB, orgID)
+	deleteErr2 := repo.DeleteOrganization(ctx, orgID)
 	assert.NotNil(t, deleteErr2)
 }
