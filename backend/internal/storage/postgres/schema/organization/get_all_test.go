@@ -3,126 +3,129 @@ package organization
 import (
 	"context"
 	"skillspark/internal/storage/postgres/testutil"
+	"skillspark/internal/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestExecute_BasicPagination(t *testing.T) {
+func TestGetAllOrganizations_BasicPagination(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 10)
+	pagination := utils.Pagination{Page: 1, Limit: 10}
+	orgs, err := repo.GetAllOrganizations(ctx, pagination)
 
-	assert.Nil(t, err)
-	assert.NotNil(t, orgs)
-	assert.GreaterOrEqual(t, totalCount, 3) 
+	require.Nil(t, err)
+	require.NotNil(t, orgs)
+	assert.GreaterOrEqual(t, len(orgs), 3)
 	assert.LessOrEqual(t, len(orgs), 10)
 }
 
-func TestExecute_SecondPage(t *testing.T) {
+func TestGetAllOrganizations_SecondPage(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	firstPageOrgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 2)
-	assert.Nil(t, err)
+	firstPage := utils.Pagination{Page: 1, Limit: 2}
+	firstPageOrgs, err := repo.GetAllOrganizations(ctx, firstPage)
+	require.Nil(t, err)
 	assert.Equal(t, 2, len(firstPageOrgs))
 
-	secondPageOrgs, totalCount2, err := repo.GetAllOrganizations(ctx, 2, 2)
+	secondPage := utils.Pagination{Page: 2, Limit: 2}
+	secondPageOrgs, err := repo.GetAllOrganizations(ctx, secondPage)
 
-	assert.Nil(t, err)
-	assert.NotNil(t, secondPageOrgs)
-	assert.Equal(t, totalCount, totalCount2) 
-	assert.GreaterOrEqual(t, len(secondPageOrgs), 1) 
-	
+	require.Nil(t, err)
+	require.NotNil(t, secondPageOrgs)
+	assert.GreaterOrEqual(t, len(secondPageOrgs), 1)
 
 	if len(secondPageOrgs) > 0 && len(firstPageOrgs) > 0 {
 		assert.NotEqual(t, firstPageOrgs[0].ID, secondPageOrgs[0].ID)
 	}
 }
 
-func TestExecute_SmallPageSize(t *testing.T) {
+func TestGetAllOrganizations_SmallPageSize(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 2)
+	pagination := utils.Pagination{Page: 1, Limit: 2}
+	orgs, err := repo.GetAllOrganizations(ctx, pagination)
 
-	assert.Nil(t, err)
-	assert.NotNil(t, orgs)
+	require.Nil(t, err)
+	require.NotNil(t, orgs)
 	assert.Equal(t, 2, len(orgs))
-	assert.GreaterOrEqual(t, totalCount, 3)
 }
 
-func TestExecute_SingleItemPerPage(t *testing.T) {
+func TestGetAllOrganizations_SingleItemPerPage(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 1)
+	pagination := utils.Pagination{Page: 1, Limit: 1}
+	orgs, err := repo.GetAllOrganizations(ctx, pagination)
 
-	assert.Nil(t, err)
-	assert.NotNil(t, orgs)
+	require.Nil(t, err)
+	require.NotNil(t, orgs)
 	assert.Equal(t, 1, len(orgs))
-	assert.GreaterOrEqual(t, totalCount, 3)
 }
 
-func TestExecute_PageBeyondData(t *testing.T) {
+func TestGetAllOrganizations_PageBeyondData(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	
-	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 1000, 10)
+	pagination := utils.Pagination{Page: 100, Limit: 10}
+	orgs, err := repo.GetAllOrganizations(ctx, pagination)
 
-	assert.Nil(t, err)
-	assert.NotNil(t, orgs)
+	require.Nil(t, err)
+	require.NotNil(t, orgs)
 	assert.Equal(t, 0, len(orgs))
-	assert.GreaterOrEqual(t, totalCount, 3) 
 }
 
-func TestExecute_AllDataOnePage(t *testing.T) {
+func TestGetAllOrganizations_AllDataOnePage(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 100)
+	pagination := utils.Pagination{Page: 1, Limit: 100}
+	orgs, err := repo.GetAllOrganizations(ctx, pagination)
 
-	assert.Nil(t, err)
-	assert.NotNil(t, orgs)
-	assert.Equal(t, totalCount, len(orgs)) 
-	assert.GreaterOrEqual(t, totalCount, 3)
+	require.Nil(t, err)
+	require.NotNil(t, orgs)
+	assert.GreaterOrEqual(t, len(orgs), 3)
 }
 
-func TestExecute_OrderByCreatedAt(t *testing.T) {
+func TestGetAllOrganizations_OrderByCreatedAt(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, _, err := repo.GetAllOrganizations(ctx, 0, 10)
+	pagination := utils.Pagination{Page: 1, Limit: 10}
+	orgs, err := repo.GetAllOrganizations(ctx, pagination)
 
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.GreaterOrEqual(t, len(orgs), 2)
 
 	for i := 0; i < len(orgs)-1; i++ {
-		assert.True(t, 
+		assert.True(t,
 			orgs[i].CreatedAt.After(orgs[i+1].CreatedAt) || orgs[i].CreatedAt.Equal(orgs[i+1].CreatedAt),
 			"Organizations should be ordered by created_at DESC",
 		)
 	}
 }
 
-func TestExecute_ZeroOffset(t *testing.T) {
+func TestGetAllOrganizations_ZeroOffset(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
-	orgs, totalCount, err := repo.GetAllOrganizations(ctx, 0, 3)
+	pagination := utils.Pagination{Page: 1, Limit: 3}
+	orgs, err := repo.GetAllOrganizations(ctx, pagination)
 
-	assert.Nil(t, err)
-	assert.NotNil(t, orgs)
+	require.Nil(t, err)
+	require.NotNil(t, orgs)
 	assert.Equal(t, 3, len(orgs))
-	assert.GreaterOrEqual(t, totalCount, 3)
 }

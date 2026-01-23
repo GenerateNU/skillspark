@@ -6,6 +6,7 @@ import (
 	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/models"
 	"skillspark/internal/storage"
+	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 )
@@ -40,10 +41,31 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		Method:      http.MethodGet,
 		Path:        "/api/v1/organizations",
 		Summary:     "List all organizations",
-		Description: "Returns a paginated list of organizations with optional filtering",
+		Description: "Returns a paginated list of organizations",
 		Tags:        []string{"Organizations"},
 	}, func(ctx context.Context, input *models.GetAllOrganizationsInput) (*models.GetAllOrganizationsOutput, error) {
-		return orgHandler.GetAllOrganizations(ctx, input)
+		page := input.Page
+		if page == 0 {
+			page = 1
+		}
+		limit := input.PageSize
+		if limit == 0 {
+			limit = 10
+		}
+
+		pagination := utils.Pagination{
+			Page:  page,
+			Limit: limit,
+		}
+
+		organizations, err := orgHandler.GetAllOrganizations(ctx, pagination)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetAllOrganizationsOutput{
+			Body: organizations,
+		}, nil
 	})
 
 	huma.Register(api, huma.Operation{

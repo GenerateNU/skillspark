@@ -57,18 +57,12 @@ type GetOrganizationByIDOutput struct {
 
 
 type GetAllOrganizationsInput struct {
-	Page     int    `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
-	PageSize int    `query:"page_size" minimum:"1" maximum:"100" default:"20" doc:"Number of items per page"`
+	Page     int `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
+	PageSize int `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
 }
 
 type GetAllOrganizationsOutput struct {
-	Body struct {
-		Organizations []Organization `json:"organizations" doc:"List of organizations"`
-		Page          int            `json:"page" doc:"Current page number"`
-		PageSize      int            `json:"page_size" doc:"Items per page"`
-		TotalCount    int            `json:"total_count" doc:"Total number of organizations"`
-		TotalPages    int            `json:"total_pages" doc:"Total number of pages"`
-	}
+	Body [] Organization `json:"body" doc:"List of organizations"`
 }
 
 type DeleteOrganizationInput struct {

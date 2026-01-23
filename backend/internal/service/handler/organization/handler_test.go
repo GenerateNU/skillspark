@@ -6,6 +6,7 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	"skillspark/internal/utils"
 	"testing"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHandler_GetOrganizationById(t *testing.T) {
@@ -233,7 +235,6 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 				},
 			},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				// Change from 3 arguments to 2 arguments
 				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput")).Return(&models.Organization{
 					ID:        existingID,
 					Name:      "Updated Name",
@@ -323,10 +324,11 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			output, err := handler.UpdateOrganization(context.TODO(), tt.input)
 
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
+				assert.Nil(t, output)
 			} else {
-				assert.NoError(t, err)
-				assert.NotNil(t, output)
+				require.NoError(t, err)
+				require.NotNil(t, output)
 				if tt.input.Body.Name != nil {
 					assert.Equal(t, *tt.input.Body.Name, output.Body.Name)
 				}
@@ -398,57 +400,48 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 
 func TestHandler_GetAllOrganizations(t *testing.T) {
 	tests := []struct {
-		name          string
-		input         *models.GetAllOrganizationsInput
-		mockSetup     func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
-		wantErr       bool
-		expectedTotal int
+		name      string
+		pagination utils.Pagination
+		mockSetup func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		wantErr   bool
+		expectedLen int
 	}{
 		{
 			name: "successful get all with defaults",
-			input: &models.GetAllOrganizationsInput{
-				Page:     1,
-				PageSize: 20,
-			},
+			pagination: utils.Pagination{Page: 1, Limit: 20},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
 				orgs := []models.Organization{
 					{ID: uuid.New(), Name: "Org 1", Active: true},
 					{ID: uuid.New(), Name: "Org 2", Active: true},
 				}
-				orgRepo.On("GetAllOrganizations", mock.Anything, 0, 20).Return(orgs, 2, nil)
+				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(orgs, nil)
 			},
-			wantErr:       false,
-			expectedTotal: 2,
+			wantErr:     false,
+			expectedLen: 2,
 		},
 		{
 			name: "successful get all with pagination",
-			input: &models.GetAllOrganizationsInput{
-				Page:     2,
-				PageSize: 10,
-			},
+			pagination: utils.Pagination{Page: 2, Limit: 10},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
 				orgs := []models.Organization{
 					{ID: uuid.New(), Name: "Org 3", Active: true},
 				}
-				orgRepo.On("GetAllOrganizations", mock.Anything, 10, 10).Return(orgs, 11, nil)
+				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(orgs, nil)
 			},
-			wantErr:       false,
-			expectedTotal: 11,
+			wantErr:     false,
+			expectedLen: 1,
 		},
 		{
 			name: "database error",
-			input: &models.GetAllOrganizationsInput{
-				Page:     1,
-				PageSize: 20,
-			},
+			pagination: utils.Pagination{Page: 1, Limit: 20},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetAllOrganizations", mock.Anything, 0, 20).Return(nil, 0, &errs.HTTPError{
+				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Database error").Code,
 					Message: "Database error",
 				})
 			},
-			wantErr:       true,
-			expectedTotal: 0,
+			wantErr:     true,
+			expectedLen: 0,
 		},
 	}
 
@@ -459,14 +452,14 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
 			handler := NewHandler(mockOrgRepo, mockLocRepo)
-			output, err := handler.GetAllOrganizations(context.TODO(), tt.input)
+			output, err := handler.GetAllOrganizations(context.TODO(), tt.pagination)
 
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, tt.expectedTotal, output.Body.TotalCount)
+				assert.Equal(t, tt.expectedLen, len(output))
 			}
 
 			mockOrgRepo.AssertExpectations(t)

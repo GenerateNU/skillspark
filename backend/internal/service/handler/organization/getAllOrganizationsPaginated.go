@@ -3,26 +3,13 @@ package organization
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/utils"
 )
 
-func (h *Handler) GetAllOrganizations(ctx context.Context, input *models.GetAllOrganizationsInput) (*models.GetAllOrganizationsOutput, error) {
-	page := input.Page
-	pageSize := input.PageSize
-	offset := (page - 1) * pageSize
-
-	organizations, totalCount, httpErr := h.OrganizationRepository.GetAllOrganizations(ctx, offset, pageSize)
-	if httpErr != nil {
-		return nil, httpErr
+func (h *Handler) GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, error) {
+	organizations, err := h.OrganizationRepository.GetAllOrganizations(ctx, pagination)
+	if err != nil {
+		return nil, err
 	}
-
-	totalPages := (totalCount + pageSize - 1) / pageSize
-
-	resp := &models.GetAllOrganizationsOutput{}
-	resp.Body.Organizations = organizations
-	resp.Body.Page = page
-	resp.Body.PageSize = pageSize
-	resp.Body.TotalCount = totalCount
-	resp.Body.TotalPages = totalPages
-
-	return resp, nil
+	return organizations, nil
 }
