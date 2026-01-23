@@ -5,6 +5,8 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
+
+	"github.com/jackc/pgx/v5"
 )
 
 func (r *OrganizationRepository) GetAllOrganizations(ctx context.Context, offset, pageSize int) ([]models.Organization, int, *errs.HTTPError) {
@@ -21,7 +23,6 @@ func (r *OrganizationRepository) GetAllOrganizations(ctx context.Context, offset
 		return nil, 0, &errr
 	}
 
-	// Get total count
 	var totalCount int
 	err = r.db.QueryRow(ctx, countQuery).Scan(&totalCount)
 	if err != nil {
@@ -29,7 +30,6 @@ func (r *OrganizationRepository) GetAllOrganizations(ctx context.Context, offset
 		return nil, 0, &errr
 	}
 
-	// Execute query with pagination
 	rows, err := r.db.Query(ctx, baseQuery, pageSize, offset)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to get organizations: ", err.Error())
@@ -37,25 +37,25 @@ func (r *OrganizationRepository) GetAllOrganizations(ctx context.Context, offset
 	}
 	defer rows.Close()
 
-	orgs := []models.Organization{}
-	
-	for rows.Next() {
-		var org models.Organization
-		err := rows.Scan(
-			&org.ID,
-			&org.Name,
-			&org.Active,
-			&org.PfpS3Key,
-			&org.LocationID,
-			&org.CreatedAt,
-			&org.UpdatedAt,
-		)
-		if err != nil {
-			errr := errs.InternalServerError("Failed to scan organization: ", err.Error())
-			return nil, 0, &errr
-		}
-		orgs = append(orgs, org)
+	orgs, err := pgx.CollectRows(rows, scanOrganization)
+	if err != nil {
+		errr := errs.InternalServerError("Failed to collect organizations: ", err.Error())
+		return nil, 0, &errr
 	}
 
 	return orgs, totalCount, nil
+}
+
+func scanOrganization(row pgx.CollectableRow) (models.Organization, error) {
+	var org models.Organization
+	err := row.Scan(
+		&org.ID,
+		&org.Name,
+		&org.Active,
+		&org.PfpS3Key,
+		&org.LocationID,
+		&org.CreatedAt,
+		&org.UpdatedAt,
+	)
+	return org, err
 }

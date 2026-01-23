@@ -18,22 +18,34 @@ func TestUpdateOrganization(t *testing.T) {
 
 	// Create an organization first
 	active := true
-	input := func() *models.CreateOrganizationInput {
+	createInput := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Original Name"
 		i.Body.Active = &active
 		return i
 	}()
 
-	created, createErr := repo.CreateOrganization(ctx, input)
+	created, createErr := repo.CreateOrganization(ctx, createInput)
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 
 	// Update it
-	created.Name = "Updated Name"
-	created.Active = false
+	newName := "Updated Name"
+	newActive := false
+	updateInput := &models.UpdateOrganizationInput{
+		ID: created.ID,
+		Body: struct {
+			Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
+			Active     *bool      `json:"active,omitempty" doc:"Active status"`
+			PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
+			LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
+		}{
+			Name:   &newName,
+			Active: &newActive,
+		},
+	}
 
-	updated, updateErr := repo.UpdateOrganization(ctx, created)
+	updated, updateErr := repo.UpdateOrganization(ctx, updateInput)
 	require.Nil(t, updateErr)
 	require.NotNil(t, updated)
 	assert.Equal(t, "Updated Name", updated.Name)
@@ -53,23 +65,34 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 
 	// Create organization
 	active := true
-	input := func() *models.CreateOrganizationInput {
+	createInput := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Test Org"
 		i.Body.Active = &active
 		return i
 	}()
 
-	created, createErr := repo.CreateOrganization(ctx, input)
+	created, createErr := repo.CreateOrganization(ctx, createInput)
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 
 	// Update with location
 	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-	created.LocationID = &locationID
-	created.Name = "Test Org with Location"
+	newName := "Test Org with Location"
+	updateInput := &models.UpdateOrganizationInput{
+		ID: created.ID,
+		Body: struct {
+			Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
+			Active     *bool      `json:"active,omitempty" doc:"Active status"`
+			PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
+			LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
+		}{
+			Name:       &newName,
+			LocationID: &locationID,
+		},
+	}
 
-	updated, updateErr := repo.UpdateOrganization(ctx, created)
+	updated, updateErr := repo.UpdateOrganization(ctx, updateInput)
 	require.Nil(t, updateErr)
 	require.NotNil(t, updated)
 	assert.Equal(t, "Test Org with Location", updated.Name)
@@ -82,13 +105,21 @@ func TestUpdateOrganization_NotFound(t *testing.T) {
 	ctx := context.Background()
 
 	// Try to update non-existent organization
-	org := &models.Organization{
-		ID:     uuid.New(),
-		Name:   "Does Not Exist",
-		Active: true,
+	nonExistentID := uuid.New()
+	newName := "Does Not Exist"
+	updateInput := &models.UpdateOrganizationInput{
+		ID: nonExistentID,
+		Body: struct {
+			Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
+			Active     *bool      `json:"active,omitempty" doc:"Active status"`
+			PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
+			LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
+		}{
+			Name: &newName,
+		},
 	}
 
-	updated, err := repo.UpdateOrganization(ctx, org)
+	updated, err := repo.UpdateOrganization(ctx, updateInput)
 
 	require.NotNil(t, err)
 	assert.Nil(t, updated)
