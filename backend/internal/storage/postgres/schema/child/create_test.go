@@ -11,33 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// a test run of this way of testing, creating something
-// before testing on it to ensure that it must exist
-func CreateTestChild(
-	t *testing.T,
-	ctx context.Context,
-	repo *ChildRepository,
-) *models.Child {
-	t.Helper()
-
-	schoolID, err := uuid.Parse("20000000-0000-0000-0000-000000000001")
-	assert.Nil(t, err)
-
-	guardianID, err := uuid.Parse("11111111-1111-1111-1111-111111111111")
-	assert.Nil(t, err)
-
-	input := &models.CreateChildInput{}
-	input.Body.Name = "Test Child"
-	input.Body.SchoolID = schoolID
-	input.Body.BirthMonth = 5
-	input.Body.BirthYear = 2019
-	input.Body.Interests = []string{"math", "art"}
-	input.Body.GuardianID = guardianID
-
-	child, _ := repo.CreateChild(ctx, input)
-	return child
-}
-
 func TestChildRepository_CreateChild(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
@@ -47,7 +20,7 @@ func TestChildRepository_CreateChild(t *testing.T) {
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
 
-	sampleChild := CreateTestChild(t, ctx, repo)
+	sampleChild := CreateTestChild(t, ctx)
 
 	childInput := func() *models.CreateChildInput {
 		input := &models.CreateChildInput{}

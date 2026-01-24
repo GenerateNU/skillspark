@@ -23,7 +23,7 @@ func TestChildRepository_UpdateChildByID(t *testing.T) {
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
 
-	testChild := CreateTestChild(t, ctx, repo)
+	testChild := CreateTestChild(t, ctx)
 
 	input := &models.UpdateChildInput{}
 	name := "Updated Child"

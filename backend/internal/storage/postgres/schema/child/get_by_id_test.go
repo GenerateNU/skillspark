@@ -21,7 +21,7 @@ func TestChildRepository_GetChildByID(t *testing.T) {
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
 
-	testChild := CreateTestChild(t, ctx, repo)
+	testChild := CreateTestChild(t, ctx)
 
 	child, err := repo.GetChildByID(ctx, testChild.ID)
 

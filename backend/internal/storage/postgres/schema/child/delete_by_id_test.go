@@ -21,7 +21,7 @@ func TestChildRepository_DeleteChildByID(t *testing.T) {
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
 
-	createdChild := CreateTestChild(t, ctx, repo)
+	createdChild := CreateTestChild(t, ctx)
 
 	child, err := repo.DeleteChildByID(ctx, createdChild.ID)
 
