@@ -3,20 +3,20 @@ package guardian
 import (
 	"context"
 	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func CreateTestGuardian(
 	t *testing.T,
 	ctx context.Context,
+	db *pgxpool.Pool,
 ) *models.Guardian {
 	t.Helper()
 
-	testDB := testutil.SetupTestDB(t)
-	repo := NewGuardianRepository(testDB)
+	repo := NewGuardianRepository(db)
 
 	input := &models.CreateGuardianInput{}
 

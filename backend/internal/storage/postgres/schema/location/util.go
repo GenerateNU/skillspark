@@ -3,18 +3,19 @@ package location
 import (
 	"context"
 	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/testutil"
 	"testing"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func CreateTestLocation(
 	t *testing.T,
 	ctx context.Context,
+	db *pgxpool.Pool,
 ) *models.Location {
 	t.Helper()
 
-	testDB := testutil.SetupTestDB(t)
-	repo := NewLocationRepository(testDB)
+	repo := NewLocationRepository(db)
 
 	input := &models.CreateLocationInput{}
 	input.Body.Latitude = 40.7128

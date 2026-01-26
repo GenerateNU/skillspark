@@ -4,20 +4,21 @@ import (
 	"context"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/organization"
-	"skillspark/internal/storage/postgres/testutil"
 	"testing"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func CreateTestEvent(
 	t *testing.T,
 	ctx context.Context,
+	db *pgxpool.Pool,
 ) *models.Event {
 	t.Helper()
 
-	testDB := testutil.SetupTestDB(t)
-	repo := NewEventRepository(testDB)
+	repo := NewEventRepository(db)
 
-	organization := organization.CreateTestOrganization(t, ctx)
+	organization := organization.CreateTestOrganization(t, ctx, db)
 
 	input := &models.CreateEventInput{}
 	ageMin := 8

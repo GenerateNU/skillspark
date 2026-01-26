@@ -3,18 +3,19 @@ package organization
 import (
 	"context"
 	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/testutil"
 	"testing"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func CreateTestOrganization(
 	t *testing.T,
 	ctx context.Context,
+	db *pgxpool.Pool,
 ) *models.Organization {
 	t.Helper()
 
-	testDB := testutil.SetupTestDB(t)
-	repo := NewOrganizationRepository(testDB)
+	repo := NewOrganizationRepository(db)
 
 	active := true
 	i := &models.CreateOrganizationInput{}

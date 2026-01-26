@@ -6,23 +6,24 @@ import (
 	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
-	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func CreateTestEventOccurrence(
 	t *testing.T,
 	ctx context.Context,
+	db *pgxpool.Pool,
 ) *models.EventOccurrence {
 	t.Helper()
 
-	testDB := testutil.SetupTestDB(t)
-	repo := NewEventOccurrenceRepository(testDB)
+	repo := NewEventOccurrenceRepository(db)
 
-	e := event.CreateTestEvent(t, ctx)
-	l := location.CreateTestLocation(t, ctx)
-	m := manager.CreateTestManager(t, ctx)
+	e := event.CreateTestEvent(t, ctx, db)
+	l := location.CreateTestLocation(t, ctx, db)
+	m := manager.CreateTestManager(t, ctx, db)
 
 	start := time.Date(2026, time.February, 1, 0, 0, 0, 0, time.Local)
 	end := time.Date(2026, time.February, 1, 1, 0, 0, 0, time.Local)
