@@ -3,11 +3,11 @@ package child
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/guardian"
+	"skillspark/internal/storage/postgres/schema/school"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,19 +20,16 @@ func CreateTestChild(
 	t.Helper()
 	repo := NewChildRepository(db)
 
-	schoolID, err := uuid.Parse("20000000-0000-0000-0000-000000000001")
-	assert.Nil(t, err)
-
-	guardianID, err := uuid.Parse("11111111-1111-1111-1111-111111111111")
-	assert.Nil(t, err)
+	s := school.CreateTestSchool(t, ctx, db)
+	g := guardian.CreateTestGuardian(t, ctx, db)
 
 	input := &models.CreateChildInput{}
 	input.Body.Name = "Test Child"
-	input.Body.SchoolID = schoolID
+	input.Body.SchoolID = s.ID
 	input.Body.BirthMonth = 5
 	input.Body.BirthYear = 2019
 	input.Body.Interests = []string{"math", "art"}
-	input.Body.GuardianID = guardianID
+	input.Body.GuardianID = g.ID
 
 	c, err := repo.CreateChild(ctx, input)
 
