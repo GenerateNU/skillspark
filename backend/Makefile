@@ -147,7 +147,7 @@ else
 	@grep -vE '$(COVERAGE_EXCLUDE)' coverage.out > coverage_filtered.out || cp coverage.out coverage_filtered.out
 	@go tool cover -html=coverage_filtered.out -o coverage.html
 	@echo "$(GREEN)Coverage report: coverage.html$(NC)"
-	@go tool cover -func=coverage_filtered.out | $(GREP) total
+	@go tool cover -func=coverage_filtered.out | grep total
 endif
 	@echo "$(YELLOW)Excluded patterns: $(COVERAGE_EXCLUDE)$(NC)"
 
