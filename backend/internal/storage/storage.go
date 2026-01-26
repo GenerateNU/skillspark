@@ -35,6 +35,7 @@ type OrganizationRepository interface {
 	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, *errs.HTTPError)
 	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput) (*models.Organization, *errs.HTTPError)
 	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
+	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID) ([]models.EventOccurrence, error)
 }
 
 type ManagerRepository interface {
@@ -73,6 +74,7 @@ type EventOccurrenceRepository interface {
 	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination) ([]models.EventOccurrence, error)
 	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error)
 	CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error)
+	UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.EventOccurrence, error)
 }
 
 type Repository struct {

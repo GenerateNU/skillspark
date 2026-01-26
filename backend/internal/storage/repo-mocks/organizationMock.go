@@ -68,3 +68,15 @@ func (m *MockOrganizationRepository) DeleteOrganization(ctx context.Context, id 
 	}
 	return args.Get(0).(*models.Organization), nil
 }
+
+func (m *MockOrganizationRepository) GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID) ([]models.EventOccurrence, error) {
+	args := m.Called(ctx, organization_id)
+	eventOccurrences := args.Get(0)
+	if eventOccurrences == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(error)
+	}
+	return eventOccurrences.([]models.EventOccurrence), nil
+}

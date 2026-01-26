@@ -466,3 +466,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 		})
 	}
 }
+
+func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
+
+}

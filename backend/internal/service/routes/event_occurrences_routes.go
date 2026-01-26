@@ -79,4 +79,22 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 			Body: eventOccurrence,
 		}, nil
 	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "patch-event-occurrence",
+		Method:      http.MethodPatch,
+		Path:        "/api/v1/event-occurrences/{id}",
+		Summary:     "Update an event occurrence",
+		Description: "Updates an event occurrence in the database",
+		Tags:        []string{"Event Occurrences"},
+	}, func(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.UpdateEventOccurrenceOutput, error) {
+		eventOccurrence, err := eventOccurrenceHandler.UpdateEventOccurrence(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.UpdateEventOccurrenceOutput{
+			Body: eventOccurrence,
+		}, nil
+	})
 }

@@ -250,3 +250,7 @@ func TestHandler_GetEventOccurrenceById(t *testing.T) {
 		})
 	}
 }
+
+func TestHandler_UpdateEventOccurrence(t *testing.T) {
+	
+}

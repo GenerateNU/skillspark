@@ -495,3 +495,7 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 		})
 	}
 }
+
+func TestHumaValidation_GetEventOccurrencesByOrganizationId(t *testing.T) {
+
+}

@@ -295,3 +295,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 		})
 	}
 }
+
+func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
+
+}
