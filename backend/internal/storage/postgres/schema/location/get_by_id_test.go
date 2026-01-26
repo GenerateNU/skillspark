@@ -21,6 +21,7 @@ func TestLocationRepository_GetLocationByID_NewYork(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewLocationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	location, err := repo.GetLocationByID(ctx, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"))
 

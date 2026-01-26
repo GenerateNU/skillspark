@@ -15,6 +15,7 @@ func TestUpdateOrganization(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Create an organization first
 	active := true
@@ -62,6 +63,7 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Create organization
 	active := true
@@ -103,6 +105,7 @@ func TestUpdateOrganization_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Try to update non-existent organization
 	nonExistentID := uuid.New()

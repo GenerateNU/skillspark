@@ -15,6 +15,7 @@ func TestCreateOrganization(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	active := true
 	input := func() *models.CreateOrganizationInput {
@@ -37,6 +38,7 @@ func TestCreateOrganization_WithLocation(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	active := true
 	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
@@ -61,6 +63,7 @@ func TestCreateOrganization_WithPfp(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	active := true
 	pfpKey := "orgs/test_corp.jpg"
@@ -84,6 +87,7 @@ func TestCreateOrganization_Inactive(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	active := false
 	input := func() *models.CreateOrganizationInput {
@@ -105,6 +109,7 @@ func TestCreateOrganization_FullDetails(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	active := true
 	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")

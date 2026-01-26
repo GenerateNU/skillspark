@@ -18,6 +18,7 @@ func TestGuardianRepository_GetGuardianByChildID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewGuardianRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// get a guardian by a child id
 	guardianFromChildID, err := repo.GetGuardianByChildID(ctx, uuid.MustParse("30000000-0000-0000-0000-000000000009"))

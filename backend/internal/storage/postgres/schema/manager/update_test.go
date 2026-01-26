@@ -20,6 +20,7 @@ func TestManagerRepository_Update_AssistantDirector(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewManagerRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 	ptr := uuid.MustParse("40000000-0000-0000-0000-000000000001")
 	managerInput := func() *models.PatchManagerInput {
 		input := &models.PatchManagerInput{}

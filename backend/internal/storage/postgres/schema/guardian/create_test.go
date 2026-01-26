@@ -18,6 +18,7 @@ func TestGuardianRepository_Create_David_Kim(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewGuardianRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	guardianInput := func() *models.CreateGuardianInput {
 		input := &models.CreateGuardianInput{}
