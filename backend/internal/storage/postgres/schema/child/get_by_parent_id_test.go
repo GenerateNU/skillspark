@@ -17,6 +17,7 @@ func CreateTestChildren(
 	repo *ChildRepository,
 ) []*models.Child {
 	t.Helper()
+	t.Parallel()
 
 	schoolID, err := uuid.Parse("20000000-0000-0000-0000-000000000001")
 	assert.Nil(t, err)
@@ -64,6 +65,7 @@ func TestChildRepository_GetChildrenByParentID_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	nonExistentID := uuid.New()
 

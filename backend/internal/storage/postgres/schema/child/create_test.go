@@ -20,7 +20,9 @@ func TestChildRepository_CreateChild(t *testing.T) {
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
 
-	sampleChild := CreateTestChild(t, ctx)
+	t.Parallel()
+
+	sampleChild := CreateTestChild(t, ctx, testDB)
 
 	childInput := func() *models.CreateChildInput {
 		input := &models.CreateChildInput{}
@@ -66,6 +68,7 @@ func TestChildRepository_CreateChild_InvalidSchoolID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 

@@ -22,8 +22,9 @@ func TestChildRepository_UpdateChildByID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	testChild := CreateTestChild(t, ctx)
+	testChild := CreateTestChild(t, ctx, testDB)
 
 	input := &models.UpdateChildInput{}
 	name := "Updated Child"
@@ -63,6 +64,7 @@ func TestChildRepository_UpdateChildByID_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	nonExistentID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
 
