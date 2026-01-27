@@ -11,7 +11,7 @@ import (
 )
 
 func (r *OrganizationRepository) GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID) ([]models.EventOccurrence, error) {
-	query, err := schema.ReadSQLBaseScript("event/sql/get_by_organization_id.sql")
+	query, err := schema.ReadSQLBaseScript("organization/sql/get_by_organization_id.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

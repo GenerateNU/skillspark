@@ -12,7 +12,7 @@ import (
 )
 
 func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
-	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence)
+	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence, repo.Manager, repo.Event, repo.Location)
 	huma.Register(api, huma.Operation{
 		OperationID: "get-all-event-occurrences",
 		Method:      http.MethodGet,

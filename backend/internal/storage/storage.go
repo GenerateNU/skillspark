@@ -60,6 +60,7 @@ type EventRepository interface {
 	UpdateEvent(ctx context.Context, location *models.UpdateEventInput) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
+	GetEventByID(ctx context.Context, id uuid.UUID) (*models.Event, error)
 }
 
 type ChildRepository interface {

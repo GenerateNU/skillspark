@@ -21,10 +21,8 @@ func (h *Handler) UpdateEventOccurrence(ctx context.Context, input *models.Updat
 	newMaxAttendees := input.Body.MaxAttendees
 	ogMaxAttendees := ogEventOccurrence.MaxAttendees // cannot be null
 	if newCurrEnrolled != nil {
-		if newMaxAttendees != nil {
-			if *newCurrEnrolled > *newMaxAttendees {
-				return nil, errs.BadRequest("Current enrolled cannot exceed max attendees")
-			}
+		if (newMaxAttendees != nil) && (*newCurrEnrolled > *newMaxAttendees) {
+			return nil, errs.BadRequest("Current enrolled cannot exceed max attendees")
 		} else {
 			if *newCurrEnrolled > ogMaxAttendees {
 				return nil, errs.BadRequest("Current enrolled cannot exceed max attendees")
