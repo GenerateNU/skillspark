@@ -209,7 +209,10 @@ func TestHandler_CreateManager(t *testing.T) {
 			name: "create Assistant Director",
 			input: func() *models.CreateManagerInput {
 				input := &models.CreateManagerInput{}
-				input.Body.UserID = uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c")
+				input.Body.Name = "Assistant Dir"
+				input.Body.Email = "ad@example.com"
+				input.Body.Username = "ad"
+				input.Body.LanguagePreference = "en"
 				input.Body.OrganizationID = &ptr
 				input.Body.Role = "Assistant Director"
 				return input
@@ -217,7 +220,8 @@ func TestHandler_CreateManager(t *testing.T) {
 			mockSetup: func(m *repomocks.MockManagerRepository) {
 				m.On("CreateManager", mock.Anything, mock.AnythingOfType("*models.CreateManagerInput")).Return(&models.Manager{
 					ID:             uuid.New(),
-					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
+					UserID:         uuid.New(),
+					Name:           "Assistant Dir",
 					OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000006"),
 					Role:           "Assistant Director",
 					CreatedAt:      time.Now(),
@@ -230,7 +234,8 @@ func TestHandler_CreateManager(t *testing.T) {
 			name: "internal server error",
 			input: func() *models.CreateManagerInput {
 				input := &models.CreateManagerInput{}
-				input.Body.UserID = uuid.New()
+				input.Body.Name = "Error User"
+				input.Body.Email = "error@example.com"
 				input.Body.OrganizationID = nil
 				input.Body.Role = "nothing"
 
@@ -265,7 +270,6 @@ func TestHandler_CreateManager(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, manager)
-				assert.Equal(t, tt.input.Body.UserID, manager.UserID)
 				assert.Equal(t, *tt.input.Body.OrganizationID, manager.OrganizationID)
 				assert.Equal(t, tt.input.Body.Role, manager.Role)
 			}
@@ -368,7 +372,8 @@ func TestHandler_PatchManager(t *testing.T) {
 			input: func() *models.PatchManagerInput {
 				input := &models.PatchManagerInput{}
 				input.Body.ID = uuid.MustParse("50000000-0000-0000-0000-000000000001")
-				input.Body.UserID = uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c")
+				input.Body.Name = "Updated Name"
+				input.Body.Email = "updated@example.com"
 				input.Body.OrganizationID = &orgID
 				input.Body.Role = "Senior Director"
 				return input
@@ -390,7 +395,7 @@ func TestHandler_PatchManager(t *testing.T) {
 			input: func() *models.PatchManagerInput {
 				input := &models.PatchManagerInput{}
 				input.Body.ID = uuid.MustParse("50000000-0000-0000-0000-000000000001")
-				input.Body.UserID = uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c")
+				input.Body.Name = "Name"
 				input.Body.OrganizationID = nil
 				input.Body.Role = "Manager"
 				return input
@@ -412,7 +417,7 @@ func TestHandler_PatchManager(t *testing.T) {
 			input: func() *models.PatchManagerInput {
 				input := &models.PatchManagerInput{}
 				input.Body.ID = uuid.MustParse("99999999-9999-9999-9999-999999999999")
-				input.Body.UserID = uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c")
+				input.Body.Name = "Ghost"
 				input.Body.Role = "Director"
 				return input
 			}(),
@@ -429,7 +434,7 @@ func TestHandler_PatchManager(t *testing.T) {
 			input: func() *models.PatchManagerInput {
 				input := &models.PatchManagerInput{}
 				input.Body.ID = uuid.MustParse("50000000-0000-0000-0000-000000000001")
-				input.Body.UserID = uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c")
+				input.Body.Name = "Error"
 				input.Body.Role = "Director"
 				return input
 			}(),
@@ -463,7 +468,6 @@ func TestHandler_PatchManager(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, manager)
 				assert.Equal(t, tt.input.Body.ID, manager.ID)
-				assert.Equal(t, tt.input.Body.UserID, manager.UserID)
 				assert.Equal(t, tt.input.Body.Role, manager.Role)
 			}
 

@@ -174,18 +174,26 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
-				"user_id":         "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
-				"organization_id": orgID,
-				"role":            "Assistant Director",
+				"name":                "Alice Smith",
+				"email":               "alice@org.com",
+				"username":            "alices",
+				"language_preference": "en",
+				"organization_id":     orgID,
+				"role":                "Assistant Director",
 			},
 			mockSetup: func(m *repomocks.MockManagerRepository) {
 				m.On(
 					"CreateManager",
 					mock.Anything,
-					mock.AnythingOfType("*models.CreateManagerInput"),
+					mock.MatchedBy(func(input *models.CreateManagerInput) bool {
+						return input.Body.Name == "Alice Smith" && *input.Body.OrganizationID == uuid.MustParse(orgID)
+					}),
 				).Return(&models.Manager{
 					ID:             uuid.New(),
-					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
+					UserID:         uuid.New(),
+					Name:           "Alice Smith",
+					Email:          "alice@org.com",
+					Username:       "alices",
 					OrganizationID: uuid.MustParse(orgID),
 					Role:           "Assistant Director",
 					CreatedAt:      time.Now(),
@@ -195,7 +203,7 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 			statusCode: http.StatusOK,
 		},
 		{
-			name: "missing user_id",
+			name: "missing required fields (name)",
 			payload: map[string]interface{}{
 				"organization_id": orgID,
 				"role":            "Assistant Director",
@@ -206,7 +214,7 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 		{
 			name: "missing role",
 			payload: map[string]interface{}{
-				"user_id":         "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+				"name":            "Alice",
 				"organization_id": orgID,
 			},
 			mockSetup:  func(*repomocks.MockManagerRepository) {},
@@ -265,19 +273,25 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
-				"id":              managerID,
-				"user_id":         "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
-				"organization_id": orgID,
-				"role":            "Senior Director",
+				"id":                  managerID,
+				"name":                "Alice Updated",
+				"email":               "alice@org.com",
+				"username":            "aliceu",
+				"language_preference": "en",
+				"organization_id":     orgID,
+				"role":                "Senior Director",
 			},
 			mockSetup: func(m *repomocks.MockManagerRepository) {
 				m.On(
 					"PatchManager",
 					mock.Anything,
-					mock.AnythingOfType("*models.PatchManagerInput"),
+					mock.MatchedBy(func(input *models.PatchManagerInput) bool {
+						return input.Body.ID == uuid.MustParse(managerID) && input.Body.Name == "Alice Updated"
+					}),
 				).Return(&models.Manager{
 					ID:             uuid.MustParse(managerID),
-					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
+					UserID:         uuid.New(),
+					Name:           "Alice Updated",
 					OrganizationID: uuid.MustParse(orgID),
 					Role:           "Senior Director",
 					CreatedAt:      time.Now(),
@@ -289,9 +303,12 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 		{
 			name: "valid payload without organization",
 			payload: map[string]interface{}{
-				"id":      managerID,
-				"user_id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
-				"role":    "Manager",
+				"id":                  managerID,
+				"name":                "Alice",
+				"role":                "Manager",
+				"email":               "a@a.com",
+				"username":            "aa",
+				"language_preference": "en",
 			},
 			mockSetup: func(m *repomocks.MockManagerRepository) {
 				m.On(
@@ -300,7 +317,7 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 					mock.AnythingOfType("*models.PatchManagerInput"),
 				).Return(&models.Manager{
 					ID:             uuid.MustParse(managerID),
-					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
+					UserID:         uuid.New(),
 					OrganizationID: uuid.Nil,
 					Role:           "Manager",
 					CreatedAt:      time.Now(),
@@ -312,7 +329,7 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 		{
 			name: "missing id",
 			payload: map[string]interface{}{
-				"user_id":         "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+				"name":            "Alice",
 				"organization_id": orgID,
 				"role":            "Director",
 			},
@@ -320,7 +337,7 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name: "missing user_id",
+			name: "missing required field (name)",
 			payload: map[string]interface{}{
 				"id":              managerID,
 				"organization_id": orgID,
@@ -333,7 +350,7 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 			name: "missing role",
 			payload: map[string]interface{}{
 				"id":              managerID,
-				"user_id":         "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+				"name":            "Alice",
 				"organization_id": orgID,
 			},
 			mockSetup:  func(*repomocks.MockManagerRepository) {},
@@ -342,9 +359,9 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 		{
 			name: "invalid id format",
 			payload: map[string]interface{}{
-				"id":      "not-a-valid-uuid",
-				"user_id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
-				"role":    "Director",
+				"id":   "not-a-valid-uuid",
+				"name": "Alice",
+				"role": "Director",
 			},
 			mockSetup:  func(*repomocks.MockManagerRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
@@ -409,7 +426,7 @@ func TestHumaValidation_DeleteManager(t *testing.T) {
 					uuid.MustParse(managerID),
 				).Return(&models.Manager{
 					ID:             uuid.MustParse(managerID),
-					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
+					UserID:         uuid.New(),
 					OrganizationID: uuid.MustParse(orgID),
 					Role:           "Director",
 					CreatedAt:      time.Now(),

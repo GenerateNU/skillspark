@@ -49,31 +49,40 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
-				"user_id": "d1c8d767-c3cf-42e9-848f-15756491e02e",
+				"name":                "John Doe",
+				"email":               "john@example.com",
+				"username":            "johndoe",
+				"language_preference": "en",
 			},
 			mockSetup: func(m *repomocks.MockGuardianRepository) {
-				m.On("GetGuardianByUserID", mock.Anything, uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e")).Return(nil, nil)
+				m.On("GetGuardianByUserID", mock.Anything, mock.Anything).Return(nil, nil).Maybe()
 				m.On(
 					"CreateGuardian",
 					mock.Anything,
-					mock.AnythingOfType("*models.CreateGuardianInput"),
+					mock.MatchedBy(func(input *models.CreateGuardianInput) bool {
+						return input.Body.Name == "John Doe" && input.Body.Email == "john@example.com"
+					}),
 				).Return(&models.Guardian{
-					ID:        uuid.New(),
-					UserID:    uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e"),
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+					ID:                 uuid.New(),
+					UserID:             uuid.New(),
+					Name:               "John Doe",
+					Email:              "john@example.com",
+					Username:           "johndoe",
+					LanguagePreference: "en",
+					CreatedAt:          time.Now(),
+					UpdatedAt:          time.Now(),
 				}, nil)
 			},
 			statusCode: http.StatusOK,
 		},
-		// {
-		// 	name: "missing required fields",
-		// 	payload: map[string]interface{}{
-		// 		"first_name": "John",
-		// 	},
-		// 	mockSetup:  func(*repomocks.MockGuardianRepository) {},
-		// 	statusCode: http.StatusUnprocessableEntity,
-		// },
+		{
+			name: "missing required fields",
+			payload: map[string]interface{}{
+				"username": "johndoe",
+			},
+			mockSetup:  func(*repomocks.MockGuardianRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
 	}
 
 	for _, tt := range tests {
@@ -126,7 +135,7 @@ func TestHumaValidation_GetGuardianByID(t *testing.T) {
 					uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 				).Return(&models.Guardian{
 					ID:        uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
-					UserID:    uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e"),
+					UserID:    uuid.New(),
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)
@@ -182,20 +191,28 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 			name:       "valid payload",
 			guardianID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 			payload: map[string]interface{}{
-				"user_id": "d1c8d767-c3cf-42e9-848f-15756491e02e",
+				"name":                "Jane Doe",
+				"email":               "jane@example.com",
+				"username":            "janedoe",
+				"language_preference": "es",
 			},
 			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On(
 					"UpdateGuardian",
 					mock.Anything,
 					mock.MatchedBy(func(input *models.UpdateGuardianInput) bool {
-						return input.ID == uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+						return input.ID == uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11") &&
+							input.Body.Name == "Jane Doe"
 					}),
 				).Return(&models.Guardian{
-					ID:        uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
-					UserID:    uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e"),
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+					ID:                 uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+					UserID:             uuid.New(),
+					Name:               "Jane Doe",
+					Email:              "jane@example.com",
+					Username:           "janedoe",
+					LanguagePreference: "es",
+					CreatedAt:          time.Now(),
+					UpdatedAt:          time.Now(),
 				}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -204,7 +221,7 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 			name:       "invalid UUID",
 			guardianID: "not-a-uuid",
 			payload: map[string]interface{}{
-				"first_name": "Jane",
+				"name": "Jane",
 			},
 			mockSetup:  func(*repomocks.MockGuardianRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
