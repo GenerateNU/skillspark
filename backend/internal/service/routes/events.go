@@ -2,16 +2,18 @@ package routes
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 	"skillspark/internal/service/handler/event"
 	"skillspark/internal/storage"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupEventRoutes(api huma.API, repo *storage.Repository) {
-	eventHandler := event.NewHandler(repo.Event)
+func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_client.Client) {
+	eventHandler := event.NewHandler(repo.Event, s3Client)
 
 	// POST /api/v1/events
 	huma.Register(api, huma.Operation{
@@ -21,14 +23,34 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository) {
 		Summary:     "Create a new event",
 		Description: "Creates a new event",
 		Tags:        []string{"Events"},
-	}, func(ctx context.Context, input *models.CreateEventInput) (*models.CreateEventOutput, error) {
-		event, err := eventHandler.CreateEvent(ctx, input)
+	}, func(ctx context.Context, input *models.CreateEventRouteInput) (*models.CreateEventOutput, error) {
+
+		formData := input.RawBody.Data()
+
+		eventBody := models.CreateEventBody{
+			Title:          formData.Title,
+			Description:    formData.Description,
+			OrganizationID: formData.OrganizationID,
+			AgeRangeMin:    formData.AgeRangeMin,
+			AgeRangeMax:    formData.AgeRangeMax,
+			Category:       formData.Category,
+		}
+
+		eventModel := models.CreateEventInput{
+			Body: eventBody,
+		}
+		image_data, err := io.ReadAll(formData.HeaderImage)
+
+		// io.readall on input
+		event, url, err := eventHandler.CreateEvent(ctx, &eventModel, &image_data, s3Client)
+
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.CreateEventOutput{
-			Body: event,
+			Body:         event,
+			PresignedURL: url,
 		}, nil
 	})
 
@@ -40,14 +62,34 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository) {
 		Summary:     "Update an existing event",
 		Description: "Updates an existing event",
 		Tags:        []string{"Events"},
-	}, func(ctx context.Context, input *models.UpdateEventInput) (*models.UpdateEventOutput, error) {
-		event, err := eventHandler.UpdateEvent(ctx, input)
+	}, func(ctx context.Context, input *models.UpdateEventRouteInput) (*models.UpdateEventOutput, error) {
+
+		formData := input.RawBody.Data()
+
+		eventBody := models.UpdateEventBody{
+			Title:          formData.Title,
+			Description:    formData.Description,
+			OrganizationID: formData.OrganizationID,
+			AgeRangeMin:    formData.AgeRangeMin,
+			AgeRangeMax:    formData.AgeRangeMax,
+			Category:       formData.Category,
+		}
+
+		eventModel := models.UpdateEventInput{
+			Body: eventBody,
+		}
+		image_data, err := io.ReadAll(formData.HeaderImage)
+
+		// io.readall on input
+		event, url, err := eventHandler.UpdateEvent(ctx, &eventModel, &image_data, s3Client)
+
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.UpdateEventOutput{
-			Body: event,
+			Body:         event,
+			PresignedURL: url,
 		}, nil
 	})
 

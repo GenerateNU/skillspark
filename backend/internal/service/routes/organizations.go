@@ -2,17 +2,19 @@ package routes
 
 import (
 	"context"
+	"io"
 	"net/http"
-	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
+	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/storage"
 	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
-	orgHandler := organization.NewHandler(repo.Organization, repo.Location)
+func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s3_client.Client) {
+	orgHandler := organization.NewHandler(repo.Organization, repo.Location, s3Client)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "create-organization",
@@ -21,8 +23,33 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		Summary:     "Create a new organization",
 		Description: "Creates a new organization with the provided information",
 		Tags:        []string{"Organizations"},
-	}, func(ctx context.Context, input *models.CreateOrganizationInput) (*models.CreateOrganizationOutput, error) {
-		return orgHandler.CreateOrganization(ctx, input)
+	}, func(ctx context.Context, input *models.CreateOrganizationRouteInput) (*models.CreateOrganizationOutput, error) {
+
+		formData := input.RawBody.Data()
+
+		organizationBody := models.CreateOrganizationBody{
+			Name:       formData.Name,
+			Active:     formData.Active,
+			LocationID: formData.LocationID,
+		}
+
+		organizationModel := models.CreateOrganizationInput{
+			Body: organizationBody,
+		}
+
+		image_data, err := io.ReadAll(formData.ProfileImage)
+
+		organization, url, err := orgHandler.CreateOrganization(ctx, &organizationModel, &image_data, s3Client)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.CreateOrganizationOutput{
+			Body:         *organization,
+			PresignedURL: url,
+		}, nil
+
 	})
 
 	huma.Register(api, huma.Operation{
@@ -75,8 +102,31 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		Summary:     "Update an organization",
 		Description: "Updates an existing organization with the provided fields (partial update)",
 		Tags:        []string{"Organizations"},
-	}, func(ctx context.Context, input *models.UpdateOrganizationInput) (*models.UpdateOrganizationOutput, error) {
-		return orgHandler.UpdateOrganization(ctx, input)
+	}, func(ctx context.Context, input *models.UpdateOrganizationRouteInput) (*models.UpdateOrganizationOutput, error) {
+		formData := input.RawBody.Data()
+
+		organizationBody := models.UpdateOrganizationBody{
+			Name:       formData.Name,
+			Active:     formData.Active,
+			LocationID: formData.LocationID,
+		}
+
+		organizationModel := models.UpdateOrganizationInput{
+			Body: organizationBody,
+		}
+
+		image_data, err := io.ReadAll(formData.ProfileImage)
+
+		organization, url, err := orgHandler.UpdateOrganization(ctx, &organizationModel, &image_data, s3Client)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.UpdateOrganizationOutput{
+			Body:         *organization,
+			PresignedURL: url,
+		}, nil
 	})
 
 	huma.Register(api, huma.Operation{

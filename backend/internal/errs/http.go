@@ -86,3 +86,5 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 
 	return c.Status(httpErr.Code).JSON(httpErr)
 }
+
+// errors for S3 posted here

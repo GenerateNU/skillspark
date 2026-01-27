@@ -7,8 +7,8 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput) (*models.Organization, *errs.HTTPError) {
-	
+func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, *errs.HTTPError) {
+
 	query, err := schema.ReadSQLBaseScript("organization/sql/create.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -18,7 +18,7 @@ func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *
 	row := r.db.QueryRow(ctx, query,
 		input.Body.Name,
 		input.Body.Active,
-		input.Body.PfpS3Key,
+		PfpS3Key,
 		input.Body.LocationID,
 	)
 
