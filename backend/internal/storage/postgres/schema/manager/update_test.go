@@ -6,6 +6,7 @@ import (
 
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/testutil"
+	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -24,12 +25,12 @@ func TestManagerRepository_Update_AssistantDirector(t *testing.T) {
 	managerInput := func() *models.PatchManagerInput {
 		input := &models.PatchManagerInput{}
 		input.Body.ID = uuid.MustParse("50000000-0000-0000-0000-000000000001")
-		input.Body.Name = "Updated Assistant"
-		input.Body.Email = "updated.assist@example.com"
-		input.Body.Username = "uassist"
-		input.Body.LanguagePreference = "en"
+		input.Body.Name = utils.PtrString("Updated Assistant")
+		input.Body.Email = utils.PtrString("updated.assist@example.com")
+		input.Body.Username = utils.PtrString("uassist")
+		input.Body.LanguagePreference = utils.PtrString("en")
 		input.Body.OrganizationID = &ptr
-		input.Body.Role = "Assistant Director"
+		input.Body.Role = utils.PtrString("Assistant Director")
 		return input
 	}()
 

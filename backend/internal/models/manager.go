@@ -69,13 +69,13 @@ type DeleteManagerOutput struct {
 type PatchManagerInput struct {
 	Body struct {
 		ID                  uuid.UUID  `json:"id" db:"id" doc:"id of the manager"`
-		Name                string     `json:"name" doc:"Name of the guardian"`
-		Email               string     `json:"email" doc:"Email of the guardian"`
-		Username            string     `json:"username" doc:"Username of the guardian"`
+		Name                *string    `json:"name,omitempty" doc:"Name of the guardian"`
+		Email               *string    `json:"email,omitempty" doc:"Email of the guardian"`
+		Username            *string    `json:"username,omitempty" doc:"Username of the guardian"`
 		ProfilePictureS3Key *string    `json:"profile_picture_s3_key,omitempty" doc:"S3 key for profile picture"`
-		LanguagePreference  string     `json:"language_preference" doc:"Language preference"`
-		OrganizationID      *uuid.UUID `json:"organization_id,omitempty" db:"organization_id" doc:"organization id of the organization the manager is associated with"`
-		Role                string     `json:"role" db:"role" doc:"role of the manager being created"`
+		LanguagePreference  *string    `json:"language_preference,omitempty" doc:"Language preference"`
+		OrganizationID      *uuid.UUID `json:"organization_id,omitempty" db:"organization_id" doc:"organization id"`
+		Role                *string    `json:"role,omitempty" db:"role" doc:"role of the manager"`
 	}
 }
 

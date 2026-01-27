@@ -286,7 +286,8 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 					"PatchManager",
 					mock.Anything,
 					mock.MatchedBy(func(input *models.PatchManagerInput) bool {
-						return input.Body.ID == uuid.MustParse(managerID) && input.Body.Name == "Alice Updated"
+						return input.Body.ID == uuid.MustParse(managerID) &&
+							input.Body.Name != nil && *input.Body.Name == "Alice Updated"
 					}),
 				).Return(&models.Manager{
 					ID:             uuid.MustParse(managerID),

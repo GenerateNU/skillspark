@@ -5,6 +5,7 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	"skillspark/internal/utils"
 	"testing"
 	"time"
 
@@ -372,10 +373,10 @@ func TestHandler_PatchManager(t *testing.T) {
 			input: func() *models.PatchManagerInput {
 				input := &models.PatchManagerInput{}
 				input.Body.ID = uuid.MustParse("50000000-0000-0000-0000-000000000001")
-				input.Body.Name = "Updated Name"
-				input.Body.Email = "updated@example.com"
+				input.Body.Name = utils.PtrString("Updated Name")
+				input.Body.Email = utils.PtrString("updated@example.com")
 				input.Body.OrganizationID = &orgID
-				input.Body.Role = "Senior Director"
+				input.Body.Role = utils.PtrString("Senior Director")
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockManagerRepository) {
@@ -395,9 +396,9 @@ func TestHandler_PatchManager(t *testing.T) {
 			input: func() *models.PatchManagerInput {
 				input := &models.PatchManagerInput{}
 				input.Body.ID = uuid.MustParse("50000000-0000-0000-0000-000000000001")
-				input.Body.Name = "Name"
+				input.Body.Name = utils.PtrString("Name")
 				input.Body.OrganizationID = nil
-				input.Body.Role = "Manager"
+				input.Body.Role = utils.PtrString("Manager")
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockManagerRepository) {
@@ -417,8 +418,8 @@ func TestHandler_PatchManager(t *testing.T) {
 			input: func() *models.PatchManagerInput {
 				input := &models.PatchManagerInput{}
 				input.Body.ID = uuid.MustParse("99999999-9999-9999-9999-999999999999")
-				input.Body.Name = "Ghost"
-				input.Body.Role = "Director"
+				input.Body.Name = utils.PtrString("Ghost")
+				input.Body.Role = utils.PtrString("Director")
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockManagerRepository) {
@@ -434,8 +435,8 @@ func TestHandler_PatchManager(t *testing.T) {
 			input: func() *models.PatchManagerInput {
 				input := &models.PatchManagerInput{}
 				input.Body.ID = uuid.MustParse("50000000-0000-0000-0000-000000000001")
-				input.Body.Name = "Error"
-				input.Body.Role = "Director"
+				input.Body.Name = utils.PtrString("Error")
+				input.Body.Role = utils.PtrString("Director")
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockManagerRepository) {
@@ -468,7 +469,7 @@ func TestHandler_PatchManager(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, manager)
 				assert.Equal(t, tt.input.Body.ID, manager.ID)
-				assert.Equal(t, tt.input.Body.Role, manager.Role)
+				assert.Equal(t, *tt.input.Body.Role, manager.Role)
 			}
 
 			mockRepo.AssertExpectations(t)

@@ -3,13 +3,22 @@ WITH m AS (
 ),
 updated_user AS (
     UPDATE "user"
-    SET name = $2, email = $3, username = $4, profile_picture_s3_key = $5, language_preference = $6, updated_at = NOW()
+    SET 
+        name = COALESCE($2, name), 
+        email = COALESCE($3, email), 
+        username = COALESCE($4, username), 
+        profile_picture_s3_key = COALESCE($5, profile_picture_s3_key), 
+        language_preference = COALESCE($6, language_preference), 
+        updated_at = NOW()
     WHERE id = (SELECT user_id FROM m)
     RETURNING id, name, email, username, profile_picture_s3_key, language_preference
 ),
 updated_manager AS (
     UPDATE manager
-    SET organization_id = $7, "role" = $8, updated_at = NOW()
+    SET 
+        organization_id = COALESCE($7, organization_id), 
+        "role" = COALESCE($8, "role"), 
+        updated_at = NOW()
     WHERE id = $1
     RETURNING id, user_id, organization_id, "role", created_at, updated_at
 )
