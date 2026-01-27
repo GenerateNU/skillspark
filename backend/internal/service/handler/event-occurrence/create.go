@@ -11,13 +11,13 @@ func (h *Handler) CreateEventOccurrence(ctx context.Context, input *models.Creat
 	managerId := input.Body.ManagerId
 	eventId := input.Body.EventId
 	locationId := input.Body.LocationId
-	
+
 	_, managerErr := h.ManagerRepository.GetManagerByID(ctx, *managerId)
 	_, eventErr := h.EventRepository.GetEventByID(ctx, eventId)
 	_, locationErr := h.LocationRepository.GetLocationByID(ctx, locationId)
 	
-	if managerErr != nil || eventErr != nil || locationErr != nil {
-		return nil, cmp.Or(managerErr, eventErr, locationErr)
+	if (managerId != nil && managerErr != nil) || eventErr != nil || locationErr != nil {
+		return nil, cmp.Or(eventErr, locationErr, managerErr)
 	}
 
 	eventOccurrence, err := h.EventOccurrenceRepository.CreateEventOccurrence(ctx, input)

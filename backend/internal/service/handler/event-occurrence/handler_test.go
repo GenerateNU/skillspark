@@ -108,6 +108,41 @@ func TestHandler_CreateEventOccurrence(t *testing.T) {
 			handler := NewHandler(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo)
 			ctx := context.Background()
 
+			mockManagerRepo.On("GetManagerByID", mock.Anything, mock.Anything,
+			).Return(&models.Manager{
+				ID: mid,
+				UserID: uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"),
+				OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				Role: "Director",
+			}, nil)
+			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything,
+			).Return(&models.Event{
+				ID: 				uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+				Title: 				"Junior Robotics Workshop",
+				Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+				OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				AgeRangeMin: 		&eight,
+				AgeRangeMax: 		&twelve,
+				Category: 			category_arr,
+				HeaderImageS3Key: 	&jpg,
+				CreatedAt: 			time.Now(),
+				UpdatedAt: 			time.Now(),
+			}, nil)
+			mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything,
+			).Return(&models.Location{
+				ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
+				Latitude:     13.7650000,
+				Longitude:    100.5380000,
+				AddressLine1: "321 Phetchaburi Road",
+				AddressLine2: &addr,
+				Subdistrict:  "Ratchathewi",
+				District:     "Ratchathewi",
+				Province:     "Bangkok",
+				PostalCode:   "10400",
+				Country:      "Thailand",
+				CreatedAt:    time.Now(),
+				UpdatedAt:    time.Now(),
+			}, nil)
 			eventOccurrence, err := handler.CreateEventOccurrence(ctx, tt.input)
 
 			if tt.wantErr {
@@ -521,6 +556,43 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 					UpdatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
 				}, nil)
 			}
+
+			mockManagerRepo.On("GetManagerByID", mock.Anything, mock.Anything,
+			).Return(&models.Manager{
+				ID: mid,
+				UserID: uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"),
+				OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				Role: "Director",
+			}, nil)
+			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything,
+			).Return(&models.Event{
+				ID: 				uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+				Title: 				"Junior Robotics Workshop",
+				Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+				OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				AgeRangeMin: 		&eight,
+				AgeRangeMax: 		&twelve,
+				Category: 			category_arr,
+				HeaderImageS3Key: 	&jpg,
+				CreatedAt: 			time.Now(),
+				UpdatedAt: 			time.Now(),
+			}, nil)
+			mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything,
+			).Return(&models.Location{
+				ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
+				Latitude:     13.7650000,
+				Longitude:    100.5380000,
+				AddressLine1: "321 Phetchaburi Road",
+				AddressLine2: &addr,
+				Subdistrict:  "Ratchathewi",
+				District:     "Ratchathewi",
+				Province:     "Bangkok",
+				PostalCode:   "10400",
+				Country:      "Thailand",
+				CreatedAt:    time.Now(),
+				UpdatedAt:    time.Now(),
+			}, nil)
+
 			eventOccurrence, err := handler.UpdateEventOccurrence(ctx, tt.input)
 
 			if tt.wantErr {

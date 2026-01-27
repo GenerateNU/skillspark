@@ -297,5 +297,184 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 }
 
 func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
+	t.Parallel()
 
+	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
+	mid_new := uuid.MustParse("50000000-0000-0000-0000-000000000005")
+	eid := uuid.MustParse("60000000-0000-0000-0000-00000000000e")
+	lid := uuid.MustParse("10000000-0000-0000-0000-000000000008")
+	start_new, _ := time.Parse(time.RFC3339, "2026-02-15 10:00:00+07")
+	end_new, _ := time.Parse(time.RFC3339, "2026-02-15 12:00:00+07")
+	max := 10
+	lang := "th"
+	curr := 8
+
+	category_arr := []string{"science","technology"}
+	eight := 8
+	twelve := 12
+	jpg := "events/robotics_workshop.jpg"
+
+	category_arr_new := []string{"technology","math"}
+	ten := 10
+	fifteen := 15
+	event_new := models.Event{
+		ID: 				uuid.MustParse("60000000-0000-0000-0000-00000000000e"),
+		Title: 				"Python for Kids",
+		Description: 		"Introduction to Python programming. Build simple programs and games while learning core concepts.",
+		OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000005"),
+		AgeRangeMin: 		&ten,
+		AgeRangeMax: 		&fifteen,
+		Category: 			category_arr_new,
+		HeaderImageS3Key: 	nil,
+		CreatedAt: 			time.Now(),
+		UpdatedAt: 			time.Now(),
+	}
+
+	addr := "Suite 15"
+	location_new := models.Location{
+		ID:           lid,
+		Latitude:     13.7400000,
+		Longitude:    100.5450000,
+		AddressLine1: "369 Wireless Road",
+		AddressLine2: nil,
+		Subdistrict:  "Lumphini",
+		District:     "Pathum Wan",
+		Province:     "Bangkok",
+		PostalCode:   "10330",
+		Country:      "Thailand",
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+
+	tests := []struct {
+		name       string
+		payload    map[string]interface{}
+		mockSetup  func(*repomocks.MockEventOccurrenceRepository)
+		statusCode int
+	}{
+		{
+			name: "valid payload with all fields changed except current enrolled",
+			payload: map[string]interface{}{
+				"id": uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+				"manager_id": mid_new,
+				"event_id": eid, 
+				"location_id": lid, 
+				"start_time": start_new, 
+				"end_time": end_new, 
+				"max_attendees": max, 
+				"language": lang,
+				"curr_enrolled": curr,
+			},
+			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
+				m.On(
+					"UpdateEventOccurrence",
+					mock.Anything,
+					mock.AnythingOfType("*models.UpdateEventOccurrenceInput"),
+				).Return(&models.EventOccurrence{
+					ID: 			uuid.New(),
+					ManagerId: 		&mid_new,
+					Event: 			event_new,
+					Location: 		location_new,
+					StartTime: 		start_new,
+					EndTime: 		end_new,
+					MaxAttendees: 	10,
+					Language: 		"th",
+					CurrEnrolled: 	8,
+					CreatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+					UpdatedAt:    	time.Now(),
+				}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "current enrolled below minimum",
+			payload: map[string]interface{}{
+				"id": nil,
+				"manager_id": nil,
+				"event_id": nil, 
+				"location_id": nil, 
+				"start_time": nil, 
+				"end_time": nil, 
+				"max_attendees": nil, 
+				"language": nil,
+				"curr_enrolled": -1,
+			},
+			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockEventOccurrenceRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
+			mockEventRepo := new(repomocks.MockEventRepository)
+			mockLocationRepo := new(repomocks.MockLocationRepository)
+			tt.mockSetup(mockRepo)
+
+			app, _ := setupEventOccurrencesTestAPI(mockRepo)
+
+			bodyBytes, err := json.Marshal(tt.payload)
+			assert.NoError(t, err)
+
+			req, err := http.NewRequest(
+				http.MethodPatch,
+				"/api/v1/event-occurrences",
+				bytes.NewBuffer(bodyBytes),
+			)
+			assert.NoError(t, err)
+			req.Header.Set("Content-Type", "application/json")
+
+			mockManagerRepo.On("GetManagerByID", mock.Anything, mock.Anything,
+			).Return(&models.Manager{
+				ID: mid,
+				UserID: uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"),
+				OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				Role: "Director",
+			}, nil)
+			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything,
+			).Return(&models.Event{
+				ID: 				uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+				Title: 				"Junior Robotics Workshop",
+				Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+				OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				AgeRangeMin: 		&eight,
+				AgeRangeMax: 		&twelve,
+				Category: 			category_arr,
+				HeaderImageS3Key: 	&jpg,
+				CreatedAt: 			time.Now(),
+				UpdatedAt: 			time.Now(),
+			}, nil)
+			mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything,
+			).Return(&models.Location{
+				ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
+				Latitude:     13.7650000,
+				Longitude:    100.5380000,
+				AddressLine1: "321 Phetchaburi Road",
+				AddressLine2: &addr,
+				Subdistrict:  "Ratchathewi",
+				District:     "Ratchathewi",
+				Province:     "Bangkok",
+				PostalCode:   "10400",
+				Country:      "Thailand",
+				CreatedAt:    time.Now(),
+				UpdatedAt:    time.Now(),
+			}, nil)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			if tt.statusCode != resp.StatusCode {
+				bodyBytes, _ := io.ReadAll(resp.Body)
+				t.Logf("Response body: %s", string(bodyBytes))
+			}
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRepo.AssertExpectations(t)
+		})
+	}
 }

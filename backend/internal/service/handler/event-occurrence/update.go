@@ -1,6 +1,7 @@
 package eventoccurrence
 
 import (
+	"cmp"
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
@@ -14,7 +15,28 @@ func (h *Handler) UpdateEventOccurrence(ctx context.Context, input *models.Updat
 	}
 
 	// check foreign keys
-	// 
+	var managerErr error
+	var eventErr error
+	var locationErr error
+
+	managerId := input.Body.ManagerId
+	if managerId != nil {
+		_, managerErr = h.ManagerRepository.GetManagerByID(ctx, *managerId)
+	}
+
+	eventId := input.Body.EventId
+	if eventId != nil {
+		_, eventErr = h.EventRepository.GetEventByID(ctx, *eventId)
+	}
+
+	locationId := input.Body.LocationId
+	if locationId != nil {
+		_, locationErr = h.LocationRepository.GetLocationByID(ctx, *locationId)
+	}
+	
+	if managerErr != nil || eventErr != nil || locationErr != nil {
+		return nil, cmp.Or(managerErr, eventErr, locationErr)
+	}
 	
 	// check that new currently enrolled number does not exceed the new or old max attendees
 	newCurrEnrolled := input.Body.CurrEnrolled
