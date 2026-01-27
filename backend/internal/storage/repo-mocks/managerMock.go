@@ -67,3 +67,14 @@ func (m *MockManagerRepository) PatchManager(ctx context.Context, manager *model
 	}
 	return args.Get(0).(*models.Manager), nil
 }
+
+func (m *MockManagerRepository) GetManagerByAuthID(ctx context.Context, authID string) (*models.Manager, error) {
+	args := m.Called(ctx, authID)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Manager), nil
+}

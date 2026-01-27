@@ -1,0 +1,72 @@
+package models 
+
+import "github.com/google/uuid"
+
+type GuardianSignUpInput struct {
+	Body struct {
+		Name                string `json:"name" db:"name"`
+		Email               string `json:"email" db:"email"`
+		Username            string `json:"username" db:"username"`
+		Password            string `json:"password" db:"password"`
+		ProfilePictureS3Key *string `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
+		LanguagePreference  string `json:"language_preference" db:"language_preference"`
+	}
+}
+
+type GuardianSignUpOutput struct {
+	Body struct {
+		Token string `json:"token" db:"token"`
+		GuardianID uuid.UUID `json:"guardian_id" db:"guardian_id"`
+	} `json:"body"`
+}
+
+type ManagerSignUpInput struct {
+	Body struct {
+		Name                string `json:"name" db:"name" doc:"name of the manager" required:"true"`
+		Email               string `json:"email" db:"email" doc:"email of the manager" required:"true"`
+		Username            string `json:"username" db:"username" doc:"username of the manager" required:"true"`
+		Password            string `json:"password" db:"password" doc:"password of the manager" required:"true"`
+		ProfilePictureS3Key *string `json:"profile_picture_s3_key" db:"profile_picture_s3_key" doc:"profile picture s3 key of the manager" required:"false"`
+		LanguagePreference  string `json:"language_preference" db:"language_preference" doc:"language preference of the manager" required:"false"`
+		OrganizationID      *uuid.UUID `json:"organization_id" db:"organization_id" doc:"organization id of the organization the manager is associated with" required:"false"`
+		Role                string `json:"role" db:"role" doc:"role of the manager being created" required:"false"`
+	}
+}
+
+type ManagerSignUpOutput struct {
+	Body struct {
+		Token string `json:"token" db:"token"`
+		ManagerID uuid.UUID `json:"manager_id" db:"manager_id"`
+	}
+}
+
+type LoginInput struct {
+	Body struct {
+		Email    string `json:"email" db:"email"`
+		Password string `json:"password" db:"password"`
+	}
+}
+
+type LoginOutput struct {
+	Body struct {
+		Token string `json:"token" db:"token"`
+	} `json:"body"`
+}
+
+type userResponse struct {
+	ID uuid.UUID `json:"id"`
+}
+
+type LoginResponse struct {
+	AccessToken  string       `json:"access_token"`
+	TokenType    string       `json:"token_type"`
+	ExpiresIn    int          `json:"expires_in"`
+	RefreshToken string       `json:"refresh_token"`
+	User         userResponse `json:"user"`
+	Error        interface{}  `json:"error"`
+}
+	
+type Payload struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}

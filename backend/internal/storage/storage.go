@@ -4,14 +4,15 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/schema/location"
-	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/child"
-	"skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/event"
+	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
+	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
+	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/school"
+	"skillspark/internal/storage/postgres/schema/user"
 	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
@@ -40,6 +41,7 @@ type OrganizationRepository interface {
 type ManagerRepository interface {
 	GetManagerByID(ctx context.Context, id uuid.UUID) (*models.Manager, error)
 	GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error)
+	GetManagerByAuthID(ctx context.Context, authID string) (*models.Manager, error)
 	DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, error)
 	CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error)
 	PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, error)
@@ -50,6 +52,7 @@ type GuardianRepository interface {
 	GetGuardianByChildID(ctx context.Context, childID uuid.UUID) (*models.Guardian, error)
 	GetGuardianByID(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
 	GetGuardianByUserID(ctx context.Context, userID uuid.UUID) (*models.Guardian, error)
+	GetGuardianByAuthID(ctx context.Context, authID string) (*models.Guardian, error)
 	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
 	DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
 }
@@ -76,15 +79,23 @@ type EventOccurrenceRepository interface {
 }
 
 type Repository struct {
-	db       *pgxpool.Pool
-	Location LocationRepository
-	Organization OrganizationRepository
-	School   SchoolRepository
-	Manager  ManagerRepository
-	Guardian GuardianRepository
-	Event    EventRepository
-	Child    ChildRepository
+	db              *pgxpool.Pool
+	Location        LocationRepository
+	Organization    OrganizationRepository
+	School          SchoolRepository
+	Manager         ManagerRepository
+	Guardian        GuardianRepository
+	Event           EventRepository
+	Child           ChildRepository
 	EventOccurrence EventOccurrenceRepository
+	User            UserRepository
+}
+
+type UserRepository interface {
+	CreateUser(ctx context.Context, user *models.CreateUserInput) (*models.User, error)
+	GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error)
+	UpdateUser(ctx context.Context, user *models.UpdateUserInput) (*models.User, error)
+	DeleteUser(ctx context.Context, id uuid.UUID) (*models.User, error)
 }
 
 // Close closes the database connection pool
@@ -101,14 +112,15 @@ func (r *Repository) GetDB() *pgxpool.Pool {
 // NewRepository creates a new Repository instance with the given database pool
 func NewRepository(db *pgxpool.Pool) *Repository {
 	return &Repository{
-		db:       db,
-		Location: location.NewLocationRepository(db),
-		Organization: organization.NewOrganizationRepository(db),
-		School:   school.NewSchoolRepository(db),
-		Manager:  manager.NewManagerRepository(db),
-		Guardian: guardian.NewGuardianRepository(db),
-		Event:    event.NewEventRepository(db),
-		Child:    child.NewChildRepository(db),
+		db:              db,
+		Location:        location.NewLocationRepository(db),
+		Organization:    organization.NewOrganizationRepository(db),
+		School:          school.NewSchoolRepository(db),
+		Manager:         manager.NewManagerRepository(db),
+		Guardian:        guardian.NewGuardianRepository(db),
+		Event:           event.NewEventRepository(db),
+		Child:           child.NewChildRepository(db),
 		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
+		User:            user.NewUserRepository(db),
 	}
 }

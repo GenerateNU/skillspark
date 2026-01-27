@@ -81,13 +81,13 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 	})
 
 	// Register Huma endpoints
-	setupHumaRoutes(humaAPI, repo)
+	setupHumaRoutes(humaAPI, repo, config)
 
 	return app, humaAPI
 }
 
 // Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository) {
+func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
@@ -99,4 +99,5 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository) {
 	routes.SetupGuardiansRoutes(api, repo)
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo)
+	routes.SetupAuthRoutes(api, repo, config)
 }

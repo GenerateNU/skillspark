@@ -78,3 +78,14 @@ func (m *MockGuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUI
 	}
 	return args.Get(0).(*models.Guardian), nil
 }
+
+func (m *MockGuardianRepository) GetGuardianByAuthID(ctx context.Context, authID string) (*models.Guardian, error) {
+	args := m.Called(ctx, authID)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Guardian), nil
+}
