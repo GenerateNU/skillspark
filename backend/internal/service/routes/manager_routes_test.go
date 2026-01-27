@@ -285,7 +285,7 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 				m.On(
 					"PatchManager",
 					mock.Anything,
-					mock.AnythingOfType("*models.PatchManagerInput"),
+					mock.Anything,
 				).Return(&models.Manager{
 					ID:             uuid.MustParse(managerID),
 					UserID:         uuid.New(),
@@ -312,7 +312,7 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 				m.On(
 					"PatchManager",
 					mock.Anything,
-					mock.AnythingOfType("*models.PatchManagerInput"),
+					mock.Anything,
 				).Return(&models.Manager{
 					ID:             uuid.MustParse(managerID),
 					UserID:         uuid.New(),
