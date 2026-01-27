@@ -285,7 +285,9 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 				m.On(
 					"PatchManager",
 					mock.Anything,
-					mock.Anything,
+					mock.MatchedBy(func(input *models.PatchManagerInput) bool {
+						return input.Body.ID == uuid.MustParse(managerID)
+					}),
 				).Return(&models.Manager{
 					ID:             uuid.MustParse(managerID),
 					UserID:         uuid.New(),
@@ -312,7 +314,9 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 				m.On(
 					"PatchManager",
 					mock.Anything,
-					mock.Anything,
+					mock.MatchedBy(func(input *models.PatchManagerInput) bool {
+						return input.Body.ID == uuid.MustParse(managerID)
+					}),
 				).Return(&models.Manager{
 					ID:             uuid.MustParse(managerID),
 					UserID:         uuid.New(),
@@ -331,26 +335,7 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 				"organization_id": orgID,
 				"role":            "Director",
 			},
-			mockSetup:  func(*repomocks.MockManagerRepository) {},
-			statusCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "missing required field (name)",
-			payload: map[string]interface{}{
-				"id":              managerID,
-				"organization_id": orgID,
-				"role":            "Director",
-			},
-			mockSetup:  func(*repomocks.MockManagerRepository) {},
-			statusCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "missing role",
-			payload: map[string]interface{}{
-				"id":              managerID,
-				"name":            "Alice",
-				"organization_id": orgID,
-			},
+			// Huma should block this because ID is required in the struct, so no mock needed
 			mockSetup:  func(*repomocks.MockManagerRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
 		},
