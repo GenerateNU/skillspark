@@ -1,6 +1,7 @@
 package models
 
 import (
+	"mime/multipart"
 	"time"
 
 	"github.com/google/uuid"
@@ -34,8 +35,26 @@ type CreateEventInput struct {
 
 		Category []string `json:"category" db:"category" doc:"Category of the event"`
 
+		// changed from HeaderImageS3Key to File datatype
 		HeaderImageS3Key *string `json:"header_image_s3_key" db:"header_image_s3_key" doc:"S3 key for the header image"`
 	}
+}
+
+// CreateEventRouteInput is the multipart form input for creating an event with an image
+type CreateEventRouteInput struct {
+	RawBody multipart.Form
+}
+
+// CreateEventFormData holds the parsed form data for creating an event
+type CreateEventFormData struct {
+	Title             string
+	Description       string
+	OrganizationID    uuid.UUID
+	AgeRangeMin       *int
+	AgeRangeMax       *int
+	Category          []string
+	HeaderImage       multipart.File        // The actual file
+	HeaderImageHeader *multipart.FileHeader // File metadata (filename, size, etc.)
 }
 
 type CreateEventOutput struct {

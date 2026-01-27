@@ -1,11 +1,11 @@
 package models
 
 import (
+	"mime/multipart"
 	"time"
 
 	"github.com/google/uuid"
 )
-
 
 type Organization struct {
 	ID         uuid.UUID  `json:"id" db:"id"`
@@ -17,6 +17,19 @@ type Organization struct {
 	UpdatedAt  time.Time  `json:"updated_at" db:"updated_at"`
 }
 
+// CreateOrganizationRouteInput is the multipart form input for creating an organization with an image
+type CreateOrganizationRouteInput struct {
+	RawBody multipart.Form
+}
+
+// CreateOrganizationFormData holds the parsed form data for creating an organization
+type CreateOrganizationFormData struct {
+	Name               string
+	Active             *bool
+	LocationID         *uuid.UUID
+	ProfileImage       multipart.File        // The actual file (pfp)
+	ProfileImageHeader *multipart.FileHeader // File metadata (filename, size, etc.)
+}
 
 type CreateOrganizationInput struct {
 	Body struct {
@@ -30,7 +43,6 @@ type CreateOrganizationInput struct {
 type CreateOrganizationOutput struct {
 	Body Organization
 }
-
 
 type UpdateOrganizationInput struct {
 	ID   uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
@@ -46,7 +58,6 @@ type UpdateOrganizationOutput struct {
 	Body Organization
 }
 
-
 type GetOrganizationByIDInput struct {
 	ID uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
 }
@@ -55,14 +66,13 @@ type GetOrganizationByIDOutput struct {
 	Body Organization
 }
 
-
 type GetAllOrganizationsInput struct {
 	Page     int `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
 	PageSize int `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
 }
 
 type GetAllOrganizationsOutput struct {
-	Body [] Organization `json:"body" doc:"List of organizations"`
+	Body []Organization `json:"body" doc:"List of organizations"`
 }
 
 type DeleteOrganizationInput struct {

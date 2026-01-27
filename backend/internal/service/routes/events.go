@@ -4,14 +4,15 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 	"skillspark/internal/service/handler/event"
 	"skillspark/internal/storage"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupEventRoutes(api huma.API, repo *storage.Repository) {
-	eventHandler := event.NewHandler(repo.Event)
+func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_client.Client) {
+	eventHandler := event.NewHandler(repo.Event, s3Client)
 
 	// POST /api/v1/events
 	huma.Register(api, huma.Operation{

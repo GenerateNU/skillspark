@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"skillspark/internal/config"
+	"skillspark/internal/s3_client"
 	"skillspark/internal/service"
 	"skillspark/internal/storage"
 
@@ -21,8 +22,10 @@ func main() {
 	// The handlers won't be called, so nil fields are fine
 	repo := &storage.Repository{}
 
+	s3Client := s3_client.NewClient(cfg.S3)
+
 	// Initialize app to get Huma API
-	_, humaAPI := service.SetupApp(cfg, repo)
+	_, humaAPI := service.SetupApp(cfg, repo, s3Client)
 
 	// Get OpenAPI spec
 	openAPI := humaAPI.OpenAPI()

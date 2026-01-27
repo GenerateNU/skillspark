@@ -3,16 +3,17 @@ package routes
 import (
 	"context"
 	"net/http"
-	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
+	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/storage"
 	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
-	orgHandler := organization.NewHandler(repo.Organization, repo.Location)
+func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s3_client.Client) {
+	orgHandler := organization.NewHandler(repo.Organization, repo.Location, s3Client)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "create-organization",
