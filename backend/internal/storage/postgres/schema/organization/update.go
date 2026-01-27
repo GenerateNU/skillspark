@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput) (*models.Organization, *errs.HTTPError) {
+func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, *errs.HTTPError) {
 	query, err := schema.ReadSQLBaseScript("organization/sql/update.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -25,8 +25,8 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 	if input.Body.Active != nil {
 		existing.Active = *input.Body.Active
 	}
-	if input.Body.PfpS3Key != nil {
-		existing.PfpS3Key = input.Body.PfpS3Key
+	if PfpS3Key != nil {
+		existing.PfpS3Key = PfpS3Key
 	}
 	if input.Body.LocationID != nil {
 		existing.LocationID = input.Body.LocationID

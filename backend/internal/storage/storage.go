@@ -33,7 +33,7 @@ type OrganizationRepository interface {
 	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, *errs.HTTPError)
 	GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
 	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, *errs.HTTPError)
-	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput) (*models.Organization, *errs.HTTPError)
+	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, *errs.HTTPError)
 	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
 }
 
@@ -56,7 +56,7 @@ type GuardianRepository interface {
 
 type EventRepository interface {
 	CreateEvent(ctx context.Context, location *models.CreateEventInput, HeaderImageS3Key *string) (*models.Event, error)
-	UpdateEvent(ctx context.Context, location *models.UpdateEventInput) (*models.Event, error)
+	UpdateEvent(ctx context.Context, location *models.UpdateEventInput, HeaderImageS3Key *string) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
 }

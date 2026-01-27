@@ -27,7 +27,7 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 
 		formData := input.RawBody.Data()
 
-		eventBody := models.CreateEventInputBody{
+		eventBody := models.CreateEventBody{
 			Title:          formData.Title,
 			Description:    formData.Description,
 			OrganizationID: formData.OrganizationID,
@@ -42,7 +42,7 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		image_data, err := io.ReadAll(formData.HeaderImage)
 
 		// io.readall on input
-		event, url, err := eventHandler.CreateEvent(ctx, &eventModel, image_data, s3Client)
+		event, url, err := eventHandler.CreateEvent(ctx, &eventModel, &image_data, s3Client)
 
 		if err != nil {
 			return nil, err
@@ -62,16 +62,34 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		Summary:     "Update an existing event",
 		Description: "Updates an existing event",
 		Tags:        []string{"Events"},
-	}, func(ctx context.Context, input *models.UpdateEventInput) (*models.UpdateEventOutput, error) {
+	}, func(ctx context.Context, input *models.UpdateEventRouteInput) (*models.UpdateEventOutput, error) {
+
+		formData := input.RawBody.Data()
+
+		eventBody := models.UpdateEventBody{
+			Title:          formData.Title,
+			Description:    formData.Description,
+			OrganizationID: formData.OrganizationID,
+			AgeRangeMin:    formData.AgeRangeMin,
+			AgeRangeMax:    formData.AgeRangeMax,
+			Category:       formData.Category,
+		}
+
+		eventModel := models.UpdateEventInput{
+			Body: eventBody,
+		}
+		image_data, err := io.ReadAll(formData.HeaderImage)
 
 		// io.readall on input
-		event, err := eventHandler.UpdateEvent(ctx, input)
+		event, url, err := eventHandler.UpdateEvent(ctx, &eventModel, &image_data, s3Client)
+
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.UpdateEventOutput{
-			Body: event,
+			Body:         event,
+			PresignedURL: url,
 		}, nil
 	})
 

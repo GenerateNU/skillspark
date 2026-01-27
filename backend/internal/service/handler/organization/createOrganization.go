@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/s3_client"
 )
 
-func (h *Handler) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput, image_data []byte, s3Client *s3_client.Client) (*models.Organization, *string, error) {
+func (h *Handler) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput, image_data *[]byte, s3Client *s3_client.Client) (*models.Organization, *string, error) {
 	key, error := h.generateS3Key(*input.Body.LocationID)
 	var url *string
 

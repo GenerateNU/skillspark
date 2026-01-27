@@ -27,7 +27,7 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 
 		formData := input.RawBody.Data()
 
-		organizationBody := models.CreateOrganizationInputBody{
+		organizationBody := models.CreateOrganizationBody{
 			Name:       formData.Name,
 			Active:     formData.Active,
 			LocationID: formData.LocationID,
@@ -39,7 +39,7 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 
 		image_data, err := io.ReadAll(formData.ProfileImage)
 
-		organization, url, err := orgHandler.CreateOrganization(ctx, &organizationModel, image_data, s3Client)
+		organization, url, err := orgHandler.CreateOrganization(ctx, &organizationModel, &image_data, s3Client)
 
 		if err != nil {
 			return nil, err
@@ -102,8 +102,31 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 		Summary:     "Update an organization",
 		Description: "Updates an existing organization with the provided fields (partial update)",
 		Tags:        []string{"Organizations"},
-	}, func(ctx context.Context, input *models.UpdateOrganizationInput) (*models.UpdateOrganizationOutput, error) {
-		return orgHandler.UpdateOrganization(ctx, input)
+	}, func(ctx context.Context, input *models.UpdateOrganizationRouteInput) (*models.UpdateOrganizationOutput, error) {
+		formData := input.RawBody.Data()
+
+		organizationBody := models.UpdateOrganizationBody{
+			Name:       formData.Name,
+			Active:     formData.Active,
+			LocationID: formData.LocationID,
+		}
+
+		organizationModel := models.UpdateOrganizationInput{
+			Body: organizationBody,
+		}
+
+		image_data, err := io.ReadAll(formData.ProfileImage)
+
+		organization, url, err := orgHandler.UpdateOrganization(ctx, &organizationModel, &image_data, s3Client)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.UpdateOrganizationOutput{
+			Body:         *organization,
+			PresignedURL: url,
+		}, nil
 	})
 
 	huma.Register(api, huma.Operation{

@@ -7,10 +7,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// type OrganizationS3Key struct {
-// 	PfpS3Key *string `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
-// }
-
 type Organization struct {
 	ID         uuid.UUID  `json:"id" db:"id"`
 	Name       string     `json:"name" db:"name"`
@@ -27,41 +23,38 @@ type CreateOrganizationRouteInput struct {
 }
 
 // CreateOrganizationFormData holds the parsed form data for creating an organization
-type CreateOrganizationFormData struct {
-	Name         string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
-	Active       *bool         `form:"active"`
-	LocationID   *uuid.UUID    `form:"location_id"`
-	ProfileImage huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
-}
-
-type UodateOrganizationRouteInput struct {
-	RawBody huma.MultipartFormFiles[CreateOrganizationFormData]
-}
-
-// UpdateOrganizationFormData holds the parsed form data for updating an organization
 type UpdateOrganizationFormData struct {
-	Name         string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
-	Active       *bool         `form:"active"`
-	LocationID   *uuid.UUID    `form:"location_id"`
-	ProfileImage huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
+	Name         *string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
+	Active       *bool          `form:"active"`
+	LocationID   *uuid.UUID     `form:"location_id"`
+	ProfileImage *huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
 }
 
-type UpdateOrganizationInputBody struct {
-	Name   string `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
-	Active *bool  `json:"active,omitempty" doc:"Active status (defaults to true)"`
-	// PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
+type CreateOrganizationFormData struct {
+	Name         string         `form:"name" required:"true" minLength:"1" maxLength:"255"`
+	Active       *bool          `form:"active"`
+	LocationID   *uuid.UUID     `form:"location_id"`
+	ProfileImage *huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
+}
+
+type UpdateOrganizationRouteInput struct {
+	RawBody huma.MultipartFormFiles[UpdateOrganizationFormData]
+}
+
+type CreateOrganizationBody struct {
+	Name       string     `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
+	Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
 	LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
 }
 
-type CreateOrganizationInputBody struct {
-	Name   string `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
-	Active *bool  `json:"active,omitempty" doc:"Active status (defaults to true)"`
-	// PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
+type UpdateOrganizationBody struct {
+	Name       *string    `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
+	Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
 	LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
 }
 
 type CreateOrganizationInput struct {
-	Body CreateOrganizationInputBody
+	Body CreateOrganizationBody
 }
 
 type CreateOrganizationOutput struct {
@@ -72,15 +65,13 @@ type CreateOrganizationOutput struct {
 type UpdateOrganizationInput struct {
 	ID   uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
 	Body struct {
-		Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
-		Active     *bool      `json:"active,omitempty" doc:"Active status"`
-		PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-		LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
+		UpdateOrganizationBody
 	}
 }
 
 type UpdateOrganizationOutput struct {
-	Body Organization
+	Body         Organization `json:"body"`
+	PresignedURL *string      `json:"presigned_url" db:"presigned_url"`
 }
 
 type GetOrganizationByIDInput struct {
@@ -88,13 +79,9 @@ type GetOrganizationByIDInput struct {
 }
 
 type GetOrganizationByIDOutput struct {
-	Body Organization
+	Body         Organization `json:"body"`
+	PresignedURL *string      `json:"presigned_url" db:"presigned_url"`
 }
-
-// type GetOrganizationByIDOutput struct {
-// 	Body Organization
-// 	PresignedURL *string `json:"presigned_url" db:"presigned_url"`
-// }
 
 type GetAllOrganizationsInput struct {
 	Page     int `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
@@ -102,13 +89,9 @@ type GetAllOrganizationsInput struct {
 }
 
 type GetAllOrganizationsOutput struct {
-	Body []Organization `json:"body" doc:"List of organizations"`
+	Body          []Organization `json:"body" doc:"List of organizations"`
+	PresignedURLS []*string      `json:"presigned_urls" doc:"List of Presigned Urls"`
 }
-
-// type GetAllOrganizationByIDOutput struct {
-// 	Body []Organization
-// 	PresignedURLS []*string `json:"presigned_urls" db:"presigned_urls"`
-// }
 
 type DeleteOrganizationInput struct {
 	ID uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
