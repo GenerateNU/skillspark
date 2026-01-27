@@ -7,7 +7,7 @@
 .DEFAULT_GOAL := help
 
 # Files/packages to exclude from coverage (regex patterns)
-COVERAGE_EXCLUDE := "main.go|shared_db.go|setup.go"
+COVERAGE_EXCLUDE := main.go|shared_db.go|setup.go
 
 # ------------------------
 # OS Detection
