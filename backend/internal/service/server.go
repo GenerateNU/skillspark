@@ -30,7 +30,8 @@ type App struct {
 func InitApp(config config.Config) *App {
 	ctx := context.Background()
 	repo := postgres.NewRepository(ctx, config.DB)
-	s3Client := s3_client.NewClient(config.S3)
+	// might need to check this error
+	s3Client, _ := s3_client.NewClient(config.S3)
 	app, humaAPI := SetupApp(config, repo, s3Client)
 	return &App{
 		Server: app,

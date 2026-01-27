@@ -1,11 +1,8 @@
 package organization
 
 import (
-	"skillspark/internal/errs"
 	"skillspark/internal/s3_client"
 	"skillspark/internal/storage"
-
-	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -20,16 +17,4 @@ func NewHandler(orgRepo storage.OrganizationRepository, locRepo storage.Location
 		LocationRepository:     locRepo,
 		s3client:               *s3client,
 	}
-}
-
-func (h *Handler) generateS3Key(id uuid.UUID) (string, error) {
-	if id == uuid.Nil {
-		err := errs.InternalServerError("Failed to create location: invalid UUID")
-		return "", &err
-	}
-
-	id_string := id.String()
-	res := "orgs" + "/" + id_string
-	return res, nil
-
 }

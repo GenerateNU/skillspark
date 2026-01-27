@@ -4,13 +4,13 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/schema/location"
-	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/child"
-	"skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/event"
+	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
+	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
+	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/utils"
 
@@ -30,7 +30,7 @@ type SchoolRepository interface {
 }
 
 type OrganizationRepository interface {
-	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput) (*models.Organization, *errs.HTTPError)
+	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, *errs.HTTPError)
 	GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
 	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, *errs.HTTPError)
 	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput) (*models.Organization, *errs.HTTPError)
@@ -55,7 +55,7 @@ type GuardianRepository interface {
 }
 
 type EventRepository interface {
-	CreateEvent(ctx context.Context, location *models.CreateEventInput) (*models.Event, error)
+	CreateEvent(ctx context.Context, location *models.CreateEventInput, HeaderImageS3Key *string) (*models.Event, error)
 	UpdateEvent(ctx context.Context, location *models.UpdateEventInput) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
@@ -76,14 +76,14 @@ type EventOccurrenceRepository interface {
 }
 
 type Repository struct {
-	db       *pgxpool.Pool
-	Location LocationRepository
-	Organization OrganizationRepository
-	School   SchoolRepository
-	Manager  ManagerRepository
-	Guardian GuardianRepository
-	Event    EventRepository
-	Child    ChildRepository
+	db              *pgxpool.Pool
+	Location        LocationRepository
+	Organization    OrganizationRepository
+	School          SchoolRepository
+	Manager         ManagerRepository
+	Guardian        GuardianRepository
+	Event           EventRepository
+	Child           ChildRepository
 	EventOccurrence EventOccurrenceRepository
 }
 
@@ -101,14 +101,14 @@ func (r *Repository) GetDB() *pgxpool.Pool {
 // NewRepository creates a new Repository instance with the given database pool
 func NewRepository(db *pgxpool.Pool) *Repository {
 	return &Repository{
-		db:       db,
-		Location: location.NewLocationRepository(db),
-		Organization: organization.NewOrganizationRepository(db),
-		School:   school.NewSchoolRepository(db),
-		Manager:  manager.NewManagerRepository(db),
-		Guardian: guardian.NewGuardianRepository(db),
-		Event:    event.NewEventRepository(db),
-		Child:    child.NewChildRepository(db),
+		db:              db,
+		Location:        location.NewLocationRepository(db),
+		Organization:    organization.NewOrganizationRepository(db),
+		School:          school.NewSchoolRepository(db),
+		Manager:         manager.NewManagerRepository(db),
+		Guardian:        guardian.NewGuardianRepository(db),
+		Event:           event.NewEventRepository(db),
+		Child:           child.NewChildRepository(db),
 		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
 	}
 }

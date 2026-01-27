@@ -2,6 +2,7 @@ package s3_client
 
 import (
 	"context"
+	"fmt"
 
 	s3_config "skillspark/internal/config"
 
@@ -15,16 +16,17 @@ type Client struct {
 	Bucket string
 }
 
-func NewClient(bucket s3_config.S3) *Client {
-	cfg, _ := config.LoadDefaultConfig(context.TODO(), config.WithRegion(bucket.Region),
+func NewClient(bucket s3_config.S3) (*Client, error) {
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(bucket.Region),
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(bucket.AccessKey,
 			bucket.SecretKey, "")))
-	// if err != nil {
-	// 	return nil, fmt.Errorf("unable to load AWS SDK config: %w", err)
-	// }
+
+	if err != nil {
+		return nil, fmt.Errorf("unable to load AWS SDK config: %w", err)
+	}
 
 	return &Client{
 		S3:     s3.NewFromConfig(cfg),
 		Bucket: bucket.Bucket,
-	}
+	}, nil
 }

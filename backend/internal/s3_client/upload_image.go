@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -29,5 +30,11 @@ func (c *Client) UploadImage(ctx context.Context, key string, image_data []byte)
 		return "", fmt.Errorf("failed to upload image with key %q: %w", key, err)
 	}
 
-	return key, nil
+	url, err := c.GeneratePresignedURL(ctx, key, time.Hour)
+
+	if err != nil {
+		return "", fmt.Errorf("failed to return presign URL after image upload %q: %w", key, err)
+	}
+
+	return url, nil
 }

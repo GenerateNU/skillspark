@@ -22,7 +22,10 @@ func main() {
 	// The handlers won't be called, so nil fields are fine
 	repo := &storage.Repository{}
 
-	s3Client := s3_client.NewClient(cfg.S3)
+	s3Client, err := s3_client.NewClient(cfg.S3)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to create S3 Client: %v\n", err)
+	}
 
 	// Initialize app to get Huma API
 	_, humaAPI := service.SetupApp(cfg, repo, s3Client)

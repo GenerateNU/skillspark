@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"skillspark/internal/models"
 	"skillspark/internal/s3_client"
@@ -22,8 +23,33 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 		Summary:     "Create a new organization",
 		Description: "Creates a new organization with the provided information",
 		Tags:        []string{"Organizations"},
-	}, func(ctx context.Context, input *models.CreateOrganizationInput) (*models.CreateOrganizationOutput, error) {
-		return orgHandler.CreateOrganization(ctx, input)
+	}, func(ctx context.Context, input *models.CreateOrganizationRouteInput) (*models.CreateOrganizationOutput, error) {
+
+		formData := input.RawBody.Data()
+
+		organizationBody := models.CreateOrganizationInputBody{
+			Name:       formData.Name,
+			Active:     formData.Active,
+			LocationID: formData.LocationID,
+		}
+
+		organizationModel := models.CreateOrganizationInput{
+			Body: organizationBody,
+		}
+
+		image_data, err := io.ReadAll(formData.ProfileImage)
+
+		organization, url, err := orgHandler.CreateOrganization(ctx, &organizationModel, image_data, s3Client)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.CreateOrganizationOutput{
+			Body:         *organization,
+			PresignedURL: url,
+		}, nil
+
 	})
 
 	huma.Register(api, huma.Operation{

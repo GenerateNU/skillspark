@@ -76,7 +76,7 @@ create table if not exists organization (
     pfp_s3_key TEXT,
     location_id UUID REFERENCES location(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 );
 
 -- initial migration to set up providers table which represents a user who can offer skills sessions within an organization

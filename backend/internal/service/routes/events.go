@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"skillspark/internal/models"
 	"skillspark/internal/s3_client"
@@ -22,14 +23,34 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		Summary:     "Create a new event",
 		Description: "Creates a new event",
 		Tags:        []string{"Events"},
-	}, func(ctx context.Context, input *models.CreateEventInput) (*models.CreateEventOutput, error) {
-		event, err := eventHandler.CreateEvent(ctx, input)
+	}, func(ctx context.Context, input *models.CreateEventRouteInput) (*models.CreateEventOutput, error) {
+
+		formData := input.RawBody.Data()
+
+		eventBody := models.CreateEventInputBody{
+			Title:          formData.Title,
+			Description:    formData.Description,
+			OrganizationID: formData.OrganizationID,
+			AgeRangeMin:    formData.AgeRangeMin,
+			AgeRangeMax:    formData.AgeRangeMax,
+			Category:       formData.Category,
+		}
+
+		eventModel := models.CreateEventInput{
+			Body: eventBody,
+		}
+		image_data, err := io.ReadAll(formData.HeaderImage)
+
+		// io.readall on input
+		event, url, err := eventHandler.CreateEvent(ctx, &eventModel, image_data, s3Client)
+
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.CreateEventOutput{
-			Body: event,
+			Body:         event,
+			PresignedURL: url,
 		}, nil
 	})
 
@@ -42,6 +63,8 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		Description: "Updates an existing event",
 		Tags:        []string{"Events"},
 	}, func(ctx context.Context, input *models.UpdateEventInput) (*models.UpdateEventOutput, error) {
+
+		// io.readall on input
 		event, err := eventHandler.UpdateEvent(ctx, input)
 		if err != nil {
 			return nil, err
