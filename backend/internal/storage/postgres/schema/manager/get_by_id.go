@@ -25,7 +25,7 @@ func (r *ManagerRepository) GetManagerByID(ctx context.Context, id uuid.UUID) (*
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			err := errs.NotFound("Location", "id", id)
+			err := errs.NotFound("Manager", "id", id)
 			return nil, &err
 		}
 		err := errs.InternalServerError("Failed to fetch manager by id: ", err.Error())
