@@ -24,11 +24,17 @@ import (
 
 func setupEventOccurrencesTestAPI(
 	eventOccurrenceRepo *repomocks.MockEventOccurrenceRepository,
+	managerRepo *repomocks.MockManagerRepository,
+	eventRepo *repomocks.MockEventRepository,
+	locationRepo *repomocks.MockLocationRepository,
 ) (*fiber.App, huma.API) {
 	app := fiber.New()
 	api := humafiber.New(app, huma.DefaultConfig("Test API", "1.0.0"))
 	repo := &storage.Repository{
 		EventOccurrence: eventOccurrenceRepo,
+		Manager: managerRepo,
+		Event: eventRepo,
+		Location: locationRepo,
 	}
 	routes.SetupEventOccurrencesRoutes(api, repo)
 	return app, api
@@ -133,9 +139,17 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockEventOccurrenceRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
+			mockEventRepo := new(repomocks.MockEventRepository)
+			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo)
+			app, _ := setupEventOccurrencesTestAPI(
+				mockRepo, 
+				mockManagerRepo,
+				mockEventRepo,
+				mockLocationRepo,
+			)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -202,8 +216,8 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			name: "valid payload with null manager id",
 			payload: map[string]interface{}{
 				"manager_id": nil,
-				"event_id": event.ID, 
-				"location_id": location.ID, 
+				"event_id": uuid.MustParse("60000000-0000-0000-0000-000000000001"), 
+				"location_id": uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"), 
 				"start_time": start, 
 				"end_time": end, 
 				"max_attendees": 10, 
@@ -266,10 +280,17 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockEventOccurrenceRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
+			mockEventRepo := new(repomocks.MockEventRepository)
+			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo)
-
+			app, _ := setupEventOccurrencesTestAPI(
+				mockRepo, 
+				mockManagerRepo,
+				mockEventRepo,
+				mockLocationRepo,
+			)
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
 
@@ -299,7 +320,6 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 	t.Parallel()
 
-	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	mid_new := uuid.MustParse("50000000-0000-0000-0000-000000000005")
 	eid := uuid.MustParse("60000000-0000-0000-0000-00000000000e")
 	lid := uuid.MustParse("10000000-0000-0000-0000-000000000008")
@@ -308,11 +328,6 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 	max := 10
 	lang := "th"
 	curr := 8
-
-	category_arr := []string{"science","technology"}
-	eight := 8
-	twelve := 12
-	jpg := "events/robotics_workshop.jpg"
 
 	category_arr_new := []string{"technology","math"}
 	ten := 10
@@ -330,7 +345,6 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 		UpdatedAt: 			time.Now(),
 	}
 
-	addr := "Suite 15"
 	location_new := models.Location{
 		ID:           lid,
 		Latitude:     13.7400000,
@@ -348,14 +362,15 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 
 	tests := []struct {
 		name       string
+		id uuid.UUID
 		payload    map[string]interface{}
 		mockSetup  func(*repomocks.MockEventOccurrenceRepository)
 		statusCode int
 	}{
 		{
 			name: "valid payload with all fields changed except current enrolled",
+			id: uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 			payload: map[string]interface{}{
-				"id": uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 				"manager_id": mid_new,
 				"event_id": eid, 
 				"location_id": lid, 
@@ -371,7 +386,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					mock.Anything,
 					mock.AnythingOfType("*models.UpdateEventOccurrenceInput"),
 				).Return(&models.EventOccurrence{
-					ID: 			uuid.New(),
+					ID: 			uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 					ManagerId: 		&mid_new,
 					Event: 			event_new,
 					Location: 		location_new,
@@ -388,8 +403,8 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 		},
 		{
 			name: "current enrolled below minimum",
+			id: uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 			payload: map[string]interface{}{
-				"id": nil,
 				"manager_id": nil,
 				"event_id": nil, 
 				"location_id": nil, 
@@ -415,64 +430,33 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo)
+			app, _ := setupEventOccurrencesTestAPI(
+				mockRepo, 
+				mockManagerRepo,
+				mockEventRepo,
+				mockLocationRepo,
+			)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
 
 			req, err := http.NewRequest(
 				http.MethodPatch,
-				"/api/v1/event-occurrences",
+				"/api/v1/event-occurrences/"+tt.id.String(),
 				bytes.NewBuffer(bodyBytes),
 			)
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
 
-			mockManagerRepo.On("GetManagerByID", mock.Anything, mock.Anything,
-			).Return(&models.Manager{
-				ID: mid,
-				UserID: uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"),
-				OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-				Role: "Director",
-			}, nil)
-			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything,
-			).Return(&models.Event{
-				ID: 				uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-				Title: 				"Junior Robotics Workshop",
-				Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
-				OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-				AgeRangeMin: 		&eight,
-				AgeRangeMax: 		&twelve,
-				Category: 			category_arr,
-				HeaderImageS3Key: 	&jpg,
-				CreatedAt: 			time.Now(),
-				UpdatedAt: 			time.Now(),
-			}, nil)
-			mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything,
-			).Return(&models.Location{
-				ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
-				Latitude:     13.7650000,
-				Longitude:    100.5380000,
-				AddressLine1: "321 Phetchaburi Road",
-				AddressLine2: &addr,
-				Subdistrict:  "Ratchathewi",
-				District:     "Ratchathewi",
-				Province:     "Bangkok",
-				PostalCode:   "10400",
-				Country:      "Thailand",
-				CreatedAt:    time.Now(),
-				UpdatedAt:    time.Now(),
-			}, nil)
-
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
 			defer func() { _ = resp.Body.Close() }()
-
+	
 			if tt.statusCode != resp.StatusCode {
 				bodyBytes, _ := io.ReadAll(resp.Body)
 				t.Logf("Response body: %s", string(bodyBytes))
 			}
-
+			
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRepo.AssertExpectations(t)
 		})
