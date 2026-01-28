@@ -84,6 +84,16 @@ type GetRegistrationsByGuardianIDOutput struct {
 	} `json:"body"`
 }
 
+type GetRegistrationsByEventOccurrenceIDInput struct {
+	EventOccurrenceID uuid.UUID `path:"event_occurrence_id" format:"uuid" doc:"Event Occurrence ID to retrieve registrations for" required:"true"`
+}
+
+type GetRegistrationsByEventOccurrenceIDOutput struct {
+	Body struct {
+		Registrations []Registration `json:"registrations" doc:"List of registrations for the event occurrence"`
+	} `json:"body"`
+}
+
 type DeleteRegistrationInput struct {
 	ID uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to delete" required:"true"`
 }

@@ -50,3 +50,11 @@ func (m *MockRegistrationRepository) UpdateRegistration(ctx context.Context, inp
 	}
 	return args.Get(0).(*models.UpdateRegistrationOutput), args.Error(1)
 }
+
+func (m *MockRegistrationRepository) GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error) {
+	args := m.Called(ctx, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.GetRegistrationsByEventOccurrenceIDOutput), args.Error(1)
+}

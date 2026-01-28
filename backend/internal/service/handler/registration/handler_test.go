@@ -215,6 +215,73 @@ func TestHandler_GetRegistrationsByGuardianID(t *testing.T) {
 	}
 }
 
+func TestHandler_GetRegistrationsByEventOccurrenceID(t *testing.T) {
+	tests := []struct {
+		name              string
+		eventOccurrenceID string
+		mockSetup         func(*repomocks.MockRegistrationRepository)
+		wantErr           bool
+		expectedLen       int
+	}{
+		{
+			name:              "successful get registrations by event occurrence",
+			eventOccurrenceID: "70000000-0000-0000-0000-000000000001",
+			mockSetup: func(m *repomocks.MockRegistrationRepository) {
+				output := &models.GetRegistrationsByEventOccurrenceIDOutput{}
+				output.Body.Registrations = []models.Registration{
+					{ID: uuid.New(), EventOccurrenceID: uuid.MustParse("70000000-0000-0000-0000-000000000001")},
+					{ID: uuid.New(), EventOccurrenceID: uuid.MustParse("70000000-0000-0000-0000-000000000001")},
+					{ID: uuid.New(), EventOccurrenceID: uuid.MustParse("70000000-0000-0000-0000-000000000001")},
+				}
+				m.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).Return(output, nil)
+			},
+			wantErr:     false,
+			expectedLen: 3,
+		},
+		{
+			name:              "no registrations found",
+			eventOccurrenceID: "70000000-0000-0000-0000-000000000099",
+			mockSetup: func(m *repomocks.MockRegistrationRepository) {
+				output := &models.GetRegistrationsByEventOccurrenceIDOutput{}
+				output.Body.Registrations = []models.Registration{}
+				m.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).Return(output, nil)
+			},
+			wantErr:     false,
+			expectedLen: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockChildRepo := new(repomocks.MockChildRepository)
+			mockGuardianRepo := new(repomocks.MockGuardianRepository)
+			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
+			tt.mockSetup(mockRegRepo)
+
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
+			ctx := context.Background()
+
+			input := &models.GetRegistrationsByEventOccurrenceIDInput{EventOccurrenceID: uuid.MustParse(tt.eventOccurrenceID)}
+			registrations, err := handler.GetRegistrationsByEventOccurrenceID(ctx, input)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, registrations)
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, registrations)
+				assert.Equal(t, tt.expectedLen, len(registrations.Body.Registrations))
+			}
+
+			mockRegRepo.AssertExpectations(t)
+		})
+	}
+}
+
 func TestHandler_CreateRegistration(t *testing.T) {
 	childID := uuid.MustParse("30000000-0000-0000-0000-000000000001")
 	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")

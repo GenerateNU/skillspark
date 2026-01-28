@@ -58,6 +58,17 @@ func SetupRegistrationRoutes(api huma.API, repo *storage.Repository) {
 	})
 
 	huma.Register(api, huma.Operation{
+		OperationID:   "get-registrations-by-event-occurrence-id",
+		Method:        http.MethodGet,
+		Path:          "/api/v1/registrations/event_occurrence/{event_occurrence_id}",
+		Summary:       "Get registrations by event occurrence ID",
+		Description:   "Retrieve all registrations for a specific event occurrence",
+		Tags:          []string{"Registrations"},
+	}, func(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error) {
+		return registrationHandler.GetRegistrationsByEventOccurrenceID(ctx, input)
+	})
+
+	huma.Register(api, huma.Operation{
 		OperationID:   "update-registration",
 		Method:        http.MethodPatch,
 		Path:          "/api/v1/registrations/{id}",

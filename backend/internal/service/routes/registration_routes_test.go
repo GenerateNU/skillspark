@@ -1,4 +1,4 @@
-package routes_test
+package routes
 
 import (
 	"bytes"
@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"skillspark/internal/models"
-	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
 
@@ -39,7 +38,7 @@ func setupRegistrationTestAPI(
 		EventOccurrence: eventOccurrenceRepo,
 	}
 
-	routes.SetupRegistrationRoutes(api, repo)
+	SetupRegistrationRoutes(api, repo)
 
 	return app, api
 }
@@ -86,6 +85,7 @@ func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -100,6 +100,213 @@ func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 			req, err := http.NewRequest(
 				http.MethodGet,
 				"/api/v1/registrations/"+tt.ID,
+				nil,
+			)
+			assert.NoError(t, err)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRegRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHumaValidation_GetRegistrationsByChildID(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		childID    string
+		mockSetup  func(*repomocks.MockRegistrationRepository)
+		statusCode int
+	}{
+		{
+			name:    "valid UUID",
+			childID: "30000000-0000-0000-0000-000000000001",
+			mockSetup: func(m *repomocks.MockRegistrationRepository) {
+				output := &models.GetRegistrationsByChildIDOutput{}
+				output.Body.Registrations = []models.Registration{
+					{
+						ID:                  uuid.New(),
+						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
+						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+						Status:              models.RegistrationStatusRegistered,
+						EventName:           "STEM Club",
+						OccurrenceStartTime: time.Now(),
+						CreatedAt:           time.Now(),
+						UpdatedAt:           time.Now(),
+					},
+				}
+				m.On("GetRegistrationsByChildID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByChildIDInput")).Return(output, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:       "invalid UUID",
+			childID:    "not-a-uuid",
+			mockSetup:  func(*repomocks.MockRegistrationRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockChildRepo := new(repomocks.MockChildRepository)
+			mockGuardianRepo := new(repomocks.MockGuardianRepository)
+			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
+			tt.mockSetup(mockRegRepo)
+
+			app, _ := setupRegistrationTestAPI(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
+
+			req, err := http.NewRequest(
+				http.MethodGet,
+				"/api/v1/registrations/child/"+tt.childID,
+				nil,
+			)
+			assert.NoError(t, err)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRegRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHumaValidation_GetRegistrationsByGuardianID(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		guardianID string
+		mockSetup  func(*repomocks.MockRegistrationRepository)
+		statusCode int
+	}{
+		{
+			name:       "valid UUID",
+			guardianID: "11111111-1111-1111-1111-111111111111",
+			mockSetup: func(m *repomocks.MockRegistrationRepository) {
+				output := &models.GetRegistrationsByGuardianIDOutput{}
+				output.Body.Registrations = []models.Registration{
+					{
+						ID:                  uuid.New(),
+						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
+						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+						Status:              models.RegistrationStatusRegistered,
+						EventName:           "STEM Club",
+						OccurrenceStartTime: time.Now(),
+						CreatedAt:           time.Now(),
+						UpdatedAt:           time.Now(),
+					},
+				}
+				m.On("GetRegistrationsByGuardianID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByGuardianIDInput")).Return(output, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:       "invalid UUID",
+			guardianID: "not-a-uuid",
+			mockSetup:  func(*repomocks.MockRegistrationRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockChildRepo := new(repomocks.MockChildRepository)
+			mockGuardianRepo := new(repomocks.MockGuardianRepository)
+			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
+			tt.mockSetup(mockRegRepo)
+
+			app, _ := setupRegistrationTestAPI(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
+
+			req, err := http.NewRequest(
+				http.MethodGet,
+				"/api/v1/registrations/guardian/"+tt.guardianID,
+				nil,
+			)
+			assert.NoError(t, err)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRegRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHumaValidation_GetRegistrationsByEventOccurrenceID(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name              string
+		eventOccurrenceID string
+		mockSetup         func(*repomocks.MockRegistrationRepository)
+		statusCode        int
+	}{
+		{
+			name:              "valid UUID",
+			eventOccurrenceID: "70000000-0000-0000-0000-000000000001",
+			mockSetup: func(m *repomocks.MockRegistrationRepository) {
+				output := &models.GetRegistrationsByEventOccurrenceIDOutput{}
+				output.Body.Registrations = []models.Registration{
+					{
+						ID:                  uuid.New(),
+						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
+						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+						Status:              models.RegistrationStatusRegistered,
+						EventName:           "STEM Club",
+						OccurrenceStartTime: time.Now(),
+						CreatedAt:           time.Now(),
+						UpdatedAt:           time.Now(),
+					},
+				}
+				m.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).Return(output, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:              "invalid UUID",
+			eventOccurrenceID: "not-a-uuid",
+			mockSetup:         func(*repomocks.MockRegistrationRepository) {},
+			statusCode:        http.StatusUnprocessableEntity,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockChildRepo := new(repomocks.MockChildRepository)
+			mockGuardianRepo := new(repomocks.MockGuardianRepository)
+			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
+			tt.mockSetup(mockRegRepo)
+
+			app, _ := setupRegistrationTestAPI(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
+
+			req, err := http.NewRequest(
+				http.MethodGet,
+				"/api/v1/registrations/event_occurrence/"+tt.eventOccurrenceID,
 				nil,
 			)
 			assert.NoError(t, err)
@@ -189,6 +396,7 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -277,6 +485,7 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
