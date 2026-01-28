@@ -12,7 +12,7 @@ import (
 )
 
 func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
-	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence)
+	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence, repo.Manager, repo.Event, repo.Location)
 	huma.Register(api, huma.Operation{
 		OperationID: "get-all-event-occurrences",
 		Method:      http.MethodGet,
@@ -76,6 +76,24 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 		}
 
 		return &models.CreateEventOccurrenceOutput{
+			Body: eventOccurrence,
+		}, nil
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "patch-event-occurrence",
+		Method:      http.MethodPatch,
+		Path:        "/api/v1/event-occurrences/{id}",
+		Summary:     "Update an event occurrence",
+		Description: "Updates an event occurrence in the database",
+		Tags:        []string{"Event Occurrences"},
+	}, func(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.UpdateEventOccurrenceOutput, error) {
+		eventOccurrence, err := eventOccurrenceHandler.UpdateEventOccurrence(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.UpdateEventOccurrenceOutput{
 			Body: eventOccurrence,
 		}, nil
 	})
