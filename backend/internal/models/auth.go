@@ -1,41 +1,41 @@
-package models 
+package models
 
 import "github.com/google/uuid"
 
 type GuardianSignUpInput struct {
 	Body struct {
-		Name                string `json:"name" db:"name"`
-		Email               string `json:"email" db:"email"`
-		Username            string `json:"username" db:"username"`
-		Password            string `json:"password" db:"password"`
+		Name                string  `json:"name" db:"name"`
+		Email               string  `json:"email" db:"email"`
+		Username            string  `json:"username" db:"username"`
+		Password            string  `json:"password" db:"password"`
 		ProfilePictureS3Key *string `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
-		LanguagePreference  string `json:"language_preference" db:"language_preference"`
+		LanguagePreference  string  `json:"language_preference" db:"language_preference"`
 	}
 }
 
 type GuardianSignUpOutput struct {
 	Body struct {
-		Token string `json:"token" db:"token"`
+		Token      string    `json:"token" db:"token"`
 		GuardianID uuid.UUID `json:"guardian_id" db:"guardian_id"`
 	} `json:"body"`
 }
 
 type ManagerSignUpInput struct {
 	Body struct {
-		Name                string `json:"name" db:"name" doc:"name of the manager" required:"true"`
-		Email               string `json:"email" db:"email" doc:"email of the manager" required:"true"`
-		Username            string `json:"username" db:"username" doc:"username of the manager" required:"true"`
-		Password            string `json:"password" db:"password" doc:"password of the manager" required:"true"`
-		ProfilePictureS3Key *string `json:"profile_picture_s3_key" db:"profile_picture_s3_key" doc:"profile picture s3 key of the manager" required:"false"`
-		LanguagePreference  string `json:"language_preference" db:"language_preference" doc:"language preference of the manager" required:"false"`
+		Name                string     `json:"name" db:"name" doc:"name of the manager" required:"true"`
+		Email               string     `json:"email" db:"email" doc:"email of the manager" required:"true"`
+		Username            string     `json:"username" db:"username" doc:"username of the manager" required:"true"`
+		Password            string     `json:"password" db:"password" doc:"password of the manager" required:"true"`
+		ProfilePictureS3Key *string    `json:"profile_picture_s3_key" db:"profile_picture_s3_key" doc:"profile picture s3 key of the manager" required:"false"`
+		LanguagePreference  string     `json:"language_preference" db:"language_preference" doc:"language preference of the manager" required:"false"`
 		OrganizationID      *uuid.UUID `json:"organization_id" db:"organization_id" doc:"organization id of the organization the manager is associated with" required:"false"`
-		Role                string `json:"role" db:"role" doc:"role of the manager being created" required:"false"`
+		Role                string     `json:"role" db:"role" doc:"role of the manager being created" required:"false"`
 	}
 }
 
 type ManagerSignUpOutput struct {
 	Body struct {
-		Token string `json:"token" db:"token"`
+		Token     string    `json:"token" db:"token"`
 		ManagerID uuid.UUID `json:"manager_id" db:"manager_id"`
 	}
 }
@@ -57,6 +57,22 @@ type userResponse struct {
 	ID uuid.UUID `json:"id"`
 }
 
+type GuardianLoginOutput struct {
+	GuardianID   uuid.UUID `json:"guardian_id" db:"guardian_id"`
+	AccessToken  string    `json:"access_token" db:"access_token"`
+	TokenType    string    `json:"token_type" db:"token_type"`
+	ExpiresIn    int       `json:"expires_in" db:"expires_in"`
+	RefreshToken string    `json:"refresh_token" db:"refresh_token"`
+}
+
+type ManagerLoginOutput struct {
+	ManagerID    uuid.UUID `json:"manager_id" db:"manager_id"`
+	AccessToken  string    `json:"access_token" db:"access_token"`
+	TokenType    string    `json:"token_type" db:"token_type"`
+	ExpiresIn    int       `json:"expires_in" db:"expires_in"`
+	RefreshToken string    `json:"refresh_token" db:"refresh_token"`
+}
+
 type LoginResponse struct {
 	AccessToken  string       `json:"access_token"`
 	TokenType    string       `json:"token_type"`
@@ -65,8 +81,25 @@ type LoginResponse struct {
 	User         userResponse `json:"user"`
 	Error        interface{}  `json:"error"`
 }
-	
+
 type Payload struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+// SignUpPayload represents the payload for Supabase signup
+type SignUpPayload struct {
+	Email    string `json:"email" db:"email"`
+	Password string `json:"password" db:"password"`
+}
+
+// UserSignupResponse represents the user data returned from Supabase signup
+type UserSignupResponse struct {
+	ID uuid.UUID `json:"id"`
+}
+
+// SignupResponse represents the complete response from Supabase signup
+type SignupResponse struct {
+	AccessToken string             `json:"access_token"`
+	User        UserSignupResponse `json:"user"`
 }
