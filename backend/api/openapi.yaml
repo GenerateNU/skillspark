@@ -1004,7 +1004,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
-    put:
+    patch:
       tags:
         - Registrations
       summary: Update a registration
@@ -1039,35 +1039,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
-    delete:
-      tags:
-        - Registrations
-      summary: Delete a registration
-      description: Delete an existing registration
-      operationId: delete-registration
-      parameters:
-        - name: id
-          in: path
-          description: Registration ID to delete
-          required: true
-          schema:
-            type: string
-            description: Registration ID to delete
-            format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: The deleted registration details
-                $ref: '#/components/schemas/Registration'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
   /api/v1/registrations/child/{child_id}:
     get:
       tags:
@@ -1091,6 +1062,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetRegistrationsByChildIDOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/registrations/event_occurrence/{event_occurrence_id}:
+    get:
+      tags:
+        - Registrations
+      summary: Get registrations by event occurrence ID
+      description: Retrieve all registrations for a specific event occurrence
+      operationId: get-registrations-by-event-occurrence-id
+      parameters:
+        - name: event_occurrence_id
+          in: path
+          description: Event Occurrence ID to retrieve registrations for
+          required: true
+          schema:
+            type: string
+            description: Event Occurrence ID to retrieve registrations for
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRegistrationsByEventOccurrenceIDOutputBody'
         default:
           description: Error
           content:
@@ -1864,6 +1864,24 @@ components:
             $ref: '#/components/schemas/Registration'
       required:
         - registrations
+    GetRegistrationsByEventOccurrenceIDOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GetRegistrationsByEventOccurrenceIDOutputBody.json
+          readOnly: true
+        registrations:
+          type: array
+          description: List of registrations for the event occurrence
+          items:
+            $ref: '#/components/schemas/Registration'
+      required:
+        - registrations
     GetRegistrationsByGuardianIDOutputBody:
       type: object
       additionalProperties: false
@@ -2084,6 +2102,33 @@ components:
         - active
         - created_at
         - updated_at
+    PatchManagerInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/PatchManagerInputBody.json
+          readOnly: true
+        id:
+          type: string
+          description: id of the manager
+        organization_id:
+          type: string
+          description: organization id of the organization the manager is associated with
+        role:
+          type: string
+          description: role of the manager being created
+        user_id:
+          type: string
+          description: user id of the manager
+      required:
+        - id
+        - user_id
+        - role
     Registration:
       type: object
       additionalProperties: false
@@ -2138,33 +2183,6 @@ components:
         - updated_at
         - event_name
         - occurrence_start_time
-    PatchManagerInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/PatchManagerInputBody.json
-          readOnly: true
-        id:
-          type: string
-          description: id of the manager
-        organization_id:
-          type: string
-          description: organization id of the organization the manager is associated with
-        role:
-          type: string
-          description: role of the manager being created
-        user_id:
-          type: string
-          description: user id of the manager
-      required:
-        - id
-        - user_id
-        - role
     School:
       type: object
       additionalProperties: false
