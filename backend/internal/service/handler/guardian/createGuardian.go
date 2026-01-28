@@ -2,6 +2,7 @@ package guardian
 
 import (
 	"context"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 )
 
@@ -9,7 +10,7 @@ func (h *Handler) CreateGuardian(ctx context.Context, input *models.CreateGuardi
 	// Check if user is already a manager
 	_, err := h.ManagerRepository.GetManagerByUserID(ctx, input.Body.UserID)
 	if err == nil {
-		return nil, err
+		return nil, errs.Conflict("Manager", "user_id", input.Body.UserID)
 	}
 
 	guardian, err := h.GuardianRepository.CreateGuardian(ctx, input)

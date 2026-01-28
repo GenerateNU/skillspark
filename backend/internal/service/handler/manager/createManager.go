@@ -2,6 +2,7 @@ package manager
 
 import (
 	"context"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 )
 
@@ -10,7 +11,7 @@ func (h *Handler) CreateManager(ctx context.Context, input *models.CreateManager
 	// Check if user is already a guardian
 	_, err := h.GuardianRepository.GetGuardianByUserID(ctx, input.Body.UserID)
 	if err == nil {
-		return nil, err
+		return nil, errs.Conflict("Guardian", "user_id", input.Body.UserID)
 	}
 
 	// Input is already parsed and validated by Huma!
