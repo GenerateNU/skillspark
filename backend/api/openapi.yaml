@@ -242,6 +242,41 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+    patch:
+      tags:
+        - Event Occurrences
+      summary: Update an event occurrence
+      description: Updates an event occurrence in the database
+      operationId: patch-event-occurrence
+      parameters:
+        - name: id
+          in: path
+          description: ID of the event occurrence to update
+          required: true
+          schema:
+            type: string
+            description: ID of the event occurrence to update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Event occurrence fields to update
+              $ref: '#/components/schemas/UpdateEventOccurrenceInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Updated event occurrence
+                $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/events:
     post:
       tags:
@@ -357,19 +392,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
   /api/v1/greet/{name}:
+  /api/v1/greet/{name}:
     get:
       tags:
         - Examples
       summary: Get a greeting
       description: Returns a personalized greeting message
       operationId: get-greeting
+        - Examples
+      summary: Get a greeting
+      description: Returns a personalized greeting message
+      operationId: get-greeting
       parameters:
         - name: name
+        - name: name
           in: path
+          description: Name to greet
           description: Name to greet
           required: true
           schema:
             type: string
+            description: Name to greet
+            maxLength: 30
             description: Name to greet
             maxLength: 30
       responses:
@@ -378,6 +422,7 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/GetGreetingOutputBody'
                 $ref: '#/components/schemas/GetGreetingOutputBody'
         default:
           description: Error
@@ -875,6 +920,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Organization'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/organizations/{organization_id}/event-occurrences/:
+    get:
+      tags:
+        - Organizations
+      summary: Get event occurrences by organization ID
+      description: Returns event occurrences that match the organization ID
+      operationId: get-event-occurrences-by-organization-id
+      parameters:
+        - name: organization_id
+          in: path
+          description: ID of an organization
+          required: true
+          schema:
+            type: string
+            description: ID of an organization
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of event occurrences in the database that match the organization ID
+                items:
+                  $ref: '#/components/schemas/EventOccurrence'
         default:
           description: Error
           content:
@@ -1865,6 +1941,33 @@ components:
           description: Username of the guardian
       required:
         - id
+    PatchManagerInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/PatchManagerInputBody.json
+          readOnly: true
+        id:
+          type: string
+          description: id of the manager
+        organization_id:
+          type: string
+          description: organization id of the organization the manager is associated with
+        role:
+          type: string
+          description: role of the manager being created
+        user_id:
+          type: string
+          description: user id of the manager
+      required:
+        - id
+        - user_id
+        - role
     School:
       type: object
       additionalProperties: false
@@ -1970,6 +2073,51 @@ components:
           description: Title of the event
           minLength: 2
           maxLength: 100
+    UpdateEventOccurrenceInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateEventOccurrenceInputBody.json
+          readOnly: true
+        curr_enrolled:
+          type: integer
+          description: Number of students currently enrolled in the event occurrence
+          format: int64
+          minimum: 0
+          maximum: 100
+        end_time:
+          type: string
+          description: End time of the event occurrence
+          format: date-time
+        event_id:
+          type: string
+          description: ID of an event in the database
+        language:
+          type: string
+          description: Primary language used for the event occurrence
+          minLength: 2
+          maxLength: 30
+        location_id:
+          type: string
+          description: ID of a location in the database
+        manager_id:
+          type: string
+          description: ID of a manager in the database
+        max_attendees:
+          type: integer
+          description: Maximum number of attendees
+          format: int64
+          minimum: 1
+          maximum: 100
+        start_time:
+          type: string
+          description: Start time of the event occurrence
+          format: date-time
     UpdateGuardianInputBody:
       type: object
       additionalProperties: false
