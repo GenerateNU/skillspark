@@ -392,28 +392,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
   /api/v1/greet/{name}:
-  /api/v1/greet/{name}:
     get:
       tags:
         - Examples
       summary: Get a greeting
       description: Returns a personalized greeting message
       operationId: get-greeting
-        - Examples
-      summary: Get a greeting
-      description: Returns a personalized greeting message
-      operationId: get-greeting
       parameters:
         - name: name
-        - name: name
           in: path
-          description: Name to greet
           description: Name to greet
           required: true
           schema:
             type: string
-            description: Name to greet
-            maxLength: 30
             description: Name to greet
             maxLength: 30
       responses:
@@ -422,7 +413,6 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetGreetingOutputBody'
                 $ref: '#/components/schemas/GetGreetingOutputBody'
         default:
           description: Error
@@ -1311,10 +1301,14 @@ components:
         profile_picture_s3_key:
           type: string
           description: S3 key for profile picture
+        user_id:
+          type: string
+          description: User ID associated with the guardian
         username:
           type: string
           description: Username of the guardian
       required:
+        - user_id
         - name
         - email
         - username
@@ -1416,10 +1410,14 @@ components:
         role:
           type: string
           description: role of the manager being created
+        user_id:
+          type: string
+          description: User ID associated with the manager
         username:
           type: string
           description: Username of the guardian
       required:
+        - user_id
         - name
         - email
         - username
@@ -1941,33 +1939,6 @@ components:
           description: Username of the guardian
       required:
         - id
-    PatchManagerInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/PatchManagerInputBody.json
-          readOnly: true
-        id:
-          type: string
-          description: id of the manager
-        organization_id:
-          type: string
-          description: organization id of the organization the manager is associated with
-        role:
-          type: string
-          description: role of the manager being created
-        user_id:
-          type: string
-          description: user id of the manager
-      required:
-        - id
-        - user_id
-        - role
     School:
       type: object
       additionalProperties: false
