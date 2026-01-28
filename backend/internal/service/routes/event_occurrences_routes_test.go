@@ -174,6 +174,8 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 	start, _ := time.Parse(time.RFC3339, "2026-02-01T00:00:00Z")
 	end, _ := time.Parse(time.RFC3339, "2026-02-01T01:00:00Z")
 
+	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
+
 	category_arr := []string{"science","technology"}
 	eight := 8
 	twelve := 12
@@ -302,6 +304,20 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
 
+			if tt.statusCode == http.StatusOK {
+				mockManagerRepo.On("GetManagerByID", mock.Anything, mock.Anything,
+				).Return(&models.Manager{
+					ID: mid,
+					UserID: uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"),
+					OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+					Role: "Director",
+				}, nil)
+				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything,
+				).Return(&event, nil)
+				mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything,
+				).Return(&location, nil)
+			}
+
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
 			defer func() { _ = resp.Body.Close() }()
@@ -320,14 +336,34 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 	t.Parallel()
 
+	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	mid_new := uuid.MustParse("50000000-0000-0000-0000-000000000005")
 	eid := uuid.MustParse("60000000-0000-0000-0000-00000000000e")
 	lid := uuid.MustParse("10000000-0000-0000-0000-000000000008")
+	start, _ := time.Parse(time.RFC3339, "2026-02-22 09:00:00+07")
+	end, _ := time.Parse(time.RFC3339, "2026-02-22 11:00:00+07")
 	start_new, _ := time.Parse(time.RFC3339, "2026-02-15 10:00:00+07")
 	end_new, _ := time.Parse(time.RFC3339, "2026-02-15 12:00:00+07")
 	max := 10
 	lang := "th"
 	curr := 8
+
+	category_arr := []string{"science","technology"}
+	eight := 8
+	twelve := 12
+	jpg := "events/robotics_workshop.jpg"
+	event := models.Event{
+		ID: 				eid,
+		Title: 				"Junior Robotics Workshop",
+		Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+		OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+		AgeRangeMin: 		&eight,
+		AgeRangeMax: 		&twelve,
+		Category: 			category_arr,
+		HeaderImageS3Key: 	&jpg,
+		CreatedAt: 			time.Now(),
+		UpdatedAt: 			time.Now(),
+	}
 
 	category_arr_new := []string{"technology","math"}
 	ten := 10
@@ -343,6 +379,22 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 		HeaderImageS3Key: 	nil,
 		CreatedAt: 			time.Now(),
 		UpdatedAt: 			time.Now(),
+	}
+
+	addr := "Suite 15"
+	location := models.Location{
+		ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
+		Latitude:     13.7650000,
+		Longitude:    100.5380000,
+		AddressLine1: "321 Phetchaburi Road",
+		AddressLine2: &addr,
+		Subdistrict:  "Ratchathewi",
+		District:     "Ratchathewi",
+		Province:     "Bangkok",
+		PostalCode:   "10400",
+		Country:      "Thailand",
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	location_new := models.Location{
@@ -447,6 +499,37 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 			)
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
+
+			if tt.statusCode == http.StatusOK {
+				mockRepo.On(
+					"GetEventOccurrenceByID",
+					mock.Anything,
+					uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+				).Return(&models.EventOccurrence{
+					ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+					ManagerId: 		&mid,
+					Event: 			event,
+					Location: 		location,
+					StartTime: 		start,
+					EndTime: 		end,
+					MaxAttendees: 	15,
+					Language: 		"en",
+					CurrEnrolled: 	5,
+					CreatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+					UpdatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+				}, nil)
+				mockManagerRepo.On("GetManagerByID", mock.Anything, mock.Anything,
+				).Return(&models.Manager{
+					ID: mid,
+					UserID: uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"),
+					OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+					Role: "Director",
+				}, nil)
+				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything,
+				).Return(&event, nil)
+				mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything,
+				).Return(&location, nil)
+			}
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
