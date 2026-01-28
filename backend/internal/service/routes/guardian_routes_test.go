@@ -3,11 +3,11 @@ package routes_test
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"testing"
 	"time"
 
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
@@ -61,7 +61,8 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 				"language_preference": "en",
 			},
 			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
-				mm.On("GetManagerByUserID", mock.Anything, mock.Anything).Return(nil, errors.New("not found"))
+				notFound := errs.NotFound("Manager", "user_id", userID)
+				mm.On("GetManagerByUserID", mock.Anything, mock.Anything).Return(nil, &notFound)
 
 				m.On("GetGuardianByUserID", mock.Anything, mock.Anything).Return(nil, nil).Maybe()
 				m.On(
