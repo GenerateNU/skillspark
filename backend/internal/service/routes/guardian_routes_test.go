@@ -3,6 +3,7 @@ package routes_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"testing"
 	"time"
@@ -22,6 +23,7 @@ import (
 
 func setupGuardianTestAPI(
 	guardianRepo *repomocks.MockGuardianRepository,
+	managerRepo *repomocks.MockManagerRepository,
 ) (*fiber.App, huma.API) {
 
 	app := fiber.New()
@@ -30,6 +32,7 @@ func setupGuardianTestAPI(
 
 	repo := &storage.Repository{
 		Guardian: guardianRepo,
+		Manager:  managerRepo,
 	}
 
 	routes.SetupGuardiansRoutes(api, repo)
@@ -40,21 +43,26 @@ func setupGuardianTestAPI(
 func TestHumaValidation_CreateGuardian(t *testing.T) {
 	t.Parallel()
 
+	userID := uuid.New()
+
 	tests := []struct {
 		name       string
 		payload    map[string]interface{}
-		mockSetup  func(*repomocks.MockGuardianRepository)
+		mockSetup  func(*repomocks.MockGuardianRepository, *repomocks.MockManagerRepository)
 		statusCode int
 	}{
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
+				"user_id":             userID.String(),
 				"name":                "John Doe",
 				"email":               "john@example.com",
 				"username":            "johndoe",
 				"language_preference": "en",
 			},
-			mockSetup: func(m *repomocks.MockGuardianRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+				mm.On("GetManagerByUserID", mock.Anything, mock.Anything).Return(nil, errors.New("not found"))
+
 				m.On("GetGuardianByUserID", mock.Anything, mock.Anything).Return(nil, nil).Maybe()
 				m.On(
 					"CreateGuardian",
@@ -64,7 +72,7 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 					}),
 				).Return(&models.Guardian{
 					ID:                 uuid.New(),
-					UserID:             uuid.New(),
+					UserID:             userID,
 					Name:               "John Doe",
 					Email:              "john@example.com",
 					Username:           "johndoe",
@@ -80,7 +88,7 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 			payload: map[string]interface{}{
 				"username": "johndoe",
 			},
-			mockSetup:  func(*repomocks.MockGuardianRepository) {},
+			mockSetup:  func(*repomocks.MockGuardianRepository, *repomocks.MockManagerRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 	}
@@ -91,9 +99,10 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
-			tt.mockSetup(mockRepo)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
+			tt.mockSetup(mockRepo, mockManagerRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -112,6 +121,7 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRepo.AssertExpectations(t)
+			mockManagerRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -156,9 +166,10 @@ func TestHumaValidation_GetGuardianByID(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -234,9 +245,10 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -296,9 +308,10 @@ func TestHumaValidation_DeleteGuardian(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
 
 			req, err := http.NewRequest(
 				http.MethodDelete,
@@ -354,9 +367,10 @@ func TestHumaValidation_GetGuardianByChildID(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
