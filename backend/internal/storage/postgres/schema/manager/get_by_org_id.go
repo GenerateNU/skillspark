@@ -20,12 +20,12 @@ func (r *ManagerRepository) GetManagerByOrgID(ctx context.Context, org_id uuid.U
 
 	row := r.db.QueryRow(ctx, query, org_id)
 	var manager models.Manager
-	err = row.Scan(&manager.ID, &manager.UserID, &manager.OrganizationID, &manager.Role,
+	err = row.Scan(&manager.ID, &manager.UserID, &manager.OrganizationID, &manager.Role, &manager.Name, &manager.Email, &manager.Username, &manager.ProfilePictureS3Key, &manager.LanguagePreference,
 		&manager.CreatedAt, &manager.UpdatedAt)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			err := errs.NotFound("Location", "id", org_id)
+			err := errs.NotFound("Manager", "organization_id", org_id)
 			return nil, &err
 		}
 		err := errs.InternalServerError("Failed to fetch manager by organization_id: ", err.Error())

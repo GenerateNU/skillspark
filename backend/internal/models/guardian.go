@@ -7,10 +7,15 @@ import (
 )
 
 type Guardian struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	UserID    uuid.UUID `json:"user_id" db:"user_id"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	ID                  uuid.UUID `json:"id" db:"id"`
+	UserID              uuid.UUID `json:"user_id" db:"user_id"`
+	Name                string    `json:"name" db:"name"`
+	Email               string    `json:"email" db:"email"`
+	Username            string    `json:"username" db:"username"`
+	ProfilePictureS3Key *string   `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
+	LanguagePreference  string    `json:"language_preference" db:"language_preference"`
+	CreatedAt           time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt           time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type GetGuardianByIDInput struct {
@@ -31,14 +36,23 @@ type GetGuardianByChildIDInput struct {
 
 type CreateGuardianInput struct {
 	Body struct {
-		UserID uuid.UUID `json:"user_id" doc:"The associated user ID of the guardian"`
+		UserID              uuid.UUID `json:"user_id" doc:"User ID associated with the guardian"`
+		Name                string    `json:"name" doc:"Name of the guardian"`
+		Email               string    `json:"email" doc:"Email of the guardian"`
+		Username            string    `json:"username" doc:"Username of the guardian"`
+		ProfilePictureS3Key *string   `json:"profile_picture_s3_key,omitempty" doc:"S3 key for profile picture"`
+		LanguagePreference  string    `json:"language_preference" doc:"Language preference"`
 	}
 }
 
 type UpdateGuardianInput struct {
 	ID   uuid.UUID `path:"id"`
 	Body struct {
-		UserID uuid.UUID `json:"user_id" doc:"The associated user ID of the guardian"`
+		Name                string  `json:"name" doc:"Name of the guardian"`
+		Email               string  `json:"email" doc:"Email of the guardian"`
+		Username            string  `json:"username" doc:"Username of the guardian"`
+		ProfilePictureS3Key *string `json:"profile_picture_s3_key,omitempty" doc:"S3 key for profile picture"`
+		LanguagePreference  string  `json:"language_preference" doc:"Language preference"`
 	}
 }
 

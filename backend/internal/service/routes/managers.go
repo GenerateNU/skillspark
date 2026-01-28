@@ -15,7 +15,7 @@ import (
 // dont rlly know what huma does in general
 // how was the manager table created in the schema???
 func SetupManagerRoutes(api huma.API, repo *storage.Repository) {
-	managerHandler := manager.NewHandler(repo.Manager)
+	managerHandler := manager.NewHandler(repo.Manager, repo.Guardian)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-manager-by-id",

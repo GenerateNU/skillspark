@@ -23,7 +23,10 @@ func TestManagerRepository_Delete_Director(t *testing.T) {
 	ptr := uuid.MustParse("40000000-0000-0000-0000-000000000006")
 	managerInput := func() *models.CreateManagerInput {
 		input := &models.CreateManagerInput{}
-		input.Body.UserID = uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c")
+		input.Body.Name = "Delete Man"
+		input.Body.Email = "delete.m@example.com"
+		input.Body.Username = "delman"
+		input.Body.LanguagePreference = "en"
 		input.Body.OrganizationID = &ptr
 		input.Body.Role = "Assistant Manager"
 		return input
@@ -36,5 +39,5 @@ func TestManagerRepository_Delete_Director(t *testing.T) {
 	assert.Equal(t, createdManager.UserID, manager.UserID)
 	assert.Equal(t, createdManager.OrganizationID, manager.OrganizationID)
 	assert.Equal(t, createdManager.Role, manager.Role)
-
+	assert.Equal(t, createdManager.Name, manager.Name)
 }

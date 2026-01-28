@@ -24,6 +24,17 @@ func (m *MockManagerRepository) GetManagerByID(ctx context.Context, id uuid.UUID
 	return args.Get(0).(*models.Manager), nil
 }
 
+func (m *MockManagerRepository) GetManagerByUserID(ctx context.Context, userID uuid.UUID) (*models.Manager, error) {
+	args := m.Called(ctx, userID)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Manager), nil
+}
+
 func (m *MockManagerRepository) GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error) {
 	args := m.Called(ctx, org_id)
 	if args.Get(0) == nil {

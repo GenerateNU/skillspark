@@ -18,23 +18,23 @@ func TestHandler_CreateEventOccurrence(t *testing.T) {
 	start, _ := time.Parse(time.RFC3339, "2026-02-15 09:00:00+07")
 	end, _ := time.Parse(time.RFC3339, "2026-02-15 11:00:00+07")
 
-	category_arr := []string{"science","technology"}
+	category_arr := []string{"science", "technology"}
 	eight := 8
 	twelve := 12
 	jpg := "events/robotics_workshop.jpg"
 	addr := "Suite 15"
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	event := models.Event{
-		ID: 				uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-		Title: 				"Junior Robotics Workshop",
-		Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
-		OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-		AgeRangeMin: 		&eight,
-		AgeRangeMax: 		&twelve,
-		Category: 			category_arr,
-		HeaderImageS3Key: 	&jpg,
-		CreatedAt: 			time.Now(),
-		UpdatedAt: 			time.Now(),
+		ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+		Title:            "Junior Robotics Workshop",
+		Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+		AgeRangeMin:      &eight,
+		AgeRangeMax:      &twelve,
+		Category:         category_arr,
+		HeaderImageS3Key: &jpg,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
 	location := models.Location{
@@ -77,17 +77,17 @@ func TestHandler_CreateEventOccurrence(t *testing.T) {
 					mock.Anything,
 					mock.AnythingOfType("*models.CreateEventOccurrenceInput"),
 				).Return(&models.EventOccurrence{
-					ID:        		uuid.New(),
-					ManagerId: 		&mid,
-					Event: 			event,
-					Location: 		location,
-					StartTime: 		start,
-					EndTime: 		end,
-					MaxAttendees: 	15,
-					Language: 		"en",
-					CurrEnrolled: 	8,
-					CreatedAt:    	time.Now(),
-					UpdatedAt:    	time.Now(),
+					ID:           uuid.New(),
+					ManagerId:    &mid,
+					Event:        event,
+					Location:     location,
+					StartTime:    start,
+					EndTime:      end,
+					MaxAttendees: 15,
+					Language:     "en",
+					CurrEnrolled: 8,
+					CreatedAt:    time.Now(),
+					UpdatedAt:    time.Now(),
 				}, nil)
 			},
 			wantErr: false,
@@ -108,28 +108,25 @@ func TestHandler_CreateEventOccurrence(t *testing.T) {
 			handler := NewHandler(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo)
 			ctx := context.Background()
 
-			mockManagerRepo.On("GetManagerByID", mock.Anything, mock.Anything,
-			).Return(&models.Manager{
-				ID: mid,
-				UserID: uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"),
+			mockManagerRepo.On("GetManagerByID", mock.Anything, mock.Anything).Return(&models.Manager{
+				ID:             mid,
+				UserID:         uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"),
 				OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-				Role: "Director",
+				Role:           "Director",
 			}, nil)
-			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything,
-			).Return(&models.Event{
-				ID: 				uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-				Title: 				"Junior Robotics Workshop",
-				Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
-				OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-				AgeRangeMin: 		&eight,
-				AgeRangeMax: 		&twelve,
-				Category: 			category_arr,
-				HeaderImageS3Key: 	&jpg,
-				CreatedAt: 			time.Now(),
-				UpdatedAt: 			time.Now(),
+			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything).Return(&models.Event{
+				ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+				Title:            "Junior Robotics Workshop",
+				Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+				OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				AgeRangeMin:      &eight,
+				AgeRangeMax:      &twelve,
+				Category:         category_arr,
+				HeaderImageS3Key: &jpg,
+				CreatedAt:        time.Now(),
+				UpdatedAt:        time.Now(),
 			}, nil)
-			mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything,
-			).Return(&models.Location{
+			mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything).Return(&models.Location{
 				ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
 				Latitude:     13.7650000,
 				Longitude:    100.5380000,
@@ -176,23 +173,23 @@ func TestHandler_GetEventOccurrenceById(t *testing.T) {
 	start, _ := time.Parse(time.RFC3339, "2026-02-15 09:00:00+07")
 	end, _ := time.Parse(time.RFC3339, "2026-02-15 11:00:00+07")
 
-	category_arr := []string{"science","technology"}
+	category_arr := []string{"science", "technology"}
 	eight := 8
 	twelve := 12
 	jpg := "events/robotics_workshop.jpg"
 	addr := "Suite 15"
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	event := models.Event{
-		ID: 				uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-		Title: 				"Junior Robotics Workshop",
-		Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
-		OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-		AgeRangeMin: 		&eight,
-		AgeRangeMax: 		&twelve,
-		Category: 			category_arr,
-		HeaderImageS3Key: 	&jpg,
-		CreatedAt: 			time.Now(),
-		UpdatedAt: 			time.Now(),
+		ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+		Title:            "Junior Robotics Workshop",
+		Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+		AgeRangeMin:      &eight,
+		AgeRangeMax:      &twelve,
+		Category:         category_arr,
+		HeaderImageS3Key: &jpg,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
 	location := models.Location{
@@ -227,17 +224,17 @@ func TestHandler_GetEventOccurrenceById(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 				).Return(&models.EventOccurrence{
-					ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000001"),
-					ManagerId: 		&mid,
-					Event: 			event,
-					Location: 		location,
-					StartTime: 		start,
-					EndTime: 		end,
-					MaxAttendees: 	15,
-					Language: 		"en",
-					CurrEnrolled: 	8,
-					CreatedAt:    	time.Now(),
-					UpdatedAt:    	time.Now(),
+					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+					ManagerId:    &mid,
+					Event:        event,
+					Location:     location,
+					StartTime:    start,
+					EndTime:      end,
+					MaxAttendees: 15,
+					Language:     "en",
+					CurrEnrolled: 8,
+					CreatedAt:    time.Now(),
+					UpdatedAt:    time.Now(),
 				}, nil)
 			},
 			wantErr: false,
@@ -262,7 +259,7 @@ func TestHandler_GetEventOccurrenceById(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt 
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -306,37 +303,37 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 	curr := 8
 	curr_bad := 20
 
-	category_arr := []string{"science","technology"}
+	category_arr := []string{"science", "technology"}
 	eight := 8
 	twelve := 12
 	jpg := "events/robotics_workshop.jpg"
 	event := models.Event{
-		ID: 				eid,
-		Title: 				"Junior Robotics Workshop",
-		Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
-		OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-		AgeRangeMin: 		&eight,
-		AgeRangeMax: 		&twelve,
-		Category: 			category_arr,
-		HeaderImageS3Key: 	&jpg,
-		CreatedAt: 			time.Now(),
-		UpdatedAt: 			time.Now(),
+		ID:               eid,
+		Title:            "Junior Robotics Workshop",
+		Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+		AgeRangeMin:      &eight,
+		AgeRangeMax:      &twelve,
+		Category:         category_arr,
+		HeaderImageS3Key: &jpg,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
-	category_arr_new := []string{"technology","math"}
+	category_arr_new := []string{"technology", "math"}
 	ten := 10
 	fifteen := 15
 	event_new := models.Event{
-		ID: 				uuid.MustParse("60000000-0000-0000-0000-00000000000e"),
-		Title: 				"Python for Kids",
-		Description: 		"Introduction to Python programming. Build simple programs and games while learning core concepts.",
-		OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000005"),
-		AgeRangeMin: 		&ten,
-		AgeRangeMax: 		&fifteen,
-		Category: 			category_arr_new,
-		HeaderImageS3Key: 	nil,
-		CreatedAt: 			time.Now(),
-		UpdatedAt: 			time.Now(),
+		ID:               uuid.MustParse("60000000-0000-0000-0000-00000000000e"),
+		Title:            "Python for Kids",
+		Description:      "Introduction to Python programming. Build simple programs and games while learning core concepts.",
+		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000005"),
+		AgeRangeMin:      &ten,
+		AgeRangeMax:      &fifteen,
+		Category:         category_arr_new,
+		HeaderImageS3Key: nil,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
 	addr := "Suite 15"
@@ -369,7 +366,6 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
-	
 
 	tests := []struct {
 		name      string
@@ -398,17 +394,17 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 				).Return(&models.EventOccurrence{
-					ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000002"),
-					ManagerId: 		&mid,
-					Event: 			event,
-					Location: 		location,
-					StartTime: 		start,
-					EndTime: 		end,
-					MaxAttendees: 	15,
-					Language: 		"en",
-					CurrEnrolled: 	5,
-					CreatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
-					UpdatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+					ManagerId:    &mid,
+					Event:        event,
+					Location:     location,
+					StartTime:    start,
+					EndTime:      end,
+					MaxAttendees: 15,
+					Language:     "en",
+					CurrEnrolled: 5,
+					CreatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+					UpdatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
 				}, nil)
 			},
 			wantErr: true,
@@ -434,17 +430,17 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 				).Return(&models.EventOccurrence{
-					ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000002"),
-					ManagerId: 		&mid,
-					Event: 			event,
-					Location: 		location,
-					StartTime: 		start,
-					EndTime: 		end,
-					MaxAttendees: 	15,
-					Language: 		"en",
-					CurrEnrolled: 	5,
-					CreatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
-					UpdatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+					ManagerId:    &mid,
+					Event:        event,
+					Location:     location,
+					StartTime:    start,
+					EndTime:      end,
+					MaxAttendees: 15,
+					Language:     "en",
+					CurrEnrolled: 5,
+					CreatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+					UpdatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
 				}, nil)
 			},
 			wantErr: true,
@@ -470,17 +466,17 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 					mock.Anything,
 					mock.AnythingOfType("*models.UpdateEventOccurrenceInput"),
 				).Return(&models.EventOccurrence{
-					ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000002"),
-					ManagerId: 		&mid,
-					Event: 			event,
-					Location: 		location,
-					StartTime: 		start,
-					EndTime: 		end,
-					MaxAttendees: 	15,
-					Language: 		"en",
-					CurrEnrolled: 	8,
-					CreatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
-					UpdatedAt:    	time.Now(),
+					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+					ManagerId:    &mid,
+					Event:        event,
+					Location:     location,
+					StartTime:    start,
+					EndTime:      end,
+					MaxAttendees: 15,
+					Language:     "en",
+					CurrEnrolled: 8,
+					CreatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+					UpdatedAt:    time.Now(),
 				}, nil)
 			},
 			wantErr: false,
@@ -506,17 +502,17 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 					mock.Anything,
 					mock.AnythingOfType("*models.UpdateEventOccurrenceInput"),
 				).Return(&models.EventOccurrence{
-					ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000002"),
-					ManagerId: 		&mid_new,
-					Event: 			event_new,
-					Location: 		location_new,
-					StartTime: 		start_new,
-					EndTime: 		end_new,
-					MaxAttendees: 	10,
-					Language: 		"th",
-					CurrEnrolled: 	5,
-					CreatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
-					UpdatedAt:    	time.Now(),
+					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+					ManagerId:    &mid_new,
+					Event:        event_new,
+					Location:     location_new,
+					StartTime:    start_new,
+					EndTime:      end_new,
+					MaxAttendees: 10,
+					Language:     "th",
+					CurrEnrolled: 5,
+					CreatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+					UpdatedAt:    time.Now(),
 				}, nil)
 			},
 			wantErr: false,
@@ -543,42 +539,39 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 				).Return(&models.EventOccurrence{
-					ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000002"),
-					ManagerId: 		&mid,
-					Event: 			event,
-					Location: 		location,
-					StartTime: 		start,
-					EndTime: 		end,
-					MaxAttendees: 	15,
-					Language: 		"en",
-					CurrEnrolled: 	5,
-					CreatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
-					UpdatedAt:    	time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+					ManagerId:    &mid,
+					Event:        event,
+					Location:     location,
+					StartTime:    start,
+					EndTime:      end,
+					MaxAttendees: 15,
+					Language:     "en",
+					CurrEnrolled: 5,
+					CreatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
+					UpdatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
 				}, nil)
 			}
 
-			mockManagerRepo.On("GetManagerByID", mock.Anything, mock.Anything,
-			).Return(&models.Manager{
-				ID: mid,
-				UserID: uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"),
+			mockManagerRepo.On("GetManagerByID", mock.Anything, mock.Anything).Return(&models.Manager{
+				ID:             mid,
+				UserID:         uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"),
 				OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-				Role: "Director",
+				Role:           "Director",
 			}, nil)
-			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything,
-			).Return(&models.Event{
-				ID: 				uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-				Title: 				"Junior Robotics Workshop",
-				Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
-				OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-				AgeRangeMin: 		&eight,
-				AgeRangeMax: 		&twelve,
-				Category: 			category_arr,
-				HeaderImageS3Key: 	&jpg,
-				CreatedAt: 			time.Now(),
-				UpdatedAt: 			time.Now(),
+			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything).Return(&models.Event{
+				ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+				Title:            "Junior Robotics Workshop",
+				Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+				OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				AgeRangeMin:      &eight,
+				AgeRangeMax:      &twelve,
+				Category:         category_arr,
+				HeaderImageS3Key: &jpg,
+				CreatedAt:        time.Now(),
+				UpdatedAt:        time.Now(),
 			}, nil)
-			mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything,
-			).Return(&models.Location{
+			mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything).Return(&models.Location{
 				ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
 				Latitude:     13.7650000,
 				Longitude:    100.5380000,

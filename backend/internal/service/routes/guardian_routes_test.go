@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
@@ -22,6 +23,7 @@ import (
 
 func setupGuardianTestAPI(
 	guardianRepo *repomocks.MockGuardianRepository,
+	managerRepo *repomocks.MockManagerRepository,
 ) (*fiber.App, huma.API) {
 
 	app := fiber.New()
@@ -30,6 +32,7 @@ func setupGuardianTestAPI(
 
 	repo := &storage.Repository{
 		Guardian: guardianRepo,
+		Manager:  managerRepo,
 	}
 
 	routes.SetupGuardiansRoutes(api, repo)
@@ -40,40 +43,55 @@ func setupGuardianTestAPI(
 func TestHumaValidation_CreateGuardian(t *testing.T) {
 	t.Parallel()
 
+	userID := uuid.New()
+
 	tests := []struct {
 		name       string
 		payload    map[string]interface{}
-		mockSetup  func(*repomocks.MockGuardianRepository)
+		mockSetup  func(*repomocks.MockGuardianRepository, *repomocks.MockManagerRepository)
 		statusCode int
 	}{
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
-				"user_id": "d1c8d767-c3cf-42e9-848f-15756491e02e",
+				"user_id":             userID.String(),
+				"name":                "John Doe",
+				"email":               "john@example.com",
+				"username":            "johndoe",
+				"language_preference": "en",
 			},
-			mockSetup: func(m *repomocks.MockGuardianRepository) {
-				m.On("GetGuardianByUserID", mock.Anything, uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e")).Return(nil, nil)
+			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+				notFound := errs.NotFound("Manager", "user_id", userID)
+				mm.On("GetManagerByUserID", mock.Anything, mock.Anything).Return(nil, &notFound)
+
+				m.On("GetGuardianByUserID", mock.Anything, mock.Anything).Return(nil, nil).Maybe()
 				m.On(
 					"CreateGuardian",
 					mock.Anything,
-					mock.AnythingOfType("*models.CreateGuardianInput"),
+					mock.MatchedBy(func(input *models.CreateGuardianInput) bool {
+						return input.Body.Name == "John Doe" && input.Body.Email == "john@example.com"
+					}),
 				).Return(&models.Guardian{
-					ID:        uuid.New(),
-					UserID:    uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e"),
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+					ID:                 uuid.New(),
+					UserID:             userID,
+					Name:               "John Doe",
+					Email:              "john@example.com",
+					Username:           "johndoe",
+					LanguagePreference: "en",
+					CreatedAt:          time.Now(),
+					UpdatedAt:          time.Now(),
 				}, nil)
 			},
 			statusCode: http.StatusOK,
 		},
-		// {
-		// 	name: "missing required fields",
-		// 	payload: map[string]interface{}{
-		// 		"first_name": "John",
-		// 	},
-		// 	mockSetup:  func(*repomocks.MockGuardianRepository) {},
-		// 	statusCode: http.StatusUnprocessableEntity,
-		// },
+		{
+			name: "missing required fields",
+			payload: map[string]interface{}{
+				"username": "johndoe",
+			},
+			mockSetup:  func(*repomocks.MockGuardianRepository, *repomocks.MockManagerRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
 	}
 
 	for _, tt := range tests {
@@ -82,9 +100,10 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
-			tt.mockSetup(mockRepo)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
+			tt.mockSetup(mockRepo, mockManagerRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -103,6 +122,7 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRepo.AssertExpectations(t)
+			mockManagerRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -126,7 +146,7 @@ func TestHumaValidation_GetGuardianByID(t *testing.T) {
 					uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 				).Return(&models.Guardian{
 					ID:        uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
-					UserID:    uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e"),
+					UserID:    uuid.New(),
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)
@@ -147,9 +167,10 @@ func TestHumaValidation_GetGuardianByID(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -182,20 +203,28 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 			name:       "valid payload",
 			guardianID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 			payload: map[string]interface{}{
-				"user_id": "d1c8d767-c3cf-42e9-848f-15756491e02e",
+				"name":                "Jane Doe",
+				"email":               "jane@example.com",
+				"username":            "janedoe",
+				"language_preference": "es",
 			},
 			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On(
 					"UpdateGuardian",
 					mock.Anything,
 					mock.MatchedBy(func(input *models.UpdateGuardianInput) bool {
-						return input.ID == uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+						return input.ID == uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11") &&
+							input.Body.Name == "Jane Doe"
 					}),
 				).Return(&models.Guardian{
-					ID:        uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
-					UserID:    uuid.MustParse("d1c8d767-c3cf-42e9-848f-15756491e02e"),
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+					ID:                 uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+					UserID:             uuid.New(),
+					Name:               "Jane Doe",
+					Email:              "jane@example.com",
+					Username:           "janedoe",
+					LanguagePreference: "es",
+					CreatedAt:          time.Now(),
+					UpdatedAt:          time.Now(),
 				}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -204,7 +233,7 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 			name:       "invalid UUID",
 			guardianID: "not-a-uuid",
 			payload: map[string]interface{}{
-				"first_name": "Jane",
+				"name": "Jane",
 			},
 			mockSetup:  func(*repomocks.MockGuardianRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
@@ -217,9 +246,10 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -279,9 +309,10 @@ func TestHumaValidation_DeleteGuardian(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
 
 			req, err := http.NewRequest(
 				http.MethodDelete,
@@ -337,9 +368,10 @@ func TestHumaValidation_GetGuardianByChildID(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
