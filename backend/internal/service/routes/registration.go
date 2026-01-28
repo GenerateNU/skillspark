@@ -59,7 +59,7 @@ func SetupRegistrationRoutes(api huma.API, repo *storage.Repository) {
 
 	huma.Register(api, huma.Operation{
 		OperationID:   "update-registration",
-		Method:        http.MethodPut,
+		Method:        http.MethodPatch,
 		Path:          "/api/v1/registrations/{id}",
 		Summary:       "Update a registration",
 		Description:   "Update an existing registration's details",

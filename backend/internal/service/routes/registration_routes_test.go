@@ -295,7 +295,7 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 			assert.NoError(t, err)
 
 			req, err := http.NewRequest(
-				http.MethodPut,
+				http.MethodPatch,
 				"/api/v1/registrations/"+tt.id,
 				bytes.NewBuffer(bodyBytes),
 			)
