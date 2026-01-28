@@ -82,7 +82,6 @@ type RegistrationRepository interface {
 	GetRegistrationsByChildID(ctx context.Context, input *models.GetRegistrationsByChildIDInput) (*models.GetRegistrationsByChildIDOutput, error)
 	GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error)
 	UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error)
-	DeleteRegistration(ctx context.Context, input *models.DeleteRegistrationInput) (*models.DeleteRegistrationOutput, error)
 }
 type Repository struct {
 	db       *pgxpool.Pool

@@ -36,15 +36,8 @@ func TestUpdateRegistration(t *testing.T) {
 	newStatus := models.RegistrationStatusCancelled
 	updateInput := &models.UpdateRegistrationInput{
 		ID: created.Body.ID,
-		Body: struct {
-			ChildID           *uuid.UUID                  `json:"child_id,omitempty" doc:"Updated child ID (optional)" format:"uuid"`
-			GuardianID        *uuid.UUID                  `json:"guardian_id,omitempty" doc:"Updated guardian ID (optional)" format:"uuid"`
-			EventOccurrenceID *uuid.UUID                  `json:"event_occurrence_id,omitempty" doc:"Updated event occurrence ID (optional)" format:"uuid"`
-			Status            *models.RegistrationStatus `json:"status,omitempty" doc:"Updated registration status (optional)" enum:"registered,cancelled"`
-		}{
-			Status: &newStatus,
-		},
 	}
+	updateInput.Body.Status = &newStatus
 
 	updated, updateErr := repo.UpdateRegistration(ctx, updateInput)
 	require.Nil(t, updateErr)
@@ -89,15 +82,8 @@ func TestUpdateRegistration_ChangeEventOccurrence(t *testing.T) {
 	newOccurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000003")
 	updateInput := &models.UpdateRegistrationInput{
 		ID: created.Body.ID,
-		Body: struct {
-			ChildID           *uuid.UUID                  `json:"child_id,omitempty" doc:"Updated child ID (optional)" format:"uuid"`
-			GuardianID        *uuid.UUID                  `json:"guardian_id,omitempty" doc:"Updated guardian ID (optional)" format:"uuid"`
-			EventOccurrenceID *uuid.UUID                  `json:"event_occurrence_id,omitempty" doc:"Updated event occurrence ID (optional)" format:"uuid"`
-			Status            *models.RegistrationStatus `json:"status,omitempty" doc:"Updated registration status (optional)" enum:"registered,cancelled"`
-		}{
-			EventOccurrenceID: &newOccurrenceID,
-		},
 	}
+	updateInput.Body.EventOccurrenceID = &newOccurrenceID
 
 	updated, updateErr := repo.UpdateRegistration(ctx, updateInput)
 	require.Nil(t, updateErr)
@@ -115,15 +101,8 @@ func TestUpdateRegistration_NotFound(t *testing.T) {
 	newStatus := models.RegistrationStatusCancelled
 	updateInput := &models.UpdateRegistrationInput{
 		ID: nonExistentID,
-		Body: struct {
-			ChildID           *uuid.UUID                  `json:"child_id,omitempty" doc:"Updated child ID (optional)" format:"uuid"`
-			GuardianID        *uuid.UUID                  `json:"guardian_id,omitempty" doc:"Updated guardian ID (optional)" format:"uuid"`
-			EventOccurrenceID *uuid.UUID                  `json:"event_occurrence_id,omitempty" doc:"Updated event occurrence ID (optional)" format:"uuid"`
-			Status            *models.RegistrationStatus `json:"status,omitempty" doc:"Updated registration status (optional)" enum:"registered,cancelled"`
-		}{
-			Status: &newStatus,
-		},
 	}
+	updateInput.Body.Status = &newStatus
 
 	updated, err := repo.UpdateRegistration(ctx, updateInput)
 

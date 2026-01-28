@@ -86,7 +86,6 @@ func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -190,7 +189,6 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -279,7 +277,6 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -301,84 +298,6 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 			)
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
-
-			resp, err := app.Test(req)
-			assert.NoError(t, err)
-			defer func() { _ = resp.Body.Close() }()
-
-			if tt.statusCode != resp.StatusCode {
-				bodyBytes, _ := io.ReadAll(resp.Body)
-				t.Logf("Response body: %s", string(bodyBytes))
-			}
-
-			assert.Equal(t, tt.statusCode, resp.StatusCode)
-			mockRegRepo.AssertExpectations(t)
-		})
-	}
-}
-
-func TestHumaValidation_DeleteRegistration(t *testing.T) {
-	t.Parallel()
-
-	registrationID := "80000000-0000-0000-0000-000000000001"
-
-	tests := []struct {
-		name       string
-		id         string
-		mockSetup  func(*repomocks.MockRegistrationRepository)
-		statusCode int
-	}{
-		{
-			name: "valid id",
-			id:   registrationID,
-			mockSetup: func(m *repomocks.MockRegistrationRepository) {
-				m.On(
-					"DeleteRegistration",
-					mock.Anything,
-					mock.AnythingOfType("*models.DeleteRegistrationInput"),
-				).Return(&models.DeleteRegistrationOutput{
-					Body: models.Registration{
-						ID:                  uuid.MustParse(registrationID),
-						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
-						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
-						Status:              models.RegistrationStatusRegistered,
-						EventName:           "STEM Club",
-						OccurrenceStartTime: time.Now(),
-						CreatedAt:           time.Now(),
-						UpdatedAt:           time.Now(),
-					},
-				}, nil)
-			},
-			statusCode: http.StatusOK,
-		},
-		{
-			name:       "invalid id format",
-			id:         "not-a-valid-uuid",
-			mockSetup:  func(*repomocks.MockRegistrationRepository) {},
-			statusCode: http.StatusUnprocessableEntity,
-		},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			mockRegRepo := new(repomocks.MockRegistrationRepository)
-			mockChildRepo := new(repomocks.MockChildRepository)
-			mockGuardianRepo := new(repomocks.MockGuardianRepository)
-			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
-			tt.mockSetup(mockRegRepo)
-
-			app, _ := setupRegistrationTestAPI(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
-
-			req, err := http.NewRequest(
-				http.MethodDelete,
-				"/api/v1/registrations/"+tt.id,
-				nil,
-			)
-			assert.NoError(t, err)
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)

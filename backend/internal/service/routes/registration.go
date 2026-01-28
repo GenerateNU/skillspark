@@ -67,15 +67,4 @@ func SetupRegistrationRoutes(api huma.API, repo *storage.Repository) {
 	}, func(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error) {
 		return registrationHandler.UpdateRegistration(ctx, input)
 	})
-
-	huma.Register(api, huma.Operation{
-		OperationID:   "delete-registration",
-		Method:        http.MethodDelete,
-		Path:          "/api/v1/registrations/{id}",
-		Summary:       "Delete a registration",
-		Description:   "Delete an existing registration",
-		Tags:          []string{"Registrations"},
-	}, func(ctx context.Context, input *models.DeleteRegistrationInput) (*models.DeleteRegistrationOutput, error) {
-		return registrationHandler.DeleteRegistration(ctx, input)
-	})
 }

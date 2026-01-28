@@ -50,11 +50,3 @@ func (m *MockRegistrationRepository) UpdateRegistration(ctx context.Context, inp
 	}
 	return args.Get(0).(*models.UpdateRegistrationOutput), args.Error(1)
 }
-
-func (m *MockRegistrationRepository) DeleteRegistration(ctx context.Context, input *models.DeleteRegistrationInput) (*models.DeleteRegistrationOutput, error) {
-	args := m.Called(ctx, input)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.DeleteRegistrationOutput), args.Error(1)
-}
