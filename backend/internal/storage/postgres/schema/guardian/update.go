@@ -14,15 +14,12 @@ func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *model
 		return nil, err
 	}
 
-	defer func() {
-		_ = tx.Rollback(ctx)
-	}()
-
 	var updatedGuardian models.Guardian
 	updatedGuardian.ID = guardian.ID
 
 	guardianQuery, err := schema.ReadSQLBaseScript("guardian/sql/update_guardian.sql")
 	if err != nil {
+		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to read guardian update query: ", err.Error())
 		return nil, &err
 	}
@@ -34,12 +31,14 @@ func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *model
 	)
 
 	if err != nil {
+		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to update guardian table: ", err.Error())
 		return nil, &err
 	}
 
 	userQuery, err := schema.ReadSQLBaseScript("guardian/sql/update_user.sql")
 	if err != nil {
+		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to read user update query: ", err.Error())
 		return nil, &err
 	}
@@ -60,6 +59,7 @@ func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *model
 	)
 
 	if err != nil {
+		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to update user table: ", err.Error())
 		return nil, &err
 	}
