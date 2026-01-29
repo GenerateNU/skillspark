@@ -25,7 +25,7 @@ type GetAllSchoolsInput struct {
 
 type CreateSchoolInput struct {
 	Body struct {
-		Name       string    `json:"name" db:"name" doc:"name of the school" minLength:"1" maxLength:"200"`
-		LocationID uuid.UUID `json:"location_id" db:"location_id" doc:"ID of the location of the school"`
+		Name       string    `json:"name" db:"name" minLength:"1" maxLength:"200"`
+		LocationID uuid.UUID `json:"location_id" db:"location_id"`
 	}
 }
