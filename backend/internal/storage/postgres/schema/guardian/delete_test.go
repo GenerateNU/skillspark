@@ -60,3 +60,17 @@ func TestGuardianRepository_DeleteGuardian(t *testing.T) {
 	assert.Nil(t, guardian)
 	assert.NotNil(t, err)
 }
+
+func TestGuardianRepository_Delete_NotFound(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+	testDB := testutil.SetupTestDB(t)
+	repo := NewGuardianRepository(testDB)
+	ctx := context.Background()
+
+	guardian, err := repo.DeleteGuardian(ctx, uuid.New())
+	assert.Error(t, err)
+	assert.Nil(t, guardian)
+	assert.Contains(t, err.Error(), "not found")
+}

@@ -52,3 +52,24 @@ func TestGuardianRepository_Update_David_Kim(t *testing.T) {
 	assert.Equal(t, guardianInput.Body.Name, retrievedGuardian.Name)
 	assert.Equal(t, guardianInput.ID, retrievedGuardian.ID)
 }
+
+func TestGuardianRepository_Update_Errors(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+
+	testDB := testutil.SetupTestDB(t)
+	repo := NewGuardianRepository(testDB)
+	ctx := context.Background()
+
+	t.Run("Update Non-Existent Guardian", func(t *testing.T) {
+		input := &models.UpdateGuardianInput{
+			ID: uuid.New(),
+		}
+		input.Body.Name = "Ghost"
+
+		guardian, err := repo.UpdateGuardian(ctx, input)
+		assert.Error(t, err)
+		assert.Nil(t, guardian)
+	})
+}

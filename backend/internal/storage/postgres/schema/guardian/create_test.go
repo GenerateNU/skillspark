@@ -49,3 +49,32 @@ func TestGuardianRepository_Create_David_Kim(t *testing.T) {
 	assert.Equal(t, guardian.UserID, retrievedGuardian.UserID)
 	assert.Equal(t, guardianInput.Body.Name, retrievedGuardian.Name)
 }
+
+func TestGuardianRepository_Create_Constraints(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+
+	testDB := testutil.SetupTestDB(t)
+	repo := NewGuardianRepository(testDB)
+	ctx := context.Background()
+
+	t.Run("Duplicate Email Failure", func(t *testing.T) {
+		input1 := &models.CreateGuardianInput{}
+		input1.Body.Name = "User One"
+		input1.Body.Email = "duplicate@test.com"
+		input1.Body.Username = "userone"
+
+		_, err := repo.CreateGuardian(ctx, input1)
+		assert.NoError(t, err)
+
+		input2 := &models.CreateGuardianInput{}
+		input2.Body.Name = "User Two"
+		input2.Body.Email = "duplicate@test.com"
+		input2.Body.Username = "usertwo"
+
+		guardian, err := repo.CreateGuardian(ctx, input2)
+		assert.Error(t, err)
+		assert.Nil(t, guardian)
+	})
+}
