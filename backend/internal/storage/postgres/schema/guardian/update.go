@@ -9,20 +9,63 @@ import (
 )
 
 func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error) {
-	query, err := schema.ReadSQLBaseScript("guardian/sql/update.sql")
+	tx, err := r.db.Begin(ctx)
 	if err != nil {
-		err := errs.InternalServerError("Failed to read base query: ", err.Error())
+		return nil, err
+	}
+
+	defer func() {
+		_ = tx.Rollback(ctx)
+	}()
+
+	var updatedGuardian models.Guardian
+	updatedGuardian.ID = guardian.ID
+
+	guardianQuery, err := schema.ReadSQLBaseScript("guardian/sql/update_guardian.sql")
+	if err != nil {
+		err := errs.InternalServerError("Failed to read guardian update query: ", err.Error())
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, guardian.ID, guardian.Body.Name, guardian.Body.Email, guardian.Body.Username, guardian.Body.ProfilePictureS3Key, guardian.Body.LanguagePreference)
+	err = tx.QueryRow(ctx, guardianQuery, guardian.ID).Scan(
+		&updatedGuardian.UserID,
+		&updatedGuardian.CreatedAt,
+		&updatedGuardian.UpdatedAt,
+	)
 
-	var updatedGuardian models.Guardian
-
-	err = row.Scan(&updatedGuardian.ID, &updatedGuardian.UserID, &updatedGuardian.Name, &updatedGuardian.Email, &updatedGuardian.Username, &updatedGuardian.ProfilePictureS3Key, &updatedGuardian.LanguagePreference, &updatedGuardian.CreatedAt, &updatedGuardian.UpdatedAt)
 	if err != nil {
-		err := errs.InternalServerError("Failed to update guardian: ", err.Error())
+		err := errs.InternalServerError("Failed to update guardian table: ", err.Error())
 		return nil, &err
+	}
+
+	userQuery, err := schema.ReadSQLBaseScript("guardian/sql/update_user.sql")
+	if err != nil {
+		err := errs.InternalServerError("Failed to read user update query: ", err.Error())
+		return nil, &err
+	}
+
+	err = tx.QueryRow(ctx, userQuery,
+		updatedGuardian.UserID,
+		guardian.Body.Name,
+		guardian.Body.Email,
+		guardian.Body.Username,
+		guardian.Body.ProfilePictureS3Key,
+		guardian.Body.LanguagePreference,
+	).Scan(
+		&updatedGuardian.Name,
+		&updatedGuardian.Email,
+		&updatedGuardian.Username,
+		&updatedGuardian.ProfilePictureS3Key,
+		&updatedGuardian.LanguagePreference,
+	)
+
+	if err != nil {
+		err := errs.InternalServerError("Failed to update user table: ", err.Error())
+		return nil, &err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
 	}
 
 	return &updatedGuardian, nil

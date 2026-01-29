@@ -2,27 +2,84 @@ package manager
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"log/slog"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
 )
 
 func (r *ManagerRepository) PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, error) {
-	query, err := schema.ReadSQLBaseScript("manager/sql/update.sql")
+	// 1. Start Transaction
+	tx, err := r.db.Begin(ctx)
 	if err != nil {
-		err := errs.InternalServerError("Failed to read base query: ", err.Error())
+		return nil, err
+	}
+
+	// Defer rollback with error logging
+	defer func() {
+		rollbackErr := tx.Rollback(ctx)
+		if rollbackErr != nil && !errors.Is(rollbackErr, sql.ErrTxDone) {
+			slog.Error("Rollback was not successful", "err", rollbackErr)
+		}
+	}()
+
+	var updatedManager models.Manager
+	updatedManager.ID = manager.Body.ID
+
+	managerQuery, err := schema.ReadSQLBaseScript("manager/sql/update_manager.sql")
+	if err != nil {
+		err := errs.InternalServerError("Failed to read manager update query: ", err.Error())
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, manager.Body.ID, manager.Body.Name, manager.Body.Email, manager.Body.Username, manager.Body.ProfilePictureS3Key, manager.Body.LanguagePreference, manager.Body.OrganizationID, manager.Body.Role)
+	err = tx.QueryRow(ctx, managerQuery,
+		manager.Body.ID,
+		manager.Body.OrganizationID,
+		manager.Body.Role,
+	).Scan(
+		&updatedManager.UserID,
+		&updatedManager.OrganizationID,
+		&updatedManager.Role,
+		&updatedManager.CreatedAt,
+		&updatedManager.UpdatedAt,
+	)
 
-	var createdManager models.Manager
-
-	err = row.Scan(&createdManager.ID, &createdManager.UserID, &createdManager.OrganizationID, &createdManager.Role, &createdManager.Name, &createdManager.Email, &createdManager.Username, &createdManager.ProfilePictureS3Key, &createdManager.LanguagePreference, &createdManager.CreatedAt, &createdManager.UpdatedAt)
 	if err != nil {
-		err := errs.InternalServerError("Failed to update manager: ", err.Error())
+		err := errs.InternalServerError("Failed to update manager table: ", err.Error())
 		return nil, &err
 	}
 
-	return &createdManager, nil
+	userQuery, err := schema.ReadSQLBaseScript("manager/sql/update_user.sql")
+	if err != nil {
+		err := errs.InternalServerError("Failed to read user update query: ", err.Error())
+		return nil, &err
+	}
+
+	err = tx.QueryRow(ctx, userQuery,
+		updatedManager.UserID,
+		manager.Body.Name,
+		manager.Body.Email,
+		manager.Body.Username,
+		manager.Body.ProfilePictureS3Key,
+		manager.Body.LanguagePreference,
+	).Scan(
+		&updatedManager.Name,
+		&updatedManager.Email,
+		&updatedManager.Username,
+		&updatedManager.ProfilePictureS3Key,
+		&updatedManager.LanguagePreference,
+	)
+
+	if err != nil {
+		err := errs.InternalServerError("Failed to update user table: ", err.Error())
+		return nil, &err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+
+	return &updatedManager, nil
 }
