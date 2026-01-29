@@ -1,6 +1,10 @@
 package models
 
-import "github.com/google/uuid"
+import (
+	"net/http"
+
+	"github.com/google/uuid"
+)
 
 type GuardianSignUpInput struct {
 	Body struct {
@@ -11,7 +15,7 @@ type GuardianSignUpInput struct {
 		ProfilePictureS3Key *string `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
 		LanguagePreference  string  `json:"language_preference" db:"language_preference"`
 	}
-}
+}	
 
 type GuardianSignUpOutput struct {
 	Body struct {
@@ -58,19 +62,25 @@ type userResponse struct {
 }
 
 type GuardianLoginOutput struct {
-	GuardianID   uuid.UUID `json:"guardian_id" db:"guardian_id"`
-	AccessToken  string    `json:"access_token" db:"access_token"`
-	TokenType    string    `json:"token_type" db:"token_type"`
-	ExpiresIn    int       `json:"expires_in" db:"expires_in"`
-	RefreshToken string    `json:"refresh_token" db:"refresh_token"`
+	AccessTokenCookie http.Cookie `header:"Set-Cookie"`
+	Body struct {
+		GuardianID    uuid.UUID `json:"guardian_id" db:"guardian_id"`
+		AccessToken  string    `json:"access_token" db:"access_token"`
+		TokenType    string    `json:"token_type" db:"token_type"`
+		ExpiresIn    int       `json:"expires_in" db:"expires_in"`
+		RefreshToken string    `json:"refresh_token" db:"refresh_token"`
+	} `json:"body"`
 }
 
 type ManagerLoginOutput struct {
-	ManagerID    uuid.UUID `json:"manager_id" db:"manager_id"`
-	AccessToken  string    `json:"access_token" db:"access_token"`
-	TokenType    string    `json:"token_type" db:"token_type"`
-	ExpiresIn    int       `json:"expires_in" db:"expires_in"`
-	RefreshToken string    `json:"refresh_token" db:"refresh_token"`
+	AccessTokenCookie http.Cookie `header:"Set-Cookie"`
+	Body struct {
+		ManagerID    uuid.UUID `json:"manager_id" db:"manager_id"`
+		AccessToken  string    `json:"access_token" db:"access_token"`
+		TokenType    string    `json:"token_type" db:"token_type"`
+		ExpiresIn    int       `json:"expires_in" db:"expires_in"`
+		RefreshToken string    `json:"refresh_token" db:"refresh_token"`
+	} `json:"body"`
 }
 
 type LoginResponse struct {

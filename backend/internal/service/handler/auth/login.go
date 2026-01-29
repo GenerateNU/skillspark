@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"skillspark/internal/auth"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 )
 
@@ -16,24 +16,32 @@ func (h *Handler) GuardianLogin(ctx context.Context, input *models.LoginInput) (
 	fmt.Println(json.Marshal(res))
 	if err != nil {
 		slog.Error(fmt.Sprintf("Login Request Failed: %v", err))
-		return nil, errs.InternalServerError(fmt.Sprintf("Login Request Failed: %v", err))
+		return nil, err
 	}
 
 	guardian, err := h.guardianRepository.GetGuardianByAuthID(ctx, res.User.ID.String())
 	if err != nil {
 		slog.Error(fmt.Sprintf("Could not find associated guardian: %v", err))
-		return nil, errs.InternalServerError(fmt.Sprintf("Could not find associated guardian: %v", err))
+		return nil, err
 	}
-
-	
 
 	guardianOutput := &models.GuardianLoginOutput{}
 
-	guardianOutput.ExpiresIn = res.ExpiresIn
-	guardianOutput.RefreshToken = res.RefreshToken
-	guardianOutput.TokenType = res.TokenType
-	guardianOutput.AccessToken = res.AccessToken
-	guardianOutput.GuardianID = guardian.ID
+	guardianOutput.Body.ExpiresIn = res.ExpiresIn
+	guardianOutput.Body.RefreshToken = res.RefreshToken
+	guardianOutput.Body.TokenType = res.TokenType
+	guardianOutput.Body.AccessToken = res.AccessToken
+	guardianOutput.Body.GuardianID = guardian.ID
+
+	guardianOutput.AccessTokenCookie = http.Cookie{
+		Name:     "jwt",
+		Value:    res.AccessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true, // HTTPS only (set false for localhost dev)
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   res.ExpiresIn, // short-lived (e.g., 1 hour)
+	}
 
 	return guardianOutput, nil
 }
@@ -41,25 +49,36 @@ func (h *Handler) GuardianLogin(ctx context.Context, input *models.LoginInput) (
 func (h *Handler) ManagerLogin(ctx context.Context, input *models.LoginInput) (*models.ManagerLoginOutput, error) {
 
 	res, err := auth.SupabaseLogin(&h.config, input.Body.Email, input.Body.Password)
-	fmt.Println(json.Marshal(res))
+
 	if err != nil {
 		slog.Error(fmt.Sprintf("Login Request Failed: %v", err))
-		return nil, errs.InternalServerError(fmt.Sprintf("Login Request Failed: %v", err))
+		return nil, err
 	}
 
 	manager, err := h.managerRepository.GetManagerByAuthID(ctx, res.User.ID.String())
 	if err != nil {
 		slog.Error(fmt.Sprintf("Could not find associated guardian: %v", err))
-		return nil, errs.InternalServerError(fmt.Sprintf("Could not find associated guardian: %v", err))
+		return nil, err
 	}
 
 	managerOutput := &models.ManagerLoginOutput{}
 
-	managerOutput.ExpiresIn = res.ExpiresIn
-	managerOutput.RefreshToken = res.RefreshToken
-	managerOutput.TokenType = res.TokenType
-	managerOutput.AccessToken = res.AccessToken
-	managerOutput.ManagerID = manager.ID
+	managerOutput.Body.ExpiresIn = res.ExpiresIn
+	managerOutput.Body.RefreshToken = res.RefreshToken
+	managerOutput.Body.TokenType = res.TokenType
+	managerOutput.Body.AccessToken = res.AccessToken
+	managerOutput.Body.ManagerID = manager.ID
+
+	managerOutput.AccessTokenCookie = http.Cookie{
+		Name:     "jwt",
+		Value:    res.AccessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true, // HTTPS only (set false for localhost dev)
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   res.ExpiresIn, // short-lived (e.g., 1 hour)
+	}
 
 	return managerOutput, nil
+
 }

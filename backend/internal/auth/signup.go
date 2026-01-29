@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"regexp"
 	"skillspark/internal/config"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 
 	"github.com/google/uuid"
@@ -81,7 +80,7 @@ func validatePasswordStrength(password string) error {
 
 func SupabaseSignup(cfg *config.Supabase, email string, password string) (models.SignupResponse, error) {
 	if err := validatePasswordStrength(password); err != nil {
-		return models.SignupResponse{}, errs.BadRequest(fmt.Sprintf("Weak Password: %v", err))
+		return models.SignupResponse{}, err
 	}
 
 	supabaseURL := cfg.URL
@@ -99,7 +98,7 @@ func SupabaseSignup(cfg *config.Supabase, email string, password string) (models
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/auth/v1/signup", supabaseURL), bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		slog.Error("Error in Request Creation: ", "err", err)
-		return models.SignupResponse{}, errs.BadRequest(fmt.Sprintf("Failed to create request: %v", err))
+		return models.SignupResponse{}, err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -109,26 +108,26 @@ func SupabaseSignup(cfg *config.Supabase, email string, password string) (models
 	res, err := Client.Do(req)
 	if err != nil {
 		slog.Error("Error executing request: ", "err", err)
-		return models.SignupResponse{}, errs.BadRequest(fmt.Sprintf("Failed to execute request: %v, %s", err, supabaseURL))
+		return models.SignupResponse{}, err
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		slog.Error("Error reading response body: ", "body", body)
-		return models.SignupResponse{}, errs.BadRequest(fmt.Sprintf("Failed to read response body: %s", body))
+		return models.SignupResponse{}, err
 	}
 
 	if res.StatusCode != http.StatusOK {
 		slog.Error("Error Response: ", "res.StatusCode", res.StatusCode, "body", string(body))
-		return models.SignupResponse{}, errs.BadRequest(fmt.Sprintf("Failed to login %d, %s", res.StatusCode, body))
+		return models.SignupResponse{}, err
 	}
 
 	var response models.SignupResponse
 	fmt.Print(response)
 	if err := json.Unmarshal(body, &response); err != nil {
 		slog.Error("Error parsing response: ", "err", err)
-		return models.SignupResponse{}, errs.BadRequest("Failed to parse request")
+		return models.SignupResponse{}, err
 	}
 
 	return response, nil
@@ -142,7 +141,7 @@ func SupabaseDeleteUser(cfg *config.Supabase, userID uuid.UUID) error {
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/auth/v1/admin/users/%s", supabaseURL, userID.String()), nil)
 	if err != nil {
 		slog.Error("Error in Request Creation: ", "err", err)
-		return errs.InternalServerError(fmt.Sprintf("Failed to create delete request: %v", err))
+		return err
 	}
 
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
@@ -151,14 +150,14 @@ func SupabaseDeleteUser(cfg *config.Supabase, userID uuid.UUID) error {
 	res, err := Client.Do(req)
 	if err != nil {
 		slog.Error("Error executing delete request: ", "err", err)
-		return errs.InternalServerError(fmt.Sprintf("Failed to execute delete request: %v", err))
+		return err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNoContent {
 		body, _ := io.ReadAll(res.Body)
 		slog.Error("Error deleting user from Supabase: ", "res.StatusCode", res.StatusCode, "body", string(body))
-		return errs.InternalServerError(fmt.Sprintf("Failed to delete user from Supabase: %d, %s", res.StatusCode, body))
+		return err
 	}
 
 	return nil
