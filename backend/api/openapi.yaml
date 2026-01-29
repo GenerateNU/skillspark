@@ -2207,8 +2207,6 @@ components:
           description: Username of the guardian
       required:
         - id
-        - user_id
-        - role
     Registration:
       type: object
       additionalProperties: false
