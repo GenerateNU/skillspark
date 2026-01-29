@@ -29,15 +29,11 @@ func (r *RegistrationRepository) GetRegistrationsByChildID(ctx context.Context, 
 		return nil, &errr
 	}
 
-	output := &models.GetRegistrationsByChildIDOutput{
-		Body: struct {
-			Registrations []models.Registration `json:"registrations" doc:"List of registrations for the child"`
-		}{
-			Registrations: registrations,
-		},
-	}
+	var output models.GetRegistrationsByChildIDOutput
 
-	return output, nil
+	output.Body.Registrations = registrations
+
+	return &output, nil
 }
 
 func scanRegistration(row pgx.CollectableRow) (models.Registration, error) {

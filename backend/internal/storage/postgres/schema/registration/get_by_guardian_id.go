@@ -29,13 +29,9 @@ func (r *RegistrationRepository) GetRegistrationsByGuardianID(ctx context.Contex
 		return nil, &errr
 	}
 
-	output := &models.GetRegistrationsByGuardianIDOutput{
-		Body: struct {
-			Registrations []models.Registration `json:"registrations" doc:"List of registrations for the guardian"`
-		}{
-			Registrations: registrations,
-		},
-	}
+	var output models.GetRegistrationsByGuardianIDOutput
 
-	return output, nil
+	output.Body.Registrations = registrations
+
+	return &output, nil
 }

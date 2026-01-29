@@ -29,13 +29,9 @@ func (r *RegistrationRepository) GetRegistrationsByEventOccurrenceID(ctx context
 		return nil, &errr
 	}
 
-	output := &models.GetRegistrationsByEventOccurrenceIDOutput{
-		Body: struct {
-			Registrations []models.Registration `json:"registrations" doc:"List of registrations for the event occurrence"`
-		}{
-			Registrations: registrations,
-		},
-	}
+	var output models.GetRegistrationsByEventOccurrenceIDOutput
 
-	return output, nil
+	output.Body.Registrations = registrations
+
+	return &output, nil
 }
