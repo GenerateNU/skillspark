@@ -4,13 +4,14 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-	"skillspark/internal/storage/postgres/schema/location"
-	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/child"
-	"skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/event"
+	"skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
+	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
+	"skillspark/internal/storage/postgres/schema/organization"
+	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/utils"
 
@@ -78,6 +79,14 @@ type EventOccurrenceRepository interface {
 	UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.EventOccurrence, error)
 }
 
+type RegistrationRepository interface {
+	CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error)
+	GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput) (*models.GetRegistrationByIDOutput, error)
+	GetRegistrationsByChildID(ctx context.Context, input *models.GetRegistrationsByChildIDInput) (*models.GetRegistrationsByChildIDOutput, error)
+	GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error)
+	GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error)
+	UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error)
+}
 type Repository struct {
 	db       *pgxpool.Pool
 	Location LocationRepository
@@ -88,6 +97,7 @@ type Repository struct {
 	Event    EventRepository
 	Child    ChildRepository
 	EventOccurrence EventOccurrenceRepository
+	Registration RegistrationRepository
 }
 
 // Close closes the database connection pool
@@ -113,5 +123,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Event:    event.NewEventRepository(db),
 		Child:    child.NewChildRepository(db),
 		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
+		Registration: registration.NewRegistrationRepository(db),
 	}
 }

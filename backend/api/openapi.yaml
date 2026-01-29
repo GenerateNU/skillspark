@@ -947,6 +947,185 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/registrations:
+    post:
+      tags:
+        - Registrations
+      summary: Create a new registration
+      description: Create a new registration for a child to attend an event occurrence
+      operationId: create-registration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRegistrationInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: The newly created registration with full details
+                $ref: '#/components/schemas/Registration'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/registrations/{id}:
+    get:
+      tags:
+        - Registrations
+      summary: Get registration by ID
+      description: Retrieve a specific registration by its unique identifier
+      operationId: get-registration-by-id
+      parameters:
+        - name: id
+          in: path
+          description: Registration ID to retrieve
+          required: true
+          schema:
+            type: string
+            description: Registration ID to retrieve
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: The requested registration with full details
+                $ref: '#/components/schemas/Registration'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    patch:
+      tags:
+        - Registrations
+      summary: Update a registration
+      description: Update an existing registration's details
+      operationId: update-registration
+      parameters:
+        - name: id
+          in: path
+          description: Registration ID to update
+          required: true
+          schema:
+            type: string
+            description: Registration ID to update
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRegistrationInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: The updated registration with full details
+                $ref: '#/components/schemas/Registration'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/registrations/child/{child_id}:
+    get:
+      tags:
+        - Registrations
+      summary: Get registrations by child ID
+      description: Retrieve all registrations for a specific child
+      operationId: get-registrations-by-child-id
+      parameters:
+        - name: child_id
+          in: path
+          description: Child ID to retrieve registrations for
+          required: true
+          schema:
+            type: string
+            description: Child ID to retrieve registrations for
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRegistrationsByChildIDOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/registrations/event_occurrence/{event_occurrence_id}:
+    get:
+      tags:
+        - Registrations
+      summary: Get registrations by event occurrence ID
+      description: Retrieve all registrations for a specific event occurrence
+      operationId: get-registrations-by-event-occurrence-id
+      parameters:
+        - name: event_occurrence_id
+          in: path
+          description: Event Occurrence ID to retrieve registrations for
+          required: true
+          schema:
+            type: string
+            description: Event Occurrence ID to retrieve registrations for
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRegistrationsByEventOccurrenceIDOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/registrations/guardian/{guardian_id}:
+    get:
+      tags:
+        - Registrations
+      summary: Get registrations by guardian ID
+      description: Retrieve all registrations for children under a specific guardian
+      operationId: get-registrations-by-guardian-id
+      parameters:
+        - name: guardian_id
+          in: path
+          description: Guardian ID to retrieve registrations for
+          required: true
+          schema:
+            type: string
+            description: Guardian ID to retrieve registrations for
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRegistrationsByGuardianIDOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/schools:
     get:
       tags:
@@ -1414,6 +1593,41 @@ components:
           maxLength: 500
       required:
         - name
+    CreateRegistrationInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateRegistrationInputBody.json
+          readOnly: true
+        child_id:
+          type: string
+          description: ID of the child to register
+          format: uuid
+        event_occurrence_id:
+          type: string
+          description: ID of the event occurrence to register for
+          format: uuid
+        guardian_id:
+          type: string
+          description: ID of the guardian registering the child
+          format: uuid
+        status:
+          type: string
+          description: Initial status of the registration
+          default: registered
+          enum:
+            - registered
+            - cancelled
+      required:
+        - child_id
+        - guardian_id
+        - event_occurrence_id
+        - status
     CreateUserInputBody:
       type: object
       additionalProperties: false
@@ -1632,6 +1846,60 @@ components:
       required:
         - message
         - timestamp
+    GetRegistrationsByChildIDOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GetRegistrationsByChildIDOutputBody.json
+          readOnly: true
+        registrations:
+          type: array
+          description: List of registrations for the child
+          items:
+            $ref: '#/components/schemas/Registration'
+      required:
+        - registrations
+    GetRegistrationsByEventOccurrenceIDOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GetRegistrationsByEventOccurrenceIDOutputBody.json
+          readOnly: true
+        registrations:
+          type: array
+          description: List of registrations for the event occurrence
+          items:
+            $ref: '#/components/schemas/Registration'
+      required:
+        - registrations
+    GetRegistrationsByGuardianIDOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GetRegistrationsByGuardianIDOutputBody.json
+          readOnly: true
+        registrations:
+          type: array
+          description: List of registrations for the guardian
+          items:
+            $ref: '#/components/schemas/Registration'
+      required:
+        - registrations
     Guardian:
       type: object
       additionalProperties: false
@@ -1861,6 +2129,60 @@ components:
         - id
         - user_id
         - role
+    Registration:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Registration.json
+          readOnly: true
+        child_id:
+          type: string
+          description: ID of the registered child
+        created_at:
+          type: string
+          description: Timestamp when registration was created
+          format: date-time
+        event_name:
+          type: string
+          description: Name of the event (joined from events table)
+        event_occurrence_id:
+          type: string
+          description: ID of the event occurrence
+        guardian_id:
+          type: string
+          description: ID of the child's guardian
+        id:
+          type: string
+          description: Unique registration identifier
+        occurrence_start_time:
+          type: string
+          description: Start time of the event occurrence
+          format: date-time
+        status:
+          type: string
+          description: Current status of the registration
+          enum:
+            - registered
+            - cancelled
+        updated_at:
+          type: string
+          description: Timestamp when registration was last updated
+          format: date-time
+      required:
+        - id
+        - child_id
+        - guardian_id
+        - event_occurrence_id
+        - status
+        - created_at
+        - updated_at
+        - event_name
+        - occurrence_start_time
     School:
       type: object
       additionalProperties: false
@@ -2054,6 +2376,35 @@ components:
           type: string
           description: S3 key for profile picture
           maxLength: 500
+    UpdateRegistrationInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateRegistrationInputBody.json
+          readOnly: true
+        child_id:
+          type: string
+          description: Updated child ID (optional)
+          format: uuid
+        event_occurrence_id:
+          type: string
+          description: Updated event occurrence ID (optional)
+          format: uuid
+        guardian_id:
+          type: string
+          description: Updated guardian ID (optional)
+          format: uuid
+        status:
+          type: string
+          description: Updated registration status (optional)
+          enum:
+            - registered
+            - cancelled
     UserOutputBody:
       type: object
       additionalProperties: false
