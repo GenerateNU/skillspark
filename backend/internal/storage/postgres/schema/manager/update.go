@@ -2,34 +2,24 @@ package manager
 
 import (
 	"context"
-	"database/sql"
-	"errors"
-	"log/slog"
+
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
 )
 
 func (r *ManagerRepository) PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, error) {
-	// 1. Start Transaction
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	// Defer rollback with error logging
-	defer func() {
-		rollbackErr := tx.Rollback(ctx)
-		if rollbackErr != nil && !errors.Is(rollbackErr, sql.ErrTxDone) {
-			slog.Error("Rollback was not successful", "err", rollbackErr)
-		}
-	}()
 
 	var updatedManager models.Manager
 	updatedManager.ID = manager.Body.ID
 
 	managerQuery, err := schema.ReadSQLBaseScript("manager/sql/update_manager.sql")
 	if err != nil {
+		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to read manager update query: ", err.Error())
 		return nil, &err
 	}
@@ -47,12 +37,14 @@ func (r *ManagerRepository) PatchManager(ctx context.Context, manager *models.Pa
 	)
 
 	if err != nil {
+		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to update manager table: ", err.Error())
 		return nil, &err
 	}
 
 	userQuery, err := schema.ReadSQLBaseScript("manager/sql/update_user.sql")
 	if err != nil {
+		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to read user update query: ", err.Error())
 		return nil, &err
 	}
@@ -73,6 +65,7 @@ func (r *ManagerRepository) PatchManager(ctx context.Context, manager *models.Pa
 	)
 
 	if err != nil {
+		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to update user table: ", err.Error())
 		return nil, &err
 	}
