@@ -495,3 +495,126 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 		})
 	}
 }
+
+func TestHumaValidation_GetEventOccurrencesByOrganizationId(t *testing.T) {
+	t.Parallel()
+
+	start, _ := time.Parse(time.RFC3339, "2026-02-15 09:00:00+07")
+	end, _ := time.Parse(time.RFC3339, "2026-02-15 11:00:00+07")
+	start2, _ := time.Parse(time.RFC3339, "2026-02-22 09:00:00+07")
+	end2, _ := time.Parse(time.RFC3339, "2026-02-22 11:00:00+07")
+
+	category_arr := []string{"science", "technology"}
+	eight := 8
+	twelve := 12
+	jpg := "events/robotics_workshop.jpg"
+	addr := "Suite 15"
+	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
+	event := models.Event{
+		ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+		Title:            "Junior Robotics Workshop",
+		Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+		AgeRangeMin:      &eight,
+		AgeRangeMax:      &twelve,
+		Category:         category_arr,
+		HeaderImageS3Key: &jpg,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
+	}
+
+	location := models.Location{
+		ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
+		Latitude:     13.7650000,
+		Longitude:    100.5380000,
+		AddressLine1: "321 Phetchaburi Road",
+		AddressLine2: &addr,
+		Subdistrict:  "Ratchathewi",
+		District:     "Ratchathewi",
+		Province:     "Bangkok",
+		PostalCode:   "10400",
+		Country:      "Thailand",
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+
+	tests := []struct {
+		name           string
+		organizationID string
+		mockSetup      func(*repomocks.MockOrganizationRepository)
+		statusCode     int
+	}{
+		{
+			name:           "valid UUID",
+			organizationID: "40000000-0000-0000-0000-000000000001",
+			mockSetup: func(m *repomocks.MockOrganizationRepository) {
+				m.On(
+					"GetEventOccurrencesByOrganizationID",
+					mock.Anything,
+					uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				).Return([]models.EventOccurrence{
+					{
+						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+						ManagerId:    &mid,
+						Event:        event,
+						Location:     location,
+						StartTime:    start,
+						EndTime:      end,
+						MaxAttendees: 15,
+						Language:     "en",
+						CurrEnrolled: 8,
+						CreatedAt:    time.Now(),
+						UpdatedAt:    time.Now(),
+					},
+					{
+						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+						ManagerId:    &mid,
+						Event:        event,
+						Location:     location,
+						StartTime:    start2,
+						EndTime:      end2,
+						MaxAttendees: 15,
+						Language:     "en",
+						CurrEnrolled: 5,
+						CreatedAt:    time.Now(),
+						UpdatedAt:    time.Now(),
+					},
+				}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:           "invalid UUID",
+			organizationID: "not-a-uuid",
+			mockSetup:      func(*repomocks.MockOrganizationRepository) {},
+			statusCode:     http.StatusUnprocessableEntity,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockOrganizationRepository)
+			mockLocationRepo := new(repomocks.MockLocationRepository)
+			tt.mockSetup(mockRepo)
+
+			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo)
+
+			req, err := http.NewRequest(
+				http.MethodGet,
+				"/api/v1/organizations/"+tt.organizationID+"/event-occurrences/",
+				nil,
+			)
+			assert.NoError(t, err)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
