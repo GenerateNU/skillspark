@@ -20,8 +20,9 @@ func TestChildRepository_DeleteChildByID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	createdChild := CreateTestChild(t, ctx, repo)
+	createdChild := CreateTestChild(t, ctx, testDB)
 
 	child, err := repo.DeleteChildByID(ctx, createdChild.ID)
 
@@ -43,6 +44,7 @@ func TestChildRepository_DeleteChildByID_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	nonExistentID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
 

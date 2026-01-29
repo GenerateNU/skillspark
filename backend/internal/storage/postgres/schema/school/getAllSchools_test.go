@@ -18,6 +18,7 @@ func TestSchoolRepository_GetAllSchools(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewSchoolRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Use existing seeded locations for referential integrity
 	newYorkLocationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
@@ -73,6 +74,8 @@ func TestSchoolRepository_GetAllSchools_Pagination(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewSchoolRepository(testDB)
 	ctx := context.Background()
+
+	t.Parallel()
 
 	newYorkLocationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 

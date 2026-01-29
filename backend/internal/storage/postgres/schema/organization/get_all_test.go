@@ -14,6 +14,7 @@ func TestGetAllOrganizations_BasicPagination(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 10}
 	orgs, err := repo.GetAllOrganizations(ctx, pagination)
@@ -28,6 +29,7 @@ func TestGetAllOrganizations_SecondPage(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	firstPage := utils.Pagination{Page: 1, Limit: 2}
 	firstPageOrgs, err := repo.GetAllOrganizations(ctx, firstPage)
@@ -51,6 +53,8 @@ func TestGetAllOrganizations_SmallPageSize(t *testing.T) {
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
 
+	t.Parallel()
+
 	pagination := utils.Pagination{Page: 1, Limit: 2}
 	orgs, err := repo.GetAllOrganizations(ctx, pagination)
 
@@ -63,6 +67,7 @@ func TestGetAllOrganizations_SingleItemPerPage(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 1}
 	orgs, err := repo.GetAllOrganizations(ctx, pagination)
@@ -76,6 +81,7 @@ func TestGetAllOrganizations_PageBeyondData(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	pagination := utils.Pagination{Page: 100, Limit: 10}
 	orgs, err := repo.GetAllOrganizations(ctx, pagination)
@@ -89,6 +95,7 @@ func TestGetAllOrganizations_AllDataOnePage(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 100}
 	orgs, err := repo.GetAllOrganizations(ctx, pagination)
@@ -102,6 +109,7 @@ func TestGetAllOrganizations_OrderByCreatedAt(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 10}
 	orgs, err := repo.GetAllOrganizations(ctx, pagination)
@@ -121,6 +129,7 @@ func TestGetAllOrganizations_ZeroOffset(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 3}
 	orgs, err := repo.GetAllOrganizations(ctx, pagination)

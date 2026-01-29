@@ -18,6 +18,7 @@ func TestManagerRepository_GetManagerByID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewManagerRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	manager, err := repo.GetManagerByID(ctx, uuid.MustParse("50000000-0000-0000-0000-000000000001"))
 

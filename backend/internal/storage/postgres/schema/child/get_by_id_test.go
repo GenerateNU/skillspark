@@ -21,7 +21,9 @@ func TestChildRepository_GetChildByID(t *testing.T) {
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
 
-	testChild := CreateTestChild(t, ctx, repo)
+	t.Parallel()
+
+	testChild := CreateTestChild(t, ctx, testDB)
 
 	child, err := repo.GetChildByID(ctx, testChild.ID)
 
@@ -56,6 +58,8 @@ func TestChildRepository_GetChildByID_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
+
+	t.Parallel()
 
 	nonExistentID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
 

@@ -20,6 +20,7 @@ func TestManagerRepository_Create_AssistantDirector(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewManagerRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 	ptr := uuid.MustParse("40000000-0000-0000-0000-000000000006")
 	managerInput := func() *models.CreateManagerInput {
 		input := &models.CreateManagerInput{}

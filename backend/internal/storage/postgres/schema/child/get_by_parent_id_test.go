@@ -7,53 +7,66 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/testutil"
 
+	"skillspark/internal/storage/postgres/schema/guardian"
+	"skillspark/internal/storage/postgres/schema/school"
+
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func CreateTestChildren(
-	t *testing.T,
-	ctx context.Context,
-	repo *ChildRepository,
-) []*models.Child {
-	t.Helper()
+func TestChildRepository_GetChildrenByParentID(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
 
-	schoolID, err := uuid.Parse("20000000-0000-0000-0000-000000000001")
-	assert.Nil(t, err)
+	testDB := testutil.SetupTestDB(t)
+	repo := NewChildRepository(testDB)
+	ctx := context.Background()
+	t.Parallel()
 
-	guardianID, err := uuid.Parse("88888888-8888-8888-8888-888888888888")
-	assert.Nil(t, err)
+	p := guardian.CreateTestGuardian(t, ctx, testDB)
+	s := school.CreateTestSchool(t, ctx, testDB)
 
 	input1 := &models.CreateChildInput{}
-	input1.Body.Name = "Test Child 1"
-	input1.Body.SchoolID = schoolID
-	input1.Body.BirthMonth = 5
-	input1.Body.BirthYear = 2019
+	input1.Body.Name = "Child One"
+	input1.Body.SchoolID = s.ID
+	input1.Body.BirthMonth = 3
+	input1.Body.BirthYear = 2018
 	input1.Body.Interests = []string{"math"}
-	input1.Body.GuardianID = guardianID
+	input1.Body.GuardianID = p.ID
 
 	child1, err := repo.CreateChild(ctx, input1)
-	assert.Nil(t, err)
-	assert.NotNil(t, child1)
+	require.NoError(t, err)
+	require.NotNil(t, child1)
 
 	input2 := &models.CreateChildInput{}
-	input2.Body.Name = "Test Child 2"
-	input2.Body.SchoolID = schoolID
-	input2.Body.BirthMonth = 8
-	input2.Body.BirthYear = 2021
-	input2.Body.Interests = []string{"science"}
-	input2.Body.GuardianID = guardianID
+	input2.Body.Name = "Child Two"
+	input2.Body.SchoolID = s.ID
+	input2.Body.BirthMonth = 7
+	input2.Body.BirthYear = 2020
+	input2.Body.Interests = []string{"science", "math"}
+	input2.Body.GuardianID = p.ID
 
 	child2, err := repo.CreateChild(ctx, input2)
-	assert.Nil(t, err)
-	assert.NotNil(t, child2)
+	require.NoError(t, err)
+	require.NotNil(t, child2)
 
-	return []*models.Child{child1, child2}
-}
+	children, err := repo.GetChildrenByParentID(ctx, p.ID)
 
-func TestChildRepository_GetChildrenByParentID(t *testing.T) {
-	// this test should exist but cannot be written correctly until one can create a guardian on the fly to test for this.
-	// otherwise we keep running into issues where more children were created under the same guardian and this test isn't really correct
+	require.NoError(t, err)
+	require.NotNil(t, children)
+	require.Len(t, children, 2)
+
+	childIDs := map[uuid.UUID]bool{
+		child1.ID: true,
+		child2.ID: true,
+	}
+
+	for _, c := range children {
+		require.True(t, childIDs[c.ID])
+		require.Equal(t, p.ID, c.GuardianID)
+	}
 }
 
 func TestChildRepository_GetChildrenByParentID_NotFound(t *testing.T) {
@@ -64,6 +77,7 @@ func TestChildRepository_GetChildrenByParentID_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewChildRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	nonExistentID := uuid.New()
 

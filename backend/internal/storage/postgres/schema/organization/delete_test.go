@@ -15,6 +15,7 @@ func TestDeleteOrganization(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Create an organization to delete
 	active := true
@@ -45,6 +46,7 @@ func TestDeleteOrganization_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Try to delete non-existent organization
 	deleted, err := repo.DeleteOrganization(ctx, uuid.New())
@@ -57,6 +59,7 @@ func TestDeleteOrganization_AlreadyDeleted(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Create organization
 	active := true
