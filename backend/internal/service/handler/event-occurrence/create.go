@@ -19,7 +19,7 @@ func (h *Handler) CreateEventOccurrence(ctx context.Context, input *models.Creat
 
 	_, eventErr := h.EventRepository.GetEventByID(ctx, eventId)
 	_, locationErr := h.LocationRepository.GetLocationByID(ctx, locationId)
-	
+
 	if managerErr != nil || eventErr != nil || locationErr != nil {
 		return nil, cmp.Or(managerErr, eventErr, locationErr)
 	}

@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-
 type Organization struct {
 	ID         uuid.UUID  `json:"id" db:"id"`
 	Name       string     `json:"name" db:"name"`
@@ -16,7 +15,6 @@ type Organization struct {
 	CreatedAt  time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt  time.Time  `json:"updated_at" db:"updated_at"`
 }
-
 
 type CreateOrganizationInput struct {
 	Body struct {
@@ -30,7 +28,6 @@ type CreateOrganizationInput struct {
 type CreateOrganizationOutput struct {
 	Body Organization
 }
-
 
 type UpdateOrganizationInput struct {
 	ID   uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
@@ -46,7 +43,6 @@ type UpdateOrganizationOutput struct {
 	Body Organization
 }
 
-
 type GetOrganizationByIDInput struct {
 	ID uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
 }
@@ -55,14 +51,13 @@ type GetOrganizationByIDOutput struct {
 	Body Organization
 }
 
-
 type GetAllOrganizationsInput struct {
 	Page     int `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
 	PageSize int `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
 }
 
 type GetAllOrganizationsOutput struct {
-	Body [] Organization `json:"body" doc:"List of organizations"`
+	Body []Organization `json:"body" doc:"List of organizations"`
 }
 
 type DeleteOrganizationInput struct {

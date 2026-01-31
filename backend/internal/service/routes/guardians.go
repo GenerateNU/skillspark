@@ -11,7 +11,7 @@ import (
 )
 
 func SetupGuardiansRoutes(api huma.API, repo *storage.Repository) {
-	guardianHandler := guardian.NewHandler(repo.Guardian)
+	guardianHandler := guardian.NewHandler(repo.Guardian, repo.Manager)
 	huma.Register(api, huma.Operation{
 		OperationID: "get-guardian-by-id",
 		Method:      http.MethodGet,

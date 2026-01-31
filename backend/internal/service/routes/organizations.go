@@ -3,8 +3,8 @@ package routes
 import (
 	"context"
 	"net/http"
-	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/models"
+	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/storage"
 	"skillspark/internal/utils"
 

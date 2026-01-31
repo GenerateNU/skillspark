@@ -41,6 +41,7 @@ type OrganizationRepository interface {
 
 type ManagerRepository interface {
 	GetManagerByID(ctx context.Context, id uuid.UUID) (*models.Manager, error)
+	GetManagerByUserID(ctx context.Context, userID uuid.UUID) (*models.Manager, error)
 	GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error)
 	DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, error)
 	CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error)
@@ -88,14 +89,14 @@ type RegistrationRepository interface {
 	UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error)
 }
 type Repository struct {
-	db       *pgxpool.Pool
-	Location LocationRepository
-	Organization OrganizationRepository
-	School   SchoolRepository
-	Manager  ManagerRepository
-	Guardian GuardianRepository
-	Event    EventRepository
-	Child    ChildRepository
+	db              *pgxpool.Pool
+	Location        LocationRepository
+	Organization    OrganizationRepository
+	School          SchoolRepository
+	Manager         ManagerRepository
+	Guardian        GuardianRepository
+	Event           EventRepository
+	Child           ChildRepository
 	EventOccurrence EventOccurrenceRepository
 	Registration RegistrationRepository
 }
@@ -114,14 +115,14 @@ func (r *Repository) GetDB() *pgxpool.Pool {
 // NewRepository creates a new Repository instance with the given database pool
 func NewRepository(db *pgxpool.Pool) *Repository {
 	return &Repository{
-		db:       db,
-		Location: location.NewLocationRepository(db),
-		Organization: organization.NewOrganizationRepository(db),
-		School:   school.NewSchoolRepository(db),
-		Manager:  manager.NewManagerRepository(db),
-		Guardian: guardian.NewGuardianRepository(db),
-		Event:    event.NewEventRepository(db),
-		Child:    child.NewChildRepository(db),
+		db:              db,
+		Location:        location.NewLocationRepository(db),
+		Organization:    organization.NewOrganizationRepository(db),
+		School:          school.NewSchoolRepository(db),
+		Manager:         manager.NewManagerRepository(db),
+		Guardian:        guardian.NewGuardianRepository(db),
+		Event:           event.NewEventRepository(db),
+		Child:           child.NewChildRepository(db),
 		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
 		Registration: registration.NewRegistrationRepository(db),
 	}

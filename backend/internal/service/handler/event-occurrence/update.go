@@ -33,11 +33,11 @@ func (h *Handler) UpdateEventOccurrence(ctx context.Context, input *models.Updat
 	if locationId != nil {
 		_, locationErr = h.LocationRepository.GetLocationByID(ctx, *locationId)
 	}
-	
+
 	if managerErr != nil || eventErr != nil || locationErr != nil {
 		return nil, cmp.Or(managerErr, eventErr, locationErr)
 	}
-	
+
 	// check that new currently enrolled number does not exceed the new or old max attendees
 	newCurrEnrolled := input.Body.CurrEnrolled
 	newMaxAttendees := input.Body.MaxAttendees

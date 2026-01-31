@@ -2,14 +2,14 @@ package organization
 
 import (
 	"context"
-	"testing"
 	"skillspark/internal/storage/postgres/testutil"
+	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestOrganizationRepository_GetEventOccurrenceByOrganizationId(t *testing.T){
+func TestOrganizationRepository_GetEventOccurrenceByOrganizationId(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}

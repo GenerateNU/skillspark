@@ -5,11 +5,13 @@ import (
 )
 
 type Handler struct {
-	ManagerRepository storage.ManagerRepository
+	ManagerRepository  storage.ManagerRepository
+	GuardianRepository storage.GuardianRepository
 }
 
-func NewHandler(managerRepository storage.ManagerRepository) *Handler {
+func NewHandler(managerRepository storage.ManagerRepository, guardianRepository storage.GuardianRepository) *Handler {
 	return &Handler{
-		ManagerRepository: managerRepository,
+		ManagerRepository:  managerRepository,
+		GuardianRepository: guardianRepository,
 	}
 }

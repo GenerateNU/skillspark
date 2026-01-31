@@ -15,8 +15,8 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 	}
 
 	// null fields are handled in SQL query with coalesce
-	row := r.db.QueryRow(ctx, 
-		query, 
+	row := r.db.QueryRow(ctx,
+		query,
 		input.ID,
 		input.Body.ManagerId,
 		input.Body.EventId,

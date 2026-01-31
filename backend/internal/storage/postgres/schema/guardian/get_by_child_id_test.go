@@ -39,5 +39,22 @@ func TestGuardianRepository_GetGuardianByChildID(t *testing.T) {
 	// compare the two guardians
 	assert.Equal(t, guardianFromChildID.ID, guardian.ID)
 	assert.Equal(t, guardianFromChildID.UserID, guardian.UserID)
+}
 
+func TestGuardianRepository_GetGuardianByChildID_NotFound(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+
+	testDB := testutil.SetupTestDB(t)
+	repo := NewGuardianRepository(testDB)
+	ctx := context.Background()
+
+	randomChildID := uuid.New()
+
+	guardian, err := repo.GetGuardianByChildID(ctx, randomChildID)
+
+	assert.Error(t, err)
+	assert.Nil(t, guardian)
+	assert.Contains(t, err.Error(), "not found")
 }
