@@ -3,6 +3,7 @@ package organization
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
@@ -41,7 +42,7 @@ func TestCreateOrganization_WithLocation(t *testing.T) {
 	t.Parallel()
 
 	active := true
-	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 	input := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Test Corp with Location"
@@ -112,7 +113,7 @@ func TestCreateOrganization_FullDetails(t *testing.T) {
 	t.Parallel()
 
 	active := true
-	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 	pfpKey := "orgs/full_corp.jpg"
 	input := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
