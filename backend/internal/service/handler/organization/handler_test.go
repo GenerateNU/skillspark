@@ -400,14 +400,14 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 
 func TestHandler_GetAllOrganizations(t *testing.T) {
 	tests := []struct {
-		name      string
-		pagination utils.Pagination
-		mockSetup func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
-		wantErr   bool
+		name        string
+		pagination  utils.Pagination
+		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		wantErr     bool
 		expectedLen int
 	}{
 		{
-			name: "successful get all with defaults",
+			name:       "successful get all with defaults",
 			pagination: utils.Pagination{Page: 1, Limit: 20},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
 				orgs := []models.Organization{
@@ -420,7 +420,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			expectedLen: 2,
 		},
 		{
-			name: "successful get all with pagination",
+			name:       "successful get all with pagination",
 			pagination: utils.Pagination{Page: 2, Limit: 10},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
 				orgs := []models.Organization{
@@ -432,7 +432,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			expectedLen: 1,
 		},
 		{
-			name: "database error",
+			name:       "database error",
 			pagination: utils.Pagination{Page: 1, Limit: 20},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
 				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(nil, &errs.HTTPError{
@@ -473,23 +473,23 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 	start2, _ := time.Parse(time.RFC3339, "2026-02-22 09:00:00+07")
 	end2, _ := time.Parse(time.RFC3339, "2026-02-22 11:00:00+07")
 
-	category_arr := []string{"science","technology"}
+	category_arr := []string{"science", "technology"}
 	eight := 8
 	twelve := 12
 	jpg := "events/robotics_workshop.jpg"
 	addr := "Suite 15"
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	event := models.Event{
-		ID: 				uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-		Title: 				"Junior Robotics Workshop",
-		Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
-		OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-		AgeRangeMin: 		&eight,
-		AgeRangeMax: 		&twelve,
-		Category: 			category_arr,
-		HeaderImageS3Key: 	&jpg,
-		CreatedAt: 			time.Now(),
-		UpdatedAt: 			time.Now(),
+		ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+		Title:            "Junior Robotics Workshop",
+		Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+		AgeRangeMin:      &eight,
+		AgeRangeMax:      &twelve,
+		Category:         category_arr,
+		HeaderImageS3Key: &jpg,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
 	location := models.Location{
@@ -525,30 +525,30 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 					uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 				).Return([]models.EventOccurrence{
 					{
-						ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000001"),
-						ManagerId: 		&mid,
-						Event: 			event,
-						Location: 		location,
-						StartTime: 		start,
-						EndTime: 		end,
-						MaxAttendees: 	15,
-						Language: 		"en",
-						CurrEnrolled: 	8,
-						CreatedAt:    	time.Now(),
-						UpdatedAt:    	time.Now(),
+						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+						ManagerId:    &mid,
+						Event:        event,
+						Location:     location,
+						StartTime:    start,
+						EndTime:      end,
+						MaxAttendees: 15,
+						Language:     "en",
+						CurrEnrolled: 8,
+						CreatedAt:    time.Now(),
+						UpdatedAt:    time.Now(),
 					},
 					{
-						ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000002"),
-						ManagerId: 		&mid,
-						Event: 			event,
-						Location: 		location,
-						StartTime: 		start2,
-						EndTime: 		end2,
-						MaxAttendees: 	15,
-						Language: 		"en",
-						CurrEnrolled: 	5,
-						CreatedAt:    	time.Now(),
-						UpdatedAt:    	time.Now(),
+						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+						ManagerId:    &mid,
+						Event:        event,
+						Location:     location,
+						StartTime:    start2,
+						EndTime:      end2,
+						MaxAttendees: 15,
+						Language:     "en",
+						CurrEnrolled: 5,
+						CreatedAt:    time.Now(),
+						UpdatedAt:    time.Now(),
 					},
 				}, nil)
 			},
@@ -569,7 +569,7 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt 
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 

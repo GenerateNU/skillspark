@@ -19,6 +19,7 @@ func TestLocationRepository_Create_NewYork(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewLocationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	locationInput := func() *models.CreateLocationInput {
 		input := &models.CreateLocationInput{}

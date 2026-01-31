@@ -20,6 +20,7 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventOccurrenceRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	start := time.Date(2026, time.February, 1, 0, 0, 0, 0, time.Local)

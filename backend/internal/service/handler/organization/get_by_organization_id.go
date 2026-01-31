@@ -13,7 +13,7 @@ func (h *Handler) GetEventOccurrencesByOrganizationID(ctx context.Context, input
 	if parse_err != nil {
 		return nil, errs.BadRequest("Invalid ID format")
 	}
-	
+
 	eventOccurrence, err := h.OrganizationRepository.GetEventOccurrencesByOrganizationID(ctx, id)
 	if err != nil {
 		return nil, err

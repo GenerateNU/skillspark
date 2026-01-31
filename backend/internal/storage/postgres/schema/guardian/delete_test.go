@@ -20,6 +20,7 @@ func TestGuardianRepository_DeleteGuardian(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewGuardianRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 	// delete a guardian that has a child that exists, should error
 	guardian, err := repo.DeleteGuardian(ctx, uuid.MustParse("11111111-1111-1111-1111-111111111111"))
 

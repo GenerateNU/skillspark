@@ -6,7 +6,7 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/event"
-	"skillspark/internal/storage/postgres/schema/event-occurrence"
+	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
@@ -27,6 +27,7 @@ type LocationRepository interface {
 }
 
 type SchoolRepository interface {
+	CreateSchool(ctx context.Context, school *models.CreateSchoolInput) (*models.School, error)
 	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error)
 }
 
@@ -88,16 +89,16 @@ type RegistrationRepository interface {
 	UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error)
 }
 type Repository struct {
-	db       *pgxpool.Pool
-	Location LocationRepository
-	Organization OrganizationRepository
-	School   SchoolRepository
-	Manager  ManagerRepository
-	Guardian GuardianRepository
-	Event    EventRepository
-	Child    ChildRepository
+	db              *pgxpool.Pool
+	Location        LocationRepository
+	Organization    OrganizationRepository
+	School          SchoolRepository
+	Manager         ManagerRepository
+	Guardian        GuardianRepository
+	Event           EventRepository
+	Child           ChildRepository
 	EventOccurrence EventOccurrenceRepository
-	Registration RegistrationRepository
+	Registration    RegistrationRepository
 }
 
 // Close closes the database connection pool
@@ -114,15 +115,15 @@ func (r *Repository) GetDB() *pgxpool.Pool {
 // NewRepository creates a new Repository instance with the given database pool
 func NewRepository(db *pgxpool.Pool) *Repository {
 	return &Repository{
-		db:       db,
-		Location: location.NewLocationRepository(db),
-		Organization: organization.NewOrganizationRepository(db),
-		School:   school.NewSchoolRepository(db),
-		Manager:  manager.NewManagerRepository(db),
-		Guardian: guardian.NewGuardianRepository(db),
-		Event:    event.NewEventRepository(db),
-		Child:    child.NewChildRepository(db),
+		db:              db,
+		Location:        location.NewLocationRepository(db),
+		Organization:    organization.NewOrganizationRepository(db),
+		School:          school.NewSchoolRepository(db),
+		Manager:         manager.NewManagerRepository(db),
+		Guardian:        guardian.NewGuardianRepository(db),
+		Event:           event.NewEventRepository(db),
+		Child:           child.NewChildRepository(db),
 		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
-		Registration: registration.NewRegistrationRepository(db),
+		Registration:    registration.NewRegistrationRepository(db),
 	}
 }

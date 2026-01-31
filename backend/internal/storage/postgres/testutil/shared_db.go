@@ -28,7 +28,6 @@ var (
 // from the template DB. Safe for t.Parallel().
 func SetupTestDB(t *testing.T) *pgxpool.Pool {
 	t.Helper()
-	t.Parallel()
 
 	if err := ensureContainerAndTemplate(); err != nil {
 		t.Fatalf("test DB setup failed: %v", err)

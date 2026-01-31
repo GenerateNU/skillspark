@@ -14,31 +14,22 @@ func TestGetById(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	org, err := repo.GetOrganizationByID(ctx, uuid.MustParse("40000000-0000-0000-0000-000000000004"))
+	testorg := CreateTestOrganization(t, ctx, testDB)
 
-	require.Nil(t,err)
-	assert.Equal(t, "Harmony Music School", org.Name)
-	assert.True(t, org.Active)
-}
-
-func TestExecute_SecondOrganization(t *testing.T) {
-	testDB := testutil.SetupTestDB(t)
-	repo := NewOrganizationRepository(testDB)
-	ctx := context.Background()
-
-	org, err := repo.GetOrganizationByID(ctx, uuid.MustParse("40000000-0000-0000-0000-000000000003"))
+	org, err := repo.GetOrganizationByID(ctx, testorg.ID)
 
 	require.Nil(t, err)
-	require.NotNil(t, org)
-	assert.Equal(t, "Creative Arts Studio", org.Name)
+	assert.Equal(t, "Test Corp", org.Name)
 	assert.True(t, org.Active)
 }
 
 func TestExecute_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
-	repo := NewOrganizationRepository(testDB)	
+	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	org, err := repo.GetOrganizationByID(ctx, uuid.New())
 

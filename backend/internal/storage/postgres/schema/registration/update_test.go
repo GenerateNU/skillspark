@@ -3,6 +3,9 @@ package registration
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/child"
+	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
+	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
@@ -16,9 +19,9 @@ func TestUpdateRegistration(t *testing.T) {
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 
-	childID := uuid.MustParse("30000000-0000-0000-0000-000000000001")
-	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
-	occurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000002")
+	childID := child.CreateTestChild(t, ctx, testDB).ID
+	guardianID := guardian.CreateTestGuardian(t, ctx, testDB).ID
+	occurrenceID := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB).ID
 
 	createInput := func() *models.CreateRegistrationInput {
 		i := &models.CreateRegistrationInput{}
@@ -62,9 +65,9 @@ func TestUpdateRegistration_ChangeEventOccurrence(t *testing.T) {
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 
-	childID := uuid.MustParse("30000000-0000-0000-0000-000000000002")
-	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
-	occurrenceID1 := uuid.MustParse("70000000-0000-0000-0000-000000000001")
+	childID := child.CreateTestChild(t, ctx, testDB).ID
+	guardianID := guardian.CreateTestGuardian(t, ctx, testDB).ID
+	occurrenceID1 := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB).ID
 
 	createInput := func() *models.CreateRegistrationInput {
 		i := &models.CreateRegistrationInput{}

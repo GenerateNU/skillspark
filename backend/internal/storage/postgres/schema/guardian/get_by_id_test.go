@@ -18,6 +18,7 @@ func TestGuardianRepository_GetGuardianByID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewGuardianRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// get a guardian that exists
 	guardian, err := repo.GetGuardianByID(ctx, uuid.MustParse("11111111-1111-1111-1111-111111111111"))
