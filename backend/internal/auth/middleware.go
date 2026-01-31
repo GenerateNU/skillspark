@@ -9,9 +9,11 @@ import (
 
 func AuthMiddleware(api huma.API, cfg *config.Supabase) func(ctx huma.Context, next func(huma.Context)) {
     skipPaths := map[string]bool{
-        "/auth/login":    true,
-        "/auth/register": true,
-        "/health":        true,
+        "/api/v1/auth/signup/guardian":    true,
+        "/api/v1/auth/signup/manager": true,
+        "/api/v1/auth/login/guardian": true,
+        "/api/v1/auth/login/manager": true,
+        "/api/v1/health":        true,
     }
 
     return func(ctx huma.Context, next func(huma.Context)) {
