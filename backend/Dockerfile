@@ -1,16 +1,30 @@
-FROM golang:1.24-alpine
+# Build stage
+FROM golang:1.24-alpine AS builder
 
-
-# Set the working directory (this is /backend in SkillSpark)
 WORKDIR /app
 
-# Copy only go.mod and go.sum first (to cache dependencies)
+# Copy dependency files
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the entire project
+# Copy source code
 COPY . .
 
-WORKDIR /app/cmd 
+# Build the executable
+# -o specifies output location
+# CGO_ENABLED=0 creates a static binary (better for alpine)
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/skillspark ./cmd
 
-CMD ["go", "run", "."]
+# Run stage
+FROM alpine:latest
+
+WORKDIR /app
+
+# Copy only the compiled binary from builder stage
+COPY --from=builder /app/bin/skillspark .
+
+# Expose port if needed (adjust based on your app)
+# EXPOSE 8080
+
+# Run the executable
+CMD ["./skillspark"]

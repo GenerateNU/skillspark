@@ -6,11 +6,12 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/event"
-	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
+	"skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
 	"skillspark/internal/storage/postgres/schema/organization"
+	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/storage/postgres/schema/user"
 	"skillspark/internal/utils"
@@ -36,10 +37,12 @@ type OrganizationRepository interface {
 	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, *errs.HTTPError)
 	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput) (*models.Organization, *errs.HTTPError)
 	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
+	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID) ([]models.EventOccurrence, error)
 }
 
 type ManagerRepository interface {
 	GetManagerByID(ctx context.Context, id uuid.UUID) (*models.Manager, error)
+	GetManagerByUserID(ctx context.Context, userID uuid.UUID) (*models.Manager, error)
 	GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error)
 	GetManagerByAuthID(ctx context.Context, authID string) (*models.Manager, error)
 	DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, error)
@@ -62,6 +65,7 @@ type EventRepository interface {
 	UpdateEvent(ctx context.Context, location *models.UpdateEventInput) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
+	GetEventByID(ctx context.Context, id uuid.UUID) (*models.Event, error)
 }
 
 type ChildRepository interface {
@@ -76,8 +80,17 @@ type EventOccurrenceRepository interface {
 	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination) ([]models.EventOccurrence, error)
 	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error)
 	CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error)
+	UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.EventOccurrence, error)
 }
 
+type RegistrationRepository interface {
+	CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error)
+	GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput) (*models.GetRegistrationByIDOutput, error)
+	GetRegistrationsByChildID(ctx context.Context, input *models.GetRegistrationsByChildIDInput) (*models.GetRegistrationsByChildIDOutput, error)
+	GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error)
+	GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error)
+	UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error)
+}
 type Repository struct {
 	db              *pgxpool.Pool
 	Location        LocationRepository
@@ -88,6 +101,7 @@ type Repository struct {
 	Event           EventRepository
 	Child           ChildRepository
 	EventOccurrence EventOccurrenceRepository
+	Registration RegistrationRepository
 	User            UserRepository
 }
 
@@ -122,5 +136,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Child:           child.NewChildRepository(db),
 		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
 		User:            user.NewUserRepository(db),
+		Registration: registration.NewRegistrationRepository(db),
 	}
 }

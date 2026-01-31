@@ -15,11 +15,11 @@ func (r *GuardianRepository) CreateGuardian(ctx context.Context, guardian *model
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, guardian.Body.UserID)
+	row := r.db.QueryRow(ctx, query, guardian.Body.Name, guardian.Body.Email, guardian.Body.Username, guardian.Body.ProfilePictureS3Key, guardian.Body.LanguagePreference)
 
 	var createdGuardian models.Guardian
 
-	err = row.Scan(&createdGuardian.ID, &createdGuardian.UserID, &createdGuardian.CreatedAt, &createdGuardian.UpdatedAt)
+	err = row.Scan(&createdGuardian.ID, &createdGuardian.UserID, &createdGuardian.Name, &createdGuardian.Email, &createdGuardian.Username, &createdGuardian.ProfilePictureS3Key, &createdGuardian.LanguagePreference, &createdGuardian.CreatedAt, &createdGuardian.UpdatedAt)
 	if err != nil {
 		err := errs.InternalServerError("Failed to create guardian: ", err.Error())
 		return nil, &err

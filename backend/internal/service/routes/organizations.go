@@ -3,8 +3,8 @@ package routes
 import (
 	"context"
 	"net/http"
-	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/models"
+	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/storage"
 	"skillspark/internal/utils"
 
@@ -88,5 +88,23 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		Tags:        []string{"Organizations"},
 	}, func(ctx context.Context, input *models.DeleteOrganizationInput) (*models.DeleteOrganizationOutput, error) {
 		return orgHandler.DeleteOrganization(ctx, input)
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-event-occurrences-by-organization-id",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/organizations/{organization_id}/event-occurrences/",
+		Summary:     "Get event occurrences by organization ID",
+		Description: "Returns event occurrences that match the organization ID",
+		Tags:        []string{"Organizations"},
+	}, func(ctx context.Context, input *models.GetEventOccurrencesByOrganizationIDInput) (*models.GetEventOccurrencesByOrganizationIDOutput, error) {
+		eventOccurrences, err := orgHandler.GetEventOccurrencesByOrganizationID(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetEventOccurrencesByOrganizationIDOutput{
+			Body: eventOccurrences,
+		}, nil
 	})
 }

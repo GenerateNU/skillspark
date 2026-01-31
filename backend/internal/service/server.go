@@ -100,7 +100,7 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo)
 	routes.SetupManagerRoutes(api, repo)
-
+	routes.SetupRegistrationRoutes(api, repo)
 	routes.SetupGuardiansRoutes(api, repo)
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo)

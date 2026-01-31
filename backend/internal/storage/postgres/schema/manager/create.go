@@ -14,11 +14,11 @@ func (r *ManagerRepository) CreateManager(ctx context.Context, manager *models.C
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, manager.Body.UserID, manager.Body.OrganizationID, manager.Body.Role)
+	row := r.db.QueryRow(ctx, query, manager.Body.Name, manager.Body.Email, manager.Body.Username, manager.Body.ProfilePictureS3Key, manager.Body.LanguagePreference, manager.Body.OrganizationID, manager.Body.Role)
 
 	var createdManager models.Manager
 
-	err = row.Scan(&createdManager.ID, &createdManager.UserID, &createdManager.OrganizationID, &createdManager.Role, &createdManager.CreatedAt, &createdManager.UpdatedAt)
+	err = row.Scan(&createdManager.ID, &createdManager.UserID, &createdManager.OrganizationID, &createdManager.Role, &createdManager.Name, &createdManager.Email, &createdManager.Username, &createdManager.ProfilePictureS3Key, &createdManager.LanguagePreference, &createdManager.CreatedAt, &createdManager.UpdatedAt)
 	if err != nil {
 		err := errs.InternalServerError("Failed to create manager: ", err.Error())
 		return nil, &err
