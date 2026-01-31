@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/testutil"
 
 	"github.com/google/uuid"
@@ -21,12 +22,13 @@ func TestManagerRepository_Update_AssistantDirector(t *testing.T) {
 	repo := NewManagerRepository(testDB)
 	ctx := context.Background()
 	t.Parallel()
-	ptr := uuid.MustParse("40000000-0000-0000-0000-000000000001")
+
+	organizationID := organization.CreateTestOrganization(t, ctx, testDB).ID
 	managerInput := func() *models.PatchManagerInput {
 		input := &models.PatchManagerInput{}
 		input.Body.ID = uuid.MustParse("50000000-0000-0000-0000-000000000001")
 		input.Body.UserID = uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f")
-		input.Body.OrganizationID = &ptr
+		input.Body.OrganizationID = &organizationID
 		input.Body.Role = "Assistant Director"
 		return input
 	}()
@@ -34,7 +36,7 @@ func TestManagerRepository_Update_AssistantDirector(t *testing.T) {
 	manager, err := repo.PatchManager(ctx, managerInput)
 	assert.Nil(t, err)
 	assert.NotNil(t, manager.UserID)
-	assert.Equal(t, uuid.MustParse("40000000-0000-0000-0000-000000000001"), manager.OrganizationID)
+	assert.Equal(t, organizationID, manager.OrganizationID)
 	assert.Equal(t, "Assistant Director", manager.Role)
 
 	id := manager.ID
