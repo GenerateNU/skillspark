@@ -3,6 +3,8 @@ package registration
 import (
 	"context"
 	"skillspark/internal/models"
+	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
+
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
@@ -15,11 +17,12 @@ func TestGetRegistrationsByEventOccurrenceID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	eventOccurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000001")
+	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
-		EventOccurrenceID: eventOccurrenceID,
+		EventOccurrenceID: r.EventOccurrenceID,
 	}
 
 	result, err := repo.GetRegistrationsByEventOccurrenceID(ctx, input)
@@ -29,7 +32,7 @@ func TestGetRegistrationsByEventOccurrenceID(t *testing.T) {
 	assert.NotEmpty(t, result.Body.Registrations)
 
 	for _, reg := range result.Body.Registrations {
-		assert.Equal(t, eventOccurrenceID, reg.EventOccurrenceID)
+		assert.Equal(t, r.EventOccurrenceID, reg.EventOccurrenceID)
 		assert.NotEqual(t, uuid.Nil, reg.ID)
 		assert.NotEqual(t, uuid.Nil, reg.ChildID)
 		assert.NotEqual(t, uuid.Nil, reg.GuardianID)
@@ -45,6 +48,7 @@ func TestGetRegistrationsByEventOccurrenceID_MultipleRegistrations(t *testing.T)
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	eventOccurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000001")
 
@@ -71,11 +75,12 @@ func TestGetRegistrationsByEventOccurrenceID_NoRegistrations(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	eventOccurrenceID := uuid.New()
+	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
-		EventOccurrenceID: eventOccurrenceID,
+		EventOccurrenceID: occurrence.ID,
 	}
 
 	result, err := repo.GetRegistrationsByEventOccurrenceID(ctx, input)
@@ -89,11 +94,12 @@ func TestGetRegistrationsByEventOccurrenceID_VerifyEventDetails(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	eventOccurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000001")
+	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
-		EventOccurrenceID: eventOccurrenceID,
+		EventOccurrenceID: r.EventOccurrenceID,
 	}
 
 	result, err := repo.GetRegistrationsByEventOccurrenceID(ctx, input)

@@ -2,6 +2,7 @@ package school
 
 import (
 	"context"
+	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/testutil"
 	"skillspark/internal/utils"
 	"testing"
@@ -21,8 +22,10 @@ func TestSchoolRepository_GetAllSchools(t *testing.T) {
 	t.Parallel()
 
 	// Use existing seeded locations for referential integrity
-	newYorkLocationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-	bostonLocationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19")
+	newYorkLocation := location.CreateTestLocation(t, ctx, testDB)
+	bostonLocation := location.CreateTestLocation(t, ctx, testDB)
+	newYorkLocationID := newYorkLocation.ID
+	bostonLocationID := bostonLocation.ID
 
 	// Insert some test schools
 	nySchoolID := uuid.New()

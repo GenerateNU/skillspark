@@ -15,11 +15,12 @@ func TestGetRegistrationsByChildID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	childID := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByChildIDInput{
-		ChildID: childID,
+		ChildID: r.ChildID,
 	}
 
 	result, err := repo.GetRegistrationsByChildID(ctx, input)
@@ -29,7 +30,7 @@ func TestGetRegistrationsByChildID(t *testing.T) {
 	assert.NotEmpty(t, result.Body.Registrations)
 
 	for _, reg := range result.Body.Registrations {
-		assert.Equal(t, childID, reg.ChildID)
+		assert.Equal(t, r.ChildID, reg.ChildID)
 		assert.NotEqual(t, uuid.Nil, reg.ID)
 		assert.NotEqual(t, uuid.Nil, reg.GuardianID)
 		assert.NotEqual(t, uuid.Nil, reg.EventOccurrenceID)
@@ -45,6 +46,7 @@ func TestGetRegistrationsByChildID_MultipleRegistrations(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	childID := uuid.MustParse("30000000-0000-0000-0000-000000000001")
 
@@ -71,6 +73,7 @@ func TestGetRegistrationsByChildID_NoRegistrations(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	childID := uuid.New()
 
@@ -89,11 +92,12 @@ func TestGetRegistrationsByChildID_VerifyEventDetails(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	childID := uuid.MustParse("30000000-0000-0000-0000-000000000003")
+	reg := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByChildIDInput{
-		ChildID: childID,
+		ChildID: reg.ChildID,
 	}
 
 	result, err := repo.GetRegistrationsByChildID(ctx, input)
