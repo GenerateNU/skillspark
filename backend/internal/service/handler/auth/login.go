@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -13,7 +12,6 @@ import (
 func (h *Handler) GuardianLogin(ctx context.Context, input *models.LoginInput) (*models.GuardianLoginOutput, error) {
 
 	res, err := auth.SupabaseLogin(&h.config, input.Body.Email, input.Body.Password)
-	fmt.Println(json.Marshal(res))
 	if err != nil {
 		slog.Error(fmt.Sprintf("Login Request Failed: %v", err))
 		return nil, err

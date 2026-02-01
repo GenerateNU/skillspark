@@ -72,9 +72,5 @@ func SupabaseLogin(cfg *config.Supabase, email string, password string) (models.
 		return models.LoginResponse{}, errs.BadRequest(fmt.Sprintf("Sign In Response Error %v", signInResponse.Error))
 	}
 
-	// fmt.Println(signInResponse)
-	debugBytes, _ := json.Marshal(signInResponse)
-	fmt.Printf("DEBUG: %s\n", string(debugBytes))
-
 	return signInResponse, nil
 }

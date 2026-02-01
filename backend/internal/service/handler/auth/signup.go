@@ -69,7 +69,6 @@ func (h *Handler) GuardianSignUp(ctx context.Context, input *models.GuardianSign
 func (h *Handler) ManagerSignUp(ctx context.Context, input *models.ManagerSignUpInput) (*models.ManagerSignUpOutput, error) {
 
 	res, err := auth.SupabaseSignup(&h.config, input.Body.Email, input.Body.Password)
-	fmt.Println(res)
 	if err != nil {
 		slog.Error(fmt.Sprintf("Signup Request Failed: %v", err))
 		return nil, err
