@@ -60,7 +60,17 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 		Description: "Returns a single organization by their ID",
 		Tags:        []string{"Organizations"},
 	}, func(ctx context.Context, input *models.GetOrganizationByIDInput) (*models.GetOrganizationByIDOutput, error) {
-		return orgHandler.GetOrganizationById(ctx, input)
+
+		organization, url, err := orgHandler.GetOrganizationById(ctx, input, s3Client)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetOrganizationByIDOutput{
+			Body:         *organization,
+			PresignedURL: url,
+		}, nil
+
 	})
 
 	huma.Register(api, huma.Operation{
@@ -85,13 +95,14 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 			Limit: limit,
 		}
 
-		organizations, err := orgHandler.GetAllOrganizations(ctx, pagination)
+		organizations, urls, err := orgHandler.GetAllOrganizations(ctx, pagination, s3Client)
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.GetAllOrganizationsOutput{
-			Body: organizations,
+			Body:          organizations,
+			PresignedURLS: urls,
 		}, nil
 	})
 
@@ -113,6 +124,7 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 
 		organizationModel := models.UpdateOrganizationInput{
 			Body: organizationBody,
+			ID:   formData.ID,
 		}
 
 		image_data, err := io.ReadAll(formData.ProfileImage)

@@ -4,19 +4,29 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
+	"time"
 
 	"github.com/google/uuid"
 )
 
-func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput) ([]models.EventOccurrence, error) {
+func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput, s3Client *s3_client.Client) ([]models.EventOccurrence, *string, error) {
 	id, parse_err := uuid.Parse(input.ID.String())
 	if parse_err != nil {
-		return nil, errs.BadRequest("Invalid ID format")
+		return nil, nil, errs.BadRequest("Invalid ID format")
 	}
-	
+
 	eventOccurrence, err := h.EventRepository.GetEventOccurrencesByEventID(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return eventOccurrence, nil
+
+	var key *string
+	var url *string
+	key = eventOccurrence[0].Event.HeaderImageS3Key
+	if key != nil {
+		s3Client.GeneratePresignedURL(ctx, *key, time.Hour)
+	}
+
+	return eventOccurrence, url, nil
 }

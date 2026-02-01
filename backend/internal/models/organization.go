@@ -24,6 +24,7 @@ type CreateOrganizationRouteInput struct {
 
 // CreateOrganizationFormData holds the parsed form data for creating an organization
 type UpdateOrganizationFormData struct {
+	ID           uuid.UUID      `path:"id"`
 	Name         *string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
 	Active       *bool          `form:"active"`
 	LocationID   *uuid.UUID     `form:"location_id"`
@@ -59,19 +60,17 @@ type CreateOrganizationInput struct {
 
 type CreateOrganizationOutput struct {
 	Body         Organization
-	PresignedURL *string `json:"presigned_url" db:"presigned_url"`
+	PresignedURL *string `json:"presigned_url"`
 }
 
 type UpdateOrganizationInput struct {
 	ID   uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
-	Body struct {
-		UpdateOrganizationBody
-	}
+	Body UpdateOrganizationBody
 }
 
 type UpdateOrganizationOutput struct {
 	Body         Organization `json:"body"`
-	PresignedURL *string      `json:"presigned_url" db:"presigned_url"`
+	PresignedURL *string      `json:"presigned_url"`
 }
 
 type GetOrganizationByIDInput struct {
@@ -80,7 +79,7 @@ type GetOrganizationByIDInput struct {
 
 type GetOrganizationByIDOutput struct {
 	Body         Organization `json:"body"`
-	PresignedURL *string      `json:"presigned_url" db:"presigned_url"`
+	PresignedURL *string      `json:"presigned_url"`
 }
 
 type GetAllOrganizationsInput struct {

@@ -42,9 +42,10 @@ type CreateEventFormData struct {
 }
 
 type UpdateEventFormData struct {
-	Title          *string        `form:"title" required:"true" minLength:"2" maxLength:"100"`
-	Description    *string        `form:"description" required:"true" minLength:"2" maxLength:"200"`
-	OrganizationID *uuid.UUID     `form:"organization_id" required:"true"`
+	ID             uuid.UUID      `path:"id"`
+	Title          *string        `form:"title" minLength:"2" maxLength:"100"`
+	Description    *string        `form:"description" minLength:"2" maxLength:"200"`
+	OrganizationID *uuid.UUID     `form:"organization_id"`
 	AgeRangeMin    *int           `form:"age_range_min"`
 	AgeRangeMax    *int           `form:"age_range_max"`
 	Category       *[]string      `form:"category"`
@@ -53,7 +54,7 @@ type UpdateEventFormData struct {
 
 type CreateEventOutput struct {
 	Body         *Event  `json:"body"`
-	PresignedURL *string `json:"presigned_url" db:"presigned_url"`
+	PresignedURL *string `json:"presigned_url"`
 }
 
 type UpdateEventRouteInput struct {
@@ -80,14 +81,12 @@ type UpdateEventBody struct {
 
 type UpdateEventInput struct {
 	ID   uuid.UUID `path:"id"`
-	Body struct {
-		UpdateEventBody
-	}
+	Body UpdateEventBody
 }
 
 type UpdateEventOutput struct {
 	Body         *Event  `json:"body"`
-	PresignedURL *string `json:"presigned_url" db:"presigned_url"`
+	PresignedURL *string `json:"presigned_url"`
 }
 
 type DeleteEventInput struct {
@@ -107,5 +106,5 @@ type GetEventOccurrencesByEventIDInput struct {
 
 type GetEventOccurrencesByEventIDOutput struct {
 	Body         []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
-	PresignedURL *string           `json:"presigned_url" db:"presigned_url"`
+	PresignedURL *string           `json:"presigned_urls"`
 }

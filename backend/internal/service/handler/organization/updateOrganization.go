@@ -4,19 +4,48 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 )
 
-func (h *Handler) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput) (*models.UpdateOrganizationOutput, error) {
+func (h *Handler) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput, image_data *[]byte, s3Client *s3_client.Client) (*models.Organization, *string, error) {
 	if input.Body.LocationID != nil {
 		if _, err := h.LocationRepository.GetLocationByID(ctx, *input.Body.LocationID); err != nil {
-			return nil, errs.BadRequest("Invalid location_id: location does not exist")
+			return nil, nil, errs.BadRequest("Invalid location_id: location does not exist")
 		}
 	}
 
-	updated, err := h.OrganizationRepository.UpdateOrganization(ctx, input)
+	var key *string
+	var url *string
+
+	occurence, err := h.OrganizationRepository.GetOrganizationByID(ctx, input.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &models.UpdateOrganizationOutput{Body: *updated}, nil
+	key = occurence.PfpS3Key
+
+	if image_data != nil {
+
+		if key == nil {
+			var genErr error
+			key, genErr = h.generateS3Key(input.ID)
+			if genErr != nil {
+				return nil, nil, genErr
+			}
+		}
+
+		uploadedUrl, errr := s3Client.UploadImage(ctx, key, *image_data)
+		if errr != nil {
+			return nil, nil, errr.(*errs.HTTPError)
+		}
+		url = uploadedUrl
+
+	}
+
+	organization, updateErr := h.OrganizationRepository.UpdateOrganization(ctx, input, key)
+	if updateErr != nil {
+		return nil, nil, updateErr
+	}
+
+	return organization, url, nil
 }

@@ -76,8 +76,10 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		}
 
 		eventModel := models.UpdateEventInput{
+			ID:   formData.ID,
 			Body: eventBody,
 		}
+
 		image_data, err := io.ReadAll(formData.HeaderImage)
 
 		// io.readall on input
@@ -124,13 +126,14 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		Description: "Returns event occurrences that match the event ID",
 		Tags:        []string{"Events"},
 	}, func(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput) (*models.GetEventOccurrencesByEventIDOutput, error) {
-		eventOccurrences, err := eventHandler.GetEventOccurrencesByEventID(ctx, input)
+		eventOccurrences, url, err := eventHandler.GetEventOccurrencesByEventID(ctx, input, s3Client)
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.GetEventOccurrencesByEventIDOutput{
-			Body: eventOccurrences,
+			Body:         eventOccurrences,
+			PresignedURL: url,
 		}, nil
 	})
 }
