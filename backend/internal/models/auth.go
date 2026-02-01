@@ -57,7 +57,7 @@ type LoginOutput struct {
 	} `json:"body"`
 }
 
-type userResponse struct {
+type UserResponse struct {
 	ID uuid.UUID `json:"id"`
 }
 
@@ -80,7 +80,7 @@ type LoginResponse struct {
 	TokenType    string       `json:"token_type"`
 	ExpiresIn    int          `json:"expires_in"`
 	RefreshToken string       `json:"refresh_token"`
-	User         userResponse `json:"user"`
+	User         UserResponse `json:"user"`
 	Error        interface{}  `json:"error"`
 }
 
