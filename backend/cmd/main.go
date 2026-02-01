@@ -63,6 +63,7 @@ func main() {
 
 func LoadConfig() (*config.Config, error) {
 	environment := os.Getenv("ENVIRONMENT")
+	testMode := os.Getenv("TEST_MODE")
 
 	var cfg config.Config
 	switch environment {
@@ -87,6 +88,8 @@ func LoadConfig() (*config.Config, error) {
 		log.Fatalln("Invalid environment name: ", environment, "The environment name must be one of either production or development")
 		return nil, fmt.Errorf("invalid environment name: %s", environment)
 	}
+
+	cfg.TestMode = testMode == "true"
 
 	return &cfg, nil
 }

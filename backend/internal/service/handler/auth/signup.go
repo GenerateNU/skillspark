@@ -13,7 +13,6 @@ func (h *Handler) GuardianSignUp(ctx context.Context, input *models.GuardianSign
 
 	// create user in supabase
 	res, err := auth.SupabaseSignup(&h.config, input.Body.Email, input.Body.Password)
-	fmt.Println(res)
 	if err != nil {
 		slog.Error(fmt.Sprintf("Signup Request Failed: %v", err))
 		return nil, err

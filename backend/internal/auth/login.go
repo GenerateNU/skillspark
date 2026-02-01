@@ -52,9 +52,13 @@ func SupabaseLogin(cfg *config.Supabase, email string, password string) (models.
 	}
 
 	if res.StatusCode != http.StatusOK {
-		errorMsg := fmt.Sprintf("Failed to login %d, %s", res.StatusCode, body)
-		fmt.Print(errorMsg)
-		return models.LoginResponse{}, errs.BadRequest(errorMsg)
+		supabaseError := &SupabaseError{}
+		if err := json.Unmarshal(body, supabaseError); err != nil {
+			slog.Error("Error parsing response: ", "err", err)
+			return models.LoginResponse{}, err
+		}
+		slog.Error("Error Response: ", "res.StatusCode", res.StatusCode, "body", string(body))
+		return models.LoginResponse{}, errs.NewHTTPError(res.StatusCode, supabaseError)
 	}
 
 	var signInResponse models.LoginResponse

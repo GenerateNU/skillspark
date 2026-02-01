@@ -2,12 +2,12 @@ package service
 
 import (
 	"context"
+	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
-	"skillspark/internal/auth"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -60,7 +60,6 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 		AllowCredentials: true,
 		ExposeHeaders:    "Content-Length, X-Request-ID",
 	}))
-	
 
 	// Create Huma API with OpenAPI configuration
 	humaConfig := huma.DefaultConfig("SkillSpark API", "1.0.0")
@@ -74,7 +73,9 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 
 	humaAPI := humafiber.New(app, humaConfig)
 
-	humaAPI.UseMiddleware(auth.AuthMiddleware(humaAPI, &config.Supabase))
+	if !config.TestMode {
+		humaAPI.UseMiddleware(auth.AuthMiddleware(humaAPI, &config.Supabase))
+	}
 
 	// Documentation routes (Huma provides built-in docs at /docs and /openapi.json)
 	setupDocsRoutes(app, "/app/api")

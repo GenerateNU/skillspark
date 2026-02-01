@@ -11,47 +11,10 @@ import (
 	"regexp"
 	"skillspark/internal/config"
 	"skillspark/internal/models"
+	"skillspark/internal/errs"
 
 	"github.com/google/uuid"
 )
-
-// type GuardianSignUpRequest struct {
-// 	Name                string `json:"name" db:"name"`
-// 	Email               string `json:"email" db:"email"`
-// 	Username            string `json:"username" db:"username"`
-// 	Password            string `json:"password" db:"password"`
-// 	ProfilePictureS3Key string `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
-// 	LanguagePreference  string `json:"language_preference" db:"language_preference"`
-// }
-
-// type ManagerSignUpRequest struct {
-// 	Name                string `json:"name" db:"name"`
-// 	Email               string `json:"email" db:"email"`
-// 	Username            string `json:"username" db:"username"`
-// 	Password            string `json:"password" db:"password"`
-// 	ProfilePictureS3Key string `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
-// 	OrganizationID      string `json:"organization_id" db:"organization_id"`
-// 	Role                string `json:"role" db:"role"`
-// }
-
-// type GuardianSignUpResponse struct {
-// 	ID                  string `json:"id" db:"id"`
-// 	Name                string `json:"name" db:"name"`
-// 	Email               string `json:"email" db:"email"`
-// 	Username            string `json:"username" db:"username"`
-// 	ProfilePictureS3Key string `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
-// 	LanguagePreference  string `json:"language_preference" db:"language_preference"`
-// }
-
-// type ManagerSignUpResponse struct {
-// 	ID                  string `json:"id" db:"id"`
-// 	Name                string `json:"name" db:"name"`
-// 	Email               string `json:"email" db:"email"`
-// 	Username            string `json:"username" db:"username"`
-// 	ProfilePictureS3Key string `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
-// 	OrganizationID      string `json:"organization_id" db:"organization_id"`
-// 	Role                string `json:"role" db:"role"`
-// }
 
 func validatePasswordStrength(password string) error {
 	if len(password) < 8 {
@@ -69,14 +32,20 @@ func validatePasswordStrength(password string) error {
 	return nil
 }
 
-// type GuardianSignUpPayload struct {
-// 	Email               string `json:"email" db:"email"`
-// 	Password            string `json:"password" db:"password"`
-// 	Name                string `json:"name" db:"name"`
-// 	Username            string `json:"username" db:"username"`
-// 	ProfilePictureS3Key string `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
-// 	LanguagePreference  string `json:"language_preference" db:"language_preference"`
-// }
+type SupabaseError struct {
+	Code    int    `json:"code"`
+	ErrorCode string `json:"error_code"`
+	Message string `json:"msg"`
+}
+
+func (e *SupabaseError) Error() string {
+    return e.Message
+}
+
+// Huma looks for this method
+func (e *SupabaseError) GetStatus() int {
+    return e.Code
+}
 
 func SupabaseSignup(cfg *config.Supabase, email string, password string) (models.SignupResponse, error) {
 	if err := validatePasswordStrength(password); err != nil {
@@ -119,12 +88,16 @@ func SupabaseSignup(cfg *config.Supabase, email string, password string) (models
 	}
 
 	if res.StatusCode != http.StatusOK {
+		supabaseError := &SupabaseError{}
+		if err := json.Unmarshal(body, supabaseError); err != nil {
+			slog.Error("Error parsing response: ", "err", err)
+			return models.SignupResponse{}, err
+		}
 		slog.Error("Error Response: ", "res.StatusCode", res.StatusCode, "body", string(body))
-		return models.SignupResponse{}, err
+		return models.SignupResponse{}, errs.NewHTTPError(res.StatusCode, supabaseError)
 	}
 
 	var response models.SignupResponse
-	fmt.Print(response)
 	if err := json.Unmarshal(body, &response); err != nil {
 		slog.Error("Error parsing response: ", "err", err)
 		return models.SignupResponse{}, err
@@ -132,6 +105,7 @@ func SupabaseSignup(cfg *config.Supabase, email string, password string) (models
 
 	return response, nil
 }
+
 
 // SupabaseDeleteUser deletes a user from Supabase auth by their user ID
 func SupabaseDeleteUser(cfg *config.Supabase, userID uuid.UUID) error {
