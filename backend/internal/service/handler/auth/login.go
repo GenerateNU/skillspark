@@ -27,10 +27,6 @@ func (h *Handler) GuardianLogin(ctx context.Context, input *models.LoginInput) (
 
 	guardianOutput := &models.GuardianLoginOutput{}
 
-	guardianOutput.Body.ExpiresIn = res.ExpiresIn
-	guardianOutput.Body.RefreshToken = res.RefreshToken
-	guardianOutput.Body.TokenType = res.TokenType
-	guardianOutput.Body.AccessToken = res.AccessToken
 	guardianOutput.Body.GuardianID = guardian.ID
 
 	guardianOutput.AccessTokenCookie = http.Cookie{
@@ -63,10 +59,6 @@ func (h *Handler) ManagerLogin(ctx context.Context, input *models.LoginInput) (*
 
 	managerOutput := &models.ManagerLoginOutput{}
 
-	managerOutput.Body.ExpiresIn = res.ExpiresIn
-	managerOutput.Body.RefreshToken = res.RefreshToken
-	managerOutput.Body.TokenType = res.TokenType
-	managerOutput.Body.AccessToken = res.AccessToken
 	managerOutput.Body.ManagerID = manager.ID
 
 	managerOutput.AccessTokenCookie = http.Cookie{

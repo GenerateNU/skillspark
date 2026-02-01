@@ -65,10 +65,6 @@ type GuardianLoginOutput struct {
 	AccessTokenCookie http.Cookie `header:"Set-Cookie"`
 	Body struct {
 		GuardianID    uuid.UUID `json:"guardian_id" db:"guardian_id"`
-		AccessToken  string    `json:"access_token" db:"access_token"`
-		TokenType    string    `json:"token_type" db:"token_type"`
-		ExpiresIn    int       `json:"expires_in" db:"expires_in"`
-		RefreshToken string    `json:"refresh_token" db:"refresh_token"`
 	} `json:"body"`
 }
 
@@ -76,10 +72,6 @@ type ManagerLoginOutput struct {
 	AccessTokenCookie http.Cookie `header:"Set-Cookie"`
 	Body struct {
 		ManagerID    uuid.UUID `json:"manager_id" db:"manager_id"`
-		AccessToken  string    `json:"access_token" db:"access_token"`
-		TokenType    string    `json:"token_type" db:"token_type"`
-		ExpiresIn    int       `json:"expires_in" db:"expires_in"`
-		RefreshToken string    `json:"refresh_token" db:"refresh_token"`
 	} `json:"body"`
 }
 
