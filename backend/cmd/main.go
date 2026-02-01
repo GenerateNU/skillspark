@@ -73,6 +73,7 @@ func LoadConfig() (*config.Config, error) {
 			log.Fatalln("Error processing environment variables: ", err)
 		}
 	case "development":
+		log.Println("Loading configuration from environment variables for development")
 		// Load configuration from environment variables for development
 		err := godotenv.Overload("../.local.env")
 		if err != nil {

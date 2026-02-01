@@ -104,11 +104,9 @@ func TestHandler_CreateGuardian(t *testing.T) {
 				input.Body.Email = "michael.chen@example.com"
 				input.Body.Username = "mchen"
 				input.Body.LanguagePreference = "en"
-				input.Body.UserID = uuid.New()
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
-				mm.On("GetManagerByUserID", mock.Anything, mock.Anything).Return(nil, &errs.HTTPError{Code: 404})
 				m.On("CreateGuardian", mock.Anything, mock.AnythingOfType("*models.CreateGuardianInput")).Return(&models.Guardian{
 					ID:        uuid.New(),
 					UserID:    uuid.New(),
@@ -127,11 +125,9 @@ func TestHandler_CreateGuardian(t *testing.T) {
 				input.Body.Email = "error@example.com"
 				input.Body.Username = "error"
 				input.Body.LanguagePreference = "en"
-				input.Body.UserID = uuid.New()
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
-				mm.On("GetManagerByUserID", mock.Anything, mock.Anything).Return(nil, &errs.HTTPError{Code: 404})
 				m.On("CreateGuardian", mock.Anything, mock.AnythingOfType("*models.CreateGuardianInput")).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.InternalServerError("Internal server error").Code,

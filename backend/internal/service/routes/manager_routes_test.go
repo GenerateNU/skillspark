@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
@@ -180,7 +179,6 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
-				"user_id":             userID.String(),
 				"name":                "Alice Smith",
 				"email":               "alice@org.com",
 				"username":            "alices",
@@ -189,8 +187,6 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 				"role":                "Assistant Director",
 			},
 			mockSetup: func(m *repomocks.MockManagerRepository, g *repomocks.MockGuardianRepository) {
-				notFound := errs.NotFound("Guardian", "user_id", userID)
-				g.On("GetGuardianByUserID", mock.Anything, mock.Anything).Return(nil, &notFound)
 
 				m.On(
 					"CreateManager",
