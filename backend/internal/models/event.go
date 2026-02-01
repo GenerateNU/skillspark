@@ -31,18 +31,18 @@ type CreateEventRouteInput struct {
 }
 
 // CreateEventFormData holds the parsed form data for creating an event
+// make agerangemin, max and headerimage optional somehow
 type CreateEventFormData struct {
-	Title          string         `form:"title" required:"true" minLength:"2" maxLength:"100"`
-	Description    string         `form:"description" required:"true" minLength:"2" maxLength:"200"`
-	OrganizationID uuid.UUID      `form:"organization_id" required:"true"`
-	AgeRangeMin    *int           `form:"age_range_min"`
-	AgeRangeMax    *int           `form:"age_range_max"`
-	Category       []string       `form:"category"`
-	HeaderImage    *huma.FormFile `form:"header_image" contentType:"image/png,image/jpeg"`
+	Title          string        `form:"title" required:"true" minLength:"2" maxLength:"100"`
+	Description    string        `form:"description" required:"true" minLength:"2" maxLength:"200"`
+	OrganizationID uuid.UUID     `form:"organization_id" required:"true"`
+	AgeRangeMin    int           `form:"age_range_min"`
+	AgeRangeMax    int           `form:"age_range_max"`
+	Category       []string      `form:"category"`
+	HeaderImage    huma.FormFile `form:"header_image" contentType:"image/png,image/jpeg"`
 }
 
 type UpdateEventFormData struct {
-	ID             uuid.UUID      `path:"id"`
 	Title          *string        `form:"title" minLength:"2" maxLength:"100"`
 	Description    *string        `form:"description" minLength:"2" maxLength:"200"`
 	OrganizationID *uuid.UUID     `form:"organization_id"`
@@ -58,6 +58,7 @@ type CreateEventOutput struct {
 }
 
 type UpdateEventRouteInput struct {
+	ID      uuid.UUID `path:"id"`
 	RawBody huma.MultipartFormFiles[UpdateEventFormData]
 }
 

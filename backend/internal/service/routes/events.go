@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"skillspark/internal/models"
@@ -31,8 +32,8 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 			Title:          formData.Title,
 			Description:    formData.Description,
 			OrganizationID: formData.OrganizationID,
-			AgeRangeMin:    formData.AgeRangeMin,
-			AgeRangeMax:    formData.AgeRangeMax,
+			AgeRangeMin:    &formData.AgeRangeMin,
+			AgeRangeMax:    &formData.AgeRangeMax,
 			Category:       formData.Category,
 		}
 
@@ -45,6 +46,7 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		event, url, err := eventHandler.CreateEvent(ctx, &eventModel, &image_data, s3Client)
 
 		if err != nil {
+			fmt.Println(err)
 			return nil, err
 		}
 
@@ -76,7 +78,7 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		}
 
 		eventModel := models.UpdateEventInput{
-			ID:   formData.ID,
+			ID:   input.ID,
 			Body: eventBody,
 		}
 
