@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"skillspark/internal/errs"
 	"skillspark/internal/auth"
 	"skillspark/internal/models"
 )
@@ -20,7 +21,7 @@ func (h *Handler) GuardianLogin(ctx context.Context, input *models.LoginInput) (
 	guardian, err := h.guardianRepository.GetGuardianByAuthID(ctx, res.User.ID.String())
 	if err != nil {
 		slog.Error(fmt.Sprintf("Could not find associated guardian: %v", err))
-		return nil, err
+		return nil, errs.Unauthorized()
 	}
 
 	guardianOutput := &models.GuardianLoginOutput{}

@@ -133,7 +133,7 @@ func TestHandler_GuardianLogin(t *testing.T) {
 			},
 			authStatus:    http.StatusOK,
 			wantErr:       true,
-			expectedError: "not found",
+			expectedError: "unauthorized",
 		},
 	}
 

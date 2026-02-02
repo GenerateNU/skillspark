@@ -52,11 +52,8 @@ func AuthMiddleware(api huma.API, cfg *config.Supabase) func(ctx huma.Context, n
 			}
 			return
 		}
-		err = res.Body.Close()
-		if err != nil {
-			slog.Error("Error closing response body: ", "err", err)
-			return
-		}
+		
+		defer func() { _ = res.Body.Close() }()
 
 		if res.StatusCode != http.StatusOK {
 			err := huma.WriteErr(api, ctx, http.StatusUnauthorized, "Invalid/Expired Token")

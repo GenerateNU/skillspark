@@ -76,11 +76,8 @@ func SupabaseSignup(cfg *config.Supabase, email string, password string) (models
 		slog.Error("Error executing request: ", "err", err)
 		return models.SignupResponse{}, err
 	}
-	err = res.Body.Close()
-	if err != nil {
-		slog.Error("Error closing response body: ", "err", err)
-		return models.SignupResponse{}, err
-	}
+	
+	defer func() { _ = res.Body.Close() }()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -126,11 +123,8 @@ func SupabaseDeleteUser(cfg *config.Supabase, userID uuid.UUID) error {
 		slog.Error("Error executing delete request: ", "err", err)
 		return err
 	}
-	err = res.Body.Close()
-	if err != nil {
-		slog.Error("Error closing response body: ", "err", err)
-		return err
-	}
+
+	defer func() { _ = res.Body.Close() }()
 
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNoContent {
 		body, _ := io.ReadAll(res.Body)
