@@ -10,19 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput, s3Client *s3_client.Client) ([]models.EventOccurrence, *string, error) {
+func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput, s3Client *s3_client.Client) ([]models.EventOccurrence, error) {
 	id, parse_err := uuid.Parse(input.ID.String())
 	if parse_err != nil {
-		return nil, nil, errs.BadRequest("Invalid ID format")
+		return nil, errs.BadRequest("Invalid ID format")
 	}
 
 	eventOccurrence, err := h.EventRepository.GetEventOccurrencesByEventID(ctx, id)
 	if err != nil {
-		return nil, nil, err
-	}
-
-	if len(eventOccurrence) == 0 {
-		return eventOccurrence, nil, nil
+		return nil, err
 	}
 
 	var url *string
@@ -30,11 +26,15 @@ func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *model
 	if key != nil {
 		presignedURL, err := s3Client.GeneratePresignedURL(ctx, *key, time.Hour)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		url = &presignedURL
 	}
 
-	return eventOccurrence, url, nil
+	for idx := range eventOccurrence {
+		eventOccurrence[idx].Event.PresignedURL = url
+	}
+
+	return eventOccurrence, nil
 }

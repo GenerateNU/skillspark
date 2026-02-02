@@ -53,7 +53,7 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		image_data, err := io.ReadAll(formData.HeaderImage)
 
 		// io.readall on input
-		event, url, err := eventHandler.CreateEvent(ctx, &eventModel, &updateBody, &image_data, s3Client)
+		event, err := eventHandler.CreateEvent(ctx, &eventModel, &updateBody, &image_data, s3Client)
 
 		if err != nil {
 			fmt.Println(err)
@@ -61,8 +61,7 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		}
 
 		return &models.CreateEventOutput{
-			Body:         event,
-			PresignedURL: url,
+			Body: event,
 		}, nil
 	})
 
@@ -95,15 +94,14 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		image_data, err := io.ReadAll(formData.HeaderImage)
 
 		// io.readall on input
-		event, url, err := eventHandler.UpdateEvent(ctx, &eventModel, &image_data, s3Client)
+		event, err := eventHandler.UpdateEvent(ctx, &eventModel, &image_data, s3Client)
 
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.UpdateEventOutput{
-			Body:         event,
-			PresignedURL: url,
+			Body: event,
 		}, nil
 	})
 
@@ -138,14 +136,13 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		Description: "Returns event occurrences that match the event ID",
 		Tags:        []string{"Events"},
 	}, func(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput) (*models.GetEventOccurrencesByEventIDOutput, error) {
-		eventOccurrences, url, err := eventHandler.GetEventOccurrencesByEventID(ctx, input, s3Client)
+		eventOccurrences, err := eventHandler.GetEventOccurrencesByEventID(ctx, input, s3Client)
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.GetEventOccurrencesByEventIDOutput{
-			Body:         eventOccurrences,
-			PresignedURL: url,
+			Body: eventOccurrences,
 		}, nil
 	})
 }

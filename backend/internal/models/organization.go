@@ -8,13 +8,14 @@ import (
 )
 
 type Organization struct {
-	ID         uuid.UUID  `json:"id" db:"id"`
-	Name       string     `json:"name" db:"name"`
-	Active     bool       `json:"active" db:"active"`
-	PfpS3Key   *string    `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
-	LocationID *uuid.UUID `json:"location_id,omitempty" db:"location_id"`
-	CreatedAt  time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt  time.Time  `json:"updated_at" db:"updated_at"`
+	ID           uuid.UUID  `json:"id" db:"id"`
+	Name         string     `json:"name" db:"name"`
+	Active       bool       `json:"active" db:"active"`
+	PfpS3Key     *string    `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
+	PresignedURL *string    `json:"presigned_url"`
+	LocationID   *uuid.UUID `json:"location_id,omitempty" db:"location_id"`
+	CreatedAt    time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at" db:"updated_at"`
 }
 
 // CreateOrganizationRouteInput is the multipart form input for creating an organization with an image
@@ -59,8 +60,7 @@ type CreateOrganizationInput struct {
 }
 
 type CreateOrganizationOutput struct {
-	Body         Organization
-	PresignedURL *string `json:"presigned_url"`
+	Body Organization
 }
 
 type UpdateOrganizationInput struct {
@@ -69,8 +69,7 @@ type UpdateOrganizationInput struct {
 }
 
 type UpdateOrganizationOutput struct {
-	Body         Organization `json:"body"`
-	PresignedURL *string      `json:"presigned_url"`
+	Body Organization `json:"body"`
 }
 
 type GetOrganizationByIDInput struct {
@@ -78,8 +77,7 @@ type GetOrganizationByIDInput struct {
 }
 
 type GetOrganizationByIDOutput struct {
-	Body         Organization `json:"body"`
-	PresignedURL *string      `json:"presigned_url"`
+	Body Organization `json:"body"`
 }
 
 type GetAllOrganizationsInput struct {
@@ -88,8 +86,7 @@ type GetAllOrganizationsInput struct {
 }
 
 type GetAllOrganizationsOutput struct {
-	Body          []Organization `json:"body" doc:"List of organizations"`
-	PresignedURLS []string       `json:"presigned_urls" doc:"List of Presigned Urls"`
+	Body []Organization `json:"body" doc:"List of organizations"`
 }
 
 type DeleteOrganizationInput struct {

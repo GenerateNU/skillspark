@@ -165,7 +165,7 @@ func TestHandler_CreateEvent(t *testing.T) {
 			handler := NewHandler(mockRepo, s3Client)
 			ctx := context.Background()
 
-			event, presignedURL, err := handler.CreateEvent(ctx, tt.input, tt.updateBody, tt.imageData, s3Client)
+			event, err := handler.CreateEvent(ctx, tt.input, tt.updateBody, tt.imageData, s3Client)
 
 			if tt.wantErr {
 				assert.NotNil(t, err)
@@ -178,14 +178,14 @@ func TestHandler_CreateEvent(t *testing.T) {
 			}
 
 			if tt.wantURL {
-				require.NotNil(t, presignedURL, "expected presigned URL to be returned")
-				parsedURL, parseErr := url.Parse(*presignedURL)
+				require.NotNil(t, event.PresignedURL, "expected presigned URL to be returned")
+				parsedURL, parseErr := url.Parse(*event.PresignedURL)
 				require.NoError(t, parseErr, "presigned URL should be valid")
 				assert.True(t, strings.HasPrefix(parsedURL.Scheme, "http"), "URL should have http/https scheme")
 				assert.Contains(t, parsedURL.Host, "amazonaws.com", "URL should be an AWS S3 URL")
 				assert.NotEmpty(t, parsedURL.RawQuery, "presigned URL should have query parameters")
 			} else if !tt.wantErr {
-				assert.Nil(t, presignedURL, "expected no presigned URL when no image data provided")
+				assert.Nil(t, event.PresignedURL, "expected no presigned URL when no image data provided")
 			}
 
 			mockRepo.AssertExpectations(t)
@@ -293,7 +293,7 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			handler := NewHandler(mockRepo, s3Client)
 			ctx := context.Background()
 
-			event, presignedURL, err := handler.UpdateEvent(ctx, tt.input, tt.imageData, s3Client)
+			event, err := handler.UpdateEvent(ctx, tt.input, tt.imageData, s3Client)
 
 			if tt.wantErr {
 				assert.NotNil(t, err)
@@ -302,7 +302,6 @@ func TestHandler_UpdateEvent(t *testing.T) {
 
 				assert.Nil(t, err)
 				assert.Nil(t, event)
-				assert.NotNil(t, presignedURL)
 			} else {
 				assert.Nil(t, err)
 				assert.NotNil(t, event)
@@ -313,8 +312,8 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			}
 
 			if tt.wantURL {
-				require.NotNil(t, presignedURL, "expected presigned URL to be returned")
-				parsedURL, parseErr := url.Parse(*presignedURL)
+				require.NotNil(t, event.PresignedURL, "expected presigned URL to be returned")
+				parsedURL, parseErr := url.Parse(*event.PresignedURL)
 				require.NoError(t, parseErr, "presigned URL should be valid")
 				assert.True(t, strings.HasPrefix(parsedURL.Scheme, "http"), "URL should have http/https scheme")
 				assert.Contains(t, parsedURL.Host, "amazonaws.com", "URL should be an AWS S3 URL")
@@ -498,7 +497,7 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 			ctx := context.Background()
 
 			input := &models.GetEventOccurrencesByEventIDInput{ID: uuid.MustParse(tt.id)}
-			eventOccurrences, _, err := handler.GetEventOccurrencesByEventID(ctx, input, s3Client)
+			eventOccurrences, err := handler.GetEventOccurrencesByEventID(ctx, input, s3Client)
 
 			assert.Nil(t, err)
 			assert.NotNil(t, eventOccurrences)

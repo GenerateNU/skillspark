@@ -14,7 +14,6 @@ import (
 // UploadImage uploads file content to S3 with the given key.
 // The caller is responsible for closing the reader after this function returns.
 
-// TODO -> close reader and
 func (c *Client) UploadImage(ctx context.Context, key *string, image_data []byte) (*string, error) {
 	if key == nil {
 		return nil, errors.New("key cannot be empty")

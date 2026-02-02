@@ -45,15 +45,14 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 
 		image_data, err := io.ReadAll(formData.ProfileImage)
 
-		organization, url, err := orgHandler.CreateOrganization(ctx, &organizationModel, &updateBody, &image_data, s3Client)
+		organization, err := orgHandler.CreateOrganization(ctx, &organizationModel, &updateBody, &image_data, s3Client)
 
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.CreateOrganizationOutput{
-			Body:         *organization,
-			PresignedURL: url,
+			Body: *organization,
 		}, nil
 
 	})
@@ -67,14 +66,13 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 		Tags:        []string{"Organizations"},
 	}, func(ctx context.Context, input *models.GetOrganizationByIDInput) (*models.GetOrganizationByIDOutput, error) {
 
-		organization, url, err := orgHandler.GetOrganizationById(ctx, input, s3Client)
+		organization, err := orgHandler.GetOrganizationById(ctx, input, s3Client)
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.GetOrganizationByIDOutput{
-			Body:         *organization,
-			PresignedURL: url,
+			Body: *organization,
 		}, nil
 
 	})
@@ -101,14 +99,13 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 			Limit: limit,
 		}
 
-		organizations, urls, err := orgHandler.GetAllOrganizations(ctx, pagination, s3Client)
+		organizations, err := orgHandler.GetAllOrganizations(ctx, pagination, s3Client)
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.GetAllOrganizationsOutput{
-			Body:          organizations,
-			PresignedURLS: urls,
+			Body: organizations,
 		}, nil
 	})
 
@@ -135,15 +132,14 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 
 		image_data, err := io.ReadAll(formData.ProfileImage)
 
-		organization, url, err := orgHandler.UpdateOrganization(ctx, &organizationModel, &image_data, s3Client)
+		organization, err := orgHandler.UpdateOrganization(ctx, &organizationModel, &image_data, s3Client)
 
 		if err != nil {
 			return nil, err
 		}
 
 		return &models.UpdateOrganizationOutput{
-			Body:         *organization,
-			PresignedURL: url,
+			Body: *organization,
 		}, nil
 	})
 

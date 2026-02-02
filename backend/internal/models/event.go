@@ -17,6 +17,7 @@ type Event struct {
 	AgeRangeMax      *int      `json:"age_range_max" db:"age_range_max"`
 	Category         []string  `json:"category" db:"category"`
 	HeaderImageS3Key *string   `json:"header_image_s3_key" db:"header_image_s3_key"`
+	PresignedURL     *string   `json:"presigned_url"`
 	CreatedAt        time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -53,8 +54,7 @@ type UpdateEventFormData struct {
 }
 
 type CreateEventOutput struct {
-	Body         *Event  `json:"body"`
-	PresignedURL *string `json:"presigned_url"`
+	Body *Event `json:"body"`
 }
 
 type UpdateEventRouteInput struct {
@@ -86,8 +86,7 @@ type UpdateEventInput struct {
 }
 
 type UpdateEventOutput struct {
-	Body         *Event  `json:"body"`
-	PresignedURL *string `json:"presigned_url"`
+	Body *Event `json:"body"`
 }
 
 type DeleteEventInput struct {
@@ -106,6 +105,5 @@ type GetEventOccurrencesByEventIDInput struct {
 }
 
 type GetEventOccurrencesByEventIDOutput struct {
-	Body         []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
-	PresignedURL *string           `json:"presigned_urls"`
+	Body []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
 }

@@ -92,7 +92,7 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 			s3Client := createTestS3Client(t)
 			handler := NewHandler(mockOrgRepo, mockLocRepo, s3Client)
 			app.Get("/organizations/:id", func(c *fiber.Ctx) error {
-				output, _, err := handler.GetOrganizationById(c.Context(), &models.GetOrganizationByIDInput{
+				output, err := handler.GetOrganizationById(c.Context(), &models.GetOrganizationByIDInput{
 					ID: uuid.MustParse(c.Params("id")),
 				}, s3Client)
 				if err != nil {
@@ -252,7 +252,7 @@ func TestHandler_CreateOrganization(t *testing.T) {
 
 			s3Client := createTestS3Client(t)
 			handler := NewHandler(mockOrgRepo, mockLocRepo, s3Client)
-			output, presignedURL, err := handler.CreateOrganization(context.TODO(), tt.input, tt.updateBody, tt.imageData, s3Client)
+			output, err := handler.CreateOrganization(context.TODO(), tt.input, tt.updateBody, tt.imageData, s3Client)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -263,15 +263,15 @@ func TestHandler_CreateOrganization(t *testing.T) {
 			}
 
 			if tt.wantURL {
-				require.NotNil(t, presignedURL, "expected presigned URL to be returned")
+				require.NotNil(t, output.PresignedURL, "expected presigned URL to be returned")
 				// Validate URL structure
-				parsedURL, parseErr := url.Parse(*presignedURL)
+				parsedURL, parseErr := url.Parse(*output.PresignedURL)
 				require.NoError(t, parseErr, "presigned URL should be valid")
 				assert.True(t, strings.HasPrefix(parsedURL.Scheme, "http"), "URL should have http/https scheme")
 				assert.Contains(t, parsedURL.Host, "amazonaws.com", "URL should be an AWS S3 URL")
 				assert.NotEmpty(t, parsedURL.RawQuery, "presigned URL should have query parameters")
 			} else if !tt.wantErr {
-				assert.Nil(t, presignedURL, "expected no presigned URL when no image data provided")
+				assert.Nil(t, output.PresignedURL, "expected no presigned URL when no image data provided")
 			}
 
 			mockOrgRepo.AssertExpectations(t)
@@ -460,7 +460,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 
 			s3Client := createTestS3Client(t)
 			handler := NewHandler(mockOrgRepo, mockLocRepo, s3Client)
-			output, presignedURL, err := handler.UpdateOrganization(context.TODO(), tt.input, tt.imageData, s3Client)
+			output, err := handler.UpdateOrganization(context.TODO(), tt.input, tt.imageData, s3Client)
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -474,14 +474,14 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			}
 
 			if tt.wantURL {
-				require.NotNil(t, presignedURL, "expected presigned URL to be returned")
-				parsedURL, parseErr := url.Parse(*presignedURL)
+				require.NotNil(t, output.PresignedURL, "expected presigned URL to be returned")
+				parsedURL, parseErr := url.Parse(*output.PresignedURL)
 				require.NoError(t, parseErr, "presigned URL should be valid")
 				assert.True(t, strings.HasPrefix(parsedURL.Scheme, "http"), "URL should have http/https scheme")
 				assert.Contains(t, parsedURL.Host, "amazonaws.com", "URL should be an AWS S3 URL")
 				assert.NotEmpty(t, parsedURL.RawQuery, "presigned URL should have query parameters")
 			} else if !tt.wantErr {
-				assert.Nil(t, presignedURL, "expected no presigned URL when no image data provided")
+				assert.Nil(t, output.PresignedURL, "expected no presigned URL when no image data provided")
 			}
 
 			mockOrgRepo.AssertExpectations(t)
@@ -604,7 +604,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 
 			s3Client := createTestS3Client(t)
 			handler := NewHandler(mockOrgRepo, mockLocRepo, s3Client)
-			output, _, err := handler.GetAllOrganizations(context.TODO(), tt.pagination, s3Client)
+			output, err := handler.GetAllOrganizations(context.TODO(), tt.pagination, s3Client)
 
 			if tt.wantErr {
 				assert.Error(t, err)
