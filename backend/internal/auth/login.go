@@ -49,7 +49,7 @@ func SupabaseLogin(cfg *config.Supabase, email string, password string) (models.
 	}
 
 	if res.StatusCode != http.StatusOK {
-		supabaseError := &SupabaseError{}
+		supabaseError := &models.SupabaseError{}
 		if err := json.Unmarshal(body, supabaseError); err != nil {
 			slog.Error("Error parsing response: ", "err", err)
 			return models.LoginResponse{}, err

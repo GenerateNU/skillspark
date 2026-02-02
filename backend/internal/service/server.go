@@ -89,7 +89,6 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 	setupHumaRoutes(humaAPI, repo, config)
 
 	return app, humaAPI
-	// TODO: fix middleware and such
 }
 
 // Setup Huma routes

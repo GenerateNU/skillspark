@@ -100,3 +100,14 @@ type SignupResponse struct {
 	AccessToken string             `json:"access_token"`
 	User        UserSignupResponse `json:"user"`
 }
+
+// Error response from Supabase API
+type SupabaseError struct {
+	Code      int    `json:"code"`
+	ErrorCode string `json:"error_code"`
+	Message   string `json:"msg"`
+}
+
+func (e *SupabaseError) Error() string {
+	return e.Message
+}

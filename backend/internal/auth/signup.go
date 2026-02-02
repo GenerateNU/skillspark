@@ -12,8 +12,6 @@ import (
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-
-	"github.com/google/uuid"
 )
 
 // checks if password is strong enough
@@ -33,15 +31,7 @@ func validatePasswordStrength(password string) error {
 	return nil
 }
 
-type SupabaseError struct {
-	Code      int    `json:"code"`
-	ErrorCode string `json:"error_code"`
-	Message   string `json:"msg"`
-}
 
-func (e *SupabaseError) Error() string {
-	return e.Message
-}
 
 // Creates a new user in Supabase auth
 func SupabaseSignup(cfg *config.Supabase, email string, password string) (models.SignupResponse, error) {
@@ -86,7 +76,7 @@ func SupabaseSignup(cfg *config.Supabase, email string, password string) (models
 	}
 
 	if res.StatusCode != http.StatusOK {
-		supabaseError := &SupabaseError{}
+		supabaseError := &models.SupabaseError{}
 		if err := json.Unmarshal(body, supabaseError); err != nil {
 			slog.Error("Error parsing response: ", "err", err)
 			return models.SignupResponse{}, err
@@ -102,35 +92,4 @@ func SupabaseSignup(cfg *config.Supabase, email string, password string) (models
 	}
 
 	return response, nil
-}
-
-// deletes a user from Supabase auth by their ID
-func SupabaseDeleteUser(cfg *config.Supabase, userID uuid.UUID) error {
-	supabaseURL := cfg.URL
-	apiKey := cfg.ServiceRoleKey
-
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/auth/v1/admin/users/%s", supabaseURL, userID.String()), nil)
-	if err != nil {
-		slog.Error("Error in Request Creation: ", "err", err)
-		return err
-	}
-
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
-	req.Header.Set("apikey", apiKey)
-
-	res, err := Client.Do(req)
-	if err != nil {
-		slog.Error("Error executing delete request: ", "err", err)
-		return err
-	}
-
-	defer func() { _ = res.Body.Close() }()
-
-	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNoContent {
-		body, _ := io.ReadAll(res.Body)
-		slog.Error("Error deleting user from Supabase: ", "res.StatusCode", res.StatusCode, "body", string(body))
-		return err
-	}
-
-	return nil
 }
