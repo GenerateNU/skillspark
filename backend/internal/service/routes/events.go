@@ -40,10 +40,20 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		eventModel := models.CreateEventInput{
 			Body: eventBody,
 		}
+
+		updateBody := models.UpdateEventBody{
+			Title:          &formData.Title,
+			Description:    &formData.Description,
+			OrganizationID: &formData.OrganizationID,
+			AgeRangeMin:    &formData.AgeRangeMin,
+			AgeRangeMax:    &formData.AgeRangeMax,
+			Category:       &formData.Category,
+		}
+
 		image_data, err := io.ReadAll(formData.HeaderImage)
 
 		// io.readall on input
-		event, url, err := eventHandler.CreateEvent(ctx, &eventModel, &image_data, s3Client)
+		event, url, err := eventHandler.CreateEvent(ctx, &eventModel, &updateBody, &image_data, s3Client)
 
 		if err != nil {
 			fmt.Println(err)
@@ -69,12 +79,12 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_clien
 		formData := input.RawBody.Data()
 
 		eventBody := models.UpdateEventBody{
-			Title:          formData.Title,
-			Description:    formData.Description,
-			OrganizationID: formData.OrganizationID,
-			AgeRangeMin:    formData.AgeRangeMin,
-			AgeRangeMax:    formData.AgeRangeMax,
-			Category:       formData.Category,
+			Title:          &formData.Title,
+			Description:    &formData.Description,
+			OrganizationID: &formData.OrganizationID,
+			AgeRangeMin:    &formData.AgeRangeMin,
+			AgeRangeMax:    &formData.AgeRangeMax,
+			Category:       &formData.Category,
 		}
 
 		eventModel := models.UpdateEventInput{

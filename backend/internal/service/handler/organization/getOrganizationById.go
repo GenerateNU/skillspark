@@ -25,7 +25,12 @@ func (h *Handler) GetOrganizationById(ctx context.Context, input *models.GetOrga
 	var url *string
 	key = organization.PfpS3Key
 	if key != nil {
-		s3Client.GeneratePresignedURL(ctx, *key, time.Hour)
+		presignedURL, err := s3Client.GeneratePresignedURL(ctx, *key, time.Hour)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		url = &presignedURL
 	}
 
 	return organization, url, nil

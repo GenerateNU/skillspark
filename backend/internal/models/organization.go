@@ -24,21 +24,21 @@ type CreateOrganizationRouteInput struct {
 
 // CreateOrganizationFormData holds the parsed form data for creating an organization
 type UpdateOrganizationFormData struct {
-	ID           uuid.UUID      `path:"id"`
-	Name         *string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
-	Active       *bool          `form:"active"`
-	LocationID   *uuid.UUID     `form:"location_id"`
-	ProfileImage *huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
+	Name         string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
+	Active       bool          `form:"active"`
+	LocationID   uuid.UUID     `form:"location_id"`
+	ProfileImage huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
 }
 
 type CreateOrganizationFormData struct {
-	Name         string         `form:"name" required:"true" minLength:"1" maxLength:"255"`
-	Active       *bool          `form:"active"`
-	LocationID   *uuid.UUID     `form:"location_id"`
-	ProfileImage *huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
+	Name         string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
+	Active       bool          `form:"active"`
+	LocationID   uuid.UUID     `form:"location_id"`
+	ProfileImage huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
 }
 
 type UpdateOrganizationRouteInput struct {
+	ID      uuid.UUID `path:"id"`
 	RawBody huma.MultipartFormFiles[UpdateOrganizationFormData]
 }
 
@@ -89,7 +89,7 @@ type GetAllOrganizationsInput struct {
 
 type GetAllOrganizationsOutput struct {
 	Body          []Organization `json:"body" doc:"List of organizations"`
-	PresignedURLS []*string      `json:"presigned_urls" doc:"List of Presigned Urls"`
+	PresignedURLS []string       `json:"presigned_urls" doc:"List of Presigned Urls"`
 }
 
 type DeleteOrganizationInput struct {

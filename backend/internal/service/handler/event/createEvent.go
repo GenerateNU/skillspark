@@ -8,7 +8,7 @@ import (
 )
 
 // TODO -> make helper
-func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInput, image_data *[]byte, s3Client *s3_client.Client) (*models.Event, *string, error) {
+func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInput, updateBody *models.UpdateEventBody, image_data *[]byte, s3Client *s3_client.Client) (*models.Event, *string, error) {
 	var key *string
 	var url *string
 
@@ -20,12 +20,25 @@ func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInpu
 
 	if image_data != nil {
 
-		key, err := h.generateS3Key(event.ID)
+		key, err = h.generateS3Key(event.ID)
+		fmt.Println(key)
 		if err != nil {
 			fmt.Println("problem", err)
 			return nil, nil, err
 		}
 		uploadedUrl, errr := s3Client.UploadImage(ctx, key, *image_data)
+
+		updateInput := &models.UpdateEventInput{
+			ID:   event.ID,
+			Body: *updateBody,
+		}
+		updateKeyValue, err := h.EventRepository.UpdateEvent(ctx, updateInput, key)
+		if err != nil {
+			fmt.Println("problem", err)
+			return nil, nil, err
+		}
+		event.HeaderImageS3Key = updateKeyValue.HeaderImageS3Key
+
 		if errr != nil {
 			fmt.Println("also a problem", errr)
 			return nil, nil, errr

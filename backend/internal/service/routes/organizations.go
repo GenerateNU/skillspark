@@ -29,17 +29,23 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 
 		organizationBody := models.CreateOrganizationBody{
 			Name:       formData.Name,
-			Active:     formData.Active,
-			LocationID: formData.LocationID,
+			Active:     &formData.Active,
+			LocationID: &formData.LocationID,
 		}
 
 		organizationModel := models.CreateOrganizationInput{
 			Body: organizationBody,
 		}
 
+		updateBody := models.UpdateOrganizationBody{
+			Name:       &formData.Name,
+			Active:     &formData.Active,
+			LocationID: &formData.LocationID,
+		}
+
 		image_data, err := io.ReadAll(formData.ProfileImage)
 
-		organization, url, err := orgHandler.CreateOrganization(ctx, &organizationModel, &image_data, s3Client)
+		organization, url, err := orgHandler.CreateOrganization(ctx, &organizationModel, &updateBody, &image_data, s3Client)
 
 		if err != nil {
 			return nil, err
@@ -117,14 +123,14 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 		formData := input.RawBody.Data()
 
 		organizationBody := models.UpdateOrganizationBody{
-			Name:       formData.Name,
-			Active:     formData.Active,
-			LocationID: formData.LocationID,
+			Name:       &formData.Name,
+			Active:     &formData.Active,
+			LocationID: &formData.LocationID,
 		}
 
 		organizationModel := models.UpdateOrganizationInput{
 			Body: organizationBody,
-			ID:   formData.ID,
+			ID:   input.ID,
 		}
 
 		image_data, err := io.ReadAll(formData.ProfileImage)

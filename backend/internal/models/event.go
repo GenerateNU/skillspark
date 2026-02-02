@@ -43,13 +43,13 @@ type CreateEventFormData struct {
 }
 
 type UpdateEventFormData struct {
-	Title          *string        `form:"title" minLength:"2" maxLength:"100"`
-	Description    *string        `form:"description" minLength:"2" maxLength:"200"`
-	OrganizationID *uuid.UUID     `form:"organization_id"`
-	AgeRangeMin    *int           `form:"age_range_min"`
-	AgeRangeMax    *int           `form:"age_range_max"`
-	Category       *[]string      `form:"category"`
-	HeaderImage    *huma.FormFile `form:"header_image" contentType:"image/png,image/jpeg"`
+	Title          string        `form:"title" minLength:"2" maxLength:"100"`
+	Description    string        `form:"description" minLength:"2" maxLength:"200"`
+	OrganizationID uuid.UUID     `form:"organization_id"`
+	AgeRangeMin    int           `form:"age_range_min"`
+	AgeRangeMax    int           `form:"age_range_max"`
+	Category       []string      `form:"category"`
+	HeaderImage    huma.FormFile `form:"header_image" contentType:"image/png,image/jpeg"`
 }
 
 type CreateEventOutput struct {

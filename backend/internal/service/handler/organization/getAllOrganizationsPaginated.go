@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-func (h *Handler) GetAllOrganizations(ctx context.Context, pagination utils.Pagination, s3Client *s3_client.Client) ([]models.Organization, []*string, error) {
+func (h *Handler) GetAllOrganizations(ctx context.Context, pagination utils.Pagination, s3Client *s3_client.Client) ([]models.Organization, []string, error) {
 	organizations, err := h.OrganizationRepository.GetAllOrganizations(ctx, pagination)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var urls []*string
+	var urls []string
 	for i := 0; i < len(organizations); i++ {
 		key := organizations[i].PfpS3Key
 		if key != nil {
@@ -22,10 +22,10 @@ func (h *Handler) GetAllOrganizations(ctx context.Context, pagination utils.Pagi
 			if httpErr != nil {
 				return nil, nil, httpErr
 			}
-			urls = append(urls, &url)
+			urls = append(urls, url)
 
 		} else {
-			urls = append(urls, nil)
+			urls = append(urls, "")
 		}
 	}
 

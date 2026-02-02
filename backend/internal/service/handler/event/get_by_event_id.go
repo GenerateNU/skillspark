@@ -25,7 +25,12 @@ func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *model
 	var url *string
 	key = eventOccurrence[0].Event.HeaderImageS3Key
 	if key != nil {
-		s3Client.GeneratePresignedURL(ctx, *key, time.Hour)
+		presignedURL, err := s3Client.GeneratePresignedURL(ctx, *key, time.Hour)
+		if err == nil {
+			return nil, nil, err
+		}
+
+		url = &presignedURL
 	}
 
 	return eventOccurrence, url, nil
