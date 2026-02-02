@@ -27,7 +27,7 @@ func TestGetRegistrationsByEventOccurrenceID(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, result)
 	assert.NotEmpty(t, result.Body.Registrations)
-	
+
 	for _, reg := range result.Body.Registrations {
 		assert.Equal(t, eventOccurrenceID, reg.EventOccurrenceID)
 		assert.NotEqual(t, uuid.Nil, reg.ID)
@@ -63,7 +63,7 @@ func TestGetRegistrationsByEventOccurrenceID_MultipleRegistrations(t *testing.T)
 		assert.Equal(t, eventOccurrenceID, reg.EventOccurrenceID)
 		registrationIDs[reg.ID] = true
 	}
-	
+
 	assert.Equal(t, len(result.Body.Registrations), len(registrationIDs))
 }
 

@@ -27,7 +27,7 @@ func TestGetRegistrationsByChildID(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, result)
 	assert.NotEmpty(t, result.Body.Registrations)
-	
+
 	for _, reg := range result.Body.Registrations {
 		assert.Equal(t, childID, reg.ChildID)
 		assert.NotEqual(t, uuid.Nil, reg.ID)
@@ -63,7 +63,7 @@ func TestGetRegistrationsByChildID_MultipleRegistrations(t *testing.T) {
 		assert.Equal(t, childID, reg.ChildID)
 		registrationIDs[reg.ID] = true
 	}
-	
+
 	assert.Equal(t, len(result.Body.Registrations), len(registrationIDs))
 }
 

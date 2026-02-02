@@ -10,15 +10,16 @@ import (
 	"net/http"
 	"regexp"
 	"skillspark/internal/config"
-	"skillspark/internal/models"
 	"skillspark/internal/errs"
+	"skillspark/internal/models"
 
 	"github.com/google/uuid"
 )
 
+// checks if password is strong enough
 func validatePasswordStrength(password string) error {
 	if len(password) < 8 {
-		return errors.New("Password must be atleast 8 characters long")
+		return errors.New("password must be atleast 8 characters long")
 	}
 	hasUpper := regexp.MustCompile(`[A-Z]`).MatchString(password)
 	hasLower := regexp.MustCompile(`[a-z]`).MatchString(password)
@@ -26,27 +27,23 @@ func validatePasswordStrength(password string) error {
 	hasSpecial := regexp.MustCompile(`[!@#~$%^&*()+|_.,;<>?/{}\-]`).MatchString(password)
 
 	if !hasUpper || !hasLower || !hasDigit || !hasSpecial {
-		return errors.New("Password must include uppercase, lowercase, digit and special characters")
+		return errors.New("password must include uppercase, lowercase, digit and special characters")
 	}
 
 	return nil
 }
 
 type SupabaseError struct {
-	Code    int    `json:"code"`
+	Code      int    `json:"code"`
 	ErrorCode string `json:"error_code"`
-	Message string `json:"msg"`
+	Message   string `json:"msg"`
 }
 
 func (e *SupabaseError) Error() string {
-    return e.Message
+	return e.Message
 }
 
-// Huma looks for this method
-func (e *SupabaseError) GetStatus() int {
-    return e.Code
-}
-
+// Creates a new user in Supabase auth
 func SupabaseSignup(cfg *config.Supabase, email string, password string) (models.SignupResponse, error) {
 	if err := validatePasswordStrength(password); err != nil {
 		return models.SignupResponse{}, err
@@ -79,7 +76,11 @@ func SupabaseSignup(cfg *config.Supabase, email string, password string) (models
 		slog.Error("Error executing request: ", "err", err)
 		return models.SignupResponse{}, err
 	}
-	defer res.Body.Close()
+	err = res.Body.Close()
+	if err != nil {
+		slog.Error("Error closing response body: ", "err", err)
+		return models.SignupResponse{}, err
+	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -106,8 +107,7 @@ func SupabaseSignup(cfg *config.Supabase, email string, password string) (models
 	return response, nil
 }
 
-
-// SupabaseDeleteUser deletes a user from Supabase auth by their user ID
+// deletes a user from Supabase auth by their ID
 func SupabaseDeleteUser(cfg *config.Supabase, userID uuid.UUID) error {
 	supabaseURL := cfg.URL
 	apiKey := cfg.ServiceRoleKey
@@ -126,7 +126,11 @@ func SupabaseDeleteUser(cfg *config.Supabase, userID uuid.UUID) error {
 		slog.Error("Error executing delete request: ", "err", err)
 		return err
 	}
-	defer res.Body.Close()
+	err = res.Body.Close()
+	if err != nil {
+		slog.Error("Error closing response body: ", "err", err)
+		return err
+	}
 
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNoContent {
 		body, _ := io.ReadAll(res.Body)

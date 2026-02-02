@@ -8,7 +8,7 @@ import (
 )
 
 func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput) (*models.Organization, *errs.HTTPError) {
-	
+
 	query, err := schema.ReadSQLBaseScript("organization/sql/create.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())

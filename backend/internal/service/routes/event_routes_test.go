@@ -309,23 +309,23 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 	start2, _ := time.Parse(time.RFC3339, "2026-02-22 09:00:00+07")
 	end2, _ := time.Parse(time.RFC3339, "2026-02-22 11:00:00+07")
 
-	category_arr := []string{"science","technology"}
+	category_arr := []string{"science", "technology"}
 	eight := 8
 	twelve := 12
 	jpg := "events/robotics_workshop.jpg"
 	addr := "Suite 15"
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	event := models.Event{
-		ID: 				uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-		Title: 				"Junior Robotics Workshop",
-		Description: 		"Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
-		OrganizationID: 	uuid.MustParse("40000000-0000-0000-0000-000000000001"),
-		AgeRangeMin: 		&eight,
-		AgeRangeMax: 		&twelve,
-		Category: 			category_arr,
-		HeaderImageS3Key: 	&jpg,
-		CreatedAt: 			time.Now(),
-		UpdatedAt: 			time.Now(),
+		ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+		Title:            "Junior Robotics Workshop",
+		Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+		AgeRangeMin:      &eight,
+		AgeRangeMax:      &twelve,
+		Category:         category_arr,
+		HeaderImageS3Key: &jpg,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
 	location := models.Location{
@@ -344,14 +344,14 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 	}
 
 	tests := []struct {
-		name       	string
-		eventID 	string
-		mockSetup  	func(*repomocks.MockEventRepository)
-		statusCode 	int
+		name       string
+		eventID    string
+		mockSetup  func(*repomocks.MockEventRepository)
+		statusCode int
 	}{
 		{
-			name:      	"valid UUID",
-			eventID: 	"60000000-0000-0000-0000-000000000001",
+			name:    "valid UUID",
+			eventID: "60000000-0000-0000-0000-000000000001",
 			mockSetup: func(m *repomocks.MockEventRepository) {
 				m.On(
 					"GetEventOccurrencesByEventID",
@@ -359,30 +359,30 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 					uuid.MustParse("60000000-0000-0000-0000-000000000001"),
 				).Return([]models.EventOccurrence{
 					{
-						ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000001"),
-						ManagerId: 		&mid,
-						Event: 			event,
-						Location: 		location,
-						StartTime: 		start,
-						EndTime: 		end,
-						MaxAttendees: 	15,
-						Language: 		"en",
-						CurrEnrolled: 	8,
-						CreatedAt:    	time.Now(),
-						UpdatedAt:    	time.Now(),
+						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+						ManagerId:    &mid,
+						Event:        event,
+						Location:     location,
+						StartTime:    start,
+						EndTime:      end,
+						MaxAttendees: 15,
+						Language:     "en",
+						CurrEnrolled: 8,
+						CreatedAt:    time.Now(),
+						UpdatedAt:    time.Now(),
 					},
 					{
-						ID:        		uuid.MustParse("70000000-0000-0000-0000-000000000002"),
-						ManagerId: 		&mid,
-						Event: 			event,
-						Location: 		location,
-						StartTime: 		start2,
-						EndTime: 		end2,
-						MaxAttendees: 	15,
-						Language: 		"en",
-						CurrEnrolled: 	5,
-						CreatedAt:    	time.Now(),
-						UpdatedAt:    	time.Now(),
+						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+						ManagerId:    &mid,
+						Event:        event,
+						Location:     location,
+						StartTime:    start2,
+						EndTime:      end2,
+						MaxAttendees: 15,
+						Language:     "en",
+						CurrEnrolled: 5,
+						CreatedAt:    time.Now(),
+						UpdatedAt:    time.Now(),
 					},
 				}, nil)
 			},
@@ -390,7 +390,7 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 		},
 		{
 			name:       "invalid UUID",
-			eventID: 	"not-a-uuid",
+			eventID:    "not-a-uuid",
 			mockSetup:  func(*repomocks.MockEventRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
 		},

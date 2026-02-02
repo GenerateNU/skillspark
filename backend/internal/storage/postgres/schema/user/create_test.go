@@ -44,7 +44,7 @@ func TestUserRepository_Create_User(t *testing.T) {
 	assert.Equal(t, userInput.Body.Email, user.Email)
 	assert.Equal(t, userInput.Body.Username, user.Username)
 	assert.Equal(t, userInput.Body.AuthID, user.AuthID)
-	
+
 	retrievedUser, err := repo.GetUserByID(ctx, user.ID)
 	if err != nil {
 		t.Fatalf("Failed to retrieve user: %v", err)

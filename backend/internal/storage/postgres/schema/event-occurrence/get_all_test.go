@@ -2,15 +2,14 @@ package eventoccurrence
 
 import (
 	"context"
-	"testing"
 	"skillspark/internal/storage/postgres/testutil"
 	"skillspark/internal/utils"
-
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T){
+func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
@@ -35,7 +34,7 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T){
 	assert.Equal(t, count, int64(len(eventOccurrences)))
 }
 
-func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.T){
+func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}

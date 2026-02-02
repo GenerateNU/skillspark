@@ -28,11 +28,6 @@ func SetupAuthRoutes(api huma.API, repo *storage.Repository, config config.Confi
 			return nil, err
 		}
 
-		// TODO: set cookies
-
-
-
-
 		return guardianRes, nil
 	})
 
@@ -49,8 +44,6 @@ func SetupAuthRoutes(api huma.API, repo *storage.Repository, config config.Confi
 		if err != nil {
 			return nil, err
 		}
-
-		// TODO: set cookies
 
 		return managerRes, nil
 	})
@@ -72,7 +65,6 @@ func SetupAuthRoutes(api huma.API, repo *storage.Repository, config config.Confi
 		return guardianRes, nil
 	})
 
-
 	huma.Register(api, huma.Operation{
 		OperationID: "login-manager",
 		Method:      http.MethodPost,
@@ -87,11 +79,7 @@ func SetupAuthRoutes(api huma.API, repo *storage.Repository, config config.Confi
 			return nil, err
 		}
 
-		// TODO: set cookies
-
 		return managerRes, nil
 	})
-
-	
 
 }

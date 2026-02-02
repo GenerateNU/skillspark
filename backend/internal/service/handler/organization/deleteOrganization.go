@@ -19,6 +19,5 @@ func (h *Handler) DeleteOrganization(ctx context.Context, input *models.DeleteOr
 		return nil, httpErr
 	}
 
-
 	return &models.DeleteOrganizationOutput{Body: *deleted}, nil
 }

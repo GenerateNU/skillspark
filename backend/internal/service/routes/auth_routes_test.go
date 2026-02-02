@@ -58,14 +58,14 @@ func TestHumaValidation_GuardianSignUp(t *testing.T) {
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
-				"email":      "guardian@example.com",
-				"password":   "password123",
-				"username":   "guardianuser",
-				"name":       "Guardian User",
-				"language_preference": "eng", 
+				"email":                  "guardian@example.com",
+				"password":               "password123",
+				"username":               "guardianuser",
+				"name":                   "Guardian User",
+				"language_preference":    "eng",
 				"profile_picture_s3_key": "/guardian123.jpg",
 			},
-			mockSetup: func(u *repomocks.MockUserRepository, g *repomocks.MockGuardianRepository) {},
+			mockSetup:  func(u *repomocks.MockUserRepository, g *repomocks.MockGuardianRepository) {},
 			statusCode: http.StatusOK,
 		},
 		{
@@ -91,7 +91,6 @@ func TestHumaValidation_GuardianSignUp(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-
 
 			if tt.name == "valid payload" {
 				t.Skip("Skipping valid payload test because Supabase client cannot be mocked easily in route tests without refactoring")
@@ -143,8 +142,8 @@ func TestHumaValidation_ManagerSignUp(t *testing.T) {
 		{
 			name: "invalid email format",
 			payload: map[string]interface{}{
-				"email": "not-an-email",
-				"password": "password123",
+				"email":             "not-an-email",
+				"password":          "password123",
 				"organization_name": "Test Org",
 			},
 			statusCode: http.StatusUnprocessableEntity,

@@ -15,7 +15,7 @@ type GuardianSignUpInput struct {
 		ProfilePictureS3Key *string `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
 		LanguagePreference  string  `json:"language_preference" db:"language_preference"`
 	}
-}	
+}
 
 type GuardianSignUpOutput struct {
 	Body struct {
@@ -51,30 +51,25 @@ type LoginInput struct {
 	}
 }
 
-type LoginOutput struct {
-	Body struct {
-		Token string `json:"token" db:"token"`
-	} `json:"body"`
-}
-
 type UserResponse struct {
 	ID uuid.UUID `json:"id"`
 }
 
 type GuardianLoginOutput struct {
 	AccessTokenCookie http.Cookie `header:"Set-Cookie"`
-	Body struct {
-		GuardianID    uuid.UUID `json:"guardian_id" db:"guardian_id"`
+	Body              struct {
+		GuardianID uuid.UUID `json:"guardian_id" db:"guardian_id"`
 	} `json:"body"`
 }
 
 type ManagerLoginOutput struct {
 	AccessTokenCookie http.Cookie `header:"Set-Cookie"`
-	Body struct {
-		ManagerID    uuid.UUID `json:"manager_id" db:"manager_id"`
+	Body              struct {
+		ManagerID uuid.UUID `json:"manager_id" db:"manager_id"`
 	} `json:"body"`
 }
 
+// Login response from Supabase API
 type LoginResponse struct {
 	AccessToken  string       `json:"access_token"`
 	TokenType    string       `json:"token_type"`

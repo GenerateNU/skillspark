@@ -101,7 +101,7 @@ type Repository struct {
 	Event           EventRepository
 	Child           ChildRepository
 	EventOccurrence EventOccurrenceRepository
-	Registration RegistrationRepository
+	Registration    RegistrationRepository
 	User            UserRepository
 }
 
@@ -136,6 +136,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Child:           child.NewChildRepository(db),
 		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
 		User:            user.NewUserRepository(db),
-		Registration: registration.NewRegistrationRepository(db),
+		Registration:    registration.NewRegistrationRepository(db),
 	}
 }

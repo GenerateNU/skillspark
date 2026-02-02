@@ -6,18 +6,10 @@ import (
 )
 
 type Handler struct {
-	config              config.Supabase
-	userRepository      storage.UserRepository
-	guardianRepository  storage.GuardianRepository
-	managerRepository   storage.ManagerRepository
-}
-
-type Credentials struct {
-	Email      string  `json:"email"`
-	Password   string  `json:"password"`
-	FirstName  *string `json:"first_name"`
-	LastName   *string `json:"last_name"`
-	RememberMe bool
+	config             config.Supabase
+	userRepository     storage.UserRepository
+	guardianRepository storage.GuardianRepository
+	managerRepository  storage.ManagerRepository
 }
 
 func NewHandler(config config.Supabase, userRepository storage.UserRepository, guardianRepository storage.GuardianRepository, managerRepository storage.ManagerRepository) *Handler {

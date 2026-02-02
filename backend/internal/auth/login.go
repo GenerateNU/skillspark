@@ -10,10 +10,7 @@ import (
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-
 )
-
-
 
 func SupabaseLogin(cfg *config.Supabase, email string, password string) (models.LoginResponse, error) {
 	supabaseURL := cfg.URL
@@ -36,14 +33,17 @@ func SupabaseLogin(cfg *config.Supabase, email string, password string) (models.
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", serviceroleKey))
 	req.Header.Set("apikey", serviceroleKey)
-	
 
 	res, err := Client.Do(req)
 	if err != nil {
 		slog.Error("Failed to execute Request", "err", err)
 		return models.LoginResponse{}, errs.BadRequest("Failed to execute Request")
 	}
-	defer res.Body.Close()
+	err = res.Body.Close()
+	if err != nil {
+		slog.Error("Failed to close response body", "err", err)
+		return models.LoginResponse{}, errs.BadRequest("Failed to close response body")
+	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {

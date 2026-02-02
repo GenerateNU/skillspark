@@ -2,14 +2,14 @@ package eventoccurrence
 
 import (
 	"context"
-	"testing"
 	"skillspark/internal/storage/postgres/testutil"
+	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T){
+func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}

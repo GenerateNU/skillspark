@@ -32,7 +32,7 @@ func (h *Handler) GuardianSignUp(ctx context.Context, input *models.GuardianSign
 	guardian, err := h.guardianRepository.CreateGuardian(ctx, createGuardian())
 	if err != nil {
 
-		// Delete Supabase auth user as cleanup 
+		// Delete Supabase auth user as cleanup
 		if deleteErr := auth.SupabaseDeleteUser(&h.config, res.User.ID); deleteErr != nil {
 			slog.Error(fmt.Sprintf("Failed to cleanup Supabase user after guardian creation failure: %v", deleteErr))
 			return nil, errs.InternalServerError(fmt.Sprintf("Creating Guardian failed: %v. WARNING: The following types are stranded and need manual cleanup: %v", err, deleteErr))
@@ -64,8 +64,6 @@ func (h *Handler) GuardianSignUp(ctx context.Context, input *models.GuardianSign
 	return guardianOutput, nil
 }
 
-// todo: fix the guardian signup to return the correct value
-
 func (h *Handler) ManagerSignUp(ctx context.Context, input *models.ManagerSignUpInput) (*models.ManagerSignUpOutput, error) {
 
 	res, err := auth.SupabaseSignup(&h.config, input.Body.Email, input.Body.Password)
@@ -73,24 +71,6 @@ func (h *Handler) ManagerSignUp(ctx context.Context, input *models.ManagerSignUp
 		slog.Error(fmt.Sprintf("Signup Request Failed: %v", err))
 		return nil, err
 	}
-
-	// 	userToCreate := &models.CreateUserInput{}
-	// 	userToCreate.Body.AuthID = &res.User.ID
-	// 	userToCreate.Body.Email = input.Body.Email
-	// 	userToCreate.Body.Name = input.Body.Name
-	// 	userToCreate.Body.LanguagePreference = input.Body.LanguagePreference
-	// 	userToCreate.Body.Username = input.Body.Username
-	// 	userToCreate.Body.ProfilePictureS3Key = input.Body.ProfilePictureS3Key
-	// 	return userToCreate
-	// }())
-	// if err != nil {
-	// 	// Cleanup: delete the Supabase auth user since database user creation failed
-	// 	if deleteErr := auth.SupabaseDeleteUser(&h.config, res.User.ID); deleteErr != nil {
-	// 		slog.Error(fmt.Sprintf("Failed to cleanup Supabase user after database user creation failure: %v", deleteErr))
-	// 		return nil, errs.InternalServerError(fmt.Sprintf("Creating User failed: %v. WARNING: Supabase auth user (ID: %s) is stranded and needs manual cleanup", err, res.User.ID))
-	// 	}
-	// 	return nil, errs.BadRequest(fmt.Sprintf("Creating User failed: %v", err))
-	// }
 
 	createManager := func() *models.CreateManagerInput {
 		manager := &models.CreateManagerInput{}
@@ -105,7 +85,7 @@ func (h *Handler) ManagerSignUp(ctx context.Context, input *models.ManagerSignUp
 	}
 	manager, err := h.managerRepository.CreateManager(ctx, createManager())
 	if err != nil {
-		// Cleanup: the Supabase auth user
+		// Cleanup the Supabase auth user
 		if deleteErr := auth.SupabaseDeleteUser(&h.config, res.User.ID); deleteErr != nil {
 			slog.Error(fmt.Sprintf("Failed to cleanup Supabase user after manager creation failure: %v", deleteErr))
 			return nil, errs.InternalServerError(fmt.Sprintf("Creating Manager failed: %v. WARNING: The following types are stranded and need manual cleanup: %v", err, deleteErr))
@@ -122,14 +102,13 @@ func (h *Handler) ManagerSignUp(ctx context.Context, input *models.ManagerSignUp
 		return updateUserInput
 	}())
 	if err != nil {
-		// Cleanup: the Supabase auth user
+		// Cleanup the Supabase auth user
 		if deleteErr := auth.SupabaseDeleteUser(&h.config, res.User.ID); deleteErr != nil {
 			slog.Error(fmt.Sprintf("Failed to cleanup Supabase user after guardian creation failure: %v", deleteErr))
 			return nil, errs.InternalServerError(fmt.Sprintf("Creating Guardian failed: %v. WARNING: The following types are stranded and need manual cleanup: %v", err, deleteErr))
 		}
 		return nil, errs.BadRequest(fmt.Sprintf("Creating Guardian/User failed: %v", err))
 	}
-
 
 	managerOutput := &models.ManagerSignUpOutput{}
 
