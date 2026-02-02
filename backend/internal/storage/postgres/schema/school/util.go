@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
 )
 
 func CreateTestSchool(
@@ -24,6 +25,10 @@ func CreateTestSchool(
 	input.Body.Name = "Monster High School"
 	input.Body.LocationID = dummyLocation.ID
 
-	school, _ := repo.CreateSchool(ctx, input)
+	school, err := repo.CreateSchool(ctx, input)
+
+	require.NoError(t, err)
+	require.NotNil(t, school)
+
 	return school
 }

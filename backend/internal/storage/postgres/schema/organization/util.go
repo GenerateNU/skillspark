@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
 )
 
 func CreateTestOrganization(
@@ -22,7 +23,10 @@ func CreateTestOrganization(
 	i.Body.Name = "Test Corp"
 	i.Body.Active = &active
 
-	organization, _ := repo.CreateOrganization(ctx, i)
+	organization, err := repo.CreateOrganization(ctx, i)
+
+	require.NoError(t, err)
+	require.NotNil(t, organization)
 
 	return organization
 }

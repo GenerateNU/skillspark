@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
 )
 
 func CreateTestEvent(
@@ -33,6 +34,9 @@ func CreateTestEvent(
 	input.Body.Category = []string{"science", "technology"}
 	input.Body.HeaderImageS3Key = &headerImage
 
-	event, _ := repo.CreateEvent(ctx, input)
+	event, err := repo.CreateEvent(ctx, input)
+
+	require.NoError(t, err)
+	require.NotNil(t, event)
 	return event
 }

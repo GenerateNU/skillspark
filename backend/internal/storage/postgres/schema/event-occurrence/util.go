@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
 )
 
 func CreateTestEventOccurrence(
@@ -37,7 +38,10 @@ func CreateTestEventOccurrence(
 	input.Body.MaxAttendees = 10
 	input.Body.Language = "en"
 
-	eventOccurrence, _ := repo.CreateEventOccurrence(ctx, input)
+	eventOccurrence, err := repo.CreateEventOccurrence(ctx, input)
+
+	require.NoError(t, err)
+	require.NotNil(t, eventOccurrence)
 
 	return eventOccurrence
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
 )
 
 func CreateTestGuardian(
@@ -23,7 +24,10 @@ func CreateTestGuardian(
 	// get a user
 	input.Body.UserID = uuid.MustParse("f2a3b4c5-d6e7-4f8a-9b0c-1d2e3f4a5b6c")
 
-	guardian, _ := repo.CreateGuardian(ctx, input)
+	guardian, err := repo.CreateGuardian(ctx, input)
+
+	require.NoError(t, err)
+	require.NotNil(t, guardian)
 
 	return guardian
 }

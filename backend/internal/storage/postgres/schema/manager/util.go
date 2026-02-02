@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
 )
 
 func CreateTestManager(
@@ -26,7 +27,10 @@ func CreateTestManager(
 	input.Body.OrganizationID = &org.ID
 	input.Body.Role = "Assistant Manager"
 
-	organization, _ := repo.CreateManager(ctx, input)
+	manager, err := repo.CreateManager(ctx, input)
 
-	return organization
+	require.NoError(t, err)
+	require.NotNil(t, manager)
+
+	return manager
 }

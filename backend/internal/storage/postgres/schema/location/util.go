@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
 )
 
 func CreateTestLocation(
@@ -28,6 +29,11 @@ func CreateTestLocation(
 	input.Body.PostalCode = "10001"
 	input.Body.Country = "USA"
 
-	location, _ := repo.CreateLocation(ctx, input)
+	location, err := repo.CreateLocation(ctx, input)
+
+	require.NoError(t, err)
+	require.NotNil(t, location)
+
 	return location
+
 }

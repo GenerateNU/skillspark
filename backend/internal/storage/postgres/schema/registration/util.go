@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
 )
 
 func CreateTestRegistration(
@@ -31,7 +32,10 @@ func CreateTestRegistration(
 		return i
 	}()
 
-	registration, _ := repo.CreateRegistration(ctx, input)
+	registration, err := repo.CreateRegistration(ctx, input)
+
+	require.NoError(t, err)
+	require.NotNil(t, registration.Body)
 
 	return &registration.Body
 }
