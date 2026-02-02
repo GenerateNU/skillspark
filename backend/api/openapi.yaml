@@ -270,7 +270,9 @@ paths:
                   minLength: 2
                   maxLength: 200
                 header_image:
-                  $ref: '#/components/schemas/FormFile'
+                  type: string
+                  format: binary
+                  contentEncoding: binary
                 organization_id:
                   type: string
                 title:
@@ -291,7 +293,7 @@ paths:
               description:
                 contentType: text/plain
               header_image:
-                contentType: text/plain
+                contentType: image/png,image/jpeg
               organization_id:
                 contentType: text/plain
               title:
@@ -299,10 +301,6 @@ paths:
       responses:
         "200":
           description: OK
-          headers:
-            PresignedURL:
-              schema:
-                type: string
           content:
             application/json:
               schema:
@@ -331,10 +329,6 @@ paths:
       responses:
         "200":
           description: OK
-          headers:
-            PresignedURL:
-              schema:
-                type: string
           content:
             application/json:
               schema:
@@ -380,14 +374,18 @@ paths:
       summary: Update an existing event
       description: Updates an existing event
       operationId: update-event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           multipart/form-data:
             schema:
               type: object
               properties:
-                ID:
-                  type: string
                 age_range_max:
                   type: integer
                   format: int64
@@ -403,7 +401,9 @@ paths:
                   minLength: 2
                   maxLength: 200
                 header_image:
-                  $ref: '#/components/schemas/FormFile'
+                  type: string
+                  format: binary
+                  contentEncoding: binary
                 organization_id:
                   type: string
                 title:
@@ -411,8 +411,6 @@ paths:
                   minLength: 2
                   maxLength: 100
             encoding:
-              ID:
-                contentType: text/plain
               age_range_max:
                 contentType: text/plain
               age_range_min:
@@ -422,7 +420,7 @@ paths:
               description:
                 contentType: text/plain
               header_image:
-                contentType: text/plain
+                contentType: image/png,image/jpeg
               organization_id:
                 contentType: text/plain
               title:
@@ -430,10 +428,6 @@ paths:
       responses:
         "200":
           description: OK
-          headers:
-            PresignedURL:
-              schema:
-                type: string
           content:
             application/json:
               schema:
@@ -839,11 +833,6 @@ paths:
       responses:
         "200":
           description: OK
-          headers:
-            PresignedURLS:
-              schema:
-                type: string
-                description: List of Presigned Urls
           content:
             application/json:
               schema:
@@ -878,7 +867,9 @@ paths:
                   minLength: 1
                   maxLength: 255
                 profile_image:
-                  $ref: '#/components/schemas/FormFile'
+                  type: string
+                  format: binary
+                  contentEncoding: binary
               required:
                 - name
             encoding:
@@ -889,14 +880,10 @@ paths:
               name:
                 contentType: text/plain
               profile_image:
-                contentType: text/plain
+                contentType: image/png,image/jpeg
       responses:
         "200":
           description: OK
-          headers:
-            PresignedURL:
-              schema:
-                type: string
           content:
             application/json:
               schema:
@@ -926,10 +913,6 @@ paths:
       responses:
         "200":
           description: OK
-          headers:
-            PresignedURL:
-              schema:
-                type: string
           content:
             application/json:
               schema:
@@ -975,14 +958,18 @@ paths:
       summary: Update an organization
       description: Updates an existing organization with the provided fields (partial update)
       operationId: update-organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           multipart/form-data:
             schema:
               type: object
               properties:
-                ID:
-                  type: string
                 active:
                   type: boolean
                 location_id:
@@ -992,12 +979,12 @@ paths:
                   minLength: 1
                   maxLength: 255
                 profile_image:
-                  $ref: '#/components/schemas/FormFile'
+                  type: string
+                  format: binary
+                  contentEncoding: binary
               required:
                 - name
             encoding:
-              ID:
-                contentType: text/plain
               active:
                 contentType: text/plain
               location_id:
@@ -1005,14 +992,10 @@ paths:
               name:
                 contentType: text/plain
               profile_image:
-                contentType: text/plain
+                contentType: image/png,image/jpeg
       responses:
         "200":
           description: OK
-          headers:
-            PresignedURL:
-              schema:
-                type: string
           content:
             application/json:
               schema:
@@ -1540,6 +1523,8 @@ components:
           type: string
         organization_id:
           type: string
+        presigned_url:
+          type: string
         title:
           type: string
         updated_at:
@@ -1554,6 +1539,7 @@ components:
         - age_range_max
         - category
         - header_image_s3_key
+        - presigned_url
         - created_at
         - updated_at
     EventOccurrence:
@@ -1607,24 +1593,6 @@ components:
         - curr_enrolled
         - created_at
         - updated_at
-    FormFile:
-      type: object
-      additionalProperties: false
-      properties:
-        ContentType:
-          type: string
-        Filename:
-          type: string
-        IsSet:
-          type: boolean
-        Size:
-          type: integer
-          format: int64
-      required:
-        - ContentType
-        - IsSet
-        - Size
-        - Filename
     GetGreetingOutputBody:
       type: object
       additionalProperties: false
@@ -1838,6 +1806,8 @@ components:
           type: string
         pfp_s3_key:
           type: string
+        presigned_url:
+          type: string
         updated_at:
           type: string
           format: date-time
@@ -1845,6 +1815,7 @@ components:
         - id
         - name
         - active
+        - presigned_url
         - created_at
         - updated_at
     PatchManagerInputBody:
