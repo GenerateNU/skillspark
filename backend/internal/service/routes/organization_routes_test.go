@@ -2,14 +2,18 @@ package routes
 
 import (
 	"bytes"
-	"encoding/json"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
+	"os"
 	"testing"
 	"time"
 
+	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"skillspark/internal/utils"
@@ -18,13 +22,67 @@ import (
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
+
+// dummyImageData for testing organization routes
+func dummyImageData() []byte {
+	return []byte{
+		0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+		0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+		0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+		0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53,
+		0xDE, 0x00, 0x00, 0x00, 0x0C, 0x49, 0x44, 0x41,
+	}
+}
+
+// createMultipartForm creates a multipart form with fields and optionally a file
+func createMultipartForm(fields map[string]string, includeFile bool, fileFieldName string) (*bytes.Buffer, string) {
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+
+	for key, val := range fields {
+		_ = writer.WriteField(key, val)
+	}
+
+	if includeFile {
+		// Create form file
+		h := make(textproto.MIMEHeader)
+		h.Set("Content-Disposition", `form-data; name="`+fileFieldName+`"; filename="test.png"`)
+		h.Set("Content-Type", "image/png")
+		part, _ := writer.CreatePart(h)
+		_, _ = part.Write(dummyImageData())
+	}
+
+	writer.Close()
+	return &body, writer.FormDataContentType()
+}
+
+func createOrgTestS3Client(t *testing.T) *s3_client.Client {
+
+	err := godotenv.Load("../../../.env")
+	if err != nil {
+		t.Logf("Warning: Could not load .env file: %v", err)
+	}
+
+	s3Config := config.S3{
+		Bucket:    os.Getenv("AWS_S3_BUCKET"),
+		Region:    os.Getenv("AWS_REGION"),
+		AccessKey: os.Getenv("AWS_ACCESS_KEY_ID"),
+		SecretKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
+	}
+	client, err := s3_client.NewClient(s3Config)
+	require.NoError(t, err)
+	return client
+}
 
 func setupOrganizationTestAPI(
 	organizationRepo *repomocks.MockOrganizationRepository,
 	locationRepo *repomocks.MockLocationRepository,
+	s3Client *s3_client.Client,
 ) (*fiber.App, huma.API) {
 	app := fiber.New()
 	api := humafiber.New(app, huma.DefaultConfig("Test API", "1.0.0"))
@@ -32,7 +90,7 @@ func setupOrganizationTestAPI(
 		Organization: organizationRepo,
 		Location:     locationRepo,
 	}
-	SetupOrganizationRoutes(api, repo)
+	SetupOrganizationRoutes(api, repo, s3Client)
 	return app, api
 }
 
@@ -100,7 +158,8 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo)
+			s3Client := createOrgTestS3Client(t)
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, s3Client)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -123,22 +182,44 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name       string
-		payload    map[string]interface{}
-		mockSetup  func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
-		statusCode int
+		name        string
+		formFields  map[string]string
+		includeFile bool
+		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		statusCode  int
 	}{
 		{
 			name: "valid payload without location",
-			payload: map[string]interface{}{
+			formFields: map[string]string{
 				"name":   "Tech Innovations",
-				"active": true,
+				"active": "true",
 			},
+			includeFile: true,
 			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
+				// Handler calls GetLocationByID with zero UUID when location_id is not provided
+				l.On(
+					"GetLocationByID",
+					mock.Anything,
+					uuid.UUID{},
+				).Return(nil, nil)
 				m.On(
 					"CreateOrganization",
 					mock.Anything,
 					mock.AnythingOfType("*models.CreateOrganizationInput"),
+					mock.Anything,
+				).Return(&models.Organization{
+					ID:        uuid.New(),
+					Name:      "Tech Innovations",
+					Active:    true,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
+
+				m.On(
+					"UpdateOrganization",
+					mock.Anything,
+					mock.AnythingOfType("*models.UpdateOrganizationInput"),
+					mock.Anything,
 				).Return(&models.Organization{
 					ID:        uuid.New(),
 					Name:      "Tech Innovations",
@@ -151,11 +232,12 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 		},
 		{
 			name: "valid payload with location",
-			payload: map[string]interface{}{
+			formFields: map[string]string{
 				"name":        "Tech Innovations",
-				"active":      true,
-				"location_id": uuid.MustParse("10000000-0000-0000-0000-000000000001"),
+				"active":      "true",
+				"location_id": "10000000-0000-0000-0000-000000000001",
 			},
+			includeFile: true,
 			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
 				locationID := uuid.MustParse("10000000-0000-0000-0000-000000000001")
 				l.On(
@@ -169,6 +251,21 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 					"CreateOrganization",
 					mock.Anything,
 					mock.AnythingOfType("*models.CreateOrganizationInput"),
+					mock.Anything,
+				).Return(&models.Organization{
+					ID:         uuid.New(),
+					Name:       "Tech Innovations",
+					Active:     true,
+					LocationID: &locationID,
+					CreatedAt:  time.Now(),
+					UpdatedAt:  time.Now(),
+				}, nil)
+
+				m.On(
+					"UpdateOrganization",
+					mock.Anything,
+					mock.AnythingOfType("*models.UpdateOrganizationInput"),
+					mock.Anything,
 				).Return(&models.Organization{
 					ID:         uuid.New(),
 					Name:       "Tech Innovations",
@@ -182,21 +279,23 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 		},
 		{
 			name: "name below minimum length",
-			payload: map[string]interface{}{
+			formFields: map[string]string{
 				"name":   "",
-				"active": true,
+				"active": "true",
 			},
-			mockSetup:  func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
-			statusCode: http.StatusUnprocessableEntity,
+			includeFile: true,
+			mockSetup:   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
+			statusCode:  http.StatusUnprocessableEntity,
 		},
 		{
 			name: "name above maximum length",
-			payload: map[string]interface{}{
+			formFields: map[string]string{
 				"name":   string(make([]byte, 256)),
-				"active": true,
+				"active": "true",
 			},
-			mockSetup:  func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
-			statusCode: http.StatusUnprocessableEntity,
+			includeFile: true,
+			mockSetup:   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
+			statusCode:  http.StatusUnprocessableEntity,
 		},
 	}
 
@@ -209,18 +308,18 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo)
+			s3Client := createOrgTestS3Client(t)
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, s3Client)
 
-			bodyBytes, err := json.Marshal(tt.payload)
-			assert.NoError(t, err)
+			body, contentType := createMultipartForm(tt.formFields, tt.includeFile, "profile_image")
 
 			req, err := http.NewRequest(
 				http.MethodPost,
 				"/api/v1/organizations",
-				bytes.NewBuffer(bodyBytes),
+				body,
 			)
 			assert.NoError(t, err)
-			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Content-Type", contentType)
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -299,7 +398,8 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo)
+			s3Client := createOrgTestS3Client(t)
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, s3Client)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -331,21 +431,41 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 	tests := []struct {
 		name           string
 		organizationID string
-		payload        map[string]interface{}
+		formFields     map[string]string
+		includeFile    bool
 		mockSetup      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
 		statusCode     int
 	}{
 		{
 			name:           "valid partial update",
 			organizationID: orgID.String(),
-			payload: map[string]interface{}{
+			formFields: map[string]string{
 				"name": "Updated Name",
 			},
+			includeFile: true,
 			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
+				// Handler calls GetLocationByID with zero UUID when location_id is not provided
+				l.On(
+					"GetLocationByID",
+					mock.Anything,
+					uuid.UUID{},
+				).Return(nil, nil)
+				m.On(
+					"GetOrganizationByID",
+					mock.Anything,
+					orgID,
+				).Return(&models.Organization{
+					ID:        orgID,
+					Name:      "Old Name",
+					Active:    true,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
 				m.On(
 					"UpdateOrganization",
 					mock.Anything,
 					mock.AnythingOfType("*models.UpdateOrganizationInput"),
+					mock.Anything,
 				).Return(&models.Organization{
 					ID:        orgID,
 					Name:      "Updated Name",
@@ -359,18 +479,20 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 		{
 			name:           "invalid UUID",
 			organizationID: "not-a-uuid",
-			payload:        map[string]interface{}{},
+			formFields:     map[string]string{},
+			includeFile:    true,
 			mockSetup:      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
 			statusCode:     http.StatusUnprocessableEntity,
 		},
 		{
 			name:           "name below minimum length",
 			organizationID: orgID.String(),
-			payload: map[string]interface{}{
+			formFields: map[string]string{
 				"name": "",
 			},
-			mockSetup:  func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
-			statusCode: http.StatusUnprocessableEntity,
+			includeFile: true,
+			mockSetup:   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
+			statusCode:  http.StatusUnprocessableEntity,
 		},
 	}
 
@@ -383,18 +505,18 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo)
+			s3Client := createOrgTestS3Client(t)
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, s3Client)
 
-			bodyBytes, err := json.Marshal(tt.payload)
-			assert.NoError(t, err)
+			body, contentType := createMultipartForm(tt.formFields, tt.includeFile, "profile_image")
 
 			req, err := http.NewRequest(
 				http.MethodPatch,
 				"/api/v1/organizations/"+tt.organizationID,
-				bytes.NewBuffer(bodyBytes),
+				body,
 			)
 			assert.NoError(t, err)
-			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Content-Type", contentType)
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -407,6 +529,7 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockOrgRepo.AssertExpectations(t)
+			mockLocRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -472,7 +595,8 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo)
+			s3Client := createOrgTestS3Client(t)
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, s3Client)
 
 			req, err := http.NewRequest(
 				http.MethodDelete,
