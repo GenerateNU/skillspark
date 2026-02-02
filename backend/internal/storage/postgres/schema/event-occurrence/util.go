@@ -5,10 +5,10 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/location"
-	"skillspark/internal/storage/postgres/schema/manager"
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 )
@@ -24,13 +24,13 @@ func CreateTestEventOccurrence(
 
 	e := event.CreateTestEvent(t, ctx, db)
 	l := location.CreateTestLocation(t, ctx, db)
-	m := manager.CreateTestManager(t, ctx, db)
 
+	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	start := time.Date(2026, time.February, 1, 0, 0, 0, 0, time.Local)
 	end := time.Date(2026, time.February, 1, 1, 0, 0, 0, time.Local)
 
 	input := &models.CreateEventOccurrenceInput{}
-	input.Body.ManagerId = &m.ID
+	input.Body.ManagerId = &mid
 	input.Body.EventId = e.ID
 	input.Body.LocationId = l.ID
 	input.Body.StartTime = start

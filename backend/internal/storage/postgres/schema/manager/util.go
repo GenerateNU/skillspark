@@ -23,7 +23,7 @@ func CreateTestManager(
 	org := organization.CreateTestOrganization(t, ctx, db)
 
 	input := &models.CreateManagerInput{}
-	input.Body.UserID = uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c")
+	input.Body.UserID = uuid.New()
 	input.Body.OrganizationID = &org.ID
 	input.Body.Role = "Assistant Manager"
 

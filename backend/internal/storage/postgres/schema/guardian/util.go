@@ -5,6 +5,8 @@ import (
 	"skillspark/internal/models"
 	"testing"
 
+	"math/rand"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
@@ -21,8 +23,9 @@ func CreateTestGuardian(
 
 	input := &models.CreateGuardianInput{}
 
-	// get a user
-	input.Body.UserID = uuid.MustParse("f2a3b4c5-d6e7-4f8a-9b0c-1d2e3f4a5b6c")
+	input.Body.UserID = uuid.New()
+	input.Body.Email = RandomString(10)
+	input.Body.Username = RandomString(10)
 
 	guardian, err := repo.CreateGuardian(ctx, input)
 
@@ -30,4 +33,15 @@ func CreateTestGuardian(
 	require.NotNil(t, guardian)
 
 	return guardian
+}
+
+func RandomString(n int) string {
+
+	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
 }
