@@ -42,6 +42,7 @@ type OrganizationRepository interface {
 
 type ManagerRepository interface {
 	GetManagerByID(ctx context.Context, id uuid.UUID) (*models.Manager, error)
+	GetManagerByUserID(ctx context.Context, userID uuid.UUID) (*models.Manager, error)
 	GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error)
 	DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, error)
 	CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error)

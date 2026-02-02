@@ -7,6 +7,7 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/testutil"
+	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -27,9 +28,12 @@ func TestManagerRepository_Update_AssistantDirector(t *testing.T) {
 	managerInput := func() *models.PatchManagerInput {
 		input := &models.PatchManagerInput{}
 		input.Body.ID = uuid.MustParse("50000000-0000-0000-0000-000000000001")
-		input.Body.UserID = uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f")
 		input.Body.OrganizationID = &organizationID
-		input.Body.Role = "Assistant Director"
+		input.Body.Name = utils.PtrString("Updated Assistant")
+		input.Body.Email = utils.PtrString("updated.assist@example.com")
+		input.Body.Username = utils.PtrString("uassist")
+		input.Body.LanguagePreference = utils.PtrString("en")
+		input.Body.Role = utils.PtrString("Assistant Director")
 		return input
 	}()
 
@@ -38,6 +42,7 @@ func TestManagerRepository_Update_AssistantDirector(t *testing.T) {
 	assert.NotNil(t, manager.UserID)
 	assert.Equal(t, organizationID, manager.OrganizationID)
 	assert.Equal(t, "Assistant Director", manager.Role)
+	assert.Equal(t, "Updated Assistant", manager.Name)
 
 	id := manager.ID
 
@@ -49,4 +54,5 @@ func TestManagerRepository_Update_AssistantDirector(t *testing.T) {
 	assert.Equal(t, manager.UserID, retrievedManager.UserID)
 	assert.Equal(t, manager.OrganizationID, retrievedManager.OrganizationID)
 	assert.Equal(t, manager.Role, retrievedManager.Role)
+	assert.Equal(t, manager.Name, retrievedManager.Name)
 }

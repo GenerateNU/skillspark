@@ -21,11 +21,13 @@ func TestGuardianRepository_Update_David_Kim(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	// Update guardian to use other profile
 	guardianInput := func() *models.UpdateGuardianInput {
 		input := &models.UpdateGuardianInput{}
 		input.ID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
-		input.Body.UserID = uuid.MustParse("f2a3b4c5-d6e7-4f8a-9b0c-1d2e3f4a5b6c")
+		input.Body.Name = "Updated David"
+		input.Body.Email = "updated.david@example.com"
+		input.Body.Username = "udavid"
+		input.Body.LanguagePreference = "en"
 		return input
 	}()
 
@@ -36,7 +38,7 @@ func TestGuardianRepository_Update_David_Kim(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, guardian)
-	assert.Equal(t, guardianInput.Body.UserID, guardian.UserID)
+	assert.Equal(t, guardianInput.Body.Name, guardian.Name)
 	assert.NotNil(t, guardian.CreatedAt)
 	assert.NotNil(t, guardian.UpdatedAt)
 	assert.Equal(t, guardianInput.ID, guardian.ID)
@@ -48,6 +50,27 @@ func TestGuardianRepository_Update_David_Kim(t *testing.T) {
 	}
 
 	assert.NotNil(t, retrievedGuardian)
-	assert.Equal(t, guardianInput.Body.UserID, retrievedGuardian.UserID)
+	assert.Equal(t, guardianInput.Body.Name, retrievedGuardian.Name)
 	assert.Equal(t, guardianInput.ID, retrievedGuardian.ID)
+}
+
+func TestGuardianRepository_Update_Errors(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+
+	testDB := testutil.SetupTestDB(t)
+	repo := NewGuardianRepository(testDB)
+	ctx := context.Background()
+
+	t.Run("Update Non-Existent Guardian", func(t *testing.T) {
+		input := &models.UpdateGuardianInput{
+			ID: uuid.New(),
+		}
+		input.Body.Name = "Ghost"
+
+		guardian, err := repo.UpdateGuardian(ctx, input)
+		assert.Error(t, err)
+		assert.Nil(t, guardian)
+	})
 }

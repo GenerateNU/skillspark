@@ -1468,11 +1468,30 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateGuardianInputBody.json
           readOnly: true
+        email:
+          type: string
+          description: Email of the guardian
+        language_preference:
+          type: string
+          description: Language preference
+        name:
+          type: string
+          description: Name of the guardian
+        profile_picture_s3_key:
+          type: string
+          description: S3 key for profile picture
         user_id:
           type: string
-          description: The associated user ID of the guardian
+          description: User ID associated with the guardian
+        username:
+          type: string
+          description: Username of the guardian
       required:
         - user_id
+        - name
+        - email
+        - username
+        - language_preference
     CreateLocationInputBody:
       type: object
       additionalProperties: false
@@ -1552,17 +1571,36 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateManagerInputBody.json
           readOnly: true
+        email:
+          type: string
+          description: Email of the guardian
+        language_preference:
+          type: string
+          description: Language preference
+        name:
+          type: string
+          description: Name of the guardian
         organization_id:
           type: string
           description: organization id of the organization the manager is associated with
+        profile_picture_s3_key:
+          type: string
+          description: S3 key for profile picture
         role:
           type: string
           description: role of the manager being created
         user_id:
           type: string
-          description: user id of the manager
+          description: User ID associated with the manager
+        username:
+          type: string
+          description: Username of the guardian
       required:
         - user_id
+        - name
+        - email
+        - username
+        - language_preference
         - role
     CreateOrganizationInputBody:
       type: object
@@ -1914,16 +1952,31 @@ components:
         created_at:
           type: string
           format: date-time
+        email:
+          type: string
         id:
+          type: string
+        language_preference:
+          type: string
+        name:
+          type: string
+        profile_picture_s3_key:
           type: string
         updated_at:
           type: string
           format: date-time
         user_id:
           type: string
+        username:
+          type: string
       required:
         - id
         - user_id
+        - name
+        - email
+        - username
+        - profile_picture_s3_key
+        - language_preference
         - created_at
         - updated_at
     HealthOutputBody:
@@ -2051,9 +2104,17 @@ components:
         created_at:
           type: string
           format: date-time
+        email:
+          type: string
         id:
           type: string
+        language_preference:
+          type: string
+        name:
+          type: string
         organization_id:
+          type: string
+        profile_picture_s3_key:
           type: string
         role:
           type: string
@@ -2062,11 +2123,18 @@ components:
           format: date-time
         user_id:
           type: string
+        username:
+          type: string
       required:
         - id
         - user_id
         - organization_id
         - role
+        - name
+        - email
+        - username
+        - profile_picture_s3_key
+        - language_preference
         - created_at
         - updated_at
     Organization:
@@ -2113,22 +2181,32 @@ components:
           examples:
             - http://localhost:8080/schemas/PatchManagerInputBody.json
           readOnly: true
+        email:
+          type: string
+          description: Email of the guardian
         id:
           type: string
           description: id of the manager
+        language_preference:
+          type: string
+          description: Language preference
+        name:
+          type: string
+          description: Name of the guardian
         organization_id:
           type: string
-          description: organization id of the organization the manager is associated with
+          description: organization id
+        profile_picture_s3_key:
+          type: string
+          description: S3 key for profile picture
         role:
           type: string
-          description: role of the manager being created
-        user_id:
+          description: role of the manager
+        username:
           type: string
-          description: user id of the manager
+          description: Username of the guardian
       required:
         - id
-        - user_id
-        - role
     Registration:
       type: object
       additionalProperties: false
@@ -2344,11 +2422,26 @@ components:
           examples:
             - http://localhost:8080/schemas/UpdateGuardianInputBody.json
           readOnly: true
-        user_id:
+        email:
           type: string
-          description: The associated user ID of the guardian
+          description: Email of the guardian
+        language_preference:
+          type: string
+          description: Language preference
+        name:
+          type: string
+          description: Name of the guardian
+        profile_picture_s3_key:
+          type: string
+          description: S3 key for profile picture
+        username:
+          type: string
+          description: Username of the guardian
       required:
-        - user_id
+        - name
+        - email
+        - username
+        - language_preference
     UpdateOrganizationInputBody:
       type: object
       additionalProperties: false

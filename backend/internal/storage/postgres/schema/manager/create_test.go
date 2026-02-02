@@ -27,6 +27,10 @@ func TestManagerRepository_Create_AssistantDirector(t *testing.T) {
 		input := &models.CreateManagerInput{}
 		input.Body.UserID = uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c")
 		input.Body.OrganizationID = &organizationID
+		input.Body.Name = "Assistant Man"
+		input.Body.Email = "am@example.com"
+		input.Body.Username = "amanager"
+		input.Body.LanguagePreference = "en"
 		input.Body.Role = "Assistant Manager"
 		return input
 	}()
@@ -36,6 +40,7 @@ func TestManagerRepository_Create_AssistantDirector(t *testing.T) {
 	assert.NotNil(t, manager.UserID)
 	assert.Equal(t, organizationID, manager.OrganizationID)
 	assert.Equal(t, "Assistant Manager", manager.Role)
+	assert.Equal(t, "Assistant Man", manager.Name)
 
 	id := manager.ID
 
@@ -47,4 +52,5 @@ func TestManagerRepository_Create_AssistantDirector(t *testing.T) {
 	assert.Equal(t, manager.UserID, retrievedManager.UserID)
 	assert.Equal(t, manager.OrganizationID, retrievedManager.OrganizationID)
 	assert.Equal(t, manager.Role, retrievedManager.Role)
+	assert.Equal(t, manager.Name, retrievedManager.Name)
 }

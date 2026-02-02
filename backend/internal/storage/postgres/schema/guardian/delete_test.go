@@ -31,7 +31,10 @@ func TestGuardianRepository_DeleteGuardian(t *testing.T) {
 	guardian, err = repo.CreateGuardian(ctx,
 		func() *models.CreateGuardianInput {
 			input := &models.CreateGuardianInput{}
-			input.Body.UserID = uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f")
+			input.Body.Name = "Delete Me"
+			input.Body.Email = "deleteme@example.com"
+			input.Body.Username = "delete"
+			input.Body.LanguagePreference = "en"
 			return input
 		}())
 	if err != nil {
@@ -39,7 +42,6 @@ func TestGuardianRepository_DeleteGuardian(t *testing.T) {
 	}
 
 	assert.NotNil(t, guardian)
-	assert.Equal(t, uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"), guardian.UserID)
 	assert.NotNil(t, guardian.CreatedAt)
 	assert.NotNil(t, guardian.UpdatedAt)
 
@@ -50,14 +52,26 @@ func TestGuardianRepository_DeleteGuardian(t *testing.T) {
 	}
 
 	assert.NotNil(t, guardian)
-	assert.Equal(t, uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"), guardian.UserID)
 	assert.NotNil(t, guardian.CreatedAt)
 	assert.NotNil(t, guardian.UpdatedAt)
 
 	// verify the guardian was deleted
-	guardian, err = repo.GetGuardianByID(ctx, uuid.MustParse("c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f"))
+	guardian, err = repo.GetGuardianByID(ctx, guardian.ID)
 
 	assert.Nil(t, guardian)
 	assert.NotNil(t, err)
+}
 
+func TestGuardianRepository_Delete_NotFound(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+	testDB := testutil.SetupTestDB(t)
+	repo := NewGuardianRepository(testDB)
+	ctx := context.Background()
+
+	guardian, err := repo.DeleteGuardian(ctx, uuid.New())
+	assert.Error(t, err)
+	assert.Nil(t, guardian)
+	assert.Contains(t, err.Error(), "not found")
 }

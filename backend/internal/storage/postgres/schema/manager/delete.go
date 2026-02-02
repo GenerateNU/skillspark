@@ -20,8 +20,7 @@ func (r *ManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID) (*m
 
 	var deletedManager models.Manager
 
-	err = row.Scan(&deletedManager.ID, &deletedManager.UserID, &deletedManager.OrganizationID, &deletedManager.Role,
-		&deletedManager.CreatedAt, &deletedManager.UpdatedAt)
+	err = row.Scan(&deletedManager.ID, &deletedManager.UserID, &deletedManager.OrganizationID, &deletedManager.Role, &deletedManager.Name, &deletedManager.Email, &deletedManager.Username, &deletedManager.ProfilePictureS3Key, &deletedManager.LanguagePreference, &deletedManager.CreatedAt, &deletedManager.UpdatedAt)
 
 	if err != nil {
 		err := errs.InternalServerError("Failed to delete manager: ", err.Error())
