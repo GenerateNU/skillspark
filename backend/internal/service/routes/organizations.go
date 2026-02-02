@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"skillspark/internal/models"
@@ -44,6 +45,10 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 		}
 
 		image_data, err := io.ReadAll(formData.ProfileImage)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
 
 		organization, err := orgHandler.CreateOrganization(ctx, &organizationModel, &updateBody, &image_data, s3Client)
 
@@ -131,6 +136,10 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s
 		}
 
 		image_data, err := io.ReadAll(formData.ProfileImage)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
 
 		organization, err := orgHandler.UpdateOrganization(ctx, &organizationModel, &image_data, s3Client)
 

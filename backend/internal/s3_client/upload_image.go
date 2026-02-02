@@ -29,13 +29,13 @@ func (c *Client) UploadImage(ctx context.Context, key *string, image_data []byte
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to upload image with key %q: %w", key, err)
+		return nil, fmt.Errorf("failed to upload image with key %q: %w", *key, err)
 	}
 
 	url, err := c.GeneratePresignedURL(ctx, *key, time.Hour)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to return presign URL after image upload %q: %w", key, err)
+		return nil, fmt.Errorf("failed to return presign URL after image upload %q: %w", *key, err)
 	}
 
 	return &url, nil

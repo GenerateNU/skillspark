@@ -57,7 +57,10 @@ func createEventMultipartForm(fields map[string]string, includeFile bool) (*byte
 		_, _ = part.Write(dummyImageData())
 	}
 
-	writer.Close()
+	err := writer.Close()
+	if err != nil {
+		return nil, ""
+	}
 	return &body, writer.FormDataContentType()
 }
 

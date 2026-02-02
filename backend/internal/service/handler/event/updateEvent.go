@@ -11,12 +11,12 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 	var key *string
 	var url *string
 
-	occurences, err := h.EventRepository.GetEventOccurrencesByEventID(ctx, input.ID)
-	if err != nil || len(occurences) == 0 {
+	occurrences, err := h.EventRepository.GetEventOccurrencesByEventID(ctx, input.ID)
+	if err != nil || len(occurrences) == 0 {
 		return nil, err
 	}
 
-	key = occurences[0].Event.HeaderImageS3Key
+	key = occurrences[0].Event.HeaderImageS3Key
 
 	if image_data != nil {
 

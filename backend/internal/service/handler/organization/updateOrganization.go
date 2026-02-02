@@ -17,12 +17,12 @@ func (h *Handler) UpdateOrganization(ctx context.Context, input *models.UpdateOr
 	var key *string
 	var url *string
 
-	occurence, err := h.OrganizationRepository.GetOrganizationByID(ctx, input.ID)
+	occurrence, err := h.OrganizationRepository.GetOrganizationByID(ctx, input.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	key = occurence.PfpS3Key
+	key = occurrence.PfpS3Key
 
 	if image_data != nil {
 
