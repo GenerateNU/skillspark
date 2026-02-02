@@ -69,8 +69,6 @@ func SetupAuthRoutes(api huma.API, repo *storage.Repository, config config.Confi
 			return nil, err
 		}
 
-		// TODO: set cookies
-
 		return guardianRes, nil
 	})
 
