@@ -11,20 +11,11 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 	var key *string
 	var url *string
 
-	occurrences, err := h.EventRepository.GetEventOccurrencesByEventID(ctx, input.ID)
-	if err != nil || len(occurrences) == 0 {
-		return nil, err
-	}
-
-	key = occurrences[0].Event.HeaderImageS3Key
-
 	if image_data != nil {
 
-		if key == nil {
-			key, err = h.generateS3Key(input.ID)
-			if err != nil {
-				return nil, err
-			}
+		key, err := h.generateS3Key(input.ID)
+		if err != nil {
+			return nil, err
 		}
 
 		uploadedUrl, errr := s3Client.UploadImage(ctx, key, *image_data)

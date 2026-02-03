@@ -328,13 +328,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			imageData: nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, existingID).Return(&models.Organization{
-					ID:       existingID,
-					Name:     "Old Name",
-					Active:   true,
-					PfpS3Key: nil,
-				}, nil)
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), mock.Anything).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(&models.Organization{
 					ID:        existingID,
 					Name:      "Updated Name",
 					Active:    true,
@@ -359,13 +353,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			imageData: nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, existingID).Return(&models.Organization{
-					ID:       existingID,
-					Name:     "Old Name",
-					Active:   true,
-					PfpS3Key: nil,
-				}, nil)
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), mock.Anything).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(&models.Organization{
 					ID:        existingID,
 					Name:      "Updated Name",
 					Active:    false,
@@ -389,12 +377,6 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			imageData: &dummyImageData,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, existingID).Return(&models.Organization{
-					ID:       existingID,
-					Name:     "Old Name",
-					Active:   true,
-					PfpS3Key: nil,
-				}, nil)
 				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), mock.Anything).Return(&models.Organization{
 					ID:        existingID,
 					Name:      "Updated Name",
@@ -421,12 +403,6 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			imageData: &dummyImageData,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, existingID).Return(&models.Organization{
-					ID:       existingID,
-					Name:     "Old Name",
-					Active:   true,
-					PfpS3Key: &pfpKey, // existing key
-				}, nil)
 				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), mock.Anything).Return(&models.Organization{
 					ID:        existingID,
 					Name:      "Updated Name",
@@ -444,7 +420,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			wantURL: true,
 		},
 		{
-			name: "organization not found on get",
+			name: "organization not found on update",
 			input: &models.UpdateOrganizationInput{
 				ID: existingID,
 				Body: models.UpdateOrganizationBody{
@@ -453,7 +429,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			imageData: nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, existingID).Return(nil, &errs.HTTPError{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(nil, &errs.HTTPError{
 					Code:    errs.NotFound("Organization", "id", existingID.String()).Code,
 					Message: "Organization not found",
 				})

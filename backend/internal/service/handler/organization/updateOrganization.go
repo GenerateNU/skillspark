@@ -17,23 +17,12 @@ func (h *Handler) UpdateOrganization(ctx context.Context, input *models.UpdateOr
 	var key *string
 	var url *string
 
-	occurrence, err := h.OrganizationRepository.GetOrganizationByID(ctx, input.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	key = occurrence.PfpS3Key
-
 	if image_data != nil {
 
-		if key == nil {
-			var genErr error
-			key, genErr = h.generateS3Key(input.ID)
-			if genErr != nil {
-				return nil, genErr
-			}
+		key, genErr := h.generateS3Key(input.ID)
+		if genErr != nil {
+			return nil, genErr
 		}
-
 		uploadedUrl, errr := s3Client.UploadImage(ctx, key, *image_data)
 		if errr != nil {
 			return nil, errr.(*errs.HTTPError)
@@ -43,10 +32,11 @@ func (h *Handler) UpdateOrganization(ctx context.Context, input *models.UpdateOr
 	}
 
 	organization, updateErr := h.OrganizationRepository.UpdateOrganization(ctx, input, key)
-	organization.PresignedURL = url
 	if updateErr != nil {
 		return nil, updateErr
 	}
+
+	organization.PresignedURL = url
 
 	return organization, nil
 }

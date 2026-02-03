@@ -215,16 +215,7 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			}(),
 			imageData: nil,
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				m.On("GetEventOccurrencesByEventID", mock.Anything, eventID).Return([]models.EventOccurrence{
-					{
-						ID: uuid.New(),
-						Event: models.Event{
-							ID:               eventID,
-							HeaderImageS3Key: &headerKey,
-						},
-					},
-				}, nil)
-				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput"), mock.Anything).Return(&models.Event{
+				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput"), (*string)(nil)).Return(&models.Event{
 					ID:          eventID,
 					Title:       "Updated Robotics",
 					Description: "Intro to robotics",
@@ -249,15 +240,6 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			}(),
 			imageData: createDummyImageData(),
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				m.On("GetEventOccurrencesByEventID", mock.Anything, eventID).Return([]models.EventOccurrence{
-					{
-						ID: uuid.New(),
-						Event: models.Event{
-							ID:               eventID,
-							HeaderImageS3Key: &headerKey,
-						},
-					},
-				}, nil)
 				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput"), mock.Anything).Return(&models.Event{
 					ID:               eventID,
 					Title:            "Updated Robotics with Image",
@@ -283,7 +265,11 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			}(),
 			imageData: nil,
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				m.On("GetEventOccurrencesByEventID", mock.Anything, uuid.MustParse("00000000-0000-0000-0000-000000000000")).Return([]models.EventOccurrence{}, nil)
+				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput"), (*string)(nil)).Return(&models.Event{
+					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
 			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				// No S3 calls expected
@@ -308,10 +294,6 @@ func TestHandler_UpdateEvent(t *testing.T) {
 
 			if tt.wantErr {
 				assert.NotNil(t, err)
-				assert.Nil(t, event)
-			} else if tt.name == "no occurrences found - returns message string" {
-
-				assert.Nil(t, err)
 				assert.Nil(t, event)
 			} else {
 				assert.Nil(t, err)
