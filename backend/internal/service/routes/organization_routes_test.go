@@ -446,17 +446,6 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 					uuid.UUID{},
 				).Return(nil, nil)
 				m.On(
-					"GetOrganizationByID",
-					mock.Anything,
-					orgID,
-				).Return(&models.Organization{
-					ID:        orgID,
-					Name:      "Old Name",
-					Active:    true,
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
-				}, nil)
-				m.On(
 					"UpdateOrganization",
 					mock.Anything,
 					mock.AnythingOfType("*models.UpdateOrganizationInput"),

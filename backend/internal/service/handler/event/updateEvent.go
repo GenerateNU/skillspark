@@ -27,11 +27,11 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 	}
 
 	event, err := h.EventRepository.UpdateEvent(ctx, input, key)
-	event.PresignedURL = url
-
 	if err != nil {
 		return nil, err
 	}
+
+	event.PresignedURL = url
 
 	return event, nil
 }

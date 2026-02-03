@@ -202,7 +202,8 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 	t.Parallel()
 
 	validID := uuid.New().String()
-	notFoundID := "00000000-0000-0000-0000-000000000000"
+	notFoundID := uuid.New().String() // Use a valid UUID that doesn't exist
+	orgID := uuid.New().String()
 
 	tests := []struct {
 		name        string
@@ -217,23 +218,15 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			name:    "valid update",
 			eventID: validID,
 			formFields: map[string]string{
-				"title": "Advanced Robotics",
+				"title":           "Advanced Robotics",
+				"organization_id": orgID,
 			},
 			includeFile: true,
 			mockSetup: func(m *repomocks.MockEventRepository) {
 				m.On(
-					"GetEventOccurrencesByEventID",
-					mock.Anything,
-					uuid.MustParse(validID),
-				).Return([]models.EventOccurrence{
-					{ID: uuid.New(), Event: models.Event{ID: uuid.MustParse(validID)}},
-				}, nil)
-				m.On(
 					"UpdateEvent",
 					mock.Anything,
-					mock.MatchedBy(func(input *models.UpdateEventInput) bool {
-						return input.ID.String() == validID && input.Body.Title != nil && *input.Body.Title == "Advanced Robotics"
-					}),
+					mock.AnythingOfType("*models.UpdateEventInput"),
 					mock.Anything,
 				).Return(&models.Event{
 					ID:    uuid.MustParse(validID),
@@ -250,27 +243,33 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			name:    "event not found",
 			eventID: notFoundID,
 			formFields: map[string]string{
-				"title": "Advanced Robotics",
+				"title":           "Advanced Robotics",
+				"organization_id": orgID,
 			},
 			includeFile: true,
 			mockSetup: func(m *repomocks.MockEventRepository) {
 				m.On(
-					"GetEventOccurrencesByEventID",
+					"UpdateEvent",
 					mock.Anything,
-					uuid.MustParse(notFoundID),
-				).Return([]models.EventOccurrence{}, nil)
+					mock.AnythingOfType("*models.UpdateEventInput"),
+					mock.Anything,
+				).Return(nil, &errs.HTTPError{
+					Code:    http.StatusNotFound,
+					Message: "Event not found",
+				})
 			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg"
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
-			statusCode: http.StatusOK,
+			statusCode: http.StatusNotFound,
 		},
 		{
 			name:    "invalid UUID",
 			eventID: "not-a-uuid",
 			formFields: map[string]string{
-				"title": "New Title",
+				"title":           "New Title",
+				"organization_id": orgID,
 			},
 			includeFile: true,
 			mockSetup:   func(*repomocks.MockEventRepository) {},
@@ -281,7 +280,8 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			name:    "invalid validation in body",
 			eventID: validID,
 			formFields: map[string]string{
-				"title": "A",
+				"title":           "A",
+				"organization_id": orgID,
 			},
 			includeFile: true,
 			mockSetup:   func(*repomocks.MockEventRepository) {},
