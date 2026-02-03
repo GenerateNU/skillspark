@@ -15,8 +15,10 @@ func TestGetRegistrationByID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	registrationID := uuid.MustParse("80000000-0000-0000-0000-000000000001")
+	reg := CreateTestRegistration(t, ctx, testDB)
+	registrationID := reg.ID
 
 	getInput := &models.GetRegistrationByIDInput{
 		ID: registrationID,
@@ -41,8 +43,11 @@ func TestGetRegistrationByID_VerifyEventDetails(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	registrationID := uuid.MustParse("80000000-0000-0000-0000-000000000006")
+	reg := CreateTestRegistration(t, ctx, testDB)
+
+	registrationID := reg.ID
 
 	getInput := &models.GetRegistrationByIDInput{
 		ID: registrationID,
@@ -76,18 +81,18 @@ func TestGetRegistrationByID_MultipleDifferentRegistrations(t *testing.T) {
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 
-	registrationID1 := uuid.MustParse("80000000-0000-0000-0000-000000000001")
-	registrationID2 := uuid.MustParse("80000000-0000-0000-0000-000000000002")
+	reg1 := CreateTestRegistration(t, ctx, testDB)
+	reg2 := CreateTestRegistration(t, ctx, testDB)
 
 	getInput1 := &models.GetRegistrationByIDInput{
-		ID: registrationID1,
+		ID: reg1.ID,
 	}
 	retrieved1, err := repo.GetRegistrationByID(ctx, getInput1)
 	require.Nil(t, err)
 	require.NotNil(t, retrieved1)
 
 	getInput2 := &models.GetRegistrationByIDInput{
-		ID: registrationID2,
+		ID: reg2.ID,
 	}
 	retrieved2, err := repo.GetRegistrationByID(ctx, getInput2)
 	require.Nil(t, err)

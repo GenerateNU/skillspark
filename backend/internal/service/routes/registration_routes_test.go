@@ -379,7 +379,8 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"event_occurrence_id": eventOccurrenceID,
 				"status":              "registered",
 			},
-			mockSetup:  func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository) {},
+			mockSetup: func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository) {
+			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
@@ -390,7 +391,8 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"event_occurrence_id": eventOccurrenceID,
 				"status":              "registered",
 			},
-			mockSetup:  func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository) {},
+			mockSetup: func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository) {
+			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 	}

@@ -3,6 +3,7 @@ package organization
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
@@ -15,6 +16,7 @@ func TestUpdateOrganization(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Create an organization first
 	active := true
@@ -57,6 +59,7 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Create organization
 	active := true
@@ -72,7 +75,7 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	require.NotNil(t, created)
 
 	// Update with location
-	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 	newName := "Test Org with Location"
 	updateInput := &models.UpdateOrganizationInput{
 		ID: created.ID,
@@ -93,6 +96,7 @@ func TestUpdateOrganization_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Try to update non-existent organization
 	nonExistentID := uuid.New()

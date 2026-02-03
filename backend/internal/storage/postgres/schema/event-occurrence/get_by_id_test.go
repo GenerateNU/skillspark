@@ -2,14 +2,14 @@ package eventoccurrence
 
 import (
 	"context"
-	"testing"
 	"skillspark/internal/storage/postgres/testutil"
+	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T){
+func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
@@ -17,6 +17,7 @@ func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T){
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventOccurrenceRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// check that get by id works for 3 different event occurrences
 	eventOccurrence1, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000001"))

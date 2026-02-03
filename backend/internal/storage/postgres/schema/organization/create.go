@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, *errs.HTTPError) {
+func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, error) {
 
 	query, err := schema.ReadSQLBaseScript("organization/sql/create.sql")
 	if err != nil {
@@ -34,8 +34,7 @@ func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *
 		&createdOrganization.UpdatedAt,
 	)
 	if err != nil {
-		errr := errs.InternalServerError("Failed to create organization: ", err.Error())
-		return nil, &errr
+		return nil, err
 	}
 
 	return &createdOrganization, nil

@@ -19,6 +19,7 @@ func TestEventRepository_Delete_JuniorRoboticsWorkshop(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	eventInput := func() *models.CreateEventInput {
 		input := &models.CreateEventInput{}
