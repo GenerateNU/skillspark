@@ -428,7 +428,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, registration)
-				assert.Equal(t, tt.input.Body.ChildID, registration.Body.ChildID)
+				assert.Equal(t, &(tt.input.Body.ChildID), registration.Body.ChildID)
 			}
 
 			mockRegRepo.AssertExpectations(t)

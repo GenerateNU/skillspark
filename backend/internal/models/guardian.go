@@ -36,6 +36,7 @@ type GetGuardianByChildIDInput struct {
 
 type CreateGuardianInput struct {
 	Body struct {
+		UserID              uuid.UUID `json:"user_id" doc:"User ID associated with the guardian"`
 		Name                string  `json:"name" doc:"Name of the guardian"`
 		Email               string  `json:"email" doc:"Email of the guardian"`
 		Username            string  `json:"username" doc:"Username of the guardian"`

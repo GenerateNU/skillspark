@@ -40,6 +40,7 @@ type GetManagerByOrgIDOutput struct {
 // create
 type CreateManagerInput struct {
 	Body struct {
+		UserID              uuid.UUID  `json:"user_id" doc:"User ID associated with the manager"`
 		Name                string     `json:"name" doc:"Name of the guardian"`
 		Email               string     `json:"email" doc:"Email of the guardian"`
 		Username            string     `json:"username" doc:"Username of the guardian"`
