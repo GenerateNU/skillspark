@@ -27,17 +27,19 @@ type App struct {
 }
 
 // Initialize the App union type containing a fiber app and repository.
-func InitApp(config config.Config) *App {
+func InitApp(config config.Config) (*App, error) {
 	ctx := context.Background()
 	repo := postgres.NewRepository(ctx, config.DB)
-	// might need to check this error
-	s3Client, _ := s3_client.NewClient(config.S3)
+	s3Client, err := s3_client.NewClient(config.S3)
+	if err != nil {
+		return nil, err
+	}
 	app, humaAPI := SetupApp(config, repo, s3Client)
 	return &App{
 		Server: app,
 		Repo:   repo,
 		API:    humaAPI,
-	}
+	}, nil
 }
 
 // Setup the fiber app with the specified configuration and database.

@@ -14,20 +14,32 @@ func (h *Handler) GetAllOrganizations(ctx context.Context, pagination utils.Pagi
 		return nil, err
 	}
 
-	for i := 0; i < len(organizations); i++ {
-		key := organizations[i].PfpS3Key
-		if key != nil {
-			url, httpErr := s3Client.GeneratePresignedURL(ctx, *key, time.Hour)
-			if httpErr != nil {
-				return nil, httpErr
-			}
-			organizations[i].PresignedURL = &url
-
-		} else {
-			organizations[i].PresignedURL = nil
+	for idx := range organizations {
+		_, err := GetAllS3Helper(ctx, s3Client, idx, organizations)
+		if err != nil {
+			return nil, err
 		}
 	}
 
 	return organizations, nil
 
+}
+
+// helper for iterating over all organizations and grabbing presigned url
+func GetAllS3Helper(ctx context.Context, s3Client s3_client.S3Interface, idx int, organizations []models.Organization) ([]models.Organization, error) {
+
+	key := organizations[idx].PfpS3Key
+
+	if key != nil {
+		url, httpErr := s3Client.GeneratePresignedURL(ctx, *key, time.Hour)
+		if httpErr != nil {
+			return nil, httpErr
+		}
+		organizations[idx].PresignedURL = &url
+
+	} else {
+		organizations[idx].PresignedURL = nil
+	}
+
+	return organizations, nil
 }

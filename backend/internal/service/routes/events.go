@@ -52,7 +52,6 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 
 		image_data, err := io.ReadAll(formData.HeaderImage)
 		if err != nil {
-			fmt.Println(err)
 			return nil, err
 		}
 
@@ -60,7 +59,6 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 		event, err := eventHandler.CreateEvent(ctx, &eventModel, &updateBody, &image_data, s3Client)
 
 		if err != nil {
-			fmt.Println(err)
 			return nil, err
 		}
 
