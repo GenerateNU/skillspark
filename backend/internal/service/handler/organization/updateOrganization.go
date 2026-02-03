@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/s3_client"
 )
 
-func (h *Handler) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput, image_data *[]byte, s3Client *s3_client.Client) (*models.Organization, error) {
+func (h *Handler) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput, image_data *[]byte, s3Client s3_client.S3Interface) (*models.Organization, error) {
 	if input.Body.LocationID != nil {
 		if _, err := h.LocationRepository.GetLocationByID(ctx, *input.Body.LocationID); err != nil {
 			return nil, errs.BadRequest("Invalid location_id: location does not exist")

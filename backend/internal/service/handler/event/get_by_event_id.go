@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput, s3Client *s3_client.Client) ([]models.EventOccurrence, error) {
+func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput, s3Client s3_client.S3Interface) ([]models.EventOccurrence, error) {
 	id, parse_err := uuid.Parse(input.ID.String())
 	if parse_err != nil {
 		return nil, errs.BadRequest("Invalid ID format")

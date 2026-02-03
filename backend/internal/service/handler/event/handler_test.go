@@ -3,37 +3,23 @@ package event
 import (
 	"context"
 	"net/url"
-	"os"
-	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-	"skillspark/internal/s3_client"
+	s3mocks "skillspark/internal/s3_client/mocks"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
-// createTestS3Client creates an S3 client for testing using credentials from .env
-func createTestS3Client(t *testing.T) *s3_client.Client {
-	// Load .env file
-	_ = godotenv.Load("../../../../.env")
-
-	s3Config := config.S3{
-		Bucket:    os.Getenv("AWS_S3_BUCKET"),
-		Region:    os.Getenv("AWS_REGION"),
-		AccessKey: os.Getenv("AWS_ACCESS_KEY_ID"),
-		SecretKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
-	}
-	client, err := s3_client.NewClient(s3Config)
-	require.NoError(t, err)
-	return client
+// createMockS3Client creates a mock S3 client for testing
+func createMockS3Client() *s3mocks.S3ClientMock {
+	return new(s3mocks.S3ClientMock)
 }
 
 // createDummyImageData
@@ -51,13 +37,14 @@ func TestHandler_CreateEvent(t *testing.T) {
 	headerKey := "events/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11/header.jpg"
 
 	tests := []struct {
-		name       string
-		input      *models.CreateEventInput
-		updateBody *models.UpdateEventBody
-		imageData  *[]byte
-		mockSetup  func(*repomocks.MockEventRepository)
-		wantErr    bool
-		wantURL    bool
+		name         string
+		input        *models.CreateEventInput
+		updateBody   *models.UpdateEventBody
+		imageData    *[]byte
+		mockSetup    func(*repomocks.MockEventRepository)
+		mockS3Setup  func(*s3mocks.S3ClientMock)
+		wantErr      bool
+		wantURL      bool
 	}{
 		{
 			name: "successful create event without image",
@@ -88,6 +75,9 @@ func TestHandler_CreateEvent(t *testing.T) {
 					CreatedAt:      time.Now(),
 					UpdatedAt:      time.Now(),
 				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no image
 			},
 			wantErr: false,
 			wantURL: false,
@@ -132,6 +122,10 @@ func TestHandler_CreateEvent(t *testing.T) {
 					UpdatedAt:        time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg?X-Amz-Signature=abc123"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
 			wantErr: false,
 			wantURL: true,
 		},
@@ -151,6 +145,9 @@ func TestHandler_CreateEvent(t *testing.T) {
 						Message: "Internal server error",
 					})
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
+			},
 			wantErr: true,
 			wantURL: false,
 		},
@@ -161,11 +158,13 @@ func TestHandler_CreateEvent(t *testing.T) {
 			mockRepo := new(repomocks.MockEventRepository)
 			tt.mockSetup(mockRepo)
 
-			s3Client := createTestS3Client(t)
-			handler := NewHandler(mockRepo, s3Client)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockRepo, mockS3)
 			ctx := context.Background()
 
-			event, err := handler.CreateEvent(ctx, tt.input, tt.updateBody, tt.imageData, s3Client)
+			event, err := handler.CreateEvent(ctx, tt.input, tt.updateBody, tt.imageData, mockS3)
 
 			if tt.wantErr {
 				assert.NotNil(t, err)
@@ -182,13 +181,12 @@ func TestHandler_CreateEvent(t *testing.T) {
 				parsedURL, parseErr := url.Parse(*event.PresignedURL)
 				require.NoError(t, parseErr, "presigned URL should be valid")
 				assert.True(t, strings.HasPrefix(parsedURL.Scheme, "http"), "URL should have http/https scheme")
-				assert.Contains(t, parsedURL.Host, "amazonaws.com", "URL should be an AWS S3 URL")
-				assert.NotEmpty(t, parsedURL.RawQuery, "presigned URL should have query parameters")
 			} else if !tt.wantErr {
 				assert.Nil(t, event.PresignedURL, "expected no presigned URL when no image data provided")
 			}
 
 			mockRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }
@@ -198,12 +196,13 @@ func TestHandler_UpdateEvent(t *testing.T) {
 	headerKey := "events/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11/header.jpg"
 
 	tests := []struct {
-		name      string
-		input     *models.UpdateEventInput
-		imageData *[]byte
-		mockSetup func(*repomocks.MockEventRepository)
-		wantErr   bool
-		wantURL   bool
+		name        string
+		input       *models.UpdateEventInput
+		imageData   *[]byte
+		mockSetup   func(*repomocks.MockEventRepository)
+		mockS3Setup func(*s3mocks.S3ClientMock)
+		wantErr     bool
+		wantURL     bool
 	}{
 		{
 			name: "successful update event without image",
@@ -232,6 +231,9 @@ func TestHandler_UpdateEvent(t *testing.T) {
 					CreatedAt:   time.Now(),
 					UpdatedAt:   time.Now(),
 				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no image
 			},
 			wantErr: false,
 			wantURL: false,
@@ -265,6 +267,10 @@ func TestHandler_UpdateEvent(t *testing.T) {
 					UpdatedAt:        time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg?X-Amz-Signature=abc123"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
 			wantErr: false,
 			wantURL: true,
 		},
@@ -279,6 +285,9 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			mockSetup: func(m *repomocks.MockEventRepository) {
 				m.On("GetEventOccurrencesByEventID", mock.Anything, uuid.MustParse("00000000-0000-0000-0000-000000000000")).Return([]models.EventOccurrence{}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected
+			},
 			wantErr: false,
 			wantURL: false,
 		},
@@ -289,11 +298,13 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			mockRepo := new(repomocks.MockEventRepository)
 			tt.mockSetup(mockRepo)
 
-			s3Client := createTestS3Client(t)
-			handler := NewHandler(mockRepo, s3Client)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockRepo, mockS3)
 			ctx := context.Background()
 
-			event, err := handler.UpdateEvent(ctx, tt.input, tt.imageData, s3Client)
+			event, err := handler.UpdateEvent(ctx, tt.input, tt.imageData, mockS3)
 
 			if tt.wantErr {
 				assert.NotNil(t, err)
@@ -316,11 +327,10 @@ func TestHandler_UpdateEvent(t *testing.T) {
 				parsedURL, parseErr := url.Parse(*event.PresignedURL)
 				require.NoError(t, parseErr, "presigned URL should be valid")
 				assert.True(t, strings.HasPrefix(parsedURL.Scheme, "http"), "URL should have http/https scheme")
-				assert.Contains(t, parsedURL.Host, "amazonaws.com", "URL should be an AWS S3 URL")
-				assert.NotEmpty(t, parsedURL.RawQuery, "presigned URL should have query parameters")
 			}
 
 			mockRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }
@@ -364,8 +374,8 @@ func TestHandler_DeleteEvent(t *testing.T) {
 			mockRepo := new(repomocks.MockEventRepository)
 			tt.mockSetup(mockRepo)
 
-			s3Client := createTestS3Client(t)
-			handler := NewHandler(mockRepo, s3Client)
+			mockS3 := createMockS3Client()
+			handler := NewHandler(mockRepo, mockS3)
 			ctx := context.Background()
 
 			msg, err := handler.DeleteEvent(ctx, tt.id)
@@ -427,6 +437,7 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 		name             string
 		id               string
 		mockSetup        func(*repomocks.MockEventRepository)
+		mockS3Setup      func(*s3mocks.S3ClientMock)
 		wantErr          bool
 		statusCode       *int
 		messageSubstring *string
@@ -468,6 +479,9 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 					},
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				m.On("GeneratePresignedURL", mock.Anything, jpg, time.Hour).Return("https://test-bucket.s3.amazonaws.com/events/robotics_workshop.jpg", nil)
+			},
 			wantErr: false,
 		},
 		{
@@ -479,6 +493,9 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse("00000000-0000-0000-0000-000000000000"),
 				).Return(make([]models.EventOccurrence, 0), nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no occurrences
 			},
 			wantErr: false,
 		},
@@ -492,12 +509,14 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 			mockRepo := new(repomocks.MockEventRepository)
 			tt.mockSetup(mockRepo)
 
-			s3Client := createTestS3Client(t)
-			handler := NewHandler(mockRepo, s3Client)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockRepo, mockS3)
 			ctx := context.Background()
 
 			input := &models.GetEventOccurrencesByEventIDInput{ID: uuid.MustParse(tt.id)}
-			eventOccurrences, err := handler.GetEventOccurrencesByEventID(ctx, input, s3Client)
+			eventOccurrences, err := handler.GetEventOccurrencesByEventID(ctx, input, mockS3)
 
 			assert.Nil(t, err)
 			assert.NotNil(t, eventOccurrences)
@@ -507,6 +526,7 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 				assert.Equal(t, 0, len(eventOccurrences))
 			}
 			mockRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }

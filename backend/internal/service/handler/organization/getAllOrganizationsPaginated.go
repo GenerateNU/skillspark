@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (h *Handler) GetAllOrganizations(ctx context.Context, pagination utils.Pagination, s3Client *s3_client.Client) ([]models.Organization, error) {
+func (h *Handler) GetAllOrganizations(ctx context.Context, pagination utils.Pagination, s3Client s3_client.S3Interface) ([]models.Organization, error) {
 	organizations, err := h.OrganizationRepository.GetAllOrganizations(ctx, pagination)
 	if err != nil {
 		return nil, err

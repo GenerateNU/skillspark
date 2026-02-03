@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) GetOrganizationById(ctx context.Context, input *models.GetOrganizationByIDInput, s3Client *s3_client.Client) (*models.Organization, error) {
+func (h *Handler) GetOrganizationById(ctx context.Context, input *models.GetOrganizationByIDInput, s3Client s3_client.S3Interface) (*models.Organization, error) {
 	id, err := uuid.Parse(input.ID.String())
 	if err != nil {
 		return nil, errs.BadRequest("Invalid ID format")

@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/s3_client"
 )
 
-func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInput, updateBody *models.UpdateEventBody, image_data *[]byte, s3Client *s3_client.Client) (*models.Event, error) {
+func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInput, updateBody *models.UpdateEventBody, image_data *[]byte, s3Client s3_client.S3Interface) (*models.Event, error) {
 	var key *string
 	var url *string
 

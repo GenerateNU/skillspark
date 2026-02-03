@@ -4,11 +4,9 @@ import (
 	"context"
 	"net/http/httptest"
 	"net/url"
-	"os"
-	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-	"skillspark/internal/s3_client"
+	s3mocks "skillspark/internal/s3_client/mocks"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"skillspark/internal/utils"
 	"strings"
@@ -17,26 +15,14 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
-// createTestS3Client creates an S3 client for testing using credentials from .env
-func createTestS3Client(t *testing.T) *s3_client.Client {
-	// Load .env file from backend root
-	_ = godotenv.Load("../../../../.env")
-
-	s3Config := config.S3{
-		Bucket:    os.Getenv("AWS_S3_BUCKET"),
-		Region:    os.Getenv("AWS_REGION"),
-		AccessKey: os.Getenv("AWS_ACCESS_KEY_ID"),
-		SecretKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
-	}
-	client, err := s3_client.NewClient(s3Config)
-	require.NoError(t, err)
-	return client
+// createMockS3Client creates a mock S3 client for testing
+func createMockS3Client() *s3mocks.S3ClientMock {
+	return new(s3mocks.S3ClientMock)
 }
 
 func TestHandler_GetOrganizationById(t *testing.T) {
@@ -44,6 +30,7 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 		name           string
 		id             string
 		mockSetup      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockS3Setup    func(*s3mocks.S3ClientMock)
 		expectedStatus int
 		wantErr        bool
 	}{
@@ -63,6 +50,9 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 					UpdatedAt:  time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				m.On("GeneratePresignedURL", mock.Anything, "orgs/profile.jpg", mock.Anything).Return("https://test-bucket.s3.amazonaws.com/orgs/profile.jpg", nil)
+			},
 			expectedStatus: 200,
 			wantErr:        false,
 		},
@@ -74,6 +64,9 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 					Code:    errs.InternalServerError("Internal server error").Code,
 					Message: "Internal server error",
 				})
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
 			},
 			expectedStatus: 500,
 			wantErr:        true,
@@ -89,12 +82,14 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			s3Client := createTestS3Client(t)
-			handler := NewHandler(mockOrgRepo, mockLocRepo, s3Client)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
 			app.Get("/organizations/:id", func(c *fiber.Ctx) error {
 				output, err := handler.GetOrganizationById(c.Context(), &models.GetOrganizationByIDInput{
 					ID: uuid.MustParse(c.Params("id")),
-				}, s3Client)
+				}, mockS3)
 				if err != nil {
 					return err
 				}
@@ -106,6 +101,7 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 
 			assert.Equal(t, tt.expectedStatus, res.StatusCode)
 			mockOrgRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }
@@ -121,13 +117,14 @@ func TestHandler_CreateOrganization(t *testing.T) {
 	pfpKey := "orgs/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11/pfp.jpg"
 
 	tests := []struct {
-		name       string
-		input      *models.CreateOrganizationInput
-		updateBody *models.UpdateOrganizationBody
-		imageData  *[]byte
-		mockSetup  func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
-		wantErr    bool
-		wantURL    bool
+		name        string
+		input       *models.CreateOrganizationInput
+		updateBody  *models.UpdateOrganizationBody
+		imageData   *[]byte
+		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockS3Setup func(*s3mocks.S3ClientMock)
+		wantErr     bool
+		wantURL     bool
 	}{
 		{
 			name: "successful create without location",
@@ -146,6 +143,9 @@ func TestHandler_CreateOrganization(t *testing.T) {
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no image
 			},
 			wantErr: false,
 			wantURL: false,
@@ -171,6 +171,9 @@ func TestHandler_CreateOrganization(t *testing.T) {
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no image
 			},
 			wantErr: false,
 			wantURL: false,
@@ -202,6 +205,10 @@ func TestHandler_CreateOrganization(t *testing.T) {
 					UpdatedAt: time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/test/pfp.jpg?X-Amz-Signature=abc123"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
 			wantErr: false,
 			wantURL: true,
 		},
@@ -221,6 +228,9 @@ func TestHandler_CreateOrganization(t *testing.T) {
 					Message: "Location not found",
 				})
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
+			},
 			wantErr: true,
 			wantURL: false,
 		},
@@ -239,6 +249,9 @@ func TestHandler_CreateOrganization(t *testing.T) {
 					Message: "Database error",
 				})
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
+			},
 			wantErr: true,
 			wantURL: false,
 		},
@@ -250,9 +263,11 @@ func TestHandler_CreateOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			s3Client := createTestS3Client(t)
-			handler := NewHandler(mockOrgRepo, mockLocRepo, s3Client)
-			output, err := handler.CreateOrganization(context.TODO(), tt.input, tt.updateBody, tt.imageData, s3Client)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			output, err := handler.CreateOrganization(context.TODO(), tt.input, tt.updateBody, tt.imageData, mockS3)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -268,14 +283,13 @@ func TestHandler_CreateOrganization(t *testing.T) {
 				parsedURL, parseErr := url.Parse(*output.PresignedURL)
 				require.NoError(t, parseErr, "presigned URL should be valid")
 				assert.True(t, strings.HasPrefix(parsedURL.Scheme, "http"), "URL should have http/https scheme")
-				assert.Contains(t, parsedURL.Host, "amazonaws.com", "URL should be an AWS S3 URL")
-				assert.NotEmpty(t, parsedURL.RawQuery, "presigned URL should have query parameters")
 			} else if !tt.wantErr {
 				assert.Nil(t, output.PresignedURL, "expected no presigned URL when no image data provided")
 			}
 
 			mockOrgRepo.AssertExpectations(t)
 			mockLocRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }
@@ -296,12 +310,13 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 	}
 
 	tests := []struct {
-		name      string
-		input     *models.UpdateOrganizationInput
-		imageData *[]byte
-		mockSetup func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
-		wantErr   bool
-		wantURL   bool
+		name        string
+		input       *models.UpdateOrganizationInput
+		imageData   *[]byte
+		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockS3Setup func(*s3mocks.S3ClientMock)
+		wantErr     bool
+		wantURL     bool
 	}{
 		{
 			name: "successful update name only",
@@ -326,6 +341,9 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no image
 			},
 			wantErr: false,
 			wantURL: false,
@@ -355,6 +373,9 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 					UpdatedAt: time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no image
+			},
 			wantErr: false,
 			wantURL: false,
 		},
@@ -382,6 +403,10 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/test/pfp.jpg?X-Amz-Signature=abc123"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
 			wantErr: false,
 			wantURL: true,
@@ -411,6 +436,10 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 					UpdatedAt: time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/test/pfp.jpg?X-Amz-Signature=abc123"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
 			wantErr: false,
 			wantURL: true,
 		},
@@ -428,6 +457,9 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 					Code:    errs.NotFound("Organization", "id", existingID.String()).Code,
 					Message: "Organization not found",
 				})
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
 			},
 			wantErr: true,
 			wantURL: false,
@@ -447,6 +479,9 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 					Message: "Location not found",
 				})
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
+			},
 			wantErr: true,
 			wantURL: false,
 		},
@@ -458,9 +493,11 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			s3Client := createTestS3Client(t)
-			handler := NewHandler(mockOrgRepo, mockLocRepo, s3Client)
-			output, err := handler.UpdateOrganization(context.TODO(), tt.input, tt.imageData, s3Client)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			output, err := handler.UpdateOrganization(context.TODO(), tt.input, tt.imageData, mockS3)
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -478,14 +515,13 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 				parsedURL, parseErr := url.Parse(*output.PresignedURL)
 				require.NoError(t, parseErr, "presigned URL should be valid")
 				assert.True(t, strings.HasPrefix(parsedURL.Scheme, "http"), "URL should have http/https scheme")
-				assert.Contains(t, parsedURL.Host, "amazonaws.com", "URL should be an AWS S3 URL")
-				assert.NotEmpty(t, parsedURL.RawQuery, "presigned URL should have query parameters")
 			} else if !tt.wantErr {
 				assert.Nil(t, output.PresignedURL, "expected no presigned URL when no image data provided")
 			}
 
 			mockOrgRepo.AssertExpectations(t)
 			mockLocRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }
@@ -530,8 +566,8 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			s3Client := createTestS3Client(t)
-			handler := NewHandler(mockOrgRepo, mockLocRepo, s3Client)
+			mockS3 := createMockS3Client()
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
 			output, err := handler.DeleteOrganization(context.TODO(), &models.DeleteOrganizationInput{
 				ID: uuid.MustParse(tt.id),
 			})
@@ -554,6 +590,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 		name        string
 		pagination  utils.Pagination
 		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockS3Setup func(*s3mocks.S3ClientMock)
 		wantErr     bool
 		expectedLen int
 	}{
@@ -567,6 +604,9 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 				}
 				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(orgs, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no pfp keys
+			},
 			wantErr:     false,
 			expectedLen: 2,
 		},
@@ -578,6 +618,9 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 					{ID: uuid.New(), Name: "Org 3", Active: true},
 				}
 				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(orgs, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no pfp keys
 			},
 			wantErr:     false,
 			expectedLen: 1,
@@ -591,6 +634,9 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 					Message: "Database error",
 				})
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
+			},
 			wantErr:     true,
 			expectedLen: 0,
 		},
@@ -602,9 +648,11 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			s3Client := createTestS3Client(t)
-			handler := NewHandler(mockOrgRepo, mockLocRepo, s3Client)
-			output, err := handler.GetAllOrganizations(context.TODO(), tt.pagination, s3Client)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			output, err := handler.GetAllOrganizations(context.TODO(), tt.pagination, mockS3)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -615,6 +663,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			}
 
 			mockOrgRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }
@@ -729,8 +778,8 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			s3Client := createTestS3Client(t)
-			handler := NewHandler(mockRepo, mockLocationRepo, s3Client)
+			mockS3 := createMockS3Client()
+			handler := NewHandler(mockRepo, mockLocationRepo, mockS3)
 			ctx := context.Background()
 
 			input := &models.GetEventOccurrencesByOrganizationIDInput{ID: uuid.MustParse(tt.id)}
