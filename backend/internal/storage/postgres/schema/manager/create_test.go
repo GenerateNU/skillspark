@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/testutil"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
-// -------------------- Assistant Director --------------------
 func TestManagerRepository_Create_AssistantDirector(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
@@ -20,14 +20,17 @@ func TestManagerRepository_Create_AssistantDirector(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewManagerRepository(testDB)
 	ctx := context.Background()
-	ptr := uuid.MustParse("40000000-0000-0000-0000-000000000006")
+	t.Parallel()
+
+	organizationID := organization.CreateTestOrganization(t, ctx, testDB).ID
 	managerInput := func() *models.CreateManagerInput {
 		input := &models.CreateManagerInput{}
+		input.Body.UserID = uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c")
+		input.Body.OrganizationID = &organizationID
 		input.Body.Name = "Assistant Man"
 		input.Body.Email = "am@example.com"
 		input.Body.Username = "amanager"
 		input.Body.LanguagePreference = "en"
-		input.Body.OrganizationID = &ptr
 		input.Body.Role = "Assistant Manager"
 		return input
 	}()
@@ -35,7 +38,7 @@ func TestManagerRepository_Create_AssistantDirector(t *testing.T) {
 	manager, err := repo.CreateManager(ctx, managerInput)
 	assert.Nil(t, err)
 	assert.NotNil(t, manager.UserID)
-	assert.Equal(t, uuid.MustParse("40000000-0000-0000-0000-000000000006"), manager.OrganizationID)
+	assert.Equal(t, organizationID, manager.OrganizationID)
 	assert.Equal(t, "Assistant Manager", manager.Role)
 	assert.Equal(t, "Assistant Man", manager.Name)
 

@@ -14,7 +14,7 @@ type MockOrganizationRepository struct {
 	mock.Mock
 }
 
-func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput) (*models.Organization, *errs.HTTPError) {
+func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput) (*models.Organization, error) {
 	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
@@ -25,7 +25,7 @@ func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, inp
 	return args.Get(0).(*models.Organization), nil
 }
 
-func (m *MockOrganizationRepository) GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError) {
+func (m *MockOrganizationRepository) GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
@@ -36,7 +36,7 @@ func (m *MockOrganizationRepository) GetOrganizationByID(ctx context.Context, id
 	return args.Get(0).(*models.Organization), nil
 }
 
-func (m *MockOrganizationRepository) GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, *errs.HTTPError) {
+func (m *MockOrganizationRepository) GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, error) {
 	args := m.Called(ctx, pagination)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
@@ -47,7 +47,7 @@ func (m *MockOrganizationRepository) GetAllOrganizations(ctx context.Context, pa
 	return args.Get(0).([]models.Organization), nil
 }
 
-func (m *MockOrganizationRepository) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput) (*models.Organization, *errs.HTTPError) {
+func (m *MockOrganizationRepository) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput) (*models.Organization, error) {
 	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
@@ -58,7 +58,7 @@ func (m *MockOrganizationRepository) UpdateOrganization(ctx context.Context, inp
 	return args.Get(0).(*models.Organization), nil
 }
 
-func (m *MockOrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError) {
+func (m *MockOrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {

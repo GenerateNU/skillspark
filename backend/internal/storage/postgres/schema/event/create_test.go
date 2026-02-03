@@ -20,6 +20,7 @@ func TestEventRepository_Create_JuniorRoboticsWorkshop(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	eventInput := func() *models.CreateEventInput {
 		input := &models.CreateEventInput{}

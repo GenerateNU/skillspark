@@ -17,6 +17,7 @@ func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventOccurrenceRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// check that get by id works for 3 different event occurrences
 	eventOccurrence1, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000001"))

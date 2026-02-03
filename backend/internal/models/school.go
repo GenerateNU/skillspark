@@ -22,3 +22,10 @@ type GetAllSchoolsInput struct {
 	Page  int `query:"page" minimum:"1" default:"1"`
 	Limit int `query:"limit" minimum:"1" maximum:"100" default:"100"`
 }
+
+type CreateSchoolInput struct {
+	Body struct {
+		Name       string    `json:"name" db:"name" minLength:"1" maxLength:"200"`
+		LocationID uuid.UUID `json:"location_id" db:"location_id"`
+	}
+}

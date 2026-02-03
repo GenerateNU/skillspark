@@ -19,6 +19,7 @@ func TestGuardianRepository_Update_David_Kim(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewGuardianRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	guardianInput := func() *models.UpdateGuardianInput {
 		input := &models.UpdateGuardianInput{}

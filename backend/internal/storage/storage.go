@@ -2,11 +2,10 @@ package storage
 
 import (
 	"context"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/event"
-	"skillspark/internal/storage/postgres/schema/event-occurrence"
+	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
@@ -28,15 +27,16 @@ type LocationRepository interface {
 }
 
 type SchoolRepository interface {
+	CreateSchool(ctx context.Context, school *models.CreateSchoolInput) (*models.School, error)
 	GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error)
 }
 
 type OrganizationRepository interface {
-	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput) (*models.Organization, *errs.HTTPError)
-	GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
-	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, *errs.HTTPError)
-	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput) (*models.Organization, *errs.HTTPError)
-	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError)
+	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput) (*models.Organization, error)
+	GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, error)
+	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, error)
+	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput) (*models.Organization, error)
+	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error)
 	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID) ([]models.EventOccurrence, error)
 }
 

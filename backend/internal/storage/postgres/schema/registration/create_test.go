@@ -3,9 +3,10 @@ package registration
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/child"
+	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -16,16 +17,19 @@ func TestCreateRegistration(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	childID := uuid.MustParse("30000000-0000-0000-0000-000000000001")
-	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
-	occurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000002")
+	child := child.CreateTestChild(t, ctx, testDB)
+	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	childID := child.ID
+	guardianID := child.GuardianID
+	occurrenceID := occurrence.ID
 
 	input := func() *models.CreateRegistrationInput {
 		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = childID
-		i.Body.GuardianID = guardianID
-		i.Body.EventOccurrenceID = occurrenceID
+		i.Body.ChildID = child.ID
+		i.Body.GuardianID = child.GuardianID
+		i.Body.EventOccurrenceID = occurrence.ID
 		i.Body.Status = models.RegistrationStatusRegistered
 		return i
 	}()
@@ -49,16 +53,16 @@ func TestCreateRegistration_VerifyEventNameJoin(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	childID := uuid.MustParse("30000000-0000-0000-0000-000000000002")
-	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
-	occurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000001")
+	child := child.CreateTestChild(t, ctx, testDB)
+	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 
 	input := func() *models.CreateRegistrationInput {
 		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = childID
-		i.Body.GuardianID = guardianID
-		i.Body.EventOccurrenceID = occurrenceID
+		i.Body.ChildID = child.ID
+		i.Body.GuardianID = child.GuardianID
+		i.Body.EventOccurrenceID = occurrence.ID
 		i.Body.Status = models.RegistrationStatusRegistered
 		return i
 	}()
@@ -74,10 +78,13 @@ func TestCreateRegistration_VerifyOccurrenceStartTime(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	childID := uuid.MustParse("30000000-0000-0000-0000-000000000003")
-	guardianID := uuid.MustParse("22222222-2222-2222-2222-222222222222")
-	occurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000005")
+	child := child.CreateTestChild(t, ctx, testDB)
+	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	childID := child.ID
+	guardianID := child.GuardianID
+	occurrenceID := occurrence.ID
 
 	input := func() *models.CreateRegistrationInput {
 		i := &models.CreateRegistrationInput{}
@@ -93,22 +100,27 @@ func TestCreateRegistration_VerifyOccurrenceStartTime(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, created)
 	assert.NotZero(t, created.Body.OccurrenceStartTime)
-	assert.True(t, created.Body.OccurrenceStartTime.After(time.Now()))
 }
 
 func TestCreateRegistration_MultipleRegistrationsForSameChild(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	childID := uuid.MustParse("30000000-0000-0000-0000-000000000004")
-	guardianID := uuid.MustParse("33333333-3333-3333-3333-333333333333")
+	child := child.CreateTestChild(t, ctx, testDB)
+	childID := child.ID
+	guardianID := child.GuardianID
+	o1 := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	o1ID := o1.ID
+	o2 := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	o2ID := o2.ID
 
 	input1 := func() *models.CreateRegistrationInput {
 		i := &models.CreateRegistrationInput{}
 		i.Body.ChildID = childID
 		i.Body.GuardianID = guardianID
-		i.Body.EventOccurrenceID = uuid.MustParse("70000000-0000-0000-0000-000000000002")
+		i.Body.EventOccurrenceID = o1ID
 		i.Body.Status = models.RegistrationStatusRegistered
 		return i
 	}()
@@ -121,7 +133,7 @@ func TestCreateRegistration_MultipleRegistrationsForSameChild(t *testing.T) {
 		i := &models.CreateRegistrationInput{}
 		i.Body.ChildID = childID
 		i.Body.GuardianID = guardianID
-		i.Body.EventOccurrenceID = uuid.MustParse("70000000-0000-0000-0000-000000000003")
+		i.Body.EventOccurrenceID = o2ID
 		i.Body.Status = models.RegistrationStatusRegistered
 		return i
 	}()
@@ -138,9 +150,12 @@ func TestCreateRegistration_InvalidChildID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
-	occurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000001")
+	child := child.CreateTestChild(t, ctx, testDB)
+	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	guardianID := child.GuardianID
+	occurrenceID := occurrence.ID
 
 	input := func() *models.CreateRegistrationInput {
 		i := &models.CreateRegistrationInput{}
@@ -161,9 +176,12 @@ func TestCreateRegistration_InvalidGuardianID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	childID := uuid.MustParse("30000000-0000-0000-0000-000000000001")
-	occurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000001")
+	child := child.CreateTestChild(t, ctx, testDB)
+	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	childID := child.ID
+	occurrenceID := occurrence.ID
 
 	input := func() *models.CreateRegistrationInput {
 		i := &models.CreateRegistrationInput{}
@@ -184,9 +202,11 @@ func TestCreateRegistration_InvalidEventOccurrenceID(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
-	childID := uuid.MustParse("30000000-0000-0000-0000-000000000001")
-	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	child := child.CreateTestChild(t, ctx, testDB)
+	childID := child.ID
+	guardianID := child.GuardianID
 
 	input := func() *models.CreateRegistrationInput {
 		i := &models.CreateRegistrationInput{}

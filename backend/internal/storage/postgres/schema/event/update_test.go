@@ -20,6 +20,7 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	createInput := func() *models.CreateEventInput {
 		input := &models.CreateEventInput{}
@@ -87,6 +88,7 @@ func TestEventRepository_Update_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	updateInput := &models.UpdateEventInput{}
 	updateInput.ID = uuid.New()
