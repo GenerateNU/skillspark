@@ -1,10 +1,13 @@
-.PHONY: help test test-unit test-db test-coverage test-one test-clean \
+.PHONY: help test test-verbose test-unit test-db test-coverage test-one test-clean \
         lint lint-fix format format-check \
         db-new db-start db-stop db-reset db-push db-link db-status \
         dev run build clean tidy download verify vendor deps
 
 # Default target - show help
 .DEFAULT_GOAL := help
+
+# Files/packages to exclude from coverage (regex patterns)
+COVERAGE_EXCLUDE := main.go|shared_db.go|setup.go
 
 # ------------------------
 # OS Detection
@@ -44,7 +47,8 @@ help:
 	@echo "$(BOLD)SkillSpark Backend - Available Commands$(NC)"
 	@echo ""
 	@echo "$(BLUE)Testing:$(NC)"
-	@echo "  make test              - Run all tests"
+	@echo "  make test              - Run all tests (quiet mode)"
+	@echo "  make test-verbose      - Run all tests with verbose output"
 	@echo "  make test-unit         - Run unit tests only"
 	@echo "  make test-db           - Run database tests"
 	@echo "  make test-coverage     - Run tests with coverage report"
@@ -78,6 +82,7 @@ help:
 	@echo "  make run               - Run server"
 	@echo "  make build             - Build the application"
 	@echo "  make clean             - Clean build artifacts and test files"
+	@echo ""
 	@echo "$(BLUE)API Documentation:$(NC)"
 	@echo "  make api-gen           - Generate OpenAPI YAML specification"
 	@echo "  make api-validate      - Validate OpenAPI spec"
@@ -89,45 +94,63 @@ help:
 # ------------------------
 test:
 	@echo "$(BOLD)Running all tests...$(NC)"
-	@go test ./... -v $(NO_CACHE) 2>&1 | tee test_output.log
+	@go test ./... $(NO_CACHE) 2>&1 | tee test_output.log
 	@echo ""
 ifeq ($(OS),Windows_NT)
-	@findstr /C:"--- FAIL" test_output.log >nul 2>&1 && ( \
-		echo $(RED)$(BOLD)Tests Failed$(NC) && \
-		findstr "^--- FAIL" test_output.log && \
+	@findstr /C:"FAIL" test_output.log >nul 2>&1 && ( \
+		echo $(RED)$(BOLD)Tests Failed:$(NC) && \
+		echo. && \
+		findstr "FAIL" test_output.log && \
 		del /F /Q test_output.log && \
 		exit 1 \
 	) || ( \
-		echo $(GREEN)$(BOLD)All Tests Passed$(NC) && \
+		echo $(GREEN)$(BOLD)All Tests Passed!$(NC) && \
 		del /F /Q test_output.log \
 	)
 else
-	@if grep -q "^--- FAIL" test_output.log 2>/dev/null; then \
-		echo "$(RED)$(BOLD)Tests Failed$(NC)"; \
-		grep "^--- FAIL" test_output.log; \
+	@if grep -q "FAIL" test_output.log 2>/dev/null; then \
+		echo "$(RED)$(BOLD)Tests Failed:$(NC)"; \
+		echo ""; \
+		grep "FAIL" test_output.log; \
+		echo ""; \
+		echo "$(YELLOW)Tip: Run 'make test-verbose' for detailed output$(NC)"; \
 		rm -f test_output.log; \
 		exit 1; \
 	else \
-		echo "$(GREEN)$(BOLD)All Tests Passed$(NC)"; \
+		echo "$(GREEN)$(BOLD)✓ All Tests Passed!$(NC)"; \
 		rm -f test_output.log; \
 	fi
 endif
 
+test-verbose:
+	@echo "$(BOLD)Running all tests (verbose)...$(NC)"
+	@go test ./... -v $(NO_CACHE)
+
 test-unit:
 	@echo "$(BOLD)Running unit tests...$(NC)"
-	@go test ./... -v $(NO_CACHE) -short
+	@go test ./... $(NO_CACHE) -short
 
 test-db:
 	@echo "$(BOLD)Running database tests...$(NC)"
-	@go test ./internal/storage/postgres/... -v $(NO_CACHE)
+	@go test ./internal/storage/postgres/... $(NO_CACHE)
 
 # Run tests with coverage
 test-coverage:
 	@echo "$(BOLD)Running tests with coverage...$(NC)"
-	@go test ./... -v -coverprofile=coverage.out $(NO_CACHE)
-	@go tool cover -html=coverage.out -o coverage.html
+	@go test ./... -coverprofile=coverage.out $(NO_CACHE)
+ifeq ($(OS),Windows_NT)
+	@type coverage.out | findstr /V /R "$(COVERAGE_EXCLUDE)" > coverage_filtered.out 2>nul || copy coverage.out coverage_filtered.out >nul
+	@go tool cover -html=coverage_filtered.out -o coverage.html
+	@echo $(GREEN)Coverage report: coverage.html$(NC)
+	@go tool cover -func=coverage_filtered.out | findstr "total"
+else
+	@grep -vE '$(COVERAGE_EXCLUDE)' coverage.out > coverage_filtered.out || cp coverage.out coverage_filtered.out
+	@go tool cover -html=coverage_filtered.out -o coverage.html
 	@echo "$(GREEN)Coverage report: coverage.html$(NC)"
-	@go tool cover -func=coverage.out | $(GREP) total
+	@go tool cover -func=coverage_filtered.out | grep total
+endif
+	@echo "$(YELLOW)Excluded patterns: $(COVERAGE_EXCLUDE)$(NC)"
+
 
 # Print coverage percentage as number only
 coverage-percentage:

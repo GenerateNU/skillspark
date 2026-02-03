@@ -96,3 +96,11 @@ type DeleteOrganizationInput struct {
 type DeleteOrganizationOutput struct {
 	Body Organization `json:"body" doc:"The deleted organization"`
 }
+
+type GetEventOccurrencesByOrganizationIDInput struct {
+	ID uuid.UUID `path:"organization_id" doc:"ID of an organization"`
+}
+
+type GetEventOccurrencesByOrganizationIDOutput struct {
+	Body []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the organization ID"`
+}
