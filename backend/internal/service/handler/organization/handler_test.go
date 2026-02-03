@@ -729,7 +729,8 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			handler := NewHandler(mockRepo, mockLocationRepo)
+			s3Client := createTestS3Client(t)
+			handler := NewHandler(mockRepo, mockLocationRepo, s3Client)
 			ctx := context.Background()
 
 			input := &models.GetEventOccurrencesByOrganizationIDInput{ID: uuid.MustParse(tt.id)}

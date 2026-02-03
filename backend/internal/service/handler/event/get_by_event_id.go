@@ -21,6 +21,10 @@ func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *model
 		return nil, err
 	}
 
+	if len(eventOccurrence) == 0 {
+		return eventOccurrence, nil
+	}
+
 	var url *string
 	key := eventOccurrence[0].Event.HeaderImageS3Key
 	if key != nil {

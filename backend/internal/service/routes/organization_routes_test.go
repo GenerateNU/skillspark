@@ -727,7 +727,8 @@ func TestHumaValidation_GetEventOccurrencesByOrganizationId(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo)
+			s3Client := createOrgTestS3Client(t)
+			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo, s3Client)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
