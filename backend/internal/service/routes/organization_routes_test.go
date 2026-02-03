@@ -146,6 +146,10 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
 			mockS3 := createMockS3Client()
+			if tt.statusCode == http.StatusOK {
+				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/babel_street.jpg"
+				mockS3.On("GeneratePresignedURL", mock.Anything, mock.Anything, mock.Anything).Return(mockURL, nil)
+			}
 			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
 
 			req, err := http.NewRequest(
