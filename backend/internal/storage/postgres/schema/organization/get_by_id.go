@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *OrganizationRepository) GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError) {
+func (r *OrganizationRepository) GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, error) {
 	query, err := schema.ReadSQLBaseScript("organization/sql/get_by_id.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())

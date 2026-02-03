@@ -8,14 +8,14 @@ import (
 )
 
 func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
-	
+
 	query, err := schema.ReadSQLBaseScript("registration/sql/create.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
 	}
 
-	row := r.db.QueryRow(ctx, query, 
+	row := r.db.QueryRow(ctx, query,
 		input.Body.ChildID,
 		input.Body.GuardianID,
 		input.Body.EventOccurrenceID,
@@ -24,16 +24,16 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 	var createdRegistration models.CreateRegistrationOutput
 
 	err = row.Scan(
-	&createdRegistration.Body.ID,
-	&createdRegistration.Body.ChildID,
-	&createdRegistration.Body.GuardianID,
-	&createdRegistration.Body.EventOccurrenceID,
-	&createdRegistration.Body.Status,
-	&createdRegistration.Body.CreatedAt,
-	&createdRegistration.Body.UpdatedAt,
-	&createdRegistration.Body.EventName,
-	&createdRegistration.Body.OccurrenceStartTime,
-)
+		&createdRegistration.Body.ID,
+		&createdRegistration.Body.ChildID,
+		&createdRegistration.Body.GuardianID,
+		&createdRegistration.Body.EventOccurrenceID,
+		&createdRegistration.Body.Status,
+		&createdRegistration.Body.CreatedAt,
+		&createdRegistration.Body.UpdatedAt,
+		&createdRegistration.Body.EventName,
+		&createdRegistration.Body.OccurrenceStartTime,
+	)
 
 	if err != nil {
 		errr := errs.InternalServerError("Failed to create registration: ", err.Error())
