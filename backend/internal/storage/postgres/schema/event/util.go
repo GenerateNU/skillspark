@@ -24,7 +24,6 @@ func CreateTestEvent(
 	input := &models.CreateEventInput{}
 	ageMin := 8
 	ageMax := 12
-	headerImage := "events/robotics_workshop.jpg"
 
 	input.Body.Title = "Junior Robotics Workshop"
 	input.Body.Description = "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!"
@@ -32,9 +31,8 @@ func CreateTestEvent(
 	input.Body.AgeRangeMin = &ageMin
 	input.Body.AgeRangeMax = &ageMax
 	input.Body.Category = []string{"science", "technology"}
-	input.Body.HeaderImageS3Key = &headerImage
 
-	event, err := repo.CreateEvent(ctx, input)
+	event, err := repo.CreateEvent(ctx, input, nil)
 
 	require.NoError(t, err)
 	require.NotNil(t, event)
