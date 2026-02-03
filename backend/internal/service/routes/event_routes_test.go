@@ -6,14 +6,13 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
-	"os"
 	"testing"
 	"time"
 
-	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/s3_client"
+	s3mocks "skillspark/internal/s3_client/mocks"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
@@ -22,10 +21,8 @@ import (
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 )
 
 // dummyImageData for testing purposes
@@ -64,25 +61,12 @@ func createEventMultipartForm(fields map[string]string, includeFile bool) (*byte
 	return &body, writer.FormDataContentType()
 }
 
-func createEventTestS3Client(t *testing.T) *s3_client.Client {
-
-	err := godotenv.Load("../../../.env")
-	if err != nil {
-		t.Logf("Warning: Could not load .env file: %v", err)
-	}
-
-	s3Config := config.S3{
-		Bucket:    os.Getenv("AWS_S3_BUCKET"),
-		Region:    os.Getenv("AWS_REGION"),
-		AccessKey: os.Getenv("AWS_ACCESS_KEY_ID"),
-		SecretKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
-	}
-	client, err := s3_client.NewClient(s3Config)
-	require.NoError(t, err)
-	return client
+// createMockS3Client creates a mock S3 client for testing
+func createMockS3Client() *s3mocks.S3ClientMock {
+	return new(s3mocks.S3ClientMock)
 }
 
-func setupEventTestAPI(eventRepo *repomocks.MockEventRepository, s3Client *s3_client.Client) (*fiber.App, huma.API) {
+func setupEventTestAPI(eventRepo *repomocks.MockEventRepository, s3Client s3_client.S3Interface) (*fiber.App, huma.API) {
 	app := fiber.New()
 	api := humafiber.New(app, huma.DefaultConfig("Test Event API", "1.0.0"))
 	repo := &storage.Repository{
@@ -102,6 +86,7 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 		formFields  map[string]string
 		includeFile bool
 		mockSetup   func(*repomocks.MockEventRepository)
+		mockS3Setup func(*s3mocks.S3ClientMock)
 		statusCode  int
 	}{
 		{
@@ -144,6 +129,10 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 					UpdatedAt:      time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
 			statusCode: http.StatusOK,
 		},
 		{
@@ -154,6 +143,7 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 			},
 			includeFile: true,
 			mockSetup:   func(*repomocks.MockEventRepository) {},
+			mockS3Setup: func(*s3mocks.S3ClientMock) {},
 			statusCode:  http.StatusUnprocessableEntity,
 		},
 		{
@@ -165,6 +155,7 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 			},
 			includeFile: true,
 			mockSetup:   func(*repomocks.MockEventRepository) {},
+			mockS3Setup: func(*s3mocks.S3ClientMock) {},
 			statusCode:  http.StatusUnprocessableEntity,
 		},
 	}
@@ -177,8 +168,10 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 			mockRepo := new(repomocks.MockEventRepository)
 			tt.mockSetup(mockRepo)
 
-			s3Client := createEventTestS3Client(t)
-			app, _ := setupEventTestAPI(mockRepo, s3Client)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			app, _ := setupEventTestAPI(mockRepo, mockS3)
 
 			body, contentType := createEventMultipartForm(tt.formFields, tt.includeFile)
 
@@ -217,6 +210,7 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 		formFields  map[string]string
 		includeFile bool
 		mockSetup   func(*repomocks.MockEventRepository)
+		mockS3Setup func(*s3mocks.S3ClientMock)
 		statusCode  int
 	}{
 		{
@@ -246,6 +240,10 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 					Title: "Advanced Robotics",
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
 			statusCode: http.StatusOK,
 		},
 		{
@@ -262,6 +260,10 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 					uuid.MustParse(notFoundID),
 				).Return([]models.EventOccurrence{}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
 			statusCode: http.StatusOK,
 		},
 		{
@@ -272,6 +274,7 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			},
 			includeFile: true,
 			mockSetup:   func(*repomocks.MockEventRepository) {},
+			mockS3Setup: func(*s3mocks.S3ClientMock) {},
 			statusCode:  http.StatusUnprocessableEntity,
 		},
 		{
@@ -282,6 +285,7 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			},
 			includeFile: true,
 			mockSetup:   func(*repomocks.MockEventRepository) {},
+			mockS3Setup: func(*s3mocks.S3ClientMock) {},
 			statusCode:  http.StatusUnprocessableEntity,
 		},
 	}
@@ -294,8 +298,10 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			mockRepo := new(repomocks.MockEventRepository)
 			tt.mockSetup(mockRepo)
 
-			s3Client := createEventTestS3Client(t)
-			app, _ := setupEventTestAPI(mockRepo, s3Client)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			app, _ := setupEventTestAPI(mockRepo, mockS3)
 
 			body, contentType := createEventMultipartForm(tt.formFields, tt.includeFile)
 
@@ -375,8 +381,8 @@ func TestHumaValidation_DeleteEvent(t *testing.T) {
 			mockRepo := new(repomocks.MockEventRepository)
 			tt.mockSetup(mockRepo)
 
-			s3Client := createEventTestS3Client(t)
-			app, _ := setupEventTestAPI(mockRepo, s3Client)
+			mockS3 := createMockS3Client()
+			app, _ := setupEventTestAPI(mockRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodDelete,
@@ -438,10 +444,11 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 	}
 
 	tests := []struct {
-		name       string
-		eventID    string
-		mockSetup  func(*repomocks.MockEventRepository)
-		statusCode int
+		name        string
+		eventID     string
+		mockSetup   func(*repomocks.MockEventRepository)
+		mockS3Setup func(*s3mocks.S3ClientMock)
+		statusCode  int
 	}{
 		{
 			name:    "valid UUID",
@@ -480,13 +487,18 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 					},
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/events/robotics_workshop.jpg"
+				m.On("GeneratePresignedURL", mock.Anything, mock.Anything, mock.Anything).Return(mockURL, nil)
+			},
 			statusCode: http.StatusOK,
 		},
 		{
-			name:       "invalid UUID",
-			eventID:    "not-a-uuid",
-			mockSetup:  func(*repomocks.MockEventRepository) {},
-			statusCode: http.StatusUnprocessableEntity,
+			name:        "invalid UUID",
+			eventID:     "not-a-uuid",
+			mockSetup:   func(*repomocks.MockEventRepository) {},
+			mockS3Setup: func(*s3mocks.S3ClientMock) {},
+			statusCode:  http.StatusUnprocessableEntity,
 		},
 	}
 
@@ -498,8 +510,10 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 			mockRepo := new(repomocks.MockEventRepository)
 			tt.mockSetup(mockRepo)
 
-			s3Client := createEventTestS3Client(t)
-			app, _ := setupEventTestAPI(mockRepo, s3Client)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			app, _ := setupEventTestAPI(mockRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodGet,

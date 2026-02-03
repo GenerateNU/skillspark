@@ -14,7 +14,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client *s3_client.Client) {
+func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface) {
 	orgHandler := organization.NewHandler(repo.Organization, repo.Location, s3Client)
 
 	huma.Register(api, huma.Operation{

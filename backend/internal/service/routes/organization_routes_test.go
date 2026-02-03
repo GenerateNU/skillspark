@@ -6,14 +6,13 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
-	"os"
 	"testing"
 	"time"
 
-	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/s3_client"
+	s3mocks "skillspark/internal/s3_client/mocks"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"skillspark/internal/utils"
@@ -22,10 +21,8 @@ import (
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 )
 
 // dummyImageData for testing organization routes
@@ -64,28 +61,15 @@ func createMultipartForm(fields map[string]string, includeFile bool, fileFieldNa
 	return &body, writer.FormDataContentType()
 }
 
-func createOrgTestS3Client(t *testing.T) *s3_client.Client {
-
-	err := godotenv.Load("../../../.env")
-	if err != nil {
-		t.Logf("Warning: Could not load .env file: %v", err)
-	}
-
-	s3Config := config.S3{
-		Bucket:    os.Getenv("AWS_S3_BUCKET"),
-		Region:    os.Getenv("AWS_REGION"),
-		AccessKey: os.Getenv("AWS_ACCESS_KEY_ID"),
-		SecretKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
-	}
-	client, err := s3_client.NewClient(s3Config)
-	require.NoError(t, err)
-	return client
+// createMockS3Client creates a mock S3 client for testing
+func createMockS3Client() *s3mocks.S3ClientMock {
+	return new(s3mocks.S3ClientMock)
 }
 
 func setupOrganizationTestAPI(
 	organizationRepo *repomocks.MockOrganizationRepository,
 	locationRepo *repomocks.MockLocationRepository,
-	s3Client *s3_client.Client,
+	s3Client s3_client.S3Interface,
 ) (*fiber.App, huma.API) {
 	app := fiber.New()
 	api := humafiber.New(app, huma.DefaultConfig("Test API", "1.0.0"))
@@ -161,8 +145,8 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			s3Client := createOrgTestS3Client(t)
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, s3Client)
+			mockS3 := createMockS3Client()
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -311,8 +295,12 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			s3Client := createOrgTestS3Client(t)
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, s3Client)
+			mockS3 := createMockS3Client()
+			if tt.statusCode == http.StatusOK {
+				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/test/pfp.jpg"
+				mockS3.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			}
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
 
 			body, contentType := createMultipartForm(tt.formFields, tt.includeFile, "profile_image")
 
@@ -401,8 +389,8 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			s3Client := createOrgTestS3Client(t)
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, s3Client)
+			mockS3 := createMockS3Client()
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -508,8 +496,12 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			s3Client := createOrgTestS3Client(t)
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, s3Client)
+			mockS3 := createMockS3Client()
+			if tt.statusCode == http.StatusOK {
+				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/test/pfp.jpg"
+				mockS3.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			}
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
 
 			body, contentType := createMultipartForm(tt.formFields, tt.includeFile, "profile_image")
 
@@ -598,8 +590,8 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			s3Client := createOrgTestS3Client(t)
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, s3Client)
+			mockS3 := createMockS3Client()
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodDelete,
@@ -727,8 +719,12 @@ func TestHumaValidation_GetEventOccurrencesByOrganizationId(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			s3Client := createOrgTestS3Client(t)
-			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo, s3Client)
+			mockS3 := createMockS3Client()
+			if tt.statusCode == http.StatusOK {
+				mockURL := "https://test-bucket.s3.amazonaws.com/events/robotics_workshop.jpg"
+				mockS3.On("GeneratePresignedURL", mock.Anything, mock.Anything, mock.Anything).Return(mockURL, nil)
+			}
+			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodGet,

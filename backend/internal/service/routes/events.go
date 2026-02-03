@@ -13,7 +13,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client *s3_client.Client) {
+func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface) {
 	eventHandler := event.NewHandler(repo.Event, s3Client)
 
 	// POST /api/v1/events
