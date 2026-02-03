@@ -18,6 +18,9 @@ func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInpu
 	if image_data != nil {
 
 		url, err = h.CreateEventS3Helper(ctx, s3Client, event, updateBody, image_data)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	event.PresignedURL = url
