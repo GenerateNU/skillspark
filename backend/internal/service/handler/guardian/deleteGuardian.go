@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"skillspark/internal/models"
+	"skillspark/internal/auth"
 )
 
 func (h *Handler) DeleteGuardian(ctx context.Context, input *models.DeleteGuardianInput) (*models.Guardian, error) {
@@ -11,6 +12,12 @@ func (h *Handler) DeleteGuardian(ctx context.Context, input *models.DeleteGuardi
 
 	if err != nil {
 		return nil, err
+	}
+
+	// delete Supabase auth user
+	deleteErr := auth.SupabaseDeleteUser(&h.config, guardian.ID)
+	if deleteErr != nil {
+		return nil, deleteErr
 	}
 
 	return guardian, nil

@@ -12,6 +12,7 @@ import (
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	"skillspark/internal/config"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -35,7 +36,15 @@ func setupmanagerTestAPI(
 		Guardian: guardianRepo,
 	}
 
-	routes.SetupManagerRoutes(api, repo)
+	cfg := config.Config {
+		Supabase: config.Supabase{
+			URL:            "https://example.supabase.co",
+			AnonKey:        "dummy-anon-key",
+			ServiceRoleKey: "dummy-service-role-key",
+		},
+	}
+
+	routes.SetupManagerRoutes(api, repo, cfg)
 
 	return app, api
 }

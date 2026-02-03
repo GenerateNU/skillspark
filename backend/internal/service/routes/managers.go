@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"net/http"
+	"skillspark/internal/config"
 	"skillspark/internal/models"
 	"skillspark/internal/service/handler/manager"
 	"skillspark/internal/storage"
@@ -10,12 +11,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-// idk what ctx does
-// idk what the tags feature does
-// dont rlly know what huma does in general
-// how was the manager table created in the schema???
-func SetupManagerRoutes(api huma.API, repo *storage.Repository) {
-	managerHandler := manager.NewHandler(repo.Manager, repo.Guardian)
+func SetupManagerRoutes(api huma.API, repo *storage.Repository, config config.Config) {
+	managerHandler := manager.NewHandler(repo.Manager, repo.Guardian, config.Supabase)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-manager-by-id",

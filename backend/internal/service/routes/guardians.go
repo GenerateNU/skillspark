@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"net/http"
+	"skillspark/internal/config"
 	"skillspark/internal/models"
 	"skillspark/internal/service/handler/guardian"
 	"skillspark/internal/storage"
@@ -10,8 +11,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupGuardiansRoutes(api huma.API, repo *storage.Repository) {
-	guardianHandler := guardian.NewHandler(repo.Guardian, repo.Manager)
+func SetupGuardiansRoutes(api huma.API, repo *storage.Repository, config config.Config) {
+	guardianHandler := guardian.NewHandler(repo.Guardian, repo.Manager, config.Supabase)
 	huma.Register(api, huma.Operation{
 		OperationID: "get-guardian-by-id",
 		Method:      http.MethodGet,

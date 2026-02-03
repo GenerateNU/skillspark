@@ -2,6 +2,7 @@ package manager
 
 import (
 	"context"
+	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
@@ -87,7 +88,12 @@ func TestHandler_GetManagerByID(t *testing.T) {
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo, mockGuardianRepo)
 
-			handler := NewHandler(mockRepo, mockGuardianRepo)
+			cfg := config.Supabase{
+				URL:            "http://mock-supabase",
+				ServiceRoleKey: "mock-key",
+			}
+
+			handler := NewHandler(mockRepo, mockGuardianRepo, cfg)
 			ctx := context.Background()
 
 			input := &models.GetManagerByIDInput{ID: uuid.MustParse(tt.id)}
@@ -181,7 +187,12 @@ func TestHandler_GetManagerByOrgID(t *testing.T) {
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo, mockGuardianRepo)
 
-			handler := NewHandler(mockRepo, mockGuardianRepo)
+			cfg := config.Supabase{
+				URL:            "http://mock-supabase",
+				ServiceRoleKey: "mock-key",
+			}
+
+			handler := NewHandler(mockRepo, mockGuardianRepo, cfg)
 			ctx := context.Background()
 
 			input := &models.GetManagerByOrgIDInput{OrganizationID: uuid.MustParse(tt.organization_id)}
@@ -264,7 +275,12 @@ func TestHandler_CreateManager(t *testing.T) {
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo, mockGuardianRepo)
 
-			handler := NewHandler(mockRepo, mockGuardianRepo)
+			cfg := config.Supabase{
+				URL:            "http://mock-supabase",
+				ServiceRoleKey: "mock-key",
+			}
+
+			handler := NewHandler(mockRepo, mockGuardianRepo, cfg)
 			ctx := context.Background()
 
 			manager, err := handler.CreateManager(ctx, tt.input)
@@ -346,7 +362,12 @@ func TestHandler_DeleteManager(t *testing.T) {
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo, mockGuardianRepo)
 
-			handler := NewHandler(mockRepo, mockGuardianRepo)
+			cfg := config.Supabase{
+				URL:            "http://mock-supabase",
+				ServiceRoleKey: "mock-key",
+			}
+
+			handler := NewHandler(mockRepo, mockGuardianRepo, cfg)
 			ctx := context.Background()
 
 			manager, err := handler.DeleteManager(ctx, tt.input)
@@ -465,7 +486,12 @@ func TestHandler_PatchManager(t *testing.T) {
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo, mockGuardianRepo)
 
-			handler := NewHandler(mockRepo, mockGuardianRepo)
+			cfg := config.Supabase{
+				URL:            "http://mock-supabase",
+				ServiceRoleKey: "mock-key",
+			}
+
+			handler := NewHandler(mockRepo, mockGuardianRepo, cfg)
 			ctx := context.Background()
 
 			manager, err := handler.PatchManager(ctx, tt.input)

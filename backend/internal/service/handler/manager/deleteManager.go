@@ -3,6 +3,7 @@ package manager
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/auth"
 
 	"github.com/google/uuid"
 )
@@ -15,6 +16,12 @@ func (h *Handler) DeleteManager(ctx context.Context, input *models.DeleteManager
 	manager, err := h.ManagerRepository.DeleteManager(ctx, id)
 	if err != nil {
 		return nil, err
+	}
+
+	// delete Supabase auth user
+	deleteErr := auth.SupabaseDeleteUser(&h.config, manager.ID)
+	if deleteErr != nil {
+		return nil, deleteErr
 	}
 
 	return manager, nil

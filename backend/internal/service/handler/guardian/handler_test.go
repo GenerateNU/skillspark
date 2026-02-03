@@ -2,6 +2,7 @@ package guardian
 
 import (
 	"context"
+	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
@@ -68,7 +69,12 @@ func TestHandler_GetGuardianById(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo, mockManagerRepo)
 
-			handler := NewHandler(mockRepo, mockManagerRepo)
+			cfg := config.Supabase{
+				URL:            "http://mock-supabase",
+				ServiceRoleKey: "mock-key",
+			}
+
+			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByIDInput{ID: uuid.MustParse(tt.id)}
@@ -147,7 +153,12 @@ func TestHandler_CreateGuardian(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo, mockManagerRepo)
 
-			handler := NewHandler(mockRepo, mockManagerRepo)
+			cfg := config.Supabase{
+				URL:            "http://mock-supabase",
+				ServiceRoleKey: "mock-key",
+			}
+
+			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
 			ctx := context.Background()
 
 			guardian, err := handler.CreateGuardian(ctx, tt.input)
@@ -232,7 +243,12 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo, mockManagerRepo)
 
-			handler := NewHandler(mockRepo, mockManagerRepo)
+			cfg := config.Supabase{
+				URL:            "http://mock-supabase",
+				ServiceRoleKey: "mock-key",
+			}
+
+			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
 			ctx := context.Background()
 
 			guardian, err := handler.UpdateGuardian(ctx, tt.input)
@@ -295,7 +311,12 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo, mockManagerRepo)
 
-			handler := NewHandler(mockRepo, mockManagerRepo)
+			cfg := config.Supabase{
+				URL:            "http://mock-supabase",
+				ServiceRoleKey: "mock-key",
+			}
+
+			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByChildIDInput{ChildID: uuid.MustParse(tt.childID)}
@@ -359,7 +380,12 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			tt.mockSetup(mockRepo, mockManagerRepo)
 
-			handler := NewHandler(mockRepo, mockManagerRepo)
+			cfg := config.Supabase{
+				URL:            "http://mock-supabase",
+				ServiceRoleKey: "mock-key",
+			}
+
+			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
 			ctx := context.Background()
 
 			input := &models.DeleteGuardianInput{ID: uuid.MustParse(tt.id)}

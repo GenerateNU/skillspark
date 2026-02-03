@@ -6,6 +6,11 @@ deleted_user AS (
     DELETE FROM "user" 
     WHERE id = (SELECT user_id FROM deleted_guardian)
     RETURNING id, name, email, username, profile_picture_s3_key, language_preference
+),
+cancelled_registration AS (
+    UPDATE registration r
+    SET status = "cancelled"
+    WHERE r.guardian_id = (SELECT user_id FROM deleted_guardian)
 )
 SELECT dg.id, dg.user_id, du.name, du.email, du.username, du.profile_picture_s3_key, du.language_preference, dg.created_at, dg.updated_at
 FROM deleted_guardian dg
