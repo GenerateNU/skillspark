@@ -76,3 +76,13 @@ type UpdateEventOccurrenceInput struct {
 type UpdateEventOccurrenceOutput struct {
 	Body *EventOccurrence `json:"body" doc:"Updated event occurrence"`
 }
+
+type DeleteEventOccurrenceInput struct {
+	ID uuid.UUID `path:"id" doc:"ID of an event occurrence"`
+}
+
+type DeleteEventOccurrenceOutput struct {
+	Body struct {
+		Message string `json:"message" doc:"Success message"`
+	} `json:"body"`
+}
