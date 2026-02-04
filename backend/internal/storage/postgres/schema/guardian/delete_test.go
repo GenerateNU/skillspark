@@ -22,7 +22,7 @@ func TestGuardianRepository_DeleteGuardian(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	// delete a guardian that has children that exists, should delete guardian and children
+	// delete a guardian that has children that exist, should delete guardian and children
 	guardian, err := repo.GetGuardianByChildID(ctx, uuid.MustParse("30000000-0000-0000-0000-000000000001")) // child 1
 	assert.Nil(t, err)
 	assert.NotNil(t, guardian)
@@ -50,7 +50,6 @@ func TestGuardianRepository_DeleteGuardian(t *testing.T) {
 	assert.Nil(t, guardian)
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "Child with id: 30000000-0000-0000-0000-000000000002 not found")
-
 
 	// create a guardian with no child
 	guardian, err = repo.CreateGuardian(ctx,

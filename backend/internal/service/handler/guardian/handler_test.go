@@ -354,6 +354,7 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)
+				m.On("SupabaseDeleteUser", mock.Anything, mock.Anything).Return(nil)
 			},
 			wantErr: false,
 		},
@@ -381,8 +382,8 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 			tt.mockSetup(mockRepo, mockManagerRepo)
 
 			cfg := config.Supabase{
-				URL:            "http://mock-supabase",
-				ServiceRoleKey: "mock-key",
+				URL:            "http://mock",
+				ServiceRoleKey: "key",
 			}
 
 			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
