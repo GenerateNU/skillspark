@@ -1,18 +1,30 @@
 import { defineConfig } from 'orval';
+import path from 'path';
 
 export default defineConfig({
   api: {
-    input: '../../../../backend/api/openapi.yaml', // Point to backend spec
     output: {
       mode: 'tags-split',
       target: './src/generated',
       client: 'react-query',
+      mock: false,
+      clean: true,
+      prettier: true,
+      indexFiles: true,
       override: {
         mutator: {
-          path: './src/mutator.ts',
+          path: path.resolve(__dirname, 'src/apiClient.ts'),
           name: 'customInstance',
         },
+        query: {
+          useQuery: true,
+          useMutation: true,
+          signal: true,
+        },
       },
+    },
+    input: {
+      target: '../../../backend/api/openapi.yaml',
     },
   },
 });
