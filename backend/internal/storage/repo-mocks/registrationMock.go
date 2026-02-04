@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/models"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -57,4 +58,12 @@ func (m *MockRegistrationRepository) GetRegistrationsByEventOccurrenceID(ctx con
 		return nil, args.Error(1)
 	}
 	return args.Get(0).(*models.GetRegistrationsByEventOccurrenceIDOutput), args.Error(1)
+}
+
+func (m *MockEventOccurrenceRepository) DeleteEventOccurrence(
+	ctx context.Context,
+	id uuid.UUID,
+) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
 }
