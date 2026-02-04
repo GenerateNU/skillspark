@@ -15,7 +15,7 @@ func (r *GuardianRepository) CreateGuardian(ctx context.Context, guardian *model
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, guardian.Body.Name, guardian.Body.Email, guardian.Body.Username, guardian.Body.ProfilePictureS3Key, guardian.Body.LanguagePreference)
+	row := r.db.QueryRow(ctx, query, guardian.Body.Name, guardian.Body.Email, guardian.Body.Username, guardian.Body.ProfilePictureS3Key, guardian.Body.LanguagePreference, guardian.Body.AuthID)
 
 	var createdGuardian models.Guardian
 

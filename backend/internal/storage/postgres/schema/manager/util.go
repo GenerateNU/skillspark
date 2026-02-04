@@ -6,7 +6,6 @@ import (
 	"skillspark/internal/storage/postgres/schema/organization"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 )
@@ -23,7 +22,6 @@ func CreateTestManager(
 	org := organization.CreateTestOrganization(t, ctx, db)
 
 	input := &models.CreateManagerInput{}
-	input.Body.UserID = uuid.New()
 	input.Body.OrganizationID = &org.ID
 	input.Body.Role = "Assistant Manager"
 

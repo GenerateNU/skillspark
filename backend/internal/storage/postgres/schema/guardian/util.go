@@ -7,7 +7,6 @@ import (
 
 	"math/rand"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 )
@@ -23,7 +22,6 @@ func CreateTestGuardian(
 
 	input := &models.CreateGuardianInput{}
 
-	input.Body.UserID = uuid.New()
 	input.Body.Email = RandomString(10)
 	input.Body.Username = RandomString(10)
 

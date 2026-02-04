@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"skillspark/internal/errs"
+	// "skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
@@ -54,15 +54,12 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
-				"user_id":             userID.String(),
 				"name":                "John Doe",
 				"email":               "john@example.com",
 				"username":            "johndoe",
 				"language_preference": "en",
 			},
 			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
-				notFound := errs.NotFound("Manager", "user_id", userID)
-				mm.On("GetManagerByUserID", mock.Anything, mock.Anything).Return(nil, &notFound)
 
 				m.On("GetGuardianByUserID", mock.Anything, mock.Anything).Return(nil, nil).Maybe()
 				m.On(
@@ -146,7 +143,6 @@ func TestHumaValidation_GetGuardianByID(t *testing.T) {
 					uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 				).Return(&models.Guardian{
 					ID:        uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
-					UserID:    uuid.New(),
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)

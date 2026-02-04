@@ -5,5 +5,6 @@ type Config struct {
 	Application Application
 	DB          DB
 	Supabase    Supabase
+	TestMode    bool
 	S3          S3
 }

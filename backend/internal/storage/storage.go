@@ -12,6 +12,7 @@ import (
 	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/school"
+	"skillspark/internal/storage/postgres/schema/user"
 	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
@@ -43,6 +44,7 @@ type ManagerRepository interface {
 	GetManagerByID(ctx context.Context, id uuid.UUID) (*models.Manager, error)
 	GetManagerByUserID(ctx context.Context, userID uuid.UUID) (*models.Manager, error)
 	GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error)
+	GetManagerByAuthID(ctx context.Context, authID string) (*models.Manager, error)
 	DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, error)
 	CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error)
 	PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, error)
@@ -53,6 +55,7 @@ type GuardianRepository interface {
 	GetGuardianByChildID(ctx context.Context, childID uuid.UUID) (*models.Guardian, error)
 	GetGuardianByID(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
 	GetGuardianByUserID(ctx context.Context, userID uuid.UUID) (*models.Guardian, error)
+	GetGuardianByAuthID(ctx context.Context, authID string) (*models.Guardian, error)
 	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
 	DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
 }
@@ -99,6 +102,14 @@ type Repository struct {
 	Child           ChildRepository
 	EventOccurrence EventOccurrenceRepository
 	Registration    RegistrationRepository
+	User            UserRepository
+}
+
+type UserRepository interface {
+	CreateUser(ctx context.Context, user *models.CreateUserInput) (*models.User, error)
+	GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error)
+	UpdateUser(ctx context.Context, user *models.UpdateUserInput) (*models.User, error)
+	DeleteUser(ctx context.Context, id uuid.UUID) (*models.User, error)
 }
 
 // Close closes the database connection pool
@@ -124,6 +135,7 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Event:           event.NewEventRepository(db),
 		Child:           child.NewChildRepository(db),
 		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
+		User:            user.NewUserRepository(db),
 		Registration:    registration.NewRegistrationRepository(db),
 	}
 }

@@ -220,11 +220,9 @@ func TestHandler_CreateManager(t *testing.T) {
 				input.Body.LanguagePreference = "en"
 				input.Body.OrganizationID = &ptr
 				input.Body.Role = "Assistant Director"
-				input.Body.UserID = uuid.New()
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockManagerRepository, g *repomocks.MockGuardianRepository) {
-				g.On("GetGuardianByUserID", mock.Anything, mock.Anything).Return(nil, &errs.HTTPError{Code: 404})
 				m.On("CreateManager", mock.Anything, mock.AnythingOfType("*models.CreateManagerInput")).Return(&models.Manager{
 					ID:             uuid.New(),
 					UserID:         uuid.New(),
@@ -245,11 +243,9 @@ func TestHandler_CreateManager(t *testing.T) {
 				input.Body.Email = "error@example.com"
 				input.Body.OrganizationID = nil
 				input.Body.Role = "nothing"
-				input.Body.UserID = uuid.New()
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockManagerRepository, g *repomocks.MockGuardianRepository) {
-				g.On("GetGuardianByUserID", mock.Anything, mock.Anything).Return(nil, &errs.HTTPError{Code: 404})
 				m.On("CreateManager", mock.Anything, mock.AnythingOfType("*models.CreateManagerInput")).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Internal server error").Code,
 					Message: "Internal server error",

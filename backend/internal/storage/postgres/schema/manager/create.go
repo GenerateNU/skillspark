@@ -14,7 +14,7 @@ func (r *ManagerRepository) CreateManager(ctx context.Context, manager *models.C
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, manager.Body.Name, manager.Body.Email, manager.Body.Username, manager.Body.ProfilePictureS3Key, manager.Body.LanguagePreference, manager.Body.OrganizationID, manager.Body.Role)
+	row := r.db.QueryRow(ctx, query, manager.Body.Name, manager.Body.Email, manager.Body.Username, manager.Body.ProfilePictureS3Key, manager.Body.LanguagePreference, manager.Body.AuthID, manager.Body.OrganizationID, manager.Body.Role)
 
 	var createdManager models.Manager
 

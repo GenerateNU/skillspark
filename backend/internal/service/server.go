@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/s3_client"
@@ -77,6 +78,10 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	humaAPI := humafiber.New(app, humaConfig)
 
+	if !config.TestMode {
+		humaAPI.UseMiddleware(auth.AuthMiddleware(humaAPI, &config.Supabase))
+	}
+
 	// Documentation routes (Huma provides built-in docs at /docs and /openapi.json)
 	setupDocsRoutes(app, "/app/api")
 
@@ -86,13 +91,13 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	})
 
 	// Register Huma endpoints
-	setupHumaRoutes(humaAPI, repo, s3Client)
+	setupHumaRoutes(humaAPI, repo, config, s3Client)
 
 	return app, humaAPI
 }
 
 // Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository, s3Client *s3_client.Client) {
+func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
@@ -104,4 +109,5 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, s3Client *s3_client
 	routes.SetupGuardiansRoutes(api, repo)
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo)
+	routes.SetupAuthRoutes(api, repo, config)
 }

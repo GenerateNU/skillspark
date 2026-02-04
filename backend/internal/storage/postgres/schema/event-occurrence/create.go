@@ -14,8 +14,8 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, i
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, 
-		query, 
+	row := r.db.QueryRow(ctx,
+		query,
 		input.Body.ManagerId,
 		input.Body.EventId,
 		input.Body.LocationId,

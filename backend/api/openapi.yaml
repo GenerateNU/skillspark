@@ -9,6 +9,118 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 paths:
+  /api/v1/auth/login/guardian:
+    post:
+      tags:
+        - Auth
+      summary: Login a guardian
+      description: Logs in a guardian
+      operationId: login-guardian
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuardianLoginOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/auth/login/manager:
+    post:
+      tags:
+        - Auth
+      summary: Login a manager
+      description: Logs in a manager
+      operationId: login-manager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerLoginOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/auth/signup/guardian:
+    post:
+      tags:
+        - Auth
+      summary: Register a guardian
+      description: Registers a guardian
+      operationId: signup-guardian
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuardianSignUpInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuardianSignUpOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/auth/signup/manager:
+    post:
+      tags:
+        - Auth
+      summary: Register a manager
+      description: Registers a manager
+      operationId: signup-manager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManagerSignUpInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerSignUpOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/child:
     post:
       tags:
@@ -1553,14 +1665,10 @@ components:
         profile_picture_s3_key:
           type: string
           description: S3 key for profile picture
-        user_id:
-          type: string
-          description: User ID associated with the guardian
         username:
           type: string
           description: Username of the guardian
       required:
-        - user_id
         - name
         - email
         - username
@@ -1662,14 +1770,10 @@ components:
         role:
           type: string
           description: role of the manager being created
-        user_id:
-          type: string
-          description: User ID associated with the manager
         username:
           type: string
           description: Username of the guardian
       required:
-        - user_id
         - name
         - email
         - username
@@ -2055,6 +2159,69 @@ components:
         - language_preference
         - created_at
         - updated_at
+    GuardianLoginOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GuardianLoginOutputBody.json
+          readOnly: true
+        guardian_id:
+          type: string
+      required:
+        - guardian_id
+    GuardianSignUpInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GuardianSignUpInputBody.json
+          readOnly: true
+        email:
+          type: string
+        language_preference:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+        profile_picture_s3_key:
+          type: string
+        username:
+          type: string
+      required:
+        - name
+        - email
+        - username
+        - password
+        - profile_picture_s3_key
+        - language_preference
+    GuardianSignUpOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GuardianSignUpOutputBody.json
+          readOnly: true
+        guardian_id:
+          type: string
+        token:
+          type: string
+      required:
+        - token
+        - guardian_id
     HealthOutputBody:
       type: object
       additionalProperties: false
@@ -2166,6 +2333,24 @@ components:
         - country
         - created_at
         - updated_at
+    LoginInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/LoginInputBody.json
+          readOnly: true
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
     Manager:
       type: object
       additionalProperties: false
@@ -2213,6 +2398,79 @@ components:
         - language_preference
         - created_at
         - updated_at
+    ManagerLoginOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ManagerLoginOutputBody.json
+          readOnly: true
+        manager_id:
+          type: string
+      required:
+        - manager_id
+    ManagerSignUpInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ManagerSignUpInputBody.json
+          readOnly: true
+        email:
+          type: string
+          description: email of the manager
+        language_preference:
+          type: string
+          description: language preference of the manager
+        name:
+          type: string
+          description: name of the manager
+        organization_id:
+          type: string
+          description: organization id of the organization the manager is associated with
+        password:
+          type: string
+          description: password of the manager
+        profile_picture_s3_key:
+          type: string
+          description: profile picture s3 key of the manager
+        role:
+          type: string
+          description: role of the manager being created
+        username:
+          type: string
+          description: username of the manager
+      required:
+        - name
+        - email
+        - username
+        - password
+    ManagerSignUpOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ManagerSignUpOutputBody.json
+          readOnly: true
+        manager_id:
+          type: string
+        token:
+          type: string
+      required:
+        - token
+        - manager_id
     Organization:
       type: object
       additionalProperties: false
