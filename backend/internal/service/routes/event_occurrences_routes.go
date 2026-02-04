@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/models"
-	"skillspark/internal/service/handler/event-occurrence"
+	eventoccurrence "skillspark/internal/service/handler/event-occurrence"
 	"skillspark/internal/storage"
 	"skillspark/internal/utils"
 
@@ -95,6 +95,29 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 
 		return &models.UpdateEventOccurrenceOutput{
 			Body: eventOccurrence,
+		}, nil
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "cancel-event-occurrence",
+		Method:      http.MethodDelete,
+		Path:        "/api/v1/event-occurrences/{id}",
+		Summary:     "Cancel an event occurrence and cancel its associated registrations",
+		Description: "Cancel an event occurrence and cancel its associated registrations",
+		Tags:        []string{"Event Occurrences"},
+	}, func(ctx context.Context, input *models.CancelEventOccurrenceInput) (*models.CancelEventOccurrenceOutput, error) {
+
+		msg, err := eventOccurrenceHandler.CancelEventOccurrence(ctx, input.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.CancelEventOccurrenceOutput{
+			Body: struct {
+				Message string `json:"message" doc:"Success message"`
+			}{
+				Message: msg,
+			},
 		}, nil
 	})
 }

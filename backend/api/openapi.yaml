@@ -354,6 +354,33 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+    delete:
+      tags:
+        - Event Occurrences
+      summary: Cancel an event occurrence and cancel its associated registrations
+      description: Cancel an event occurrence and cancel its associated registrations
+      operationId: cancel-event-occurrence
+      parameters:
+        - name: id
+          in: path
+          description: ID of an event occurrence
+          required: true
+          schema:
+            type: string
+            description: ID of an event occurrence
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelEventOccurrenceOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
     patch:
       tags:
         - Event Occurrences
@@ -1502,6 +1529,22 @@ paths:
                 $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
+    CancelEventOccurrenceOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CancelEventOccurrenceOutputBody.json
+          readOnly: true
+        message:
+          type: string
+          description: Success message
+      required:
+        - message
     Child:
       type: object
       additionalProperties: false
@@ -2029,6 +2072,12 @@ components:
         start_time:
           type: string
           format: date-time
+        status:
+          type: string
+          description: Current status of the event occurrence
+          enum:
+            - scheduled
+            - cancelled
         updated_at:
           type: string
           format: date-time
@@ -2044,6 +2093,7 @@ components:
         - curr_enrolled
         - created_at
         - updated_at
+        - status
     GetGreetingOutputBody:
       type: object
       additionalProperties: false

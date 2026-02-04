@@ -81,6 +81,7 @@ type EventOccurrenceRepository interface {
 	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error)
 	CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error)
 	UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.EventOccurrence, error)
+	CancelEventOccurrence(ctx context.Context, id uuid.UUID) error
 }
 
 type RegistrationRepository interface {
