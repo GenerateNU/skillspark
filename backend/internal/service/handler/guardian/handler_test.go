@@ -66,7 +66,6 @@ func TestHandler_GetGuardianById(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
-			mockManagerRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
@@ -74,7 +73,7 @@ func TestHandler_GetGuardianById(t *testing.T) {
 				ServiceRoleKey: "mock-key",
 			}
 
-			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
+			handler := NewHandler(mockRepo, cfg)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByIDInput{ID: uuid.MustParse(tt.id)}
@@ -98,7 +97,7 @@ func TestHandler_CreateGuardian(t *testing.T) {
 	tests := []struct {
 		name      string
 		input     *models.CreateGuardianInput
-		mockSetup func(*repomocks.MockGuardianRepository)
+		mockSetup func(*repomocks.MockGuardianRepository, )
 		wantErr   bool
 	}{
 		{
@@ -111,7 +110,7 @@ func TestHandler_CreateGuardian(t *testing.T) {
 				input.Body.LanguagePreference = "en"
 				return input
 			}(),
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("CreateGuardian", mock.Anything, mock.AnythingOfType("*models.CreateGuardianInput")).Return(&models.Guardian{
 					ID:        uuid.New(),
 					UserID:    uuid.New(),
@@ -132,7 +131,7 @@ func TestHandler_CreateGuardian(t *testing.T) {
 				input.Body.LanguagePreference = "en"
 				return input
 			}(),
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("CreateGuardian", mock.Anything, mock.AnythingOfType("*models.CreateGuardianInput")).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.InternalServerError("Internal server error").Code,
@@ -156,7 +155,7 @@ func TestHandler_CreateGuardian(t *testing.T) {
 				ServiceRoleKey: "mock-key",
 			}
 
-			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
+			handler := NewHandler(mockRepo, cfg)
 			ctx := context.Background()
 
 			guardian, err := handler.CreateGuardian(ctx, tt.input)
@@ -244,7 +243,7 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 				ServiceRoleKey: "mock-key",
 			}
 
-			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
+			handler := NewHandler(mockRepo, cfg)
 			ctx := context.Background()
 
 			guardian, err := handler.UpdateGuardian(ctx, tt.input)
@@ -310,7 +309,7 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 				ServiceRoleKey: "mock-key",
 			}
 
-			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
+			handler := NewHandler(mockRepo, cfg)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByChildIDInput{ChildID: uuid.MustParse(tt.childID)}
@@ -378,7 +377,7 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 				ServiceRoleKey: "key",
 			}
 
-			handler := NewHandler(mockRepo, mockManagerRepo, cfg)
+			handler := NewHandler(mockRepo, cfg)
 			ctx := context.Background()
 
 			input := &models.DeleteGuardianInput{ID: uuid.MustParse(tt.id)}
