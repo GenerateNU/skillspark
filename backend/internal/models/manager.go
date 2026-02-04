@@ -43,10 +43,11 @@ type CreateManagerInput struct {
 		Name                string     `json:"name" doc:"Name of the guardian"`
 		Email               string     `json:"email" doc:"Email of the guardian"`
 		Username            string     `json:"username" doc:"Username of the guardian"`
-		ProfilePictureS3Key *string    `json:"profile_picture_s3_key,omitempty" doc:"S3 key for profile picture"`
+		ProfilePictureS3Key *string    `json:"profile_picture_s3_key,omitempty" doc:"S3 key for profile picture" required:"false"`
 		LanguagePreference  string     `json:"language_preference" doc:"Language preference"`
 		OrganizationID      *uuid.UUID `json:"organization_id,omitempty" db:"organization_id" doc:"organization id of the organization the manager is associated with"`
 		Role                string     `json:"role" db:"role" doc:"role of the manager being created"`
+		AuthID              *uuid.UUID `json:"auth_id,omitempty" db:"auth_id" doc:"auth id of the manager being created" required:"false"`
 	}
 }
 

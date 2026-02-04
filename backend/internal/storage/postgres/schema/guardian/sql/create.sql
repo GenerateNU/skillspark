@@ -1,7 +1,7 @@
 WITH new_user AS (
-    INSERT INTO "user" (name, email, username, profile_picture_s3_key, language_preference)
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING id, name, email, username, profile_picture_s3_key, language_preference
+    INSERT INTO "user" (name, email, username, profile_picture_s3_key, language_preference, auth_id)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING id, name, email, username, profile_picture_s3_key, language_preference, auth_id
 ),
 new_guardian AS (
     INSERT INTO guardian (user_id)
