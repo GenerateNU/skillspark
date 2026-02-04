@@ -39,7 +39,7 @@ func TestEventOccurrenceRepository_CancelEventOccurrence(t *testing.T) {
 	assert.Equal(t, "cancelled", string(updatedEo.Status))
 }
 
-func TestEventOccurrenceRepository_DeleteEventOccurrence_Within24HoursFails(t *testing.T) {
+func TestEventOccurrenceRepository_CancelEventOccurrence_Within24HoursFails(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
@@ -48,8 +48,9 @@ func TestEventOccurrenceRepository_DeleteEventOccurrence_Within24HoursFails(t *t
 	repo := NewEventOccurrenceRepository(testDB)
 	ctx := context.Background()
 
-	start := time.Now().Add(-2 * time.Hour)
-	end := time.Now().Add(1 * time.Hour)
+	// Event happening within the next 24 hours
+	start := time.Now().Add(2 * time.Hour)
+	end := start.Add(1 * time.Hour)
 
 	eventOccurrenceInput := func() *models.CreateEventOccurrenceInput {
 		input := &models.CreateEventOccurrenceInput{}
@@ -68,9 +69,11 @@ func TestEventOccurrenceRepository_DeleteEventOccurrence_Within24HoursFails(t *t
 	assert.NotNil(t, eventOccurrence)
 
 	err = repo.CancelEventOccurrence(ctx, eventOccurrence.ID)
-
 	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Cannot delete event happening within the next 24 hours")
 
-	_, getErr := repo.GetEventOccurrenceByID(ctx, eventOccurrence.ID)
+	storedEO, getErr := repo.GetEventOccurrenceByID(ctx, eventOccurrence.ID)
 	assert.NoError(t, getErr)
+	assert.NotNil(t, storedEO)
+	assert.Equal(t, eventOccurrence.ID, storedEO.ID)
 }
