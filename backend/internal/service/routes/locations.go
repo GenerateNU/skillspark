@@ -6,6 +6,7 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/service/handler/location"
 	"skillspark/internal/storage"
+	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 )
@@ -45,6 +46,39 @@ func SetupLocationsRoutes(api huma.API, repo *storage.Repository) {
 
 		return &models.CreateLocationOutput{
 			Body: location,
+		}, nil
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-all-locations",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/locations",
+		Summary:     "Get all locations",
+		Description: "Returns all locations",
+		Tags:        []string{"Locations"},
+	}, func(ctx context.Context, input *models.GetAllLocationsInput) (*models.GetAllLocationsOutput, error) {
+		page := input.Page
+		if page == 0 {
+			page = 1
+		}
+
+		limit := input.Limit
+		if limit == 0 {
+			limit = 10
+		}
+
+		pagination := utils.Pagination{
+			Page:  page,
+			Limit: limit,
+		}
+
+		locations, err := locationHandler.GetAllLocations(ctx, pagination)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetAllLocationsOutput{
+			Body: locations,
 		}, nil
 	})
 }

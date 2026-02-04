@@ -13,6 +13,7 @@ import (
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -213,6 +214,89 @@ func TestHumaValidation_GetLocationByID(t *testing.T) {
 			req, err := http.NewRequest(
 				http.MethodGet,
 				"/api/v1/locations/"+tt.locationID,
+				nil,
+			)
+			assert.NoError(t, err)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHumaValidation_GetAllLocations(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name        string
+		queryParams string
+		mockSetup   func(*repomocks.MockLocationRepository)
+		statusCode  int
+	}{
+		{
+			name:        "valid request default pagination",
+			queryParams: "",
+			mockSetup: func(m *repomocks.MockLocationRepository) {
+				m.On(
+					"GetAllLocations",
+					mock.Anything,
+					utils.Pagination{Page: 1, Limit: 100},
+				).Return([]models.Location{
+					{
+						ID:        uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+						District:  "New York",
+						Latitude:  40.7128,
+						Longitude: -74.0060,
+					},
+				}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:        "valid request custom pagination",
+			queryParams: "?page=2&limit=5",
+			mockSetup: func(m *repomocks.MockLocationRepository) {
+				m.On(
+					"GetAllLocations",
+					mock.Anything,
+					utils.Pagination{Page: 2, Limit: 5},
+				).Return([]models.Location{}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:        "internal server error",
+			queryParams: "",
+			mockSetup: func(m *repomocks.MockLocationRepository) {
+				m.On(
+					"GetAllLocations",
+					mock.Anything,
+					mock.AnythingOfType("utils.Pagination"),
+				).Return(nil, &errs.HTTPError{
+					Code:    http.StatusInternalServerError,
+					Message: "Internal server error",
+				})
+			},
+			statusCode: http.StatusInternalServerError,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockLocationRepository)
+			tt.mockSetup(mockRepo)
+
+			app, _ := setupTestAPI(mockRepo)
+
+			req, err := http.NewRequest(
+				http.MethodGet,
+				"/api/v1/locations"+tt.queryParams,
 				nil,
 			)
 			assert.NoError(t, err)
