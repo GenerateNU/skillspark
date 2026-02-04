@@ -41,21 +41,6 @@ func (h *Handler) GuardianSignUp(ctx context.Context, input *models.GuardianSign
 		return nil, errs.BadRequest(fmt.Sprintf("Creating Guardian/User failed: %v", err))
 	}
 
-	// _, err = h.userRepository.UpdateUser(ctx, func() *models.UpdateUserInput {
-	// 	updateUserInput := &models.UpdateUserInput{}
-	// 	updateUserInput.ID = guardian.UserID
-	// 	updateUserInput.Body.AuthID = &res.User.ID
-	// 	return updateUserInput
-	// }())
-	// if err != nil {
-	// 	// Cleanup: the Supabase auth user
-	// 	if deleteErr := auth.SupabaseDeleteUser(&h.config, res.User.ID); deleteErr != nil {
-	// 		slog.Error(fmt.Sprintf("Failed to cleanup Supabase user after guardian creation failure: %v", deleteErr))
-	// 		return nil, errs.InternalServerError(fmt.Sprintf("Creating Guardian failed: %v. WARNING: The following types are stranded and need manual cleanup: %v", err, deleteErr))
-	// 	}
-	// 	return nil, errs.BadRequest(fmt.Sprintf("Creating Guardian/User failed: %v", err))
-	// }
-
 	guardianOutput := &models.GuardianSignUpOutput{}
 
 	guardianOutput.Body.Token = res.AccessToken
@@ -94,22 +79,6 @@ func (h *Handler) ManagerSignUp(ctx context.Context, input *models.ManagerSignUp
 
 		return nil, errs.BadRequest(fmt.Sprintf("Creating Manager/User failed: %v", err))
 	}
-
-	// attach auth user to user entity
-	// _, err = h.userRepository.UpdateUser(ctx, func() *models.UpdateUserInput {
-	// 	updateUserInput := &models.UpdateUserInput{}
-	// 	updateUserInput.ID = manager.UserID
-	// 	updateUserInput.Body.AuthID = &res.User.ID
-	// 	return updateUserInput
-	// }())
-	// if err != nil {
-	// 	// Cleanup the Supabase auth user
-	// 	if deleteErr := auth.SupabaseDeleteUser(&h.config, res.User.ID); deleteErr != nil {
-	// 		slog.Error(fmt.Sprintf("Failed to cleanup Supabase user after guardian creation failure: %v", deleteErr))
-	// 		return nil, errs.InternalServerError(fmt.Sprintf("Creating Guardian failed: %v. WARNING: The following types are stranded and need manual cleanup: %v", err, deleteErr))
-	// 	}
-	// 	return nil, errs.BadRequest(fmt.Sprintf("Creating Guardian/User failed: %v", err))
-	// }
 
 	managerOutput := &models.ManagerSignUpOutput{}
 
