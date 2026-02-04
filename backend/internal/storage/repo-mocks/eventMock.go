@@ -12,8 +12,8 @@ type MockEventRepository struct {
 	mock.Mock
 }
 
-func (m *MockEventRepository) CreateEvent(ctx context.Context, input *models.CreateEventInput) (*models.Event, error) {
-	args := m.Called(ctx, input)
+func (m *MockEventRepository) CreateEvent(ctx context.Context, input *models.CreateEventInput, HeaderImageS3Key *string) (*models.Event, error) {
+	args := m.Called(ctx, input, HeaderImageS3Key)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil
@@ -23,8 +23,8 @@ func (m *MockEventRepository) CreateEvent(ctx context.Context, input *models.Cre
 	return args.Get(0).(*models.Event), nil
 }
 
-func (m *MockEventRepository) UpdateEvent(ctx context.Context, input *models.UpdateEventInput) (*models.Event, error) {
-	args := m.Called(ctx, input)
+func (m *MockEventRepository) UpdateEvent(ctx context.Context, input *models.UpdateEventInput, HeaderImageS3Key *string) (*models.Event, error) {
+	args := m.Called(ctx, input, HeaderImageS3Key)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil

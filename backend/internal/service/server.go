@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
+	"skillspark/internal/s3_client"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
@@ -26,19 +27,23 @@ type App struct {
 }
 
 // Initialize the App union type containing a fiber app and repository.
-func InitApp(config config.Config) *App {
+func InitApp(config config.Config) (*App, error) {
 	ctx := context.Background()
 	repo := postgres.NewRepository(ctx, config.DB)
-	app, humaAPI := SetupApp(config, repo)
+	s3Client, err := s3_client.NewClient(config.S3)
+	if err != nil {
+		return nil, err
+	}
+	app, humaAPI := SetupApp(config, repo, s3Client)
 	return &App{
 		Server: app,
 		Repo:   repo,
 		API:    humaAPI,
-	}
+	}, nil
 }
 
 // Setup the fiber app with the specified configuration and database.
-func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.API) {
+func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client) (*fiber.App, huma.API) {
 	app := fiber.New(fiber.Config{
 		JSONEncoder:  go_json.Marshal,
 		JSONDecoder:  go_json.Unmarshal,
@@ -81,19 +86,19 @@ func SetupApp(config config.Config, repo *storage.Repository) (*fiber.App, huma.
 	})
 
 	// Register Huma endpoints
-	setupHumaRoutes(humaAPI, repo)
+	setupHumaRoutes(humaAPI, repo, s3Client)
 
 	return app, humaAPI
 }
 
 // Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository) {
+func setupHumaRoutes(api huma.API, repo *storage.Repository, s3Client *s3_client.Client) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
-	routes.SetupOrganizationRoutes(api, repo)
+	routes.SetupOrganizationRoutes(api, repo, s3Client)
 	routes.SetupSchoolsRoutes(api, repo)
-	routes.SetupEventRoutes(api, repo)
+	routes.SetupEventRoutes(api, repo, s3Client)
 	routes.SetupManagerRoutes(api, repo)
 	routes.SetupRegistrationRoutes(api, repo)
 	routes.SetupGuardiansRoutes(api, repo)

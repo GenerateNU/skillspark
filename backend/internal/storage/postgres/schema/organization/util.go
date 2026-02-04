@@ -22,7 +22,7 @@ func CreateTestOrganization(
 	i.Body.Name = "Test Corp"
 	i.Body.Active = &active
 
-	organization, _ := repo.CreateOrganization(ctx, i)
+	organization, _ := repo.CreateOrganization(ctx, i, nil)
 
 	// t.Logf("error returned: %v", err)
 

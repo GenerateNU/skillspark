@@ -1,0 +1,42 @@
+package s3_client
+
+import (
+	"bytes"
+	"context"
+	"errors"
+	"fmt"
+	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+)
+
+// UploadImage uploads file content to S3 with the given key.
+// The caller is responsible for closing the reader after this function returns.
+
+func (c *Client) UploadImage(ctx context.Context, key *string, image_data []byte) (*string, error) {
+	if key == nil {
+		return nil, errors.New("key cannot be empty")
+	}
+
+	data := bytes.NewReader(image_data)
+
+	_, err := c.S3.PutObject(ctx, &s3.PutObjectInput{
+		Bucket:      aws.String(c.Bucket),
+		Key:         aws.String(*key),
+		Body:        data,
+		ContentType: aws.String("image/png"),
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload image with key %q: %w", *key, err)
+	}
+
+	url, err := c.GeneratePresignedURL(ctx, *key, time.Hour)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to return presign URL after image upload %q: %w", *key, err)
+	}
+
+	return &url, nil
+}

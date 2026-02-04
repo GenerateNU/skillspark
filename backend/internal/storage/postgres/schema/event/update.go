@@ -7,14 +7,14 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *EventRepository) UpdateEvent(ctx context.Context, input *models.UpdateEventInput) (*models.Event, error) {
+func (r *EventRepository) UpdateEvent(ctx context.Context, input *models.UpdateEventInput, HeaderImageS3Key *string) (*models.Event, error) {
 	query, err := schema.ReadSQLBaseScript("event/sql/update.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, input.ID, input.Body.Title, input.Body.Description, input.Body.OrganizationID, input.Body.AgeRangeMin, input.Body.AgeRangeMax, input.Body.Category, input.Body.HeaderImageS3Key)
+	row := r.db.QueryRow(ctx, query, input.ID, input.Body.Title, input.Body.Description, input.Body.OrganizationID, input.Body.AgeRangeMin, input.Body.AgeRangeMax, input.Body.Category, HeaderImageS3Key)
 
 	var event models.Event
 
