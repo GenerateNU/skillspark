@@ -32,10 +32,10 @@ type SchoolRepository interface {
 }
 
 type OrganizationRepository interface {
-	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput) (*models.Organization, error)
+	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, error)
 	GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, error)
 	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, error)
-	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput) (*models.Organization, error)
+	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, error)
 	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error)
 	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID) ([]models.EventOccurrence, error)
 }
@@ -61,8 +61,8 @@ type GuardianRepository interface {
 }
 
 type EventRepository interface {
-	CreateEvent(ctx context.Context, location *models.CreateEventInput) (*models.Event, error)
-	UpdateEvent(ctx context.Context, location *models.UpdateEventInput) (*models.Event, error)
+	CreateEvent(ctx context.Context, location *models.CreateEventInput, HeaderImageS3Key *string) (*models.Event, error)
+	UpdateEvent(ctx context.Context, location *models.UpdateEventInput, HeaderImageS3Key *string) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
 	GetEventByID(ctx context.Context, id uuid.UUID) (*models.Event, error)

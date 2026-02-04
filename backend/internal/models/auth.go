@@ -30,10 +30,11 @@ type ManagerSignUpInput struct {
 		Email               string     `json:"email" db:"email" doc:"email of the manager" required:"true"`
 		Username            string     `json:"username" db:"username" doc:"username of the manager" required:"true"`
 		Password            string     `json:"password" db:"password" doc:"password of the manager" required:"true"`
-		ProfilePictureS3Key *string    `json:"profile_picture_s3_key" db:"profile_picture_s3_key" doc:"profile picture s3 key of the manager" required:"false"`
-		LanguagePreference  string     `json:"language_preference" db:"language_preference" doc:"language preference of the manager" required:"false"`
-		OrganizationID      *uuid.UUID `json:"organization_id" db:"organization_id" doc:"organization id of the organization the manager is associated with" required:"false"`
-		Role                string     `json:"role" db:"role" doc:"role of the manager being created" required:"false"`
+		ProfilePictureS3Key *string    `json:"profile_picture_s3_key,omitempty" db:"profile_picture_s3_key" doc:"profile picture s3 key of the manager" required:"false"`
+		LanguagePreference  string     `json:"language_preference" db:"language_preference" doc:"language preference of the manager" required:"true"`
+		OrganizationID      uuid.UUID `json:"organization_id" db:"organization_id" doc:"organization id of the organization the manager is associated with" required:"true"`
+		Role                string    `json:"role" db:"role" doc:"role of the manager being created" required:"true"`
+		AuthID              *uuid.UUID `json:"auth_id,omitempty" db:"auth_id" doc:"auth id of the manager being created" required:"false"`
 	}
 }
 

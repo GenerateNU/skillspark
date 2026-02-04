@@ -26,7 +26,7 @@ func TestDeleteOrganization(t *testing.T) {
 		return i
 	}()
 
-	created, createErr := repo.CreateOrganization(ctx, input)
+	created, createErr := repo.CreateOrganization(ctx, input, nil)
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 
@@ -70,7 +70,7 @@ func TestDeleteOrganization_AlreadyDeleted(t *testing.T) {
 		return i
 	}()
 
-	created, createErr := repo.CreateOrganization(ctx, input)
+	created, createErr := repo.CreateOrganization(ctx, input, nil)
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 

@@ -23,7 +23,10 @@ func main() {
 	}
 
 	// Initialize application with config
-	app := service.InitApp(*cfg)
+	app, err := service.InitApp(*cfg)
+	if err != nil {
+		log.Fatalf("Failed to initialize application: %v", err)
+	}
 
 	// Close database connection when main exits
 	defer func() {

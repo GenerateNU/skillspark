@@ -18,13 +18,13 @@ func TestHandler_GetGuardianById(t *testing.T) {
 	tests := []struct {
 		name      string
 		id        string
-		mockSetup func(*repomocks.MockGuardianRepository, *repomocks.MockManagerRepository)
+		mockSetup func(*repomocks.MockGuardianRepository)
 		wantErr   bool
 	}{
 		{
 			name: "successful get guardian by id - Sarah Johnson",
 			id:   "11111111-1111-1111-1111-111111111111",
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("GetGuardianByID", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111111")).Return(&models.Guardian{
 					ID:        uuid.MustParse("11111111-1111-1111-1111-111111111111"),
 					UserID:    uuid.MustParse("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"),
@@ -37,7 +37,7 @@ func TestHandler_GetGuardianById(t *testing.T) {
 		{
 			name: "guardian not found",
 			id:   "00000000-0000-0000-0000-000000000000",
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("GetGuardianByID", mock.Anything, uuid.MustParse("00000000-0000-0000-0000-000000000000")).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("Guardian", "id", "00000000-0000-0000-0000-000000000000").Code,
@@ -49,7 +49,7 @@ func TestHandler_GetGuardianById(t *testing.T) {
 		{
 			name: "internal server error",
 			id:   "ffffffff-ffff-ffff-ffff-ffffffffffff",
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("GetGuardianByID", mock.Anything, uuid.MustParse("ffffffff-ffff-ffff-ffff-ffffffffffff")).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.InternalServerError("Internal server error").Code,
@@ -66,8 +66,8 @@ func TestHandler_GetGuardianById(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
-			mockManagerRepo := new(repomocks.MockManagerRepository)
-			tt.mockSetup(mockRepo, mockManagerRepo)
+			mockManagerRepo := new(repomocks.MockGuardianRepository)
+			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
 				URL:            "http://mock-supabase",
@@ -90,7 +90,6 @@ func TestHandler_GetGuardianById(t *testing.T) {
 			}
 
 			mockRepo.AssertExpectations(t)
-			mockManagerRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -99,7 +98,7 @@ func TestHandler_CreateGuardian(t *testing.T) {
 	tests := []struct {
 		name      string
 		input     *models.CreateGuardianInput
-		mockSetup func(*repomocks.MockGuardianRepository, *repomocks.MockManagerRepository)
+		mockSetup func(*repomocks.MockGuardianRepository)
 		wantErr   bool
 	}{
 		{
@@ -150,8 +149,7 @@ func TestHandler_CreateGuardian(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
-			mockManagerRepo := new(repomocks.MockManagerRepository)
-			tt.mockSetup(mockRepo, mockManagerRepo)
+			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
 				URL:            "http://mock-supabase",
@@ -173,7 +171,6 @@ func TestHandler_CreateGuardian(t *testing.T) {
 			}
 
 			mockRepo.AssertExpectations(t)
-			mockManagerRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -183,7 +180,7 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 		name      string
 		id        string
 		input     *models.UpdateGuardianInput
-		mockSetup func(*repomocks.MockGuardianRepository, *repomocks.MockManagerRepository)
+		mockSetup func(*repomocks.MockGuardianRepository)
 		wantErr   bool
 	}{
 		{
@@ -198,7 +195,7 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 				input.Body.LanguagePreference = "es"
 				return input
 			}(),
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("UpdateGuardian", mock.Anything, mock.MatchedBy(func(input *models.UpdateGuardianInput) bool {
 					return input.ID == uuid.MustParse("11111111-1111-1111-1111-111111111111")
 				})).Return(&models.Guardian{
@@ -223,7 +220,7 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 				input.Body.Name = "Unknown"
 				return input
 			}(),
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("UpdateGuardian", mock.Anything, mock.AnythingOfType("*models.UpdateGuardianInput")).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("Guardian", "id", "00000000-0000-0000-0000-000000000000").Code,
@@ -240,8 +237,7 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
-			mockManagerRepo := new(repomocks.MockManagerRepository)
-			tt.mockSetup(mockRepo, mockManagerRepo)
+			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
 				URL:            "http://mock-supabase",
@@ -263,7 +259,6 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 			}
 
 			mockRepo.AssertExpectations(t)
-			mockManagerRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -272,13 +267,13 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 	tests := []struct {
 		name      string
 		childID   string
-		mockSetup func(*repomocks.MockGuardianRepository, *repomocks.MockManagerRepository)
+		mockSetup func(*repomocks.MockGuardianRepository)
 		wantErr   bool
 	}{
 		{
 			name:    "successful get guardian by child id - Emily Johnson",
 			childID: "30000000-0000-0000-0000-000000000001",
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("GetGuardianByChildID", mock.Anything, uuid.MustParse("30000000-0000-0000-0000-000000000001")).Return(&models.Guardian{
 					ID:        uuid.MustParse("11111111-1111-1111-1111-111111111111"),
 					UserID:    uuid.MustParse("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"),
@@ -291,7 +286,7 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 		{
 			name:    "guardian not found for child",
 			childID: "00000000-0000-0000-0000-000000000000",
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("GetGuardianByChildID", mock.Anything, uuid.MustParse("00000000-0000-0000-0000-000000000000")).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("Guardian", "child_id", "00000000-0000-0000-0000-000000000000").Code,
@@ -308,8 +303,7 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
-			mockManagerRepo := new(repomocks.MockManagerRepository)
-			tt.mockSetup(mockRepo, mockManagerRepo)
+			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
 				URL:            "http://mock-supabase",
@@ -332,7 +326,6 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 			}
 
 			mockRepo.AssertExpectations(t)
-			mockManagerRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -341,13 +334,13 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 	tests := []struct {
 		name      string
 		id        string
-		mockSetup func(*repomocks.MockGuardianRepository, *repomocks.MockManagerRepository)
+		mockSetup func(*repomocks.MockGuardianRepository)
 		wantErr   bool
 	}{
 		{
 			name: "successful delete guardian - Sarah Johnson", // assume guardian has no children
 			id:   "11111111-1111-1111-1111-111111111111",
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("DeleteGuardian", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111111")).Return(&models.Guardian{
 					ID:        uuid.MustParse("11111111-1111-1111-1111-111111111111"),
 					UserID:    uuid.MustParse("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"),
@@ -361,7 +354,7 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 		{
 			name: "guardian not found",
 			id:   "00000000-0000-0000-0000-000000000000",
-			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("DeleteGuardian", mock.Anything, uuid.MustParse("00000000-0000-0000-0000-000000000000")).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("Guardian", "id", "00000000-0000-0000-0000-000000000000").Code,
@@ -378,8 +371,7 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
-			mockManagerRepo := new(repomocks.MockManagerRepository)
-			tt.mockSetup(mockRepo, mockManagerRepo)
+			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
 				URL:            "http://mock",
@@ -402,7 +394,6 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 			}
 
 			mockRepo.AssertExpectations(t)
-			mockManagerRepo.AssertExpectations(t)
 		})
 	}
 }

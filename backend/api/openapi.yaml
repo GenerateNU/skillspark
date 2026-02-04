@@ -398,10 +398,53 @@ paths:
       operationId: create-event
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateEventInputBody'
-        required: true
+              type: object
+              properties:
+                age_range_max:
+                  type: integer
+                  format: int64
+                age_range_min:
+                  type: integer
+                  format: int64
+                category:
+                  type: array
+                  items:
+                    type: string
+                description:
+                  type: string
+                  minLength: 2
+                  maxLength: 200
+                header_image:
+                  type: string
+                  format: binary
+                  contentEncoding: binary
+                organization_id:
+                  type: string
+                title:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+              required:
+                - title
+                - description
+                - organization_id
+            encoding:
+              age_range_max:
+                contentType: text/plain
+              age_range_min:
+                contentType: text/plain
+              category:
+                contentType: text/plain
+              description:
+                contentType: text/plain
+              header_image:
+                contentType: image/png,image/jpeg
+              organization_id:
+                contentType: text/plain
+              title:
+                contentType: text/plain
       responses:
         "200":
           description: OK
@@ -486,10 +529,49 @@ paths:
             type: string
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UpdateEventInputBody'
-        required: true
+              type: object
+              properties:
+                age_range_max:
+                  type: integer
+                  format: int64
+                age_range_min:
+                  type: integer
+                  format: int64
+                category:
+                  type: array
+                  items:
+                    type: string
+                description:
+                  type: string
+                  minLength: 2
+                  maxLength: 200
+                header_image:
+                  type: string
+                  format: binary
+                  contentEncoding: binary
+                organization_id:
+                  type: string
+                title:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+            encoding:
+              age_range_max:
+                contentType: text/plain
+              age_range_min:
+                contentType: text/plain
+              category:
+                contentType: text/plain
+              description:
+                contentType: text/plain
+              header_image:
+                contentType: image/png,image/jpeg
+              organization_id:
+                contentType: text/plain
+              title:
+                contentType: text/plain
       responses:
         "200":
           description: OK
@@ -919,10 +1001,33 @@ paths:
       operationId: create-organization
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateOrganizationInputBody'
-        required: true
+              type: object
+              properties:
+                active:
+                  type: boolean
+                location_id:
+                  type: string
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                profile_image:
+                  type: string
+                  format: binary
+                  contentEncoding: binary
+              required:
+                - name
+            encoding:
+              active:
+                contentType: text/plain
+              location_id:
+                contentType: text/plain
+              name:
+                contentType: text/plain
+              profile_image:
+                contentType: image/png,image/jpeg
       responses:
         "200":
           description: OK
@@ -1003,18 +1108,38 @@ paths:
       parameters:
         - name: id
           in: path
-          description: Organization ID
           required: true
           schema:
             type: string
-            description: Organization ID
-            format: uuid
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UpdateOrganizationInputBody'
-        required: true
+              type: object
+              properties:
+                active:
+                  type: boolean
+                location_id:
+                  type: string
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                profile_image:
+                  type: string
+                  format: binary
+                  contentEncoding: binary
+              required:
+                - name
+            encoding:
+              active:
+                contentType: text/plain
+              location_id:
+                contentType: text/plain
+              name:
+                contentType: text/plain
+              profile_image:
+                contentType: image/png,image/jpeg
       responses:
         "200":
           description: OK
@@ -1471,58 +1596,6 @@ components:
         - birth_year
         - interests
         - guardian_id
-    CreateEventInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/CreateEventInputBody.json
-          readOnly: true
-        age_range_max:
-          type: integer
-          description: Max age for the event
-          format: int64
-          minimum: 0
-          maximum: 100
-        age_range_min:
-          type: integer
-          description: Minimum age for the event
-          format: int64
-          minimum: 0
-          maximum: 100
-        category:
-          type: array
-          description: Category of the event
-          items:
-            type: string
-        description:
-          type: string
-          description: Description of the event
-          minLength: 2
-          maxLength: 200
-        header_image_s3_key:
-          type: string
-          description: S3 key for the header image
-        organization_id:
-          type: string
-          description: ID of the hosting organization
-        title:
-          type: string
-          description: Title of the event
-          minLength: 2
-          maxLength: 100
-      required:
-        - title
-        - description
-        - organization_id
-        - age_range_min
-        - age_range_max
-        - category
-        - header_image_s3_key
     CreateEventOccurrenceInputBody:
       type: object
       additionalProperties: false
@@ -1901,6 +1974,8 @@ components:
           type: string
         organization_id:
           type: string
+        presigned_url:
+          type: string
         title:
           type: string
         updated_at:
@@ -1915,6 +1990,7 @@ components:
         - age_range_max
         - category
         - header_image_s3_key
+        - presigned_url
         - created_at
         - updated_at
     EventOccurrence:
@@ -2428,6 +2504,7 @@ components:
         - active
         - created_at
         - updated_at
+    Organization:
     PatchManagerInputBody:
       type: object
       additionalProperties: false
@@ -2501,6 +2578,8 @@ components:
           format: date-time
         status:
           type: string
+        presigned_url:
+          type: string
           description: Current status of the registration
           enum:
             - registered
@@ -2511,6 +2590,38 @@ components:
           format: date-time
       required:
         - id
+        - name
+        - active
+        - presigned_url
+        - created_at
+        - updated_at
+    PatchManagerInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/PatchManagerInputBody.json
+          readOnly: true
+        id:
+          type: string
+          description: id of the manager
+        organization_id:
+          type: string
+          description: organization id of the organization the manager is associated with
+        role:
+          type: string
+          description: role of the manager being created
+        user_id:
+          type: string
+          description: user id of the manager
+      required:
+        - id
+        - user_id
+        - role
         - child_id
         - guardian_id
         - event_occurrence_id
@@ -2696,6 +2807,7 @@ components:
           type: string
           description: Username of the guardian
       required:
+        - user_id
         - name
         - email
         - username

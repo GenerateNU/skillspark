@@ -26,7 +26,7 @@ func TestCreateOrganization(t *testing.T) {
 		return i
 	}()
 
-	created, err := repo.CreateOrganization(ctx, input)
+	created, err := repo.CreateOrganization(ctx, input, nil)
 
 	require.Nil(t, err)
 	require.NotNil(t, created)
@@ -51,7 +51,7 @@ func TestCreateOrganization_WithLocation(t *testing.T) {
 		return i
 	}()
 
-	created, err := repo.CreateOrganization(ctx, input)
+	created, err := repo.CreateOrganization(ctx, input, nil)
 
 	require.Nil(t, err)
 	require.NotNil(t, created)
@@ -72,11 +72,10 @@ func TestCreateOrganization_WithPfp(t *testing.T) {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Test Corp with Profile"
 		i.Body.Active = &active
-		i.Body.PfpS3Key = &pfpKey
 		return i
 	}()
 
-	created, err := repo.CreateOrganization(ctx, input)
+	created, err := repo.CreateOrganization(ctx, input, &pfpKey)
 
 	require.Nil(t, err)
 	require.NotNil(t, created)
@@ -98,7 +97,7 @@ func TestCreateOrganization_Inactive(t *testing.T) {
 		return i
 	}()
 
-	created, err := repo.CreateOrganization(ctx, input)
+	created, err := repo.CreateOrganization(ctx, input, nil)
 
 	require.Nil(t, err)
 	require.NotNil(t, created)
@@ -119,12 +118,11 @@ func TestCreateOrganization_FullDetails(t *testing.T) {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Full Details Corp"
 		i.Body.Active = &active
-		i.Body.PfpS3Key = &pfpKey
 		i.Body.LocationID = &locationID
 		return i
 	}()
 
-	created, err := repo.CreateOrganization(ctx, input)
+	created, err := repo.CreateOrganization(ctx, input, &pfpKey)
 
 	require.Nil(t, err)
 	require.NotNil(t, created)

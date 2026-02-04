@@ -188,7 +188,6 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
-				"user_id": 				uuid.MustParse("21111111-1111-1111-1111-121212121212"),
 				"name":                "Alice Smith",
 				"email":               "alice@org.com",
 				"username":            "alices",

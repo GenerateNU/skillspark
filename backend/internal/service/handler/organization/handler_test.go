@@ -3,10 +3,13 @@ package organization
 import (
 	"context"
 	"net/http/httptest"
+	"net/url"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	s3mocks "skillspark/internal/s3_client/mocks"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"skillspark/internal/utils"
+	"strings"
 	"testing"
 	"time"
 
@@ -17,11 +20,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// createMockS3Client creates a mock S3 client for testing
+func createMockS3Client() *s3mocks.S3ClientMock {
+	return new(s3mocks.S3ClientMock)
+}
+
 func TestHandler_GetOrganizationById(t *testing.T) {
 	tests := []struct {
 		name           string
 		id             string
 		mockSetup      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockS3Setup    func(*s3mocks.S3ClientMock)
 		expectedStatus int
 		wantErr        bool
 	}{
@@ -41,6 +50,9 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 					UpdatedAt:  time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				m.On("GeneratePresignedURL", mock.Anything, "orgs/profile.jpg", mock.Anything).Return("https://test-bucket.s3.amazonaws.com/orgs/profile.jpg", nil)
+			},
 			expectedStatus: 200,
 			wantErr:        false,
 		},
@@ -52,6 +64,9 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 					Code:    errs.InternalServerError("Internal server error").Code,
 					Message: "Internal server error",
 				})
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
 			},
 			expectedStatus: 500,
 			wantErr:        true,
@@ -67,11 +82,14 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
 			app.Get("/organizations/:id", func(c *fiber.Ctx) error {
 				output, err := handler.GetOrganizationById(c.Context(), &models.GetOrganizationByIDInput{
 					ID: uuid.MustParse(c.Params("id")),
-				})
+				}, mockS3)
 				if err != nil {
 					return err
 				}
@@ -83,31 +101,42 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 
 			assert.Equal(t, tt.expectedStatus, res.StatusCode)
 			mockOrgRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }
 
 func TestHandler_CreateOrganization(t *testing.T) {
+	// Dummy image data (PNG header bytes)
+	dummyImageData := []byte{
+		0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+		0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+		0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+		0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53,
+	}
+	pfpKey := "orgs/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11/pfp.jpg"
+
 	tests := []struct {
-		name      string
-		input     *models.CreateOrganizationInput
-		mockSetup func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
-		wantErr   bool
+		name        string
+		input       *models.CreateOrganizationInput
+		updateBody  *models.UpdateOrganizationBody
+		imageData   *[]byte
+		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockS3Setup func(*s3mocks.S3ClientMock)
+		wantErr     bool
+		wantURL     bool
 	}{
 		{
 			name: "successful create without location",
 			input: &models.CreateOrganizationInput{
-				Body: struct {
-					Name       string     `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
-					Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
-					PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-					LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-				}{
+				Body: models.CreateOrganizationBody{
 					Name: "Tech Corp",
 				},
 			},
+			updateBody: nil,
+			imageData:  nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput")).Return(&models.Organization{
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput"), mock.Anything).Return(&models.Organization{
 					ID:        uuid.New(),
 					Name:      "Tech Corp",
 					Active:    true,
@@ -115,26 +144,27 @@ func TestHandler_CreateOrganization(t *testing.T) {
 					UpdatedAt: time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no image
+			},
 			wantErr: false,
+			wantURL: false,
 		},
 		{
 			name: "successful create with location",
 			input: &models.CreateOrganizationInput{
-				Body: struct {
-					Name       string     `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
-					Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
-					PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-					LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-				}{
+				Body: models.CreateOrganizationBody{
 					Name:       "Tech Corp",
 					LocationID: func() *uuid.UUID { id := uuid.New(); return &id }(),
 				},
 			},
+			updateBody: nil,
+			imageData:  nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
 				locRepo.On("GetLocationByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.Location{
 					ID: uuid.New(),
 				}, nil)
-				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput")).Return(&models.Organization{
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput"), mock.Anything).Return(&models.Organization{
 					ID:        uuid.New(),
 					Name:      "Tech Corp",
 					Active:    true,
@@ -142,48 +172,88 @@ func TestHandler_CreateOrganization(t *testing.T) {
 					UpdatedAt: time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no image
+			},
 			wantErr: false,
+			wantURL: false,
+		},
+		{
+			name: "successful create with image - returns valid presigned URL",
+			input: &models.CreateOrganizationInput{
+				Body: models.CreateOrganizationBody{
+					Name: "Tech Corp",
+				},
+			},
+			updateBody: &models.UpdateOrganizationBody{},
+			imageData:  &dummyImageData,
+			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
+				orgID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput"), mock.Anything).Return(&models.Organization{
+					ID:        orgID,
+					Name:      "Tech Corp",
+					Active:    true,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), mock.Anything).Return(&models.Organization{
+					ID:        orgID,
+					Name:      "Tech Corp",
+					Active:    true,
+					PfpS3Key:  &pfpKey,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/test/pfp.jpg?X-Amz-Signature=abc123"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
+			wantErr: false,
+			wantURL: true,
 		},
 		{
 			name: "invalid location_id",
 			input: &models.CreateOrganizationInput{
-				Body: struct {
-					Name       string     `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
-					Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
-					PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-					LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-				}{
+				Body: models.CreateOrganizationBody{
 					Name:       "Tech Corp",
 					LocationID: func() *uuid.UUID { id := uuid.New(); return &id }(),
 				},
 			},
+			updateBody: nil,
+			imageData:  nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
 				locRepo.On("GetLocationByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Location not found").Code,
 					Message: "Location not found",
 				})
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
+			},
 			wantErr: true,
+			wantURL: false,
 		},
 		{
 			name: "database error on create",
 			input: &models.CreateOrganizationInput{
-				Body: struct {
-					Name       string     `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
-					Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
-					PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-					LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-				}{
+				Body: models.CreateOrganizationBody{
 					Name: "Tech Corp",
 				},
 			},
+			updateBody: nil,
+			imageData:  nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput")).Return(nil, &errs.HTTPError{
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput"), mock.Anything).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Database error").Code,
 					Message: "Database error",
 				})
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
+			},
 			wantErr: true,
+			wantURL: false,
 		},
 	}
 
@@ -193,19 +263,33 @@ func TestHandler_CreateOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo)
-			output, err := handler.CreateOrganization(context.TODO(), tt.input)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			output, err := handler.CreateOrganization(context.TODO(), tt.input, tt.updateBody, tt.imageData, mockS3)
 
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, tt.input.Body.Name, output.Body.Name)
+				assert.Equal(t, tt.input.Body.Name, output.Name)
+			}
+
+			if tt.wantURL {
+				require.NotNil(t, output.PresignedURL, "expected presigned URL to be returned")
+				// Validate URL structure
+				parsedURL, parseErr := url.Parse(*output.PresignedURL)
+				require.NoError(t, parseErr, "presigned URL should be valid")
+				assert.True(t, strings.HasPrefix(parsedURL.Scheme, "http"), "URL should have http/https scheme")
+			} else if !tt.wantErr {
+				assert.Nil(t, output.PresignedURL, "expected no presigned URL when no image data provided")
 			}
 
 			mockOrgRepo.AssertExpectations(t)
 			mockLocRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }
@@ -214,28 +298,37 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 	existingID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	newName := "Updated Name"
 	activeFalse := false
+	pfpKey := "orgs/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11/pfp.jpg"
+
+	// Dummy image data (PNG header)
+	dummyImageData := []byte{
+		0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+		0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+		0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+		0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53,
+		0xDE, 0x00, 0x00, 0x00, 0x0C, 0x49, 0x44, 0x41,
+	}
 
 	tests := []struct {
-		name      string
-		input     *models.UpdateOrganizationInput
-		mockSetup func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
-		wantErr   bool
+		name        string
+		input       *models.UpdateOrganizationInput
+		imageData   *[]byte
+		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockS3Setup func(*s3mocks.S3ClientMock)
+		wantErr     bool
+		wantURL     bool
 	}{
 		{
 			name: "successful update name only",
 			input: &models.UpdateOrganizationInput{
 				ID: existingID,
-				Body: struct {
-					Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
-					Active     *bool      `json:"active,omitempty" doc:"Active status"`
-					PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-					LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-				}{
+				Body: models.UpdateOrganizationBody{
 					Name: &newName,
 				},
 			},
+			imageData: nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput")).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(&models.Organization{
 					ID:        existingID,
 					Name:      "Updated Name",
 					Active:    true,
@@ -243,24 +336,24 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 					UpdatedAt: time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no image
+			},
 			wantErr: false,
+			wantURL: false,
 		},
 		{
 			name: "successful update multiple fields",
 			input: &models.UpdateOrganizationInput{
 				ID: existingID,
-				Body: struct {
-					Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
-					Active     *bool      `json:"active,omitempty" doc:"Active status"`
-					PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-					LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-				}{
+				Body: models.UpdateOrganizationBody{
 					Name:   &newName,
 					Active: &activeFalse,
 				},
 			},
+			imageData: nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput")).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(&models.Organization{
 					ID:        existingID,
 					Name:      "Updated Name",
 					Active:    false,
@@ -268,49 +361,105 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 					UpdatedAt: time.Now(),
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no image
+			},
 			wantErr: false,
+			wantURL: false,
 		},
 		{
-			name: "organization not found",
+			name: "successful update with image - returns valid presigned URL",
 			input: &models.UpdateOrganizationInput{
 				ID: existingID,
-				Body: struct {
-					Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
-					Active     *bool      `json:"active,omitempty" doc:"Active status"`
-					PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-					LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-				}{
+				Body: models.UpdateOrganizationBody{
 					Name: &newName,
 				},
 			},
+			imageData: &dummyImageData,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput")).Return(nil, &errs.HTTPError{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), mock.Anything).Return(&models.Organization{
+					ID:        existingID,
+					Name:      "Updated Name",
+					Active:    true,
+					PfpS3Key:  &pfpKey,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/test/pfp.jpg?X-Amz-Signature=abc123"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
+			wantErr: false,
+			wantURL: true,
+		},
+		{
+			name: "successful update with image - existing key reused",
+			input: &models.UpdateOrganizationInput{
+				ID: existingID,
+				Body: models.UpdateOrganizationBody{
+					Name: &newName,
+				},
+			},
+			imageData: &dummyImageData,
+			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), mock.Anything).Return(&models.Organization{
+					ID:        existingID,
+					Name:      "Updated Name",
+					Active:    true,
+					PfpS3Key:  &pfpKey,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/test/pfp.jpg?X-Amz-Signature=abc123"
+				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
+			wantErr: false,
+			wantURL: true,
+		},
+		{
+			name: "organization not found on update",
+			input: &models.UpdateOrganizationInput{
+				ID: existingID,
+				Body: models.UpdateOrganizationBody{
+					Name: &newName,
+				},
+			},
+			imageData: nil,
+			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(nil, &errs.HTTPError{
 					Code:    errs.NotFound("Organization", "id", existingID.String()).Code,
 					Message: "Organization not found",
 				})
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
+			},
 			wantErr: true,
+			wantURL: false,
 		},
 		{
 			name: "invalid location_id on update",
 			input: &models.UpdateOrganizationInput{
 				ID: existingID,
-				Body: struct {
-					Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
-					Active     *bool      `json:"active,omitempty" doc:"Active status"`
-					PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-					LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-				}{
+				Body: models.UpdateOrganizationBody{
 					LocationID: func() *uuid.UUID { id := uuid.New(); return &id }(),
 				},
 			},
+			imageData: nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
 				locRepo.On("GetLocationByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Location not found").Code,
 					Message: "Location not found",
 				})
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
+			},
 			wantErr: true,
+			wantURL: false,
 		},
 	}
 
@@ -320,8 +469,11 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo)
-			output, err := handler.UpdateOrganization(context.TODO(), tt.input)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			output, err := handler.UpdateOrganization(context.TODO(), tt.input, tt.imageData, mockS3)
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -330,12 +482,22 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 				require.NoError(t, err)
 				require.NotNil(t, output)
 				if tt.input.Body.Name != nil {
-					assert.Equal(t, *tt.input.Body.Name, output.Body.Name)
+					assert.Equal(t, *tt.input.Body.Name, output.Name)
 				}
+			}
+
+			if tt.wantURL {
+				require.NotNil(t, output.PresignedURL, "expected presigned URL to be returned")
+				parsedURL, parseErr := url.Parse(*output.PresignedURL)
+				require.NoError(t, parseErr, "presigned URL should be valid")
+				assert.True(t, strings.HasPrefix(parsedURL.Scheme, "http"), "URL should have http/https scheme")
+			} else if !tt.wantErr {
+				assert.Nil(t, output.PresignedURL, "expected no presigned URL when no image data provided")
 			}
 
 			mockOrgRepo.AssertExpectations(t)
 			mockLocRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }
@@ -380,7 +542,8 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo)
+			mockS3 := createMockS3Client()
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
 			output, err := handler.DeleteOrganization(context.TODO(), &models.DeleteOrganizationInput{
 				ID: uuid.MustParse(tt.id),
 			})
@@ -403,6 +566,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 		name        string
 		pagination  utils.Pagination
 		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockS3Setup func(*s3mocks.S3ClientMock)
 		wantErr     bool
 		expectedLen int
 	}{
@@ -416,6 +580,9 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 				}
 				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(orgs, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no pfp keys
+			},
 			wantErr:     false,
 			expectedLen: 2,
 		},
@@ -427,6 +594,9 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 					{ID: uuid.New(), Name: "Org 3", Active: true},
 				}
 				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(orgs, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected when no pfp keys
 			},
 			wantErr:     false,
 			expectedLen: 1,
@@ -440,6 +610,9 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 					Message: "Database error",
 				})
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				// No S3 calls expected on error
+			},
 			wantErr:     true,
 			expectedLen: 0,
 		},
@@ -451,8 +624,11 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo)
-			output, err := handler.GetAllOrganizations(context.TODO(), tt.pagination)
+			mockS3 := createMockS3Client()
+			tt.mockS3Setup(mockS3)
+
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			output, err := handler.GetAllOrganizations(context.TODO(), tt.pagination, mockS3)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -463,6 +639,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			}
 
 			mockOrgRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
 		})
 	}
 }
@@ -577,7 +754,8 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			handler := NewHandler(mockRepo, mockLocationRepo)
+			mockS3 := createMockS3Client()
+			handler := NewHandler(mockRepo, mockLocationRepo, mockS3)
 			ctx := context.Background()
 
 			input := &models.GetEventOccurrencesByOrganizationIDInput{ID: uuid.MustParse(tt.id)}

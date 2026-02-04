@@ -63,7 +63,6 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 		{
 			name: "valid payload",
 			payload: map[string]interface{}{
-				"user_id": 				uuid.MustParse("50000000-0000-0000-0000-000000000001"),
 				"name":                "John Doe",
 				"email":               "john@example.com",
 				"username":            "johndoe",

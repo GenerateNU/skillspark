@@ -8,7 +8,6 @@ import (
 	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/testutil"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,7 +25,7 @@ func TestManagerRepository_Delete_Director(t *testing.T) {
 
 	managerInput := func() *models.CreateManagerInput {
 		input := &models.CreateManagerInput{}
-		input.Body.UserID = uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c")
+
 		input.Body.OrganizationID = &organizationID
 		input.Body.Name = "Delete Man"
 		input.Body.Email = "delete.m@example.com"
