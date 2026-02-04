@@ -769,6 +769,46 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
   /api/v1/locations:
+    get:
+      tags:
+        - Locations
+      summary: Get all locations
+      description: Returns all locations
+      operationId: get-all-locations
+      parameters:
+        - name: page
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 100
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of all locations in the database
+                items:
+                  $ref: '#/components/schemas/Location'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
     post:
       tags:
         - Locations
@@ -1653,6 +1693,9 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateGuardianInputBody.json
           readOnly: true
+        auth_id:
+          type: string
+          description: auth id of the guardian being created
         email:
           type: string
           description: Email of the guardian
@@ -1735,7 +1778,6 @@ components:
         - latitude
         - longitude
         - address_line1
-        - address_line2
         - subdistrict
         - district
         - province
@@ -1752,6 +1794,9 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateManagerInputBody.json
           readOnly: true
+        auth_id:
+          type: string
+          description: auth id of the manager being created
         email:
           type: string
           description: Email of the guardian
@@ -1779,35 +1824,6 @@ components:
         - username
         - language_preference
         - role
-    CreateOrganizationInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/CreateOrganizationInputBody.json
-          readOnly: true
-        active:
-          type: boolean
-          description: Active status (defaults to true)
-        location_id:
-          type: string
-          description: Associated location ID
-          format: uuid
-        name:
-          type: string
-          description: Organization name
-          minLength: 1
-          maxLength: 255
-        pfp_s3_key:
-          type: string
-          description: S3 key for profile picture
-          maxLength: 500
-      required:
-        - name
     CreateRegistrationInputBody:
       type: object
       additionalProperties: false
@@ -2424,6 +2440,9 @@ components:
           examples:
             - http://localhost:8080/schemas/ManagerSignUpInputBody.json
           readOnly: true
+        auth_id:
+          type: string
+          description: auth id of the manager being created
         email:
           type: string
           description: email of the manager
@@ -2453,6 +2472,9 @@ components:
         - email
         - username
         - password
+        - language_preference
+        - organization_id
+        - role
     ManagerSignUpOutputBody:
       type: object
       additionalProperties: false
@@ -2495,6 +2517,8 @@ components:
           type: string
         pfp_s3_key:
           type: string
+        presigned_url:
+          type: string
         updated_at:
           type: string
           format: date-time
@@ -2502,9 +2526,9 @@ components:
         - id
         - name
         - active
+        - presigned_url
         - created_at
         - updated_at
-    Organization:
     PatchManagerInputBody:
       type: object
       additionalProperties: false
@@ -2578,8 +2602,6 @@ components:
           format: date-time
         status:
           type: string
-        presigned_url:
-          type: string
           description: Current status of the registration
           enum:
             - registered
@@ -2590,38 +2612,6 @@ components:
           format: date-time
       required:
         - id
-        - name
-        - active
-        - presigned_url
-        - created_at
-        - updated_at
-    PatchManagerInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/PatchManagerInputBody.json
-          readOnly: true
-        id:
-          type: string
-          description: id of the manager
-        organization_id:
-          type: string
-          description: organization id of the organization the manager is associated with
-        role:
-          type: string
-          description: role of the manager being created
-        user_id:
-          type: string
-          description: user id of the manager
-      required:
-        - id
-        - user_id
-        - role
         - child_id
         - guardian_id
         - event_occurrence_id
@@ -2691,50 +2681,6 @@ components:
         school_id:
           type: string
           description: ID of the school the child goes to
-    UpdateEventInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/UpdateEventInputBody.json
-          readOnly: true
-        age_range_max:
-          type: integer
-          description: Max age for the event
-          format: int64
-          minimum: 0
-          maximum: 100
-        age_range_min:
-          type: integer
-          description: Minimum age for the event
-          format: int64
-          minimum: 0
-          maximum: 100
-        category:
-          type: array
-          description: Category of the event
-          items:
-            type: string
-        description:
-          type: string
-          description: Description of the event
-          minLength: 2
-          maxLength: 200
-        header_image_s3_key:
-          type: string
-          description: S3 key for the header image
-        organization_id:
-          type: string
-          description: ID of the hosting organization
-        title:
-          type: string
-          description: Title of the event
-          minLength: 2
-          maxLength: 100
     UpdateEventOccurrenceInputBody:
       type: object
       additionalProperties: false
@@ -2807,38 +2753,10 @@ components:
           type: string
           description: Username of the guardian
       required:
-        - user_id
         - name
         - email
         - username
         - language_preference
-    UpdateOrganizationInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/UpdateOrganizationInputBody.json
-          readOnly: true
-        active:
-          type: boolean
-          description: Active status
-        location_id:
-          type: string
-          description: Associated location ID
-          format: uuid
-        name:
-          type: string
-          description: Organization name
-          minLength: 1
-          maxLength: 255
-        pfp_s3_key:
-          type: string
-          description: S3 key for profile picture
-          maxLength: 500
     UpdateRegistrationInputBody:
       type: object
       additionalProperties: false
