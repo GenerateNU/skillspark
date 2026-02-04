@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"skillspark/internal/errs"
+	"skillspark/internal/storage/postgres/schema"
 	"time"
 
 	"github.com/google/uuid"
@@ -11,18 +12,21 @@ import (
 )
 
 func (r *EventOccurrenceRepository) CancelEventOccurrence(ctx context.Context, id uuid.UUID) error {
-
 	eo, err := r.GetEventOccurrenceByID(ctx, id)
-
 	if err != nil {
-		err := errs.InternalServerError("Failed to find event occurrence with given ID: ", err.Error())
-		return &err
+		e := errs.InternalServerError(
+			"Failed to find event occurrence with given ID: ",
+			err.Error(),
+		)
+		return &e
 	}
 
 	now := time.Now()
 	if eo.StartTime.After(now) && eo.StartTime.Before(now.Add(24*time.Hour)) {
-		err := errs.InternalServerError("Cannot delete event happening within the next 24 hours.")
-		return &err
+		e := errs.InternalServerError(
+			"Cannot delete event happening within the next 24 hours.",
+		)
+		return &e
 	}
 
 	tx, err := r.db.Begin(ctx)
@@ -37,22 +41,30 @@ func (r *EventOccurrenceRepository) CancelEventOccurrence(ctx context.Context, i
 		}
 	}()
 
-	_, err = tx.Exec(ctx, `
-		UPDATE registration
-		SET status = 'cancelled'
-		WHERE event_occurrence_id = $1
-	`, id)
+	// cancel associated registrations
+	cancelRegistrationsQuery, err := schema.ReadSQLBaseScript(
+		"event-occurrence/sql/cancel_registrations.sql",
+	)
 	if err != nil {
+		e := errs.InternalServerError("Failed to read cancel registrations SQL", err.Error())
+		return &e
+	}
+
+	if _, err := tx.Exec(ctx, cancelRegistrationsQuery, id); err != nil {
 		e := errs.InternalServerError("Failed to cancel registrations", err.Error())
 		return &e
 	}
 
-	commandTag, err := tx.Exec(ctx, `
-		UPDATE event_occurrence
-		SET status = 'cancelled',
-			updated_at = NOW()
-		WHERE id = $1
-	`, id)
+	// cancel the event occurrence
+	cancelEventOccurrenceQuery, err := schema.ReadSQLBaseScript(
+		"event-occurrence/sql/cancel_eventoccurrence.sql",
+	)
+	if err != nil {
+		e := errs.InternalServerError("Failed to read cancel event occurrence SQL", err.Error())
+		return &e
+	}
+
+	commandTag, err := tx.Exec(ctx, cancelEventOccurrenceQuery, id)
 	if err != nil {
 		e := errs.InternalServerError("Failed to cancel event occurrence", err.Error())
 		return &e
