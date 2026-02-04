@@ -1,0 +1,9 @@
+{
+  "name": "frontend",
+  "private": true,
+  "scripts": {
+    "dev:web": "bun run dev --filter apps/web",
+    "dev:mobile": "bun run start --filter apps/mobile",
+    "generate:api": "bun run generate --filter packages/api-client"
+  }
+}
