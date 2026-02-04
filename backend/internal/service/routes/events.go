@@ -2,7 +2,6 @@ package routes
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"skillspark/internal/models"
@@ -95,7 +94,6 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 
 		image_data, err := io.ReadAll(formData.HeaderImage)
 		if err != nil {
-			fmt.Println(err)
 			return nil, err
 		}
 
