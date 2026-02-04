@@ -7,8 +7,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) DeleteEventOccurrence(ctx context.Context, id uuid.UUID) (string, *errs.HTTPError) {
-	err := h.EventOccurrenceRepository.DeleteEventOccurrence(ctx, id)
+func (h *Handler) CancelEventOccurrence(ctx context.Context, id uuid.UUID) (string, *errs.HTTPError) {
+	err := h.EventOccurrenceRepository.CancelEventOccurrence(ctx, id)
 	if err != nil {
 		return "", err.(*errs.HTTPError)
 	}

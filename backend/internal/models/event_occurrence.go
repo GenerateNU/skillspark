@@ -6,20 +6,28 @@ import (
 	"github.com/google/uuid"
 )
 
+type EventOccurrenceStatus string
+
+const (
+	EventOccurrenceStatusScheduled EventOccurrenceStatus = "scheduled"
+	EventOccurrenceStatusCancelled EventOccurrenceStatus = "cancelled"
+)
+
 // database model for a specific instance of an event
 // stores full type information for Event and Location
 type EventOccurrence struct {
-	ID           uuid.UUID  `json:"id" db:"id"`
-	ManagerId    *uuid.UUID `json:"manager_id" db:"manager_id"`
-	Event        Event      `json:"event" db:"-"`
-	Location     Location   `json:"location" db:"-"`
-	StartTime    time.Time  `json:"start_time" db:"start_time"`
-	EndTime      time.Time  `json:"end_time" db:"end_time"`
-	MaxAttendees int        `json:"max_attendees" db:"max_attendees"`
-	Language     string     `json:"language" db:"language"`
-	CurrEnrolled int        `json:"curr_enrolled" db:"curr_enrolled"`
-	CreatedAt    time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt    time.Time  `json:"updated_at" db:"updated_at"`
+	ID           uuid.UUID          `json:"id" db:"id"`
+	ManagerId    *uuid.UUID         `json:"manager_id" db:"manager_id"`
+	Event        Event              `json:"event" db:"-"`
+	Location     Location           `json:"location" db:"-"`
+	StartTime    time.Time          `json:"start_time" db:"start_time"`
+	EndTime      time.Time          `json:"end_time" db:"end_time"`
+	MaxAttendees int                `json:"max_attendees" db:"max_attendees"`
+	Language     string             `json:"language" db:"language"`
+	CurrEnrolled int                `json:"curr_enrolled" db:"curr_enrolled"`
+	CreatedAt    time.Time          `json:"created_at" db:"created_at"`
+	UpdatedAt    time.Time          `json:"updated_at" db:"updated_at"`
+	Status       RegistrationStatus `json:"status" db:"status" doc:"Current status of the event occurrence" enum:"scheduled,cancelled"`
 }
 
 // get all
@@ -77,11 +85,11 @@ type UpdateEventOccurrenceOutput struct {
 	Body *EventOccurrence `json:"body" doc:"Updated event occurrence"`
 }
 
-type DeleteEventOccurrenceInput struct {
+type CancelEventOccurrenceInput struct {
 	ID uuid.UUID `path:"id" doc:"ID of an event occurrence"`
 }
 
-type DeleteEventOccurrenceOutput struct {
+type CancelEventOccurrenceOutput struct {
 	Body struct {
 		Message string `json:"message" doc:"Success message"`
 	} `json:"body"`

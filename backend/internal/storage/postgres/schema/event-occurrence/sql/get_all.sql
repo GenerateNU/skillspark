@@ -8,6 +8,7 @@ SELECT
     eo.curr_enrolled,
     eo.created_at,
     eo.updated_at,
+    eo.status, 
 
     e.id,
     e.title,

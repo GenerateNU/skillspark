@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEventOccurrenceRepository_DeleteEventOccurrence(t *testing.T) {
+func TestEventOccurrenceRepository_CancelEventOccurrence(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
 	}
@@ -24,15 +24,19 @@ func TestEventOccurrenceRepository_DeleteEventOccurrence(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
+	// Create a test event occurrence
 	eo := CreateTestEventOccurrence(t, ctx, testDB)
 
-	err := repo.DeleteEventOccurrence(ctx, eo.ID)
-
+	// Cancel the event occurrence
+	err := repo.CancelEventOccurrence(ctx, eo.ID)
 	assert.NoError(t, err)
 
-	_, err = repo.GetEventOccurrenceByID(ctx, eo.ID)
-	assert.Error(t, err)
+	// Fetch the event occurrence again
+	updatedEo, err := repo.GetEventOccurrenceByID(ctx, eo.ID)
+	assert.NoError(t, err)
 
+	// Verify the status was set to 'cancelled'
+	assert.Equal(t, "cancelled", string(updatedEo.Status))
 }
 
 func TestEventOccurrenceRepository_DeleteEventOccurrence_Within24HoursFails(t *testing.T) {
@@ -63,7 +67,7 @@ func TestEventOccurrenceRepository_DeleteEventOccurrence_Within24HoursFails(t *t
 	assert.NoError(t, err)
 	assert.NotNil(t, eventOccurrence)
 
-	err = repo.DeleteEventOccurrence(ctx, eventOccurrence.ID)
+	err = repo.CancelEventOccurrence(ctx, eventOccurrence.ID)
 
 	assert.Error(t, err)
 

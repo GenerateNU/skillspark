@@ -41,6 +41,7 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 		&updatedEventOccurrence.CurrEnrolled,
 		&updatedEventOccurrence.CreatedAt,
 		&updatedEventOccurrence.UpdatedAt,
+		&updatedEventOccurrence.Status,
 
 		// event fields
 		&updatedEventOccurrence.Event.ID,

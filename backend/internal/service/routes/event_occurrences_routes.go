@@ -99,20 +99,20 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 	})
 
 	huma.Register(api, huma.Operation{
-		OperationID: "delete-event-occurrence",
+		OperationID: "cancel-event-occurrence",
 		Method:      http.MethodDelete,
 		Path:        "/api/v1/event-occurrences/{id}",
-		Summary:     "Delete an event occurrence and cancel its associated registrations",
-		Description: "Delete an event occurrence and cancel its associated registrations",
+		Summary:     "Cancel an event occurrence and cancel its associated registrations",
+		Description: "Cancel an event occurrence and cancel its associated registrations",
 		Tags:        []string{"Event Occurrences"},
-	}, func(ctx context.Context, input *models.DeleteEventOccurrenceInput) (*models.DeleteEventOccurrenceOutput, error) {
+	}, func(ctx context.Context, input *models.CancelEventOccurrenceInput) (*models.CancelEventOccurrenceOutput, error) {
 
-		msg, err := eventOccurrenceHandler.DeleteEventOccurrence(ctx, input.ID)
+		msg, err := eventOccurrenceHandler.CancelEventOccurrence(ctx, input.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		return &models.DeleteEventOccurrenceOutput{
+		return &models.CancelEventOccurrenceOutput{
 			Body: struct {
 				Message string `json:"message" doc:"Success message"`
 			}{

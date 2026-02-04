@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *EventOccurrenceRepository) DeleteEventOccurrence(ctx context.Context, id uuid.UUID) error {
+func (r *EventOccurrenceRepository) CancelEventOccurrence(ctx context.Context, id uuid.UUID) error {
 
 	eo, err := r.GetEventOccurrenceByID(ctx, id)
 
@@ -47,11 +47,13 @@ func (r *EventOccurrenceRepository) DeleteEventOccurrence(ctx context.Context, i
 	}
 
 	commandTag, err := tx.Exec(ctx, `
-		DELETE FROM event_occurrence
+		UPDATE event_occurrence
+		SET status = 'cancelled',
+			updated_at = NOW()
 		WHERE id = $1
 	`, id)
 	if err != nil {
-		e := errs.InternalServerError("Failed to delete event occurrence", err.Error())
+		e := errs.InternalServerError("Failed to cancel event occurrence", err.Error())
 		return &e
 	}
 
