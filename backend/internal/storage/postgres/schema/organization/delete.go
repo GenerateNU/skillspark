@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *OrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, *errs.HTTPError) {
+func (r *OrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error) {
 	query, err := schema.ReadSQLBaseScript("organization/sql/delete.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())

@@ -20,12 +20,12 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	createInput := func() *models.CreateEventInput {
 		input := &models.CreateEventInput{}
 		ageMin := 8
 		ageMax := 12
-		headerImage := "events/robotics_workshop.jpg"
 
 		input.Body.Title = "Junior Robotics Workshop"
 		input.Body.Description = "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!"
@@ -33,12 +33,12 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 		input.Body.AgeRangeMin = &ageMin
 		input.Body.AgeRangeMax = &ageMax
 		input.Body.Category = []string{"science", "technology"}
-		input.Body.HeaderImageS3Key = &headerImage
 
 		return input
 	}()
 
-	createdEvent, err := repo.CreateEvent(ctx, createInput)
+	headerImage := "events/robotics_workshop.jpg"
+	createdEvent, err := repo.CreateEvent(ctx, createInput, &headerImage)
 	assert.Nil(t, err)
 	assert.NotNil(t, createdEvent)
 
@@ -51,7 +51,6 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	newAgeMin := 10
 	newAgeMax := 14
 	newCategory := []string{"science", "technology"}
-	imageKey := "events/robotics_workshop.jpg"
 
 	updateInput.Body.Title = &newTitle
 	updateInput.Body.Description = &newDescription
@@ -59,9 +58,9 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	updateInput.Body.AgeRangeMin = &newAgeMin
 	updateInput.Body.AgeRangeMax = &newAgeMax
 	updateInput.Body.Category = &newCategory
-	updateInput.Body.HeaderImageS3Key = &imageKey
 
-	updatedEvent, err := repo.UpdateEvent(ctx, updateInput)
+	imageKey := "events/robotics_workshop.jpg"
+	updatedEvent, err := repo.UpdateEvent(ctx, updateInput, &imageKey)
 	assert.Nil(t, err)
 	assert.NotNil(t, updatedEvent)
 
@@ -87,6 +86,7 @@ func TestEventRepository_Update_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	updateInput := &models.UpdateEventInput{}
 	updateInput.ID = uuid.New()
@@ -97,7 +97,7 @@ func TestEventRepository_Update_NotFound(t *testing.T) {
 	updateInput.Body.Title = &title
 	updateInput.Body.OrganizationID = &orgID
 
-	updatedEvent, err := repo.UpdateEvent(ctx, updateInput)
+	updatedEvent, err := repo.UpdateEvent(ctx, updateInput, nil)
 	assert.Nil(t, updatedEvent)
 	assert.NotNil(t, err)
 }

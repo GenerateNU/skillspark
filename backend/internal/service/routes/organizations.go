@@ -2,8 +2,10 @@ package routes
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/storage"
 	"skillspark/internal/utils"
@@ -11,8 +13,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
-	orgHandler := organization.NewHandler(repo.Organization, repo.Location)
+func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface) {
+	orgHandler := organization.NewHandler(repo.Organization, repo.Location, s3Client)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "create-organization",
@@ -21,8 +23,41 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		Summary:     "Create a new organization",
 		Description: "Creates a new organization with the provided information",
 		Tags:        []string{"Organizations"},
-	}, func(ctx context.Context, input *models.CreateOrganizationInput) (*models.CreateOrganizationOutput, error) {
-		return orgHandler.CreateOrganization(ctx, input)
+	}, func(ctx context.Context, input *models.CreateOrganizationRouteInput) (*models.CreateOrganizationOutput, error) {
+
+		formData := input.RawBody.Data()
+
+		organizationBody := models.CreateOrganizationBody{
+			Name:       formData.Name,
+			Active:     &formData.Active,
+			LocationID: &formData.LocationID,
+		}
+
+		organizationModel := models.CreateOrganizationInput{
+			Body: organizationBody,
+		}
+
+		updateBody := models.UpdateOrganizationBody{
+			Name:       &formData.Name,
+			Active:     &formData.Active,
+			LocationID: &formData.LocationID,
+		}
+
+		image_data, err := io.ReadAll(formData.ProfileImage)
+		if err != nil {
+			return nil, err
+		}
+
+		organization, err := orgHandler.CreateOrganization(ctx, &organizationModel, &updateBody, &image_data, s3Client)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.CreateOrganizationOutput{
+			Body: *organization,
+		}, nil
+
 	})
 
 	huma.Register(api, huma.Operation{
@@ -33,7 +68,16 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		Description: "Returns a single organization by their ID",
 		Tags:        []string{"Organizations"},
 	}, func(ctx context.Context, input *models.GetOrganizationByIDInput) (*models.GetOrganizationByIDOutput, error) {
-		return orgHandler.GetOrganizationById(ctx, input)
+
+		organization, err := orgHandler.GetOrganizationById(ctx, input, s3Client)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetOrganizationByIDOutput{
+			Body: *organization,
+		}, nil
+
 	})
 
 	huma.Register(api, huma.Operation{
@@ -58,7 +102,7 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 			Limit: limit,
 		}
 
-		organizations, err := orgHandler.GetAllOrganizations(ctx, pagination)
+		organizations, err := orgHandler.GetAllOrganizations(ctx, pagination, s3Client)
 		if err != nil {
 			return nil, err
 		}
@@ -75,8 +119,35 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository) {
 		Summary:     "Update an organization",
 		Description: "Updates an existing organization with the provided fields (partial update)",
 		Tags:        []string{"Organizations"},
-	}, func(ctx context.Context, input *models.UpdateOrganizationInput) (*models.UpdateOrganizationOutput, error) {
-		return orgHandler.UpdateOrganization(ctx, input)
+	}, func(ctx context.Context, input *models.UpdateOrganizationRouteInput) (*models.UpdateOrganizationOutput, error) {
+		formData := input.RawBody.Data()
+
+		organizationBody := models.UpdateOrganizationBody{
+			Name:       &formData.Name,
+			Active:     &formData.Active,
+			LocationID: &formData.LocationID,
+		}
+
+		organizationModel := models.UpdateOrganizationInput{
+			Body: organizationBody,
+			ID:   input.ID,
+		}
+
+		image_data, err := io.ReadAll(formData.ProfileImage)
+		if err != nil {
+
+			return nil, err
+		}
+
+		organization, err := orgHandler.UpdateOrganization(ctx, &organizationModel, &image_data, s3Client)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.UpdateOrganizationOutput{
+			Body: *organization,
+		}, nil
 	})
 
 	huma.Register(api, huma.Operation{

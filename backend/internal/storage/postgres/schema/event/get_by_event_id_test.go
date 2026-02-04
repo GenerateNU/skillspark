@@ -17,6 +17,7 @@ func TestEventRepository_GetEventOccurrenceByEventId(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// check that get by event id returns multiple event occurrences with the same event id
 	eventOccurrences, err := repo.GetEventOccurrencesByEventID(ctx, uuid.MustParse("60000000-0000-0000-0000-00000000000d"))

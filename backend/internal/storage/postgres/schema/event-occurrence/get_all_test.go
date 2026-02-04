@@ -17,6 +17,7 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventOccurrenceRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// get the total number of event occurrences in the test database
 	var count int64
@@ -42,6 +43,7 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventOccurrenceRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// get the total number of event occurrences in the test database
 	var count int64

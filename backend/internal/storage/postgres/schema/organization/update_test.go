@@ -3,6 +3,7 @@ package organization
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
@@ -15,6 +16,7 @@ func TestUpdateOrganization(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Create an organization first
 	active := true
@@ -25,7 +27,7 @@ func TestUpdateOrganization(t *testing.T) {
 		return i
 	}()
 
-	created, createErr := repo.CreateOrganization(ctx, createInput)
+	created, createErr := repo.CreateOrganization(ctx, createInput, nil)
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 
@@ -34,18 +36,13 @@ func TestUpdateOrganization(t *testing.T) {
 	newActive := false
 	updateInput := &models.UpdateOrganizationInput{
 		ID: created.ID,
-		Body: struct {
-			Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
-			Active     *bool      `json:"active,omitempty" doc:"Active status"`
-			PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-			LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-		}{
+		Body: models.UpdateOrganizationBody{
 			Name:   &newName,
 			Active: &newActive,
 		},
 	}
 
-	updated, updateErr := repo.UpdateOrganization(ctx, updateInput)
+	updated, updateErr := repo.UpdateOrganization(ctx, updateInput, nil)
 	require.Nil(t, updateErr)
 	require.NotNil(t, updated)
 	assert.Equal(t, "Updated Name", updated.Name)
@@ -62,6 +59,7 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Create organization
 	active := true
@@ -72,27 +70,22 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 		return i
 	}()
 
-	created, createErr := repo.CreateOrganization(ctx, createInput)
+	created, createErr := repo.CreateOrganization(ctx, createInput, nil)
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 
 	// Update with location
-	locationID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 	newName := "Test Org with Location"
 	updateInput := &models.UpdateOrganizationInput{
 		ID: created.ID,
-		Body: struct {
-			Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
-			Active     *bool      `json:"active,omitempty" doc:"Active status"`
-			PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-			LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-		}{
+		Body: models.UpdateOrganizationBody{
 			Name:       &newName,
 			LocationID: &locationID,
 		},
 	}
 
-	updated, updateErr := repo.UpdateOrganization(ctx, updateInput)
+	updated, updateErr := repo.UpdateOrganization(ctx, updateInput, nil)
 	require.Nil(t, updateErr)
 	require.NotNil(t, updated)
 	assert.Equal(t, "Test Org with Location", updated.Name)
@@ -103,23 +96,19 @@ func TestUpdateOrganization_NotFound(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	// Try to update non-existent organization
 	nonExistentID := uuid.New()
 	newName := "Does Not Exist"
 	updateInput := &models.UpdateOrganizationInput{
 		ID: nonExistentID,
-		Body: struct {
-			Name       *string    `json:"name,omitempty" minLength:"1" maxLength:"255" doc:"Organization name"`
-			Active     *bool      `json:"active,omitempty" doc:"Active status"`
-			PfpS3Key   *string    `json:"pfp_s3_key,omitempty" maxLength:"500" doc:"S3 key for profile picture"`
-			LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
-		}{
+		Body: models.UpdateOrganizationBody{
 			Name: &newName,
 		},
 	}
 
-	updated, err := repo.UpdateOrganization(ctx, updateInput)
+	updated, err := repo.UpdateOrganization(ctx, updateInput, nil)
 
 	require.NotNil(t, err)
 	assert.Nil(t, updated)

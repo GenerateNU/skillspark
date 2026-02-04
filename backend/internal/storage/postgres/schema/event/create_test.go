@@ -20,12 +20,12 @@ func TestEventRepository_Create_JuniorRoboticsWorkshop(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventRepository(testDB)
 	ctx := context.Background()
+	t.Parallel()
 
 	eventInput := func() *models.CreateEventInput {
 		input := &models.CreateEventInput{}
 		ageMin := 8
 		ageMax := 12
-		headerImage := "events/robotics_workshop.jpg"
 
 		input.Body.Title = "Junior Robotics Workshop"
 		input.Body.Description = "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!"
@@ -33,12 +33,12 @@ func TestEventRepository_Create_JuniorRoboticsWorkshop(t *testing.T) {
 		input.Body.AgeRangeMin = &ageMin
 		input.Body.AgeRangeMax = &ageMax
 		input.Body.Category = []string{"science", "technology"}
-		input.Body.HeaderImageS3Key = &headerImage
 
 		return input
 	}()
 
-	event, err := repo.CreateEvent(ctx, eventInput)
+	headerImage := "events/robotics_workshop.jpg"
+	event, err := repo.CreateEvent(ctx, eventInput, &headerImage)
 	assert.Nil(t, err)
 	assert.NotNil(t, event)
 	assert.Equal(t, "Junior Robotics Workshop", event.Title)
