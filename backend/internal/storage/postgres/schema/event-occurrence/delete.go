@@ -19,7 +19,8 @@ func (r *EventOccurrenceRepository) CancelEventOccurrence(ctx context.Context, i
 		return &err
 	}
 
-	if eo.StartTime.After(time.Now().Add(-24 * time.Hour)) {
+	now := time.Now()
+	if eo.StartTime.After(now) && eo.StartTime.Before(now.Add(24*time.Hour)) {
 		err := errs.InternalServerError("Cannot delete event happening within the next 24 hours.")
 		return &err
 	}
