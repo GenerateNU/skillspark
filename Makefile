@@ -2,7 +2,7 @@
         docker-build docker-clean docker-prune \
         up down stop restart logs build clean \
         up-backend up-frontend logs-backend logs-frontend \
-        build-backend build-frontend shell-backend shell-frontend setup-hooks
+        build-backend build-frontend shell-backend shell-frontend setup-hooks generate-api
 
 # Default target - show help
 .DEFAULT_GOAL := help
@@ -232,3 +232,8 @@ setup-hooks:
 	@echo "Installing git hooks..."
 	@ln -sf ../../scripts/hooks/pre-commit .git/hooks/pre-commit
 	@echo "✅ Hooks installed!"
+
+
+
+generate-api:
+	cd frontend/packages/api-client && bun run generate

@@ -1,8 +1,8 @@
 services:
   web-frontend:
     build:
-      context: ./frontend/web
-      dockerfile: Dockerfile
+      context: ./frontend  # Changed from ./frontend/apps/web
+      dockerfile: apps/web/Dockerfile  # Path relative to context
     ports:
       - "80:80"
     depends_on:
@@ -12,7 +12,7 @@ services:
     container_name: web-frontend
     labels:
       - "description=Frontend available at http://localhost"
-
+  
   backend:
     build:
       context: ./backend
