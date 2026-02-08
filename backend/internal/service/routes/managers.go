@@ -12,7 +12,7 @@ import (
 )
 
 func SetupManagerRoutes(api huma.API, repo *storage.Repository, config config.Config) {
-	managerHandler := manager.NewHandler(repo.Manager, repo.Guardian, config.Supabase)
+	managerHandler := manager.NewHandler(repo.Manager, repo.GetDB(), config.Supabase)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-manager-by-id",

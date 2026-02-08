@@ -1,20 +1,22 @@
 package manager
 
 import (
-	"skillspark/internal/storage"
 	"skillspark/internal/config"
+	"skillspark/internal/storage"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Handler struct {
 	ManagerRepository  storage.ManagerRepository
-	GuardianRepository storage.GuardianRepository
+	db *pgxpool.Pool
 	config             config.Supabase
 }
 
-func NewHandler(managerRepository storage.ManagerRepository, guardianRepository storage.GuardianRepository, config config.Supabase) *Handler {
+func NewHandler(managerRepository storage.ManagerRepository, db *pgxpool.Pool, config config.Supabase) *Handler {
 	return &Handler{
 		ManagerRepository:  managerRepository,
-		GuardianRepository: guardianRepository,
+		db: db,
 		config: config,
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/testutil"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"testing"
 	"time"
@@ -73,7 +74,9 @@ func TestHandler_GetGuardianById(t *testing.T) {
 				ServiceRoleKey: "mock-key",
 			}
 
-			handler := NewHandler(mockRepo, cfg)
+			testDB := testutil.SetupTestDB(t)
+
+			handler := NewHandler(mockRepo, testDB, cfg)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByIDInput{ID: uuid.MustParse(tt.id)}
@@ -155,7 +158,9 @@ func TestHandler_CreateGuardian(t *testing.T) {
 				ServiceRoleKey: "mock-key",
 			}
 
-			handler := NewHandler(mockRepo, cfg)
+			testDB := testutil.SetupTestDB(t)
+
+			handler := NewHandler(mockRepo, testDB, cfg)
 			ctx := context.Background()
 
 			guardian, err := handler.CreateGuardian(ctx, tt.input)
@@ -243,7 +248,9 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 				ServiceRoleKey: "mock-key",
 			}
 
-			handler := NewHandler(mockRepo, cfg)
+			testDB := testutil.SetupTestDB(t)
+
+			handler := NewHandler(mockRepo, testDB, cfg)
 			ctx := context.Background()
 
 			guardian, err := handler.UpdateGuardian(ctx, tt.input)
@@ -309,7 +316,9 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 				ServiceRoleKey: "mock-key",
 			}
 
-			handler := NewHandler(mockRepo, cfg)
+			testDB := testutil.SetupTestDB(t)
+
+			handler := NewHandler(mockRepo, testDB, cfg)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByChildIDInput{ChildID: uuid.MustParse(tt.childID)}
@@ -377,7 +386,9 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 				ServiceRoleKey: "key",
 			}
 
-			handler := NewHandler(mockRepo, cfg)
+			testDB := testutil.SetupTestDB(t)
+
+			handler := NewHandler(mockRepo, testDB, cfg)
 			ctx := context.Background()
 
 			input := &models.DeleteGuardianInput{ID: uuid.MustParse(tt.id)}

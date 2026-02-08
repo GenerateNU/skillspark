@@ -53,6 +53,7 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 	t.Parallel()
 
 	userID := uuid.New()
+	authID := uuid.New()
 
 	tests := []struct {
 		name       string
@@ -67,6 +68,7 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 				"email":               "john@example.com",
 				"username":            "johndoe",
 				"language_preference": "en",
+				"auth_id": authID,
 			},
 			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
 
@@ -84,6 +86,7 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 					Email:              "john@example.com",
 					Username:           "johndoe",
 					LanguagePreference: "en",
+					AuthID: 			authID,
 					CreatedAt:          time.Now(),
 					UpdatedAt:          time.Now(),
 				}, nil)

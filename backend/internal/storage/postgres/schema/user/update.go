@@ -37,7 +37,7 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user *models.UpdateUser
 		existing.LanguagePreference = *user.Body.LanguagePreference
 	}
 	if user.Body.AuthID != nil {
-		existing.AuthID = user.Body.AuthID
+		existing.AuthID = *user.Body.AuthID
 	}
 
 	row := r.db.QueryRow(ctx, query, existing.Name, existing.Email, existing.Username, existing.ProfilePictureS3Key, existing.LanguagePreference, existing.AuthID, existing.ID)

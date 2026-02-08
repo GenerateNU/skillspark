@@ -22,7 +22,7 @@ func (r *GuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID) (
 
 	var deletedGuardian models.Guardian
 
-	err = row.Scan(&deletedGuardian.ID, &deletedGuardian.UserID, &deletedGuardian.Name, &deletedGuardian.Email, &deletedGuardian.Username, &deletedGuardian.ProfilePictureS3Key, &deletedGuardian.LanguagePreference, &deletedGuardian.CreatedAt, &deletedGuardian.UpdatedAt)
+	err = row.Scan(&deletedGuardian.ID, &deletedGuardian.UserID, &deletedGuardian.Name, &deletedGuardian.Email, &deletedGuardian.Username, &deletedGuardian.ProfilePictureS3Key, &deletedGuardian.LanguagePreference, &deletedGuardian.AuthID, &deletedGuardian.CreatedAt, &deletedGuardian.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			err := errs.NotFound("Guardian", "id", id)

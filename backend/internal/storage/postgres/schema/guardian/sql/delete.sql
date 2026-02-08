@@ -5,14 +5,14 @@ WITH deleted_guardian AS (
 deleted_user AS (
     DELETE FROM "user" 
     WHERE id = (SELECT user_id FROM deleted_guardian)
-    RETURNING id, name, email, username, profile_picture_s3_key, language_preference
+    RETURNING id, name, email, username, profile_picture_s3_key, language_preference, auth_id
 ),
 cancelled_registration AS (
     UPDATE registration
     SET status = 'cancelled'
-    WHERE guardian_id = (SELECT user_id FROM deleted_guardian)
+    WHERE guardian_id = (SELECT id FROM deleted_guardian)
     RETURNING *
 )
-SELECT dg.id, dg.user_id, du.name, du.email, du.username, du.profile_picture_s3_key, du.language_preference, dg.created_at, dg.updated_at
+SELECT dg.id, dg.user_id, du.name, du.email, du.username, du.profile_picture_s3_key, du.language_preference, du.auth_id, dg.created_at, dg.updated_at
 FROM deleted_guardian dg
 JOIN deleted_user du ON dg.user_id = du.id;

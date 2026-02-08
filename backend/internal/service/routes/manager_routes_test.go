@@ -24,7 +24,6 @@ import (
 
 func setupmanagerTestAPI(
 	managerRepo *repomocks.MockManagerRepository,
-	guardianRepo *repomocks.MockGuardianRepository,
 ) (*fiber.App, huma.API) {
 
 	app := fiber.New()
@@ -33,7 +32,6 @@ func setupmanagerTestAPI(
 
 	repo := &storage.Repository{
 		Manager:  managerRepo,
-		Guardian: guardianRepo,
 	}
 
 	cfg := config.Config {
@@ -89,10 +87,9 @@ func TestHumaValidation_GetManagerByID(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockManagerRepository)
-			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupmanagerTestAPI(mockRepo, mockGuardianRepo)
+			app, _ := setupmanagerTestAPI(mockRepo)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -151,10 +148,9 @@ func TestHumaValidation_GetManagerByOrgID(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockManagerRepository)
-			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupmanagerTestAPI(mockRepo, mockGuardianRepo)
+			app, _ := setupmanagerTestAPI(mockRepo)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -178,11 +174,12 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 
 	orgID := "40000000-0000-0000-0000-000000000006"
 	userID := uuid.New()
+	authID := uuid.New()
 
 	tests := []struct {
 		name       string
 		payload    map[string]interface{}
-		mockSetup  func(*repomocks.MockManagerRepository, *repomocks.MockGuardianRepository)
+		mockSetup  func(*repomocks.MockManagerRepository)
 		statusCode int
 	}{
 		{
@@ -194,8 +191,9 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 				"language_preference": "en",
 				"organization_id":     orgID,
 				"role":                "Assistant Director",
+				"auth_id": 				authID,
 			},
-			mockSetup: func(m *repomocks.MockManagerRepository, g *repomocks.MockGuardianRepository) {
+			mockSetup: func(m *repomocks.MockManagerRepository) {
 
 				m.On(
 					"CreateManager",
@@ -211,6 +209,7 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 					Username:       "alices",
 					OrganizationID: uuid.MustParse(orgID),
 					Role:           "Assistant Director",
+					AuthID: 		authID,
 					CreatedAt:      time.Now(),
 					UpdatedAt:      time.Now(),
 				}, nil)
@@ -223,7 +222,7 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 				"organization_id": orgID,
 				"role":            "Assistant Director",
 			},
-			mockSetup:  func(*repomocks.MockManagerRepository, *repomocks.MockGuardianRepository) {},
+			mockSetup:  func(*repomocks.MockManagerRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
@@ -232,7 +231,7 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 				"name":            "Alice",
 				"organization_id": orgID,
 			},
-			mockSetup:  func(*repomocks.MockManagerRepository, *repomocks.MockGuardianRepository) {},
+			mockSetup:  func(*repomocks.MockManagerRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 	}
@@ -243,10 +242,9 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockManagerRepository)
-			mockGuardianRepo := new(repomocks.MockGuardianRepository)
-			tt.mockSetup(mockRepo, mockGuardianRepo)
+			tt.mockSetup(mockRepo)
 
-			app, _ := setupmanagerTestAPI(mockRepo, mockGuardianRepo)
+			app, _ := setupmanagerTestAPI(mockRepo)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -270,7 +268,6 @@ func TestHumaValidation_CreateManager(t *testing.T) {
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRepo.AssertExpectations(t)
-			mockGuardianRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -374,10 +371,9 @@ func TestHumaValidation_PatchManager(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockManagerRepository)
-			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupmanagerTestAPI(mockRepo, mockGuardianRepo)
+			app, _ := setupmanagerTestAPI(mockRepo)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -463,10 +459,9 @@ func TestHumaValidation_DeleteManager(t *testing.T) {
 			}
 
 			mockRepo := new(repomocks.MockManagerRepository)
-			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupmanagerTestAPI(mockRepo, mockGuardianRepo)
+			app, _ := setupmanagerTestAPI(mockRepo)
 
 			req, err := http.NewRequest(
 				http.MethodDelete,

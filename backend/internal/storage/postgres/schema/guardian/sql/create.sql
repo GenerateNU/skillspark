@@ -8,6 +8,6 @@ new_guardian AS (
     SELECT id FROM new_user
     RETURNING id, user_id, created_at, updated_at
 )
-SELECT g.id, g.user_id, u.name, u.email, u.username, u.profile_picture_s3_key, u.language_preference, g.created_at, g.updated_at
+SELECT g.id, g.user_id, u.name, u.email, u.username, u.profile_picture_s3_key, u.language_preference, u.auth_id, g.created_at, g.updated_at
 FROM new_guardian g
 JOIN new_user u ON g.user_id = u.id;
