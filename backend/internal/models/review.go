@@ -24,3 +24,33 @@ type CreateReviewInput struct {
 		Categories     []string  `json:"categories" db:"categories" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
 	}
 }
+
+type GetReviewsByGuardianIDInput struct {
+	ID       uuid.UUID `path:"id"`
+	Page     int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
+	PageSize int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+}
+
+type GetReviewsByEventIDInput struct {
+	ID       uuid.UUID `path:"id"`
+	Page     int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
+	PageSize int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+}
+
+type DeleteReviewInput struct {
+	ID uuid.UUID `path:"id"`
+}
+
+type ReviewsOutput struct {
+	Body []Review `json:"body" doc:"List of reviews"`
+}
+
+type DeleteReviewOutput struct {
+	Body struct {
+		Message string `json:"message" doc:"Success message"`
+	} `json:"body"`
+}
+
+type CreateReviewOutput struct {
+	Body Review
+}
