@@ -11,7 +11,7 @@ WITH updated_row AS (
         curr_enrolled = COALESCE($9, eo.curr_enrolled),
         updated_at = NOW()
     WHERE eo.id = $1
-    RETURNING eo.id, eo.manager_id, eo.event_id, eo.location_id, eo.start_time, eo.end_time, eo.max_attendees, eo.language, eo.curr_enrolled, eo.created_at, eo.updated_at
+    RETURNING eo.id, eo.manager_id, eo.event_id, eo.location_id, eo.start_time, eo.end_time, eo.max_attendees, eo.language, eo.curr_enrolled, eo.created_at, eo.updated_at, eo.status
 )
 SELECT 
     eo.id,
@@ -23,6 +23,7 @@ SELECT
     eo.curr_enrolled,
     eo.created_at,
     eo.updated_at,
+    eo.status, 
 
     e.id,
     e.title,

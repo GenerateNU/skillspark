@@ -3,6 +3,7 @@ package repomocks
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -32,4 +33,15 @@ func (m *MockLocationRepository) CreateLocation(ctx context.Context, location *m
 		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Location), nil
+}
+
+func (m *MockLocationRepository) GetAllLocations(ctx context.Context, pagination utils.Pagination) ([]models.Location, error) {
+	args := m.Called(ctx, pagination)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(error)
+	}
+	return args.Get(0).([]models.Location), nil
 }

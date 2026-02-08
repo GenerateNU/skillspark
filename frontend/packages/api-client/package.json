@@ -1,0 +1,25 @@
+{
+  "name": "@skillspark/api-client",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "generate": "orval",
+    "generate:watch": "orval --watch"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.62.14",
+    "axios": "^1.7.9"
+  },
+  "devDependencies": {
+    "orval": "^7.3.0",
+    "typescript": "^5.3.3"
+  }
+}

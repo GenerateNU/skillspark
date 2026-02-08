@@ -24,6 +24,7 @@ import (
 type LocationRepository interface {
 	GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, error)
 	CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, error)
+	GetAllLocations(ctx context.Context, pagination utils.Pagination) ([]models.Location, error)
 }
 
 type SchoolRepository interface {
@@ -81,6 +82,7 @@ type EventOccurrenceRepository interface {
 	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error)
 	CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error)
 	UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.EventOccurrence, error)
+	CancelEventOccurrence(ctx context.Context, id uuid.UUID) error
 }
 
 type RegistrationRepository interface {

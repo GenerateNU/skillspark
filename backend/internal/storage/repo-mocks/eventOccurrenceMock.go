@@ -57,3 +57,11 @@ func (m *MockEventOccurrenceRepository) UpdateEventOccurrence(ctx context.Contex
 	}
 	return args.Get(0).(*models.EventOccurrence), nil
 }
+
+func (m *MockEventOccurrenceRepository) CancelEventOccurrence(
+	ctx context.Context,
+	id uuid.UUID,
+) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}

@@ -32,6 +32,7 @@ func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, 
 		&eventOccurrence.CurrEnrolled,
 		&eventOccurrence.CreatedAt,
 		&eventOccurrence.UpdatedAt,
+		&eventOccurrence.Status,
 
 		// event fields
 		&eventOccurrence.Event.ID,

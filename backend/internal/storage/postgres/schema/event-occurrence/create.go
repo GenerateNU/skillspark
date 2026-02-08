@@ -38,6 +38,7 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, i
 		&createdEventOccurrence.CurrEnrolled,
 		&createdEventOccurrence.CreatedAt,
 		&createdEventOccurrence.UpdatedAt,
+		&createdEventOccurrence.Status,
 
 		// event fields
 		&createdEventOccurrence.Event.ID,

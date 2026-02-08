@@ -34,7 +34,7 @@ type CreateLocationInput struct {
 
 		AddressLine1 string `json:"address_line1" db:"address_line1" doc:"Primary address line of the location" minLength:"5" maxLength:"200"`
 
-		AddressLine2 *string `json:"address_line2" db:"address_line2" doc:"Secondary address line of the location" minLength:"5" maxLength:"200"`
+		AddressLine2 *string `json:"address_line2,omitempty" db:"address_line2" doc:"Secondary address line of the location" minLength:"5" maxLength:"200"`
 
 		Subdistrict string `json:"subdistrict" db:"subdistrict" doc:"Subdistrict of the location" minLength:"2" maxLength:"100"`
 
@@ -54,4 +54,13 @@ type GetLocationByIDOutput struct {
 
 type CreateLocationOutput struct {
 	Body *Location `json:"body"`
+}
+
+type GetAllLocationsInput struct {
+	Page  int `query:"page" minimum:"1" default:"1"`
+	Limit int `query:"limit" minimum:"1" maximum:"100" default:"100"`
+}
+
+type GetAllLocationsOutput struct {
+	Body []Location `json:"body" doc:"List of all locations in the database"`
 }

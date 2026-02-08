@@ -6,6 +6,7 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	"skillspark/internal/utils"
 	"testing"
 	"time"
 
@@ -256,6 +257,95 @@ func TestHandler_CreateLocation(t *testing.T) {
 				assert.Equal(t, tt.input.Body.Country, location.Country)
 				assert.Equal(t, tt.input.Body.Latitude, location.Latitude)
 				assert.Equal(t, tt.input.Body.Longitude, location.Longitude)
+			}
+
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHandler_GetAllLocations(t *testing.T) {
+	statusCodeInternalServerError := http.StatusInternalServerError
+	messageSubstringInternalServerError := "Internal server error"
+	tests := []struct {
+		name             string
+		mockSetup        func(*repomocks.MockLocationRepository)
+		wantErr          bool
+		statusCode       *int
+		messageSubstring *string
+	}{
+		{
+			name: "successful get all locations",
+			mockSetup: func(m *repomocks.MockLocationRepository) {
+				m.On("GetAllLocations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return([]models.Location{
+					{
+						ID:           uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+						Latitude:     40.7128,
+						Longitude:    -74.0060,
+						AddressLine1: "123 Broadway",
+						District:     "New York County",
+						Province:     "NY",
+						PostalCode:   "10001",
+						Country:      "USA",
+					},
+					{
+						ID:           uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19"),
+						Latitude:     42.3601,
+						Longitude:    -71.0589,
+						AddressLine1: "600 Boylston Street",
+						District:     "Boston",
+						Province:     "MA",
+						PostalCode:   "02116",
+						Country:      "USA",
+					},
+				}, nil)
+			},
+			wantErr: false,
+		},
+		{
+			name: "internal server error",
+			mockSetup: func(m *repomocks.MockLocationRepository) {
+				m.On("GetAllLocations", mock.Anything, mock.AnythingOfType("utils.Pagination")).
+					Return(nil, &errs.HTTPError{
+						Code:    errs.InternalServerError("Internal server error").Code,
+						Message: "Internal server error",
+					})
+			},
+			wantErr:          true,
+			statusCode:       &statusCodeInternalServerError,
+			messageSubstring: &messageSubstringInternalServerError,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockLocationRepository)
+			tt.mockSetup(mockRepo)
+
+			handler := NewHandler(mockRepo)
+			ctx := context.Background()
+
+			pagination := utils.Pagination{
+				Page:  1,
+				Limit: 10,
+			}
+
+			locations, err := handler.GetAllLocations(ctx, pagination)
+
+			if tt.wantErr {
+				assert.NotNil(t, err)
+				assert.Nil(t, locations)
+				assert.Equal(t, *tt.statusCode, err.Code)
+				assert.Contains(t, err.Message, *tt.messageSubstring)
+			} else {
+				assert.Nil(t, err)
+				assert.NotNil(t, locations)
+				assert.Len(t, locations, 2)
+				assert.Equal(t, "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", locations[0].ID.String())
+				assert.Equal(t, "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19", locations[1].ID.String())
 			}
 
 			mockRepo.AssertExpectations(t)
