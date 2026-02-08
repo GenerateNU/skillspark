@@ -3,6 +3,7 @@ package review
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/testutil"
 	"skillspark/internal/utils"
 	"strconv"
@@ -52,4 +53,20 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 	for _, r := range reviews {
 		assert.Contains(t, expectedIDs, r.ID)
 	}
+}
+
+func TestGetReviewsByGuardianID_NoReviews(t *testing.T) {
+	testDB := testutil.SetupTestDB(t)
+	repo := NewReviewRepository(testDB)
+	ctx := context.Background()
+	t.Parallel()
+
+	g := guardian.CreateTestGuardian(t, ctx, testDB)
+
+	pagination := utils.Pagination{Limit: 10, Page: 1}
+	reviews, err := repo.GetReviewsByGuardianID(ctx, g.ID, pagination)
+
+	require.Nil(t, err)
+	require.NotNil(t, reviews)
+	assert.Len(t, reviews, 0)
 }

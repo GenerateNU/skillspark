@@ -3,8 +3,10 @@ package review
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/event"
 	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
+	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/testutil"
 	"skillspark/internal/utils"
 	"strconv"
@@ -21,20 +23,29 @@ func TestGetReviewsByEventID(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
+	regRepo := registration.NewRegistrationRepository(testDB)
+
+	child := child.CreateTestChild(t, ctx, testDB)
 	eo := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 
-	firstReview := CreateTestReview(t, ctx, testDB)
+	input := func() *models.CreateRegistrationInput {
+		i := &models.CreateRegistrationInput{}
+		i.Body.ChildID = child.ID
+		i.Body.GuardianID = child.GuardianID
+		i.Body.EventOccurrenceID = eo.ID
+		i.Body.Status = models.RegistrationStatusRegistered
+		return i
+	}()
 
-	eventID := eo.Event.ID
+	regoutput, _ := regRepo.CreateRegistration(ctx, input)
 
 	var expectedReviews []*models.Review
-	expectedReviews = append(expectedReviews, firstReview)
 
 	for i := 0; i < 3; i++ {
 
 		input := &models.CreateReviewInput{}
-		input.Body.RegistrationID = firstReview.RegistrationID
-		input.Body.GuardianID = firstReview.GuardianID
+		input.Body.RegistrationID = regoutput.Body.ID
+		input.Body.GuardianID = child.GuardianID
 		input.Body.Description = "Review number " + strconv.Itoa(i+2)
 		input.Body.Categories = []string{"interesting"}
 
@@ -46,7 +57,7 @@ func TestGetReviewsByEventID(t *testing.T) {
 	}
 
 	pagination := utils.Pagination{Limit: 10, Page: 1}
-	reviews, err := repo.GetReviewsByEventID(ctx, eventID, pagination)
+	reviews, err := repo.GetReviewsByEventID(ctx, eo.Event.ID, pagination)
 	require.Nil(t, err)
 	require.Len(t, reviews, len(expectedReviews))
 
