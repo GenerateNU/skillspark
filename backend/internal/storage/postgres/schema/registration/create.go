@@ -51,7 +51,7 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		return nil, &errr
 	}
 
-	incrementEventOccurrenceQuery, err := schema.ReadSQLBaseScript("registration/sql/increment_event_occurrence.sql")
+	incrementEventOccurrenceQuery, err := schema.ReadSQLBaseScript("registration/sql/change_event_occurrence_by.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		if err := tx.Rollback(ctx); err != nil {
@@ -60,7 +60,7 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		return nil, &errr
 	}
 
-	_, err = tx.Exec(ctx, incrementEventOccurrenceQuery, input.Body.EventOccurrenceID)
+	_, err = tx.Exec(ctx, incrementEventOccurrenceQuery, input.Body.EventOccurrenceID, 1)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to increment event occurrence attendee count: ", err.Error())
 		if err := tx.Rollback(ctx); err != nil {

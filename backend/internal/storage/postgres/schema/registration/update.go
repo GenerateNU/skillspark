@@ -106,12 +106,11 @@ func (r *RegistrationRepository) UpdateRegistration(ctx context.Context, input *
 }
 
 func decreaseEventOccurrenceAttendeeCount(ctx context.Context, eventOccurrenceID uuid.UUID, tx pgx.Tx) error {
-
-	decrementEventOccurrenceQuery, err := schema.ReadSQLBaseScript("registration/sql/decrement_event_occurrence.sql")
+	decrementEventOccurrenceQuery, err := schema.ReadSQLBaseScript("registration/sql/change_event_occurrence_by.sql")
 	if err != nil {
 		return errs.InternalServerError("Failed to read base query: ", err.Error())
 	}
-	_, err = tx.Exec(ctx, decrementEventOccurrenceQuery, eventOccurrenceID)
+	_, err = tx.Exec(ctx, decrementEventOccurrenceQuery, eventOccurrenceID, -1)
 	if err != nil {
 		return errs.InternalServerError("Failed to decrement event occurrence attendee count: ", err.Error())
 	}
