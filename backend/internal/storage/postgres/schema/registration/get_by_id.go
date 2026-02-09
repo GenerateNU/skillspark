@@ -10,14 +10,19 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *RegistrationRepository) GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput) (*models.GetRegistrationByIDOutput, error) {
+func (r *RegistrationRepository) GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput, tx *pgx.Tx) (*models.GetRegistrationByIDOutput, error) {
 	query, err := schema.ReadSQLBaseScript("registration/sql/get_by_id.sql")
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
 	}
 
-	row := r.db.QueryRow(ctx, query, input.ID)
+	var row pgx.Row
+	if tx != nil {
+		row = (*tx).QueryRow(ctx, query, input.ID)
+	} else {
+		row = r.db.QueryRow(ctx, query, input.ID)
+	}
 
 	var registration models.GetRegistrationByIDOutput
 

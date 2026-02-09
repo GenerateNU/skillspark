@@ -68,17 +68,19 @@ type CreateEventOccurrenceOutput struct {
 
 // patch
 type UpdateEventOccurrenceInput struct {
-	ID   uuid.UUID `path:"id" doc:"ID of the event occurrence to update"`
-	Body struct {
-		ManagerId    *uuid.UUID `json:"manager_id,omitempty" doc:"ID of a manager in the database"`
-		EventId      *uuid.UUID `json:"event_id,omitempty" doc:"ID of an event in the database"`
-		LocationId   *uuid.UUID `json:"location_id,omitempty" doc:"ID of a location in the database"`
-		StartTime    *time.Time `json:"start_time,omitempty" doc:"Start time of the event occurrence"`
-		EndTime      *time.Time `json:"end_time,omitempty" doc:"End time of the event occurrence"`
-		MaxAttendees *int       `json:"max_attendees,omitempty" doc:"Maximum number of attendees" minimum:"1" maximum:"100"`
-		Language     *string    `json:"language,omitempty" doc:"Primary language used for the event occurrence" minLength:"2" maxLength:"30"`
-		CurrEnrolled *int       `json:"curr_enrolled,omitempty" doc:"Number of students currently enrolled in the event occurrence" minimum:"0" maximum:"100"`
-	} `json:"body" doc:"Event occurrence fields to update"`
+	ID   uuid.UUID                      `path:"id" doc:"ID of the event occurrence to update"`
+	Body UpdateEventOccurrenceInputBody `json:"body" doc:"Event occurrence fields to update"`
+}
+
+type UpdateEventOccurrenceInputBody struct {
+	ManagerId    *uuid.UUID `json:"manager_id,omitempty" doc:"ID of a manager in the database"`
+	EventId      *uuid.UUID `json:"event_id,omitempty" doc:"ID of an event in the database"`
+	LocationId   *uuid.UUID `json:"location_id,omitempty" doc:"ID of a location in the database"`
+	StartTime    *time.Time `json:"start_time,omitempty" doc:"Start time of the event occurrence"`
+	EndTime      *time.Time `json:"end_time,omitempty" doc:"End time of the event occurrence"`
+	MaxAttendees *int       `json:"max_attendees,omitempty" doc:"Maximum number of attendees" minimum:"1" maximum:"100"`
+	Language     *string    `json:"language,omitempty" doc:"Primary language used for the event occurrence" minLength:"2" maxLength:"30"`
+	CurrEnrolled *int       `json:"curr_enrolled,omitempty" doc:"Number of students currently enrolled in the event occurrence" minimum:"0" maximum:"100"`
 }
 
 type UpdateEventOccurrenceOutput struct {
