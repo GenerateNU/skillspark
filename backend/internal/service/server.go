@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"log"
+	"os"
 	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
@@ -9,6 +11,7 @@ import (
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
+	"skillspark/internal/stripeClient"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -90,14 +93,20 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 		return c.Status(fiber.StatusOK).SendString("Welcome to SkillSpark!")
 	})
 
+	stripeAPIKey := os.Getenv("STRIPE_SECRET_TEST_KEY")
+	if stripeAPIKey == "" {
+		log.Fatal("STRIPE_SECRET_KEY environment variable is required")
+	}
+	stripeClient := stripeClient.NewStripeClient(stripeAPIKey)
+
 	// Register Huma endpoints
-	setupHumaRoutes(humaAPI, repo, config, s3Client)
+	setupHumaRoutes(humaAPI, repo, config, s3Client, stripeClient)
 
 	return app, humaAPI
 }
 
 // Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client) {
+func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, sc *stripeClient.StripeClient) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
@@ -110,4 +119,5 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo)
 	routes.SetupAuthRoutes(api, repo, config)
+	routes.SetupPaymentRoutes(api, repo, sc)
 }

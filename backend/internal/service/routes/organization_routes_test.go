@@ -13,6 +13,7 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/s3_client"
 	s3mocks "skillspark/internal/s3_client/mocks"
+	// "skillspark/internal/service/client"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"skillspark/internal/utils"

@@ -25,6 +25,7 @@ type LocationRepository interface {
 	GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, error)
 	CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, error)
 	GetAllLocations(ctx context.Context, pagination utils.Pagination) ([]models.Location, error)
+	GetLocationByOrganizationID(ctx context.Context, orgID uuid.UUID) (*models.Location, error)
 }
 
 type SchoolRepository interface {
