@@ -33,7 +33,7 @@ func TestGuardianRepository_DeleteGuardian(t *testing.T) {
 	assert.NotNil(t, guardian)
 	assert.Equal(t, uuid.MustParse("11111111-1111-1111-1111-111111111111"), guardian.ID)
 
-	guardian, err = repo.DeleteGuardian(ctx, uuid.MustParse("11111111-1111-1111-1111-111111111111"))
+	guardian, err = repo.DeleteGuardian(ctx, uuid.MustParse("11111111-1111-1111-1111-111111111111"), nil)
 	assert.Nil(t, err)
 	assert.NotNil(t, guardian)
 
@@ -70,7 +70,7 @@ func TestGuardianRepository_DeleteGuardian(t *testing.T) {
 	assert.NotNil(t, guardian.UpdatedAt)
 
 	// delete the guardian
-	guardian, err = repo.DeleteGuardian(ctx, uuid.MustParse(guardian.ID.String()))
+	guardian, err = repo.DeleteGuardian(ctx, uuid.MustParse(guardian.ID.String()), nil)
 	if err != nil {
 		t.Fatalf("Failed to delete guardian: %v", err)
 	}
@@ -94,7 +94,7 @@ func TestGuardianRepository_Delete_NotFound(t *testing.T) {
 	repo := NewGuardianRepository(testDB)
 	ctx := context.Background()
 
-	guardian, err := repo.DeleteGuardian(ctx, uuid.New())
+	guardian, err := repo.DeleteGuardian(ctx, uuid.New(), nil)
 	assert.Error(t, err)
 	assert.Nil(t, guardian)
 	assert.Contains(t, err.Error(), "not found")

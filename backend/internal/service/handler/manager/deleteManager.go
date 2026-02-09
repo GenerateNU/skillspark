@@ -15,12 +15,20 @@ func (h *Handler) DeleteManager(ctx context.Context, input *models.DeleteManager
 
 	// transaction so that database guardian and Supabase auth user are always deleted together
 	tx, txErr := h.db.Begin(ctx)
+
+	defer func() {
+		closeErr := tx.Conn().Close(ctx)
+		if closeErr != nil {
+			slog.Error("Failed to close transaction: " + closeErr.Error())
+		}
+	}()
+
 	if txErr != nil {
 		slog.Error("Failed to start transaction: " + txErr.Error())
 		return nil, txErr
 	}
 
-	manager, err := h.ManagerRepository.DeleteManager(ctx, id)
+	manager, err := h.ManagerRepository.DeleteManager(ctx, id, &tx)
 	if err != nil {
 		rollBackErr := tx.Rollback(ctx)
 		if rollBackErr != nil {

@@ -42,7 +42,7 @@ func TestGuardianRepository_DeleteGuardian_SetFieldsNull(t *testing.T) {
 	assert.Equal(t, regId, reg1.ID)
 	assert.Equal(t, &childId, reg1.ChildID)
 
-	guardian, guardianErr := guardianRepo.DeleteGuardian(ctx, guardianId)
+	guardian, guardianErr := guardianRepo.DeleteGuardian(ctx, guardianId, nil)
 	assert.Nil(t, guardianErr)
 	assert.NotNil(t, guardian)
 

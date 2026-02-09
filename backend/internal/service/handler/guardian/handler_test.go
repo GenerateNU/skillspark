@@ -9,6 +9,8 @@ import (
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"testing"
 	"time"
+	"net/http"
+	supabaseMock "skillspark/internal/service/handler/auth"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -343,20 +345,21 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 		name      string
 		id        string
 		mockSetup func(*repomocks.MockGuardianRepository)
+		authResponse  interface{}
+		authStatus    int
 		wantErr   bool
 	}{
 		{
-			name: "successful delete guardian - Sarah Johnson", // assume guardian has no children
-			id:   "11111111-1111-1111-1111-111111111111",
+			name: "successful delete guardian", 
+			id:   "761ef221-6a5a-463e-8b1f-a3a9296c7fb9",
 			mockSetup: func(m *repomocks.MockGuardianRepository) {
-				m.On("DeleteGuardian", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111111")).Return(&models.Guardian{
-					ID:        uuid.MustParse("11111111-1111-1111-1111-111111111111"),
-					UserID:    uuid.MustParse("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"),
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+				m.On("DeleteGuardian", mock.Anything, uuid.MustParse("761ef221-6a5a-463e-8b1f-a3a9296c7fb9")).Return(&models.Guardian{
+					ID:        uuid.MustParse("761ef221-6a5a-463e-8b1f-a3a9296c7fb9"),
+					UserID:    uuid.MustParse("484de30a-aaa3-4a3a-aeb7-14d7f7ddbe26"),
 				}, nil)
-				m.On("SupabaseDeleteUser", mock.Anything, mock.Anything).Return(nil)
 			},
+			authResponse: []string {},
+			authStatus: http.StatusOK,
 			wantErr: false,
 		},
 		{
@@ -369,6 +372,8 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 						Message: "Not found",
 					})
 			},
+			authResponse: []string {},
+			authStatus: http.StatusOK,
 			wantErr: true,
 		},
 	}
@@ -377,6 +382,8 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 		tt := tt // capture range variable for parallel
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
+			supabaseMock.SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockRepo := new(repomocks.MockGuardianRepository)
 			tt.mockSetup(mockRepo)
