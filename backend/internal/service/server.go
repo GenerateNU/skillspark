@@ -115,7 +115,7 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetupEventRoutes(api, repo, s3Client)
 	routes.SetupManagerRoutes(api, repo)
 	routes.SetupRegistrationRoutes(api, repo)
-	routes.SetupGuardiansRoutes(api, repo)
+	routes.SetupGuardiansRoutes(api, repo, sc)
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo)
 	routes.SetupAuthRoutes(api, repo, config)

@@ -1,0 +1,19 @@
+package stripeClient
+
+import (
+	"context"
+	"skillspark/internal/models"
+
+	"github.com/stripe/stripe-go/v84"
+)
+
+type StripeClientInterface interface {
+	CreateOrganizationAccount(ctx context.Context, name string, email string, country string) (*models.CreateOrgStripeAccountOutput, error)
+	CreateAccountOnboardingLink(ctx context.Context, input *models.CreateStripeOnboardingLinkInput) (*models.CreateStripeOnboardingLinkOutput, error)
+	CreateCustomer(ctx context.Context, email string, name string) (*stripe.Customer, error)
+	CreateSetupIntent(ctx context.Context, stripeCustomerID string) (string, error)
+	CreatePaymentIntent(ctx context.Context, input *models.CreatePaymentIntentInput) (*models.CreatePaymentIntentOutput, error)
+	GetAccount(ctx context.Context, accountID string) (*stripe.V2CoreAccount, error)
+	DetachPaymentMethod(ctx context.Context, paymentMethodID string) error
+	CreateLoginLink(ctx context.Context, accountID string) (string, error)
+}

@@ -1,8 +1,10 @@
 package payment
 
 import (
-	"skillspark/internal/stripeClient"
+	"context"
+	"skillspark/internal/models"
 	"skillspark/internal/storage"
+	"skillspark/internal/stripeClient"
 )
 
 type Handler struct {
@@ -10,18 +12,28 @@ type Handler struct {
 	ManagerRepository      storage.ManagerRepository
 	RegistrationRepository storage.RegistrationRepository
 	LocationRepository     storage.LocationRepository
-	StripeClient           stripeClient.StripeClient
+	GuardianRepository     storage.GuardianRepository
+	StripeClient           *stripeClient.StripeClient
 }
 
-func NewHandler(orgRepo storage.OrganizationRepository, managerRepo storage.ManagerRepository, registrationRepo storage.RegistrationRepository, locRepo storage.LocationRepository, sc stripeClient.StripeClient) *Handler {
+func (h *Handler) CreateAccountOnboardingLink(ctx context.Context, input *models.CreateStripeOnboardingLinkInput) (*models.CreateStripeOnboardingLinkOutput, error) {
+	panic("unimplemented")
+}
+
+func NewHandler(
+	orgRepo storage.OrganizationRepository,
+	managerRepo storage.ManagerRepository,
+	registrationRepo storage.RegistrationRepository,
+	locRepo storage.LocationRepository,
+	guardianRepo storage.GuardianRepository,
+	sc *stripeClient.StripeClient,
+) *Handler {
 	return &Handler{
 		OrganizationRepository: orgRepo,
-		ManagerRepository:     managerRepo,
+		ManagerRepository:      managerRepo,
 		RegistrationRepository: registrationRepo,
-		LocationRepository: locRepo,
-		StripeClient: sc,
+		LocationRepository:     locRepo,
+		GuardianRepository:     guardianRepo,
+		StripeClient:           sc,
 	}
 }
-
-
-

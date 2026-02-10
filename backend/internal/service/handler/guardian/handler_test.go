@@ -5,6 +5,7 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	stripemocks "skillspark/internal/stripeClient/mocks"
 	"testing"
 	"time"
 
@@ -60,14 +61,15 @@ func TestHandler_GetGuardianById(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
-			handler := NewHandler(mockRepo)
+			handler := NewHandler(mockRepo, mockStripeClient)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByIDInput{ID: uuid.MustParse(tt.id)}
@@ -137,14 +139,15 @@ func TestHandler_CreateGuardian(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
-			handler := NewHandler(mockRepo)
+			handler := NewHandler(mockRepo, mockStripeClient)
 			ctx := context.Background()
 
 			guardian, err := handler.CreateGuardian(ctx, tt.input)
@@ -220,14 +223,15 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
-			handler := NewHandler(mockRepo)
+			handler := NewHandler(mockRepo, mockStripeClient)
 			ctx := context.Background()
 
 			guardian, err := handler.UpdateGuardian(ctx, tt.input)
@@ -281,14 +285,15 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
-			handler := NewHandler(mockRepo)
+			handler := NewHandler(mockRepo, mockStripeClient)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByChildIDInput{ChildID: uuid.MustParse(tt.childID)}
@@ -316,7 +321,7 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 		wantErr   bool
 	}{
 		{
-			name: "successful delete guardian - Sarah Johnson", // assume guardian has no children
+			name: "successful delete guardian - Sarah Johnson",
 			id:   "11111111-1111-1111-1111-111111111111",
 			mockSetup: func(m *repomocks.MockGuardianRepository) {
 				m.On("DeleteGuardian", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111111")).Return(&models.Guardian{
@@ -343,14 +348,15 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
-			handler := NewHandler(mockRepo)
+			handler := NewHandler(mockRepo, mockStripeClient)
 			ctx := context.Background()
 
 			input := &models.DeleteGuardianInput{ID: uuid.MustParse(tt.id)}

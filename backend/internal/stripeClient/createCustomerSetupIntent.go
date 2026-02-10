@@ -12,6 +12,7 @@ func (sc *StripeClient) CreateSetupIntent(
 ) (string, error) {
 	params := &stripe.SetupIntentCreateParams{
 		Customer: stripe.String(stripeCustomerID),
+		Usage: stripe.String("off_session"),
 		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 	}
 	

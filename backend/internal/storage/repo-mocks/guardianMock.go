@@ -89,3 +89,14 @@ func (m *MockGuardianRepository) GetGuardianByAuthID(ctx context.Context, authID
 	}
 	return args.Get(0).(*models.Guardian), nil
 }
+
+func (m *MockGuardianRepository) SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string) (*models.Guardian, error) {
+	args := m.Called(ctx, guardianID, stripeCustomerID)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Guardian), nil
+}

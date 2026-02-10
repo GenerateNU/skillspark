@@ -19,7 +19,18 @@ func (r *GuardianRepository) CreateGuardian(ctx context.Context, guardian *model
 
 	var createdGuardian models.Guardian
 
-	err = row.Scan(&createdGuardian.ID, &createdGuardian.UserID, &createdGuardian.Name, &createdGuardian.Email, &createdGuardian.Username, &createdGuardian.ProfilePictureS3Key, &createdGuardian.LanguagePreference, &createdGuardian.CreatedAt, &createdGuardian.UpdatedAt)
+	err = row.Scan(
+		&createdGuardian.ID,
+		&createdGuardian.UserID,
+		&createdGuardian.Name,
+		&createdGuardian.Email,
+		&createdGuardian.Username,
+		&createdGuardian.ProfilePictureS3Key,
+		&createdGuardian.LanguagePreference,
+		&createdGuardian.StripeCustomerID,
+		&createdGuardian.CreatedAt,
+		&createdGuardian.UpdatedAt,
+	)
 	if err != nil {
 		err := errs.InternalServerError("Failed to create guardian: ", err.Error())
 		return nil, &err

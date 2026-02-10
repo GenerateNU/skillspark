@@ -6,12 +6,13 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/service/handler/guardian"
 	"skillspark/internal/storage"
+	"skillspark/internal/stripeClient"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupGuardiansRoutes(api huma.API, repo *storage.Repository) {
-	guardianHandler := guardian.NewHandler(repo.Guardian)
+func SetupGuardiansRoutes(api huma.API, repo *storage.Repository, sc *stripeClient.StripeClient) {
+	guardianHandler := guardian.NewHandler(repo.Guardian, sc)
 	huma.Register(api, huma.Operation{
 		OperationID: "get-guardian-by-id",
 		Method:      http.MethodGet,

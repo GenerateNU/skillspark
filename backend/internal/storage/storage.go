@@ -7,6 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema/event"
 	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
+	guardianpaymentmethod "skillspark/internal/storage/postgres/schema/guardian-payment-method"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
 	"skillspark/internal/storage/postgres/schema/organization"
@@ -62,6 +63,14 @@ type GuardianRepository interface {
 	GetGuardianByAuthID(ctx context.Context, authID string) (*models.Guardian, error)
 	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
 	DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
+	SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string,) (*models.Guardian, error)
+}
+
+type GuardianPaymentMethodRepository interface {
+	CreateGuardianPaymentMethod(ctx context.Context, input *models.CreateGuardianPaymentMethodInput) (*models.GuardianPaymentMethod, error)
+	GetPaymentMethodsByGuardianID(ctx context.Context, guardianID uuid.UUID) ([]models.GuardianPaymentMethod, error)
+	UpdateGuardianPaymentMethod(ctx context.Context, id uuid.UUID, isDefault bool) (*models.GuardianPaymentMethod, error)
+	DeleteGuardianPaymentMethod(ctx context.Context, id uuid.UUID) (*models.GuardianPaymentMethod, error)
 }
 
 type EventRepository interface {
@@ -108,6 +117,7 @@ type Repository struct {
 	EventOccurrence EventOccurrenceRepository
 	Registration    RegistrationRepository
 	User            UserRepository
+	GuardianPaymentMethod GuardianPaymentMethodRepository
 }
 
 type UserRepository interface {
@@ -142,5 +152,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
 		User:            user.NewUserRepository(db),
 		Registration:    registration.NewRegistrationRepository(db),
+		GuardianPaymentMethod: guardianpaymentmethod.NewGuardianPaymentMethodRepository(db),
 	}
 }

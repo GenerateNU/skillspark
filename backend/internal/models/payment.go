@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	// "github.com/google/uuid"
 	"github.com/google/uuid"
 	"github.com/stripe/stripe-go/v84"
 )
@@ -34,18 +33,36 @@ type CreateStripeOnboardingLinkOutput struct {
 	}
 }
 
+type CreateSetupIntentInput struct {
+	GuardianID uuid.UUID `path:"guardian_id" doc:"Guardian ID"`
+}
+
+type CreateSetupIntentOutput struct {
+	Body struct {
+		ClientSecret string `json:"client_secret" doc:"Stripe SetupIntent client_secret for frontend"`
+	}
+}
+
+type CreateOrgLoginLinkInput struct {
+	OrganizationID uuid.UUID `path:"organization_id" doc:"Organization ID"`
+}
+
+type CreateOrgLoginLinkOutput struct {
+	Body struct {
+		LoginURL string `json:"login_url" doc:"Stripe Express dashboard login URL"`
+	}
+}
+
 type CreatePaymentIntentInput struct {
 	Body struct {
-		// From frontend
-		RegistrationID   uuid.UUID  `json:"registration_id"`
-		GuardianID       uuid.UUID  `json:"guardian_id"` 
-		ProviderOrgID    uuid.UUID  `json:"provider_org_id"`
-		Amount           int64      `json:"amount"`
-		Currency         string     `json:"currency"`
-		EventDate        time.Time  `json:"event_date"`
-		PaymentMethodID  *string    `json:"payment_method_id,omitempty"`
+		RegistrationID  uuid.UUID `json:"registration_id" doc:"Registration/booking ID"`
+		GuardianID      uuid.UUID `json:"guardian_id" doc:"Guardian ID"`
+		ProviderOrgID   uuid.UUID `json:"provider_org_id" doc:"Provider organization ID"`
+		Amount          int64     `json:"amount" doc:"Total amount in cents" minimum:"1"`
+		Currency        string    `json:"currency" doc:"Currency code (e.g., thb, usd)" pattern:"^[a-z]{3}$"`
+		EventDate       time.Time `json:"event_date" doc:"Event date and time"`
+		PaymentMethodID *string   `json:"payment_method_id,omitempty" doc:"Stripe payment method ID (required for bookings)"`
 		
-		// Populated by handler from DB (not from frontend!)
 		GuardianStripeID string
 		OrgStripeID      string
 	}
@@ -55,7 +72,6 @@ type CreatePaymentIntentOutput struct {
 	Body struct {
 		PaymentIntentID string `json:"payment_intent_id" doc:"Stripe payment intent ID"`
 		ClientSecret    string `json:"client_secret" doc:"Client secret for frontend to confirm payment"`
-		Status          string `json:"status" doc:"Payment intent status (e.g., requires_confirmation)"`
+		Status          string `json:"status" doc:"Payment intent status"`
 	}
 }
-
