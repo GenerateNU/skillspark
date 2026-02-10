@@ -1759,6 +1759,7 @@ components:
         - email
         - username
         - language_preference
+        - auth_id
     CreateLocationInputBody:
       type: object
       additionalProperties: false
@@ -1867,6 +1868,7 @@ components:
         - username
         - language_preference
         - role
+        - auth_id
     CreateRegistrationInputBody:
       type: object
       additionalProperties: false
@@ -2195,6 +2197,8 @@ components:
           examples:
             - http://localhost:8080/schemas/Guardian.json
           readOnly: true
+        auth_id:
+          type: string
         created_at:
           type: string
           format: date-time
@@ -2223,6 +2227,7 @@ components:
         - username
         - profile_picture_s3_key
         - language_preference
+        - auth_id
         - created_at
         - updated_at
     GuardianLoginOutputBody:
@@ -2428,6 +2433,8 @@ components:
           examples:
             - http://localhost:8080/schemas/Manager.json
           readOnly: true
+        auth_id:
+          type: string
         created_at:
           type: string
           format: date-time
@@ -2462,6 +2469,7 @@ components:
         - username
         - profile_picture_s3_key
         - language_preference
+        - auth_id
         - created_at
         - updated_at
     ManagerLoginOutputBody:
