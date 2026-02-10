@@ -5,28 +5,47 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
+
+	"github.com/jackc/pgx/v5"
 )
 
-func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.EventOccurrence, error) {
+func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput, tx *pgx.Tx) (*models.EventOccurrence, error) {
 	query, err := schema.ReadSQLBaseScript("event-occurrence/sql/update.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
 	}
 
+	var row pgx.Row
+	if tx != nil {
+		row = (*tx).QueryRow(ctx,
+			query,
+			input.ID,
+			input.Body.ManagerId,
+			input.Body.EventId,
+			input.Body.LocationId,
+			input.Body.StartTime,
+			input.Body.EndTime,
+			input.Body.MaxAttendees,
+			input.Body.Language,
+			input.Body.CurrEnrolled,
+		)
+	} else {
+		row = r.db.QueryRow(ctx,
+			query,
+			input.ID,
+			input.Body.ManagerId,
+			input.Body.EventId,
+			input.Body.LocationId,
+			input.Body.StartTime,
+			input.Body.EndTime,
+			input.Body.MaxAttendees,
+			input.Body.Language,
+			input.Body.CurrEnrolled,
+		)
+	}
+
 	// null fields are handled in SQL query with coalesce
-	row := r.db.QueryRow(ctx,
-		query,
-		input.ID,
-		input.Body.ManagerId,
-		input.Body.EventId,
-		input.Body.LocationId,
-		input.Body.StartTime,
-		input.Body.EndTime,
-		input.Body.MaxAttendees,
-		input.Body.Language,
-		input.Body.CurrEnrolled,
-	)
 	var updatedEventOccurrence models.EventOccurrence
 
 	// populate data in struct, embedding event and location data

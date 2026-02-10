@@ -14,7 +14,7 @@ func (h *Handler) GetRegistrationByID(ctx context.Context, input *models.GetRegi
 		return nil, errs.BadRequest("Invalid ID format")
 	}
 
-	registration, httpErr := h.RegistrationRepository.GetRegistrationByID(ctx, &models.GetRegistrationByIDInput{ID: id})
+	registration, httpErr := h.RegistrationRepository.GetRegistrationByID(ctx, &models.GetRegistrationByIDInput{ID: id}, nil)
 	if httpErr != nil {
 		return nil, httpErr
 	}
