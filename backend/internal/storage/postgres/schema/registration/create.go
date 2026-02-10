@@ -59,7 +59,6 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		}
 		return nil, &errr
 	}
-	//dummy commit
 
 	_, err = tx.Exec(ctx, incrementEventOccurrenceQuery, input.Body.EventOccurrenceID, 1)
 	if err != nil {
