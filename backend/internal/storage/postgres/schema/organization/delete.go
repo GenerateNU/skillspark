@@ -26,6 +26,8 @@ func (r *OrganizationRepository) DeleteOrganization(ctx context.Context, id uuid
 		&deletedOrganization.Active,
 		&deletedOrganization.PfpS3Key,
 		&deletedOrganization.LocationID,
+		&deletedOrganization.StripeAccountID,
+		&deletedOrganization.StripeAccountActivated,
 		&deletedOrganization.CreatedAt,
 		&deletedOrganization.UpdatedAt,
 	)

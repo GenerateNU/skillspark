@@ -21,8 +21,12 @@ func TestGetById(t *testing.T) {
 	org, err := repo.GetOrganizationByID(ctx, testorg.ID)
 
 	require.Nil(t, err)
+	require.NotNil(t, org)
 	assert.Equal(t, "Test Corp", org.Name)
 	assert.True(t, org.Active)
+	
+	assert.Nil(t, org.StripeAccountID)
+	assert.False(t, org.StripeAccountActivated)
 }
 
 func TestExecute_NotFound(t *testing.T) {

@@ -40,6 +40,8 @@ type OrganizationRepository interface {
 	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, error)
 	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error)
 	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID) ([]models.EventOccurrence, error)
+	SetStripeAccountID(ctx context.Context, orgID uuid.UUID, stripeAccountID string) (*models.Organization, error)
+	SetStripeAccountActivated(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error)
 }
 
 type ManagerRepository interface {

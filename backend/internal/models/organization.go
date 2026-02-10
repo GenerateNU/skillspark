@@ -16,6 +16,8 @@ type Organization struct {
 	LocationID *uuid.UUID `json:"location_id,omitempty" db:"location_id"`
 	CreatedAt  time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt  time.Time  `json:"updated_at" db:"updated_at"`
+	StripeAccountID *string `json:"stripe_account_id" db:"stripe_account_id"`
+	StripeAccountActivated bool `json:"stripe_account_activated" db:"stripe_account_activated" default:"false"`
 }
 
 // CreateOrganizationRouteInput is the multipart form input for creating an organization with an image

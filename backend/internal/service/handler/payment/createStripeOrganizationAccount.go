@@ -3,14 +3,12 @@ package payment
 import (
 	"context"
 	"skillspark/internal/models"
-	
-
 )
 
 func (h *Handler) CreateOrgStripeAccount(
 	ctx context.Context,
 	input *models.CreateOrgStripeAccountInput,
-) (*models.CreateOrgStripeAccountOutput, error) {
+) (*models.Organization, error) {
 	
 	org, orgErr := h.OrganizationRepository.GetOrganizationByID(ctx, input.Body.OrganizationID)
 
@@ -36,6 +34,12 @@ func (h *Handler) CreateOrgStripeAccount(
 		return nil, err
 	}
 
-	return nil, nil
+	updatedOrg, err := h.OrganizationRepository.SetStripeAccountID(ctx, input.Body.OrganizationID, stripeAccount.Body.Account.ID)
+
+	if (err != nil) {
+		return nil, err
+	}
+
+	return updatedOrg, nil
 	
 }

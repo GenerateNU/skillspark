@@ -22,7 +22,7 @@ func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc *stripeClient
 		Summary:       "Create a new Stripe account for an organization",
 		Description:   "Create a new Stripe account for an organization",
 		Tags:          []string{"StripeClient"},
-	}, func(ctx context.Context, input *models.CreateOrgStripeAccountInput) (*models.CreateOrgStripeAccountOutput, error) {
+	}, func(ctx context.Context, input *models.CreateOrgStripeAccountInput) (*models.Organization, error) {
 		return paymentHandler.CreateOrgStripeAccount(ctx, input);
 	})
 
@@ -36,4 +36,13 @@ func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc *stripeClient
 	}, func(ctx context.Context, input *models.CreateStripeOnboardingLinkInput) (*models.CreateStripeOnboardingLinkOutput, error) {
 		return sc.CreateAccountOnboardingLink(ctx, input);
 	})
+
+	// huma.Register(api, huma.Operation{
+	// 	OperationID: "stripe-webhook",
+	// 	Method:      http.MethodPost,
+	// 	Path:        "/webhooks/stripe",
+	// 	Summary:     "Handle Stripe webhooks",
+	// 	Tags:        []string{"Webhooks"},
+	// 	Security:    []map[string][]string{}, // No auth for webhooks
+	// }, paymentHandler.HandleStripeWebhook)
 }
