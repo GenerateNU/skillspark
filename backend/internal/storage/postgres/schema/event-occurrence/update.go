@@ -26,6 +26,7 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 		input.Body.MaxAttendees,
 		input.Body.Language,
 		input.Body.CurrEnrolled,
+		input.Body.Price,
 	)
 	var updatedEventOccurrence models.EventOccurrence
 
@@ -42,6 +43,7 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 		&updatedEventOccurrence.CreatedAt,
 		&updatedEventOccurrence.UpdatedAt,
 		&updatedEventOccurrence.Status,
+		&updatedEventOccurrence.Price,
 
 		// event fields
 		&updatedEventOccurrence.Event.ID,

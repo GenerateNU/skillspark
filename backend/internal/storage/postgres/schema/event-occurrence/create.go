@@ -23,6 +23,7 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, i
 		input.Body.EndTime,
 		input.Body.MaxAttendees,
 		input.Body.Language,
+		input.Body.Price,
 	)
 	var createdEventOccurrence models.EventOccurrence
 
@@ -39,6 +40,7 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, i
 		&createdEventOccurrence.CreatedAt,
 		&createdEventOccurrence.UpdatedAt,
 		&createdEventOccurrence.Status,
+		&createdEventOccurrence.Price,
 
 		// event fields
 		&createdEventOccurrence.Event.ID,
