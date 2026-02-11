@@ -9,7 +9,7 @@ import (
 func (h *Handler) CreateGuardianPaymentMethod(
 	ctx context.Context,
 	input *models.CreateGuardianPaymentMethodInput,
-) (*models.GuardianPaymentMethod, error) {
+) (*models.CreateGuardianPaymentMethodOutput, error) {
 	
 	guardian, err := h.GuardianRepository.GetGuardianByID(ctx, input.Body.GuardianID)
 	if err != nil {
@@ -27,5 +27,7 @@ func (h *Handler) CreateGuardianPaymentMethod(
 		return nil, err
 	}
 
-	return paymentMethod, nil
+	return &models.CreateGuardianPaymentMethodOutput{
+		Body: *paymentMethod,
+	}, nil
 }
