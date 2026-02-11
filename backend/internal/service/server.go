@@ -106,7 +106,7 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 }
 
 // Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, sc *stripeClient.StripeClient) {
+func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, sc stripeClient.StripeClientInterface) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)

@@ -11,7 +11,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc *stripeClient.StripeClient) {
+func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc stripeClient.StripeClientInterface) {
 	paymentHandler := payment.NewHandler(
 		repo.Organization,
 		repo.Manager,

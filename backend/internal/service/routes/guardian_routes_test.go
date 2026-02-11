@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	// "skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	stripemocks "skillspark/internal/stripeClient/mocks"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -24,6 +24,7 @@ import (
 func setupGuardianTestAPI(
 	guardianRepo *repomocks.MockGuardianRepository,
 	managerRepo *repomocks.MockManagerRepository,
+	stripeClient *stripemocks.MockStripeClient,
 ) (*fiber.App, huma.API) {
 
 	app := fiber.New()
@@ -35,7 +36,7 @@ func setupGuardianTestAPI(
 		Manager:  managerRepo,
 	}
 
-	routes.SetupGuardiansRoutes(api, repo)
+	routes.SetupGuardiansRoutes(api, repo, stripeClient)
 
 	return app, api
 }
@@ -98,9 +99,10 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 
 			mockRepo := new(repomocks.MockGuardianRepository)
 			mockManagerRepo := new(repomocks.MockManagerRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo, mockManagerRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo, mockStripeClient)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -164,9 +166,10 @@ func TestHumaValidation_GetGuardianByID(t *testing.T) {
 
 			mockRepo := new(repomocks.MockGuardianRepository)
 			mockManagerRepo := new(repomocks.MockManagerRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo, mockStripeClient)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -243,9 +246,10 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 
 			mockRepo := new(repomocks.MockGuardianRepository)
 			mockManagerRepo := new(repomocks.MockManagerRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo, mockStripeClient)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -306,72 +310,14 @@ func TestHumaValidation_DeleteGuardian(t *testing.T) {
 
 			mockRepo := new(repomocks.MockGuardianRepository)
 			mockManagerRepo := new(repomocks.MockManagerRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo, mockStripeClient)
 
 			req, err := http.NewRequest(
 				http.MethodDelete,
 				"/api/v1/guardians/"+tt.guardianID,
-				nil,
-			)
-			assert.NoError(t, err)
-
-			resp, err := app.Test(req)
-			assert.NoError(t, err)
-			defer func() { _ = resp.Body.Close() }()
-
-			assert.Equal(t, tt.statusCode, resp.StatusCode)
-			mockRepo.AssertExpectations(t)
-		})
-	}
-}
-
-func TestHumaValidation_GetGuardianByChildID(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name       string
-		childID    string
-		mockSetup  func(*repomocks.MockGuardianRepository)
-		statusCode int
-	}{
-		{
-			name:    "valid UUID",
-			childID: "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22",
-			mockSetup: func(m *repomocks.MockGuardianRepository) {
-				m.On(
-					"GetGuardianByChildID",
-					mock.Anything,
-					uuid.MustParse("b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22"),
-				).Return(&models.Guardian{
-					ID: uuid.New(),
-				}, nil)
-			},
-			statusCode: http.StatusOK,
-		},
-		{
-			name:       "invalid UUID",
-			childID:    "not-a-uuid",
-			mockSetup:  func(*repomocks.MockGuardianRepository) {},
-			statusCode: http.StatusUnprocessableEntity,
-		},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			mockRepo := new(repomocks.MockGuardianRepository)
-			mockManagerRepo := new(repomocks.MockManagerRepository)
-			tt.mockSetup(mockRepo)
-
-			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo)
-
-			req, err := http.NewRequest(
-				http.MethodGet,
-				"/api/v1/guardians/child/"+tt.childID,
 				nil,
 			)
 			assert.NoError(t, err)

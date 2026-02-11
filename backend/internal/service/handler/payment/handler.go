@@ -13,7 +13,7 @@ type Handler struct {
 	RegistrationRepository storage.RegistrationRepository
 	LocationRepository     storage.LocationRepository
 	GuardianRepository     storage.GuardianRepository
-	StripeClient           *stripeClient.StripeClient
+	StripeClient           stripeClient.StripeClientInterface
 }
 
 func (h *Handler) CreateAccountOnboardingLink(ctx context.Context, input *models.CreateStripeOnboardingLinkInput) (*models.CreateStripeOnboardingLinkOutput, error) {
@@ -26,7 +26,7 @@ func NewHandler(
 	registrationRepo storage.RegistrationRepository,
 	locRepo storage.LocationRepository,
 	guardianRepo storage.GuardianRepository,
-	sc *stripeClient.StripeClient,
+	sc stripeClient.StripeClientInterface,
 ) *Handler {
 	return &Handler{
 		OrganizationRepository: orgRepo,

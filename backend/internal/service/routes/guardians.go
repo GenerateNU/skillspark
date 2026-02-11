@@ -11,7 +11,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupGuardiansRoutes(api huma.API, repo *storage.Repository, sc *stripeClient.StripeClient) {
+func SetupGuardiansRoutes(api huma.API, repo *storage.Repository, sc stripeClient.StripeClientInterface) {
 	guardianHandler := guardian.NewHandler(repo.Guardian, sc)
 	huma.Register(api, huma.Operation{
 		OperationID: "get-guardian-by-id",

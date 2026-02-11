@@ -8,13 +8,13 @@ import (
 type Handler struct {
 	GuardianRepository              storage.GuardianRepository
 	GuardianPaymentMethodRepository storage.GuardianPaymentMethodRepository
-	StripeClient                    *stripeClient.StripeClient
+	StripeClient                    stripeClient.StripeClientInterface
 }
 
 func NewHandler(
 	guardianRepo storage.GuardianRepository,
 	paymentMethodRepo storage.GuardianPaymentMethodRepository,
-	sc *stripeClient.StripeClient,
+	sc stripeClient.StripeClientInterface,
 ) *Handler {
 	return &Handler{
 		GuardianRepository:              guardianRepo,

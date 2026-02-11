@@ -7,13 +7,13 @@ import (
 
 type Handler struct {
 	GuardianRepository storage.GuardianRepository
-	StripeClient stripeClient.StripeClient
+	StripeClient stripeClient.StripeClientInterface
 	}
 
-func NewHandler(guardianRepository storage.GuardianRepository, sc *stripeClient.StripeClient) *Handler {
+func NewHandler(guardianRepository storage.GuardianRepository, sc stripeClient.StripeClientInterface) *Handler {
 	return &Handler{
 		GuardianRepository: guardianRepository,
-		StripeClient: *sc,
+		StripeClient: sc,
 
 	}
 }

@@ -9,8 +9,7 @@ import (
 )
 
 func (sc *StripeClient) CreateOrganizationAccount(
-	ctx context.Context, name string, email string, country string,
-) (*models.CreateOrgStripeAccountOutput, error) {
+	ctx context.Context, name string, email string, country string) (*models.CreateOrgStripeAccountOutput, error) {
 	params := &stripe.V2CoreAccountCreateParams{
 		Identity: &stripe.V2CoreAccountCreateIdentityParams{
 			Country: stripe.String(country),
