@@ -353,7 +353,11 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 			name: "successful delete guardian", 
 			id:   "761ef221-6a5a-463e-8b1f-a3a9296c7fb9",
 			mockSetup: func(m *repomocks.MockGuardianRepository) {
-				m.On("DeleteGuardian", mock.Anything, uuid.MustParse("761ef221-6a5a-463e-8b1f-a3a9296c7fb9")).Return(&models.Guardian{
+				m.On("DeleteGuardian", 
+				mock.Anything, 
+				uuid.MustParse("761ef221-6a5a-463e-8b1f-a3a9296c7fb9"),
+				mock.Anything,
+				).Return(&models.Guardian{
 					ID:        uuid.MustParse("761ef221-6a5a-463e-8b1f-a3a9296c7fb9"),
 					UserID:    uuid.MustParse("484de30a-aaa3-4a3a-aeb7-14d7f7ddbe26"),
 				}, nil)
@@ -366,8 +370,11 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 			name: "guardian not found",
 			id:   "00000000-0000-0000-0000-000000000000",
 			mockSetup: func(m *repomocks.MockGuardianRepository) {
-				m.On("DeleteGuardian", mock.Anything, uuid.MustParse("00000000-0000-0000-0000-000000000000")).
-					Return(nil, &errs.HTTPError{
+				m.On("DeleteGuardian", 
+				mock.Anything, 
+				uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+				mock.Anything,
+				).Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("Guardian", "id", "00000000-0000-0000-0000-000000000000").Code,
 						Message: "Not found",
 					})

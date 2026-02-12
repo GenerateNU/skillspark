@@ -1,4 +1,9 @@
-WITH deleted_guardian AS (
+WITH cancelled_registration AS (
+    UPDATE registration
+    SET status = 'cancelled'
+    WHERE guardian_id = $1
+),
+deleted_guardian AS (
     DELETE FROM guardian WHERE id = $1
     RETURNING id, user_id, created_at, updated_at
 ),
@@ -6,12 +11,6 @@ deleted_user AS (
     DELETE FROM "user" 
     WHERE id = (SELECT user_id FROM deleted_guardian)
     RETURNING id, name, email, username, profile_picture_s3_key, language_preference, auth_id
-),
-cancelled_registration AS (
-    UPDATE registration
-    SET status = 'cancelled'
-    WHERE guardian_id = (SELECT id FROM deleted_guardian)
-    RETURNING *
 )
 SELECT dg.id, dg.user_id, du.name, du.email, du.username, du.profile_picture_s3_key, du.language_preference, du.auth_id, dg.created_at, dg.updated_at
 FROM deleted_guardian dg

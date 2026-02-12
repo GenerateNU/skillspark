@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *GuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID, tx *pgx.Tx) (*models.Guardian, error) {
+func (r *GuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error) {
 	query, err := schema.ReadSQLBaseScript("guardian/sql/delete.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -20,7 +20,7 @@ func (r *GuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID, t
 
 	var row pgx.Row
 	if tx != nil {
-		row = (*tx).QueryRow(ctx, query, id)
+		row = tx.QueryRow(ctx, query, id)
 	} else { 
 		row = r.db.QueryRow(ctx, query, id)
 	}

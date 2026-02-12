@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *ManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID, tx *pgx.Tx) (*models.Manager, error) {
+func (r *ManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Manager, error) {
 	query, err := schema.ReadSQLBaseScript("manager/sql/delete.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -19,7 +19,7 @@ func (r *ManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID, tx 
 
 	var row pgx.Row
 	if tx != nil {
-		row = (*tx).QueryRow(ctx, query, id)
+		row = tx.QueryRow(ctx, query, id)
 	} else { 
 		row = r.db.QueryRow(ctx, query, id)
 	}

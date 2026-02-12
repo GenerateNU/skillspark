@@ -47,7 +47,7 @@ type ManagerRepository interface {
 	GetManagerByUserID(ctx context.Context, userID uuid.UUID) (*models.Manager, error)
 	GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error)
 	GetManagerByAuthID(ctx context.Context, authID string) (*models.Manager, error)
-	DeleteManager(ctx context.Context, id uuid.UUID, tx *pgx.Tx) (*models.Manager, error)
+	DeleteManager(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Manager, error)
 	CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error)
 	PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, error)
 }
@@ -59,7 +59,7 @@ type GuardianRepository interface {
 	GetGuardianByUserID(ctx context.Context, userID uuid.UUID) (*models.Guardian, error)
 	GetGuardianByAuthID(ctx context.Context, authID string) (*models.Guardian, error)
 	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
-	DeleteGuardian(ctx context.Context, id uuid.UUID, tx *pgx.Tx) (*models.Guardian, error)
+	DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error)
 }
 
 type EventRepository interface {

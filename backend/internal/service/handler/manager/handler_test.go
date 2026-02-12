@@ -319,7 +319,11 @@ func TestHandler_DeleteManager(t *testing.T) {
 				ID: uuid.MustParse("50000000-0000-0000-0000-000000000001"),
 			},
 			mockSetup: func(m *repomocks.MockManagerRepository) {
-				m.On("DeleteManager", mock.Anything, uuid.MustParse("50000000-0000-0000-0000-000000000001")).Return(&models.Manager{
+				m.On("DeleteManager", 
+				mock.Anything, 
+				uuid.MustParse("50000000-0000-0000-0000-000000000001"),
+				mock.Anything,
+				).Return(&models.Manager{
 					ID:             uuid.MustParse("50000000-0000-0000-0000-000000000001"),
 					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
 					OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000006"),
@@ -338,7 +342,11 @@ func TestHandler_DeleteManager(t *testing.T) {
 				ID: uuid.MustParse("99999999-9999-9999-9999-999999999999"),
 			},
 			mockSetup: func(m *repomocks.MockManagerRepository) {
-				m.On("DeleteManager", mock.Anything, uuid.MustParse("99999999-9999-9999-9999-999999999999")).Return(nil, &errs.HTTPError{
+				m.On("DeleteManager", 
+				mock.Anything, 
+				uuid.MustParse("99999999-9999-9999-9999-999999999999"),
+				mock.Anything,
+				).Return(nil, &errs.HTTPError{
 					Code:    404,
 					Message: "Manager not found",
 				})
@@ -353,7 +361,11 @@ func TestHandler_DeleteManager(t *testing.T) {
 				ID: uuid.MustParse("50000000-0000-0000-0000-000000000002"),
 			},
 			mockSetup: func(m *repomocks.MockManagerRepository) {
-				m.On("DeleteManager", mock.Anything, uuid.MustParse("50000000-0000-0000-0000-000000000002")).Return(nil, &errs.HTTPError{
+				m.On("DeleteManager", 
+				mock.Anything, 
+				uuid.MustParse("50000000-0000-0000-0000-000000000002"),
+				mock.Anything,
+				).Return(nil, &errs.HTTPError{
 					Code:    500,
 					Message: "Internal server error",
 				})

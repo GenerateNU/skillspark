@@ -11,7 +11,12 @@ import (
 func (h *Handler) DeleteGuardian(ctx context.Context, input *models.DeleteGuardianInput) (*models.Guardian, error) {
 	// transaction so that database guardian and Supabase auth user are always deleted together
 	tx, txErr := h.db.Begin(ctx)
-	
+
+	if txErr != nil {
+		slog.Error("Failed to start transaction: " + txErr.Error())
+		return nil, txErr
+	}
+
 	defer func() {
 		closeErr := tx.Conn().Close(ctx)
 		if closeErr != nil {
@@ -19,12 +24,7 @@ func (h *Handler) DeleteGuardian(ctx context.Context, input *models.DeleteGuardi
 		}
 	}()
 
-	if txErr != nil {
-		slog.Error("Failed to start transaction: " + txErr.Error())
-		return nil, txErr
-	}
-
-	guardian, err := h.GuardianRepository.DeleteGuardian(ctx, input.ID, &tx)
+	guardian, err := h.GuardianRepository.DeleteGuardian(ctx, input.ID, tx)
 	if err != nil {
 		rollBackErr := tx.Rollback(ctx)
 		if rollBackErr != nil {

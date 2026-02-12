@@ -5,16 +5,17 @@ import (
 	"log/slog"
 	"skillspark/internal/models"
 	"skillspark/internal/auth"
-
-	"github.com/google/uuid"
 )
 
 // DeleteManager handles DELETE /manager
 func (h *Handler) DeleteManager(ctx context.Context, input *models.DeleteManagerInput) (*models.Manager, error) {
-	id, _ := uuid.Parse(input.ID.String())	
-
 	// transaction so that database guardian and Supabase auth user are always deleted together
 	tx, txErr := h.db.Begin(ctx)
+
+	if txErr != nil {
+		slog.Error("Failed to start transaction: " + txErr.Error())
+		return nil, txErr
+	}
 
 	defer func() {
 		closeErr := tx.Conn().Close(ctx)
@@ -23,12 +24,7 @@ func (h *Handler) DeleteManager(ctx context.Context, input *models.DeleteManager
 		}
 	}()
 
-	if txErr != nil {
-		slog.Error("Failed to start transaction: " + txErr.Error())
-		return nil, txErr
-	}
-
-	manager, err := h.ManagerRepository.DeleteManager(ctx, id, &tx)
+	manager, err := h.ManagerRepository.DeleteManager(ctx, input.ID, tx)
 	if err != nil {
 		rollBackErr := tx.Rollback(ctx)
 		if rollBackErr != nil {

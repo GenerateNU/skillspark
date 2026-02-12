@@ -1,8 +1,8 @@
 ALTER TABLE registration
-ALTER child_id DROP NOT NULL;
+ALTER COLUMN child_id DROP NOT NULL;
 
 ALTER TABLE registration
-ALTER guardian_id DROP NOT NULL;
+ALTER COLUMN guardian_id DROP NOT NULL;
 
 ALTER TABLE child
 DROP CONSTRAINT IF EXISTS child_guardian_id_fkey,

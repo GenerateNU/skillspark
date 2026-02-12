@@ -58,8 +58,8 @@ func (m *MockManagerRepository) CreateManager(ctx context.Context, manager *mode
 	return args.Get(0).(*models.Manager), nil
 }
 
-func (m *MockManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID, tx *pgx.Tx) (*models.Manager, error) {
-	args := m.Called(ctx, id)
+func (m *MockManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Manager, error) {
+	args := m.Called(ctx, id, tx)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil

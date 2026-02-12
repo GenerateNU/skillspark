@@ -290,6 +290,7 @@ func TestHumaValidation_DeleteGuardian(t *testing.T) {
 		name       string
 		guardianID string
 		mockSetup  func(*repomocks.MockGuardianRepository)
+		authResponse  interface{}
 		statusCode int
 	}{
 		{
@@ -309,12 +310,14 @@ func TestHumaValidation_DeleteGuardian(t *testing.T) {
 					LanguagePreference: "en",
 				}, nil)
 			},
+			authResponse: []string {},
 			statusCode: http.StatusOK,
 		},
 		{
 			name:       "invalid UUID",
 			guardianID: "not-a-uuid",
 			mockSetup:  func(*repomocks.MockGuardianRepository) {},
+			authResponse: []string {},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 	}
