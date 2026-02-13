@@ -51,26 +51,6 @@ func SetupManagerRoutes(api huma.API, repo *storage.Repository, config config.Co
 		}, nil
 	})
 
-	// create manager here
-
-	huma.Register(api, huma.Operation{
-		OperationID: "post-manager",
-		Method:      http.MethodPost,
-		Path:        "/api/v1/manager",
-		Summary:     "posts a manager",
-		Description: "Returns a manager by id",
-		Tags:        []string{"Managers"},
-	}, func(ctx context.Context, input *models.CreateManagerInput) (*models.CreateManagerOutput, error) {
-		manager, err := managerHandler.CreateManager(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-
-		return &models.CreateManagerOutput{
-			Body: manager,
-		}, nil
-	})
-
 	// delete manager here
 
 	huma.Register(api, huma.Operation{
