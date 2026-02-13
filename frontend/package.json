@@ -6,8 +6,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:web": "bun run dev --filter apps/web",
-    "dev:mobile": "bun run start --filter apps/mobile",
+    "dev:web": "bun --filter apps/web dev",
+    "dev:mobile": "cd apps/mobile && bun run start",
     "generate:api": "cd packages/api-client && bun run generate"
   },
   "dependencies": {

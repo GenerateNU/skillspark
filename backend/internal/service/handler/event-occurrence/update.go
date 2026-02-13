@@ -52,7 +52,7 @@ func (h *Handler) UpdateEventOccurrence(ctx context.Context, input *models.Updat
 		}
 	}
 
-	eventOccurrence, err := h.EventOccurrenceRepository.UpdateEventOccurrence(ctx, input)
+	eventOccurrence, err := h.EventOccurrenceRepository.UpdateEventOccurrence(ctx, input, nil)
 	if err != nil {
 		return nil, err
 	}

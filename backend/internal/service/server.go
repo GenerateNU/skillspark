@@ -109,5 +109,6 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetupGuardiansRoutes(api, repo)
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo)
+	routes.SetUpReviewRoutes(api, repo)
 	routes.SetupAuthRoutes(api, repo, config)
 }
