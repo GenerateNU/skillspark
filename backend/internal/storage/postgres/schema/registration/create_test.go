@@ -222,3 +222,39 @@ func TestCreateRegistration_InvalidEventOccurrenceID(t *testing.T) {
 	require.NotNil(t, err)
 	require.Nil(t, created)
 }
+
+func TestCreateRegistration_IncreasesAttendeeCount(t *testing.T) {
+	testDB := testutil.SetupTestDB(t)
+	repo := NewRegistrationRepository(testDB)
+	eventOccurrenceRepo := eventoccurrence.NewEventOccurrenceRepository(testDB)
+	ctx := context.Background()
+	t.Parallel()
+
+	child := child.CreateTestChild(t, ctx, testDB)
+	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	occurrenceID := occurrence.ID
+
+	initialOccurrence, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID)
+	require.Nil(t, err)
+	require.NotNil(t, initialOccurrence)
+	initialCount := initialOccurrence.CurrEnrolled
+
+	input := func() *models.CreateRegistrationInput {
+		i := &models.CreateRegistrationInput{}
+		i.Body.ChildID = child.ID
+		i.Body.GuardianID = child.GuardianID
+		i.Body.EventOccurrenceID = occurrenceID
+		i.Body.Status = models.RegistrationStatusRegistered
+		return i
+	}()
+
+	created, err := repo.CreateRegistration(ctx, input)
+
+	require.Nil(t, err)
+	require.NotNil(t, created)
+
+	updatedOccurrence, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID)
+	require.Nil(t, err)
+	require.NotNil(t, updatedOccurrence)
+	assert.Equal(t, initialCount+1, updatedOccurrence.CurrEnrolled, "Attendee count should increase by 1 after successful registration")
+}
