@@ -9,6 +9,7 @@ import (
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"testing"
+	"log/slog"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -91,7 +92,12 @@ func TestCreateReview_Success(t *testing.T) {
 
 	resp, err := app.Test(req)
 	assert.NoError(t, err)
-	defer resp.Body.Close()
+	defer func() {
+		closeErr := resp.Body.Close()
+		if closeErr != nil {
+			slog.Error("Failed to close transaction: " + closeErr.Error())
+		}
+	}()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
@@ -135,7 +141,12 @@ func TestGetReviewsByEventID(t *testing.T) {
 
 	resp, err := app.Test(req)
 	assert.NoError(t, err)
-	defer resp.Body.Close()
+	defer func() {
+		closeErr := resp.Body.Close()
+		if closeErr != nil {
+			slog.Error("Failed to close transaction: " + closeErr.Error())
+		}
+	}()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
@@ -178,7 +189,12 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 
 	resp, err := app.Test(req)
 	assert.NoError(t, err)
-	defer resp.Body.Close()
+	defer func() {
+		closeErr := resp.Body.Close()
+		if closeErr != nil {
+			slog.Error("Failed to close transaction: " + closeErr.Error())
+		}
+	}()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
@@ -211,7 +227,12 @@ func TestDeleteReview(t *testing.T) {
 
 	resp, err := app.Test(req)
 	assert.NoError(t, err)
-	defer resp.Body.Close()
+	defer func() {
+		closeErr := resp.Body.Close()
+		if closeErr != nil {
+			slog.Error("Failed to close transaction: " + closeErr.Error())
+		}
+	}()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 

@@ -1,12 +1,14 @@
 package auth
 
 import (
+	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"skillspark/internal/config"
-	"log/slog"
+	"skillspark/internal/errs"
+
 	"github.com/google/uuid"
-	"fmt"
 )
 
 // deletes a user from Supabase auth by their ID
@@ -34,7 +36,7 @@ func SupabaseDeleteUser(cfg *config.Supabase, userID uuid.UUID) error {
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNoContent {
 		body, _ := io.ReadAll(res.Body)
 		slog.Error("Error deleting user from Supabase: ", "res.StatusCode", res.StatusCode, "body", string(body))
-		return err
+		return errs.InternalServerError("Error deleting user from Supabase: " + string(body))
 	}
 
 	return nil

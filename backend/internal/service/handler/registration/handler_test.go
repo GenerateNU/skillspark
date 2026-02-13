@@ -14,6 +14,9 @@ import (
 )
 
 func TestHandler_GetRegistrationByID(t *testing.T) {
+	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+
 	tests := []struct {
 		name      string
 		id        string
@@ -27,8 +30,8 @@ func TestHandler_GetRegistrationByID(t *testing.T) {
 				m.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).Return(&models.GetRegistrationByIDOutput{
 					Body: models.Registration{
 						ID:                  uuid.MustParse("80000000-0000-0000-0000-000000000001"),
-						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						ChildID:             &childIdEx,
+						GuardianID:          &guardianIdEx,
 						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 						Status:              models.RegistrationStatusRegistered,
 						EventName:           "STEM Club",
@@ -85,6 +88,8 @@ func TestHandler_GetRegistrationByID(t *testing.T) {
 }
 
 func TestHandler_GetRegistrationsByChildID(t *testing.T) {
+	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+
 	tests := []struct {
 		name        string
 		childID     string
@@ -98,8 +103,8 @@ func TestHandler_GetRegistrationsByChildID(t *testing.T) {
 			mockSetup: func(m *repomocks.MockRegistrationRepository) {
 				output := &models.GetRegistrationsByChildIDOutput{}
 				output.Body.Registrations = []models.Registration{
-					{ID: uuid.New(), ChildID: uuid.MustParse("30000000-0000-0000-0000-000000000001")},
-					{ID: uuid.New(), ChildID: uuid.MustParse("30000000-0000-0000-0000-000000000001")},
+					{ID: uuid.New(), ChildID: &childIdEx},
+					{ID: uuid.New(), ChildID: &childIdEx},
 				}
 				m.On("GetRegistrationsByChildID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByChildIDInput")).Return(output, nil)
 			},
@@ -150,6 +155,8 @@ func TestHandler_GetRegistrationsByChildID(t *testing.T) {
 }
 
 func TestHandler_GetRegistrationsByGuardianID(t *testing.T) {
+	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+
 	tests := []struct {
 		name        string
 		guardianID  string
@@ -163,9 +170,9 @@ func TestHandler_GetRegistrationsByGuardianID(t *testing.T) {
 			mockSetup: func(m *repomocks.MockRegistrationRepository) {
 				output := &models.GetRegistrationsByGuardianIDOutput{}
 				output.Body.Registrations = []models.Registration{
-					{ID: uuid.New(), GuardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111")},
-					{ID: uuid.New(), GuardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111")},
-					{ID: uuid.New(), GuardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111")},
+					{ID: uuid.New(), GuardianID: &guardianIdEx},
+					{ID: uuid.New(), GuardianID: &guardianIdEx},
+					{ID: uuid.New(), GuardianID: &guardianIdEx},
 				}
 				m.On("GetRegistrationsByGuardianID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByGuardianIDInput")).Return(output, nil)
 			},
@@ -319,8 +326,8 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				regRepo.On("CreateRegistration", mock.Anything, mock.AnythingOfType("*models.CreateRegistrationInput")).Return(&models.CreateRegistrationOutput{
 					Body: models.Registration{
 						ID:                  uuid.New(),
-						ChildID:             childID,
-						GuardianID:          guardianID,
+						ChildID:             &childID,
+						GuardianID:          &guardianID,
 						EventOccurrenceID:   eventOccurrenceID,
 						Status:              models.RegistrationStatusRegistered,
 						EventName:           "STEM Club",
@@ -421,7 +428,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, registration)
-				assert.Equal(t, tt.input.Body.ChildID, registration.Body.ChildID)
+				assert.Equal(t, &(tt.input.Body.ChildID), registration.Body.ChildID)
 			}
 
 			mockRegRepo.AssertExpectations(t)
@@ -433,6 +440,9 @@ func TestHandler_CreateRegistration(t *testing.T) {
 }
 
 func TestHandler_UpdateRegistration(t *testing.T) {
+	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+
 	existingID := uuid.MustParse("80000000-0000-0000-0000-000000000001")
 	newStatus := models.RegistrationStatusCancelled
 	newChildID := uuid.New()
@@ -454,8 +464,8 @@ func TestHandler_UpdateRegistration(t *testing.T) {
 				regRepo.On("UpdateRegistration", mock.Anything, mock.AnythingOfType("*models.UpdateRegistrationInput")).Return(&models.UpdateRegistrationOutput{
 					Body: models.Registration{
 						ID:                  existingID,
-						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						ChildID:             &childIdEx,
+						GuardianID:          &guardianIdEx,
 						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 						Status:              models.RegistrationStatusCancelled,
 						EventName:           "STEM Club",

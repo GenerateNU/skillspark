@@ -38,10 +38,10 @@ func (r *RegistrationRepository) UpdateRegistration(ctx context.Context, input *
 	existing := existingOutput.Body
 
 	if input.Body.ChildID != nil {
-		existing.ChildID = *input.Body.ChildID
+		existing.ChildID = input.Body.ChildID
 	}
 	if input.Body.GuardianID != nil {
-		existing.GuardianID = *input.Body.GuardianID
+		existing.GuardianID = input.Body.GuardianID
 	}
 	if input.Body.EventOccurrenceID != nil {
 		existing.EventOccurrenceID = *input.Body.EventOccurrenceID

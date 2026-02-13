@@ -11,18 +11,23 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *GuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, error) {
+func (r *GuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error) {
 	query, err := schema.ReadSQLBaseScript("guardian/sql/delete.sql")
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, id)
+	var row pgx.Row
+	if tx != nil {
+		row = tx.QueryRow(ctx, query, id)
+	} else { 
+		row = r.db.QueryRow(ctx, query, id)
+	}
 
 	var deletedGuardian models.Guardian
 
-	err = row.Scan(&deletedGuardian.ID, &deletedGuardian.UserID, &deletedGuardian.Name, &deletedGuardian.Email, &deletedGuardian.Username, &deletedGuardian.ProfilePictureS3Key, &deletedGuardian.LanguagePreference, &deletedGuardian.CreatedAt, &deletedGuardian.UpdatedAt)
+	err = row.Scan(&deletedGuardian.ID, &deletedGuardian.UserID, &deletedGuardian.Name, &deletedGuardian.Email, &deletedGuardian.Username, &deletedGuardian.ProfilePictureS3Key, &deletedGuardian.LanguagePreference, &deletedGuardian.AuthID, &deletedGuardian.CreatedAt, &deletedGuardian.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			err := errs.NotFound("Guardian", "id", id)

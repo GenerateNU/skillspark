@@ -38,8 +38,8 @@ func TestCreateRegistration(t *testing.T) {
 
 	require.Nil(t, err)
 	require.NotNil(t, created)
-	assert.Equal(t, childID, created.Body.ChildID)
-	assert.Equal(t, guardianID, created.Body.GuardianID)
+	assert.Equal(t, &childID, created.Body.ChildID)
+	assert.Equal(t, &guardianID, created.Body.GuardianID)
 	assert.Equal(t, occurrenceID, created.Body.EventOccurrenceID)
 	assert.Equal(t, models.RegistrationStatusRegistered, created.Body.Status)
 	assert.NotEqual(t, uuid.Nil, created.Body.ID)

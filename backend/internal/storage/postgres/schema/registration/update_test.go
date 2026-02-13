@@ -4,8 +4,8 @@ import (
 	"context"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
-	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
+	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
@@ -19,8 +19,9 @@ func TestUpdateRegistration(t *testing.T) {
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 
-	childID := child.CreateTestChild(t, ctx, testDB).ID
-	guardianID := guardian.CreateTestGuardian(t, ctx, testDB).ID
+	child := child.CreateTestChild(t, ctx, testDB)
+	childID := child.ID
+	guardianID := child.GuardianID
 	occurrenceID := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB).ID
 
 	createInput := func() *models.CreateRegistrationInput {
@@ -65,8 +66,9 @@ func TestUpdateRegistration_ChangeEventOccurrence(t *testing.T) {
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 
-	childID := child.CreateTestChild(t, ctx, testDB).ID
-	guardianID := guardian.CreateTestGuardian(t, ctx, testDB).ID
+	child := child.CreateTestChild(t, ctx, testDB)
+	childID := child.ID
+	guardianID := child.GuardianID
 	occurrenceID1 := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB).ID
 
 	createInput := func() *models.CreateRegistrationInput {
