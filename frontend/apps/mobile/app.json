@@ -9,7 +9,10 @@
     "newArchEnabled": true,
     "scheme": "skillspark",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyDXdTQ5a2vyohjvHyFMpwCHhvnYHpvj9zM"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +20,12 @@
         "image": "./assets/images/generate.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAqpVHHROE6iUHUi0qeUnIuW9G9aUhJeCY"
+        }
+      }
     },
     "plugins": [
       "expo-router",

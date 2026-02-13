@@ -9,5 +9,8 @@
     "dev:web": "bun run dev --filter apps/web",
     "dev:mobile": "bun run start --filter apps/mobile",
     "generate:api": "cd packages/api-client && bun run generate"
+  },
+  "dependencies": {
+    "react-native-maps": "^1.27.1"
   }
 }
