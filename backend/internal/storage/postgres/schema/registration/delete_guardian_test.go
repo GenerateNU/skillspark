@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"skillspark/internal/storage/postgres/testutil"
 	guardian "skillspark/internal/storage/postgres/schema/guardian"
+	"skillspark/internal/storage/postgres/testutil"
 
 	"skillspark/internal/models"
 
@@ -50,7 +50,7 @@ func TestGuardianRepository_DeleteGuardian_SetFieldsNull(t *testing.T) {
 	assert.Nil(t, guardian)
 	assert.NotNil(t, guardianErr)
 
-	registration, getErr := repo.GetRegistrationByID(ctx, input2) // guardian and child fks null
+	registration, getErr := repo.GetRegistrationByID(ctx, input2, nil) // guardian and child fks null
 	assert.Nil(t, getErr)
 	assert.NotNil(t, registration)
 	assert.Nil(t, registration.Body.GuardianID)

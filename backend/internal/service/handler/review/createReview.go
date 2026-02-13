@@ -10,7 +10,7 @@ func (h *Handler) CreateReview(ctx context.Context, input *models.CreateReviewIn
 
 	if _, err := h.RegistrationRepository.GetRegistrationByID(ctx, &models.GetRegistrationByIDInput{
 		ID: input.Body.RegistrationID,
-	}); err != nil {
+	}, nil); err != nil {
 		e := errs.BadRequest("Invalid registration_id: registration does not exist")
 		return nil, &e
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
+	"skillspark/internal/storage/postgres/schema/guardian"
 	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
