@@ -1,9 +1,13 @@
 WITH updated AS (
     UPDATE registration
     SET
-        child_id = $1,
+        payment_intent_status = $2::payment_intent_status,
+        paid_at = CASE 
+            WHEN $2 = 'succeeded' THEN NOW() 
+            ELSE paid_at 
+        END,
         updated_at = NOW()
-    WHERE id = $2
+    WHERE id = $1
     RETURNING 
         id, 
         child_id, 

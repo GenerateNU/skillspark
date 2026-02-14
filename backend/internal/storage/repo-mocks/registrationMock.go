@@ -12,7 +12,7 @@ type MockRegistrationRepository struct {
 	mock.Mock
 }
 
-func (m *MockRegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
+func (m *MockRegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error) {
 	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -58,6 +58,22 @@ func (m *MockRegistrationRepository) GetRegistrationsByEventOccurrenceID(ctx con
 		return nil, args.Error(1)
 	}
 	return args.Get(0).(*models.GetRegistrationsByEventOccurrenceIDOutput), args.Error(1)
+}
+
+func (m *MockRegistrationRepository) CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error) {
+	args := m.Called(ctx, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.CancelRegistrationOutput), args.Error(1)
+}
+
+func (m *MockRegistrationRepository) UpdateRegistrationPaymentStatus(ctx context.Context, input *models.UpdateRegistrationPaymentStatusInput) (*models.UpdateRegistrationPaymentStatusOutput, error) {
+	args := m.Called(ctx, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.UpdateRegistrationPaymentStatusOutput), args.Error(1)
 }
 
 func (m *MockEventOccurrenceRepository) DeleteEventOccurrence(

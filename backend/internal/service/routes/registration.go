@@ -6,12 +6,13 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/service/handler/registration"
 	"skillspark/internal/storage"
+	"skillspark/internal/stripeClient"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupRegistrationRoutes(api huma.API, repo *storage.Repository) {
-	registrationHandler := registration.NewHandler(repo.Registration, repo.Child, repo.Guardian, repo.EventOccurrence)
+func SetupRegistrationRoutes(api huma.API, repo *storage.Repository, sc stripeClient.StripeClientInterface) {
+	registrationHandler := registration.NewHandler(repo.Registration, repo.Child, repo.Guardian, repo.EventOccurrence, repo.Organization, sc)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "create-registration",
@@ -73,9 +74,31 @@ func SetupRegistrationRoutes(api huma.API, repo *storage.Repository) {
 		Method:      http.MethodPatch,
 		Path:        "/api/v1/registrations/{id}",
 		Summary:     "Update a registration",
-		Description: "Update an existing registration's details",
+		Description: "Update the child associated with a registration",
 		Tags:        []string{"Registrations"},
 	}, func(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error) {
 		return registrationHandler.UpdateRegistration(ctx, input)
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "cancel-registration",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/registrations/{id}/cancel",
+		Summary:     "Cancel a registration",
+		Description: "Cancel a registration and process refund if applicable",
+		Tags:        []string{"Registrations"},
+	}, func(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error) {
+		return registrationHandler.CancelRegistration(ctx, input)
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "update-registration-payment-status",
+		Method:      http.MethodPatch,
+		Path:        "/api/v1/registrations/{id}/payment-status",
+		Summary:     "Update registration payment status",
+		Description: "Update the payment intent status for a registration (typically called by webhooks)",
+		Tags:        []string{"Registrations"},
+	}, func(ctx context.Context, input *models.UpdateRegistrationPaymentStatusInput) (*models.UpdateRegistrationPaymentStatusOutput, error) {
+		return registrationHandler.UpdateRegistrationPaymentStatus(ctx, input)
 	})
 }

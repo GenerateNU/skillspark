@@ -39,6 +39,17 @@ func TestGetRegistrationsByChildID(t *testing.T) {
 		assert.NotZero(t, reg.CreatedAt)
 		assert.NotZero(t, reg.UpdatedAt)
 		assert.NotZero(t, reg.OccurrenceStartTime)
+		
+		// Verify payment fields
+		assert.NotEmpty(t, reg.StripePaymentIntentID)
+		assert.NotEmpty(t, reg.StripeCustomerID)
+		assert.NotEmpty(t, reg.OrgStripeAccountID)
+		assert.NotEmpty(t, reg.StripePaymentMethodID)
+		assert.NotZero(t, reg.TotalAmount)
+		assert.NotZero(t, reg.ProviderAmount)
+		assert.NotZero(t, reg.PlatformFeeAmount)
+		assert.NotEmpty(t, reg.Currency)
+		assert.NotEmpty(t, reg.PaymentIntentStatus)
 	}
 }
 

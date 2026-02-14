@@ -11,6 +11,7 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	stripemocks "skillspark/internal/stripeClient/mocks"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -25,6 +26,7 @@ func setupRegistrationTestAPI(
 	childRepo *repomocks.MockChildRepository,
 	guardianRepo *repomocks.MockGuardianRepository,
 	eventOccurrenceRepo *repomocks.MockEventOccurrenceRepository,
+
 ) (*fiber.App, huma.API) {
 
 	app := fiber.New()
@@ -38,7 +40,9 @@ func setupRegistrationTestAPI(
 		EventOccurrence: eventOccurrenceRepo,
 	}
 
-	SetupRegistrationRoutes(api, repo)
+	sc := new(stripemocks.MockStripeClient)
+
+	SetupRegistrationRoutes(api, repo, sc)
 
 	return app, api
 }

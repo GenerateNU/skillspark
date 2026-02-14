@@ -37,6 +37,19 @@ func TestGetRegistrationByID(t *testing.T) {
 	assert.NotZero(t, retrieved.Body.CreatedAt)
 	assert.NotZero(t, retrieved.Body.UpdatedAt)
 	assert.NotZero(t, retrieved.Body.OccurrenceStartTime)
+	
+	// Verify payment fields
+	assert.NotEmpty(t, retrieved.Body.StripePaymentIntentID)
+	assert.NotEmpty(t, retrieved.Body.StripeCustomerID)
+	assert.NotEmpty(t, retrieved.Body.OrgStripeAccountID)
+	assert.NotEmpty(t, retrieved.Body.StripePaymentMethodID)
+	assert.NotZero(t, retrieved.Body.TotalAmount)
+	assert.NotZero(t, retrieved.Body.ProviderAmount)
+	assert.NotZero(t, retrieved.Body.PlatformFeeAmount)
+	assert.NotEmpty(t, retrieved.Body.Currency)
+	assert.NotEmpty(t, retrieved.Body.PaymentIntentStatus)
+	assert.Nil(t, retrieved.Body.CancelledAt)
+	assert.Nil(t, retrieved.Body.PaidAt)
 }
 
 func TestGetRegistrationByID_VerifyEventDetails(t *testing.T) {

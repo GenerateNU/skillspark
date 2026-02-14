@@ -16,4 +16,6 @@ type StripeClientInterface interface {
 	GetAccount(ctx context.Context, accountID string) (*stripe.V2CoreAccount, error)
 	DetachPaymentMethod(ctx context.Context, paymentMethodID string) error
 	CreateLoginLink(ctx context.Context, accountID string) (string, error)
+	CancelPaymentIntent(ctx context.Context, input *models.CancelPaymentIntentInput) (*models.CancelPaymentIntentOutput, error)
+	CapturePaymentIntent(ctx context.Context, input *models.CapturePaymentIntentInput) (*models.CapturePaymentIntentOutput, error)
 }

@@ -1,9 +1,10 @@
 WITH updated AS (
     UPDATE registration
     SET
-        child_id = $1,
+        status = 'cancelled',
+        cancelled_at = NOW(),
         updated_at = NOW()
-    WHERE id = $2
+    WHERE id = $1
     RETURNING 
         id, 
         child_id, 

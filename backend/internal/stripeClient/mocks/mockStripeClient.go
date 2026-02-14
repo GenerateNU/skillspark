@@ -66,6 +66,28 @@ func (m *MockStripeClient) CreatePaymentIntent(
 	return args.Get(0).(*models.CreatePaymentIntentOutput), args.Error(1)
 }
 
+func (m *MockStripeClient) CapturePaymentIntent(
+	ctx context.Context,
+	input *models.CapturePaymentIntentInput,
+) (*models.CapturePaymentIntentOutput, error) {
+	args := m.Called(ctx, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.CapturePaymentIntentOutput), args.Error(1)
+}
+
+func (m *MockStripeClient) CancelPaymentIntent(
+	ctx context.Context,
+	input *models.CancelPaymentIntentInput,
+) (*models.CancelPaymentIntentOutput, error) {
+	args := m.Called(ctx, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.CancelPaymentIntentOutput), args.Error(1)
+}
+
 func (m *MockStripeClient) GetAccount(
 	ctx context.Context,
 	accountID string,

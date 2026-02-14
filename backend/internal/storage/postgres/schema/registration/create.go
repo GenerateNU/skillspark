@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
+func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error) {
 
 	query, err := schema.ReadSQLBaseScript("registration/sql/create.sql")
 	if err != nil {
@@ -16,10 +16,19 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 	}
 
 	row := r.db.QueryRow(ctx, query,
-		input.Body.ChildID,
-		input.Body.GuardianID,
-		input.Body.EventOccurrenceID,
-		input.Body.Status)
+		input.ChildID,
+		input.GuardianID,
+		input.EventOccurrenceID,
+		input.Status,
+		input.StripePaymentIntentID,
+		input.StripeCustomerID,
+		input.OrgStripeAccountID,
+		input.StripePaymentMethodID,
+		input.TotalAmount,
+		input.ProviderAmount, 
+		input.PlatformFeeAmount, 
+		input.Currency,
+		input.PaymentIntentStatus)
 
 	var createdRegistration models.CreateRegistrationOutput
 
@@ -31,8 +40,19 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		&createdRegistration.Body.Status,
 		&createdRegistration.Body.CreatedAt,
 		&createdRegistration.Body.UpdatedAt,
+		&createdRegistration.Body.StripeCustomerID,
+		&createdRegistration.Body.OrgStripeAccountID,
+		&createdRegistration.Body.Currency,
+		&createdRegistration.Body.PaymentIntentStatus,
+		&createdRegistration.Body.CancelledAt,
+		&createdRegistration.Body.StripePaymentIntentID,
+		&createdRegistration.Body.TotalAmount,
+		&createdRegistration.Body.ProviderAmount,
+		&createdRegistration.Body.PlatformFeeAmount,
+		&createdRegistration.Body.PaidAt,
+		&createdRegistration.Body.StripePaymentMethodID,
 		&createdRegistration.Body.EventName,
-		&createdRegistration.Body.OccurrenceStartTime,
+		&createdRegistration.Body.OccurrenceStartTime, 
 	)
 
 	if err != nil {

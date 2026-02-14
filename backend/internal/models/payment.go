@@ -70,8 +70,40 @@ type CreatePaymentIntentInput struct {
 
 type CreatePaymentIntentOutput struct {
 	Body struct {
-		PaymentIntentID string `json:"payment_intent_id" doc:"Stripe payment intent ID"`
-		ClientSecret    string `json:"client_secret" doc:"Client secret for frontend to confirm payment"`
-		Status          string `json:"status" doc:"Payment intent status"`
+		PaymentIntentID   string `json:"payment_intent_id" doc:"Stripe payment intent ID"`
+		ClientSecret      string `json:"client_secret" doc:"Client secret for frontend to confirm payment"`
+		Status            string `json:"status" doc:"Payment intent status"`
+		TotalAmount       int    `json:"total_amount" doc:"Total amount in cents"`
+		ProviderAmount    int    `json:"provider_amount" doc:"Amount provider receives in cents"`
+		PlatformFeeAmount int    `json:"platform_fee_amount" doc:"Platform fee in cents"`
+		Currency          string `json:"currency" doc:"Currency code"`
 	}
+}
+
+type CancelPaymentIntentInput struct {
+	PaymentIntentID string `json:"payment_intent_id" doc:"Stripe payment intent ID to cancel/refund"`
+	StripeAccountID string `json:"stripe_account_id" doc:"Organization's Stripe account ID"`
+}
+
+type CancelPaymentIntentOutput struct {
+	Body struct {
+		PaymentIntentID string `json:"payment_intent_id" doc:"Cancelled payment intent ID"`
+		Status          string `json:"status" doc:"Payment intent status after cancellation"`
+		Amount          int64  `json:"amount" doc:"Amount that was cancelled/refunded in cents"`
+		Currency        string `json:"currency" doc:"Currency code"`
+	} `json:"body" doc:"Cancellation result"`
+}
+
+type CapturePaymentIntentInput struct {
+	PaymentIntentID string `json:"payment_intent_id" doc:"Stripe payment intent ID to capture"`
+	StripeAccountID string `json:"stripe_account_id" doc:"Organization's Stripe account ID"`
+}
+
+type CapturePaymentIntentOutput struct {
+	Body struct {
+		PaymentIntentID string `json:"payment_intent_id" doc:"Captured payment intent ID"`
+		Status          string `json:"status" doc:"Payment intent status (should be 'succeeded')"`
+		Amount          int64  `json:"amount" doc:"Amount captured in cents"`
+		Currency        string `json:"currency" doc:"Currency code"`
+	} `json:"body" doc:"Capture result"`
 }

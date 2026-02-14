@@ -53,10 +53,15 @@ func (sc *StripeClient) CreatePaymentIntent(ctx context.Context, input *models.C
 		return nil, err
 	}
 
+	
 	output := &models.CreatePaymentIntentOutput{}
 	output.Body.ClientSecret = intent.ClientSecret
 	output.Body.PaymentIntentID = intent.ID
 	output.Body.Status = string(intent.Status)
+	output.Body.TotalAmount = int(intent.Amount)
+	output.Body.ProviderAmount = int(intent.TransferData.Amount)
+	output.Body.PlatformFeeAmount = int(intent.ApplicationFeeAmount)
+	output.Body.Currency = input.Body.Currency
 	
 	return output, nil
 }

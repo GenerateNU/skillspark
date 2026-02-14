@@ -18,11 +18,21 @@ CREATE TABLE IF NOT EXISTS guardian_payment_methods (
 CREATE INDEX IF NOT EXISTS idx_guardian_payment_methods ON guardian_payment_methods(guardian_id);
 CREATE INDEX IF NOT EXISTS idx_default_payment_method ON guardian_payment_methods(guardian_id, is_default) WHERE is_default = true;
 
+CREATE TYPE payment_intent_status AS ENUM (
+    'requires_payment_method',
+    'requires_confirmation',
+    'requires_action',
+    'processing',
+    'requires_capture',
+    'canceled',
+    'succeeded'
+);
+
 ALTER TABLE registration
 ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(255),
 ADD COLUMN IF NOT EXISTS org_stripe_account_id VARCHAR(255),
 ADD COLUMN IF NOT EXISTS currency VARCHAR(3) DEFAULT 'thb',
-ADD COLUMN IF NOT EXISTS payment_intent_status VARCHAR(50),
+ADD COLUMN IF NOT EXISTS payment_intent_status payment_intent_status,
 ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMPTZ,
 ADD COLUMN IF NOT EXISTS stripe_payment_intent_id VARCHAR(255) UNIQUE,
 ADD COLUMN IF NOT EXISTS total_amount INTEGER,
