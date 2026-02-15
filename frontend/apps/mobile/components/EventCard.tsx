@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Platform } from 'react-native';
+import { Alert, StyleSheet, View, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LocationPin } from '@/constants/mock-locations';
 import { ThemedText } from '@/components/themed-text';
@@ -45,7 +45,7 @@ export function EventCard({ pin }: EventCardProps) {
       <TouchableOpacity 
         style={styles.reserveButton} 
         activeOpacity={1} 
-        onPress={() => alert(`Reserved: ${pin.title}`)} 
+        onPress={() => Alert.alert('Reservation', `Reserved: ${pin.title}`)} 
       >
         <ThemedText style={styles.reserveButtonText}>Reserve</ThemedText>
       </TouchableOpacity>
