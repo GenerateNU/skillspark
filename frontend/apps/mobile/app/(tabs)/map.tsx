@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Linking, Button, ActivityIndicator } from 'react-native';
+import { StyleSheet, Linking, Button, ActivityIndicator, View } from 'react-native';
 import * as Location from 'expo-location';
 // import { useGetAllEventOccurrences } from '@skillspark/api-client'; <-- uncomment this when we will implement actual API calls
 import { ThemedView } from '@/components/themed-view';
@@ -76,6 +76,12 @@ export default function MapScreen() {
         locations={mapLocations} 
         userLocation={userLocation} 
       />
+
+      {!isApiLoading && mapLocations.length === 0 && (
+         <View style={styles.emptyStateContainer}>
+            <ThemedText style={styles.emptyStateText}>No events found nearby.</ThemedText>
+         </View>
+      )}
     </ThemedView>
   );
 }
@@ -92,5 +98,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     fontSize: 16,
+  },
+  emptyStateContainer: {
+    position: 'absolute',
+    top: 60,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  emptyStateText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   }
 });
