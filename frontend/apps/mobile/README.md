@@ -37,7 +37,7 @@ To use the Map features, you must configure Google Maps API keys for iOS and And
 1. Create a `.env` file in the `frontend/apps/mobile` directory (copy from a template if available).
 
    ```bash
-   cd backend
+   cd frontend/apps/mobile
    cp env.sample .env
    ```
 
