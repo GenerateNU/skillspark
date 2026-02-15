@@ -5,13 +5,6 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-export interface CancelEventOccurrenceOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** Success message */
-  message: string;
-}
-
 export interface Child {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -56,6 +49,41 @@ export interface CreateChildInputBody {
   school_id: string;
 }
 
+export interface CreateEventInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /**
+   * Max age for the event
+   * @minimum 0
+   * @maximum 100
+   */
+  age_range_max: number;
+  /**
+   * Minimum age for the event
+   * @minimum 0
+   * @maximum 100
+   */
+  age_range_min: number;
+  /** Category of the event */
+  category: string[];
+  /**
+   * Description of the event
+   * @minLength 2
+   * @maxLength 200
+   */
+  description: string;
+  /** S3 key for the header image */
+  header_image_s3_key: string;
+  /** ID of the hosting organization */
+  organization_id: string;
+  /**
+   * Title of the event
+   * @minLength 2
+   * @maxLength 100
+   */
+  title: string;
+}
+
 export interface CreateEventOccurrenceInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -86,8 +114,6 @@ export interface CreateEventOccurrenceInputBody {
 export interface CreateGuardianInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** auth id of the guardian being created */
-  auth_id?: string;
   /** Email of the guardian */
   email: string;
   /** Language preference */
@@ -96,6 +122,8 @@ export interface CreateGuardianInputBody {
   name: string;
   /** S3 key for profile picture */
   profile_picture_s3_key?: string;
+  /** User ID associated with the guardian */
+  user_id: string;
   /** Username of the guardian */
   username: string;
 }
@@ -114,7 +142,7 @@ export interface CreateLocationInputBody {
    * @minLength 5
    * @maxLength 200
    */
-  address_line2?: string;
+  address_line2: string;
   /**
    * Country of the location
    * @minLength 2
@@ -162,8 +190,6 @@ export interface CreateLocationInputBody {
 export interface CreateManagerInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** auth id of the manager being created */
-  auth_id?: string;
   /** Email of the guardian */
   email: string;
   /** Language preference */
@@ -176,20 +202,42 @@ export interface CreateManagerInputBody {
   profile_picture_s3_key?: string;
   /** role of the manager being created */
   role: string;
+  /** User ID associated with the manager */
+  user_id: string;
   /** Username of the guardian */
   username: string;
+}
+
+export interface CreateOrganizationInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Active status (defaults to true) */
+  active?: boolean;
+  /** Associated location ID */
+  location_id?: string;
+  /**
+   * Organization name
+   * @minLength 1
+   * @maxLength 255
+   */
+  name: string;
+  /**
+   * S3 key for profile picture
+   * @maxLength 500
+   */
+  pfp_s3_key?: string;
 }
 
 /**
  * Initial status of the registration
  */
-export type CreateRegistrationInputBodyStatus = typeof CreateRegistrationInputBodyStatus[keyof typeof CreateRegistrationInputBodyStatus];
-
+export type CreateRegistrationInputBodyStatus =
+  (typeof CreateRegistrationInputBodyStatus)[keyof typeof CreateRegistrationInputBodyStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateRegistrationInputBodyStatus = {
-  registered: 'registered',
-  cancelled: 'cancelled',
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface CreateRegistrationInputBody {
@@ -203,19 +251,6 @@ export interface CreateRegistrationInputBody {
   guardian_id: string;
   /** Initial status of the registration */
   status: CreateRegistrationInputBodyStatus;
-}
-
-export interface CreateReviewInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** Review categories for this review, can be one of fun, engaging, interesting or informative. */
-  categories: string[];
-  /** The review text */
-  description: string;
-  /** ID of the guardian */
-  guardian_id: string;
-  /** ID of the linked registration */
-  registration_id: string;
 }
 
 export interface CreateUserInputBody {
@@ -234,13 +269,6 @@ export interface CreateUserInputBody {
 }
 
 export interface DeleteEventOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** Success message */
-  message: string;
-}
-
-export interface DeleteReviewOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   /** Success message */
@@ -284,22 +312,9 @@ export interface Event {
   header_image_s3_key: string;
   id: string;
   organization_id: string;
-  presigned_url: string;
   title: string;
   updated_at: string;
 }
-
-/**
- * Current status of the event occurrence
- */
-export type EventOccurrenceStatus = typeof EventOccurrenceStatus[keyof typeof EventOccurrenceStatus];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const EventOccurrenceStatus = {
-  scheduled: 'scheduled',
-  cancelled: 'cancelled',
-} as const;
 
 export interface EventOccurrence {
   /** A URL to the JSON Schema for this object. */
@@ -314,8 +329,6 @@ export interface EventOccurrence {
   manager_id: string;
   max_attendees: number;
   start_time: string;
-  /** Current status of the event occurrence */
-  status: EventOccurrenceStatus;
   updated_at: string;
 }
 
@@ -363,30 +376,6 @@ export interface Guardian {
   username: string;
 }
 
-export interface GuardianLoginOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  guardian_id: string;
-}
-
-export interface GuardianSignUpInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  email: string;
-  language_preference: string;
-  name: string;
-  password: string;
-  profile_picture_s3_key: string;
-  username: string;
-}
-
-export interface GuardianSignUpOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  guardian_id: string;
-  token: string;
-}
-
 export interface HealthOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -426,13 +415,6 @@ export interface Location {
   updated_at: string;
 }
 
-export interface LoginInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  email: string;
-  password: string;
-}
-
 export interface Manager {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -449,42 +431,6 @@ export interface Manager {
   username: string;
 }
 
-export interface ManagerLoginOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  manager_id: string;
-}
-
-export interface ManagerSignUpInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** auth id of the manager being created */
-  auth_id?: string;
-  /** email of the manager */
-  email: string;
-  /** language preference of the manager */
-  language_preference: string;
-  /** name of the manager */
-  name: string;
-  /** organization id of the organization the manager is associated with */
-  organization_id: string;
-  /** password of the manager */
-  password: string;
-  /** profile picture s3 key of the manager */
-  profile_picture_s3_key?: string;
-  /** role of the manager being created */
-  role: string;
-  /** username of the manager */
-  username: string;
-}
-
-export interface ManagerSignUpOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  manager_id: string;
-  token: string;
-}
-
 export interface Organization {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -494,7 +440,6 @@ export interface Organization {
   location_id?: string;
   name: string;
   pfp_s3_key?: string;
-  presigned_url: string;
   updated_at: string;
 }
 
@@ -522,13 +467,13 @@ export interface PatchManagerInputBody {
 /**
  * Current status of the registration
  */
-export type RegistrationStatus = typeof RegistrationStatus[keyof typeof RegistrationStatus];
-
+export type RegistrationStatus =
+  (typeof RegistrationStatus)[keyof typeof RegistrationStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const RegistrationStatus = {
-  registered: 'registered',
-  cancelled: 'cancelled',
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface Registration {
@@ -550,25 +495,6 @@ export interface Registration {
   occurrence_start_time: string;
   /** Current status of the registration */
   status: RegistrationStatus;
-  /** Timestamp when registration was last updated */
-  updated_at: string;
-}
-
-export interface Review {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** Review categories for this review, can be one of fun, engaging, interesting or informative. */
-  categories: string[];
-  /** Timestamp when registration was created */
-  created_at: string;
-  /** The review text */
-  description: string;
-  /** ID of the guardian */
-  guardian_id: string;
-  /** Unique review identifier */
-  id: string;
-  /** ID of the linked registration */
-  registration_id: string;
   /** Timestamp when registration was last updated */
   updated_at: string;
 }
@@ -608,6 +534,41 @@ export interface UpdateChildInputBody {
   name?: string;
   /** ID of the school the child goes to */
   school_id?: string;
+}
+
+export interface UpdateEventInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /**
+   * Max age for the event
+   * @minimum 0
+   * @maximum 100
+   */
+  age_range_max?: number;
+  /**
+   * Minimum age for the event
+   * @minimum 0
+   * @maximum 100
+   */
+  age_range_min?: number;
+  /** Category of the event */
+  category?: string[];
+  /**
+   * Description of the event
+   * @minLength 2
+   * @maxLength 200
+   */
+  description?: string;
+  /** S3 key for the header image */
+  header_image_s3_key?: string;
+  /** ID of the hosting organization */
+  organization_id?: string;
+  /**
+   * Title of the event
+   * @minLength 2
+   * @maxLength 100
+   */
+  title?: string;
 }
 
 export interface UpdateEventOccurrenceInputBody {
@@ -658,16 +619,36 @@ export interface UpdateGuardianInputBody {
   username: string;
 }
 
+export interface UpdateOrganizationInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Active status */
+  active?: boolean;
+  /** Associated location ID */
+  location_id?: string;
+  /**
+   * Organization name
+   * @minLength 1
+   * @maxLength 255
+   */
+  name?: string;
+  /**
+   * S3 key for profile picture
+   * @maxLength 500
+   */
+  pfp_s3_key?: string;
+}
+
 /**
  * Updated registration status (optional)
  */
-export type UpdateRegistrationInputBodyStatus = typeof UpdateRegistrationInputBodyStatus[keyof typeof UpdateRegistrationInputBodyStatus];
-
+export type UpdateRegistrationInputBodyStatus =
+  (typeof UpdateRegistrationInputBodyStatus)[keyof typeof UpdateRegistrationInputBodyStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateRegistrationInputBodyStatus = {
-  registered: 'registered',
-  cancelled: 'cancelled',
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface UpdateRegistrationInputBody {
@@ -697,138 +678,39 @@ export interface UserOutputBody {
 }
 
 export type GetAllEventOccurrencesParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
-};
-
-export type CreateEventBody = {
-  age_range_max?: number;
-  age_range_min?: number;
-  category?: string[];
   /**
-   * @minLength 2
-   * @maxLength 200
+   * @minimum 1
    */
-  description: string;
-  header_image?: Blob;
-  organization_id: string;
+  page?: number;
   /**
-   * @minLength 2
-   * @maxLength 100
+   * @minimum 1
+   * @maximum 100
    */
-  title: string;
-};
-
-export type UpdateEventBody = {
-  age_range_max?: number;
-  age_range_min?: number;
-  category?: string[];
-  /**
-   * @minLength 2
-   * @maxLength 200
-   */
-  description?: string;
-  header_image?: Blob;
-  organization_id?: string;
-  /**
-   * @minLength 2
-   * @maxLength 100
-   */
-  title?: string;
-};
-
-export type GetAllLocationsParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
+  limit?: number;
 };
 
 export type ListOrganizationsParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
-};
-
-export type CreateOrganizationBody = {
-  active?: boolean;
-  location_id?: string;
   /**
-   * @minLength 1
-   * @maxLength 255
+   * Page number (starts at 1)
+   * @minimum 1
    */
-  name: string;
-  profile_image?: Blob;
-};
-
-export type UpdateOrganizationBody = {
-  active?: boolean;
-  location_id?: string;
+  page?: number;
   /**
-   * @minLength 1
-   * @maxLength 255
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
    */
-  name: string;
-  profile_image?: Blob;
-};
-
-export type GetReviewByEventIdParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
-};
-
-export type GetReviewByGuardianIdParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  page_size?: number;
 };
 
 export type GetAllSchoolsParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
 };
-
