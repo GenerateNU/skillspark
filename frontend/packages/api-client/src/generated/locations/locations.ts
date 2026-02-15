@@ -5,7 +5,10 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,300 +21,299 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   CreateLocationInputBody,
   ErrorModel,
-  Location,
-} from "../skillSparkAPI.schemas";
+  GetAllLocationsParams,
+  Location
+} from '../skillSparkAPI.schemas';
 
-import { customInstance } from "../../apiClient";
+import { customInstance } from '../../apiClient';
 
 // https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
-type IfEquals<X, Y, A = X, B = never> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
+type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
+T,
+>() => T extends Y ? 1 : 2
+? A
+: B;
 
 type WritableKeys<T> = {
-  [P in keyof T]-?: IfEquals<
-    { [Q in P]: T[P] },
-    { -readonly [Q in P]: T[P] },
-    P
-  >;
+[P in keyof T]-?: IfEquals<
+  { [Q in P]: T[P] },
+  { -readonly [Q in P]: T[P] },
+  P
+>;
 }[keyof T];
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I,
-) => void
-  ? I
-  : never;
+type UnionToIntersection<U> =
+  (U extends any ? (k: U)=>void : never) extends ((k: infer I)=>void) ? I : never;
 type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
 
 type Writable<T> = Pick<T, WritableKeys<T>>;
-type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
-  ? {
-      [P in keyof Writable<T>]: T[P] extends object
-        ? NonReadonly<NonNullable<T[P]>>
-        : T[P];
-    }
-  : DistributeReadOnlyOverUnions<T>;
+type NonReadonly<T> = [T] extends [UnionToIntersection<T>] ? {
+  [P in keyof Writable<T>]: T[P] extends object
+    ? NonReadonly<NonNullable<T[P]>>
+    : T[P];
+} : DistributeReadOnlyOverUnions<T>;
+
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
+
+/**
+ * Returns all locations
+ * @summary Get all locations
+ */
+export const getAllLocations = (
+    params?: GetAllLocationsParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<Location[]>(
+      {url: `/api/v1/locations`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+  
+
+
+
+export const getGetAllLocationsQueryKey = (params?: GetAllLocationsParams,) => {
+    return [
+    `/api/v1/locations`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getGetAllLocationsQueryOptions = <TData = Awaited<ReturnType<typeof getAllLocations>>, TError = ErrorModel>(params?: GetAllLocationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLocations>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAllLocationsQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllLocations>>> = ({ signal }) => getAllLocations(params, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllLocations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAllLocationsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllLocations>>>
+export type GetAllLocationsQueryError = ErrorModel
+
+
+export function useGetAllLocations<TData = Awaited<ReturnType<typeof getAllLocations>>, TError = ErrorModel>(
+ params: undefined |  GetAllLocationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLocations>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllLocations>>,
+          TError,
+          Awaited<ReturnType<typeof getAllLocations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllLocations<TData = Awaited<ReturnType<typeof getAllLocations>>, TError = ErrorModel>(
+ params?: GetAllLocationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLocations>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllLocations>>,
+          TError,
+          Awaited<ReturnType<typeof getAllLocations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllLocations<TData = Awaited<ReturnType<typeof getAllLocations>>, TError = ErrorModel>(
+ params?: GetAllLocationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLocations>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get all locations
+ */
+
+export function useGetAllLocations<TData = Awaited<ReturnType<typeof getAllLocations>>, TError = ErrorModel>(
+ params?: GetAllLocationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLocations>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAllLocationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
 
 /**
  * Creates a new location
  * @summary Create a new location
  */
 export const postLocation = (
-  createLocationInputBody: NonReadonly<CreateLocationInputBody>,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
+    createLocationInputBody: NonReadonly<CreateLocationInputBody>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
-  return customInstance<Location>(
-    {
-      url: `/api/v1/locations`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: createLocationInputBody,
-      signal,
+      
+      
+      return customInstance<Location>(
+      {url: `/api/v1/locations`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createLocationInputBody, signal
     },
-    options,
-  );
-};
+      options);
+    }
+  
 
-export const getPostLocationMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postLocation>>,
-    TError,
-    { data: NonReadonly<CreateLocationInputBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postLocation>>,
-  TError,
-  { data: NonReadonly<CreateLocationInputBody> },
-  TContext
-> => {
-  const mutationKey = ["postLocation"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postLocation>>,
-    { data: NonReadonly<CreateLocationInputBody> }
-  > = (props) => {
-    const { data } = props ?? {};
+export const getPostLocationMutationOptions = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLocation>>, TError,{data: NonReadonly<CreateLocationInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postLocation>>, TError,{data: NonReadonly<CreateLocationInputBody>}, TContext> => {
 
-    return postLocation(data, requestOptions);
-  };
+const mutationKey = ['postLocation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-  return { mutationFn, ...mutationOptions };
-};
+      
 
-export type PostLocationMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postLocation>>
->;
-export type PostLocationMutationBody = NonReadonly<CreateLocationInputBody>;
-export type PostLocationMutationError = ErrorModel;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postLocation>>, {data: NonReadonly<CreateLocationInputBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postLocation(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostLocationMutationResult = NonNullable<Awaited<ReturnType<typeof postLocation>>>
+    export type PostLocationMutationBody = NonReadonly<CreateLocationInputBody>
+    export type PostLocationMutationError = ErrorModel
+
+    /**
  * @summary Create a new location
  */
-export const usePostLocation = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postLocation>>,
-      TError,
-      { data: NonReadonly<CreateLocationInputBody> },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postLocation>>,
-  TError,
-  { data: NonReadonly<CreateLocationInputBody> },
-  TContext
-> => {
-  const mutationOptions = getPostLocationMutationOptions(options);
+export const usePostLocation = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLocation>>, TError,{data: NonReadonly<CreateLocationInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postLocation>>,
+        TError,
+        {data: NonReadonly<CreateLocationInputBody>},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
-/**
+      const mutationOptions = getPostLocationMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
  * Returns a location by id
  * @summary Get a location by id
  */
 export const getLocationById = (
-  id: string,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
-  return customInstance<Location>(
-    { url: `/api/v1/locations/${id}`, method: "GET", signal },
-    options,
-  );
-};
+      
+      
+      return customInstance<Location>(
+      {url: `/api/v1/locations/${id}`, method: 'GET', signal
+    },
+      options);
+    }
+  
 
-export const getGetLocationByIdQueryKey = (id?: string) => {
-  return [`/api/v1/locations/${id}`] as const;
-};
 
-export const getGetLocationByIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getLocationById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getLocationById>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
+
+export const getGetLocationByIdQueryKey = (id?: string,) => {
+    return [
+    `/api/v1/locations/${id}`
+    ] as const;
+    }
+
+    
+export const getGetLocationByIdQueryOptions = <TData = Awaited<ReturnType<typeof getLocationById>>, TError = ErrorModel>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLocationById>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetLocationByIdQueryKey(id);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getLocationById>>> = ({
-    signal,
-  }) => getLocationById(id, requestOptions, signal);
+  const queryKey =  queryOptions?.queryKey ?? getGetLocationByIdQueryKey(id);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!id,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getLocationById>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetLocationByIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getLocationById>>
->;
-export type GetLocationByIdQueryError = ErrorModel;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLocationById>>> = ({ signal }) => getLocationById(id, requestOptions, signal);
 
-export function useGetLocationById<
-  TData = Awaited<ReturnType<typeof getLocationById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getLocationById>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLocationById>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetLocationByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getLocationById>>>
+export type GetLocationByIdQueryError = ErrorModel
+
+
+export function useGetLocationById<TData = Awaited<ReturnType<typeof getLocationById>>, TError = ErrorModel>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLocationById>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getLocationById>>,
           TError,
           Awaited<ReturnType<typeof getLocationById>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetLocationById<
-  TData = Awaited<ReturnType<typeof getLocationById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getLocationById>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLocationById<TData = Awaited<ReturnType<typeof getLocationById>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLocationById>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getLocationById>>,
           TError,
           Awaited<ReturnType<typeof getLocationById>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetLocationById<
-  TData = Awaited<ReturnType<typeof getLocationById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getLocationById>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLocationById<TData = Awaited<ReturnType<typeof getLocationById>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLocationById>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get a location by id
  */
 
-export function useGetLocationById<
-  TData = Awaited<ReturnType<typeof getLocationById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getLocationById>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetLocationByIdQueryOptions(id, options);
+export function useGetLocationById<TData = Awaited<ReturnType<typeof getLocationById>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLocationById>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetLocationByIdQueryOptions(id,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
