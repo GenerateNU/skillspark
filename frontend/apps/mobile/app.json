@@ -9,7 +9,10 @@
     "newArchEnabled": true,
     "scheme": "skillspark",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "SkillSpark needs your location to show events and activities near you."
+      }
     },
     "android": {
       "adaptiveIcon": {
