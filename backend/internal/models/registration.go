@@ -8,8 +8,8 @@ import (
 
 type Registration struct {
 	ID                  uuid.UUID          `json:"id" db:"id" doc:"Unique registration identifier"`
-	ChildID             uuid.UUID          `json:"child_id" db:"child_id" doc:"ID of the registered child"`
-	GuardianID          uuid.UUID          `json:"guardian_id" db:"guardian_id" doc:"ID of the child's guardian"`
+	ChildID             *uuid.UUID         `json:"child_id" db:"child_id" doc:"ID of the registered child"`
+	GuardianID          *uuid.UUID         `json:"guardian_id" db:"guardian_id" doc:"ID of the child's guardian"`
 	EventOccurrenceID   uuid.UUID          `json:"event_occurrence_id" db:"event_occurrence_id" doc:"ID of the event occurrence"`
 	Status              RegistrationStatus `json:"status" db:"status" doc:"Current status of the registration" enum:"registered,cancelled"`
 	CreatedAt           time.Time          `json:"created_at" db:"created_at" doc:"Timestamp when registration was created"`

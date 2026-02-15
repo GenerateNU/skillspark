@@ -641,32 +641,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
-  /api/v1/guardians:
-    post:
-      tags:
-        - Guardians
-      summary: Create a new guardian
-      description: Creates a new guardian
-      operationId: post-guardian
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateGuardianInputBody'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Guardian'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
   /api/v1/guardians/{id}:
     get:
       tags:
@@ -888,31 +862,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
   /api/v1/manager:
-    post:
-      tags:
-        - Managers
-      summary: posts a manager
-      description: Returns a manager by id
-      operationId: post-manager
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateManagerInputBody'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Manager'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
     patch:
       tags:
         - Managers
@@ -1877,40 +1826,6 @@ components:
         - end_time
         - max_attendees
         - language
-    CreateGuardianInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/CreateGuardianInputBody.json
-          readOnly: true
-        auth_id:
-          type: string
-          description: auth id of the guardian being created
-        email:
-          type: string
-          description: Email of the guardian
-        language_preference:
-          type: string
-          description: Language preference
-        name:
-          type: string
-          description: Name of the guardian
-        profile_picture_s3_key:
-          type: string
-          description: S3 key for profile picture
-        username:
-          type: string
-          description: Username of the guardian
-      required:
-        - name
-        - email
-        - username
-        - language_preference
     CreateLocationInputBody:
       type: object
       additionalProperties: false
@@ -1978,47 +1893,6 @@ components:
         - province
         - postal_code
         - country
-    CreateManagerInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/CreateManagerInputBody.json
-          readOnly: true
-        auth_id:
-          type: string
-          description: auth id of the manager being created
-        email:
-          type: string
-          description: Email of the guardian
-        language_preference:
-          type: string
-          description: Language preference
-        name:
-          type: string
-          description: Name of the guardian
-        organization_id:
-          type: string
-          description: organization id of the organization the manager is associated with
-        profile_picture_s3_key:
-          type: string
-          description: S3 key for profile picture
-        role:
-          type: string
-          description: role of the manager being created
-        username:
-          type: string
-          description: Username of the guardian
-      required:
-        - name
-        - email
-        - username
-        - language_preference
-        - role
     CreateRegistrationInputBody:
       type: object
       additionalProperties: false
@@ -2393,6 +2267,8 @@ components:
           examples:
             - http://localhost:8080/schemas/Guardian.json
           readOnly: true
+        auth_id:
+          type: string
         created_at:
           type: string
           format: date-time
@@ -2421,6 +2297,7 @@ components:
         - username
         - profile_picture_s3_key
         - language_preference
+        - auth_id
         - created_at
         - updated_at
     GuardianLoginOutputBody:
@@ -2626,6 +2503,8 @@ components:
           examples:
             - http://localhost:8080/schemas/Manager.json
           readOnly: true
+        auth_id:
+          type: string
         created_at:
           type: string
           format: date-time
@@ -2660,6 +2539,7 @@ components:
         - username
         - profile_picture_s3_key
         - language_preference
+        - auth_id
         - created_at
         - updated_at
     ManagerLoginOutputBody:

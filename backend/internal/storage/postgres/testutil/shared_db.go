@@ -3,8 +3,8 @@ package testutil
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -20,6 +20,7 @@ var (
 	adminPool  *pgxpool.Pool
 	container  testcontainers.Container
 	templateDB = "template_test_db"
+	dbCounter  atomic.Uint64
 )
 
 // ---------- PUBLIC API ----------
@@ -34,8 +35,11 @@ func SetupTestDB(t *testing.T) *pgxpool.Pool {
 	}
 
 	ctx := context.Background()
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	dbName := fmt.Sprintf("test_%d_%d", time.Now().UnixNano(), rng.Intn(1_000_000))
+	// Guaranteed unique even in parallel
+	dbName := fmt.Sprintf("test_%d_%d",
+		time.Now().UnixNano(),
+		dbCounter.Add(1),
+	)
 
 	dbIdent := pgx.Identifier{dbName}.Sanitize()
 	templateIdent := pgx.Identifier{templateDB}.Sanitize()

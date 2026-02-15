@@ -25,7 +25,7 @@ func TestCreateReview(t *testing.T) {
 	input := func() *models.CreateReviewInput {
 		i := &models.CreateReviewInput{}
 		i.Body.RegistrationID = registrationID
-		i.Body.GuardianID = guardianID
+		i.Body.GuardianID = *guardianID
 		i.Body.Description = "Test review"
 		i.Body.Categories = []string{"informative"}
 		return i
@@ -37,7 +37,7 @@ func TestCreateReview(t *testing.T) {
 	require.NotNil(t, created)
 
 	assert.Equal(t, registrationID, created.RegistrationID)
-	assert.Equal(t, guardianID, created.GuardianID)
+	assert.Equal(t, *guardianID, created.GuardianID)
 	assert.Equal(t, input.Body.Description, created.Description)
 	assert.Equal(t, input.Body.Categories, created.Categories)
 	assert.NotEqual(t, uuid.Nil, created.ID)
@@ -57,7 +57,7 @@ func TestCreateReview_FailsInvalidRegistration(t *testing.T) {
 	input := func() *models.CreateReviewInput {
 		i := &models.CreateReviewInput{}
 		i.Body.RegistrationID = uuid.New()
-		i.Body.GuardianID = validGuardianID
+		i.Body.GuardianID = *validGuardianID
 		i.Body.Description = "Test review"
 		i.Body.Categories = []string{"informative"}
 		return i

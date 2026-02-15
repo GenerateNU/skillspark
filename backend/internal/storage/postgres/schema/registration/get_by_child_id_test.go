@@ -20,7 +20,7 @@ func TestGetRegistrationsByChildID(t *testing.T) {
 	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByChildIDInput{
-		ChildID: r.ChildID,
+		ChildID: *r.ChildID,
 	}
 
 	result, err := repo.GetRegistrationsByChildID(ctx, input)
@@ -62,7 +62,7 @@ func TestGetRegistrationsByChildID_MultipleRegistrations(t *testing.T) {
 
 	registrationIDs := make(map[uuid.UUID]bool)
 	for _, reg := range result.Body.Registrations {
-		assert.Equal(t, childID, reg.ChildID)
+		assert.Equal(t, &childID, reg.ChildID)
 		registrationIDs[reg.ID] = true
 	}
 
@@ -97,7 +97,7 @@ func TestGetRegistrationsByChildID_VerifyEventDetails(t *testing.T) {
 	reg := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByChildIDInput{
-		ChildID: reg.ChildID,
+		ChildID: *reg.ChildID,
 	}
 
 	result, err := repo.GetRegistrationsByChildID(ctx, input)

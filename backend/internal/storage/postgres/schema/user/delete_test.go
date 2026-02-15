@@ -25,7 +25,7 @@ func TestUserRepository_Delete(t *testing.T) {
 	userInput.Body.Email = "delete@test.com"
 	userInput.Body.Username = "deleteuser"
 	authID := uuid.New()
-	userInput.Body.AuthID = &authID
+	userInput.Body.AuthID = authID
 
 	createdUser, err := repo.CreateUser(ctx, userInput)
 	if err != nil {

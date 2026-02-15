@@ -20,7 +20,7 @@ func TestGetRegistrationsByGuardianID(t *testing.T) {
 	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByGuardianIDInput{
-		GuardianID: r.GuardianID,
+		GuardianID: *r.GuardianID,
 	}
 
 	result, err := repo.GetRegistrationsByGuardianID(ctx, input)
@@ -62,8 +62,8 @@ func TestGetRegistrationsByGuardianID_MultipleChildren(t *testing.T) {
 
 	childIDs := make(map[uuid.UUID]bool)
 	for _, reg := range result.Body.Registrations {
-		assert.Equal(t, guardianID, reg.GuardianID)
-		childIDs[reg.ChildID] = true
+		assert.Equal(t, &guardianID, reg.GuardianID)
+		childIDs[*reg.ChildID] = true
 	}
 
 	assert.GreaterOrEqual(t, len(childIDs), 1)
@@ -98,7 +98,7 @@ func TestGetRegistrationsByGuardianID_VerifyEventDetails(t *testing.T) {
 	guardianID := reg.GuardianID
 
 	input := &models.GetRegistrationsByGuardianIDInput{
-		GuardianID: guardianID,
+		GuardianID: *guardianID,
 	}
 
 	result, err := repo.GetRegistrationsByGuardianID(ctx, input)
