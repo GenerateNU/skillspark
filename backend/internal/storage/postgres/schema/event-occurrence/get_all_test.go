@@ -2,6 +2,7 @@ package eventoccurrence
 
 import (
 	"context"
+	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/testutil"
 	"skillspark/internal/utils"
 	"testing"
@@ -29,7 +30,7 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T) {
 	pagination := utils.NewPagination()
 
 	// check that all 15 event occurrences in the test database are returned
-	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination)
+	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{})
 	assert.Nil(t, err)
 	assert.NotNil(t, eventOccurrences)
 	assert.Equal(t, count, int64(len(eventOccurrences)))
@@ -55,21 +56,21 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.
 
 	// test page 1 with limit 4
 	pagination1 := utils.Pagination{Page: 1, Limit: 4}
-	eventOccurrences1, err1 := repo.GetAllEventOccurrences(ctx, pagination1)
+	eventOccurrences1, err1 := repo.GetAllEventOccurrences(ctx, pagination1, models.GetAllEventOccurrencesFilter{})
 	assert.Nil(t, err1)
 	assert.NotNil(t, eventOccurrences1)
 	assert.Equal(t, 4, len(eventOccurrences1))
 
 	// test page 2 with limit 4
 	pagination2 := utils.Pagination{Page: 2, Limit: 4}
-	eventOccurrences2, err2 := repo.GetAllEventOccurrences(ctx, pagination2)
+	eventOccurrences2, err2 := repo.GetAllEventOccurrences(ctx, pagination2, models.GetAllEventOccurrencesFilter{})
 	assert.Nil(t, err2)
 	assert.NotNil(t, eventOccurrences2)
 	assert.Equal(t, 4, len(eventOccurrences2))
 
 	// test page 3 with limit 4
 	pagination3 := utils.Pagination{Page: 3, Limit: 4}
-	eventOccurrences3, err3 := repo.GetAllEventOccurrences(ctx, pagination3)
+	eventOccurrences3, err3 := repo.GetAllEventOccurrences(ctx, pagination3, models.GetAllEventOccurrencesFilter{})
 	assert.Nil(t, err3)
 	assert.NotNil(t, eventOccurrences3)
 	assert.Equal(t, 4, len(eventOccurrences3))

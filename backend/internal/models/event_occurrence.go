@@ -32,8 +32,25 @@ type EventOccurrence struct {
 
 // get all
 type GetAllEventOccurrencesInput struct {
-	Page  int `query:"page" minimum:"1" default:"1"`
-	Limit int `query:"limit" minimum:"1" maximum:"100" default:"100"`
+	Page        int     `query:"page" minimum:"1" default:"1"`
+	Limit       int     `query:"limit" minimum:"1" maximum:"100" default:"100"`
+	Search      string  `query:"search"`
+	Latitude    float64 `query:"lat"`
+	Longitude   float64 `query:"lng"`
+	RadiusKm    float64 `query:"radius_km"`
+	PriceTier   string  `query:"price"`
+	MinDuration int     `query:"min_duration"`
+	MaxDuration int     `query:"max_duration"`
+}
+
+type GetAllEventOccurrencesFilter struct {
+	Search             *string
+	Latitude           *float64
+	Longitude          *float64
+	RadiusKm           *float64
+	PriceTier          *string
+	MinDurationMinutes *int
+	MaxDurationMinutes *int
 }
 
 type GetAllEventOccurrencesOutput struct {
