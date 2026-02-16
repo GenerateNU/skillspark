@@ -1,29 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Linking, Button, ActivityIndicator, View } from 'react-native';
 import * as Location from 'expo-location';
-// import { useGetAllEventOccurrences } from '@skillspark/api-client'; <-- uncomment this when we will implement actual API calls
+import { useGetAllEventOccurrences } from '@skillspark/api-client';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { SkillSparkMap } from '@/components/SkillSparkMap';
-import { MOCK_LOCATIONS, LocationPin } from '@/constants/mock-locations'; 
+import { LocationPin } from '@/constants/mock-locations'; 
 
 export default function MapScreen() {
-  // const { data: occurrences, isLoading: isApiLoading, error } = useGetAllEventOccurrences(); <-- uncomment when API calls are implemented
+  const { data: occurrences, isLoading: isApiLoading, error } = useGetAllEventOccurrences();
   
-  const isApiLoading = false; // Mock loading state
-  const mapLocations: LocationPin[] = MOCK_LOCATIONS; 
-
-  /* <--- uncomment this block when API calss are implemented
   const mapLocations: LocationPin[] = (occurrences || []) 
     .filter(occ => occ.location && occ.event)
     .map(occ => ({
       id: occ.id,
       title: occ.event.title,
-      description: occ.location.address_line1,
+      description: occ.event.description,
       latitude: occ.location.latitude,
       longitude: occ.location.longitude,
+      // Defaulting rating as it is not currently provided by the API
+      rating: 5.0, 
+      members: occ.curr_enrolled,
+      image: occ.event.header_image_s3_key
     }));
-  */
 
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
   const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
