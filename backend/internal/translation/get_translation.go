@@ -25,6 +25,7 @@ func (t *TranslateClient) GetTranslation(ctx context.Context, input string) (*st
 
 	req.Header.Add("Accept", `application/json`)
 	resp, err := t.Client.Do(req)
+
 	if err != nil {
 		return nil, err
 	}
