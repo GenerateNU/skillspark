@@ -19,7 +19,7 @@
     "axios": "^1.7.9"
   },
   "devDependencies": {
-    "orval": "^7.3.0",
+    "orval": "^8.4.0",
     "typescript": "^5.3.3"
   }
 }
