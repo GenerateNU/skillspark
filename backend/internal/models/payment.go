@@ -15,8 +15,14 @@ type CreateOrgStripeAccountInput struct {
 
 type CreateOrgStripeAccountOutput struct {
 	Body struct {
+		Account Organization `json:"account" doc:"Stripe account details"`
+	} `json:"body" doc:"Updated organization with Stripe account ID"`
+}
+
+type CreateOrgStripeAccountClientOutput struct {
+	Body struct {
 		Account stripe.V2CoreAccount `json:"account" doc:"Stripe account details"`
-	}
+	} `json:"body" doc:"Updated organization with Stripe account ID"`
 }
 
 type CreateStripeOnboardingLinkInput struct {
@@ -30,7 +36,7 @@ type CreateStripeOnboardingLinkInput struct {
 type CreateStripeOnboardingLinkOutput struct {
 	Body struct {
 		OnboardingURL string `json:"onboarding_url" doc:"Stripe-hosted onboarding page URL"`
-	}
+	} `json:"body"`
 }
 
 type CreateSetupIntentInput struct {
@@ -40,7 +46,7 @@ type CreateSetupIntentInput struct {
 type CreateSetupIntentOutput struct {
 	Body struct {
 		ClientSecret string `json:"client_secret" doc:"Stripe SetupIntent client_secret for frontend"`
-	}
+	} `json:"body"`
 }
 
 type CreateOrgLoginLinkInput struct {
@@ -50,7 +56,7 @@ type CreateOrgLoginLinkInput struct {
 type CreateOrgLoginLinkOutput struct {
 	Body struct {
 		LoginURL string `json:"login_url" doc:"Stripe Express dashboard login URL"`
-	}
+	} `json:"body"`
 }
 
 type CreatePaymentIntentInput struct {
@@ -77,7 +83,7 @@ type CreatePaymentIntentOutput struct {
 		ProviderAmount    int    `json:"provider_amount" doc:"Amount provider receives in cents"`
 		PlatformFeeAmount int    `json:"platform_fee_amount" doc:"Platform fee in cents"`
 		Currency          string `json:"currency" doc:"Currency code"`
-	}
+	} `json:"body"`
 }
 
 type CancelPaymentIntentInput struct {

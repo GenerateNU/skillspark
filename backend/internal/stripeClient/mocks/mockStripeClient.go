@@ -16,12 +16,12 @@ func (m *MockStripeClient) CreateOrganizationAccount(
 	name string,
 	email string,
 	country string,
-) (*models.CreateOrgStripeAccountOutput, error) {
+) (*models.CreateOrgStripeAccountClientOutput, error) {
 	args := m.Called(ctx, name, email, country)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*models.CreateOrgStripeAccountOutput), args.Error(1)
+	return args.Get(0).(*models.CreateOrgStripeAccountClientOutput), args.Error(1)
 }
 
 func (m *MockStripeClient) CreateAccountOnboardingLink(

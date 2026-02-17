@@ -28,7 +28,7 @@ func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc stripeClient.
 		Summary:       "Create a new Stripe account for an organization",
 		Description:   "Create a new Stripe account for an organization",
 		Tags:          []string{"Payments"},
-	}, func(ctx context.Context, input *models.CreateOrgStripeAccountInput) (*models.Organization, error) {
+	}, func(ctx context.Context, input *models.CreateOrgStripeAccountInput) (*models.CreateOrgStripeAccountOutput, error) {
 		return paymentHandler.CreateOrgStripeAccount(ctx, input)
 	})
 

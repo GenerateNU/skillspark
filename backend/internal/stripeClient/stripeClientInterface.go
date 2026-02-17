@@ -8,7 +8,7 @@ import (
 )
 
 type StripeClientInterface interface {
-	CreateOrganizationAccount(ctx context.Context, name string, email string, country string) (*models.CreateOrgStripeAccountOutput, error)
+	CreateOrganizationAccount(ctx context.Context, name string, email string, country string) (*models.CreateOrgStripeAccountClientOutput, error)
 	CreateAccountOnboardingLink(ctx context.Context, input *models.CreateStripeOnboardingLinkInput) (*models.CreateStripeOnboardingLinkOutput, error)
 	CreateCustomer(ctx context.Context, email string, name string) (*stripe.Customer, error)
 	CreateSetupIntent(ctx context.Context, stripeCustomerID string) (string, error)
