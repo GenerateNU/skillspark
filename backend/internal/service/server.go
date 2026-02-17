@@ -110,10 +110,11 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetupOrganizationRoutes(api, repo, s3Client)
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
-	routes.SetupManagerRoutes(api, repo)
+	routes.SetupManagerRoutes(api, repo, config)
 	routes.SetupRegistrationRoutes(api, repo)
-	routes.SetupGuardiansRoutes(api, repo)
+	routes.SetupGuardiansRoutes(api, repo, config)
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo)
+	routes.SetUpReviewRoutes(api, repo)
 	routes.SetupAuthRoutes(api, repo, config)
 }

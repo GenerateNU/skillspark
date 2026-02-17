@@ -24,7 +24,7 @@ func TestGetRegistrationByID(t *testing.T) {
 		ID: registrationID,
 	}
 
-	retrieved, err := repo.GetRegistrationByID(ctx, getInput)
+	retrieved, err := repo.GetRegistrationByID(ctx, getInput, nil)
 
 	require.Nil(t, err)
 	require.NotNil(t, retrieved)
@@ -53,7 +53,7 @@ func TestGetRegistrationByID_VerifyEventDetails(t *testing.T) {
 		ID: registrationID,
 	}
 
-	retrieved, err := repo.GetRegistrationByID(ctx, getInput)
+	retrieved, err := repo.GetRegistrationByID(ctx, getInput, nil)
 
 	require.Nil(t, err)
 	require.NotNil(t, retrieved)
@@ -70,7 +70,7 @@ func TestGetRegistrationByID_NotFound(t *testing.T) {
 		ID: uuid.New(),
 	}
 
-	retrieved, err := repo.GetRegistrationByID(ctx, getInput)
+	retrieved, err := repo.GetRegistrationByID(ctx, getInput, nil)
 
 	require.NotNil(t, err)
 	require.Nil(t, retrieved)
@@ -87,14 +87,14 @@ func TestGetRegistrationByID_MultipleDifferentRegistrations(t *testing.T) {
 	getInput1 := &models.GetRegistrationByIDInput{
 		ID: reg1.ID,
 	}
-	retrieved1, err := repo.GetRegistrationByID(ctx, getInput1)
+	retrieved1, err := repo.GetRegistrationByID(ctx, getInput1, nil)
 	require.Nil(t, err)
 	require.NotNil(t, retrieved1)
 
 	getInput2 := &models.GetRegistrationByIDInput{
 		ID: reg2.ID,
 	}
-	retrieved2, err := repo.GetRegistrationByID(ctx, getInput2)
+	retrieved2, err := repo.GetRegistrationByID(ctx, getInput2, nil)
 	require.Nil(t, err)
 	require.NotNil(t, retrieved2)
 

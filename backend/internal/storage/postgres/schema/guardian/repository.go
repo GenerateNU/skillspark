@@ -9,3 +9,7 @@ type GuardianRepository struct {
 func NewGuardianRepository(db *pgxpool.Pool) *GuardianRepository {
 	return &GuardianRepository{db: db}
 }
+
+func (r *GuardianRepository) GetDB() *pgxpool.Pool {
+	return r.db
+}

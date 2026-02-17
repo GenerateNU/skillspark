@@ -1,55 +1,18 @@
 package auth
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
-	authLib "skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
-
-// MockRoundTripper is a helper to mock http.Client via its Transport
-type MockRoundTripper struct {
-	RoundTripFunc func(req *http.Request) *http.Response
-}
-
-func (m *MockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	return m.RoundTripFunc(req), nil
-}
-
-func setupMockAuthClient(t *testing.T, responseBody interface{}, statusCode int) {
-	originalClient := authLib.Client
-	t.Cleanup(func() {
-		authLib.Client = originalClient
-	})
-
-	mockTransport := &MockRoundTripper{
-		RoundTripFunc: func(req *http.Request) *http.Response {
-			respBytes, _ := json.Marshal(responseBody)
-			return &http.Response{
-				StatusCode: statusCode,
-				Body:       io.NopCloser(bytes.NewBuffer(respBytes)),
-				Header:     make(http.Header),
-			}
-		},
-	}
-
-	authLib.Client = &http.Client{
-		Transport: mockTransport,
-		Timeout:   1 * time.Second,
-	}
-}
 
 func TestHandler_GuardianLogin(t *testing.T) {
 	tests := []struct {
@@ -153,7 +116,7 @@ func TestHandler_GuardianLogin(t *testing.T) {
 				tt.authResponse = resp
 			}
 
-			setupMockAuthClient(t, tt.authResponse, tt.authStatus)
+			SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			mockUserRepo := new(repomocks.MockUserRepository)
@@ -239,7 +202,7 @@ func TestHandler_ManagerLogin(t *testing.T) {
 				}
 			}
 
-			setupMockAuthClient(t, tt.authResponse, tt.authStatus)
+			SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			// Need dummy repos for NewHandler
@@ -313,7 +276,7 @@ func TestHandler_GuardianSignUp(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setupMockAuthClient(t, tt.authResponse, tt.authStatus)
+			SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			mockUserRepo := new(repomocks.MockUserRepository)
@@ -392,7 +355,7 @@ func TestHandler_ManagerSignUp(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setupMockAuthClient(t, tt.authResponse, tt.authStatus)
+			SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockUserRepo := new(repomocks.MockUserRepository)

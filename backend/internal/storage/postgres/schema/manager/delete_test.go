@@ -35,7 +35,7 @@ func TestManagerRepository_Delete_Director(t *testing.T) {
 		return input
 	}()
 	createdManager, _ := repo.CreateManager(ctx, managerInput)
-	manager, err := repo.DeleteManager(ctx, createdManager.ID)
+	manager, err := repo.DeleteManager(ctx, createdManager.ID, nil)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, manager)

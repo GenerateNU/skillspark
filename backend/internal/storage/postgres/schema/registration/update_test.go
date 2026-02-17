@@ -4,8 +4,8 @@ import (
 	"context"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
-	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
+	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
@@ -19,8 +19,9 @@ func TestUpdateRegistration(t *testing.T) {
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 
-	childID := child.CreateTestChild(t, ctx, testDB).ID
-	guardianID := guardian.CreateTestGuardian(t, ctx, testDB).ID
+	child := child.CreateTestChild(t, ctx, testDB)
+	childID := child.ID
+	guardianID := child.GuardianID
 	occurrenceID := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB).ID
 
 	createInput := func() *models.CreateRegistrationInput {
@@ -55,7 +56,7 @@ func TestUpdateRegistration(t *testing.T) {
 	getInput := &models.GetRegistrationByIDInput{
 		ID: created.Body.ID,
 	}
-	fetched, getErr := repo.GetRegistrationByID(ctx, getInput)
+	fetched, getErr := repo.GetRegistrationByID(ctx, getInput, nil)
 	require.Nil(t, getErr)
 	assert.Equal(t, models.RegistrationStatusCancelled, fetched.Body.Status)
 }
@@ -65,8 +66,9 @@ func TestUpdateRegistration_ChangeEventOccurrence(t *testing.T) {
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 
-	childID := child.CreateTestChild(t, ctx, testDB).ID
-	guardianID := guardian.CreateTestGuardian(t, ctx, testDB).ID
+	child := child.CreateTestChild(t, ctx, testDB)
+	childID := child.ID
+	guardianID := child.GuardianID
 	occurrenceID1 := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB).ID
 
 	createInput := func() *models.CreateRegistrationInput {
@@ -111,4 +113,50 @@ func TestUpdateRegistration_NotFound(t *testing.T) {
 
 	require.NotNil(t, err)
 	assert.Nil(t, updated)
+}
+
+func TestUpdateRegistration_DecrementsAttendeeCount(t *testing.T) {
+	testDB := testutil.SetupTestDB(t)
+	repo := NewRegistrationRepository(testDB)
+	eventOccurrenceRepo := eventoccurrence.NewEventOccurrenceRepository(testDB)
+	ctx := context.Background()
+
+	childID := child.CreateTestChild(t, ctx, testDB).ID
+	guardianID := guardian.CreateTestGuardian(t, ctx, testDB).ID
+	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	occurrenceID := occurrence.ID
+
+	createInput := func() *models.CreateRegistrationInput {
+		i := &models.CreateRegistrationInput{}
+		i.Body.ChildID = childID
+		i.Body.GuardianID = guardianID
+		i.Body.EventOccurrenceID = occurrenceID
+		i.Body.Status = models.RegistrationStatusRegistered
+		return i
+	}()
+
+	created, createErr := repo.CreateRegistration(ctx, createInput)
+	require.Nil(t, createErr)
+	require.NotNil(t, created)
+
+	occurrenceAfterCreate, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID)
+	require.Nil(t, err)
+	require.NotNil(t, occurrenceAfterCreate)
+	countAfterCreate := occurrenceAfterCreate.CurrEnrolled
+
+	newStatus := models.RegistrationStatusCancelled
+	updateInput := &models.UpdateRegistrationInput{
+		ID: created.Body.ID,
+	}
+	updateInput.Body.Status = &newStatus
+
+	updated, updateErr := repo.UpdateRegistration(ctx, updateInput)
+	require.Nil(t, updateErr)
+	require.NotNil(t, updated)
+	assert.Equal(t, models.RegistrationStatusCancelled, updated.Body.Status)
+
+	occurrenceAfterCancel, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID)
+	require.Nil(t, err)
+	require.NotNil(t, occurrenceAfterCancel)
+	assert.Equal(t, countAfterCreate-1, occurrenceAfterCancel.CurrEnrolled, "Attendee count should decrease by 1 after cancelling registration")
 }

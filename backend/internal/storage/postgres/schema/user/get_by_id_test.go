@@ -25,7 +25,7 @@ func TestUserRepository_GetByID(t *testing.T) {
 	userInput.Body.Email = "getbyid@test.com"
 	userInput.Body.Username = "getbyid"
 	authID := uuid.New()
-	userInput.Body.AuthID = &authID
+	userInput.Body.AuthID = authID
 
 	createdUser, err := repo.CreateUser(ctx, userInput)
 	if err != nil {

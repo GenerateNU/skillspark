@@ -26,7 +26,7 @@ func (h *Handler) GuardianSignUp(ctx context.Context, input *models.GuardianSign
 		guardian.Body.LanguagePreference = input.Body.LanguagePreference
 		guardian.Body.Username = input.Body.Username
 		guardian.Body.ProfilePictureS3Key = input.Body.ProfilePictureS3Key
-		guardian.Body.AuthID = &res.User.ID
+		guardian.Body.AuthID = res.User.ID
 		return guardian
 	}
 	guardian, err := h.guardianRepository.CreateGuardian(ctx, createGuardian())
@@ -65,7 +65,7 @@ func (h *Handler) ManagerSignUp(ctx context.Context, input *models.ManagerSignUp
 		manager.Body.ProfilePictureS3Key = input.Body.ProfilePictureS3Key
 		manager.Body.LanguagePreference = input.Body.LanguagePreference
 		manager.Body.OrganizationID = &input.Body.OrganizationID
-		manager.Body.AuthID = &res.User.ID
+		manager.Body.AuthID = res.User.ID
 		manager.Body.Role = input.Body.Role
 		return manager
 	}

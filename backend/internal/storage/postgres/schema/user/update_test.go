@@ -25,7 +25,7 @@ func TestUserRepository_Update(t *testing.T) {
 	userInput.Body.Email = "original@test.com"
 	userInput.Body.Username = "original"
 	authID := uuid.New()
-	userInput.Body.AuthID = &authID
+	userInput.Body.AuthID = authID
 
 	createdUser, err := repo.CreateUser(ctx, userInput)
 	if err != nil {

@@ -26,7 +26,7 @@ func TestUserRepository_Create_User(t *testing.T) {
 		input.Body.Username = "testuser"
 		input.Body.LanguagePreference = "en"
 		authID := uuid.New()
-		input.Body.AuthID = &authID
+		input.Body.AuthID = authID
 		return input
 	}()
 
@@ -69,7 +69,7 @@ func TestUserRepository_Create_Constraints(t *testing.T) {
 		input1.Body.Email = "duplicate@test.com"
 		input1.Body.Username = "userone"
 		authID1 := uuid.New()
-		input1.Body.AuthID = &authID1
+		input1.Body.AuthID = authID1
 
 		_, err := repo.CreateUser(ctx, input1)
 		assert.NoError(t, err)
@@ -79,7 +79,7 @@ func TestUserRepository_Create_Constraints(t *testing.T) {
 		input2.Body.Email = "duplicate@test.com"
 		input2.Body.Username = "usertwo"
 		authID2 := uuid.New()
-		input2.Body.AuthID = &authID2
+		input2.Body.AuthID = authID2
 
 		user, err := repo.CreateUser(ctx, input2)
 		assert.Error(t, err)
@@ -92,7 +92,7 @@ func TestUserRepository_Create_Constraints(t *testing.T) {
 		input1.Body.Email = "uniqueA@test.com"
 		input1.Body.Username = "usera"
 		authID := uuid.New()
-		input1.Body.AuthID = &authID
+		input1.Body.AuthID = authID
 
 		_, err := repo.CreateUser(ctx, input1)
 		assert.NoError(t, err)

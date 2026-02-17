@@ -23,10 +23,10 @@ func (r *GuardianRepository) GetGuardianByChildID(ctx context.Context, childID u
 
 	var guardian models.Guardian
 
-	err = row.Scan(&guardian.ID, &guardian.UserID, &guardian.Name, &guardian.Email, &guardian.Username, &guardian.ProfilePictureS3Key, &guardian.LanguagePreference, &guardian.CreatedAt, &guardian.UpdatedAt)
+	err = row.Scan(&guardian.ID, &guardian.UserID, &guardian.Name, &guardian.Email, &guardian.Username, &guardian.ProfilePictureS3Key, &guardian.LanguagePreference, &guardian.AuthID, &guardian.CreatedAt, &guardian.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			err := errs.BadRequest("Child with guardian id: " + childID.String() + " not found")
+			err := errs.BadRequest("Child with id: " + childID.String() + " not found")
 			return nil, &err
 		}
 		err := errs.InternalServerError("Failed to get guardian by child id: ", err.Error())
