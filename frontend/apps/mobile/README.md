@@ -29,3 +29,25 @@ To learn more about developing your project with Expo, look at the following res
 
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+
+## Configuration
+
+To use the Map features, you must configure Google Maps API keys for iOS and Android.
+
+1. Create a `.env` file in the `frontend/apps/mobile` directory (copy from a template if available).
+
+   ```bash
+   cd frontend/apps/mobile
+   cp env.sample .env
+   ```
+
+2. Edit `.env` and fill in the required values:
+
+## Map Integration & Managing Locations
+The map view (app/(tabs)/map.tsx) retrieves event occurrences dynamically from the backend API. It renders location pins for all events that have valid geographic coordinates.
+
+To populate the map:
+
+1. Ensure the backend API is running and accessible.
+
+2. Create event occurrences with associated locations containing valid latitude and longitude.
