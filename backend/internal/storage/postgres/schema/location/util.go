@@ -2,12 +2,16 @@ package location
 
 import (
 	"context"
+	"embed"
 	"skillspark/internal/models"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 )
+
+//go:embed sql/*.sql
+var SqlLocationFiles embed.FS
 
 func CreateTestLocation(
 	t *testing.T,

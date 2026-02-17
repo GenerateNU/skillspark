@@ -9,7 +9,7 @@ import (
 
 func (r *SchoolRepository) CreateSchool(ctx context.Context, school *models.CreateSchoolInput) (*models.School, error) {
 
-	query, err := schema.ReadSQLBaseScript("school/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlSchoolFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

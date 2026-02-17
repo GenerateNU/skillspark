@@ -8,7 +8,7 @@ import (
 )
 
 func (r *ManagerRepository) CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error) {
-	query, err := schema.ReadSQLBaseScript("manager/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlManagerFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

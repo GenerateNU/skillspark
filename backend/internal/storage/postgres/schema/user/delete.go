@@ -10,7 +10,7 @@ import (
 )
 
 func (r *UserRepository) DeleteUser(ctx context.Context, id uuid.UUID) (*models.User, error) {
-	query, err := schema.ReadSQLBaseScript("user/sql/delete.sql")
+	query, err := schema.ReadSQLBaseScript("delete.sql", SqlUserFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
