@@ -2,6 +2,7 @@ package registration
 
 import (
 	"context"
+	"embed"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
 	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
@@ -10,6 +11,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 )
+
+//go:embed sql/*.sql
+var SqlRegistrationFiles embed.FS
 
 func CreateTestRegistration(
 	t *testing.T,

@@ -9,7 +9,7 @@ import (
 
 func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, error) {
 
-	query, err := schema.ReadSQLBaseScript("organization/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlOrganizationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
