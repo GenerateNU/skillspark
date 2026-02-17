@@ -7,6 +7,7 @@ import (
 	"skillspark/internal/models"
 	s3mocks "skillspark/internal/s3_client/mocks"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	translatemocks "skillspark/internal/translation/mocks"
 	"strings"
 	"testing"
 	"time"
@@ -20,6 +21,11 @@ import (
 // createMockS3Client creates a mock S3 client for testing
 func createMockS3Client() *s3mocks.S3ClientMock {
 	return new(s3mocks.S3ClientMock)
+}
+
+// createMockTranslateClient creates a mock translation client for testing
+func createMockTranslateClient() *translatemocks.TranslateMock {
+	return new(translatemocks.TranslateMock)
 }
 
 // createDummyImageData
@@ -37,14 +43,15 @@ func TestHandler_CreateEvent(t *testing.T) {
 	headerKey := "events/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11/header.jpg"
 
 	tests := []struct {
-		name         string
-		input        *models.CreateEventInput
-		updateBody   *models.UpdateEventBody
-		imageData    *[]byte
-		mockSetup    func(*repomocks.MockEventRepository)
-		mockS3Setup  func(*s3mocks.S3ClientMock)
-		wantErr      bool
-		wantURL      bool
+		name               string
+		input              *models.CreateEventInput
+		updateBody         *models.UpdateEventBody
+		imageData          *[]byte
+		mockSetup          func(*repomocks.MockEventRepository)
+		mockS3Setup        func(*s3mocks.S3ClientMock)
+		mockTranslateSetup func(*translatemocks.TranslateMock)
+		wantErr            bool
+		wantURL            bool
 	}{
 		{
 			name: "successful create event without image",
@@ -61,10 +68,21 @@ func TestHandler_CreateEvent(t *testing.T) {
 				input.Body.Category = []string{"stem", "robotics"}
 				return input
 			}(),
-			updateBody: nil,
+			updateBody: &models.UpdateEventBody{},
 			imageData:  nil,
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				m.On("CreateEvent", mock.Anything, mock.AnythingOfType("*models.CreateEventInput"), mock.Anything).Return(&models.Event{
+				m.On("CreateEvent", mock.Anything, mock.AnythingOfType("*models.CreateEventDBInput"), mock.Anything).Return(&models.Event{
+					ID:             uuid.New(),
+					Title:          "Junior Robotics",
+					Description:    "Intro to robotics",
+					OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+					AgeRangeMin:    func() *int { i := 8; return &i }(),
+					AgeRangeMax:    func() *int { i := 12; return &i }(),
+					Category:       []string{"stem", "robotics"},
+					CreatedAt:      time.Now(),
+					UpdatedAt:      time.Now(),
+				}, nil)
+				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventDBInput"), mock.Anything).Return(&models.Event{
 					ID:             uuid.New(),
 					Title:          "Junior Robotics",
 					Description:    "Intro to robotics",
@@ -78,6 +96,10 @@ func TestHandler_CreateEvent(t *testing.T) {
 			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				// No S3 calls expected when no image
+			},
+			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
+				translation := "จูเนียร์ โรโบติกส์|*|ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
+				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			wantErr: false,
 			wantURL: false,
@@ -101,7 +123,7 @@ func TestHandler_CreateEvent(t *testing.T) {
 			imageData:  createDummyImageData(),
 			mockSetup: func(m *repomocks.MockEventRepository) {
 				eventID := uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-				m.On("CreateEvent", mock.Anything, mock.AnythingOfType("*models.CreateEventInput"), mock.Anything).Return(&models.Event{
+				m.On("CreateEvent", mock.Anything, mock.AnythingOfType("*models.CreateEventDBInput"), mock.Anything).Return(&models.Event{
 					ID:             eventID,
 					Title:          "Junior Robotics",
 					Description:    "Intro to robotics",
@@ -112,7 +134,7 @@ func TestHandler_CreateEvent(t *testing.T) {
 					CreatedAt:      time.Now(),
 					UpdatedAt:      time.Now(),
 				}, nil)
-				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput"), mock.Anything).Return(&models.Event{
+				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventDBInput"), mock.Anything).Return(&models.Event{
 					ID:               eventID,
 					Title:            "Junior Robotics",
 					Description:      "Intro to robotics",
@@ -126,6 +148,10 @@ func TestHandler_CreateEvent(t *testing.T) {
 				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg?X-Amz-Signature=abc123"
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
+			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
+				translation := "จูเนียร์ โรโบติกส์|*|ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
+				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+			},
 			wantErr: false,
 			wantURL: true,
 		},
@@ -136,10 +162,10 @@ func TestHandler_CreateEvent(t *testing.T) {
 				input.Body.Title = "Error Event"
 				return input
 			}(),
-			updateBody: nil,
+			updateBody: &models.UpdateEventBody{},
 			imageData:  nil,
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				m.On("CreateEvent", mock.Anything, mock.AnythingOfType("*models.CreateEventInput"), mock.Anything).
+				m.On("CreateEvent", mock.Anything, mock.AnythingOfType("*models.CreateEventDBInput"), mock.Anything).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.InternalServerError("Internal server error").Code,
 						Message: "Internal server error",
@@ -147,6 +173,9 @@ func TestHandler_CreateEvent(t *testing.T) {
 			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				// No S3 calls expected on error
+			},
+			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
+				// No translation calls expected - CreateEvent fails before translation
 			},
 			wantErr: true,
 			wantURL: false,
@@ -161,7 +190,10 @@ func TestHandler_CreateEvent(t *testing.T) {
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockRepo, mockS3)
+			mockTranslate := createMockTranslateClient()
+			tt.mockTranslateSetup(mockTranslate)
+
+			handler := NewHandler(mockRepo, mockS3, mockTranslate)
 			ctx := context.Background()
 
 			event, err := handler.CreateEvent(ctx, tt.input, tt.updateBody, tt.imageData, mockS3)
@@ -187,6 +219,7 @@ func TestHandler_CreateEvent(t *testing.T) {
 
 			mockRepo.AssertExpectations(t)
 			mockS3.AssertExpectations(t)
+			mockTranslate.AssertExpectations(t)
 		})
 	}
 }
@@ -196,13 +229,14 @@ func TestHandler_UpdateEvent(t *testing.T) {
 	headerKey := "events/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11/header.jpg"
 
 	tests := []struct {
-		name        string
-		input       *models.UpdateEventInput
-		imageData   *[]byte
-		mockSetup   func(*repomocks.MockEventRepository)
-		mockS3Setup func(*s3mocks.S3ClientMock)
-		wantErr     bool
-		wantURL     bool
+		name               string
+		input              *models.UpdateEventInput
+		imageData          *[]byte
+		mockSetup          func(*repomocks.MockEventRepository)
+		mockS3Setup        func(*s3mocks.S3ClientMock)
+		mockTranslateSetup func(*translatemocks.TranslateMock)
+		wantErr            bool
+		wantURL            bool
 	}{
 		{
 			name: "successful update event without image",
@@ -215,7 +249,7 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			}(),
 			imageData: nil,
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput"), (*string)(nil)).Return(&models.Event{
+				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventDBInput"), (*string)(nil)).Return(&models.Event{
 					ID:          eventID,
 					Title:       "Updated Robotics",
 					Description: "Intro to robotics",
@@ -225,6 +259,10 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				// No S3 calls expected when no image
+			},
+			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
+				translation := "หุ่นยนต์ที่อัปเดต|*|"
+				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			wantErr: false,
 			wantURL: false,
@@ -240,7 +278,7 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			}(),
 			imageData: createDummyImageData(),
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput"), mock.Anything).Return(&models.Event{
+				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventDBInput"), mock.Anything).Return(&models.Event{
 					ID:               eventID,
 					Title:            "Updated Robotics with Image",
 					Description:      "Intro to robotics",
@@ -253,6 +291,10 @@ func TestHandler_UpdateEvent(t *testing.T) {
 				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg?X-Amz-Signature=abc123"
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
+			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
+				translation := "หุ่นยนต์ที่อัปเดตพร้อมรูปภาพ|*|"
+				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+			},
 			wantErr: false,
 			wantURL: true,
 		},
@@ -261,18 +303,25 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			input: func() *models.UpdateEventInput {
 				input := &models.UpdateEventInput{}
 				input.ID = uuid.MustParse("00000000-0000-0000-0000-000000000000")
+				title := "Empty Event"
+				input.Body.Title = &title
 				return input
 			}(),
 			imageData: nil,
 			mockSetup: func(m *repomocks.MockEventRepository) {
-				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventInput"), (*string)(nil)).Return(&models.Event{
+				m.On("UpdateEvent", mock.Anything, mock.AnythingOfType("*models.UpdateEventDBInput"), (*string)(nil)).Return(&models.Event{
 					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+					Title:     "Empty Event",
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}, nil)
 			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				// No S3 calls expected
+			},
+			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
+				translation := "เหตุการณ์ว่างเปล่า|*|"
+				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			wantErr: false,
 			wantURL: false,
@@ -287,7 +336,10 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockRepo, mockS3)
+			mockTranslate := createMockTranslateClient()
+			tt.mockTranslateSetup(mockTranslate)
+
+			handler := NewHandler(mockRepo, mockS3, mockTranslate)
 			ctx := context.Background()
 
 			event, err := handler.UpdateEvent(ctx, tt.input, tt.imageData, mockS3)
@@ -313,6 +365,7 @@ func TestHandler_UpdateEvent(t *testing.T) {
 
 			mockRepo.AssertExpectations(t)
 			mockS3.AssertExpectations(t)
+			mockTranslate.AssertExpectations(t)
 		})
 	}
 }
@@ -357,7 +410,8 @@ func TestHandler_DeleteEvent(t *testing.T) {
 			tt.mockSetup(mockRepo)
 
 			mockS3 := createMockS3Client()
-			handler := NewHandler(mockRepo, mockS3)
+			mockTranslate := createMockTranslateClient()
+			handler := NewHandler(mockRepo, mockS3, mockTranslate)
 			ctx := context.Background()
 
 			msg, err := handler.DeleteEvent(ctx, tt.id)
@@ -494,7 +548,8 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockRepo, mockS3)
+			mockTranslate := createMockTranslateClient()
+			handler := NewHandler(mockRepo, mockS3, mockTranslate)
 			ctx := context.Background()
 
 			input := &models.GetEventOccurrencesByEventIDInput{ID: uuid.MustParse(tt.id)}
