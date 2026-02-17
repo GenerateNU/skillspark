@@ -16,6 +16,19 @@ type Review struct {
 	UpdatedAt      time.Time `json:"updated_at" db:"updated_at" doc:"Timestamp when registration was last updated"`
 }
 
+type CreateReviewDBBody struct {
+	RegistrationID uuid.UUID `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
+	GuardianID     uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian"`
+	Description_EN string    `json:"description_en" db:"description_en" doc:"The review text"`
+	Description_TH string    `json:"description_th" db:"description_th" doc:"The review text"`
+	Categories_EN  []string  `json:"categories_en" db:"categories_en" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
+	Categories_TH  []string  `json:"categories_th" db:"categories_th" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
+}
+
+type CreateReviewDBInput struct {
+	Body CreateReviewDBBody
+}
+
 type CreateReviewInput struct {
 	Body struct {
 		RegistrationID uuid.UUID `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`

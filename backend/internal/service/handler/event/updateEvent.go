@@ -11,8 +11,6 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 	var key *string
 	var url *string
 
-	// TODO add this to goroutine
-
 	translationResp, err := h.CallTranslateAPI(ctx, input.Body.Title, input.Body.Description)
 	if err != nil {
 		return nil, err

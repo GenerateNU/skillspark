@@ -22,12 +22,7 @@ func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInpu
 		Body: *updateBody,
 	}
 
-	translationResp, err := h.CallTranslateAPI(ctx, &event.Title, &event.Description)
-	if err != nil {
-		return nil, err
-	}
-	translationsReinsertion := h.UpdateTranslateStruct(ctx, updateInput, translationResp.Title_TH, translationResp.Description_TH)
-	_, err = h.EventRepository.UpdateEvent(ctx, translationsReinsertion, key)
+	translationsReinsertion, err := h.TranslationHelper(ctx, event, updateInput)
 	if err != nil {
 		return nil, err
 	}
@@ -68,4 +63,18 @@ func (h *Handler) CreateEventS3Helper(ctx context.Context, s3Client s3_client.S3
 
 	return nil, nil, nil
 
+}
+
+func (h *Handler) TranslationHelper(ctx context.Context, event *models.Event, updateInput *models.UpdateEventInput) (*models.UpdateEventDBInput, error) {
+	translationResp, err := h.CallTranslateAPI(ctx, &event.Title, &event.Description)
+	if err != nil {
+		return nil, err
+	}
+	translationsReinsertion := h.UpdateTranslateStruct(ctx, updateInput, translationResp.Title_TH, translationResp.Description_TH)
+	_, err = h.EventRepository.UpdateEvent(ctx, translationsReinsertion, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return translationsReinsertion, nil
 }
