@@ -17,7 +17,18 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 		return nil, &err
 	}
 
-	rows, err := r.db.Query(ctx, query, pagination.Limit, pagination.GetOffset())
+	rows, err := r.db.Query(
+		ctx,
+		query,
+		pagination.Limit,
+		pagination.GetOffset(),
+		filters.Search,
+		filters.MinDurationMinutes,
+		filters.MaxDurationMinutes,
+		filters.Latitude,
+		filters.Longitude,
+		filters.RadiusKm,
+	)
 	if err != nil {
 		err := errs.InternalServerError("Failed to fetch all event occurrences: ", err.Error())
 		return nil, &err
