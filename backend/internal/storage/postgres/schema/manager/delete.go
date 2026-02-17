@@ -11,7 +11,7 @@ import (
 )
 
 func (r *ManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Manager, error) {
-	query, err := schema.ReadSQLBaseScript("manager/sql/delete.sql")
+	query, err := schema.ReadSQLBaseScript("delete.sql", SqlManagerFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
@@ -20,10 +20,10 @@ func (r *ManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID, tx 
 	var row pgx.Row
 	if tx != nil {
 		row = tx.QueryRow(ctx, query, id)
-	} else { 
+	} else {
 		row = r.db.QueryRow(ctx, query, id)
 	}
-	
+
 	var deletedManager models.Manager
 
 	err = row.Scan(&deletedManager.ID, &deletedManager.UserID, &deletedManager.OrganizationID, &deletedManager.Role, &deletedManager.Name, &deletedManager.Email, &deletedManager.Username, &deletedManager.ProfilePictureS3Key, &deletedManager.LanguagePreference, &deletedManager.AuthID, &deletedManager.CreatedAt, &deletedManager.UpdatedAt)
