@@ -3,9 +3,19 @@ import { StyleSheet } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
-import { LocationPin } from '@/constants/mock-locations';
 import { ThemedView } from '@/components/themed-view';
 import { EventCard } from '@/components/EventCard'; 
+
+export interface LocationPin {
+  id: string;
+  title: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+  rating: number;     
+  members: number;     
+  image?: string;     
+}
 
 interface SkillSparkMapProps {
   locations: LocationPin[];
@@ -44,7 +54,11 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
               setSelectedPin(loc);
             }}
           >
-            <Ionicons name="location" size={40} color={selectedPin?.id === loc.id ? "#FF4B4B" : "#FF6B6B"} />
+            <Ionicons 
+              name="location" 
+              size={40} 
+              color={selectedPin?.id === loc.id ? "#FF4B4B" : "#FF6B6B"} 
+            />
           </Marker>
         ))}
       </MapView>

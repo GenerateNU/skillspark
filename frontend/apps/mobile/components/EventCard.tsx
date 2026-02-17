@@ -1,10 +1,20 @@
 import React from 'react';
 import { Alert, StyleSheet, View, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LocationPin } from '@/constants/mock-locations';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
+
+export interface LocationPin {
+  id: string;
+  title: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+  rating: number;     
+  members: number;     
+  image?: string;     
+}
 
 interface EventCardProps {
   pin: LocationPin;

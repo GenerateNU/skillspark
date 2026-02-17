@@ -46,9 +46,3 @@ To use the Map features, you must configure Google Maps API keys for iOS and And
 ## Map Integration & Managing Locations
 
 The map view (app/(tabs)/map.tsx) currently renders location pins based on mock data. To add specific locations to the map for testing:
-
-1. Open constants/mock-locations.ts.
-
-2. Add a new object to the MOCK_LOCATIONS array. Ensure it adheres to the LocationPin interface:
-
-3. Save the file. The map will automatically update to display the new pin.
