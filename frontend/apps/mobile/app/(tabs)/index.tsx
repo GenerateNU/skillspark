@@ -24,21 +24,30 @@ function EventOccurrencesList() {
         <ThemedText type="defaultSemiBold" style={styles.errorText}>
           Error loading events
         </ThemedText>
-        <ThemedText>{error.detail}</ThemedText>
+        <ThemedText>{error.message || 'An error occurred'}</ThemedText>
+      </ThemedView>
+    );
+  }
+
+  // Check if eventOccurrences exists and is an array before filtering
+  if (!eventOccurrences || !Array.isArray(eventOccurrences)) {
+    return (
+      <ThemedView style={styles.centerContainer}>
+        <ThemedText>No events available</ThemedText>
       </ThemedView>
     );
   }
 
   // Filter and sort upcoming events
   const upcomingEvents = eventOccurrences
-    ?.filter(occurrence => {
+    .filter(occurrence => {
       return new Date(occurrence.start_time) >= new Date();
     })
     .sort((a, b) => {
       return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
     });
 
-  if (!upcomingEvents || upcomingEvents.length === 0) {
+  if (upcomingEvents.length === 0) {
     return (
       <ThemedView style={styles.centerContainer}>
         <ThemedText>No upcoming events</ThemedText>

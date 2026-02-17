@@ -20,6 +20,7 @@ export default defineConfig({
           useQuery: true,
           useMutation: true,
           signal: true,
+          version: 5,
         },
       },
     },
