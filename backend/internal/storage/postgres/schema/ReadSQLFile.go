@@ -12,7 +12,6 @@ func ReadSQLBaseScript(path string, fs embed.FS) (string, error) {
 	}
 
 	// Prepend "sql/" if not already present, since embed.FS includes the directory prefix
-	// when using //go:embed sql/*.sql
 	if !strings.HasPrefix(path, "sql/") {
 		path = "sql/" + path
 	}
