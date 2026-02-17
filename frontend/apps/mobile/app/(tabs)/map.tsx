@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { StyleSheet, Linking, Button, ActivityIndicator, View } from 'react-native';
 import * as Location from 'expo-location';
 import { useGetAllEventOccurrences } from '@skillspark/api-client';
+import type { EventOccurrence } from '@skillspark/api-client';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { SkillSparkMap } from '@/components/SkillSparkMap';
@@ -18,11 +19,14 @@ export interface LocationPin {
 }
 
 export default function MapScreen() {
-  const { data: occurrences, isLoading: isApiLoading, error } = useGetAllEventOccurrences();
+  const { data, isLoading: isApiLoading, error } = useGetAllEventOccurrences();
   
-  // mapLocations now strictly uses API data
+  const occurrences = (data as unknown as EventOccurrence[]) || [];
+
   const mapLocations: LocationPin[] = useMemo(() => {
-    return (occurrences || []) 
+    if (!Array.isArray(occurrences)) return [];
+
+    return occurrences
       .filter(occ => occ.location && occ.event)
       .map(occ => ({
         id: occ.id,
@@ -30,7 +34,6 @@ export default function MapScreen() {
         description: occ.event.description,
         latitude: occ.location.latitude,
         longitude: occ.location.longitude,
-        // Defaulting rating as it is not currently provided by the API
         rating: 5.0, 
         members: occ.curr_enrolled,
         image: occ.event.header_image_s3_key
@@ -89,7 +92,13 @@ export default function MapScreen() {
         userLocation={userLocation} 
       />
 
-      {!isApiLoading && mapLocations.length === 0 && (
+      {!isApiLoading && error && (
+         <View style={styles.emptyStateContainer}>
+            <ThemedText style={styles.emptyStateText}>An error occurred while fetching events.</ThemedText>
+         </View>
+      )}
+
+      {!isApiLoading && !error && mapLocations.length === 0 && (
          <View style={styles.emptyStateContainer}>
             <ThemedText style={styles.emptyStateText}>No events found nearby.</ThemedText>
          </View>
