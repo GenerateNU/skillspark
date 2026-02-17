@@ -127,13 +127,6 @@ export async function customInstance<T>(
 ): Promise<T> {
   const baseURL = getBaseURL();
   const fullUrl = `${baseURL}${url}`;
-
-  console.log('🚀 Making fetch request:', {
-    url,
-    fullUrl,
-    method: options?.method,
-  });
-
   // Get token for auth
   const token = getStorageItem('temp_jwt') || getStorageItem('jwt');
   
@@ -145,11 +138,6 @@ export async function customInstance<T>(
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
-  });
-
-  console.log('📦 Fetch response:', {
-    status: response.status,
-    ok: response.ok,
   });
 
   if (!response.ok) {
@@ -164,7 +152,6 @@ export async function customInstance<T>(
   }
 
   const data = await response.json();
-  console.log('✅ Response data:', data);
   return data;
 }
 

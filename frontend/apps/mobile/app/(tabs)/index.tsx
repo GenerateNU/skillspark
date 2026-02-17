@@ -7,25 +7,8 @@ import { useGetAllEventOccurrences } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 
 function EventOccurrencesList() {
-  console.log('🔍 Component rendering');
   
   const { data: response, isLoading, error, status, fetchStatus } = useGetAllEventOccurrences();
-
-  console.log('📊 Query Status:', {
-    status,
-    fetchStatus,
-    isLoading,
-    hasError: !!error,
-    hasData: !!response,
-  });
-
-  if (error) {
-    console.error('❌ Query Error:', error);
-  }
-
-  if (response) {
-    console.log('✅ Response received:', response);
-  }
 
   if (isLoading) {
     return (
