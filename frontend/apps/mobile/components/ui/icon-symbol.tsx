@@ -18,6 +18,9 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
+  'map.fill': 'map',             
+  'gearshape.fill': 'settings',  
+  'gearshape': 'settings',       
 } as IconMapping;
 
 /**
@@ -37,5 +40,9 @@ export function IconSymbol({
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  const materialName = MAPPING[name];
+  if (!materialName) {
+    console.log(`MISSING MAPPING for icon: ${name}`);
+  }
+  return <MaterialIcons color={color} size={size} name={materialName} style={style} />;
 }

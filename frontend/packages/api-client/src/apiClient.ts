@@ -121,15 +121,38 @@ apiClient.interceptors.response.use(
   }
 );
 
-export function customInstance<T>(
-  config: AxiosRequestConfig,
-  options?: AxiosRequestConfig
+export async function customInstance<T>(
+  url: string,
+  options?: RequestInit,
 ): Promise<T> {
-  return apiClient({
-    ...config,
+  const baseURL = getBaseURL();
+  const fullUrl = `${baseURL}${url}`;
+  // Get token for auth
+  const token = getStorageItem('temp_jwt') || getStorageItem('jwt');
+  
+  const response = await fetch(fullUrl, {
     ...options,
-    withCredentials: true,
-  }).then((response: AxiosResponse<T>) => response.data);
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options?.headers,
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      handleLogout();
+    }
+    const error = await response.json().catch(() => ({ 
+      message: 'An error occurred',
+      detail: `HTTP ${response.status}` 
+    }));
+    throw error;
+  }
+
+  const data = await response.json();
+  return data;
 }
 
 export default apiClient;

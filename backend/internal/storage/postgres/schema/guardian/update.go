@@ -17,7 +17,7 @@ func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *model
 	var updatedGuardian models.Guardian
 	updatedGuardian.ID = guardian.ID
 
-	guardianQuery, err := schema.ReadSQLBaseScript("guardian/sql/update_guardian.sql")
+	guardianQuery, err := schema.ReadSQLBaseScript("update_guardian.sql", SqlGuardianFiles)
 	if err != nil {
 		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to read guardian update query: ", err.Error())
@@ -36,7 +36,7 @@ func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *model
 		return nil, &err
 	}
 
-	userQuery, err := schema.ReadSQLBaseScript("guardian/sql/update_user.sql")
+	userQuery, err := schema.ReadSQLBaseScript("update_user.sql", SqlGuardianFiles)
 	if err != nil {
 		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to read user update query: ", err.Error())

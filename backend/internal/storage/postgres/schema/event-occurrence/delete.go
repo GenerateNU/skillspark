@@ -42,9 +42,7 @@ func (r *EventOccurrenceRepository) CancelEventOccurrence(ctx context.Context, i
 	}()
 
 	// cancel associated registrations
-	cancelRegistrationsQuery, err := schema.ReadSQLBaseScript(
-		"event-occurrence/sql/cancel_registrations.sql",
-	)
+	cancelRegistrationsQuery, err := schema.ReadSQLBaseScript("cancel_registrations.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		e := errs.InternalServerError("Failed to read cancel registrations SQL", err.Error())
 		return &e
@@ -56,9 +54,7 @@ func (r *EventOccurrenceRepository) CancelEventOccurrence(ctx context.Context, i
 	}
 
 	// cancel the event occurrence
-	cancelEventOccurrenceQuery, err := schema.ReadSQLBaseScript(
-		"event-occurrence/sql/cancel_eventoccurrence.sql",
-	)
+	cancelEventOccurrenceQuery, err := schema.ReadSQLBaseScript("cancel_eventoccurrence.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		e := errs.InternalServerError("Failed to read cancel event occurrence SQL", err.Error())
 		return &e

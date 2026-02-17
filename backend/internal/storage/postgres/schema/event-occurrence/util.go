@@ -2,6 +2,7 @@ package eventoccurrence
 
 import (
 	"context"
+	"embed"
 	"math"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/event"
@@ -13,6 +14,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 )
+
+//go:embed sql/*.sql
+var SqlEventOccurrenceFiles embed.FS
 
 func CreateTestEventOccurrence(
 	t *testing.T,

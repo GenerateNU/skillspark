@@ -8,7 +8,7 @@ import (
 )
 
 func (r *UserRepository) UpdateUser(ctx context.Context, user *models.UpdateUserInput) (*models.User, error) {
-	query, err := schema.ReadSQLBaseScript("user/sql/update.sql")
+	query, err := schema.ReadSQLBaseScript("update.sql", SqlUserFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

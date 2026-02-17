@@ -13,7 +13,7 @@ import (
 
 func (r *ChildRepository) DeleteChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error) {
 
-	query, err := schema.ReadSQLBaseScript("child/sql/delete_by_id.sql")
+	query, err := schema.ReadSQLBaseScript("delete_by_id.sql", SqlChildFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

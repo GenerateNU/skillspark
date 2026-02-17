@@ -12,7 +12,7 @@ import (
 
 func (r *LocationRepository) GetAllLocations(ctx context.Context, pagination utils.Pagination) ([]models.Location, error) {
 	//Get base query
-	query, err := schema.ReadSQLBaseScript("location/sql/get_all_locations.sql")
+	query, err := schema.ReadSQLBaseScript("get_all_locations.sql", SqlLocationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
