@@ -7,7 +7,25 @@ import { useGetAllEventOccurrences } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 
 function EventOccurrencesList() {
-  const { data: eventOccurrences, isLoading, error } = useGetAllEventOccurrences();
+  console.log('🔍 Component rendering');
+  
+  const { data: response, isLoading, error, status, fetchStatus } = useGetAllEventOccurrences();
+
+  console.log('📊 Query Status:', {
+    status,
+    fetchStatus,
+    isLoading,
+    hasError: !!error,
+    hasData: !!response,
+  });
+
+  if (error) {
+    console.error('❌ Query Error:', error);
+  }
+
+  if (response) {
+    console.log('✅ Response received:', response);
+  }
 
   if (isLoading) {
     return (
@@ -29,7 +47,10 @@ function EventOccurrencesList() {
     );
   }
 
-  // Check if eventOccurrences exists and is an array before filtering
+  // Response is already an array of EventOccurrence objects
+  const eventOccurrences = response;
+
+  // Check if eventOccurrences exists and is an array
   if (!eventOccurrences || !Array.isArray(eventOccurrences)) {
     return (
       <ThemedView style={styles.centerContainer}>
@@ -69,7 +90,7 @@ function EventOccurrencesList() {
       
       {item.location && (
         <ThemedText style={styles.eventDetail}>
-          📍 {item.location.address_line1} {item.location.address_line2 ? `, ${item.location.address_line2}` : ''} {item.location.province}, {item.location.subdistrict} {item.location.postal_code}
+          📍 {item.location.address_line1} {item.location.address_line2 ? `, ${item.location.address_line2}` : ''}, {item.location.subdistrict}, {item.location.district}, {item.location.province} {item.location.postal_code}
         </ThemedText>
       )}
       
