@@ -11,7 +11,7 @@ import (
 )
 
 func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
-	query, err := schema.ReadSQLBaseScript("user/sql/get_by_id.sql")
+	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlUserFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

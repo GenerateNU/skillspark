@@ -17,7 +17,7 @@ func (r *ChildRepository) GetChildrenByParentID(
 ) ([]models.Child, error) {
 
 	// if the guardian does not exist, want to error
-	existsQuery, err := schema.ReadSQLBaseScript("child/sql/guardian_exists.sql")
+	existsQuery, err := schema.ReadSQLBaseScript("guardian_exists.sql", SqlChildFiles)
 	if err != nil {
 		httpErr := errs.InternalServerError("Failed to read guardian exists query")
 		return nil, &httpErr
@@ -34,7 +34,7 @@ func (r *ChildRepository) GetChildrenByParentID(
 		return nil, &httpErr
 	}
 
-	query, err := schema.ReadSQLBaseScript("child/sql/get_by_parent_id.sql")
+	query, err := schema.ReadSQLBaseScript("get_by_parent_id.sql", SqlChildFiles)
 	if err != nil {
 		httpErr := errs.InternalServerError("Failed to read base query")
 		return nil, &httpErr

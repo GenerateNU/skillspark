@@ -11,7 +11,7 @@ import (
 )
 
 func (r *ManagerRepository) GetManagerByAuthID(ctx context.Context, authID string) (*models.Manager, error) {
-	query, err := schema.ReadSQLBaseScript("manager/sql/get_by_auth_id.sql")
+	query, err := schema.ReadSQLBaseScript("get_by_auth_id.sql", SqlManagerFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

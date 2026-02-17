@@ -8,7 +8,7 @@ import (
 )
 
 func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error) {
-	query, err := schema.ReadSQLBaseScript("event-occurrence/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

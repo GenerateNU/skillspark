@@ -12,7 +12,7 @@ import (
 )
 
 func (r *ChildRepository) GetChildByID(ctx context.Context, childID uuid.UUID) (*models.Child, error) {
-	query, err := schema.ReadSQLBaseScript("child/sql/get_by_id.sql")
+	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlChildFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
