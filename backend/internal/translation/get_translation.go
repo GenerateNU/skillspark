@@ -16,7 +16,7 @@ func (t *TranslateClient) GetTranslation(ctx context.Context, input string) (*st
 	var result TranslateResponse
 
 	encodedInput := url.QueryEscape(input)
-	url := "https://free-translate-api-iau1.onrender.com/translate?sl=en&dl=th&text=" + encodedInput
+	url := "https://octopus-app-leyjd.ondigitalocean.app/translate?sl=en&dl=th&text=" + encodedInput
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
