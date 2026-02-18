@@ -10,8 +10,8 @@ SELECT
     eo.updated_at,
 
     e.id,
-    e.title,
-    e.description,
+    e.title_en,
+    e.description_en,
     e.organization_id,
     e.age_range_min,
     e.age_range_max,

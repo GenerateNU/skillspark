@@ -12,7 +12,7 @@ import (
 func (h *Handler) GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
 
 	if _, err := h.EventRepository.GetEventByID(ctx, id); err != nil {
-		return nil, errs.BadRequest("Invalid event_id: event does not exist")
+		return nil, errs.BadRequest("Invalid event_id: event does not exist" + err.Error())
 	}
 
 	reviews, httpErr := h.ReviewRepository.GetReviewsByEventID(ctx, id, AcceptLanguage, pagination)

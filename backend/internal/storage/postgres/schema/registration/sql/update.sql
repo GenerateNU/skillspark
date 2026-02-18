@@ -17,7 +17,7 @@ SELECT
     u.status,
     u.created_at,
     u.updated_at,
-    e.title AS event_name,
+    e.title_en AS event_name,
     eo.start_time AS occurrence_start_time
 FROM updated u
 JOIN event_occurrence eo ON u.event_occurrence_id = eo.id
