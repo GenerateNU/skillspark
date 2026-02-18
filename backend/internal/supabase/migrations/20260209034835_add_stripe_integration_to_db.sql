@@ -1,23 +1,3 @@
-CREATE TABLE IF NOT EXISTS guardian_payment_methods (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    guardian_id UUID NOT NULL REFERENCES guardian(id) ON DELETE CASCADE,                 
-    stripe_payment_method_id VARCHAR(255) NOT NULL UNIQUE,                            
-    
-    card_brand VARCHAR(50),                  
-    card_last4 VARCHAR(4),                  
-    card_exp_month INTEGER,                   
-    card_exp_year INTEGER,           
-    
-    is_default BOOLEAN DEFAULT false NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,  
-    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL, 
-    
-    CONSTRAINT unique_guardian_payment_method UNIQUE(guardian_id, stripe_payment_method_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_guardian_payment_methods ON guardian_payment_methods(guardian_id);
-CREATE INDEX IF NOT EXISTS idx_default_payment_method ON guardian_payment_methods(guardian_id, is_default) WHERE is_default = true;
-
 CREATE TYPE payment_intent_status AS ENUM (
     'requires_payment_method',
     'requires_confirmation',
