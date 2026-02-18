@@ -11,7 +11,9 @@ SELECT
 
     e.id,
     e.title_en,
+    e.title_th,
     e.description_en,
+    e.description_th,
     e.organization_id,
     e.age_range_min,
     e.age_range_max,

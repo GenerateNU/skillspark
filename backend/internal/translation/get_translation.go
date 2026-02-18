@@ -32,14 +32,17 @@ func (t *TranslateClient) GetTranslation(ctx context.Context, input string) (*st
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	if err := json.Unmarshal(body, &result); err != nil {
+		return nil, err
+	}
+
+	err = resp.Body.Close()
+	if err != nil {
 		return nil, err
 	}
 
