@@ -32,9 +32,6 @@ export default function ProfileScreen() {
 
   return (
     <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <ThemedText style={styles.headerTitle}>Profile</ThemedText>
-      </View>
       <ScrollView 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
