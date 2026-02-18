@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 type TranslateResponse struct {
@@ -16,7 +17,8 @@ func (t *TranslateClient) GetTranslation(ctx context.Context, input string) (*st
 	var result TranslateResponse
 
 	encodedInput := url.QueryEscape(input)
-	url := "https://octopus-app-leyjd.ondigitalocean.app/translate?sl=en&dl=th&text=" + encodedInput
+	apiUrl := os.Getenv("TRANSLATIONS_API_URL")
+	url := apiUrl + encodedInput
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

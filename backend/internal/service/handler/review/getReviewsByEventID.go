@@ -9,13 +9,13 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) GetReviewsByEventID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Review, error) {
+func (h *Handler) GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
 
 	if _, err := h.EventRepository.GetEventByID(ctx, id); err != nil {
 		return nil, errs.BadRequest("Invalid event_id: event does not exist")
 	}
 
-	reviews, httpErr := h.ReviewRepository.GetReviewsByEventID(ctx, id, pagination)
+	reviews, httpErr := h.ReviewRepository.GetReviewsByEventID(ctx, id, AcceptLanguage, pagination)
 	if httpErr != nil {
 		return nil, httpErr
 	}

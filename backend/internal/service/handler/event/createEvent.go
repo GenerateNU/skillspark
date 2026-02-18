@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/s3_client"
 )
@@ -9,12 +10,12 @@ import (
 func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInput, updateBody *models.UpdateEventBody, imageData *[]byte, s3Client s3_client.S3Interface) (*models.Event, error) {
 	var key *string
 	var url *string
-	//var wg sync.WaitGroup
 
 	initInput := h.CreateTranslateStruct(ctx, input, nil, nil)
 	event, err := h.EventRepository.CreateEvent(ctx, initInput, key)
 	if err != nil {
-		return nil, err
+		e := errs.InternalServerError("Invalid creation" + err.Error())
+		return nil, e
 	}
 
 	updateInput := &models.UpdateEventInput{
@@ -24,17 +25,20 @@ func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInpu
 
 	translationsReinsertion, err := h.TranslationHelper(ctx, event, updateInput)
 	if err != nil {
-		return nil, err
+		e := errs.BadRequest("Invalid translation call" + err.Error())
+		return nil, e
 	}
 
 	url, key, err = h.CreateEventS3Helper(ctx, s3Client, event, updateInput, imageData)
 	if err != nil {
-		return nil, err
+		e := errs.InternalServerError("Something went wrong when inserting into S3" + err.Error())
+		return nil, e
 	}
 	_, err = h.EventRepository.UpdateEvent(ctx, translationsReinsertion, key)
 
 	if err != nil {
-		return nil, err
+		e := errs.InternalServerError("Invalid Update" + err.Error())
+		return nil, e
 	}
 	event.PresignedURL = url
 	event.HeaderImageS3Key = key
