@@ -16,6 +16,8 @@ import (
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	translations "skillspark/internal/translation"
+	translatemocks "skillspark/internal/translation/mocks"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -66,13 +68,18 @@ func createMockS3Client() *s3mocks.S3ClientMock {
 	return new(s3mocks.S3ClientMock)
 }
 
-func setupEventTestAPI(eventRepo *repomocks.MockEventRepository, s3Client s3_client.S3Interface) (*fiber.App, huma.API) {
+// createMockTranslateClient creates a mock translation client for testing
+func createMockTranslateClient() *translatemocks.TranslateMock {
+	return new(translatemocks.TranslateMock)
+}
+
+func setupEventTestAPI(eventRepo *repomocks.MockEventRepository, s3Client s3_client.S3Interface, translateClient translations.TranslationInterface) (*fiber.App, huma.API) {
 	app := fiber.New()
 	api := humafiber.New(app, huma.DefaultConfig("Test Event API", "1.0.0"))
 	repo := &storage.Repository{
 		Event: eventRepo,
 	}
-	routes.SetupEventRoutes(api, repo, s3Client)
+	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
 	return app, api
 }
 
@@ -82,12 +89,13 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 	orgID := uuid.New()
 
 	tests := []struct {
-		name        string
-		formFields  map[string]string
-		includeFile bool
-		mockSetup   func(*repomocks.MockEventRepository)
-		mockS3Setup func(*s3mocks.S3ClientMock)
-		statusCode  int
+		name               string
+		formFields         map[string]string
+		includeFile        bool
+		mockSetup          func(*repomocks.MockEventRepository)
+		mockS3Setup        func(*s3mocks.S3ClientMock)
+		mockTranslateSetup func(*translatemocks.TranslateMock)
+		statusCode         int
 	}{
 		{
 			name: "valid payload",
@@ -104,7 +112,7 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 				m.On(
 					"CreateEvent",
 					mock.Anything,
-					mock.AnythingOfType("*models.CreateEventInput"),
+					mock.AnythingOfType("*models.CreateEventDBInput"),
 					mock.Anything,
 				).Return(&models.Event{
 					ID:             eventID,
@@ -118,7 +126,7 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 				m.On(
 					"UpdateEvent",
 					mock.Anything,
-					mock.AnythingOfType("*models.UpdateEventInput"),
+					mock.AnythingOfType("*models.UpdateEventDBInput"),
 					mock.Anything,
 				).Return(&models.Event{
 					ID:             eventID,
@@ -133,6 +141,10 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg"
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
+			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
+				translation := "จูเนียร์ โรโบติกส์|*|ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
+				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+			},
 			statusCode: http.StatusOK,
 		},
 		{
@@ -141,10 +153,11 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 				"description":     "Introduction to robotics",
 				"organization_id": orgID.String(),
 			},
-			includeFile: true,
-			mockSetup:   func(*repomocks.MockEventRepository) {},
-			mockS3Setup: func(*s3mocks.S3ClientMock) {},
-			statusCode:  http.StatusUnprocessableEntity,
+			includeFile:        true,
+			mockSetup:          func(*repomocks.MockEventRepository) {},
+			mockS3Setup:        func(*s3mocks.S3ClientMock) {},
+			mockTranslateSetup: func(*translatemocks.TranslateMock) {},
+			statusCode:         http.StatusUnprocessableEntity,
 		},
 		{
 			name: "title too short",
@@ -153,10 +166,11 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 				"description":     "Introduction to robotics",
 				"organization_id": orgID.String(),
 			},
-			includeFile: true,
-			mockSetup:   func(*repomocks.MockEventRepository) {},
-			mockS3Setup: func(*s3mocks.S3ClientMock) {},
-			statusCode:  http.StatusUnprocessableEntity,
+			includeFile:        true,
+			mockSetup:          func(*repomocks.MockEventRepository) {},
+			mockS3Setup:        func(*s3mocks.S3ClientMock) {},
+			mockTranslateSetup: func(*translatemocks.TranslateMock) {},
+			statusCode:         http.StatusUnprocessableEntity,
 		},
 	}
 
@@ -171,7 +185,10 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			app, _ := setupEventTestAPI(mockRepo, mockS3)
+			mockTranslate := createMockTranslateClient()
+			tt.mockTranslateSetup(mockTranslate)
+
+			app, _ := setupEventTestAPI(mockRepo, mockS3, mockTranslate)
 
 			body, contentType := createEventMultipartForm(tt.formFields, tt.includeFile)
 
@@ -206,13 +223,14 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 	orgID := uuid.New().String()
 
 	tests := []struct {
-		name        string
-		eventID     string
-		formFields  map[string]string
-		includeFile bool
-		mockSetup   func(*repomocks.MockEventRepository)
-		mockS3Setup func(*s3mocks.S3ClientMock)
-		statusCode  int
+		name               string
+		eventID            string
+		formFields         map[string]string
+		includeFile        bool
+		mockSetup          func(*repomocks.MockEventRepository)
+		mockS3Setup        func(*s3mocks.S3ClientMock)
+		mockTranslateSetup func(*translatemocks.TranslateMock)
+		statusCode         int
 	}{
 		{
 			name:    "valid update",
@@ -226,7 +244,7 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 				m.On(
 					"UpdateEvent",
 					mock.Anything,
-					mock.AnythingOfType("*models.UpdateEventInput"),
+					mock.AnythingOfType("*models.UpdateEventDBInput"),
 					mock.Anything,
 				).Return(&models.Event{
 					ID:    uuid.MustParse(validID),
@@ -236,6 +254,10 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg"
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
+			},
+			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
+				translation := "หุ่นยนต์ขั้นสูง|*|"
+				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -251,7 +273,7 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 				m.On(
 					"UpdateEvent",
 					mock.Anything,
-					mock.AnythingOfType("*models.UpdateEventInput"),
+					mock.AnythingOfType("*models.UpdateEventDBInput"),
 					mock.Anything,
 				).Return(nil, &errs.HTTPError{
 					Code:    http.StatusNotFound,
@@ -262,6 +284,10 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 				mockURL := "https://test-bucket.s3.amazonaws.com/events/test/header.jpg"
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
+			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
+				translation := "หุ่นยนต์ขั้นสูง|*|"
+				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+			},
 			statusCode: http.StatusNotFound,
 		},
 		{
@@ -271,10 +297,11 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 				"title":           "New Title",
 				"organization_id": orgID,
 			},
-			includeFile: true,
-			mockSetup:   func(*repomocks.MockEventRepository) {},
-			mockS3Setup: func(*s3mocks.S3ClientMock) {},
-			statusCode:  http.StatusUnprocessableEntity,
+			includeFile:        true,
+			mockSetup:          func(*repomocks.MockEventRepository) {},
+			mockS3Setup:        func(*s3mocks.S3ClientMock) {},
+			mockTranslateSetup: func(*translatemocks.TranslateMock) {},
+			statusCode:         http.StatusUnprocessableEntity,
 		},
 		{
 			name:    "invalid validation in body",
@@ -283,10 +310,11 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 				"title":           "A",
 				"organization_id": orgID,
 			},
-			includeFile: true,
-			mockSetup:   func(*repomocks.MockEventRepository) {},
-			mockS3Setup: func(*s3mocks.S3ClientMock) {},
-			statusCode:  http.StatusUnprocessableEntity,
+			includeFile:        true,
+			mockSetup:          func(*repomocks.MockEventRepository) {},
+			mockS3Setup:        func(*s3mocks.S3ClientMock) {},
+			mockTranslateSetup: func(*translatemocks.TranslateMock) {},
+			statusCode:         http.StatusUnprocessableEntity,
 		},
 	}
 
@@ -301,7 +329,10 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			app, _ := setupEventTestAPI(mockRepo, mockS3)
+			mockTranslate := createMockTranslateClient()
+			tt.mockTranslateSetup(mockTranslate)
+
+			app, _ := setupEventTestAPI(mockRepo, mockS3, mockTranslate)
 
 			body, contentType := createEventMultipartForm(tt.formFields, tt.includeFile)
 
@@ -382,7 +413,8 @@ func TestHumaValidation_DeleteEvent(t *testing.T) {
 			tt.mockSetup(mockRepo)
 
 			mockS3 := createMockS3Client()
-			app, _ := setupEventTestAPI(mockRepo, mockS3)
+			mockTranslate := createMockTranslateClient()
+			app, _ := setupEventTestAPI(mockRepo, mockS3, mockTranslate)
 
 			req, err := http.NewRequest(
 				http.MethodDelete,
@@ -513,7 +545,8 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			app, _ := setupEventTestAPI(mockRepo, mockS3)
+			mockTranslate := createMockTranslateClient()
+			app, _ := setupEventTestAPI(mockRepo, mockS3, mockTranslate)
 
 			req, err := http.NewRequest(
 				http.MethodGet,

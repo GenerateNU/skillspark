@@ -3,13 +3,14 @@ package routes_test
 import (
 	"bytes"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	translatemocks "skillspark/internal/translation/mocks"
 	"testing"
-	"log/slog"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -24,6 +25,7 @@ func setupReviewTestAPI(
 	regRepo *repomocks.MockRegistrationRepository,
 	guardianRepo *repomocks.MockGuardianRepository,
 	eventRepo *repomocks.MockEventRepository,
+	translateClient *translatemocks.TranslateMock,
 ) (*fiber.App, huma.API) {
 
 	app := fiber.New()
@@ -36,7 +38,7 @@ func setupReviewTestAPI(
 		Event:        eventRepo,
 	}
 
-	routes.SetUpReviewRoutes(api, repo)
+	routes.SetUpReviewRoutes(api, repo, translateClient)
 
 	return app, api
 }
@@ -48,9 +50,15 @@ func TestCreateReview_Success(t *testing.T) {
 	guardianID := uuid.New()
 	reviewID := uuid.New()
 
+	translateRepo := new(translatemocks.TranslateMock)
+	translated := "งานดี"
+	translateRepo.
+		On("GetTranslation", mock.Anything, "Great event").
+		Return(&translated, nil)
+
 	regRepo := new(repomocks.MockRegistrationRepository)
 	regRepo.
-		On("GetRegistrationByID", mock.Anything, mock.Anything).
+		On("GetRegistrationByID", mock.Anything, mock.Anything, mock.Anything).
 		Return(&models.GetRegistrationByIDOutput{
 			Body: models.Registration{
 				ID: regID,
@@ -72,6 +80,7 @@ func TestCreateReview_Success(t *testing.T) {
 		regRepo,
 		guardianRepo,
 		new(repomocks.MockEventRepository),
+		translateRepo,
 	)
 
 	payload := map[string]interface{}{
@@ -104,6 +113,7 @@ func TestCreateReview_Success(t *testing.T) {
 	regRepo.AssertExpectations(t)
 	guardianRepo.AssertExpectations(t)
 	reviewRepo.AssertExpectations(t)
+	translateRepo.AssertExpectations(t)
 }
 
 func TestGetReviewsByEventID(t *testing.T) {
@@ -122,6 +132,7 @@ func TestGetReviewsByEventID(t *testing.T) {
 			"GetReviewsByEventID",
 			mock.Anything, // context
 			eventID,       // uuid
+			"en-US",       // AcceptLanguage
 			mock.Anything, // utils.Pagination
 		).
 		Return([]models.Review{}, nil)
@@ -131,6 +142,7 @@ func TestGetReviewsByEventID(t *testing.T) {
 		new(repomocks.MockRegistrationRepository),
 		new(repomocks.MockGuardianRepository),
 		eventRepo,
+		new(translatemocks.TranslateMock),
 	)
 
 	req, _ := http.NewRequest(
@@ -138,6 +150,7 @@ func TestGetReviewsByEventID(t *testing.T) {
 		"/api/v1/review/event/"+eventID.String(),
 		nil,
 	)
+	req.Header.Set("Accept-Language", "en-US")
 
 	resp, err := app.Test(req)
 	assert.NoError(t, err)
@@ -170,6 +183,7 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 			"GetReviewsByGuardianID",
 			mock.Anything, // context
 			guardianID,    // uuid
+			"en-US",       // AcceptLanguage
 			mock.Anything, // utils.Pagination
 		).
 		Return([]models.Review{}, nil)
@@ -179,6 +193,7 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 		new(repomocks.MockRegistrationRepository),
 		guardianRepo,
 		new(repomocks.MockEventRepository),
+		new(translatemocks.TranslateMock),
 	)
 
 	req, _ := http.NewRequest(
@@ -186,6 +201,7 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 		"/api/v1/review/guardian/"+guardianID.String(),
 		nil,
 	)
+	req.Header.Set("Accept-Language", "en-US")
 
 	resp, err := app.Test(req)
 	assert.NoError(t, err)
@@ -217,6 +233,7 @@ func TestDeleteReview(t *testing.T) {
 		new(repomocks.MockRegistrationRepository),
 		new(repomocks.MockGuardianRepository),
 		new(repomocks.MockEventRepository),
+		new(translatemocks.TranslateMock),
 	)
 
 	req, _ := http.NewRequest(

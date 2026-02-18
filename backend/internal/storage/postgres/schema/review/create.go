@@ -7,8 +7,9 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.CreateReviewInput) (*models.Review, error) {
+func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.CreateReviewDBInput) (*models.Review, error) {
 	query, err := schema.ReadSQLBaseScript("create.sql", SqlReviewFiles)
+
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
@@ -17,7 +18,8 @@ func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.Creat
 	row := r.db.QueryRow(ctx, query,
 		input.Body.RegistrationID,
 		input.Body.GuardianID,
-		input.Body.Description,
+		input.Body.Description_EN,
+		input.Body.Description_TH,
 		input.Body.Categories,
 	)
 

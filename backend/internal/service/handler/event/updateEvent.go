@@ -11,6 +11,13 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 	var key *string
 	var url *string
 
+	translationResp, err := h.CallTranslateAPI(ctx, input.Body.Title, input.Body.Description)
+	if err != nil {
+		return nil, err
+	}
+
+	updateInput := h.UpdateTranslateStruct(ctx, input, translationResp.Title_TH, translationResp.Description_TH)
+
 	if image_data != nil {
 		var err error
 		url, key, err = h.UpdateEventS3Helper(ctx, s3Client, input, image_data)
@@ -19,7 +26,7 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 		}
 	}
 
-	event, err := h.EventRepository.UpdateEvent(ctx, input, key)
+	event, err := h.EventRepository.UpdateEvent(ctx, updateInput, key)
 	if err != nil {
 		return nil, err
 	}

@@ -25,6 +25,8 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, i
 		input.Body.Language,
 	)
 	var createdEventOccurrence models.EventOccurrence
+	var titleEN, descriptionEN string
+	var titleTH, descriptionTH *string
 
 	// populate data in struct, embedding event and location data
 	err = row.Scan(
@@ -42,8 +44,10 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, i
 
 		// event fields
 		&createdEventOccurrence.Event.ID,
-		&createdEventOccurrence.Event.Title,
-		&createdEventOccurrence.Event.Description,
+		&titleEN,
+		&titleTH,
+		&descriptionEN,
+		&descriptionTH,
 		&createdEventOccurrence.Event.OrganizationID,
 		&createdEventOccurrence.Event.AgeRangeMin,
 		&createdEventOccurrence.Event.AgeRangeMax,
@@ -66,6 +70,10 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, i
 		&createdEventOccurrence.Location.CreatedAt,
 		&createdEventOccurrence.Location.UpdatedAt,
 	)
+
+	// Default to English
+	createdEventOccurrence.Event.Title = titleEN
+	createdEventOccurrence.Event.Description = descriptionEN
 
 	if err != nil {
 		err := errs.InternalServerError("Failed to create event occurrence: ", err.Error())

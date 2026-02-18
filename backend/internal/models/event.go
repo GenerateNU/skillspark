@@ -22,6 +22,39 @@ type Event struct {
 	UpdatedAt        time.Time `json:"updated_at" db:"updated_at"`
 }
 
+type CreateDBBody struct {
+	Title_EN       string    `json:"title_en,omitempty" db:"title_en" doc:"Title of the event in english" minLength:"2" maxLength:"100"`
+	Title_TH       *string   `json:"title_th,omitempty" db:"title_th" doc:"Title of the event in thai" minLength:"2" maxLength:"100"`
+	Description_EN string    `json:"description_en,omitempty" db:"description_en" doc:"Description of the event in english" minLength:"2" maxLength:"200"`
+	Description_TH *string   `json:"description_th,omitempty" db:"description_th" doc:"Description of the event in thai" minLength:"2" maxLength:"200"`
+	OrganizationID uuid.UUID `json:"organization_id,omitempty" db:"organization_id" doc:"ID of the hosting organization"`
+	AgeRangeMin    *int      `json:"age_range_min,omitempty" db:"age_range_min" doc:"Minimum age for the event" minimum:"0" maximum:"100"`
+	AgeRangeMax    *int      `json:"age_range_max,omitempty" db:"age_range_max" doc:"Max age for the event" minimum:"0" maximum:"100"`
+	Category       []string  `json:"category,omitempty" db:"category" doc:"Category of the event"`
+}
+
+type UpdateDBBody struct {
+	Title_EN       *string    `json:"title_en,omitempty" db:"title_en" doc:"Title of the event in english" minLength:"2" maxLength:"100"`
+	Title_TH       *string    `json:"title_th,omitempty" db:"title_th" doc:"Title of the event in thai" minLength:"2" maxLength:"100"`
+	Description_EN *string    `json:"description_en,omitempty" db:"description_en" doc:"Description of the event in english" minLength:"2" maxLength:"200"`
+	Description_TH *string    `json:"description_th,omitempty" db:"description_th" doc:"Description of the event in thai" minLength:"2" maxLength:"200"`
+	OrganizationID *uuid.UUID `json:"organization_id,omitempty" db:"organization_id" doc:"ID of the hosting organization"`
+	AgeRangeMin    *int       `json:"age_range_min,omitempty" db:"age_range_min" doc:"Minimum age for the event" minimum:"0" maximum:"100"`
+	AgeRangeMax    *int       `json:"age_range_max,omitempty" db:"age_range_max" doc:"Max age for the event" minimum:"0" maximum:"100"`
+	Category       *[]string  `json:"category,omitempty" db:"category" doc:"Category of the event"`
+}
+
+type CreateEventDBInput struct {
+	Body CreateDBBody
+}
+
+type UpdateEventDBInput struct {
+	ID   uuid.UUID `path:"id"`
+	Body UpdateDBBody
+}
+
+// ----------------------------
+
 type CreateEventInput struct {
 	Body CreateEventBody
 }
@@ -101,9 +134,11 @@ type DeleteEventOutput struct {
 
 // get by event id
 type GetEventOccurrencesByEventIDInput struct {
-	ID uuid.UUID `path:"event_id" doc:"ID of an event"`
+	AcceptLanguage string    `header:"Accept-Language"`
+	ID             uuid.UUID `path:"event_id" doc:"ID of an event"`
 }
 
 type GetEventOccurrencesByEventIDOutput struct {
-	Body []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
+	AcceptLanguage string            `header:"Accept-Language"`
+	Body           []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
 }

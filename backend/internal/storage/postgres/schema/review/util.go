@@ -26,11 +26,12 @@ func CreateTestReview(
 
 	r := registration.CreateTestRegistration(t, ctx, db)
 	g := guardian.CreateTestGuardian(t, ctx, db)
-
-	input := &models.CreateReviewInput{}
+	desc_ptr := "รีวิวการทดสอบ ให้คะแนนเต็มสิบ"
+	input := &models.CreateReviewDBInput{}
 	input.Body.RegistrationID = r.ID
 	input.Body.GuardianID = g.ID
-	input.Body.Description = "Test review, ten out of ten"
+	input.Body.Description_EN = "Test review, ten out of ten"
+	input.Body.Description_TH = &desc_ptr
 	input.Body.Categories = []string{"interesting", "informative"}
 
 	review, err := repo.CreateReview(ctx, input)

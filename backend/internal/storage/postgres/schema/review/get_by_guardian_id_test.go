@@ -27,10 +27,12 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 
 	for i := 0; i < 3; i++ {
 
-		input := &models.CreateReviewInput{}
+		descriptionTH := "รีวิวหมายเลข " + strconv.Itoa(i+2)
+		input := &models.CreateReviewDBInput{}
 		input.Body.RegistrationID = firstReview.RegistrationID
 		input.Body.GuardianID = firstReview.GuardianID
-		input.Body.Description = "Review number " + strconv.Itoa(i+2)
+		input.Body.Description_EN = "Review number " + strconv.Itoa(i+2)
+		input.Body.Description_TH = &descriptionTH
 		input.Body.Categories = []string{"interesting"}
 
 		r, err := repo.CreateReview(ctx, input)
@@ -41,7 +43,7 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 	}
 
 	pagination := utils.Pagination{Limit: 10, Page: 1}
-	reviews, err := repo.GetReviewsByGuardianID(ctx, firstReview.GuardianID, pagination)
+	reviews, err := repo.GetReviewsByGuardianID(ctx, firstReview.GuardianID, "en-US", pagination)
 	require.Nil(t, err)
 	require.Len(t, reviews, len(expectedReviews))
 
@@ -64,7 +66,7 @@ func TestGetReviewsByGuardianID_NoReviews(t *testing.T) {
 	g := guardian.CreateTestGuardian(t, ctx, testDB)
 
 	pagination := utils.Pagination{Limit: 10, Page: 1}
-	reviews, err := repo.GetReviewsByGuardianID(ctx, g.ID, pagination)
+	reviews, err := repo.GetReviewsByGuardianID(ctx, g.ID, "en-US", pagination)
 
 	require.Nil(t, err)
 	require.NotNil(t, reviews)

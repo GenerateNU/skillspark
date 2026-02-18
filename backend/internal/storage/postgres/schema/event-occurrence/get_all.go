@@ -34,6 +34,8 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 
 func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error) {
 	var createdEventOccurrence models.EventOccurrence
+	var titleEN, descriptionEN string
+	var titleTH, descriptionTH *string
 	// populate data from each row
 	err := row.Scan(
 		// event occurrence fields
@@ -50,8 +52,10 @@ func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error)
 
 		// event fields
 		&createdEventOccurrence.Event.ID,
-		&createdEventOccurrence.Event.Title,
-		&createdEventOccurrence.Event.Description,
+		&titleEN,
+		&titleTH,
+		&descriptionEN,
+		&descriptionTH,
 		&createdEventOccurrence.Event.OrganizationID,
 		&createdEventOccurrence.Event.AgeRangeMin,
 		&createdEventOccurrence.Event.AgeRangeMax,
@@ -74,5 +78,10 @@ func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error)
 		&createdEventOccurrence.Location.CreatedAt,
 		&createdEventOccurrence.Location.UpdatedAt,
 	)
+
+	// Default to English
+	createdEventOccurrence.Event.Title = titleEN
+	createdEventOccurrence.Event.Description = descriptionEN
+
 	return createdEventOccurrence, err
 }

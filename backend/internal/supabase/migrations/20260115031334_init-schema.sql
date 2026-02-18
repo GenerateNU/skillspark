@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS manager (
 create table if not exists event (  
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
-    description TEXT NOT NULL,
+    description TEXT NOT NULL, 
     organization_id UUID NOT NULL REFERENCES organization(id),
     age_range_min INT,
     age_range_max INT,

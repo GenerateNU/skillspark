@@ -6,6 +6,7 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	translatemocks "skillspark/internal/translation/mocks"
 	"skillspark/internal/utils"
 	"testing"
 	"time"
@@ -19,7 +20,7 @@ func TestHandler_CreateReview(t *testing.T) {
 	tests := []struct {
 		name      string
 		input     *models.CreateReviewInput
-		mockSetup func(*repomocks.MockReviewRepository, *repomocks.MockRegistrationRepository, *repomocks.MockGuardianRepository)
+		mockSetup func(*repomocks.MockReviewRepository, *repomocks.MockRegistrationRepository, *repomocks.MockGuardianRepository, *translatemocks.TranslateMock)
 		wantErr   bool
 	}{
 		{
@@ -32,12 +33,17 @@ func TestHandler_CreateReview(t *testing.T) {
 				in.Body.Categories = []string{"fun", "engaging"}
 				return in
 			}(),
-			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository) {
+			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
+				// translation succeeds
+				translated := "งานยอดเยี่ยม!"
+				translateMock.On("GetTranslation", mock.Anything, "Great event!").Return(&translated, nil)
+
 				// registration exists
 				regRepo.On(
 					"GetRegistrationByID",
-					mock.Anything, // matches any context.Context
-					mock.AnythingOfType("*models.GetRegistrationByIDInput"), // pointer to input struct
+					mock.Anything,
+					mock.AnythingOfType("*models.GetRegistrationByIDInput"),
+					mock.Anything,
 				).Return(&models.GetRegistrationByIDOutput{
 					Body: models.Registration{
 						ID: uuid.MustParse("99999999-0000-0000-0000-000000000001"),
@@ -51,7 +57,7 @@ func TestHandler_CreateReview(t *testing.T) {
 					}, nil)
 
 				// create review
-				reviewRepo.On("CreateReview", mock.Anything, mock.AnythingOfType("*models.CreateReviewInput")).
+				reviewRepo.On("CreateReview", mock.Anything, mock.AnythingOfType("*models.CreateReviewDBInput")).
 					Return(&models.Review{
 						ID:             uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 						RegistrationID: uuid.MustParse("10000000-0000-0000-0000-000000000001"),
@@ -65,6 +71,22 @@ func TestHandler_CreateReview(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "translation fails",
+			input: func() *models.CreateReviewInput {
+				in := &models.CreateReviewInput{}
+				in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
+				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
+				in.Body.Description = "Great event!"
+				in.Body.Categories = []string{"fun", "engaging"}
+				return in
+			}(),
+			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
+				// translation fails
+				translateMock.On("GetTranslation", mock.Anything, "Great event!").Return(nil, errors.New("translation service unavailable"))
+			},
+			wantErr: true,
+		},
+		{
 			name: "invalid registration_id",
 			input: func() *models.CreateReviewInput {
 				in := &models.CreateReviewInput{}
@@ -74,12 +96,16 @@ func TestHandler_CreateReview(t *testing.T) {
 				in.Body.Categories = []string{"fun", "engaging"}
 				return in
 			}(),
-			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository) {
+			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
+				// translation succeeds
+				translated := "งานยอดเยี่ยม!"
+				translateMock.On("GetTranslation", mock.Anything, "Great event!").Return(&translated, nil)
 
 				regRepo.On(
 					"GetRegistrationByID",
-					mock.Anything, // matches any context.Context
-					mock.AnythingOfType("*models.GetRegistrationByIDInput"), // pointer to input struct
+					mock.Anything,
+					mock.AnythingOfType("*models.GetRegistrationByIDInput"),
+					mock.Anything,
 				).Return(nil, errors.New("not found"))
 
 			},
@@ -95,12 +121,17 @@ func TestHandler_CreateReview(t *testing.T) {
 				in.Body.Categories = []string{"fun", "engaging"}
 				return in
 			}(),
-			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository) {
+			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
+				// translation succeeds
+				translated := "งานยอดเยี่ยม!"
+				translateMock.On("GetTranslation", mock.Anything, "Great event!").Return(&translated, nil)
+
 				// registration exists
 				regRepo.On(
 					"GetRegistrationByID",
-					mock.Anything, // matches any context.Context
-					mock.AnythingOfType("*models.GetRegistrationByIDInput"), // pointer to input struct
+					mock.Anything,
+					mock.AnythingOfType("*models.GetRegistrationByIDInput"),
+					mock.Anything,
 				).Return(&models.GetRegistrationByIDOutput{
 					Body: models.Registration{
 						ID: uuid.MustParse("99999999-0000-0000-0000-000000000001"),
@@ -126,12 +157,17 @@ func TestHandler_CreateReview(t *testing.T) {
 				in.Body.Categories = []string{"fun", "engaging"}
 				return in
 			}(),
-			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository) {
+			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
+				// translation succeeds
+				translated := "งานยอดเยี่ยม!"
+				translateMock.On("GetTranslation", mock.Anything, "Great event!").Return(&translated, nil)
+
 				// registration exists
 				regRepo.On(
 					"GetRegistrationByID",
-					mock.Anything, // matches any context.Context
-					mock.AnythingOfType("*models.GetRegistrationByIDInput"), // pointer to input struct
+					mock.Anything,
+					mock.AnythingOfType("*models.GetRegistrationByIDInput"),
+					mock.Anything,
 				).Return(&models.GetRegistrationByIDOutput{
 					Body: models.Registration{
 						ID: uuid.MustParse("99999999-0000-0000-0000-000000000001"),
@@ -145,7 +181,7 @@ func TestHandler_CreateReview(t *testing.T) {
 					}, nil)
 
 				// repository returns error
-				reviewRepo.On("CreateReview", mock.Anything, mock.AnythingOfType("*models.CreateReviewInput")).
+				reviewRepo.On("CreateReview", mock.Anything, mock.AnythingOfType("*models.CreateReviewDBInput")).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.BadRequest("Invalid review").Code,
 						Message: "Invalid review",
@@ -163,12 +199,14 @@ func TestHandler_CreateReview(t *testing.T) {
 			mockReviewRepo := new(repomocks.MockReviewRepository)
 			mockRegRepo := new(repomocks.MockRegistrationRepository)
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
-			tt.mockSetup(mockReviewRepo, mockRegRepo, mockGuardianRepo)
+			mockTranslate := new(translatemocks.TranslateMock)
+			tt.mockSetup(mockReviewRepo, mockRegRepo, mockGuardianRepo, mockTranslate)
 
 			handler := &Handler{
 				ReviewRepository:       mockReviewRepo,
 				RegistrationRepository: mockRegRepo,
 				GuardianRepository:     mockGuardianRepo,
+				TranslateClient:        mockTranslate,
 			}
 			ctx := context.Background()
 
@@ -188,6 +226,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			mockReviewRepo.AssertExpectations(t)
 			mockRegRepo.AssertExpectations(t)
 			mockGuardianRepo.AssertExpectations(t)
+			mockTranslate.AssertExpectations(t)
 		})
 	}
 }
@@ -254,22 +293,24 @@ func TestHandler_DeleteReview(t *testing.T) {
 
 func TestHandler_GetReviewsByEventID(t *testing.T) {
 	tests := []struct {
-		name        string
-		eventID     uuid.UUID
-		mockSetup   func(*repomocks.MockEventRepository, *repomocks.MockReviewRepository)
-		wantReviews []models.Review
-		wantErr     bool
+		name           string
+		eventID        uuid.UUID
+		acceptLanguage string
+		mockSetup      func(*repomocks.MockEventRepository, *repomocks.MockReviewRepository)
+		wantReviews    []models.Review
+		wantErr        bool
 	}{
 		{
-			name:    "successful fetch reviews",
-			eventID: uuid.MustParse("10000000-0000-0000-0000-000000000001"),
+			name:           "successful fetch reviews",
+			eventID:        uuid.MustParse("10000000-0000-0000-0000-000000000001"),
+			acceptLanguage: "en-US",
 			mockSetup: func(eventRepo *repomocks.MockEventRepository, reviewRepo *repomocks.MockReviewRepository) {
 				// Event exists
 				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000001")).
 					Return(&models.Event{ID: uuid.MustParse("10000000-0000-0000-0000-000000000001")}, nil)
 
 				// Reviews returned
-				reviewRepo.On("GetReviewsByEventID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000001"), mock.AnythingOfType("utils.Pagination")).
+				reviewRepo.On("GetReviewsByEventID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000001"), "en-US", mock.AnythingOfType("utils.Pagination")).
 					Return([]models.Review{
 						{
 							ID:             uuid.MustParse("20000000-0000-0000-0000-000000000001"),
@@ -294,8 +335,9 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "event does not exist",
-			eventID: uuid.MustParse("99999999-0000-0000-0000-000000000000"),
+			name:           "event does not exist",
+			eventID:        uuid.MustParse("99999999-0000-0000-0000-000000000000"),
+			acceptLanguage: "en-US",
 			mockSetup: func(eventRepo *repomocks.MockEventRepository, reviewRepo *repomocks.MockReviewRepository) {
 				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("99999999-0000-0000-0000-000000000000")).
 					Return(nil, errs.BadRequest("event does not exist"))
@@ -304,13 +346,14 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 			wantErr:     true,
 		},
 		{
-			name:    "review repository error",
-			eventID: uuid.MustParse("10000000-0000-0000-0000-000000000002"),
+			name:           "review repository error",
+			eventID:        uuid.MustParse("10000000-0000-0000-0000-000000000002"),
+			acceptLanguage: "en-US",
 			mockSetup: func(eventRepo *repomocks.MockEventRepository, reviewRepo *repomocks.MockReviewRepository) {
 				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000002")).
 					Return(&models.Event{ID: uuid.MustParse("10000000-0000-0000-0000-000000000002")}, nil)
 
-				reviewRepo.On("GetReviewsByEventID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000002"), mock.AnythingOfType("utils.Pagination")).
+				reviewRepo.On("GetReviewsByEventID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000002"), "en-US", mock.AnythingOfType("utils.Pagination")).
 					Return(nil, errs.BadRequest("cannot fetch reviews"))
 			},
 			wantReviews: nil,
@@ -333,7 +376,7 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 			}
 
 			pagination := utils.Pagination{Page: 1, Limit: 10}
-			reviews, err := handler.GetReviewsByEventID(context.Background(), tt.eventID, pagination)
+			reviews, err := handler.GetReviewsByEventID(context.Background(), tt.eventID, tt.acceptLanguage, pagination)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -357,15 +400,17 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 
 func TestHandler_GetReviewsByGuardianID(t *testing.T) {
 	tests := []struct {
-		name        string
-		guardianID  uuid.UUID
-		mockSetup   func(*repomocks.MockGuardianRepository, *repomocks.MockReviewRepository)
-		wantReviews []models.Review
-		wantErr     bool
+		name           string
+		guardianID     uuid.UUID
+		acceptLanguage string
+		mockSetup      func(*repomocks.MockGuardianRepository, *repomocks.MockReviewRepository)
+		wantReviews    []models.Review
+		wantErr        bool
 	}{
 		{
-			name:       "successful fetch reviews",
-			guardianID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+			name:           "successful fetch reviews",
+			guardianID:     uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+			acceptLanguage: "en-US",
 			mockSetup: func(guardianRepo *repomocks.MockGuardianRepository, reviewRepo *repomocks.MockReviewRepository) {
 				// Guardian exists
 				guardianRepo.On("GetGuardianByID", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111111")).
@@ -374,7 +419,7 @@ func TestHandler_GetReviewsByGuardianID(t *testing.T) {
 					}, nil)
 
 				// Reviews returned
-				reviewRepo.On("GetReviewsByGuardianID", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111111"), mock.AnythingOfType("utils.Pagination")).
+				reviewRepo.On("GetReviewsByGuardianID", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111111"), "en-US", mock.AnythingOfType("utils.Pagination")).
 					Return([]models.Review{
 						{
 							ID:             uuid.MustParse("20000000-0000-0000-0000-000000000001"),
@@ -399,8 +444,9 @@ func TestHandler_GetReviewsByGuardianID(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:       "review repository error",
-			guardianID: uuid.MustParse("11111111-1111-1111-1111-111111111112"),
+			name:           "review repository error",
+			guardianID:     uuid.MustParse("11111111-1111-1111-1111-111111111112"),
+			acceptLanguage: "en-US",
 			mockSetup: func(guardianRepo *repomocks.MockGuardianRepository, reviewRepo *repomocks.MockReviewRepository) {
 				// Guardian exists
 				guardianRepo.On("GetGuardianByID", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111112")).
@@ -409,7 +455,7 @@ func TestHandler_GetReviewsByGuardianID(t *testing.T) {
 					}, nil)
 
 				// Repository error
-				reviewRepo.On("GetReviewsByGuardianID", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111112"), mock.AnythingOfType("utils.Pagination")).
+				reviewRepo.On("GetReviewsByGuardianID", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111112"), "en-US", mock.AnythingOfType("utils.Pagination")).
 					Return(nil, errs.BadRequest("cannot fetch reviews"))
 			},
 			wantReviews: nil,
@@ -432,7 +478,7 @@ func TestHandler_GetReviewsByGuardianID(t *testing.T) {
 			}
 
 			pagination := utils.Pagination{Page: 1, Limit: 10}
-			reviews, err := handler.GetReviewsByGuardianID(context.Background(), tt.guardianID, pagination)
+			reviews, err := handler.GetReviewsByGuardianID(context.Background(), tt.guardianID, tt.acceptLanguage, pagination)
 
 			if tt.wantErr {
 				assert.Error(t, err)

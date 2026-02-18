@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"net/http"
 	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
@@ -9,6 +10,7 @@ import (
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
+	translations "skillspark/internal/translation"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -35,7 +37,11 @@ func InitApp(config config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	app, humaAPI := SetupApp(config, repo, s3Client)
+
+	c := &http.Client{}
+	translateClient := translations.NewClient(c)
+
+	app, humaAPI := SetupApp(config, repo, s3Client, translateClient)
 	return &App{
 		Server: app,
 		Repo:   repo,
@@ -44,7 +50,7 @@ func InitApp(config config.Config) (*App, error) {
 }
 
 // Setup the fiber app with the specified configuration and database.
-func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client) (*fiber.App, huma.API) {
+func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, translateClient *translations.TranslateClient) (*fiber.App, huma.API) {
 	app := fiber.New(fiber.Config{
 		JSONEncoder:  go_json.Marshal,
 		JSONDecoder:  go_json.Unmarshal,
@@ -91,24 +97,24 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	})
 
 	// Register Huma endpoints
-	setupHumaRoutes(humaAPI, repo, config, s3Client)
+	setupHumaRoutes(humaAPI, repo, config, s3Client, translateClient)
 
 	return app, humaAPI
 }
 
 // Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client) {
+func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
 	routes.SetupOrganizationRoutes(api, repo, s3Client)
 	routes.SetupSchoolsRoutes(api, repo)
-	routes.SetupEventRoutes(api, repo, s3Client)
+	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
 	routes.SetupManagerRoutes(api, repo, config)
 	routes.SetupRegistrationRoutes(api, repo)
 	routes.SetupGuardiansRoutes(api, repo, config)
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo)
-	routes.SetUpReviewRoutes(api, repo)
+	routes.SetUpReviewRoutes(api, repo, translateClient)
 	routes.SetupAuthRoutes(api, repo, config)
 }

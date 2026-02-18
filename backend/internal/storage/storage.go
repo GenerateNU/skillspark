@@ -64,8 +64,8 @@ type GuardianRepository interface {
 }
 
 type EventRepository interface {
-	CreateEvent(ctx context.Context, location *models.CreateEventInput, HeaderImageS3Key *string) (*models.Event, error)
-	UpdateEvent(ctx context.Context, location *models.UpdateEventInput, HeaderImageS3Key *string) (*models.Event, error)
+	CreateEvent(ctx context.Context, location *models.CreateEventDBInput, HeaderImageS3Key *string) (*models.Event, error)
+	UpdateEvent(ctx context.Context, location *models.UpdateEventDBInput, HeaderImageS3Key *string) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
 	GetEventByID(ctx context.Context, id uuid.UUID) (*models.Event, error)
@@ -97,9 +97,9 @@ type RegistrationRepository interface {
 }
 
 type ReviewRepository interface {
-	CreateReview(ctx context.Context, input *models.CreateReviewInput) (*models.Review, error)
-	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Review, error)
-	GetReviewsByEventID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Review, error)
+	CreateReview(ctx context.Context, input *models.CreateReviewDBInput) (*models.Review, error)
+	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
+	GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	DeleteReview(ctx context.Context, id uuid.UUID) error
 }
 
