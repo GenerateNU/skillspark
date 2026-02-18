@@ -3,37 +3,45 @@ package registration
 import (
 	"context"
 	"errors"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 )
 
 func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
 
-	if _, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID); err != nil {
-		return nil, errs.BadRequest("Invalid event_occurrence_id: event occurrence does not exist")
+	eventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID)
+
+	if (err != nil) {
+		return nil, err
+	}
+	
+	guardian, err := h.GuardianRepository.GetGuardianByID(ctx, input.Body.GuardianID)
+	
+	if (err != nil) {
+		return nil, err
 	}
 
-	if _, err := h.ChildRepository.GetChildByID(ctx, input.Body.ChildID); err != nil {
-		return nil, errs.BadRequest("Invalid child_id: child does not exist")
+	if (guardian.StripeCustomerID == nil) {
+		return nil, errors.New("Guardian must have a Stripe Customer ID")
 	}
 
-	if _, err := h.GuardianRepository.GetGuardianByID(ctx, input.Body.GuardianID); err != nil {
-		return nil, errs.BadRequest("Invalid guardian_id: guardian does not exist")
+	org, err := h.OrganizationRepository.GetOrganizationByID(ctx, eventOccurrence.Event.OrganizationID)
+
+	if (err != nil) {
+		return nil, err
 	}
 
-	eventOccurrence, _ := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID)
-	
-	guardian, _ := h.GuardianRepository.GetGuardianByID(ctx, input.Body.GuardianID)
-	
-	org, _ := h.OrganizationRepository.GetOrganizationByID(ctx, eventOccurrence.Event.OrganizationID)
-	
+	paymentMethod := input.Body.PaymentMethodID
 
+	if (paymentMethod == nil) {
+		paymentMethod = guardian.StripeCustomerID
+	}
+	
 	piInput := models.CreatePaymentIntentInput{}
 	piInput.Body.Amount = int64(eventOccurrence.Price)
 	piInput.Body.Currency = input.Body.Currency
 	piInput.Body.GuardianStripeID = *guardian.StripeCustomerID
 	piInput.Body.OrgStripeID = *org.StripeAccountID
-	piInput.Body.PaymentMethodID = &input.Body.PaymentMethodID
+	piInput.Body.PaymentMethodID = paymentMethod
 	piInput.Body.EventDate = eventOccurrence.StartTime
 
 
@@ -50,7 +58,7 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 		StripePaymentIntentID: paymentIntent.Body.PaymentIntentID,
 		StripeCustomerID:      *guardian.StripeCustomerID,
 		OrgStripeAccountID:    *org.StripeAccountID,
-		StripePaymentMethodID: input.Body.PaymentMethodID,
+		StripePaymentMethodID: *input.Body.PaymentMethodID,
 		TotalAmount:           paymentIntent.Body.TotalAmount,     
 		ProviderAmount:        paymentIntent.Body.ProviderAmount,   
 		PlatformFeeAmount:     paymentIntent.Body.PlatformFeeAmount,

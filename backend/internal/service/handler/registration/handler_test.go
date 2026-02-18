@@ -372,7 +372,6 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.EventOccurrenceID = eventOccurrenceID
 				i.Body.Status = models.RegistrationStatusRegistered
 				i.Body.Currency = "usd"
-				i.Body.PaymentMethodID = "pm_test_123"
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {

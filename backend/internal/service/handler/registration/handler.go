@@ -14,7 +14,9 @@ type Handler struct {
 	StripeClient              stripeClient.StripeClientInterface
 }
 
-func NewHandler(registrationRepo storage.RegistrationRepository, childRepo storage.ChildRepository, guardianRepo storage.GuardianRepository, eventOccurrenceRepo storage.EventOccurrenceRepository, organizationRepo storage.OrganizationRepository, sc stripeClient.StripeClientInterface) *Handler {
+func NewHandler(registrationRepo storage.RegistrationRepository, childRepo storage.ChildRepository, 
+	guardianRepo storage.GuardianRepository, eventOccurrenceRepo storage.EventOccurrenceRepository, 
+	organizationRepo storage.OrganizationRepository, sc stripeClient.StripeClientInterface) *Handler {
 	return &Handler{
 		RegistrationRepository:    registrationRepo,
 		ChildRepository:           childRepo,

@@ -67,6 +67,14 @@ type CreateOrgLoginLinkOutput struct {
 	} `json:"body"`
 }
 
+type CreateCustomerPaymentMethodInput struct {
+	GuardianID uuid.UUID   `path:"guardian_id"`
+}
+
+type CreateCustomerPaymentMethodOutput struct {
+		PaymentMethod stripe.PaymentMethod `json:"payment_method_id"`
+}
+
 type CreatePaymentIntentInput struct {
 	Body struct {
 		RegistrationID  uuid.UUID `json:"registration_id" doc:"Registration/booking ID"`

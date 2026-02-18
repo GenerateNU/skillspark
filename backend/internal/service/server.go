@@ -120,5 +120,4 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetupEventOccurrencesRoutes(api, repo)
 	routes.SetupAuthRoutes(api, repo, config)
 	routes.SetupPaymentRoutes(api, repo, sc)
-	routes.SetupGuardianPaymentMethodRoutes(api, repo, sc)
 }

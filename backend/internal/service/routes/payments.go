@@ -57,12 +57,23 @@ func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc stripeClient.
 	huma.Register(api, huma.Operation{
 	OperationID:   "create-guardian-setup-intent",
 	Method:        http.MethodPost,
-	Path:          "/api/v1/guardians/{guardian_id}/setup-intent",
+	Path:          "/api/v1/stripe/setup-intent/{guardian_id}",
 	Summary:       "Create a SetupIntent for guardian to add payment method",
 	Description:   "Creates a Stripe SetupIntent and returns client_secret for frontend to collect card details",
 	Tags:          []string{"Payments"},
 	}, func(ctx context.Context, input *models.CreateSetupIntentInput) (*models.CreateSetupIntentOutput, error) {
 	return paymentHandler.CreateSetupIntent(ctx, input)
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID:   "create-stripe-customer",
+		Method:        http.MethodPost,
+		Path:          "/api/v1/stripe/customer/{guardian_id}",
+		Summary:       "Create a new Stripe Customer",
+		Description:   "Create a new Stripe Customer",
+		Tags:          []string{"Payments"},
+	}, func(ctx context.Context, input *models.CreateStripeCustomerInput) (*models.CreateStripeCustomerOutput, error) {
+		return paymentHandler.CreateStripeCustomer(ctx, input)
 	})
 
 	// huma.Register(api, huma.Operation{
