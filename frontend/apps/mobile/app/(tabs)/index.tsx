@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { StyleSheet, ActivityIndicator, FlatList, View, Button } from "react-native";
+import { StyleSheet, ActivityIndicator, FlatList, View } from "react-native";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -7,8 +7,7 @@ import { useGetAllEventOccurrences } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 
 function EventOccurrencesList() {
-
-  const { data: response, isLoading, error, status, fetchStatus } = useGetAllEventOccurrences();
+  const { data: responseWrapper, isLoading, error } = useGetAllEventOccurrences();
 
   if (isLoading) {
     return (
@@ -30,10 +29,8 @@ function EventOccurrencesList() {
     );
   }
 
-  // Response is already an array of EventOccurrence objects
-  const eventOccurrences = response;
+  const eventOccurrences = responseWrapper?.data;
 
-  // Check if eventOccurrences exists and is an array
   if (!eventOccurrences || !Array.isArray(eventOccurrences)) {
     return (
       <ThemedView style={styles.centerContainer}>
@@ -45,6 +42,7 @@ function EventOccurrencesList() {
   // Filter and sort upcoming events
   const upcomingEvents = eventOccurrences
     .filter(occurrence => {
+      if (!occurrence.start_time) return false;
       return new Date(occurrence.start_time) >= new Date();
     })
     .sort((a, b) => {
