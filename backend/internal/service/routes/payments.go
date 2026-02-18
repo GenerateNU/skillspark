@@ -76,6 +76,17 @@ func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc stripeClient.
 		return paymentHandler.CreateStripeCustomer(ctx, input)
 	})
 
+// 	huma.Register(api, huma.Operation{
+// 	OperationID:   "get-guardian-payment-methods",
+// 	Method:        http.MethodGet,
+// 	Path:          "/api/v1/guardians/{guardian_id}/payment-methods",
+// 	Summary:       "Get all payment methods for a guardian",
+// 	Description:   "Retrieves all saved payment methods for a specific guardian",
+// 	Tags:          []string{"Payments"},
+// }, func(ctx context.Context, input *models.GetGuardianPaymentMethodsByGuardianIDInput) (*models.GetGuardianPaymentMethodsByGuardianIDOutput, error) {
+// 	return paymentHandler.GetPaymentMethodsByGuardianID(ctx, input)
+// })
+
 	// huma.Register(api, huma.Operation{
 	// 	OperationID: "stripe-webhook",
 	// 	Method:      http.MethodPost,

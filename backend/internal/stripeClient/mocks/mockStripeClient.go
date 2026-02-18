@@ -47,16 +47,6 @@ func (m *MockStripeClient) CreateCustomer(
 	return args.Get(0).(*stripe.Customer), args.Error(1)
 }
 
-func (m *MockStripeClient) 	CreateCustomerPaymentMethod(ctx context.Context, 
-	customerID string) (*stripe.PaymentMethod, error) {
-	args := m.Called(ctx, customerID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*stripe.PaymentMethod), args.Error(1)
-}
-
-
 func (m *MockStripeClient) CreateSetupIntent(
 	ctx context.Context,
 	stripeCustomerID string,

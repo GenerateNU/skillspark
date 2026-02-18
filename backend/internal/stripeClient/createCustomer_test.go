@@ -14,7 +14,7 @@ func TestStripeClient_CreateCustomer(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client,_ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates customer with email and name", func(t *testing.T) {

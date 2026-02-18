@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"skillspark/internal/config"
 	"skillspark/internal/service"
+	"skillspark/jobs"
 	"syscall"
 	"time"
 
@@ -35,6 +36,11 @@ func main() {
 			slog.Error("failed to close database", "error", err)
 		}
 	}()
+
+	jobScheduler := jobs.NewJobScheduler(app.Repo, app.StripeClient)
+	jobScheduler.Start()
+	defer jobScheduler.Stop()
+	slog.Info("Cron jobs started")
 
 	port := cfg.Application.Port
 

@@ -47,6 +47,7 @@ type CreateRegistrationInput struct {
 		EventOccurrenceID uuid.UUID          `json:"event_occurrence_id" doc:"ID of the event occurrence to register for" format:"uuid" required:"true"`
 		PaymentMethodID   *string            `json:"payment_method_id" doc:"Stripe payment method ID to use"`
 		Currency          string             `json:"currency" doc:"Currency code (e.g., thb, usd)" default:"thb"`
+		Amount            int64				 `json:"amount" doc:"the amount being paid in the lowest denomination of a currency (ex: cents for USD)"`
 		Status            RegistrationStatus `json:"status" doc:"Initial status of the registration" default:"registered" enum:"registered,cancelled"`
 	} `json:"body"`
 }

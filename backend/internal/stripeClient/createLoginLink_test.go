@@ -14,7 +14,7 @@ func TestStripeClient_CreateLoginLink(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client,_ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates login link for onboarded account", func(t *testing.T) {

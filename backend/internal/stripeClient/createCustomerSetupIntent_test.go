@@ -14,7 +14,7 @@ func TestStripeClient_CreateSetupIntent(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client,_ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates setup intent for valid customer", func(t *testing.T) {

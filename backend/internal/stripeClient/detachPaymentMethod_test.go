@@ -13,7 +13,7 @@ func TestStripeClient_DetachPaymentMethod(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client,_ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully detaches payment method from customer", func(t *testing.T) {

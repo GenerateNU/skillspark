@@ -3,6 +3,7 @@ package repomocks
 import (
 	"context"
 	"skillspark/internal/models"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -58,6 +59,14 @@ func (m *MockRegistrationRepository) GetRegistrationsByEventOccurrenceID(ctx con
 		return nil, args.Error(1)
 	}
 	return args.Get(0).(*models.GetRegistrationsByEventOccurrenceIDOutput), args.Error(1)
+}
+
+func (m *MockRegistrationRepository) GetRegistrationsForCapture(ctx context.Context, startWindow time.Time, endWindow time.Time) ([]models.Registration, error) {
+	args := m.Called(ctx, startWindow, endWindow)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.Registration), args.Error(1)
 }
 
 func (m *MockRegistrationRepository) CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error) {

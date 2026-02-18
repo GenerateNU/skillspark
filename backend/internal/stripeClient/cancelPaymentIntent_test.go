@@ -17,7 +17,7 @@ func TestStripeClient_CancelPaymentIntent_RequiresCapture(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client,_ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	paymentMethodID := "pm_card_visa"
@@ -56,7 +56,7 @@ func TestStripeClient_CancelPaymentIntent_Succeeded(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	paymentMethodID := "pm_card_visa"
@@ -100,7 +100,7 @@ func TestStripeClient_CancelPaymentIntent_InvalidID(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	cancelInput := &models.CancelPaymentIntentInput{
@@ -122,7 +122,7 @@ func TestStripeClient_CancelPaymentIntent_AlreadyCanceled(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	paymentMethodID := "pm_card_visa"

@@ -20,7 +20,7 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client,_ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates payment intent with test payment method", func(t *testing.T) {

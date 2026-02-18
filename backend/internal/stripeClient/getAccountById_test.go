@@ -16,7 +16,7 @@ func TestGetAccount(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client,_ := NewStripeClient(apiKey)
 	
 	// Add timeout to prevent hanging
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

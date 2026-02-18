@@ -18,7 +18,7 @@ func TestStripeClient_CreateOrganizationAccount(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client := NewStripeClient(apiKey)
+	client,_ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates Express account", func(t *testing.T) {

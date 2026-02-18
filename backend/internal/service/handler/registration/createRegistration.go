@@ -43,11 +43,12 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 	piInput.Body.OrgStripeID = *org.StripeAccountID
 	piInput.Body.PaymentMethodID = paymentMethod
 	piInput.Body.EventDate = eventOccurrence.StartTime
+	piInput.Body.Amount = input.Body.Amount
 
 
 	paymentIntent, err := h.StripeClient.CreatePaymentIntent(ctx, &piInput)
 	if err != nil {
-		return nil, errors.New("failed to create payment intent")
+		return nil, err
 	}
 
 	completeRegistration := &models.CreateRegistrationWithPaymentData{
