@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView, ActivityIndicator, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -13,6 +14,7 @@ const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
+  const router = useRouter();
 
   const listBackgroundColor = colorScheme === 'dark' ? '#1c1c1e' : '#F9FAFB';
   const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
@@ -78,7 +80,10 @@ export default function ProfileScreen() {
           <ThemedText style={styles.sectionTitle}>Preferences</ThemedText>
           <View style={[styles.listGroup, { backgroundColor: listBackgroundColor, borderColor }]}>
             <ListItem label="Payment" />
-            <ListItem label="Family Information" />
+            <ListItem 
+              label="Family Information" 
+              onPress={() => router.push('/family')}
+            />
             <ListItem label="Settings" isLast />
           </View>
         </View>
