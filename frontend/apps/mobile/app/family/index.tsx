@@ -10,38 +10,73 @@ import { Colors } from '@/constants/theme';
 
 const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
 
+const TAG_COLORS = [
+  { bg: '#E6F4EA', border: '#4CAF50', text: '#2E7D32' },
+  { bg: '#FFF8E1', border: '#FFC107', text: '#F57F17' },
+  { bg: '#FCE4EC', border: '#E91E63', text: '#880E4F' },
+  { bg: '#E3F2FD', border: '#2196F3', text: '#0D47A1' },
+  { bg: '#F3E5F5', border: '#9C27B0', text: '#4A148C' },
+];
+
+const MAX_VISIBLE_TAGS = 3;
+
+function InterestTags({ interests }: { interests?: string[] | string }) {
+  const tags: string[] = Array.isArray(interests)
+    ? interests
+    : typeof interests === 'string' && interests
+    ? interests.split(',').map(s => s.trim()).filter(Boolean)
+    : [];
+
+  if (!tags.length) return null;
+
+  const visible = tags.slice(0, MAX_VISIBLE_TAGS);
+  const overflow = tags.length - MAX_VISIBLE_TAGS;
+
+  return (
+    <View style={styles.tagsRow}>
+      {visible.map((tag, i) => {
+        const c = TAG_COLORS[i % TAG_COLORS.length];
+        return (
+          <View key={tag} style={[styles.tag, { backgroundColor: c.bg, borderColor: c.border }]}>
+            <IconSymbol name="camera.filters" size={13} color={c.border} />
+            <ThemedText style={[styles.tagText, { color: c.text }]}>{tag}</ThemedText>
+          </View>
+        );
+      })}
+      {overflow > 0 && (
+        <ThemedText style={styles.overflowText}>+{overflow}</ThemedText>
+      )}
+    </View>
+  );
+}
+
 export default function FamilyListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
-  
+
   const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(GUARDIAN_ID);
   const { data: childrenResponse, isLoading: childrenLoading } = useGetChildrenByGuardianId(GUARDIAN_ID);
-  
+
   const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
   const children = childrenResponse?.status === 200 ? childrenResponse.data : [];
 
-  const handleAddChild = () => {
-    router.push('/family/manage');
-  };
+  // const handleAddChild = () => router.push('/family/manage');
 
-  const handleEditChild = (child: any) => {
-    router.push({
-      pathname: '/family/manage',
-      params: { 
-        id: child.id,
-        name: child.name,
-        birth_year: child.birth_year,
-        birth_month: child.birth_month,
-        school_id: child.school_id,
-        interests: child.interests
-      }
-    });
-  };
-
-  const cardBackgroundColor = colorScheme === 'dark' ? '#27272a' : '#F3F4F6';
-  const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
+  // const handleEditChild = (child: any) => {
+  //   router.push({
+  //     pathname: '/family/manage',
+  //     params: {
+  //       id: child.id,
+  //       name: child.name,
+  //       birth_year: child.birth_year,
+  //       birth_month: child.birth_month,
+  //       school_id: child.school_id,
+  //       interests: child.interests,
+  //     },
+  //   });
+  // };
 
   if (guardianLoading || childrenLoading) {
     return (
@@ -53,114 +88,76 @@ export default function FamilyListScreen() {
 
   return (
     <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
-      
-      {/* Custom Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          onPress={() => router.back()} 
-          style={styles.backButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Family Information</ThemedText>
-        <View style={styles.headerRight} /> 
+        <View style={styles.headerRight} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        
-        {/* 1. User Info (Top) */}
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>My Profile</ThemedText>
-          <View style={[styles.card, { backgroundColor: cardBackgroundColor, borderColor }]}>
-            <View style={styles.cardRow}>
-              <View style={[styles.avatarCircle, { backgroundColor: theme.tint }]}>
-                 {/* Initials or Icon */}
-                <ThemedText style={styles.avatarText}>
-                  {guardian?.name ? guardian.name.charAt(0).toUpperCase() : 'U'}
-                </ThemedText>
-              </View>
-              <View style={styles.cardInfo}>
-                <ThemedText style={styles.cardTitle}>{guardian?.name || 'User'}</ThemedText>
-                <ThemedText style={styles.cardSubtitle}>Guardian</ThemedText>
-              </View>
-              {/* Optional Edit Button for User */}
-              {/* <TouchableOpacity>
-                <IconSymbol name="pencil" size={20} color={theme.icon} />
-              </TouchableOpacity> */}
-            </View>
+        <TouchableOpacity style={styles.row} activeOpacity={0.7}>
+          <View style={styles.iconAvatar}>
+            <IconSymbol name="person.circle" size={40} color={theme.text} />
           </View>
-        </View>
-
-        {/* 2. Family Members (Middle) */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeaderRow}>
-            <ThemedText style={styles.sectionTitle}>Family Members</ThemedText>
+          <View style={styles.rowInfo}>
+            <ThemedText style={styles.rowTitle}>{guardian?.name}</ThemedText>
+            <ThemedText style={styles.rowSub}>@{guardian?.username}</ThemedText>
+            <ThemedText style={styles.rowSub}>{guardian?.email}</ThemedText>
           </View>
-          
-          <View style={styles.listContainer}>
-            {children.map((child: any) => (
-              <TouchableOpacity 
-                key={child.id} 
-                onPress={() => handleEditChild(child)}
-                activeOpacity={0.7}
-                style={[styles.card, { backgroundColor: cardBackgroundColor, borderColor }]}
-              >
-                <View style={styles.cardRow}>
-                  <View style={[styles.initialsCircle, { borderColor: theme.tint }]}>
-                    <ThemedText style={[styles.initialsText, { color: theme.tint }]}>
-                      {child.name?.charAt(0)}
-                    </ThemedText>
-                  </View>
-                  <View style={styles.cardInfo}>
-                    <ThemedText style={styles.cardTitle}>{child.name}</ThemedText>
-                    <ThemedText style={styles.cardSubtitle}>Born {child.birth_year}</ThemedText>
-                  </View>
-                  <IconSymbol name="chevron.right" size={20} color="#9CA3AF" />
-                </View>
-              </TouchableOpacity>
-            ))}
-            
-            {children.length === 0 && (
-              <View style={styles.emptyState}>
-                <ThemedText style={{ color: '#9CA3AF' }}>No family members added yet.</ThemedText>
-              </View>
-            )}
-          </View>
-
-          <TouchableOpacity 
-            style={[styles.addButton, { backgroundColor: theme.tint }]}
-            onPress={handleAddChild}
-          >
-            <IconSymbol name="plus" size={20} color="#FFF" />
-            <ThemedText style={styles.addButtonText}>Add Family Member</ThemedText>
+          <IconSymbol name="chevron.right" size={18} color="#9CA3AF" />
+        </TouchableOpacity>
+        <View style={styles.divider} />
+        <View style={styles.sectionHeaderRow}>
+          <ThemedText style={styles.sectionTitle}>Child Profile</ThemedText>
+          <TouchableOpacity onPress={() => {}}>
+            <ThemedText style={[styles.addLink, { color: theme.tint }]}>add profile +</ThemedText>
           </TouchableOpacity>
         </View>
-
-        {/* 3. Emergency Contact (Bottom) */}
-        <View style={styles.section}>
+        {children.length === 0 && (
+          <ThemedText style={styles.emptyText}>No child profiles added yet.</ThemedText>
+        )}
+        {children.map((child: any, idx: number) => (
+          <React.Fragment key={child.id}>
+            <TouchableOpacity style={styles.row} onPress={() => {}} activeOpacity={0.7}>
+              <View style={styles.initialsCircle}>
+                <ThemedText style={styles.initialsText}>
+                  {child.name?.slice(0, 2).toUpperCase() || '??'}
+                </ThemedText>
+              </View>
+              <View style={styles.rowInfo}>
+                <ThemedText style={styles.rowTitle}>{child.name}</ThemedText>
+                <ThemedText style={styles.rowSub}>
+                  {child.birth_month ? `${child.birth_month}, ` : ''}{child.birth_year}
+                </ThemedText>
+                {child.interests && (
+                  <ThemedText style={styles.rowSub}>Interests</ThemedText>
+                )}
+                <InterestTags interests={child.interests} />
+              </View>
+              <IconSymbol name="chevron.right" size={18} color="#9CA3AF" />
+            </TouchableOpacity>
+            {idx < children.length - 1 && <View style={styles.divider} />}
+          </React.Fragment>
+        ))}
+        <View style={styles.divider} />
+        <View style={styles.sectionHeaderRow}>
           <ThemedText style={styles.sectionTitle}>Emergency Contact</ThemedText>
-          <View style={[styles.card, { backgroundColor: cardBackgroundColor, borderColor, padding: 16 }]}>
-            <View style={styles.cardRow}>
-              <View style={[styles.avatarCircle, { backgroundColor: '#EF4444' }]}>
-                <ThemedText style={styles.avatarText}>MS</ThemedText>
-              </View>
-              <View style={styles.cardInfo}>
-                <ThemedText style={styles.cardTitle}>Martha Smith</ThemedText>
-                <ThemedText style={styles.cardSubtitle}>Grandmother</ThemedText>
-              </View>
-              <TouchableOpacity style={styles.phoneButton}>
-                <IconSymbol name="phone.fill" size={20} color={theme.tint} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.contactRow}>
-              <IconSymbol name="phone" size={16} color="#9CA3AF" />
-              <ThemedText style={styles.contactText}>(555) 123-4567</ThemedText>
-            </View>
-          </View>
+          <TouchableOpacity>
+            <ThemedText style={[styles.addLink, { color: theme.tint }]}>add contact +</ThemedText>
+          </TouchableOpacity>
         </View>
-
+        <TouchableOpacity style={styles.row} activeOpacity={0.7}>
+          <View style={styles.iconAvatar}>
+            <IconSymbol name="person.circle" size={40} color={theme.text} />
+          </View>
+          <View style={styles.rowInfo}>
+            <ThemedText style={styles.rowTitle}>Martha Smith</ThemedText>
+            <ThemedText style={styles.rowSub}>(555) 123-4567</ThemedText>
+          </View>
+          <IconSymbol name="chevron.right" size={18} color="#9CA3AF" />
+        </TouchableOpacity>
         <View style={{ height: 40 }} />
       </ScrollView>
     </ThemedView>
@@ -168,14 +165,9 @@ export default function FamilyListScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  container: { flex: 1 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -183,127 +175,56 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  backButton: {
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontFamily: 'Archivo_600SemiBold',
-    textAlign: 'center',
-  },
-  headerRight: {
-    width: 40,
-  },
-  content: {
-    padding: 20,
-    paddingTop: 10,
-  },
-  section: {
-    marginBottom: 24,
-  },
+  backButton: { width: 40, justifyContent: 'center', alignItems: 'flex-start' },
+  headerTitle: { fontSize: 18, fontFamily: 'Archivo_600SemiBold', textAlign: 'center' },
+  headerRight: { width: 40 },
+
+  content: { paddingHorizontal: 20, paddingTop: 8 },
+
+  divider: { height: 1, backgroundColor: '#E5E7EB', marginVertical: 4 },
+
   sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    paddingVertical: 14,
   },
-  sectionTitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    fontFamily: 'Archivo_600SemiBold',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  card: {
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-  },
-  cardRow: {
+  sectionTitle: { fontSize: 17, fontFamily: 'Archivo_700Bold' },
+  addLink: { fontSize: 14, fontFamily: 'Archivo_500Medium' },
+
+  row: {
     flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardInfo: {
-    flex: 1,
-    paddingHorizontal: 12,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontFamily: 'Archivo_600SemiBold',
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    fontFamily: 'Archivo_400Regular',
-  },
-  avatarCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontFamily: 'Archivo_700Bold',
-  },
-  initialsCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 1.5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  initialsText: {
-    fontSize: 18,
-    fontFamily: 'Archivo_600SemiBold',
-  },
-  phoneButton: {
-    padding: 8,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E5E7EB',
-    marginVertical: 12,
-  },
-  contactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  contactText: {
-    fontSize: 14,
-    fontFamily: 'Archivo_500Medium',
-  },
-  listContainer: {
+    alignItems: 'flex-start',
+    paddingVertical: 12,
     gap: 12,
-    marginBottom: 16,
   },
-  emptyState: {
+  iconAvatar: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
+  initialsCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: '#9CA3AF',
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    borderStyle: 'dashed',
-    marginBottom: 16,
   },
-  addButton: {
+  initialsText: { fontSize: 15, fontFamily: 'Archivo_600SemiBold' },
+  rowInfo: { flex: 1, gap: 2 },
+  rowTitle: { fontSize: 16, fontFamily: 'Archivo_600SemiBold' },
+  rowSub: { fontSize: 13, color: '#6B7280', fontFamily: 'Archivo_400Regular' },
+
+  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 },
+  tag: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    borderRadius: 12,
-    gap: 8,
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 20,
+    borderWidth: 1,
   },
-  addButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontFamily: 'Archivo_600SemiBold',
-  },
+  tagText: { fontSize: 12, fontFamily: 'Archivo_500Medium' },
+  overflowText: { fontSize: 13, color: '#6B7280', fontFamily: 'Archivo_500Medium', alignSelf: 'center' },
+
+  emptyText: { color: '#9CA3AF', fontSize: 14, paddingBottom: 12 },
 });
