@@ -7,8 +7,6 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useGetChildrenByGuardianId, useGetGuardianById } from '@skillspark/api-client';
 import { Colors } from '@/constants/theme';
-
-// Import abstracted components
 import { ChildListItem } from '@/components/ChildListItem';
 import { SectionHeader } from '@/components/SectionHeader';
 

@@ -3,9 +3,10 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { InterestTags } from './InterestTags';
+import { Child } from '@skillspark/api-client';
 
 type ChildListItemProps = {
-  child: any; // Replace with your specific Child type if available
+  child: Child; 
   onPress?: () => void;
 };
 
