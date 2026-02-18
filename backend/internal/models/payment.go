@@ -26,11 +26,11 @@ type CreateOrgStripeAccountClientOutput struct {
 }
 
 type CreateStripeOnboardingLinkInput struct {
+	OrganizationID uuid.UUID `path:"organization_id" doc:"Organization ID"`
 	Body struct {
-		OrganizationID  uuid.UUID `json:"organization_id" doc:"Account ID for the organization"`
 		RefreshURL string `json:"refresh_url" doc:"URL to redirect if onboarding is exited early"`
 		ReturnURL  string `json:"return_url" doc:"URL to redirect after successful onboarding"`
-	}
+	} `json:"body"`
 }
 
 type CreateStripeOnboardingLinkClientInput struct {

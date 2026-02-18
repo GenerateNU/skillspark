@@ -35,7 +35,7 @@ func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc stripeClient.
 	huma.Register(api, huma.Operation{
 	OperationID:   "create-org-stripe-onboarding-link",
 	Method:        http.MethodPost,
-	Path:          "/api/v1/stripe/onboarding",
+	Path:          "/api/v1/stripe/onboarding/{organization_id}",
 	Summary:       "Creates an onboarding link for a Stripe account",
 	Description:   "Creates an onboarding link for a Stripe account",
 	Tags:          []string{"Payments"},
@@ -46,7 +46,7 @@ func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc stripeClient.
 	huma.Register(api, huma.Operation{
 		OperationID:   "create-org-login-link",
 		Method:        http.MethodPost,
-		Path:          "/api/v1/organizations/{organization_id}/stripe-login",
+		Path:          "/api/v1/stripe/login/{organization_id}",
 		Summary:       "Create Stripe dashboard login link for organization",
 		Description:   "Generates a login link for organization to access their Stripe Express dashboard",
 		Tags:          []string{"Payments"},
