@@ -24,7 +24,7 @@ func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc stripeClient.
 	huma.Register(api, huma.Operation{
 		OperationID:   "create-org-stripe-account",
 		Method:        http.MethodPost,
-		Path:          "/api/v1/stripe/orgaccount",
+		Path:          "/api/v1/stripe/orgaccount/{organization_id}",
 		Summary:       "Create a new Stripe account for an organization",
 		Description:   "Create a new Stripe account for an organization",
 		Tags:          []string{"Payments"},

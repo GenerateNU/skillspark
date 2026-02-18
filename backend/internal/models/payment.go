@@ -8,9 +8,7 @@ import (
 )
 
 type CreateOrgStripeAccountInput struct {
-	Body struct {
-		OrganizationID uuid.UUID `json:"organization_id" doc:"UUID of the existing organization"`
-	}
+	OrganizationID uuid.UUID `path:"organization_id" doc:"UUID of the existing organization"`
 }
 
 type CreateOrgStripeAccountOutput struct {

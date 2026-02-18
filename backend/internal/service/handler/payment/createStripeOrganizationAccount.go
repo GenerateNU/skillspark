@@ -11,7 +11,7 @@ func (h *Handler) CreateOrgStripeAccount(
 	input *models.CreateOrgStripeAccountInput,
 ) (*models.CreateOrgStripeAccountOutput, error) {
 	
-	org, orgErr := h.OrganizationRepository.GetOrganizationByID(ctx, input.Body.OrganizationID)
+	org, orgErr := h.OrganizationRepository.GetOrganizationByID(ctx, input.OrganizationID)
 
 	if orgErr != nil {
 		return nil, orgErr
@@ -21,13 +21,13 @@ func (h *Handler) CreateOrgStripeAccount(
 		return nil, errors.New("Stripe account already exists for this organization.")
 	}
 
-	manager, manErr := h.ManagerRepository.GetManagerByOrgID(ctx, input.Body.OrganizationID)
+	manager, manErr := h.ManagerRepository.GetManagerByOrgID(ctx, input.OrganizationID)
 
 	if manErr != nil {
 		return nil, manErr
 	}
 
-	location, locErr := h.LocationRepository.GetLocationByOrganizationID(ctx, input.Body.OrganizationID)
+	location, locErr := h.LocationRepository.GetLocationByOrganizationID(ctx, input.OrganizationID)
 
 	if locErr != nil {
 		return nil, locErr
@@ -39,7 +39,7 @@ func (h *Handler) CreateOrgStripeAccount(
 		return nil, err
 	}
 
-	updatedOrg, err := h.OrganizationRepository.SetStripeAccountID(ctx, input.Body.OrganizationID, stripeAccount.Body.Account.ID)
+	updatedOrg, err := h.OrganizationRepository.SetStripeAccountID(ctx, input.OrganizationID, stripeAccount.Body.Account.ID)
 
 	if (err != nil) {
 		return nil, err
