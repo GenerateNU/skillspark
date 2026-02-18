@@ -17,7 +17,7 @@ func (h *Handler) CreateOrgLoginLink(
 	}
 	
 	if org.StripeAccountID == nil || *org.StripeAccountID == "" {
-		return nil, errors.New("organization must have stripe account")
+		return nil, errors.New("Organization does not have associated Stripe Account.")
 	}
 	
 	loginURL, err := h.StripeClient.CreateLoginLink(ctx, *org.StripeAccountID)

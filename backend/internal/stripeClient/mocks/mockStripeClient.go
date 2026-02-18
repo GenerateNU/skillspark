@@ -26,7 +26,7 @@ func (m *MockStripeClient) CreateOrganizationAccount(
 
 func (m *MockStripeClient) CreateAccountOnboardingLink(
 	ctx context.Context,
-	input *models.CreateStripeOnboardingLinkInput,
+	input *models.CreateStripeOnboardingLinkClientInput,
 ) (*models.CreateStripeOnboardingLinkOutput, error) {
 	args := m.Called(ctx, input)
 	if args.Get(0) == nil {

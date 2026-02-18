@@ -31,8 +31,8 @@ func TestStripeClient_CreateAccountOnboardingLink(t *testing.T) {
 		require.NotNil(t, account)
 
 		// Create onboarding link
-		input := &models.CreateStripeOnboardingLinkInput{}
-		input.Body.AccountID = account.Body.Account.ID
+		input := &models.CreateStripeOnboardingLinkClientInput{}
+		input.Body.StripeAccountID = account.Body.Account.ID
 		input.Body.RefreshURL = "http://localhost:8080/onboarding/refresh"
 		input.Body.ReturnURL = "http://localhost:8080/onboarding/success"
 
@@ -58,8 +58,8 @@ func TestStripeClient_CreateAccountOnboardingLink(t *testing.T) {
 		require.NoError(t, err)
 
 		// Create onboarding link with different URLs
-		input := &models.CreateStripeOnboardingLinkInput{}
-		input.Body.AccountID = account.Body.Account.ID
+		input := &models.CreateStripeOnboardingLinkClientInput{}
+		input.Body.StripeAccountID = account.Body.Account.ID
 		input.Body.RefreshURL = "https://furever.com/setup/retry"
 		input.Body.ReturnURL = "https://furever.com/dashboard"
 
@@ -79,8 +79,8 @@ func TestStripeClient_CreateAccountOnboardingLink(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		input := &models.CreateStripeOnboardingLinkInput{}
-		input.Body.AccountID = account.Body.Account.ID
+		input := &models.CreateStripeOnboardingLinkClientInput{}
+		input.Body.StripeAccountID = account.Body.Account.ID
 		input.Body.RefreshURL = "http://localhost:8080/refresh"
 		input.Body.ReturnURL = "http://localhost:8080/return"
 
@@ -99,8 +99,8 @@ func TestStripeClient_CreateAccountOnboardingLink(t *testing.T) {
 	})
 
 	t.Run("Fails with invalid account ID", func(t *testing.T) {
-		input := &models.CreateStripeOnboardingLinkInput{}
-		input.Body.AccountID = "acct_invalid123"
+		input := &models.CreateStripeOnboardingLinkClientInput{}
+		input.Body.StripeAccountID = "acct_invalid123"
 		input.Body.RefreshURL = "http://localhost:8080/refresh"
 		input.Body.ReturnURL = "http://localhost:8080/return"
 
@@ -112,8 +112,8 @@ func TestStripeClient_CreateAccountOnboardingLink(t *testing.T) {
 	})
 
 	t.Run("Fails with empty account ID", func(t *testing.T) {
-		input := &models.CreateStripeOnboardingLinkInput{}
-		input.Body.AccountID = ""
+		input := &models.CreateStripeOnboardingLinkClientInput{}
+		input.Body.StripeAccountID = ""
 		input.Body.RefreshURL = "http://localhost:8080/refresh"
 		input.Body.ReturnURL = "http://localhost:8080/return"
 
@@ -133,8 +133,8 @@ func TestStripeClient_CreateAccountOnboardingLink(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		input := &models.CreateStripeOnboardingLinkInput{}
-		input.Body.AccountID = account.Body.Account.ID
+		input := &models.CreateStripeOnboardingLinkClientInput{}
+		input.Body.StripeAccountID = account.Body.Account.ID
 		input.Body.RefreshURL = "not-a-valid-url"
 		input.Body.ReturnURL = "http://localhost:8080/return"
 

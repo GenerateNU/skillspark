@@ -11,11 +11,11 @@ import (
 
 func (sc *StripeClient) CreateAccountOnboardingLink(
     ctx context.Context,
-    input *models.CreateStripeOnboardingLinkInput,
+    input *models.CreateStripeOnboardingLinkClientInput,
 ) (*models.CreateStripeOnboardingLinkOutput, error) {
 	
     params := &stripe.AccountLinkCreateParams{
-        Account:    &input.Body.AccountID,
+        Account:    &input.Body.StripeAccountID,
         RefreshURL: &input.Body.RefreshURL,
         ReturnURL:  &input.Body.ReturnURL,
         Type:       stripe.String("account_onboarding"),

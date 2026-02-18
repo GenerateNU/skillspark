@@ -1,8 +1,6 @@
 package payment
 
 import (
-	"context"
-	"skillspark/internal/models"
 	"skillspark/internal/storage"
 	"skillspark/internal/stripeClient"
 )
@@ -14,10 +12,6 @@ type Handler struct {
 	LocationRepository     storage.LocationRepository
 	GuardianRepository     storage.GuardianRepository
 	StripeClient           stripeClient.StripeClientInterface
-}
-
-func (h *Handler) CreateAccountOnboardingLink(ctx context.Context, input *models.CreateStripeOnboardingLinkInput) (*models.CreateStripeOnboardingLinkOutput, error) {
-	panic("unimplemented")
 }
 
 func NewHandler(
