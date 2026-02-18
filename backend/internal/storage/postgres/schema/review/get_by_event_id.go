@@ -14,7 +14,7 @@ import (
 func (r *ReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
 
 	language = AcceptLanguage
-	baseQuery, err := schema.ReadSQLBaseScript("review/sql/get_by_event_id.sql")
+	baseQuery, err := schema.ReadSQLBaseScript("get_by_event_id.sql", SqlReviewFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

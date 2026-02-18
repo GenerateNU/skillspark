@@ -8,7 +8,7 @@ import (
 )
 
 func (r *EventRepository) CreateEvent(ctx context.Context, event *models.CreateEventDBInput, HeaderImageS3Key *string) (*models.Event, error) {
-	query, err := schema.ReadSQLBaseScript("event/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlEventFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

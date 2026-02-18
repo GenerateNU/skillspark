@@ -8,7 +8,8 @@ import (
 )
 
 func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.CreateReviewDBInput) (*models.Review, error) {
-	query, err := schema.ReadSQLBaseScript("review/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlReviewFiles)
+
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

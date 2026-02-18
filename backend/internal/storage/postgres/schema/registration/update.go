@@ -13,7 +13,7 @@ import (
 )
 
 func (r *RegistrationRepository) UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error) {
-	query, err := schema.ReadSQLBaseScript("registration/sql/update.sql")
+	query, err := schema.ReadSQLBaseScript("update.sql", SqlRegistrationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
@@ -106,7 +106,7 @@ func (r *RegistrationRepository) UpdateRegistration(ctx context.Context, input *
 }
 
 func decreaseEventOccurrenceAttendeeCount(ctx context.Context, eventOccurrenceID uuid.UUID, tx pgx.Tx) error {
-	decrementEventOccurrenceQuery, err := schema.ReadSQLBaseScript("registration/sql/change_event_occurrence_by.sql")
+	decrementEventOccurrenceQuery, err := schema.ReadSQLBaseScript("change_event_occurrence_by.sql", SqlRegistrationFiles)
 	if err != nil {
 		return errs.InternalServerError("Failed to read base query: ", err.Error())
 	}

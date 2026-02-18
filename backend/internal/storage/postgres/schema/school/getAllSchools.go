@@ -12,7 +12,7 @@ import (
 
 func (r *SchoolRepository) GetAllSchools(ctx context.Context, pagination utils.Pagination) ([]models.School, error) {
 	//Get base query
-	query, err := schema.ReadSQLBaseScript("school/sql/get_all_schools.sql")
+	query, err := schema.ReadSQLBaseScript("get_all_schools.sql", SqlSchoolFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

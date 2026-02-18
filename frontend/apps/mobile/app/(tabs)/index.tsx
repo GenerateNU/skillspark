@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { StyleSheet, ActivityIndicator, FlatList, View } from "react-native";
+import { StyleSheet, ActivityIndicator, FlatList, View, Button } from "react-native";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -7,7 +7,8 @@ import { useGetAllEventOccurrences } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 
 function EventOccurrencesList() {
-  const { data: eventOccurrences, isLoading, error } = useGetAllEventOccurrences();
+
+  const { data: response, isLoading, error, status, fetchStatus } = useGetAllEventOccurrences();
 
   if (isLoading) {
     return (
@@ -24,21 +25,33 @@ function EventOccurrencesList() {
         <ThemedText type="defaultSemiBold" style={styles.errorText}>
           Error loading events
         </ThemedText>
-        <ThemedText>{error.detail}</ThemedText>
+        <ThemedText>{error.message || 'An error occurred'}</ThemedText>
+      </ThemedView>
+    );
+  }
+
+  // Response is already an array of EventOccurrence objects
+  const eventOccurrences = response;
+
+  // Check if eventOccurrences exists and is an array
+  if (!eventOccurrences || !Array.isArray(eventOccurrences)) {
+    return (
+      <ThemedView style={styles.centerContainer}>
+        <ThemedText>No events available</ThemedText>
       </ThemedView>
     );
   }
 
   // Filter and sort upcoming events
   const upcomingEvents = eventOccurrences
-    ?.filter(occurrence => {
+    .filter(occurrence => {
       return new Date(occurrence.start_time) >= new Date();
     })
     .sort((a, b) => {
       return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
     });
 
-  if (!upcomingEvents || upcomingEvents.length === 0) {
+  if (upcomingEvents.length === 0) {
     return (
       <ThemedView style={styles.centerContainer}>
         <ThemedText>No upcoming events</ThemedText>
@@ -51,19 +64,19 @@ function EventOccurrencesList() {
       <ThemedText type="subtitle">
         {item.event.title}
       </ThemedText>
-      
+
       {item.event.description && (
         <ThemedText style={styles.eventDescription}>
           {item.event.description}
         </ThemedText>
       )}
-      
+
       {item.location && (
         <ThemedText style={styles.eventDetail}>
-          📍 {item.location.address_line1} {item.location.address_line2 ? `, ${item.location.address_line2}` : ''} {item.location.province}, {item.location.subdistrict} {item.location.postal_code}
+          📍 {item.location.address_line1} {item.location.address_line2 ? `, ${item.location.address_line2}` : ''}, {item.location.subdistrict}, {item.location.district}, {item.location.province} {item.location.postal_code}
         </ThemedText>
       )}
-      
+
       <ThemedText style={styles.eventDetail}>
         🕒 {new Date(item.start_time).toLocaleDateString('en-US', {
           weekday: 'short',
@@ -73,18 +86,18 @@ function EventOccurrencesList() {
           minute: '2-digit',
         })}
       </ThemedText>
-      
+
       <ThemedText style={styles.eventDetail}>
         ⏱️ Ends: {new Date(item.end_time).toLocaleTimeString('en-US', {
           hour: 'numeric',
           minute: '2-digit',
         })}
       </ThemedText>
-      
+
       <ThemedText style={styles.eventDetail}>
         👥 {item.curr_enrolled} / {item.max_attendees} enrolled
       </ThemedText>
-      
+
       {item.language && (
         <ThemedText style={styles.eventDetail}>
           🌐 Language: {item.language}

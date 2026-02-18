@@ -14,7 +14,7 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		return nil, errs.InternalServerError("Failed to begin transaction: ", err.Error())
 	}
 
-	query, err := schema.ReadSQLBaseScript("registration/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlRegistrationFiles)
 	if err != nil {
 		if err := tx.Rollback(ctx); err != nil {
 			slog.Error("Failed to rollback transaction: " + err.Error())
@@ -51,7 +51,7 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		return nil, &errr
 	}
 
-	incrementEventOccurrenceQuery, err := schema.ReadSQLBaseScript("registration/sql/change_event_occurrence_by.sql")
+	incrementEventOccurrenceQuery, err := schema.ReadSQLBaseScript("change_event_occurrence_by.sql", SqlRegistrationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		if err := tx.Rollback(ctx); err != nil {

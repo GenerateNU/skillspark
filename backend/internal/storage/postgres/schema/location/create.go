@@ -8,7 +8,7 @@ import (
 )
 
 func (r *LocationRepository) CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, error) {
-	query, err := schema.ReadSQLBaseScript("location/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlLocationFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
