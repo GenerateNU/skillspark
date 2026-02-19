@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bash ../../../scripts/load-root-env.sh vite",
-    "build": "bash ../../../scripts/load-root-env.sh sh -c 'tsc -b && vite build'",
-    "preview": "bash ../../../scripts/load-root-env.sh vite preview",
+    "dev": "bash ../../scripts/load-root-env.sh vite",
+    "build": "bash ../../scripts/load-root-env.sh sh -c 'tsc -b && vite build'",
+    "preview": "bash ../../scripts/load-root-env.sh vite preview",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext ts,tsx --fix",
