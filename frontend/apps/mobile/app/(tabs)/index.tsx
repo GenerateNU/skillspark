@@ -151,20 +151,7 @@ function EventCard({ item }: { item: EventOccurrence }) {
   const duration = formatDuration(item.start_time, item.end_time);
   const ageLabel = item.event.age_range_min != null
     ? `${item.event.age_range_min}${item.event.age_range_max != null ? `–${item.event.age_range_max}` : ""}+`
-    : null;
-
-  console.log("[EventCard]", JSON.stringify({
-    id: item.id,
-    title: item.event.title,
-    presigned_url: item.event.presigned_url,
-    age_range_min: item.event.age_range_min,
-    age_range_max: item.event.age_range_max,
-    start_time: item.start_time,
-    end_time: item.end_time,
-    curr_enrolled: item.curr_enrolled,
-    max_attendees: item.max_attendees,
-    location: item.location,
-  }, null, 2));
+    : null
 
   return (
     <View style={{ marginHorizontal: 20, marginBottom: 20 }}>
@@ -252,9 +239,6 @@ function EventOccurrencesList() {
       </View>
     );
   }
-
-  console.log("[EventOccurrencesList] total events:", response.length);
-  console.log("[EventOccurrencesList] sample:", JSON.stringify(response[0], null, 2));
 
   const upcomingEvents = response
     .filter((o) => new Date(o.start_time) >= new Date())
