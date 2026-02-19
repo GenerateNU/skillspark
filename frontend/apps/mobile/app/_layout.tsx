@@ -1,6 +1,5 @@
 import { Redirect, router, Stack } from "expo-router";
 import "react-native-reanimated";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export const unstable_settings = {
@@ -17,12 +16,21 @@ const queryClient = new QueryClient({
   },
 });
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  
+const LoginOrHome = () => {
+  const isAuth = false;
+
+  return (
+    <>
+        <Stack/>
+        {!isAuth && <Redirect href="/(auth)/login" />}
+        {isAuth && <Redirect href="/(app)/(tabs)" />}
+    </>
+  );
+}
+
+export default function RootLayout() {  
   return (
       <QueryClientProvider client={queryClient}>
-        <StatusBar />
         <LoginOrHome />
       </QueryClientProvider>
   );

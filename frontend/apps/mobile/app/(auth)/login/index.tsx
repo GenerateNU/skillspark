@@ -1,51 +1,41 @@
-import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useState } from "react";
 import { Button, StyleSheet, TextInput } from "react-native";
 
 export default function LoginScreen() {
-  return (
+  const [emailText, setEmailText] = useState("");
+  const [passwordText, setPasswordText] = useState("");
   
+  return (
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Log In</ThemedText>
           <TextInput
           placeholder="Email"
+          onChangeText={setEmailText}
+          value={emailText}
+          keyboardType="email-address"
           />
           <TextInput
           placeholder="Password"
+          onChangeText={setPasswordText}
+          value={passwordText}
+          keyboardType="default"
+          secureTextEntry={true}
           />
           <Button
             title={"Log In"}
-            onPress={() => console.log("smth")}
+            onPress={() => console.log(emailText + "\n" + passwordText)}
           />
         </ThemedView>
      );
 }
 
 const styles = StyleSheet.create({
-    headerImage: {
-    color: "#FFFFFF",
-    bottom: -90,
-    left: -35,
-    position: "absolute",
-  },
   titleContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 16,
-  },
-  centerContainer: {
-    padding: 16,
-    alignItems: "center",
-    gap: 8,
-  },
-  separator: {
-    height: 12,
   },
   errorText: {
     color: '#ff4444',

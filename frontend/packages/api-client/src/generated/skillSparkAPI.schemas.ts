@@ -218,6 +218,7 @@ export interface ErrorDetail {
 }
 
 export interface ErrorModel {
+  message: string;
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   /** A human-readable explanation specific to this occurrence of the problem. */
