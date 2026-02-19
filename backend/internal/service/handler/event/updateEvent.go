@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/s3_client"
 )
@@ -13,7 +14,8 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 
 	translationResp, err := h.CallTranslateAPI(ctx, input.Body.Title, input.Body.Description)
 	if err != nil {
-		return nil, err
+		e := errs.InternalServerError("Invalid registration_id: registration does not exist", err.Error())
+		return nil, e
 	}
 
 	updateInput := h.UpdateTranslateStruct(ctx, input, translationResp.Title_TH, translationResp.Description_TH)
@@ -22,13 +24,15 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 		var err error
 		url, key, err = h.UpdateEventS3Helper(ctx, s3Client, input, image_data)
 		if err != nil {
-			return nil, err
+			e := errs.InternalServerError("Invalid registration_id: registration does not exist", err.Error())
+			return nil, e
 		}
 	}
 
 	event, err := h.EventRepository.UpdateEvent(ctx, updateInput, key)
 	if err != nil {
-		return nil, err
+		e := errs.InternalServerError("Invalid registration_id: registration does not exist", err.Error())
+		return nil, e
 	}
 
 	event.PresignedURL = url
