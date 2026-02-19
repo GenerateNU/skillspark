@@ -7,4 +7,5 @@ type Config struct {
 	Supabase    Supabase
 	TestMode    bool
 	S3          S3
+	SQS         SQS
 }
