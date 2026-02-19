@@ -33,6 +33,24 @@ func SetupGuardiansRoutes(api huma.API, repo *storage.Repository, sc stripeClien
 	})
 
 	huma.Register(api, huma.Operation{
+		OperationID: "post-guardian",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/guardians",
+		Summary:     "Create a new guardian",
+		Description: "Creates a new guardian",
+		Tags:        []string{"Guardians"},
+	}, func(ctx context.Context, input *models.CreateGuardianInput) (*models.CreateGuardianOutput, error) {
+		guardian, err := guardianHandler.CreateGuardian(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.CreateGuardianOutput{
+			Body: guardian,
+		}, nil
+	})
+
+	huma.Register(api, huma.Operation{
 		OperationID: "delete-guardian",
 		Method:      http.MethodDelete,
 		Path:        "/api/v1/guardians/{id}",

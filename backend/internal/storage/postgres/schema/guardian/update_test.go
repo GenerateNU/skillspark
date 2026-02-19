@@ -87,7 +87,8 @@ func TestGuardianRepository_Update_DoesNotModifyStripeCustomerID(t *testing.T) {
 	guardian := CreateTestGuardian(t, ctx, testDB)
 	stripeCustomerID := "cus_test123"
 	
-	repo.SetStripeCustomerID(ctx, guardian.ID, stripeCustomerID)
+	_, err := repo.SetStripeCustomerID(ctx, guardian.ID, stripeCustomerID)
+	assert.NoError(t, err)
 
 	updateInput := &models.UpdateGuardianInput{}
 	updateInput.ID = guardian.ID
@@ -95,7 +96,11 @@ func TestGuardianRepository_Update_DoesNotModifyStripeCustomerID(t *testing.T) {
 
 	updated, err := repo.UpdateGuardian(ctx, updateInput)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
+	assert.NotNil(t, updated)
 	assert.Equal(t, "Updated Name", updated.Name)
-	assert.Equal(t, stripeCustomerID, *updated.StripeCustomerID)
+	assert.NotNil(t, updated.StripeCustomerID, "StripeCustomerID should not be nil")
+	if updated.StripeCustomerID != nil {
+		assert.Equal(t, stripeCustomerID, *updated.StripeCustomerID)
+	}
 }

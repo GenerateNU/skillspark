@@ -1,7 +1,3 @@
-WITH delete_payment_methods AS (
-    DELETE FROM guardian_payment_methods
-    WHERE guardian_id = $1
-)
 UPDATE guardian
 SET 
     stripe_customer_id = $2,

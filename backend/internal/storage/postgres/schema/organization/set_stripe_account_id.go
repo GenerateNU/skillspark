@@ -10,7 +10,7 @@ import (
 )
 
 func (r *OrganizationRepository) SetStripeAccountID(ctx context.Context, orgID uuid.UUID, stripeAccountID string) (*models.Organization, error) {
-	query, err := schema.ReadSQLBaseScript("organization/sql/set_stripe_account_id.sql", SqlOrganizationFiles)
+	query, err := schema.ReadSQLBaseScript("set_stripe_account_id.sql", SqlOrganizationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

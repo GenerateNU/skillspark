@@ -12,7 +12,7 @@ import (
 )
 
 func (r *LocationRepository) GetLocationByOrganizationID(ctx context.Context, orgID uuid.UUID) (*models.Location, error) {
-	query, err := schema.ReadSQLBaseScript("location/sql/get_by_organization_id.sql", SqlLocationFiles)
+	query, err := schema.ReadSQLBaseScript("get_by_organization_id.sql", SqlLocationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

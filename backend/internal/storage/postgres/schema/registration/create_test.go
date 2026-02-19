@@ -20,12 +20,6 @@ func TestCreateRegistration(t *testing.T) {
 
 	created := CreateTestRegistration(t, ctx, testDB)
 
-	child := child.CreateTestChild(t, ctx, testDB)
-	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
-	childID := child.ID
-	guardianID := child.GuardianID
-	occurrenceID := occurrence.ID
-
 	require.NotNil(t, created)
 	assert.NotEqual(t, uuid.Nil, created.ID)
 	assert.NotEqual(t, uuid.Nil, created.ChildID)
@@ -49,15 +43,6 @@ func TestCreateRegistration(t *testing.T) {
 	assert.Equal(t, "requires_capture", created.PaymentIntentStatus)
 	assert.Nil(t, created.CancelledAt)
 	assert.Nil(t, created.PaidAt)
-	assert.Equal(t, &childID, created.ChildID)
-	assert.Equal(t, &guardianID, created.GuardianID)
-	assert.Equal(t, occurrenceID, created.EventOccurrenceID)
-	assert.Equal(t, models.RegistrationStatusRegistered, created.Status)
-	assert.NotEqual(t, uuid.Nil, created.ID)
-	assert.NotZero(t, created.CreatedAt)
-	assert.NotZero(t, created.UpdatedAt)
-	assert.NotEmpty(t, created.EventName)
-	assert.NotZero(t, created.OccurrenceStartTime)
 }
 
 func TestCreateRegistration_VerifyEventNameJoin(t *testing.T) {

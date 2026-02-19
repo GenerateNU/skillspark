@@ -68,9 +68,9 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 				"email":               "john@example.com",
 				"username":            "johndoe",
 				"language_preference": "en",
+				"auth_id":             uuid.New().String(),  // Add this
 			},
 			mockSetup: func(m *repomocks.MockGuardianRepository, mm *repomocks.MockManagerRepository) {
-
 				m.On("GetGuardianByUserID", mock.Anything, mock.Anything).Return(nil, nil).Maybe()
 				m.On(
 					"CreateGuardian",
@@ -85,6 +85,7 @@ func TestHumaValidation_CreateGuardian(t *testing.T) {
 					Email:              "john@example.com",
 					Username:           "johndoe",
 					LanguagePreference: "en",
+					AuthID:             uuid.New(),  // Add this
 					CreatedAt:          time.Now(),
 					UpdatedAt:          time.Now(),
 				}, nil)
@@ -302,6 +303,7 @@ func TestHumaValidation_DeleteGuardian(t *testing.T) {
 					"DeleteGuardian",
 					mock.Anything,
 					uuid.MustParse(guardianID),
+					mock.Anything,
 				).Return(&models.Guardian{
 					ID: uuid.MustParse(guardianID),
 					UserID: uuid.MustParse(userID),
@@ -342,6 +344,73 @@ func TestHumaValidation_DeleteGuardian(t *testing.T) {
 			req, err := http.NewRequest(
 				http.MethodDelete,
 				"/api/v1/guardians/"+tt.guardianID,
+				nil,
+			)
+			assert.NoError(t, err)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHumaValidation_GetGuardianByChildID(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		childID    string
+		mockSetup  func(*repomocks.MockGuardianRepository)
+		statusCode int
+	}{
+		{
+			name:    "valid UUID",
+			childID: "30000000-0000-0000-0000-000000000001",
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
+				m.On(
+					"GetGuardianByChildID",
+					mock.Anything,
+					uuid.MustParse("30000000-0000-0000-0000-000000000001"),
+				).Return(&models.Guardian{
+					ID:                 uuid.New(),
+					UserID:             uuid.New(),
+					Name:               "Parent Name",
+					Email:              "parent@example.com",
+					Username:           "parentuser",
+					LanguagePreference: "en",
+					CreatedAt:          time.Now(),
+					UpdatedAt:          time.Now(),
+				}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:       "invalid UUID",
+			childID:    "not-a-uuid",
+			mockSetup:  func(*repomocks.MockGuardianRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockGuardianRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
+			tt.mockSetup(mockRepo)
+
+			app, _ := setupGuardianTestAPI(mockRepo, mockManagerRepo, mockStripeClient)
+
+			req, err := http.NewRequest(
+				http.MethodGet,
+				"/api/v1/guardians/child/"+tt.childID,
 				nil,
 			)
 			assert.NoError(t, err)

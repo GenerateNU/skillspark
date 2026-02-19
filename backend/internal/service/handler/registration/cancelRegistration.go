@@ -8,6 +8,7 @@ import (
 
 func (h *Handler) CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error) {
 	
+	
 
 	getInput := &models.GetRegistrationByIDInput{
 		ID: input.ID,

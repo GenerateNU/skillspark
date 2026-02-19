@@ -20,6 +20,6 @@ deleted_user AS (
     WHERE id = (SELECT user_id FROM deleted_guardian)
     RETURNING id, name, email, username, profile_picture_s3_key, language_preference, auth_id
 )
-SELECT dg.id, dg.user_id, du.name, du.email, du.username, du.profile_picture_s3_key, du.language_preference, , du.auth_id, dg.stripe_customer_id, dg.created_at, dg.updated_at
+SELECT dg.id, dg.user_id, du.name, du.email, du.username, du.profile_picture_s3_key, du.language_preference, du.auth_id, dg.stripe_customer_id, dg.created_at, dg.updated_at
 FROM deleted_guardian dg
 JOIN deleted_user du ON dg.user_id = du.id;

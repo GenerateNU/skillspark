@@ -16,7 +16,7 @@ func (r *GuardianRepository) SetStripeCustomerID(
 	guardianID uuid.UUID,
 	stripeCustomerID string,
 ) (*models.Guardian, error) {
-	query, err := schema.ReadSQLBaseScript("guardian/sql/set_stripe_customer_id.sql", SqlGuardianFiles)
+	query, err := schema.ReadSQLBaseScript("set_stripe_customer_id.sql", SqlGuardianFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

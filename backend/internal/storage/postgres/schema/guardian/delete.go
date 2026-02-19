@@ -12,7 +12,6 @@ import (
 )
 
 func (r *GuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error) {
-	tx, err := r.db.Begin(ctx)
 	query, err := schema.ReadSQLBaseScript("delete.sql", SqlGuardianFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
