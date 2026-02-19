@@ -14,7 +14,7 @@
         "NSLocationWhenInUseUsageDescription": "SkillSpark needs your location to show events and activities near you."
       },
       "config": {},
-      "bundleIdentifier": "com.adescoteaux.SkillSpark"
+      "bundleIdentifier": "com.skillspark.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +26,7 @@
       "config": {
         "googleMaps": {}
       },
-      "package": "com.adescoteaux.SkillSpark"
+      "package": "com.skillspark.app"
     },
     "plugins": [
       "expo-router",
