@@ -34,7 +34,7 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 			Page:  page,
 			Limit: limit,
 		}
-		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination)
+		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination, input.AcceptLanguage)
 		if err != nil {
 			return nil, err
 		}

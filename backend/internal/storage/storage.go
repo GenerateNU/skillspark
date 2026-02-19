@@ -67,7 +67,7 @@ type EventRepository interface {
 	CreateEvent(ctx context.Context, location *models.CreateEventDBInput, HeaderImageS3Key *string) (*models.Event, error)
 	UpdateEvent(ctx context.Context, location *models.UpdateEventDBInput, HeaderImageS3Key *string) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
-	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
+	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID, AcceptLanguage string) ([]models.EventOccurrence, error)
 	GetEventByID(ctx context.Context, id uuid.UUID) (*models.Event, error)
 }
 
@@ -80,8 +80,8 @@ type ChildRepository interface {
 }
 
 type EventOccurrenceRepository interface {
-	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination) ([]models.EventOccurrence, error)
-	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error)
+	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string) ([]models.EventOccurrence, error)
+	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.EventOccurrence, error)
 	CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error)
 	UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput, tx *pgx.Tx) (*models.EventOccurrence, error)
 	CancelEventOccurrence(ctx context.Context, id uuid.UUID) error

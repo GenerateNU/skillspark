@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"skillspark/internal/models"
@@ -38,7 +39,8 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 		}
 
 		eventModel := models.CreateEventInput{
-			Body: eventBody,
+			AcceptLanguage: input.AcceptLanguage,
+			Body:           eventBody,
 		}
 
 		updateBody := models.UpdateEventBody{
@@ -88,9 +90,11 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 			Category:       &formData.Category,
 		}
 
+		fmt.Println(input.AcceptLanguage)
 		eventModel := models.UpdateEventInput{
-			ID:   input.ID,
-			Body: eventBody,
+			AcceptLanguage: input.AcceptLanguage,
+			ID:             input.ID,
+			Body:           eventBody,
 		}
 
 		image_data, err := io.ReadAll(formData.HeaderImage)

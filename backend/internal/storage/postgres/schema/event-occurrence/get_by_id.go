@@ -11,7 +11,8 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error) {
+func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.EventOccurrence, error) {
+	language = AcceptLanguage
 	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -65,9 +66,13 @@ func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, 
 		&eventOccurrence.Location.UpdatedAt,
 	)
 
-	// Default to English
-	eventOccurrence.Event.Title = titleEN
-	eventOccurrence.Event.Description = descriptionEN
+	if language == "th" {
+		eventOccurrence.Event.Title = *titleTH
+		eventOccurrence.Event.Description = *descriptionTH
+	} else {
+		eventOccurrence.Event.Title = titleEN
+		eventOccurrence.Event.Description = descriptionEN
+	}
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

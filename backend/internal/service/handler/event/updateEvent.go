@@ -18,7 +18,7 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 		return nil, e
 	}
 
-	updateInput := h.UpdateTranslateStruct(ctx, input, translationResp.Title_TH, translationResp.Description_TH)
+	updateInput := h.UpdateTranslateStruct(ctx, input, translationResp.TranslatedTitle, translationResp.TranslatedDescription)
 
 	if image_data != nil {
 		var err error

@@ -75,7 +75,7 @@ func (h *Handler) TranslationHelper(ctx context.Context, event *models.Event, up
 	if err != nil {
 		return nil, err
 	}
-	translationsReinsertion := h.UpdateTranslateStruct(ctx, updateInput, translationResp.Title_TH, translationResp.Description_TH)
+	translationsReinsertion := h.UpdateTranslateStruct(ctx, updateInput, translationResp.TranslatedTitle, translationResp.TranslatedDescription)
 	_, err = h.EventRepository.UpdateEvent(ctx, translationsReinsertion, nil)
 	if err != nil {
 		return nil, err

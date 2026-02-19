@@ -39,8 +39,8 @@ func (m *MockEventRepository) DeleteEvent(ctx context.Context, id uuid.UUID) err
 	return args.Error(0)
 }
 
-func (m *MockEventRepository) GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error) {
-	args := m.Called(ctx, event_id)
+func (m *MockEventRepository) GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID, AcceptLanguage string) ([]models.EventOccurrence, error) {
+	args := m.Called(ctx, event_id, AcceptLanguage)
 	eventOccurrences := args.Get(0)
 	if eventOccurrences == nil {
 		if args.Get(1) == nil {

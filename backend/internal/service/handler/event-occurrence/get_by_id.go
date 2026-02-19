@@ -14,7 +14,7 @@ func (h *Handler) GetEventOccurrenceByID(ctx context.Context, input *models.GetE
 		return nil, errs.BadRequest("Invalid ID format")
 	}
 
-	eventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, id)
+	eventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, id, input.AcceptLanguage)
 	if err != nil {
 		return nil, err
 	}

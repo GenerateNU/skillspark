@@ -32,8 +32,9 @@ type EventOccurrence struct {
 
 // get all
 type GetAllEventOccurrencesInput struct {
-	Page  int `query:"page" minimum:"1" default:"1"`
-	Limit int `query:"limit" minimum:"1" maximum:"100" default:"100"`
+	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	Page           int    `query:"page" minimum:"1" default:"1"`
+	Limit          int    `query:"limit" minimum:"1" maximum:"100" default:"100"`
 }
 
 type GetAllEventOccurrencesOutput struct {
@@ -42,7 +43,8 @@ type GetAllEventOccurrencesOutput struct {
 
 // get by event occurrence id
 type GetEventOccurrenceByIDInput struct {
-	ID uuid.UUID `path:"id" doc:"ID of an event occurrence"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	ID             uuid.UUID `path:"id" doc:"ID of an event occurrence"`
 }
 
 type GetEventOccurrenceByIDOutput struct {
@@ -51,7 +53,8 @@ type GetEventOccurrenceByIDOutput struct {
 
 // post
 type CreateEventOccurrenceInput struct {
-	Body struct {
+	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	Body           struct {
 		ManagerId    *uuid.UUID `json:"manager_id,omitempty" doc:"ID of a manager in the database"`
 		EventId      uuid.UUID  `json:"event_id" doc:"ID of an event in the database"`
 		LocationId   uuid.UUID  `json:"location_id" doc:"ID of a location in the database"`
@@ -68,8 +71,9 @@ type CreateEventOccurrenceOutput struct {
 
 // patch
 type UpdateEventOccurrenceInput struct {
-	ID   uuid.UUID                      `path:"id" doc:"ID of the event occurrence to update"`
-	Body UpdateEventOccurrenceInputBody `json:"body" doc:"Event occurrence fields to update"`
+	AcceptLanguage string                         `header:"Accept-Language" default:"en-US"`
+	ID             uuid.UUID                      `path:"id" doc:"ID of the event occurrence to update"`
+	Body           UpdateEventOccurrenceInputBody `json:"body" doc:"Event occurrence fields to update"`
 }
 
 type UpdateEventOccurrenceInputBody struct {
