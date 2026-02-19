@@ -24,5 +24,13 @@ func (r *EventRepository) CreateEvent(ctx context.Context, event *models.CreateE
 		return nil, &err
 	}
 
+	if event.AcceptLanguage == "th" {
+		createdEvent.Title = *event.Body.Title_TH
+		createdEvent.Description = *event.Body.Description_TH
+	} else {
+		createdEvent.Title = event.Body.Title_EN
+		createdEvent.Description = event.Body.Description_EN
+	}
+
 	return &createdEvent, nil
 }

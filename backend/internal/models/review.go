@@ -25,7 +25,8 @@ type CreateReviewDBBody struct {
 }
 
 type CreateReviewDBInput struct {
-	Body CreateReviewDBBody
+	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	Body           CreateReviewDBBody
 }
 
 type GetReviewInput struct {
@@ -40,7 +41,8 @@ type GetReviewInput struct {
 }
 
 type CreateReviewInput struct {
-	Body struct {
+	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	Body           struct {
 		RegistrationID uuid.UUID `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
 		GuardianID     uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian"`
 		Description    string    `json:"description" db:"description" doc:"The review text"`

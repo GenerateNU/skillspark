@@ -12,7 +12,7 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 	var key *string
 	var url *string
 
-	translationResp, err := h.CallTranslateAPI(ctx, input.Body.Title, input.Body.Description)
+	translationResp, err := h.CallTranslateAPI(ctx, input.Body.Title, input.Body.Description, input.AcceptLanguage)
 	if err != nil {
 		e := errs.InternalServerError("Invalid registration_id: registration does not exist", err.Error())
 		return nil, e

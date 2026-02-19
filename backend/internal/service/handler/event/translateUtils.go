@@ -12,8 +12,9 @@ type EventTranslationResponse struct {
 	Description_TH *string `json:"description_th"`
 }
 
-func (h *Handler) CallTranslateAPI(ctx context.Context, title_en *string, description_en *string) (*EventTranslationResponse, error) {
-
+func (h *Handler) CallTranslateAPI(ctx context.Context, title *string, description *string, AcceptLanguage string) (*EventTranslationResponse, error) {
+	var sl string
+	var dl string
 	deref := func(s *string) string {
 		if s == nil {
 			return ""
@@ -21,16 +22,25 @@ func (h *Handler) CallTranslateAPI(ctx context.Context, title_en *string, descri
 		return *s
 	}
 
-	title := deref(title_en)
-	description := deref(description_en)
+	title_t := deref(title)
+	description_t := deref(description)
 
-	if title == "" && description == "" {
+	if title_t == "" && description_t == "" {
 		err := fmt.Errorf("no title or description provided")
 		return nil, err
 	}
 
-	translationString := title + "|*|" + description
-	response, err := h.TranslateClient.GetTranslation(ctx, translationString)
+	if AcceptLanguage == "th" {
+		sl = "th"
+		dl = "en"
+	} else {
+		sl = "en"
+		dl = "th"
+	}
+
+	translationString := title_t + "|*|" + description_t
+
+	response, err := h.TranslateClient.GetTranslation(ctx, translationString, sl, dl)
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +64,7 @@ func (h *Handler) CreateTranslateStruct(ctx context.Context, event *models.Creat
 	eventBody := event.Body
 
 	dbInitInput := &models.CreateEventDBInput{
+		AcceptLanguage: event.AcceptLanguage,
 		Body: models.CreateDBBody{
 			Title_EN:       eventBody.Title,
 			Title_TH:       title_th,
@@ -74,7 +85,8 @@ func (h *Handler) UpdateTranslateStruct(ctx context.Context, event *models.Updat
 	eventBody := event.Body
 
 	dbInitInput := &models.UpdateEventDBInput{
-		ID: event.ID,
+		AcceptLanguage: event.AcceptLanguage,
+		ID:             event.ID,
 		Body: models.UpdateDBBody{
 			Title_EN:       eventBody.Title,
 			Title_TH:       title_th,

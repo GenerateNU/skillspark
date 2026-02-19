@@ -5,5 +5,5 @@ import (
 )
 
 type TranslationInterface interface {
-	GetTranslation(ctx context.Context, input string) (*string, error)
+	GetTranslation(ctx context.Context, input string, sl string, dl string) (*string, error)
 }

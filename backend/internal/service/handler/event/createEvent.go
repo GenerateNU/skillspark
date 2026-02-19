@@ -19,8 +19,9 @@ func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInpu
 	}
 
 	updateInput := &models.UpdateEventInput{
-		ID:   event.ID,
-		Body: *updateBody,
+		AcceptLanguage: input.AcceptLanguage,
+		ID:             event.ID,
+		Body:           *updateBody,
 	}
 
 	translationsReinsertion, err := h.TranslationHelper(ctx, event, updateInput)
@@ -70,7 +71,7 @@ func (h *Handler) CreateEventS3Helper(ctx context.Context, s3Client s3_client.S3
 }
 
 func (h *Handler) TranslationHelper(ctx context.Context, event *models.Event, updateInput *models.UpdateEventInput) (*models.UpdateEventDBInput, error) {
-	translationResp, err := h.CallTranslateAPI(ctx, &event.Title, &event.Description)
+	translationResp, err := h.CallTranslateAPI(ctx, &event.Title, &event.Description, updateInput.AcceptLanguage)
 	if err != nil {
 		return nil, err
 	}

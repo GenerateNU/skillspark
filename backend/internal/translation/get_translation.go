@@ -7,18 +7,22 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 type TranslateResponse struct {
 	DestinationText string `json:"destination-text"`
 }
 
-func (t *TranslateClient) GetTranslation(ctx context.Context, input string) (*string, error) {
+func (t *TranslateClient) GetTranslation(ctx context.Context, input string, sl string, dl string) (*string, error) {
 	var result TranslateResponse
 
 	encodedInput := url.QueryEscape(input)
 	apiUrl := os.Getenv("TRANSLATIONS_API_URL")
-	url := apiUrl + encodedInput
+
+	params := []string{"sl=", sl, "&dl=", dl, "&text="}
+	paramSpecs := strings.Join(params, "")
+	url := apiUrl + paramSpecs + encodedInput
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

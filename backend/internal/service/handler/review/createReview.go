@@ -8,7 +8,7 @@ import (
 
 func (h *Handler) CreateReview(ctx context.Context, input *models.CreateReviewInput) (*models.CreateReviewOutput, *errs.HTTPError) {
 
-	description, err := h.CallTranslateAPI(ctx, &input.Body.Description)
+	description, err := h.CallTranslateAPI(ctx, &input.Body.Description, input.AcceptLanguage)
 	if err != nil {
 		e := errs.BadRequest("Invalid registration_id: registration does not exist")
 		return nil, &e

@@ -45,23 +45,27 @@ type UpdateDBBody struct {
 }
 
 type CreateEventDBInput struct {
-	Body CreateDBBody
+	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	Body           CreateDBBody
 }
 
 type UpdateEventDBInput struct {
-	ID   uuid.UUID `path:"id"`
-	Body UpdateDBBody
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	ID             uuid.UUID `path:"id"`
+	Body           UpdateDBBody
 }
 
 // ----------------------------
 
 type CreateEventInput struct {
-	Body CreateEventBody
+	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	Body           CreateEventBody
 }
 
 // CreateEventRouteInput is the multipart form input for creating an event with an image
 type CreateEventRouteInput struct {
-	RawBody huma.MultipartFormFiles[CreateEventFormData]
+	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	RawBody        huma.MultipartFormFiles[CreateEventFormData]
 }
 
 // CreateEventFormData holds the parsed form data for creating an event
@@ -91,8 +95,9 @@ type CreateEventOutput struct {
 }
 
 type UpdateEventRouteInput struct {
-	ID      uuid.UUID `path:"id"`
-	RawBody huma.MultipartFormFiles[UpdateEventFormData]
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	ID             uuid.UUID `path:"id"`
+	RawBody        huma.MultipartFormFiles[UpdateEventFormData]
 }
 
 type CreateEventBody struct {
@@ -114,8 +119,9 @@ type UpdateEventBody struct {
 }
 
 type UpdateEventInput struct {
-	ID   uuid.UUID `path:"id"`
-	Body UpdateEventBody
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	ID             uuid.UUID `path:"id"`
+	Body           UpdateEventBody
 }
 
 type UpdateEventOutput struct {
