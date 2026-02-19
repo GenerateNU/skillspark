@@ -5,7 +5,10 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,8 +21,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   CreateEventBody,
@@ -27,644 +30,448 @@ import type {
   ErrorModel,
   Event,
   EventOccurrence,
-  UpdateEventBody,
-} from "../skillSparkAPI.schemas";
+  UpdateEventBody
+} from '../skillSparkAPI.schemas';
 
-import { customInstance } from "../../apiClient";
+import { customInstance } from '../../apiClient';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
 export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
-export type HTTPStatusCode4xx =
-  | 400
-  | 401
-  | 402
-  | 403
-  | 404
-  | 405
-  | 406
-  | 407
-  | 408
-  | 409
-  | 410
-  | 411
-  | 412
-  | 413
-  | 414
-  | 415
-  | 416
-  | 417
-  | 418
-  | 419
-  | 420
-  | 421
-  | 422
-  | 423
-  | 424
-  | 426
-  | 428
-  | 429
-  | 431
-  | 451;
+export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 419 | 420 | 421 | 422 | 423 | 424 | 426 | 428 | 429 | 431 | 451;
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
-export type HTTPStatusCodes =
-  | HTTPStatusCode1xx
-  | HTTPStatusCode2xx
-  | HTTPStatusCode3xx
-  | HTTPStatusCode4xx
-  | HTTPStatusCode5xx;
+export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
+
 
 /**
  * Creates a new event
  * @summary Create a new event
  */
 export type createEventResponse200 = {
-  data: Event;
-  status: 200;
-};
+  data: Event
+  status: 200
+}
 
 export type createEventResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
 
-export type createEventResponseSuccess = createEventResponse200 & {
+export type createEventResponseSuccess = (createEventResponse200) & {
   headers: Headers;
 };
-export type createEventResponseError = createEventResponseDefault & {
+export type createEventResponseError = (createEventResponseDefault) & {
   headers: Headers;
 };
 
-export type createEventResponse =
-  | createEventResponseSuccess
-  | createEventResponseError;
+export type createEventResponse = (createEventResponseSuccess | createEventResponseError)
 
 export const getCreateEventUrl = () => {
-  return `/api/v1/events`;
-};
 
-export const createEvent = async (
-  createEventBody: CreateEventBody,
-  options?: RequestInit,
-): Promise<createEventResponse> => {
-  const formData = new FormData();
-  if (createEventBody.age_range_max !== undefined) {
-    formData.append(`age_range_max`, createEventBody.age_range_max.toString());
-  }
-  if (createEventBody.age_range_min !== undefined) {
-    formData.append(`age_range_min`, createEventBody.age_range_min.toString());
-  }
-  if (createEventBody.category !== undefined) {
-    createEventBody.category.forEach((value) =>
-      formData.append(`category`, value),
-    );
-  }
-  formData.append(
-    `description`,
-    createEventBody.description instanceof Blob
-      ? createEventBody.description
-      : new Blob([createEventBody.description], { type: "text/plain" }),
-  );
-  if (createEventBody.header_image !== undefined) {
-    formData.append(`header_image`, createEventBody.header_image);
-  }
-  formData.append(
-    `organization_id`,
-    createEventBody.organization_id instanceof Blob
-      ? createEventBody.organization_id
-      : new Blob([createEventBody.organization_id], { type: "text/plain" }),
-  );
-  formData.append(
-    `title`,
-    createEventBody.title instanceof Blob
-      ? createEventBody.title
-      : new Blob([createEventBody.title], { type: "text/plain" }),
-  );
 
-  return customInstance<createEventResponse>(getCreateEventUrl(), {
+  
+
+  return `/api/v1/events`
+}
+
+export const createEvent = async (createEventBody: CreateEventBody, options?: RequestInit): Promise<createEventResponse> => {
+    const formData = new FormData();
+if(createEventBody.age_range_max !== undefined) {
+ formData.append(`age_range_max`, createEventBody.age_range_max.toString())
+ }
+if(createEventBody.age_range_min !== undefined) {
+ formData.append(`age_range_min`, createEventBody.age_range_min.toString())
+ }
+if(createEventBody.category !== undefined) {
+ createEventBody.category.forEach(value => formData.append(`category`, value));
+ }
+formData.append(`description`, createEventBody.description instanceof Blob ? createEventBody.description : new Blob([createEventBody.description], { type: 'text/plain' }));
+if(createEventBody.header_image !== undefined) {
+ formData.append(`header_image`, createEventBody.header_image);
+ }
+formData.append(`organization_id`, createEventBody.organization_id instanceof Blob ? createEventBody.organization_id : new Blob([createEventBody.organization_id], { type: 'text/plain' }));
+formData.append(`title`, createEventBody.title instanceof Blob ? createEventBody.title : new Blob([createEventBody.title], { type: 'text/plain' }));
+
+  return customInstance<createEventResponse>(getCreateEventUrl(),
+  {      
     ...options,
-    method: "POST",
-    body: formData,
-  });
-};
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
 
-export const getCreateEventMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createEvent>>,
-    TError,
-    { data: CreateEventBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createEvent>>,
-  TError,
-  { data: CreateEventBody },
-  TContext
-> => {
-  const mutationKey = ["createEvent"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createEvent>>,
-    { data: CreateEventBody }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return createEvent(data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getCreateEventMutationOptions = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError,{data: CreateEventBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError,{data: CreateEventBody}, TContext> => {
 
-export type CreateEventMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createEvent>>
->;
-export type CreateEventMutationBody = CreateEventBody;
-export type CreateEventMutationError = ErrorModel;
+const mutationKey = ['createEvent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createEvent>>, {data: CreateEventBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createEvent(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateEventMutationResult = NonNullable<Awaited<ReturnType<typeof createEvent>>>
+    export type CreateEventMutationBody = CreateEventBody
+    export type CreateEventMutationError = ErrorModel
+
+    /**
  * @summary Create a new event
  */
-export const useCreateEvent = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createEvent>>,
-      TError,
-      { data: CreateEventBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createEvent>>,
-  TError,
-  { data: CreateEventBody },
-  TContext
-> => {
-  return useMutation(getCreateEventMutationOptions(options), queryClient);
-};
-/**
+export const useCreateEvent = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError,{data: CreateEventBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createEvent>>,
+        TError,
+        {data: CreateEventBody},
+        TContext
+      > => {
+      return useMutation(getCreateEventMutationOptions(options), queryClient);
+    }
+    /**
  * Returns event occurrences that match the event ID
  * @summary Get event occurrences by event ID
  */
 export type getEventOccurrencesByEventIdResponse200 = {
-  data: EventOccurrence[];
-  status: 200;
-};
+  data: EventOccurrence[]
+  status: 200
+}
 
 export type getEventOccurrencesByEventIdResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type getEventOccurrencesByEventIdResponseSuccess = (getEventOccurrencesByEventIdResponse200) & {
+  headers: Headers;
+};
+export type getEventOccurrencesByEventIdResponseError = (getEventOccurrencesByEventIdResponseDefault) & {
+  headers: Headers;
 };
 
-export type getEventOccurrencesByEventIdResponseSuccess =
-  getEventOccurrencesByEventIdResponse200 & {
-    headers: Headers;
-  };
-export type getEventOccurrencesByEventIdResponseError =
-  getEventOccurrencesByEventIdResponseDefault & {
-    headers: Headers;
-  };
+export type getEventOccurrencesByEventIdResponse = (getEventOccurrencesByEventIdResponseSuccess | getEventOccurrencesByEventIdResponseError)
 
-export type getEventOccurrencesByEventIdResponse =
-  | getEventOccurrencesByEventIdResponseSuccess
-  | getEventOccurrencesByEventIdResponseError;
+export const getGetEventOccurrencesByEventIdUrl = (eventId: string,) => {
 
-export const getGetEventOccurrencesByEventIdUrl = (eventId: string) => {
-  return `/api/v1/events/${eventId}/event-occurrences/`;
-};
 
-export const getEventOccurrencesByEventId = async (
-  eventId: string,
-  options?: RequestInit,
-): Promise<getEventOccurrencesByEventIdResponse> => {
-  return customInstance<getEventOccurrencesByEventIdResponse>(
-    getGetEventOccurrencesByEventIdUrl(eventId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+  
 
-export const getGetEventOccurrencesByEventIdQueryKey = (eventId: string) => {
-  return [`/api/v1/events/${eventId}/event-occurrences/`] as const;
-};
+  return `/api/v1/events/${eventId}/event-occurrences/`
+}
 
-export const getGetEventOccurrencesByEventIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-  TError = ErrorModel,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
+export const getEventOccurrencesByEventId = async (eventId: string, options?: RequestInit): Promise<getEventOccurrencesByEventIdResponse> => {
+  
+  return customInstance<getEventOccurrencesByEventIdResponse>(getGetEventOccurrencesByEventIdUrl(eventId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetEventOccurrencesByEventIdQueryKey = (eventId: string,) => {
+    return [
+    `/api/v1/events/${eventId}/event-occurrences/`
+    ] as const;
+    }
+
+    
+export const getGetEventOccurrencesByEventIdQueryOptions = <TData = Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError = ErrorModel>(eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetEventOccurrencesByEventIdQueryKey(eventId);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getEventOccurrencesByEventId>>
-  > = ({ signal }) =>
-    getEventOccurrencesByEventId(eventId, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetEventOccurrencesByEventIdQueryKey(eventId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!eventId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetEventOccurrencesByEventIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getEventOccurrencesByEventId>>
->;
-export type GetEventOccurrencesByEventIdQueryError = ErrorModel;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEventOccurrencesByEventId>>> = ({ signal }) => getEventOccurrencesByEventId(eventId, { signal, ...requestOptions });
 
-export function useGetEventOccurrencesByEventId<
-  TData = Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-  TError = ErrorModel,
->(
-  eventId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(eventId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEventOccurrencesByEventIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEventOccurrencesByEventId>>>
+export type GetEventOccurrencesByEventIdQueryError = ErrorModel
+
+
+export function useGetEventOccurrencesByEventId<TData = Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError = ErrorModel>(
+ eventId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
           TError,
           Awaited<ReturnType<typeof getEventOccurrencesByEventId>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetEventOccurrencesByEventId<
-  TData = Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-  TError = ErrorModel,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEventOccurrencesByEventId<TData = Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError = ErrorModel>(
+ eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
           TError,
           Awaited<ReturnType<typeof getEventOccurrencesByEventId>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetEventOccurrencesByEventId<
-  TData = Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-  TError = ErrorModel,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEventOccurrencesByEventId<TData = Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError = ErrorModel>(
+ eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get event occurrences by event ID
  */
 
-export function useGetEventOccurrencesByEventId<
-  TData = Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-  TError = ErrorModel,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getEventOccurrencesByEventId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetEventOccurrencesByEventIdQueryOptions(
-    eventId,
-    options,
-  );
+export function useGetEventOccurrencesByEventId<TData = Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError = ErrorModel>(
+ eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventOccurrencesByEventId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetEventOccurrencesByEventIdQueryOptions(eventId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Deletes an existing event by id
  * @summary Delete an existing event by id
  */
 export type deleteEventResponse200 = {
-  data: DeleteEventOutputBody;
-  status: 200;
-};
+  data: DeleteEventOutputBody
+  status: 200
+}
 
 export type deleteEventResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
 
-export type deleteEventResponseSuccess = deleteEventResponse200 & {
+export type deleteEventResponseSuccess = (deleteEventResponse200) & {
   headers: Headers;
 };
-export type deleteEventResponseError = deleteEventResponseDefault & {
+export type deleteEventResponseError = (deleteEventResponseDefault) & {
   headers: Headers;
 };
 
-export type deleteEventResponse =
-  | deleteEventResponseSuccess
-  | deleteEventResponseError;
+export type deleteEventResponse = (deleteEventResponseSuccess | deleteEventResponseError)
 
-export const getDeleteEventUrl = (id: string) => {
-  return `/api/v1/events/${id}`;
-};
+export const getDeleteEventUrl = (id: string,) => {
 
-export const deleteEvent = async (
-  id: string,
-  options?: RequestInit,
-): Promise<deleteEventResponse> => {
-  return customInstance<deleteEventResponse>(getDeleteEventUrl(id), {
+
+  
+
+  return `/api/v1/events/${id}`
+}
+
+export const deleteEvent = async (id: string, options?: RequestInit): Promise<deleteEventResponse> => {
+  
+  return customInstance<deleteEventResponse>(getDeleteEventUrl(id),
+  {      
     ...options,
-    method: "DELETE",
-  });
-};
+    method: 'DELETE'
+    
+    
+  }
+);}
 
-export const getDeleteEventMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteEvent>>,
-    TError,
-    { id: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteEvent>>,
-  TError,
-  { id: string },
-  TContext
-> => {
-  const mutationKey = ["deleteEvent"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteEvent>>,
-    { id: string }
-  > = (props) => {
-    const { id } = props ?? {};
 
-    return deleteEvent(id, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getDeleteEventMutationOptions = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError,{id: string}, TContext> => {
 
-export type DeleteEventMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteEvent>>
->;
+const mutationKey = ['deleteEvent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-export type DeleteEventMutationError = ErrorModel;
+      
 
-/**
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvent>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvent(id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEventMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvent>>>
+    
+    export type DeleteEventMutationError = ErrorModel
+
+    /**
  * @summary Delete an existing event by id
  */
-export const useDeleteEvent = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteEvent>>,
-      TError,
-      { id: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteEvent>>,
-  TError,
-  { id: string },
-  TContext
-> => {
-  return useMutation(getDeleteEventMutationOptions(options), queryClient);
-};
-/**
+export const useDeleteEvent = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvent>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getDeleteEventMutationOptions(options), queryClient);
+    }
+    /**
  * Updates an existing event
  * @summary Update an existing event
  */
 export type updateEventResponse200 = {
-  data: Event;
-  status: 200;
-};
+  data: Event
+  status: 200
+}
 
 export type updateEventResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
 
-export type updateEventResponseSuccess = updateEventResponse200 & {
+export type updateEventResponseSuccess = (updateEventResponse200) & {
   headers: Headers;
 };
-export type updateEventResponseError = updateEventResponseDefault & {
+export type updateEventResponseError = (updateEventResponseDefault) & {
   headers: Headers;
 };
 
-export type updateEventResponse =
-  | updateEventResponseSuccess
-  | updateEventResponseError;
+export type updateEventResponse = (updateEventResponseSuccess | updateEventResponseError)
 
-export const getUpdateEventUrl = (id: string) => {
-  return `/api/v1/events/${id}`;
-};
+export const getUpdateEventUrl = (id: string,) => {
 
-export const updateEvent = async (
-  id: string,
-  updateEventBody: UpdateEventBody,
-  options?: RequestInit,
-): Promise<updateEventResponse> => {
-  const formData = new FormData();
-  if (updateEventBody.age_range_max !== undefined) {
-    formData.append(`age_range_max`, updateEventBody.age_range_max.toString());
-  }
-  if (updateEventBody.age_range_min !== undefined) {
-    formData.append(`age_range_min`, updateEventBody.age_range_min.toString());
-  }
-  if (updateEventBody.category !== undefined) {
-    updateEventBody.category.forEach((value) =>
-      formData.append(`category`, value),
-    );
-  }
-  if (updateEventBody.description !== undefined) {
-    formData.append(
-      `description`,
-      updateEventBody.description instanceof Blob
-        ? updateEventBody.description
-        : new Blob([updateEventBody.description], { type: "text/plain" }),
-    );
-  }
-  if (updateEventBody.header_image !== undefined) {
-    formData.append(`header_image`, updateEventBody.header_image);
-  }
-  if (updateEventBody.organization_id !== undefined) {
-    formData.append(
-      `organization_id`,
-      updateEventBody.organization_id instanceof Blob
-        ? updateEventBody.organization_id
-        : new Blob([updateEventBody.organization_id], { type: "text/plain" }),
-    );
-  }
-  if (updateEventBody.title !== undefined) {
-    formData.append(
-      `title`,
-      updateEventBody.title instanceof Blob
-        ? updateEventBody.title
-        : new Blob([updateEventBody.title], { type: "text/plain" }),
-    );
-  }
 
-  return customInstance<updateEventResponse>(getUpdateEventUrl(id), {
+  
+
+  return `/api/v1/events/${id}`
+}
+
+export const updateEvent = async (id: string,
+    updateEventBody: UpdateEventBody, options?: RequestInit): Promise<updateEventResponse> => {
+    const formData = new FormData();
+if(updateEventBody.age_range_max !== undefined) {
+ formData.append(`age_range_max`, updateEventBody.age_range_max.toString())
+ }
+if(updateEventBody.age_range_min !== undefined) {
+ formData.append(`age_range_min`, updateEventBody.age_range_min.toString())
+ }
+if(updateEventBody.category !== undefined) {
+ updateEventBody.category.forEach(value => formData.append(`category`, value));
+ }
+if(updateEventBody.description !== undefined) {
+ formData.append(`description`, updateEventBody.description instanceof Blob ? updateEventBody.description : new Blob([updateEventBody.description], { type: 'text/plain' }));
+ }
+if(updateEventBody.header_image !== undefined) {
+ formData.append(`header_image`, updateEventBody.header_image);
+ }
+if(updateEventBody.organization_id !== undefined) {
+ formData.append(`organization_id`, updateEventBody.organization_id instanceof Blob ? updateEventBody.organization_id : new Blob([updateEventBody.organization_id], { type: 'text/plain' }));
+ }
+if(updateEventBody.title !== undefined) {
+ formData.append(`title`, updateEventBody.title instanceof Blob ? updateEventBody.title : new Blob([updateEventBody.title], { type: 'text/plain' }));
+ }
+
+  return customInstance<updateEventResponse>(getUpdateEventUrl(id),
+  {      
     ...options,
-    method: "PATCH",
-    body: formData,
-  });
-};
+    method: 'PATCH'
+    ,
+    body: 
+      formData,
+  }
+);}
 
-export const getUpdateEventMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateEvent>>,
-    TError,
-    { id: string; data: UpdateEventBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateEvent>>,
-  TError,
-  { id: string; data: UpdateEventBody },
-  TContext
-> => {
-  const mutationKey = ["updateEvent"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateEvent>>,
-    { id: string; data: UpdateEventBody }
-  > = (props) => {
-    const { id, data } = props ?? {};
 
-    return updateEvent(id, data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getUpdateEventMutationOptions = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateEvent>>, TError,{id: string;data: UpdateEventBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateEvent>>, TError,{id: string;data: UpdateEventBody}, TContext> => {
 
-export type UpdateEventMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateEvent>>
->;
-export type UpdateEventMutationBody = UpdateEventBody;
-export type UpdateEventMutationError = ErrorModel;
+const mutationKey = ['updateEvent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateEvent>>, {id: string;data: UpdateEventBody}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateEvent(id,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateEventMutationResult = NonNullable<Awaited<ReturnType<typeof updateEvent>>>
+    export type UpdateEventMutationBody = UpdateEventBody
+    export type UpdateEventMutationError = ErrorModel
+
+    /**
  * @summary Update an existing event
  */
-export const useUpdateEvent = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateEvent>>,
-      TError,
-      { id: string; data: UpdateEventBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof updateEvent>>,
-  TError,
-  { id: string; data: UpdateEventBody },
-  TContext
-> => {
-  return useMutation(getUpdateEventMutationOptions(options), queryClient);
-};
+export const useUpdateEvent = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateEvent>>, TError,{id: string;data: UpdateEventBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateEvent>>,
+        TError,
+        {id: string;data: UpdateEventBody},
+        TContext
+      > => {
+      return useMutation(getUpdateEventMutationOptions(options), queryClient);
+    }
+    
