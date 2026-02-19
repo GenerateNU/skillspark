@@ -13,6 +13,7 @@ import (
 
 func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence, repo.Manager, repo.Event, repo.Location)
+
 	huma.Register(api, huma.Operation{
 		OperationID: "get-all-event-occurrences",
 		Method:      http.MethodGet,
@@ -21,6 +22,7 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 		Description: "Returns a list of all event occurrences in the database",
 		Tags:        []string{"Event Occurrences"},
 	}, func(ctx context.Context, input *models.GetAllEventOccurrencesInput) (*models.GetAllEventOccurrencesOutput, error) {
+
 		page := input.Page
 		if page == 0 {
 			page = 1
@@ -34,7 +36,52 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 			Page:  page,
 			Limit: limit,
 		}
-		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination)
+
+		// all-or-none validation
+		if (input.Latitude.Set || input.Longitude.Set || input.RadiusKm != 0) &&
+			!(input.Latitude.Set && input.Longitude.Set && input.RadiusKm != 0) {
+			return nil, huma.Error400BadRequest("lat, lng, and radius_km must all be provided together")
+		}
+
+		// optional: enforce positive radius
+		if input.RadiusKm < 0 {
+			return nil, huma.Error400BadRequest("radius_km must be positive")
+		}
+
+		// map to DB-level filter object
+		var filters models.GetAllEventOccurrencesFilter
+
+		if input.Search != "" {
+			filters.Search = &input.Search
+		}
+
+		if input.Latitude.Set && input.Longitude.Set && input.RadiusKm != 0 {
+			filters.Latitude = &input.Latitude.Value
+			filters.Longitude = &input.Longitude.Value
+			filters.RadiusKm = &input.RadiusKm
+		}
+
+		if input.MinDuration != 0 {
+			filters.MinDurationMinutes = &input.MinDuration
+		}
+
+		if input.MaxDuration != 0 {
+			filters.MaxDurationMinutes = &input.MaxDuration
+		}
+
+		if input.MinDuration != 0 && input.MaxDuration != 0 && input.MinDuration > input.MaxDuration {
+			return nil, huma.Error400BadRequest("min_duration cannot be larger than max_duration")
+		}
+
+		if input.PriceTier != "" {
+			if input.PriceTier != "$" && input.PriceTier != "$$" && input.PriceTier != "$$$" {
+				return nil, huma.Error400BadRequest("price tier must be one of $, $$, $$$")
+			} else {
+				filters.PriceTier = &input.PriceTier
+			}
+		}
+
+		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination, filters)
 		if err != nil {
 			return nil, err
 		}

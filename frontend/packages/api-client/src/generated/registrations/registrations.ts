@@ -5,7 +5,10 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,8 +21,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   CreateRegistrationInputBody,
@@ -28,1118 +31,701 @@ import type {
   GetRegistrationsByEventOccurrenceIDOutputBody,
   GetRegistrationsByGuardianIDOutputBody,
   Registration,
-  UpdateRegistrationInputBody,
-} from "../skillSparkAPI.schemas";
+  UpdateRegistrationInputBody
+} from '../skillSparkAPI.schemas';
 
-import { customInstance } from "../../apiClient";
+import { customInstance } from '../../apiClient';
 
 // https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
-type IfEquals<X, Y, A = X, B = never> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
+type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
+T,
+>() => T extends Y ? 1 : 2
+? A
+: B;
 
 type WritableKeys<T> = {
-  [P in keyof T]-?: IfEquals<
-    { [Q in P]: T[P] },
-    { -readonly [Q in P]: T[P] },
-    P
-  >;
+[P in keyof T]-?: IfEquals<
+  { [Q in P]: T[P] },
+  { -readonly [Q in P]: T[P] },
+  P
+>;
 }[keyof T];
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I,
-) => void
-  ? I
-  : never;
+type UnionToIntersection<U> =
+  (U extends any ? (k: U)=>void : never) extends ((k: infer I)=>void) ? I : never;
 type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
 
 type Writable<T> = Pick<T, WritableKeys<T>>;
-type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
-  ? {
-      [P in keyof Writable<T>]: T[P] extends object
-        ? NonReadonly<NonNullable<T[P]>>
-        : T[P];
-    }
-  : DistributeReadOnlyOverUnions<T>;
+type NonReadonly<T> = [T] extends [UnionToIntersection<T>] ? {
+  [P in keyof Writable<T>]: T[P] extends object
+    ? NonReadonly<NonNullable<T[P]>>
+    : T[P];
+} : DistributeReadOnlyOverUnions<T>;
+
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
 export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
-export type HTTPStatusCode4xx =
-  | 400
-  | 401
-  | 402
-  | 403
-  | 404
-  | 405
-  | 406
-  | 407
-  | 408
-  | 409
-  | 410
-  | 411
-  | 412
-  | 413
-  | 414
-  | 415
-  | 416
-  | 417
-  | 418
-  | 419
-  | 420
-  | 421
-  | 422
-  | 423
-  | 424
-  | 426
-  | 428
-  | 429
-  | 431
-  | 451;
+export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 419 | 420 | 421 | 422 | 423 | 424 | 426 | 428 | 429 | 431 | 451;
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
-export type HTTPStatusCodes =
-  | HTTPStatusCode1xx
-  | HTTPStatusCode2xx
-  | HTTPStatusCode3xx
-  | HTTPStatusCode4xx
-  | HTTPStatusCode5xx;
+export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
+
 
 /**
  * Create a new registration for a child to attend an event occurrence
  * @summary Create a new registration
  */
 export type createRegistrationResponse200 = {
-  data: Registration;
-  status: 200;
-};
+  data: Registration
+  status: 200
+}
 
 export type createRegistrationResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type createRegistrationResponseSuccess = (createRegistrationResponse200) & {
+  headers: Headers;
+};
+export type createRegistrationResponseError = (createRegistrationResponseDefault) & {
+  headers: Headers;
 };
 
-export type createRegistrationResponseSuccess =
-  createRegistrationResponse200 & {
-    headers: Headers;
-  };
-export type createRegistrationResponseError =
-  createRegistrationResponseDefault & {
-    headers: Headers;
-  };
-
-export type createRegistrationResponse =
-  | createRegistrationResponseSuccess
-  | createRegistrationResponseError;
+export type createRegistrationResponse = (createRegistrationResponseSuccess | createRegistrationResponseError)
 
 export const getCreateRegistrationUrl = () => {
-  return `/api/v1/registrations`;
-};
 
-export const createRegistration = async (
-  createRegistrationInputBody: NonReadonly<CreateRegistrationInputBody>,
-  options?: RequestInit,
-): Promise<createRegistrationResponse> => {
-  return customInstance<createRegistrationResponse>(
-    getCreateRegistrationUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createRegistrationInputBody),
-    },
-  );
-};
 
-export const getCreateRegistrationMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createRegistration>>,
-    TError,
-    { data: NonReadonly<CreateRegistrationInputBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createRegistration>>,
-  TError,
-  { data: NonReadonly<CreateRegistrationInputBody> },
-  TContext
-> => {
-  const mutationKey = ["createRegistration"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createRegistration>>,
-    { data: NonReadonly<CreateRegistrationInputBody> }
-  > = (props) => {
-    const { data } = props ?? {};
+  return `/api/v1/registrations`
+}
 
-    return createRegistration(data, requestOptions);
-  };
+export const createRegistration = async (createRegistrationInputBody: NonReadonly<CreateRegistrationInputBody>, options?: RequestInit): Promise<createRegistrationResponse> => {
+  
+  return customInstance<createRegistrationResponse>(getCreateRegistrationUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createRegistrationInputBody,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type CreateRegistrationMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createRegistration>>
->;
-export type CreateRegistrationMutationBody =
-  NonReadonly<CreateRegistrationInputBody>;
-export type CreateRegistrationMutationError = ErrorModel;
 
-/**
+
+export const getCreateRegistrationMutationOptions = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createRegistration>>, TError,{data: NonReadonly<CreateRegistrationInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createRegistration>>, TError,{data: NonReadonly<CreateRegistrationInputBody>}, TContext> => {
+
+const mutationKey = ['createRegistration'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createRegistration>>, {data: NonReadonly<CreateRegistrationInputBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createRegistration(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateRegistrationMutationResult = NonNullable<Awaited<ReturnType<typeof createRegistration>>>
+    export type CreateRegistrationMutationBody = NonReadonly<CreateRegistrationInputBody>
+    export type CreateRegistrationMutationError = ErrorModel
+
+    /**
  * @summary Create a new registration
  */
-export const useCreateRegistration = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createRegistration>>,
-      TError,
-      { data: NonReadonly<CreateRegistrationInputBody> },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createRegistration>>,
-  TError,
-  { data: NonReadonly<CreateRegistrationInputBody> },
-  TContext
-> => {
-  return useMutation(
-    getCreateRegistrationMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useCreateRegistration = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createRegistration>>, TError,{data: NonReadonly<CreateRegistrationInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createRegistration>>,
+        TError,
+        {data: NonReadonly<CreateRegistrationInputBody>},
+        TContext
+      > => {
+      return useMutation(getCreateRegistrationMutationOptions(options), queryClient);
+    }
+    /**
  * Retrieve a specific registration by its unique identifier
  * @summary Get registration by ID
  */
 export type getRegistrationByIdResponse200 = {
-  data: Registration;
-  status: 200;
-};
+  data: Registration
+  status: 200
+}
 
 export type getRegistrationByIdResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type getRegistrationByIdResponseSuccess = (getRegistrationByIdResponse200) & {
+  headers: Headers;
+};
+export type getRegistrationByIdResponseError = (getRegistrationByIdResponseDefault) & {
+  headers: Headers;
 };
 
-export type getRegistrationByIdResponseSuccess =
-  getRegistrationByIdResponse200 & {
-    headers: Headers;
-  };
-export type getRegistrationByIdResponseError =
-  getRegistrationByIdResponseDefault & {
-    headers: Headers;
-  };
+export type getRegistrationByIdResponse = (getRegistrationByIdResponseSuccess | getRegistrationByIdResponseError)
 
-export type getRegistrationByIdResponse =
-  | getRegistrationByIdResponseSuccess
-  | getRegistrationByIdResponseError;
+export const getGetRegistrationByIdUrl = (id: string,) => {
 
-export const getGetRegistrationByIdUrl = (id: string) => {
-  return `/api/v1/registrations/${id}`;
-};
 
-export const getRegistrationById = async (
-  id: string,
-  options?: RequestInit,
-): Promise<getRegistrationByIdResponse> => {
-  return customInstance<getRegistrationByIdResponse>(
-    getGetRegistrationByIdUrl(id),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+  
 
-export const getGetRegistrationByIdQueryKey = (id: string) => {
-  return [`/api/v1/registrations/${id}`] as const;
-};
+  return `/api/v1/registrations/${id}`
+}
 
-export const getGetRegistrationByIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getRegistrationById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationById>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
+export const getRegistrationById = async (id: string, options?: RequestInit): Promise<getRegistrationByIdResponse> => {
+  
+  return customInstance<getRegistrationByIdResponse>(getGetRegistrationByIdUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetRegistrationByIdQueryKey = (id: string,) => {
+    return [
+    `/api/v1/registrations/${id}`
+    ] as const;
+    }
+
+    
+export const getGetRegistrationByIdQueryOptions = <TData = Awaited<ReturnType<typeof getRegistrationById>>, TError = ErrorModel>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationById>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetRegistrationByIdQueryKey(id);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getRegistrationById>>
-  > = ({ signal }) => getRegistrationById(id, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetRegistrationByIdQueryKey(id);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!id,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getRegistrationById>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetRegistrationByIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getRegistrationById>>
->;
-export type GetRegistrationByIdQueryError = ErrorModel;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRegistrationById>>> = ({ signal }) => getRegistrationById(id, { signal, ...requestOptions });
 
-export function useGetRegistrationById<
-  TData = Awaited<ReturnType<typeof getRegistrationById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationById>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRegistrationById>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRegistrationByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getRegistrationById>>>
+export type GetRegistrationByIdQueryError = ErrorModel
+
+
+export function useGetRegistrationById<TData = Awaited<ReturnType<typeof getRegistrationById>>, TError = ErrorModel>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationById>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRegistrationById>>,
           TError,
           Awaited<ReturnType<typeof getRegistrationById>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetRegistrationById<
-  TData = Awaited<ReturnType<typeof getRegistrationById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationById>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRegistrationById<TData = Awaited<ReturnType<typeof getRegistrationById>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationById>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRegistrationById>>,
           TError,
           Awaited<ReturnType<typeof getRegistrationById>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetRegistrationById<
-  TData = Awaited<ReturnType<typeof getRegistrationById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationById>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRegistrationById<TData = Awaited<ReturnType<typeof getRegistrationById>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationById>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get registration by ID
  */
 
-export function useGetRegistrationById<
-  TData = Awaited<ReturnType<typeof getRegistrationById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationById>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetRegistrationByIdQueryOptions(id, options);
+export function useGetRegistrationById<TData = Awaited<ReturnType<typeof getRegistrationById>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationById>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetRegistrationByIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Update an existing registration's details
  * @summary Update a registration
  */
 export type updateRegistrationResponse200 = {
-  data: Registration;
-  status: 200;
-};
+  data: Registration
+  status: 200
+}
 
 export type updateRegistrationResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type updateRegistrationResponseSuccess = (updateRegistrationResponse200) & {
+  headers: Headers;
+};
+export type updateRegistrationResponseError = (updateRegistrationResponseDefault) & {
+  headers: Headers;
 };
 
-export type updateRegistrationResponseSuccess =
-  updateRegistrationResponse200 & {
-    headers: Headers;
-  };
-export type updateRegistrationResponseError =
-  updateRegistrationResponseDefault & {
-    headers: Headers;
-  };
+export type updateRegistrationResponse = (updateRegistrationResponseSuccess | updateRegistrationResponseError)
 
-export type updateRegistrationResponse =
-  | updateRegistrationResponseSuccess
-  | updateRegistrationResponseError;
+export const getUpdateRegistrationUrl = (id: string,) => {
 
-export const getUpdateRegistrationUrl = (id: string) => {
-  return `/api/v1/registrations/${id}`;
-};
 
-export const updateRegistration = async (
-  id: string,
-  updateRegistrationInputBody: NonReadonly<UpdateRegistrationInputBody>,
-  options?: RequestInit,
-): Promise<updateRegistrationResponse> => {
-  return customInstance<updateRegistrationResponse>(
-    getUpdateRegistrationUrl(id),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateRegistrationInputBody),
-    },
-  );
-};
+  
 
-export const getUpdateRegistrationMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateRegistration>>,
-    TError,
-    { id: string; data: NonReadonly<UpdateRegistrationInputBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateRegistration>>,
-  TError,
-  { id: string; data: NonReadonly<UpdateRegistrationInputBody> },
-  TContext
-> => {
-  const mutationKey = ["updateRegistration"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/registrations/${id}`
+}
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateRegistration>>,
-    { id: string; data: NonReadonly<UpdateRegistrationInputBody> }
-  > = (props) => {
-    const { id, data } = props ?? {};
+export const updateRegistration = async (id: string,
+    updateRegistrationInputBody: NonReadonly<UpdateRegistrationInputBody>, options?: RequestInit): Promise<updateRegistrationResponse> => {
+  
+  return customInstance<updateRegistrationResponse>(getUpdateRegistrationUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateRegistrationInputBody,)
+  }
+);}
 
-    return updateRegistration(id, data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type UpdateRegistrationMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateRegistration>>
->;
-export type UpdateRegistrationMutationBody =
-  NonReadonly<UpdateRegistrationInputBody>;
-export type UpdateRegistrationMutationError = ErrorModel;
 
-/**
+export const getUpdateRegistrationMutationOptions = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRegistration>>, TError,{id: string;data: NonReadonly<UpdateRegistrationInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateRegistration>>, TError,{id: string;data: NonReadonly<UpdateRegistrationInputBody>}, TContext> => {
+
+const mutationKey = ['updateRegistration'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateRegistration>>, {id: string;data: NonReadonly<UpdateRegistrationInputBody>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateRegistration(id,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateRegistrationMutationResult = NonNullable<Awaited<ReturnType<typeof updateRegistration>>>
+    export type UpdateRegistrationMutationBody = NonReadonly<UpdateRegistrationInputBody>
+    export type UpdateRegistrationMutationError = ErrorModel
+
+    /**
  * @summary Update a registration
  */
-export const useUpdateRegistration = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateRegistration>>,
-      TError,
-      { id: string; data: NonReadonly<UpdateRegistrationInputBody> },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof updateRegistration>>,
-  TError,
-  { id: string; data: NonReadonly<UpdateRegistrationInputBody> },
-  TContext
-> => {
-  return useMutation(
-    getUpdateRegistrationMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useUpdateRegistration = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRegistration>>, TError,{id: string;data: NonReadonly<UpdateRegistrationInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateRegistration>>,
+        TError,
+        {id: string;data: NonReadonly<UpdateRegistrationInputBody>},
+        TContext
+      > => {
+      return useMutation(getUpdateRegistrationMutationOptions(options), queryClient);
+    }
+    /**
  * Retrieve all registrations for a specific child
  * @summary Get registrations by child ID
  */
 export type getRegistrationsByChildIdResponse200 = {
-  data: GetRegistrationsByChildIDOutputBody;
-  status: 200;
-};
+  data: GetRegistrationsByChildIDOutputBody
+  status: 200
+}
 
 export type getRegistrationsByChildIdResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type getRegistrationsByChildIdResponseSuccess = (getRegistrationsByChildIdResponse200) & {
+  headers: Headers;
+};
+export type getRegistrationsByChildIdResponseError = (getRegistrationsByChildIdResponseDefault) & {
+  headers: Headers;
 };
 
-export type getRegistrationsByChildIdResponseSuccess =
-  getRegistrationsByChildIdResponse200 & {
-    headers: Headers;
-  };
-export type getRegistrationsByChildIdResponseError =
-  getRegistrationsByChildIdResponseDefault & {
-    headers: Headers;
-  };
+export type getRegistrationsByChildIdResponse = (getRegistrationsByChildIdResponseSuccess | getRegistrationsByChildIdResponseError)
 
-export type getRegistrationsByChildIdResponse =
-  | getRegistrationsByChildIdResponseSuccess
-  | getRegistrationsByChildIdResponseError;
+export const getGetRegistrationsByChildIdUrl = (childId: string,) => {
 
-export const getGetRegistrationsByChildIdUrl = (childId: string) => {
-  return `/api/v1/registrations/child/${childId}`;
-};
 
-export const getRegistrationsByChildId = async (
-  childId: string,
-  options?: RequestInit,
-): Promise<getRegistrationsByChildIdResponse> => {
-  return customInstance<getRegistrationsByChildIdResponse>(
-    getGetRegistrationsByChildIdUrl(childId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+  
 
-export const getGetRegistrationsByChildIdQueryKey = (childId: string) => {
-  return [`/api/v1/registrations/child/${childId}`] as const;
-};
+  return `/api/v1/registrations/child/${childId}`
+}
 
-export const getGetRegistrationsByChildIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-  TError = ErrorModel,
->(
-  childId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
+export const getRegistrationsByChildId = async (childId: string, options?: RequestInit): Promise<getRegistrationsByChildIdResponse> => {
+  
+  return customInstance<getRegistrationsByChildIdResponse>(getGetRegistrationsByChildIdUrl(childId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetRegistrationsByChildIdQueryKey = (childId: string,) => {
+    return [
+    `/api/v1/registrations/child/${childId}`
+    ] as const;
+    }
+
+    
+export const getGetRegistrationsByChildIdQueryOptions = <TData = Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError = ErrorModel>(childId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetRegistrationsByChildIdQueryKey(childId);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getRegistrationsByChildId>>
-  > = ({ signal }) =>
-    getRegistrationsByChildId(childId, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetRegistrationsByChildIdQueryKey(childId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!childId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetRegistrationsByChildIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getRegistrationsByChildId>>
->;
-export type GetRegistrationsByChildIdQueryError = ErrorModel;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRegistrationsByChildId>>> = ({ signal }) => getRegistrationsByChildId(childId, { signal, ...requestOptions });
 
-export function useGetRegistrationsByChildId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-  TError = ErrorModel,
->(
-  childId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(childId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRegistrationsByChildIdQueryResult = NonNullable<Awaited<ReturnType<typeof getRegistrationsByChildId>>>
+export type GetRegistrationsByChildIdQueryError = ErrorModel
+
+
+export function useGetRegistrationsByChildId<TData = Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError = ErrorModel>(
+ childId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRegistrationsByChildId>>,
           TError,
           Awaited<ReturnType<typeof getRegistrationsByChildId>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetRegistrationsByChildId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-  TError = ErrorModel,
->(
-  childId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRegistrationsByChildId<TData = Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError = ErrorModel>(
+ childId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRegistrationsByChildId>>,
           TError,
           Awaited<ReturnType<typeof getRegistrationsByChildId>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetRegistrationsByChildId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-  TError = ErrorModel,
->(
-  childId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRegistrationsByChildId<TData = Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError = ErrorModel>(
+ childId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get registrations by child ID
  */
 
-export function useGetRegistrationsByChildId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-  TError = ErrorModel,
->(
-  childId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByChildId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetRegistrationsByChildIdQueryOptions(
-    childId,
-    options,
-  );
+export function useGetRegistrationsByChildId<TData = Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError = ErrorModel>(
+ childId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByChildId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetRegistrationsByChildIdQueryOptions(childId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Retrieve all registrations for a specific event occurrence
  * @summary Get registrations by event occurrence ID
  */
 export type getRegistrationsByEventOccurrenceIdResponse200 = {
-  data: GetRegistrationsByEventOccurrenceIDOutputBody;
-  status: 200;
-};
+  data: GetRegistrationsByEventOccurrenceIDOutputBody
+  status: 200
+}
 
 export type getRegistrationsByEventOccurrenceIdResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type getRegistrationsByEventOccurrenceIdResponseSuccess = (getRegistrationsByEventOccurrenceIdResponse200) & {
+  headers: Headers;
+};
+export type getRegistrationsByEventOccurrenceIdResponseError = (getRegistrationsByEventOccurrenceIdResponseDefault) & {
+  headers: Headers;
 };
 
-export type getRegistrationsByEventOccurrenceIdResponseSuccess =
-  getRegistrationsByEventOccurrenceIdResponse200 & {
-    headers: Headers;
-  };
-export type getRegistrationsByEventOccurrenceIdResponseError =
-  getRegistrationsByEventOccurrenceIdResponseDefault & {
-    headers: Headers;
-  };
+export type getRegistrationsByEventOccurrenceIdResponse = (getRegistrationsByEventOccurrenceIdResponseSuccess | getRegistrationsByEventOccurrenceIdResponseError)
 
-export type getRegistrationsByEventOccurrenceIdResponse =
-  | getRegistrationsByEventOccurrenceIdResponseSuccess
-  | getRegistrationsByEventOccurrenceIdResponseError;
+export const getGetRegistrationsByEventOccurrenceIdUrl = (eventOccurrenceId: string,) => {
 
-export const getGetRegistrationsByEventOccurrenceIdUrl = (
-  eventOccurrenceId: string,
+
+  
+
+  return `/api/v1/registrations/event_occurrence/${eventOccurrenceId}`
+}
+
+export const getRegistrationsByEventOccurrenceId = async (eventOccurrenceId: string, options?: RequestInit): Promise<getRegistrationsByEventOccurrenceIdResponse> => {
+  
+  return customInstance<getRegistrationsByEventOccurrenceIdResponse>(getGetRegistrationsByEventOccurrenceIdUrl(eventOccurrenceId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetRegistrationsByEventOccurrenceIdQueryKey = (eventOccurrenceId: string,) => {
+    return [
+    `/api/v1/registrations/event_occurrence/${eventOccurrenceId}`
+    ] as const;
+    }
+
+    
+export const getGetRegistrationsByEventOccurrenceIdQueryOptions = <TData = Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError = ErrorModel>(eventOccurrenceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
-  return `/api/v1/registrations/event_occurrence/${eventOccurrenceId}`;
-};
 
-export const getRegistrationsByEventOccurrenceId = async (
-  eventOccurrenceId: string,
-  options?: RequestInit,
-): Promise<getRegistrationsByEventOccurrenceIdResponse> => {
-  return customInstance<getRegistrationsByEventOccurrenceIdResponse>(
-    getGetRegistrationsByEventOccurrenceIdUrl(eventOccurrenceId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-export const getGetRegistrationsByEventOccurrenceIdQueryKey = (
-  eventOccurrenceId: string,
-) => {
-  return [
-    `/api/v1/registrations/event_occurrence/${eventOccurrenceId}`,
-  ] as const;
-};
+  const queryKey =  queryOptions?.queryKey ?? getGetRegistrationsByEventOccurrenceIdQueryKey(eventOccurrenceId);
 
-export const getGetRegistrationsByEventOccurrenceIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-  TError = ErrorModel,
->(
-  eventOccurrenceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getGetRegistrationsByEventOccurrenceIdQueryKey(eventOccurrenceId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>> = ({ signal }) => getRegistrationsByEventOccurrenceId(eventOccurrenceId, { signal, ...requestOptions });
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>
-  > = ({ signal }) =>
-    getRegistrationsByEventOccurrenceId(eventOccurrenceId, {
-      signal,
-      ...requestOptions,
-    });
+      
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!eventOccurrenceId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+      
 
-export type GetRegistrationsByEventOccurrenceIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>
->;
-export type GetRegistrationsByEventOccurrenceIdQueryError = ErrorModel;
+   return  { queryKey, queryFn, enabled: !!(eventOccurrenceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-export function useGetRegistrationsByEventOccurrenceId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-  TError = ErrorModel,
->(
-  eventOccurrenceId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+export type GetRegistrationsByEventOccurrenceIdQueryResult = NonNullable<Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>>
+export type GetRegistrationsByEventOccurrenceIdQueryError = ErrorModel
+
+
+export function useGetRegistrationsByEventOccurrenceId<TData = Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError = ErrorModel>(
+ eventOccurrenceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
           TError,
           Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetRegistrationsByEventOccurrenceId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-  TError = ErrorModel,
->(
-  eventOccurrenceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRegistrationsByEventOccurrenceId<TData = Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError = ErrorModel>(
+ eventOccurrenceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
           TError,
           Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetRegistrationsByEventOccurrenceId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-  TError = ErrorModel,
->(
-  eventOccurrenceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRegistrationsByEventOccurrenceId<TData = Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError = ErrorModel>(
+ eventOccurrenceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get registrations by event occurrence ID
  */
 
-export function useGetRegistrationsByEventOccurrenceId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-  TError = ErrorModel,
->(
-  eventOccurrenceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetRegistrationsByEventOccurrenceIdQueryOptions(
-    eventOccurrenceId,
-    options,
-  );
+export function useGetRegistrationsByEventOccurrenceId<TData = Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError = ErrorModel>(
+ eventOccurrenceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByEventOccurrenceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetRegistrationsByEventOccurrenceIdQueryOptions(eventOccurrenceId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Retrieve all registrations for children under a specific guardian
  * @summary Get registrations by guardian ID
  */
 export type getRegistrationsByGuardianIdResponse200 = {
-  data: GetRegistrationsByGuardianIDOutputBody;
-  status: 200;
-};
+  data: GetRegistrationsByGuardianIDOutputBody
+  status: 200
+}
 
 export type getRegistrationsByGuardianIdResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type getRegistrationsByGuardianIdResponseSuccess = (getRegistrationsByGuardianIdResponse200) & {
+  headers: Headers;
+};
+export type getRegistrationsByGuardianIdResponseError = (getRegistrationsByGuardianIdResponseDefault) & {
+  headers: Headers;
 };
 
-export type getRegistrationsByGuardianIdResponseSuccess =
-  getRegistrationsByGuardianIdResponse200 & {
-    headers: Headers;
-  };
-export type getRegistrationsByGuardianIdResponseError =
-  getRegistrationsByGuardianIdResponseDefault & {
-    headers: Headers;
-  };
+export type getRegistrationsByGuardianIdResponse = (getRegistrationsByGuardianIdResponseSuccess | getRegistrationsByGuardianIdResponseError)
 
-export type getRegistrationsByGuardianIdResponse =
-  | getRegistrationsByGuardianIdResponseSuccess
-  | getRegistrationsByGuardianIdResponseError;
+export const getGetRegistrationsByGuardianIdUrl = (guardianId: string,) => {
 
-export const getGetRegistrationsByGuardianIdUrl = (guardianId: string) => {
-  return `/api/v1/registrations/guardian/${guardianId}`;
-};
 
-export const getRegistrationsByGuardianId = async (
-  guardianId: string,
-  options?: RequestInit,
-): Promise<getRegistrationsByGuardianIdResponse> => {
-  return customInstance<getRegistrationsByGuardianIdResponse>(
-    getGetRegistrationsByGuardianIdUrl(guardianId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+  
 
-export const getGetRegistrationsByGuardianIdQueryKey = (guardianId: string) => {
-  return [`/api/v1/registrations/guardian/${guardianId}`] as const;
-};
+  return `/api/v1/registrations/guardian/${guardianId}`
+}
 
-export const getGetRegistrationsByGuardianIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-  TError = ErrorModel,
->(
-  guardianId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
+export const getRegistrationsByGuardianId = async (guardianId: string, options?: RequestInit): Promise<getRegistrationsByGuardianIdResponse> => {
+  
+  return customInstance<getRegistrationsByGuardianIdResponse>(getGetRegistrationsByGuardianIdUrl(guardianId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetRegistrationsByGuardianIdQueryKey = (guardianId: string,) => {
+    return [
+    `/api/v1/registrations/guardian/${guardianId}`
+    ] as const;
+    }
+
+    
+export const getGetRegistrationsByGuardianIdQueryOptions = <TData = Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError = ErrorModel>(guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getGetRegistrationsByGuardianIdQueryKey(guardianId);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getRegistrationsByGuardianId>>
-  > = ({ signal }) =>
-    getRegistrationsByGuardianId(guardianId, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetRegistrationsByGuardianIdQueryKey(guardianId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!guardianId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetRegistrationsByGuardianIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getRegistrationsByGuardianId>>
->;
-export type GetRegistrationsByGuardianIdQueryError = ErrorModel;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRegistrationsByGuardianId>>> = ({ signal }) => getRegistrationsByGuardianId(guardianId, { signal, ...requestOptions });
 
-export function useGetRegistrationsByGuardianId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-  TError = ErrorModel,
->(
-  guardianId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(guardianId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRegistrationsByGuardianIdQueryResult = NonNullable<Awaited<ReturnType<typeof getRegistrationsByGuardianId>>>
+export type GetRegistrationsByGuardianIdQueryError = ErrorModel
+
+
+export function useGetRegistrationsByGuardianId<TData = Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError = ErrorModel>(
+ guardianId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
           TError,
           Awaited<ReturnType<typeof getRegistrationsByGuardianId>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetRegistrationsByGuardianId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-  TError = ErrorModel,
->(
-  guardianId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRegistrationsByGuardianId<TData = Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError = ErrorModel>(
+ guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
           TError,
           Awaited<ReturnType<typeof getRegistrationsByGuardianId>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetRegistrationsByGuardianId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-  TError = ErrorModel,
->(
-  guardianId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRegistrationsByGuardianId<TData = Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError = ErrorModel>(
+ guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get registrations by guardian ID
  */
 
-export function useGetRegistrationsByGuardianId<
-  TData = Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-  TError = ErrorModel,
->(
-  guardianId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRegistrationsByGuardianId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetRegistrationsByGuardianIdQueryOptions(
-    guardianId,
-    options,
-  );
+export function useGetRegistrationsByGuardianId<TData = Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError = ErrorModel>(
+ guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRegistrationsByGuardianId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetRegistrationsByGuardianIdQueryOptions(guardianId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+

@@ -282,6 +282,46 @@ paths:
             default: 100
             minimum: 1
             maximum: 100
+        - name: search
+          in: query
+          explode: false
+          schema:
+            type: string
+        - name: lat
+          in: query
+          explode: false
+          schema:
+            type: number
+            format: double
+        - name: lng
+          in: query
+          explode: false
+          schema:
+            type: number
+            format: double
+        - name: radius_km
+          in: query
+          explode: false
+          schema:
+            type: number
+            format: double
+        - name: price
+          in: query
+          explode: false
+          schema:
+            type: string
+        - name: min_duration
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+        - name: max_duration
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
       responses:
         "200":
           description: OK

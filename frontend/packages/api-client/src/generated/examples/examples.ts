@@ -5,7 +5,9 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-import { useQuery } from "@tanstack/react-query";
+import {
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -15,226 +17,144 @@ import type {
   QueryKey,
   UndefinedInitialDataOptions,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   ErrorModel,
-  GetGreetingOutputBody,
-} from "../skillSparkAPI.schemas";
+  GetGreetingOutputBody
+} from '../skillSparkAPI.schemas';
 
-import { customInstance } from "../../apiClient";
+import { customInstance } from '../../apiClient';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
 export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
-export type HTTPStatusCode4xx =
-  | 400
-  | 401
-  | 402
-  | 403
-  | 404
-  | 405
-  | 406
-  | 407
-  | 408
-  | 409
-  | 410
-  | 411
-  | 412
-  | 413
-  | 414
-  | 415
-  | 416
-  | 417
-  | 418
-  | 419
-  | 420
-  | 421
-  | 422
-  | 423
-  | 424
-  | 426
-  | 428
-  | 429
-  | 431
-  | 451;
+export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 419 | 420 | 421 | 422 | 423 | 424 | 426 | 428 | 429 | 431 | 451;
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
-export type HTTPStatusCodes =
-  | HTTPStatusCode1xx
-  | HTTPStatusCode2xx
-  | HTTPStatusCode3xx
-  | HTTPStatusCode4xx
-  | HTTPStatusCode5xx;
+export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
+
 
 /**
  * Returns a personalized greeting message
  * @summary Get a greeting
  */
 export type getGreetingResponse200 = {
-  data: GetGreetingOutputBody;
-  status: 200;
-};
+  data: GetGreetingOutputBody
+  status: 200
+}
 
 export type getGreetingResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
 
-export type getGreetingResponseSuccess = getGreetingResponse200 & {
+export type getGreetingResponseSuccess = (getGreetingResponse200) & {
   headers: Headers;
 };
-export type getGreetingResponseError = getGreetingResponseDefault & {
+export type getGreetingResponseError = (getGreetingResponseDefault) & {
   headers: Headers;
 };
 
-export type getGreetingResponse =
-  | getGreetingResponseSuccess
-  | getGreetingResponseError;
+export type getGreetingResponse = (getGreetingResponseSuccess | getGreetingResponseError)
 
-export const getGetGreetingUrl = (name: string) => {
-  return `/api/v1/greet/${name}`;
-};
+export const getGetGreetingUrl = (name: string,) => {
 
-export const getGreeting = async (
-  name: string,
-  options?: RequestInit,
-): Promise<getGreetingResponse> => {
-  return customInstance<getGreetingResponse>(getGetGreetingUrl(name), {
+
+  
+
+  return `/api/v1/greet/${name}`
+}
+
+export const getGreeting = async (name: string, options?: RequestInit): Promise<getGreetingResponse> => {
+  
+  return customInstance<getGreetingResponse>(getGetGreetingUrl(name),
+  {      
     ...options,
-    method: "GET",
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getGetGreetingQueryKey = (name: string) => {
-  return [`/api/v1/greet/${name}`] as const;
-};
 
-export const getGetGreetingQueryOptions = <
-  TData = Awaited<ReturnType<typeof getGreeting>>,
-  TError = ErrorModel,
->(
-  name: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
+
+
+
+export const getGetGreetingQueryKey = (name: string,) => {
+    return [
+    `/api/v1/greet/${name}`
+    ] as const;
+    }
+
+    
+export const getGetGreetingQueryOptions = <TData = Awaited<ReturnType<typeof getGreeting>>, TError = ErrorModel>(name: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetGreetingQueryKey(name);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getGreeting>>> = ({
-    signal,
-  }) => getGreeting(name, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetGreetingQueryKey(name);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!name,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getGreeting>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetGreetingQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getGreeting>>
->;
-export type GetGreetingQueryError = ErrorModel;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getGreeting>>> = ({ signal }) => getGreeting(name, { signal, ...requestOptions });
 
-export function useGetGreeting<
-  TData = Awaited<ReturnType<typeof getGreeting>>,
-  TError = ErrorModel,
->(
-  name: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData>
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(name), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetGreetingQueryResult = NonNullable<Awaited<ReturnType<typeof getGreeting>>>
+export type GetGreetingQueryError = ErrorModel
+
+
+export function useGetGreeting<TData = Awaited<ReturnType<typeof getGreeting>>, TError = ErrorModel>(
+ name: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getGreeting>>,
           TError,
           Awaited<ReturnType<typeof getGreeting>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetGreeting<
-  TData = Awaited<ReturnType<typeof getGreeting>>,
-  TError = ErrorModel,
->(
-  name: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetGreeting<TData = Awaited<ReturnType<typeof getGreeting>>, TError = ErrorModel>(
+ name: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getGreeting>>,
           TError,
           Awaited<ReturnType<typeof getGreeting>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetGreeting<
-  TData = Awaited<ReturnType<typeof getGreeting>>,
-  TError = ErrorModel,
->(
-  name: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetGreeting<TData = Awaited<ReturnType<typeof getGreeting>>, TError = ErrorModel>(
+ name: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get a greeting
  */
 
-export function useGetGreeting<
-  TData = Awaited<ReturnType<typeof getGreeting>>,
-  TError = ErrorModel,
->(
-  name: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetGreetingQueryOptions(name, options);
+export function useGetGreeting<TData = Awaited<ReturnType<typeof getGreeting>>, TError = ErrorModel>(
+ name: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGreeting>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetGreetingQueryOptions(name,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+

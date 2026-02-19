@@ -13,6 +13,7 @@ import (
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -524,6 +525,118 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything).Return(&event, nil)
 				mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything).Return(&location, nil)
 			}
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			if tt.statusCode != resp.StatusCode {
+				bodyBytes, _ := io.ReadAll(resp.Body)
+				t.Logf("Response body: %s", string(bodyBytes))
+			}
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
+	t.Parallel()
+
+	search := "robotics"
+	lat := 13.75
+	lng := 100.55
+	radius := 5.0
+	minDuration := 30
+	maxDuration := 120
+	priceTier := "$$"
+
+	tests := []struct {
+		name       string
+		query      string
+		mockSetup  func(*repomocks.MockEventOccurrenceRepository)
+		statusCode int
+	}{
+		{
+			name:  "happy path with all filters",
+			query: "?page=1&limit=10&search=robotics&lat=13.75&lng=100.55&radius_km=5&price=$$&min_duration=30&max_duration=120",
+			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
+				m.On(
+					"GetAllEventOccurrences",
+					mock.Anything,
+					utils.Pagination{Page: 1, Limit: 10},
+					models.GetAllEventOccurrencesFilter{
+						Search:             &search,
+						Latitude:           &lat,
+						Longitude:          &lng,
+						RadiusKm:           &radius,
+						PriceTier:          &priceTier,
+						MinDurationMinutes: &minDuration,
+						MaxDurationMinutes: &maxDuration,
+					},
+				).Return([]models.EventOccurrence{}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:       "lat/lng/radius incomplete should return 400",
+			query:      "?lat=13.75&lng=100.55",
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository) {},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name:       "min_duration > max_duration should return 400",
+			query:      "?min_duration=120&max_duration=30",
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository) {},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name:       "invalid price tier should return 400",
+			query:      "?price=invalid",
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository) {},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name:  "no filters, just default pagination",
+			query: "?page=1&limit=5",
+			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
+				m.On(
+					"GetAllEventOccurrences",
+					mock.Anything,
+					utils.Pagination{Page: 1, Limit: 5},
+					models.GetAllEventOccurrencesFilter{},
+				).Return([]models.EventOccurrence{}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockEventOccurrenceRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
+			mockEventRepo := new(repomocks.MockEventRepository)
+			mockLocationRepo := new(repomocks.MockLocationRepository)
+
+			tt.mockSetup(mockRepo)
+
+			app, _ := setupEventOccurrencesTestAPI(
+				mockRepo,
+				mockManagerRepo,
+				mockEventRepo,
+				mockLocationRepo,
+			)
+
+			req, err := http.NewRequest(
+				http.MethodGet,
+				"/api/v1/event-occurrences"+tt.query,
+				nil,
+			)
+			assert.NoError(t, err)
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
