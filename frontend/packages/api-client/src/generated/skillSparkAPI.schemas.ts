@@ -145,12 +145,12 @@ export interface CreateLocationInputBody {
 /**
  * Initial status of the registration
  */
-export type CreateRegistrationInputBodyStatus =
-  (typeof CreateRegistrationInputBodyStatus)[keyof typeof CreateRegistrationInputBodyStatus];
+export type CreateRegistrationInputBodyStatus = typeof CreateRegistrationInputBodyStatus[keyof typeof CreateRegistrationInputBodyStatus];
+
 
 export const CreateRegistrationInputBodyStatus = {
-  registered: "registered",
-  cancelled: "cancelled",
+  registered: 'registered',
+  cancelled: 'cancelled',
 } as const;
 
 export interface CreateRegistrationInputBody {
@@ -253,12 +253,12 @@ export interface Event {
 /**
  * Current status of the event occurrence
  */
-export type EventOccurrenceStatus =
-  (typeof EventOccurrenceStatus)[keyof typeof EventOccurrenceStatus];
+export type EventOccurrenceStatus = typeof EventOccurrenceStatus[keyof typeof EventOccurrenceStatus];
+
 
 export const EventOccurrenceStatus = {
-  scheduled: "scheduled",
-  cancelled: "cancelled",
+  scheduled: 'scheduled',
+  cancelled: 'cancelled',
 } as const;
 
 export interface Location {
@@ -308,12 +308,12 @@ export interface GetGreetingOutputBody {
 /**
  * Current status of the registration
  */
-export type RegistrationStatus =
-  (typeof RegistrationStatus)[keyof typeof RegistrationStatus];
+export type RegistrationStatus = typeof RegistrationStatus[keyof typeof RegistrationStatus];
+
 
 export const RegistrationStatus = {
-  registered: "registered",
-  cancelled: "cancelled",
+  registered: 'registered',
+  cancelled: 'cancelled',
 } as const;
 
 export interface Registration {
@@ -622,12 +622,12 @@ export interface UpdateGuardianInputBody {
 /**
  * Updated registration status (optional)
  */
-export type UpdateRegistrationInputBodyStatus =
-  (typeof UpdateRegistrationInputBodyStatus)[keyof typeof UpdateRegistrationInputBodyStatus];
+export type UpdateRegistrationInputBodyStatus = typeof UpdateRegistrationInputBodyStatus[keyof typeof UpdateRegistrationInputBodyStatus];
+
 
 export const UpdateRegistrationInputBodyStatus = {
-  registered: "registered",
-  cancelled: "cancelled",
+  registered: 'registered',
+  cancelled: 'cancelled',
 } as const;
 
 export interface UpdateRegistrationInputBody {
@@ -657,15 +657,22 @@ export interface UserOutputBody {
 }
 
 export type GetAllEventOccurrencesParams = {
-  /**
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
+/**
+ * @minimum 1
+ */
+page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+search?: string;
+lat?: number;
+lng?: number;
+radius_km?: number;
+price?: string;
+min_duration?: number;
+max_duration?: number;
 };
 
 export type CreateEventBody = {
@@ -705,29 +712,29 @@ export type UpdateEventBody = {
 };
 
 export type GetAllLocationsParams = {
-  /**
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
+/**
+ * @minimum 1
+ */
+page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
 };
 
 export type ListOrganizationsParams = {
-  /**
-   * Page number (starts at 1)
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * Number of items per page
-   * @minimum 1
-   * @maximum 100
-   */
-  page_size?: number;
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type CreateOrganizationBody = {
@@ -753,41 +760,42 @@ export type UpdateOrganizationBody = {
 };
 
 export type GetReviewByEventIdParams = {
-  /**
-   * Page number (starts at 1)
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * Number of items per page
-   * @minimum 1
-   * @maximum 100
-   */
-  page_size?: number;
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type GetReviewByGuardianIdParams = {
-  /**
-   * Page number (starts at 1)
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * Number of items per page
-   * @minimum 1
-   * @maximum 100
-   */
-  page_size?: number;
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type GetAllSchoolsParams = {
-  /**
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
+/**
+ * @minimum 1
+ */
+page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
 };
+

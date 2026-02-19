@@ -12,7 +12,9 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "SkillSpark needs your location to show events and activities near you."
-      }
+      },
+      "config": {},
+      "bundleIdentifier": "com.skillspark.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +22,11 @@
         "image": "./assets/images/generate.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {}
+      },
+      "package": "com.skillspark.app"
     },
     "plugins": [
       "expo-router",

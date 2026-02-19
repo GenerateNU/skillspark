@@ -2,7 +2,8 @@
         docker-build docker-clean docker-prune \
         up down stop restart logs build clean \
         up-backend up-frontend logs-backend logs-frontend \
-        build-backend build-frontend shell-backend shell-frontend setup-hooks generate-api
+        build-backend build-frontend shell-backend shell-frontend setup-hooks generate-api \
+        clean-node-modules
 
 # Default target - show help
 .DEFAULT_GOAL := help
@@ -60,6 +61,9 @@ help:
 	@echo "$(BLUE)Cleanup:$(NC)"
 	@echo "  make clean             - Remove containers and volumes"
 	@echo "  make prune             - Remove all unused Docker resources"
+	@echo ""
+	@echo "$(BLUE)Dependencies:$(NC)"
+	@echo "  make clean-node-modules - Remove all node_modules and reinstall dependencies"
 	@echo ""
 ifeq ($(OS),Windows_NT)
 	@echo "$(YELLOW)Note: On Windows, hot reload uses 'docker watch' in a separate terminal$(NC)"
@@ -237,3 +241,15 @@ setup-hooks:
 
 generate-api:
 	cd frontend/packages/api-client && bun run generate
+
+clean-node-modules:
+	@echo "$(BOLD)Searching for and removing all node_modules folders...$(NC)"
+	@find . -type d -name "node_modules" -exec rm -rf {} + 2>/dev/null || true
+	@echo "$(GREEN)All node_modules folders removed$(NC)"
+	@echo ""
+	@echo "$(BOLD)Reinstalling dependencies in all locations...$(NC)"
+	@for dir in $$(find . -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;); do \
+		echo "$(BLUE)Installing in: $$dir$(NC)"; \
+		(cd "$$dir" && bun install) || true; \
+	done
+	@echo "$(GREEN)All dependencies reinstalled$(NC)"
