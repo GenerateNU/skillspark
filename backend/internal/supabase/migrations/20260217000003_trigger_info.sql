@@ -1,0 +1,5 @@
+-- Trigger to be set up manually or via Supabase Dashboard to call the Edge Function.
+-- Typically: 
+-- 1. Enable Database Webhooks
+-- 2. Create a webhook 'send-notification' on table 'notification' (INSERT)
+-- 3. Point to the Edge Function URL

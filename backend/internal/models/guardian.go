@@ -15,6 +15,7 @@ type Guardian struct {
 	ProfilePictureS3Key *string   `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
 	LanguagePreference  string    `json:"language_preference" db:"language_preference"`
 	AuthID              uuid.UUID `json:"auth_id" db:"auth_id"`
+	LineAccountID       *string   `json:"line_account_id" db:"line_account_id"`
 	CreatedAt           time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -37,11 +38,11 @@ type GetGuardianByChildIDInput struct {
 
 type CreateGuardianInput struct {
 	Body struct {
-		Name                string  `json:"name" doc:"Name of the guardian"`
-		Email               string  `json:"email" doc:"Email of the guardian"`
-		Username            string  `json:"username" doc:"Username of the guardian"`
-		ProfilePictureS3Key *string `json:"profile_picture_s3_key,omitempty" doc:"S3 key for profile picture" required:"false"`
-		LanguagePreference  string  `json:"language_preference" doc:"Language preference"`
+		Name                string    `json:"name" doc:"Name of the guardian"`
+		Email               string    `json:"email" doc:"Email of the guardian"`
+		Username            string    `json:"username" doc:"Username of the guardian"`
+		ProfilePictureS3Key *string   `json:"profile_picture_s3_key,omitempty" doc:"S3 key for profile picture" required:"false"`
+		LanguagePreference  string    `json:"language_preference" doc:"Language preference"`
 		AuthID              uuid.UUID `json:"auth_id" db:"auth_id" doc:"auth id of the guardian being created"`
 	}
 }

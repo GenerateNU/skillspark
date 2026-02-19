@@ -9,6 +9,7 @@ import (
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
+	"skillspark/internal/storage/postgres/schema/notification"
 	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/review"
@@ -94,6 +95,8 @@ type RegistrationRepository interface {
 	GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error)
 	GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error)
 	UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error)
+	GetUpcomingUnsentRegistrations(ctx context.Context, input *registration.GetUpcomingUnsentRegistrationsInput) (*registration.GetUpcomingUnsentRegistrationsOutput, error)
+	MarkReminderSent(ctx context.Context, tx pgx.Tx, id uuid.UUID, sent bool) error
 }
 
 type ReviewRepository interface {
@@ -110,6 +113,10 @@ type UserRepository interface {
 	DeleteUser(ctx context.Context, id uuid.UUID) (*models.User, error)
 }
 
+type NotificationRepository interface {
+	CreateNotification(ctx context.Context, tx pgx.Tx, notification *models.Notification) error
+}
+
 type Repository struct {
 	db              *pgxpool.Pool
 	Location        LocationRepository
@@ -123,6 +130,7 @@ type Repository struct {
 	Registration    RegistrationRepository
 	Review          ReviewRepository
 	User            UserRepository
+	Notification    NotificationRepository
 }
 
 // Close closes the database connection pool
@@ -151,5 +159,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		User:            user.NewUserRepository(db),
 		Registration:    registration.NewRegistrationRepository(db),
 		Review:          review.NewReviewRepository(db),
+		Notification:    notification.NewNotificationRepository(db),
 	}
 }

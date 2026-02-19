@@ -3,6 +3,7 @@ package repomocks
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/registration"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -59,6 +60,19 @@ func (m *MockRegistrationRepository) GetRegistrationsByEventOccurrenceID(ctx con
 		return nil, args.Error(1)
 	}
 	return args.Get(0).(*models.GetRegistrationsByEventOccurrenceIDOutput), args.Error(1)
+}
+
+func (m *MockRegistrationRepository) GetUpcomingUnsentRegistrations(ctx context.Context, input *registration.GetUpcomingUnsentRegistrationsInput) (*registration.GetUpcomingUnsentRegistrationsOutput, error) {
+	args := m.Called(ctx, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*registration.GetUpcomingUnsentRegistrationsOutput), args.Error(1)
+}
+
+func (m *MockRegistrationRepository) MarkReminderSent(ctx context.Context, tx pgx.Tx, id uuid.UUID, sent bool) error {
+	args := m.Called(ctx, tx, id, sent)
+	return args.Error(0)
 }
 
 func (m *MockEventOccurrenceRepository) DeleteEventOccurrence(

@@ -1,0 +1,8 @@
+{
+    "imports": {
+        "deno.land/std": "https://deno.land/std@0.224.0",
+        "resend": "https://npm.esm.sh/resend@2.0.0",
+        "@line/bot-sdk": "https://npm.esm.sh/@line/bot-sdk@8.0.0",
+        "@supabase/supabase-js": "https://npm.esm.sh/@supabase/supabase-js@2.39.0"
+    }
+}

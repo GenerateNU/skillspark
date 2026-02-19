@@ -2,13 +2,17 @@ package service
 
 import (
 	"context"
+
 	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/s3_client"
+	"skillspark/internal/service/cron"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
+	"skillspark/internal/storage/postgres/schema/notification"
+	"skillspark/internal/storage/postgres/schema/registration"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -35,6 +39,20 @@ func InitApp(config config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	regRepo, ok := repo.Registration.(*registration.RegistrationRepository)
+	if !ok {
+		// handle error
+	}
+
+	notifRepo, ok := repo.Notification.(*notification.NotificationRepository)
+	if !ok {
+		// handle error
+	}
+
+	cronService := cron.NewService(repo.GetDB(), regRepo, notifRepo)
+	cronService.Start()
+
 	app, humaAPI := SetupApp(config, repo, s3Client)
 	return &App{
 		Server: app,

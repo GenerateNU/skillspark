@@ -16,6 +16,7 @@ type Registration struct {
 	UpdatedAt           time.Time          `json:"updated_at" db:"updated_at" doc:"Timestamp when registration was last updated"`
 	EventName           string             `json:"event_name" db:"event_name" doc:"Name of the event (joined from events table)"`
 	OccurrenceStartTime time.Time          `json:"occurrence_start_time" db:"occurrence_start_time" doc:"Start time of the event occurrence"`
+	ReminderSent        bool               `json:"reminder_sent" db:"reminder_sent" doc:"Whether the reminder has been sent"`
 }
 
 type RegistrationStatus string
