@@ -27,7 +27,7 @@ func (r *ReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.UUID
 	}
 	defer rows.Close()
 
-	reviews, err := pgx.CollectRows(rows, ScanReviews)
+	reviews, err := pgx.CollectRows(rows, r.ScanReviews)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to collect reviews: ", err.Error())
 		return nil, &errr
