@@ -38,6 +38,14 @@ func main() {
 
 	port := cfg.Application.Port
 
+	// Start notification scheduler in background
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	
+	go func() {
+		app.Scheduler.StartScheduler(ctx)
+	}()
+
 	// Listen for connections with a goroutine
 	go func() {
 		if err := app.Server.Listen(":" + port); err != nil {
@@ -53,11 +61,14 @@ func main() {
 
 	slog.Info("Shutting down server")
 
-	// Shutdown server with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
+	// Cancel scheduler context
+	cancel()
 
-	if err := app.Server.ShutdownWithContext(ctx); err != nil {
+	// Shutdown server with timeout
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer shutdownCancel()
+
+	if err := app.Server.ShutdownWithContext(shutdownCtx); err != nil {
 		slog.Error("failed to shutdown server gracefully", "error", err)
 	}
 

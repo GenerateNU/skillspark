@@ -5,8 +5,10 @@ import (
 	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
+	"skillspark/internal/notification"
 	"skillspark/internal/s3_client"
 	"skillspark/internal/service/routes"
+	"skillspark/internal/sqs_client"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
 
@@ -22,9 +24,11 @@ import (
 )
 
 type App struct {
-	Server *fiber.App
-	Repo   *storage.Repository
-	API    huma.API
+	Server     *fiber.App
+	Repo       *storage.Repository
+	API        huma.API
+	Scheduler  *notification.Scheduler
+	NotifService *notification.Service
 }
 
 // Initialize the App union type containing a fiber app and repository.
@@ -35,11 +39,24 @@ func InitApp(config config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	
+	// Initialize SQS client
+	sqsClient, err := sqs_client.NewClient(config.SQS)
+	if err != nil {
+		return nil, err
+	}
+	
+	// Initialize notification service and scheduler
+	notifService := notification.NewService(repo, sqsClient)
+	scheduler := notification.NewScheduler(repo, sqsClient)
+	
 	app, humaAPI := SetupApp(config, repo, s3Client)
 	return &App{
-		Server: app,
-		Repo:   repo,
-		API:    humaAPI,
+		Server:      app,
+		Repo:        repo,
+		API:         humaAPI,
+		Scheduler:   scheduler,
+		NotifService: notifService,
 	}, nil
 }
 
