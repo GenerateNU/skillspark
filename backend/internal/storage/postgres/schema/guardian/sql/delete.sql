@@ -1,16 +1,14 @@
-WITH guardian_registrations_and_times AS (
-    SELECT r.id, r.guardian_id, eo.start_time, eo.end_time
+WITH guardian_registrations AS (
+    SELECT r.id, r.guardian_id
     FROM registration r
-    JOIN event_occurrence eo ON r.event_occurrence_id = eo.id
     WHERE guardian_id = $1
 ),
 cancelled_registrations AS (
     UPDATE registration r
     SET status = 'cancelled'
     WHERE r.id IN (
-        SELECT grt.id
-        FROM guardian_registrations_and_times grt
-        WHERE grt.start_time > NOW()
+        SELECT gr.id
+        FROM guardian_registrations gr
     )
 ),
 deleted_guardian AS (

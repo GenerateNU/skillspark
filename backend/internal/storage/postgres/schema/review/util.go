@@ -2,6 +2,7 @@ package review
 
 import (
 	"context"
+	"embed"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/registration"
@@ -10,6 +11,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 )
+
+//go:embed sql/*.sql
+var SqlReviewFiles embed.FS
 
 func CreateTestReview(
 	t *testing.T,

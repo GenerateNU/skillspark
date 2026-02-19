@@ -12,7 +12,7 @@ import (
 
 func (r *OrganizationRepository) GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, error) {
 
-	baseQuery, err := schema.ReadSQLBaseScript("organization/sql/get_all.sql")
+	baseQuery, err := schema.ReadSQLBaseScript("get_all.sql", SqlOrganizationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

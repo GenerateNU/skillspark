@@ -12,7 +12,7 @@ import (
 )
 
 func (r *GuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error) {
-	query, err := schema.ReadSQLBaseScript("guardian/sql/delete.sql")
+	query, err := schema.ReadSQLBaseScript("delete.sql", SqlGuardianFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
@@ -21,7 +21,7 @@ func (r *GuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID, t
 	var row pgx.Row
 	if tx != nil {
 		row = tx.QueryRow(ctx, query, id)
-	} else { 
+	} else {
 		row = r.db.QueryRow(ctx, query, id)
 	}
 

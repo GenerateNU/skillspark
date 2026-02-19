@@ -2,6 +2,7 @@ package guardian
 
 import (
 	"context"
+	"embed"
 	"skillspark/internal/models"
 	"testing"
 
@@ -11,6 +12,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 )
+
+//go:embed sql/*.sql
+var SqlGuardianFiles embed.FS
 
 func CreateTestGuardian(
 	t *testing.T,

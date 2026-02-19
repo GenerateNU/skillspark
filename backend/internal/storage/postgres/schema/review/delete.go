@@ -10,7 +10,7 @@ import (
 
 func (r *ReviewRepository) DeleteReview(ctx context.Context, id uuid.UUID) error {
 
-	query, err := schema.ReadSQLBaseScript("review/sql/delete.sql")
+	query, err := schema.ReadSQLBaseScript("delete.sql", SqlReviewFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return &err

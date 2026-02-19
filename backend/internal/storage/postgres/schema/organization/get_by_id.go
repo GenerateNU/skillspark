@@ -12,7 +12,7 @@ import (
 )
 
 func (r *OrganizationRepository) GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, error) {
-	query, err := schema.ReadSQLBaseScript("organization/sql/get_by_id.sql")
+	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlOrganizationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

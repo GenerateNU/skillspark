@@ -12,7 +12,7 @@ import (
 )
 
 func (r *ManagerRepository) GetManagerByID(ctx context.Context, id uuid.UUID) (*models.Manager, error) {
-	query, err := schema.ReadSQLBaseScript("manager/sql/get_by_id.sql")
+	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlManagerFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

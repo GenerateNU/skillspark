@@ -8,7 +8,7 @@ import (
 )
 
 func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, error) {
-	query, err := schema.ReadSQLBaseScript("organization/sql/update.sql")
+	query, err := schema.ReadSQLBaseScript("update.sql", SqlOrganizationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

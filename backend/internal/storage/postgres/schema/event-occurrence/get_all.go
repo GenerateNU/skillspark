@@ -11,7 +11,7 @@ import (
 )
 
 func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination) ([]models.EventOccurrence, error) {
-	query, err := schema.ReadSQLBaseScript("event-occurrence/sql/get_all.sql")
+	query, err := schema.ReadSQLBaseScript("get_all.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

@@ -8,7 +8,7 @@ import (
 )
 
 func (r *UserRepository) CreateUser(ctx context.Context, user *models.CreateUserInput) (*models.User, error) {
-	query, err := schema.ReadSQLBaseScript("user/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlUserFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

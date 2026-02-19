@@ -13,7 +13,7 @@ import (
 )
 
 func (r *GuardianRepository) GetGuardianByID(ctx context.Context, id uuid.UUID) (*models.Guardian, error) {
-	query, err := schema.ReadSQLBaseScript("guardian/sql/get_by_id.sql")
+	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlGuardianFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

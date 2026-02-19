@@ -10,7 +10,7 @@ import (
 )
 
 func (r *RegistrationRepository) GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error) {
-	query, err := schema.ReadSQLBaseScript("registration/sql/get_by_guardian_id.sql")
+	query, err := schema.ReadSQLBaseScript("get_by_guardian_id.sql", SqlRegistrationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

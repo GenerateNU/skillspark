@@ -17,7 +17,7 @@ func (r *ManagerRepository) PatchManager(ctx context.Context, manager *models.Pa
 	var updatedManager models.Manager
 	updatedManager.ID = manager.Body.ID
 
-	managerQuery, err := schema.ReadSQLBaseScript("manager/sql/update_manager.sql")
+	managerQuery, err := schema.ReadSQLBaseScript("update_manager.sql", SqlManagerFiles)
 	if err != nil {
 		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to read manager update query: ", err.Error())
@@ -42,7 +42,7 @@ func (r *ManagerRepository) PatchManager(ctx context.Context, manager *models.Pa
 		return nil, &err
 	}
 
-	userQuery, err := schema.ReadSQLBaseScript("manager/sql/update_user.sql")
+	userQuery, err := schema.ReadSQLBaseScript("update_user.sql", SqlManagerFiles)
 	if err != nil {
 		_ = tx.Rollback(ctx)
 		err := errs.InternalServerError("Failed to read user update query: ", err.Error())

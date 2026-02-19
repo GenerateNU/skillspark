@@ -12,7 +12,7 @@ import (
 )
 
 func (r *EventRepository) GetEventByID(ctx context.Context, id uuid.UUID) (*models.Event, error) {
-	query, err := schema.ReadSQLBaseScript("event/sql/get_by_id.sql")
+	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlEventFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

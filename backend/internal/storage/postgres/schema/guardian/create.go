@@ -9,7 +9,7 @@ import (
 )
 
 func (r *GuardianRepository) CreateGuardian(ctx context.Context, guardian *models.CreateGuardianInput) (*models.Guardian, error) {
-	query, err := schema.ReadSQLBaseScript("guardian/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlGuardianFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
