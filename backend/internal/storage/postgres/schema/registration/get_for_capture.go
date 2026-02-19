@@ -11,7 +11,7 @@ import (
 )
 
 func (r *RegistrationRepository) GetRegistrationsForCapture(ctx context.Context, startWindow time.Time, endWindow time.Time) ([]models.Registration, error) {
-	query, err := schema.ReadSQLBaseScript("registration/sql/get_for_capture.sql")
+	query, err := schema.ReadSQLBaseScript("registration/sql/get_for_capture.sql", SqlRegistrationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

@@ -73,9 +73,12 @@ type CreateRegistrationOutput struct {
 }
 
 type UpdateRegistrationInput struct {
-	ID   uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to update"`
+	ID   uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to update" required:"true"`
 	Body struct {
-		ChildID uuid.UUID `json:"child_id,omitempty" doc:"Updated child ID (optional)"`
+		ChildID           *uuid.UUID          `json:"child_id,omitempty" doc:"Updated child ID (optional)" format:"uuid"`
+		GuardianID        *uuid.UUID          `json:"guardian_id,omitempty" doc:"Updated guardian ID (optional)" format:"uuid"`
+		EventOccurrenceID *uuid.UUID          `json:"event_occurrence_id,omitempty" doc:"Updated event occurrence ID (optional)" format:"uuid"`
+		Status            *RegistrationStatus `json:"status,omitempty" doc:"Updated registration status (optional)" enum:"registered,cancelled"`
 	} `json:"body"`
 }
 

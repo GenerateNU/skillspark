@@ -73,7 +73,7 @@ func TestGetRegistrationsByGuardianID_MultipleChildren(t *testing.T) {
 
 	childIDs := make(map[uuid.UUID]bool)
 	for _, reg := range result.Body.Registrations {
-		assert.Equal(t, guardianID, reg.GuardianID)
+		assert.Equal(t, &guardianID, reg.GuardianID)
 		childIDs[reg.ChildID] = true
 	}
 

@@ -11,6 +11,7 @@ import (
 	"skillspark/internal/storage/postgres/schema/manager"
 	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/registration"
+	"skillspark/internal/storage/postgres/schema/review"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/storage/postgres/schema/user"
 	"skillspark/internal/utils"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -50,7 +52,7 @@ type ManagerRepository interface {
 	GetManagerByUserID(ctx context.Context, userID uuid.UUID) (*models.Manager, error)
 	GetManagerByOrgID(ctx context.Context, org_id uuid.UUID) (*models.Manager, error)
 	GetManagerByAuthID(ctx context.Context, authID string) (*models.Manager, error)
-	DeleteManager(ctx context.Context, id uuid.UUID) (*models.Manager, error)
+	DeleteManager(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Manager, error)
 	CreateManager(ctx context.Context, manager *models.CreateManagerInput) (*models.Manager, error)
 	PatchManager(ctx context.Context, manager *models.PatchManagerInput) (*models.Manager, error)
 }
@@ -62,8 +64,8 @@ type GuardianRepository interface {
 	GetGuardianByUserID(ctx context.Context, userID uuid.UUID) (*models.Guardian, error)
 	GetGuardianByAuthID(ctx context.Context, authID string) (*models.Guardian, error)
 	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
-	DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, error)
 	SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string,) (*models.Guardian, error)
+	DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error)
 }
 
 type EventRepository interface {
@@ -86,13 +88,13 @@ type EventOccurrenceRepository interface {
 	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination) ([]models.EventOccurrence, error)
 	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error)
 	CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error)
-	UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.EventOccurrence, error)
+	UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput, tx *pgx.Tx) (*models.EventOccurrence, error)
 	CancelEventOccurrence(ctx context.Context, id uuid.UUID) error
 }
 
 type RegistrationRepository interface {
 	CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error)
-	GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput) (*models.GetRegistrationByIDOutput, error)
+	GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput, tx *pgx.Tx) (*models.GetRegistrationByIDOutput, error)
 	GetRegistrationsByChildID(ctx context.Context, input *models.GetRegistrationsByChildIDInput) (*models.GetRegistrationsByChildIDOutput, error)
 	GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error)
 	GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error)
@@ -100,6 +102,20 @@ type RegistrationRepository interface {
 	UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error)
 	CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error)
 	UpdateRegistrationPaymentStatus(ctx context.Context, input *models.UpdateRegistrationPaymentStatusInput) (*models.UpdateRegistrationPaymentStatusOutput, error)
+}
+
+type ReviewRepository interface {
+	CreateReview(ctx context.Context, input *models.CreateReviewInput) (*models.Review, error)
+	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Review, error)
+	GetReviewsByEventID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Review, error)
+	DeleteReview(ctx context.Context, id uuid.UUID) error
+}
+
+type UserRepository interface {
+	CreateUser(ctx context.Context, user *models.CreateUserInput) (*models.User, error)
+	GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error)
+	UpdateUser(ctx context.Context, user *models.UpdateUserInput) (*models.User, error)
+	DeleteUser(ctx context.Context, id uuid.UUID) (*models.User, error)
 }
 
 type Repository struct {
@@ -113,14 +129,8 @@ type Repository struct {
 	Child           ChildRepository
 	EventOccurrence EventOccurrenceRepository
 	Registration    RegistrationRepository
+	Review          ReviewRepository
 	User            UserRepository
-}
-
-type UserRepository interface {
-	CreateUser(ctx context.Context, user *models.CreateUserInput) (*models.User, error)
-	GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error)
-	UpdateUser(ctx context.Context, user *models.UpdateUserInput) (*models.User, error)
-	DeleteUser(ctx context.Context, id uuid.UUID) (*models.User, error)
 }
 
 // Close closes the database connection pool
@@ -148,5 +158,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
 		User:            user.NewUserRepository(db),
 		Registration:    registration.NewRegistrationRepository(db),
+		Review:          review.NewReviewRepository(db),
 	}
 }

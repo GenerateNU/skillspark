@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
+	"github.com/jackc/pgx/v5"
 )
 
 type MockGuardianRepository struct {
@@ -68,8 +69,8 @@ func (m *MockGuardianRepository) UpdateGuardian(ctx context.Context, guardian *m
 	return args.Get(0).(*models.Guardian), nil
 }
 
-func (m *MockGuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID) (*models.Guardian, error) {
-	args := m.Called(ctx, id)
+func (m *MockGuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error) {
+	args := m.Called(ctx, id, tx)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil

@@ -13,7 +13,7 @@ import (
 )
 
 func (r *GuardianRepository) GetGuardianByID(ctx context.Context, id uuid.UUID) (*models.Guardian, error) {
-	query, err := schema.ReadSQLBaseScript("guardian/sql/get_by_id.sql")
+	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlGuardianFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
@@ -23,7 +23,7 @@ func (r *GuardianRepository) GetGuardianByID(ctx context.Context, id uuid.UUID) 
 
 	var guardian models.Guardian
 
-	err = row.Scan(&guardian.ID, &guardian.UserID, &guardian.Name, &guardian.Email, &guardian.Username, &guardian.ProfilePictureS3Key, &guardian.LanguagePreference, &guardian.StripeCustomerID, &guardian.CreatedAt, &guardian.UpdatedAt)
+	err = row.Scan(&guardian.ID, &guardian.UserID, &guardian.Name, &guardian.Email, &guardian.Username, &guardian.ProfilePictureS3Key, &guardian.LanguagePreference, &guardian.AuthID, &guardian.StripeCustomerID, &guardian.CreatedAt, &guardian.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			err := errs.NotFound("Guardian", "id", id)

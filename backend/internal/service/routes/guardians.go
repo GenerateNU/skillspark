@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"net/http"
+	"skillspark/internal/config"
 	"skillspark/internal/models"
 	"skillspark/internal/service/handler/guardian"
 	"skillspark/internal/storage"
@@ -11,8 +12,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupGuardiansRoutes(api huma.API, repo *storage.Repository, sc stripeClient.StripeClientInterface) {
-	guardianHandler := guardian.NewHandler(repo.Guardian, sc)
+func SetupGuardiansRoutes(api huma.API, repo *storage.Repository, sc stripeClient.StripeClientInterface, config config.Config) {
+	guardianHandler := guardian.NewHandler(repo.Guardian, repo.GetDB(), sc, config.Supabase)
 	huma.Register(api, huma.Operation{
 		OperationID: "get-guardian-by-id",
 		Method:      http.MethodGet,
@@ -27,24 +28,6 @@ func SetupGuardiansRoutes(api huma.API, repo *storage.Repository, sc stripeClien
 		}
 
 		return &models.GetGuardianByIDOutput{
-			Body: guardian,
-		}, nil
-	})
-
-	huma.Register(api, huma.Operation{
-		OperationID: "post-guardian",
-		Method:      http.MethodPost,
-		Path:        "/api/v1/guardians",
-		Summary:     "Create a new guardian",
-		Description: "Creates a new guardian",
-		Tags:        []string{"Guardians"},
-	}, func(ctx context.Context, input *models.CreateGuardianInput) (*models.CreateGuardianOutput, error) {
-		guardian, err := guardianHandler.CreateGuardian(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-
-		return &models.CreateGuardianOutput{
 			Body: guardian,
 		}, nil
 	})

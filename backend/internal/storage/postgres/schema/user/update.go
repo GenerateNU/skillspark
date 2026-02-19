@@ -8,7 +8,7 @@ import (
 )
 
 func (r *UserRepository) UpdateUser(ctx context.Context, user *models.UpdateUserInput) (*models.User, error) {
-	query, err := schema.ReadSQLBaseScript("user/sql/update.sql")
+	query, err := schema.ReadSQLBaseScript("update.sql", SqlUserFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
@@ -37,7 +37,7 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user *models.UpdateUser
 		existing.LanguagePreference = *user.Body.LanguagePreference
 	}
 	if user.Body.AuthID != nil {
-		existing.AuthID = user.Body.AuthID
+		existing.AuthID = *user.Body.AuthID
 	}
 
 	row := r.db.QueryRow(ctx, query, existing.Name, existing.Email, existing.Username, existing.ProfilePictureS3Key, existing.LanguagePreference, existing.AuthID, existing.ID)

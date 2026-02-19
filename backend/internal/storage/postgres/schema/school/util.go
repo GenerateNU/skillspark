@@ -2,6 +2,7 @@ package school
 
 import (
 	"context"
+	"embed"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/location"
 	"testing"
@@ -9,6 +10,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 )
+
+//go:embed sql/*.sql
+var SqlSchoolFiles embed.FS
 
 func CreateTestSchool(
 	t *testing.T,

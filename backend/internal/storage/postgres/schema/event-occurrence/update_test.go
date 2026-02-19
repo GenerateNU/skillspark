@@ -47,7 +47,7 @@ func TestEventOccurrenceRepository_UpdateEventOccurrence(t *testing.T) {
 	}()
 
 	// check updated event occurrence struct
-	eventOccurrence, err := repo.UpdateEventOccurrence(ctx, eventOccurrenceInput)
+	eventOccurrence, err := repo.UpdateEventOccurrence(ctx, eventOccurrenceInput, nil)
 	assert.Nil(t, err)
 	assert.NotNil(t, eventOccurrence)
 	assert.Equal(t, eventOccurrenceInput.Body.ManagerId, eventOccurrence.ManagerId)

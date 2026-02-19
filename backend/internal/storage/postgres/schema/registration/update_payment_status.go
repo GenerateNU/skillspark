@@ -11,7 +11,7 @@ import (
 )
 
 func (r *RegistrationRepository) UpdateRegistrationPaymentStatus(ctx context.Context, input *models.UpdateRegistrationPaymentStatusInput) (*models.UpdateRegistrationPaymentStatusOutput, error) {
-	query, err := schema.ReadSQLBaseScript("registration/sql/update_payment_status.sql")
+	query, err := schema.ReadSQLBaseScript("registration/sql/update_payment_status.sql", SqlRegistrationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

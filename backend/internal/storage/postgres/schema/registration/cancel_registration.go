@@ -11,7 +11,7 @@ import (
 )
 
 func (r *RegistrationRepository) CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error) {
-	query, err := schema.ReadSQLBaseScript("registration/sql/cancel_registration.sql")
+	query, err := schema.ReadSQLBaseScript("registration/sql/cancel_registration.sql", SqlRegistrationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

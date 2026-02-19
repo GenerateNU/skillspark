@@ -10,7 +10,7 @@ import (
 )
 
 func (r *OrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error) {
-	query, err := schema.ReadSQLBaseScript("organization/sql/delete.sql")
+	query, err := schema.ReadSQLBaseScript("delete.sql", SqlOrganizationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

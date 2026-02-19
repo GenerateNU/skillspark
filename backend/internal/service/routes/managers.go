@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"net/http"
+	"skillspark/internal/config"
 	"skillspark/internal/models"
 	"skillspark/internal/service/handler/manager"
 	"skillspark/internal/storage"
@@ -10,12 +11,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-// idk what ctx does
-// idk what the tags feature does
-// dont rlly know what huma does in general
-// how was the manager table created in the schema???
-func SetupManagerRoutes(api huma.API, repo *storage.Repository) {
-	managerHandler := manager.NewHandler(repo.Manager, repo.Guardian)
+func SetupManagerRoutes(api huma.API, repo *storage.Repository, config config.Config) {
+	managerHandler := manager.NewHandler(repo.Manager, repo.GetDB(), config.Supabase)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-manager-by-id",
@@ -50,26 +47,6 @@ func SetupManagerRoutes(api huma.API, repo *storage.Repository) {
 		}
 
 		return &models.GetManagerByOrgIDOutput{
-			Body: manager,
-		}, nil
-	})
-
-	// create manager here
-
-	huma.Register(api, huma.Operation{
-		OperationID: "post-manager",
-		Method:      http.MethodPost,
-		Path:        "/api/v1/manager",
-		Summary:     "posts a manager",
-		Description: "Returns a manager by id",
-		Tags:        []string{"Managers"},
-	}, func(ctx context.Context, input *models.CreateManagerInput) (*models.CreateManagerOutput, error) {
-		manager, err := managerHandler.CreateManager(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-
-		return &models.CreateManagerOutput{
 			Body: manager,
 		}, nil
 	})

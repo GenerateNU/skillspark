@@ -2,11 +2,15 @@ package organization
 
 import (
 	"context"
+	"embed"
 	"skillspark/internal/models"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+//go:embed sql/*.sql
+var SqlOrganizationFiles embed.FS
 
 func CreateTestOrganization(
 	t *testing.T,

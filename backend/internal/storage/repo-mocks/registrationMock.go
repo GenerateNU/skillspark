@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -21,7 +22,7 @@ func (m *MockRegistrationRepository) CreateRegistration(ctx context.Context, inp
 	return args.Get(0).(*models.CreateRegistrationOutput), args.Error(1)
 }
 
-func (m *MockRegistrationRepository) GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput) (*models.GetRegistrationByIDOutput, error) {
+func (m *MockRegistrationRepository) GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput, tx *pgx.Tx) (*models.GetRegistrationByIDOutput, error) {
 	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)

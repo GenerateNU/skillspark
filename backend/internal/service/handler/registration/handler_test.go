@@ -182,6 +182,7 @@ func TestHandler_GetRegistrationsByChildID(t *testing.T) {
 }
 
 func TestHandler_GetRegistrationsByGuardianID(t *testing.T) {
+	
 	tests := []struct {
 		name        string
 		guardianID  string
@@ -539,7 +540,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, registration)
-				assert.Equal(t, tt.input.Body.ChildID, registration.Body.ChildID)
+				assert.Equal(t, &(tt.input.Body.ChildID), registration.Body.ChildID)
 			}
 
 			mockRegRepo.AssertExpectations(t)
@@ -552,6 +553,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 }
 
 func TestHandler_UpdateRegistration(t *testing.T) {
+
 	existingID := uuid.MustParse("80000000-0000-0000-0000-000000000001")
 	newChildID := uuid.MustParse("30000000-0000-0000-0000-000000000002")
 	invalidChildID := uuid.New()
@@ -566,7 +568,7 @@ func TestHandler_UpdateRegistration(t *testing.T) {
 			name: "successful update child",
 			input: func() *models.UpdateRegistrationInput {
 				i := &models.UpdateRegistrationInput{ID: existingID}
-				i.Body.ChildID = newChildID
+				i.Body.ChildID = &newChildID
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository) {
@@ -603,7 +605,7 @@ func TestHandler_UpdateRegistration(t *testing.T) {
 			name: "registration not found",
 			input: func() *models.UpdateRegistrationInput {
 				i := &models.UpdateRegistrationInput{ID: existingID}
-				i.Body.ChildID = newChildID
+				i.Body.ChildID = &newChildID
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository) {
@@ -623,7 +625,7 @@ func TestHandler_UpdateRegistration(t *testing.T) {
 			name: "invalid child_id on update",
 			input: func() *models.UpdateRegistrationInput {
 				i := &models.UpdateRegistrationInput{ID: existingID}
-				i.Body.ChildID = invalidChildID
+				i.Body.ChildID = &invalidChildID
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository) {

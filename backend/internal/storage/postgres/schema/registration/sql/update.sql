@@ -2,8 +2,11 @@ WITH updated AS (
     UPDATE registration
     SET
         child_id = $1,
+        guardian_id = $2,
+        event_occurrence_id = $3,
+        status = $4,
         updated_at = NOW()
-    WHERE id = $2
+    WHERE id = $5
     RETURNING 
         id, 
         child_id, 

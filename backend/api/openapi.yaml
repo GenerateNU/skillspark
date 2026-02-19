@@ -641,32 +641,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
-  /api/v1/guardians:
-    post:
-      tags:
-        - Guardians
-      summary: Create a new guardian
-      description: Creates a new guardian
-      operationId: post-guardian
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateGuardianInputBody'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Guardian'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
   /api/v1/guardians/{id}:
     get:
       tags:
@@ -888,31 +862,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
   /api/v1/manager:
-    post:
-      tags:
-        - Managers
-      summary: posts a manager
-      description: Returns a manager by id
-      operationId: post-manager
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateManagerInputBody'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Manager'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
     patch:
       tags:
         - Managers
@@ -1430,6 +1379,158 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/review:
+    post:
+      tags:
+        - Review
+      summary: Creates a review
+      description: Creates a review
+      operationId: create-review
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReviewInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/review/{id}:
+    delete:
+      tags:
+        - Review
+      summary: Delete an existing review by id
+      description: Deletes an existing review by id
+      operationId: delete-review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteReviewOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/review/event/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get reviews by event ID
+      description: Returns all reviews with the given event ID
+      operationId: get-review-by-event-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: page_size
+          in: query
+          description: Number of items per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of items per page
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of reviews
+                items:
+                  $ref: '#/components/schemas/Review'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/review/guardian/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get reviews by guardian ID
+      description: Returns all reviews with the given guardian ID
+      operationId: get-review-by-guardian-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: page_size
+          in: query
+          description: Number of items per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of items per page
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of reviews
+                items:
+                  $ref: '#/components/schemas/Review'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/schools:
     get:
       tags:
@@ -1725,40 +1826,6 @@ components:
         - end_time
         - max_attendees
         - language
-    CreateGuardianInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/CreateGuardianInputBody.json
-          readOnly: true
-        auth_id:
-          type: string
-          description: auth id of the guardian being created
-        email:
-          type: string
-          description: Email of the guardian
-        language_preference:
-          type: string
-          description: Language preference
-        name:
-          type: string
-          description: Name of the guardian
-        profile_picture_s3_key:
-          type: string
-          description: S3 key for profile picture
-        username:
-          type: string
-          description: Username of the guardian
-      required:
-        - name
-        - email
-        - username
-        - language_preference
     CreateLocationInputBody:
       type: object
       additionalProperties: false
@@ -1826,47 +1893,6 @@ components:
         - province
         - postal_code
         - country
-    CreateManagerInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/CreateManagerInputBody.json
-          readOnly: true
-        auth_id:
-          type: string
-          description: auth id of the manager being created
-        email:
-          type: string
-          description: Email of the guardian
-        language_preference:
-          type: string
-          description: Language preference
-        name:
-          type: string
-          description: Name of the guardian
-        organization_id:
-          type: string
-          description: organization id of the organization the manager is associated with
-        profile_picture_s3_key:
-          type: string
-          description: S3 key for profile picture
-        role:
-          type: string
-          description: role of the manager being created
-        username:
-          type: string
-          description: Username of the guardian
-      required:
-        - name
-        - email
-        - username
-        - language_preference
-        - role
     CreateRegistrationInputBody:
       type: object
       additionalProperties: false
@@ -1902,6 +1928,36 @@ components:
         - guardian_id
         - event_occurrence_id
         - status
+    CreateReviewInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateReviewInputBody.json
+          readOnly: true
+        categories:
+          type: array
+          description: Review categories for this review, can be one of fun, engaging, interesting or informative.
+          items:
+            type: string
+        description:
+          type: string
+          description: The review text
+        guardian_id:
+          type: string
+          description: ID of the guardian
+        registration_id:
+          type: string
+          description: ID of the linked registration
+      required:
+        - registration_id
+        - guardian_id
+        - description
+        - categories
     CreateUserInputBody:
       type: object
       additionalProperties: false
@@ -1938,6 +1994,22 @@ components:
           format: uri
           examples:
             - http://localhost:8080/schemas/DeleteEventOutputBody.json
+          readOnly: true
+        message:
+          type: string
+          description: Success message
+      required:
+        - message
+    DeleteReviewOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DeleteReviewOutputBody.json
           readOnly: true
         message:
           type: string
@@ -2195,6 +2267,8 @@ components:
           examples:
             - http://localhost:8080/schemas/Guardian.json
           readOnly: true
+        auth_id:
+          type: string
         created_at:
           type: string
           format: date-time
@@ -2223,6 +2297,7 @@ components:
         - username
         - profile_picture_s3_key
         - language_preference
+        - auth_id
         - created_at
         - updated_at
     GuardianLoginOutputBody:
@@ -2428,6 +2503,8 @@ components:
           examples:
             - http://localhost:8080/schemas/Manager.json
           readOnly: true
+        auth_id:
+          type: string
         created_at:
           type: string
           format: date-time
@@ -2462,6 +2539,7 @@ components:
         - username
         - profile_picture_s3_key
         - language_preference
+        - auth_id
         - created_at
         - updated_at
     ManagerLoginOutputBody:
@@ -2670,6 +2748,50 @@ components:
         - updated_at
         - event_name
         - occurrence_start_time
+    Review:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Review.json
+          readOnly: true
+        categories:
+          type: array
+          description: Review categories for this review, can be one of fun, engaging, interesting or informative.
+          items:
+            type: string
+        created_at:
+          type: string
+          description: Timestamp when registration was created
+          format: date-time
+        description:
+          type: string
+          description: The review text
+        guardian_id:
+          type: string
+          description: ID of the guardian
+        id:
+          type: string
+          description: Unique review identifier
+        registration_id:
+          type: string
+          description: ID of the linked registration
+        updated_at:
+          type: string
+          description: Timestamp when registration was last updated
+          format: date-time
+      required:
+        - id
+        - registration_id
+        - guardian_id
+        - description
+        - categories
+        - created_at
+        - updated_at
     School:
       type: object
       additionalProperties: false

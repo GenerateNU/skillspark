@@ -9,7 +9,7 @@ import (
 
 func (r *ChildRepository) CreateChild(ctx context.Context, child *models.CreateChildInput) (*models.Child, error) {
 
-	query, err := schema.ReadSQLBaseScript("child/sql/create.sql")
+	query, err := schema.ReadSQLBaseScript("create.sql", SqlChildFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

@@ -99,7 +99,7 @@ func TestCancelRegistration_VerifyPersistence(t *testing.T) {
 	getInput := &models.GetRegistrationByIDInput{
 		ID: created.ID,
 	}
-	fetched, err := repo.GetRegistrationByID(ctx, getInput)
+	fetched, err := repo.GetRegistrationByID(ctx, getInput, nil)
 	
 	require.Nil(t, err)
 	require.NotNil(t, fetched)

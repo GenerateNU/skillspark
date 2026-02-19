@@ -16,6 +16,7 @@ type Manager struct {
 	Username            string    `json:"username" db:"username"`
 	ProfilePictureS3Key *string   `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
 	LanguagePreference  string    `json:"language_preference" db:"language_preference"`
+	AuthID              uuid.UUID `json:"auth_id" db:"auth_id"`
 	CreatedAt           time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -47,7 +48,7 @@ type CreateManagerInput struct {
 		LanguagePreference  string     `json:"language_preference" doc:"Language preference"`
 		OrganizationID      *uuid.UUID `json:"organization_id,omitempty" db:"organization_id" doc:"organization id of the organization the manager is associated with"`
 		Role                string     `json:"role" db:"role" doc:"role of the manager being created"`
-		AuthID              *uuid.UUID `json:"auth_id,omitempty" db:"auth_id" doc:"auth id of the manager being created" required:"false"`
+		AuthID              uuid.UUID `json:"auth_id" db:"auth_id" doc:"auth id of the manager being created"`
 	}
 }
 

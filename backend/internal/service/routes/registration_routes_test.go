@@ -50,6 +50,9 @@ func setupRegistrationTestAPI(
 func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 	t.Parallel()
 
+	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+
 	tests := []struct {
 		name       string
 		ID         string
@@ -67,8 +70,8 @@ func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 				).Return(&models.GetRegistrationByIDOutput{
 					Body: models.Registration{
 						ID:                  uuid.MustParse("80000000-0000-0000-0000-000000000001"),
-						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						ChildID:             childIdEx,
+						GuardianID:          guardianIdEx,
 						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 						Status:              models.RegistrationStatusRegistered,
 						EventName:           "STEM Club",
@@ -121,6 +124,9 @@ func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 func TestHumaValidation_GetRegistrationsByChildID(t *testing.T) {
 	t.Parallel()
 
+	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+
 	tests := []struct {
 		name       string
 		childID    string
@@ -135,8 +141,8 @@ func TestHumaValidation_GetRegistrationsByChildID(t *testing.T) {
 				output.Body.Registrations = []models.Registration{
 					{
 						ID:                  uuid.New(),
-						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						ChildID:             childIdEx,
+						GuardianID:          guardianIdEx,
 						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 						Status:              models.RegistrationStatusRegistered,
 						EventName:           "STEM Club",
@@ -190,6 +196,9 @@ func TestHumaValidation_GetRegistrationsByChildID(t *testing.T) {
 func TestHumaValidation_GetRegistrationsByGuardianID(t *testing.T) {
 	t.Parallel()
 
+	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+
 	tests := []struct {
 		name       string
 		guardianID string
@@ -204,8 +213,8 @@ func TestHumaValidation_GetRegistrationsByGuardianID(t *testing.T) {
 				output.Body.Registrations = []models.Registration{
 					{
 						ID:                  uuid.New(),
-						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						ChildID:             childIdEx,
+						GuardianID:          guardianIdEx,
 						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 						Status:              models.RegistrationStatusRegistered,
 						EventName:           "STEM Club",
@@ -259,6 +268,9 @@ func TestHumaValidation_GetRegistrationsByGuardianID(t *testing.T) {
 func TestHumaValidation_GetRegistrationsByEventOccurrenceID(t *testing.T) {
 	t.Parallel()
 
+	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+
 	tests := []struct {
 		name              string
 		eventOccurrenceID string
@@ -273,8 +285,8 @@ func TestHumaValidation_GetRegistrationsByEventOccurrenceID(t *testing.T) {
 				output.Body.Registrations = []models.Registration{
 					{
 						ID:                  uuid.New(),
-						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						ChildID:             childIdEx,
+						GuardianID:          guardianIdEx,
 						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 						Status:              models.RegistrationStatusRegistered,
 						EventName:           "STEM Club",
@@ -332,6 +344,9 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 	guardianID := "11111111-1111-1111-1111-111111111111"
 	eventOccurrenceID := "70000000-0000-0000-0000-000000000001"
 
+	childIdEx := uuid.MustParse(childID)
+	guardianIdEx := uuid.MustParse(guardianID)
+
 	tests := []struct {
 		name       string
 		payload    map[string]interface{}
@@ -363,8 +378,8 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				).Return(&models.CreateRegistrationOutput{
 					Body: models.Registration{
 						ID:                  uuid.New(),
-						ChildID:             uuid.MustParse(childID),
-						GuardianID:          uuid.MustParse(guardianID),
+						ChildID:             childIdEx,
+						GuardianID:          guardianIdEx,
 						EventOccurrenceID:   uuid.MustParse(eventOccurrenceID),
 						Status:              models.RegistrationStatusRegistered,
 						EventName:           "STEM Club",
@@ -443,6 +458,9 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 func TestHumaValidation_UpdateRegistration(t *testing.T) {
 	t.Parallel()
 
+	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+
 	registrationID := "80000000-0000-0000-0000-000000000001"
 
 	tests := []struct {
@@ -466,8 +484,8 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 				).Return(&models.UpdateRegistrationOutput{
 					Body: models.Registration{
 						ID:                  uuid.MustParse(registrationID),
-						ChildID:             uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-						GuardianID:          uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						ChildID:             childIdEx,
+						GuardianID:          guardianIdEx,
 						EventOccurrenceID:   uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 						Status:              models.RegistrationStatusCancelled,
 						EventName:           "STEM Club",
