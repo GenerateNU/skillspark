@@ -69,8 +69,16 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 			filters.MaxDurationMinutes = &input.MaxDuration
 		}
 
+		if input.MinDuration != 0 && input.MaxDuration != 0 && input.MinDuration > input.MaxDuration {
+			return nil, huma.Error400BadRequest("min_duration cannot be larger than max_duration")
+		}
+
 		if input.PriceTier != "" {
-			filters.PriceTier = &input.PriceTier
+			if input.PriceTier != "$" && input.PriceTier != "$$" && input.PriceTier != "$$$" {
+				return nil, huma.Error400BadRequest("price tier must be one of $, $$, $$$")
+			} else {
+				filters.PriceTier = &input.PriceTier
+			}
 		}
 
 		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination, filters)
