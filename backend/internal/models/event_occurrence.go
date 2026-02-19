@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -32,15 +33,15 @@ type EventOccurrence struct {
 
 // get all
 type GetAllEventOccurrencesInput struct {
-	Page        int     `query:"page" minimum:"1" default:"1"`
-	Limit       int     `query:"limit" minimum:"1" maximum:"100" default:"100"`
-	Search      string  `query:"search"`
-	Latitude    float64 `query:"lat"`
-	Longitude   float64 `query:"lng"`
-	RadiusKm    float64 `query:"radius_km"`
-	PriceTier   string  `query:"price"`
-	MinDuration int     `query:"min_duration"`
-	MaxDuration int     `query:"max_duration"`
+	Page        int             `query:"page" minimum:"1" default:"1"`
+	Limit       int             `query:"limit" minimum:"1" maximum:"100" default:"100"`
+	Search      string          `query:"search"`
+	Latitude    OptionalFloat64 `query:"lat"`
+	Longitude   OptionalFloat64 `query:"lng"`
+	RadiusKm    float64         `query:"radius_km"`
+	PriceTier   string          `query:"price"`
+	MinDuration int             `query:"min_duration"`
+	MaxDuration int             `query:"max_duration"`
 }
 
 type GetAllEventOccurrencesFilter struct {
@@ -60,6 +61,11 @@ type GetAllEventOccurrencesOutput struct {
 // get by event occurrence id
 type GetEventOccurrenceByIDInput struct {
 	ID uuid.UUID `path:"id" doc:"ID of an event occurrence"`
+}
+
+type OptionalFloat64 struct {
+	Value float64
+	Set   bool
 }
 
 type GetEventOccurrenceByIDOutput struct {
@@ -112,4 +118,20 @@ type CancelEventOccurrenceOutput struct {
 	Body struct {
 		Message string `json:"message" doc:"Success message"`
 	} `json:"body"`
+}
+
+func (o *OptionalFloat64) UnmarshalText(text []byte) error {
+	if len(text) == 0 {
+		o.Set = false
+		return nil
+	}
+
+	v, err := strconv.ParseFloat(string(text), 64)
+	if err != nil {
+		return err
+	}
+
+	o.Value = v
+	o.Set = true
+	return nil
 }
