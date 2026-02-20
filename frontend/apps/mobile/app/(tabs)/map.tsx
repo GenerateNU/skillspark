@@ -21,7 +21,7 @@ export interface LocationPin {
 export default function MapScreen() {
   const { data, isLoading: isApiLoading, error } = useGetAllEventOccurrences();
   
-  const occurrences = (data as unknown as EventOccurrence[]) || [];
+  const occurrences = (data as any)?.data ?? [];
 
   const mapLocations: LocationPin[] = useMemo(() => {
     if (!Array.isArray(occurrences)) return [];
