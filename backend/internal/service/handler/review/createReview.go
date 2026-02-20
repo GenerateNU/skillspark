@@ -13,7 +13,7 @@ func (h *Handler) CreateReview(ctx context.Context, input *models.CreateReviewIn
 		e := errs.BadRequest("Invalid registration_id: registration does not exist")
 		return nil, &e
 	}
-	CreateReviewInput := h.CreateTranslateStruct(ctx, input, description)
+	CreateReviewInput := h.CreateTranslateStruct(ctx, input, description, input.AcceptLanguage)
 
 	if _, err := h.RegistrationRepository.GetRegistrationByID(ctx, &models.GetRegistrationByIDInput{
 		ID: input.Body.RegistrationID,

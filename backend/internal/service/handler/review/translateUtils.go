@@ -40,7 +40,7 @@ func (h *Handler) CallTranslateAPI(ctx context.Context, description_en *string, 
 	return response, nil
 }
 
-func (h *Handler) CreateTranslateStruct(ctx context.Context, event *models.CreateReviewInput, description_th *string) *models.CreateReviewDBInput {
+func (h *Handler) CreateTranslateStruct(ctx context.Context, event *models.CreateReviewInput, description *string, AcceptLanguage string) *models.CreateReviewDBInput {
 
 	eventBody := event.Body
 
@@ -49,10 +49,16 @@ func (h *Handler) CreateTranslateStruct(ctx context.Context, event *models.Creat
 		Body: models.CreateReviewDBBody{
 			RegistrationID: eventBody.RegistrationID,
 			GuardianID:     eventBody.GuardianID,
-			Description_EN: eventBody.Description,
-			Description_TH: description_th,
 			Categories:     eventBody.Categories,
 		},
+	}
+
+	if AcceptLanguage == "th" {
+		dbInitInput.Body.Description_EN = eventBody.Description
+		dbInitInput.Body.Description_TH = description
+	} else {
+		dbInitInput.Body.Description_EN = *description
+		dbInitInput.Body.Description_TH = &eventBody.Description
 	}
 
 	return dbInitInput

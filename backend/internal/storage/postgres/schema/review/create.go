@@ -24,8 +24,9 @@ func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.Creat
 	)
 
 	var createdReview models.Review
+	var descEN, descTH string
 
-	err = row.Scan(&createdReview.ID, &createdReview.RegistrationID, &createdReview.GuardianID, &createdReview.Description, &createdReview.Categories, &createdReview.CreatedAt, &createdReview.UpdatedAt)
+	err = row.Scan(&createdReview.ID, &createdReview.RegistrationID, &createdReview.GuardianID, &descEN, &descTH, &createdReview.Categories, &createdReview.CreatedAt, &createdReview.UpdatedAt)
 
 	if err != nil {
 		err := errs.InternalServerError("Failed to create child: ", err.Error())
@@ -33,9 +34,9 @@ func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.Creat
 	}
 
 	if input.AcceptLanguage == "th" {
-		createdReview.Description = *input.Body.Description_TH
+		createdReview.Description = descTH
 	} else {
-		createdReview.Description = input.Body.Description_EN
+		createdReview.Description = descEN
 	}
 
 	return &createdReview, nil

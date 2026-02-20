@@ -17,19 +17,20 @@ func (r *EventRepository) CreateEvent(ctx context.Context, event *models.CreateE
 	row := r.db.QueryRow(ctx, query, event.Body.Title_EN, event.Body.Title_TH, event.Body.Description_EN, event.Body.Description_TH, event.Body.OrganizationID, event.Body.AgeRangeMin, event.Body.AgeRangeMax, event.Body.Category, HeaderImageS3Key)
 
 	var createdEvent models.Event
+	var titleEN, titleTH, descEN, descTH string
 
-	err = row.Scan(&createdEvent.ID, &createdEvent.Title, &createdEvent.Description, &createdEvent.OrganizationID, &createdEvent.AgeRangeMin, &createdEvent.AgeRangeMax, &createdEvent.Category, &createdEvent.HeaderImageS3Key, &createdEvent.CreatedAt, &createdEvent.UpdatedAt)
+	err = row.Scan(&createdEvent.ID, &titleEN, &titleTH, &descEN, &descTH, &createdEvent.OrganizationID, &createdEvent.AgeRangeMin, &createdEvent.AgeRangeMax, &createdEvent.Category, &createdEvent.HeaderImageS3Key, &createdEvent.CreatedAt, &createdEvent.UpdatedAt)
 	if err != nil {
 		err := errs.InternalServerError("Failed to create event: ", err.Error())
 		return nil, &err
 	}
 
 	if event.AcceptLanguage == "th" {
-		createdEvent.Title = *event.Body.Title_TH
-		createdEvent.Description = *event.Body.Description_TH
+		createdEvent.Title = titleTH
+		createdEvent.Description = descTH
 	} else {
-		createdEvent.Title = event.Body.Title_EN
-		createdEvent.Description = event.Body.Description_EN
+		createdEvent.Title = titleEN
+		createdEvent.Description = descEN
 	}
 
 	return &createdEvent, nil
