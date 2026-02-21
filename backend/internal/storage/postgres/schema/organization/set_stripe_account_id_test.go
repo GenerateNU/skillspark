@@ -23,15 +23,15 @@ func TestSetStripeAccountID(t *testing.T) {
 	stripeAccountID := "acct_1SwvOB2Sjs4wsi8o"
 	updated, err := repo.SetStripeAccountID(ctx, testOrg.ID, stripeAccountID)
 
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.NotNil(t, updated)
 	assert.Equal(t, testOrg.ID, updated.ID)
 	assert.NotNil(t, updated.StripeAccountID)
 	assert.Equal(t, stripeAccountID, *updated.StripeAccountID)
 	assert.False(t, updated.StripeAccountActivated)
 
-	fetched, getErr := repo.GetOrganizationByID(ctx, testOrg.ID)
-	require.Nil(t, getErr)
+	fetched, err := repo.GetOrganizationByID(ctx, testOrg.ID)
+	require.NoError(t, err)
 	assert.Equal(t, stripeAccountID, *fetched.StripeAccountID)
 	assert.False(t, fetched.StripeAccountActivated)
 }
@@ -46,12 +46,12 @@ func TestSetStripeAccountID_MultipleTimes(t *testing.T) {
 
 	firstAccountID := "acct_first123"
 	updated1, err := repo.SetStripeAccountID(ctx, testOrg.ID, firstAccountID)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, firstAccountID, *updated1.StripeAccountID)
 
 	secondAccountID := "acct_second456"
 	updated2, err := repo.SetStripeAccountID(ctx, testOrg.ID, secondAccountID)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, secondAccountID, *updated2.StripeAccountID)
 	assert.False(t, updated2.StripeAccountActivated)
 }
@@ -62,12 +62,9 @@ func TestSetStripeAccountID_NotFound(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	nonExistentID := uuid.New()
-	stripeAccountID := "acct_1SwvOB2Sjs4wsi8o"
+	updated, err := repo.SetStripeAccountID(ctx, uuid.New(), "acct_1SwvOB2Sjs4wsi8o")
 
-	updated, err := repo.SetStripeAccountID(ctx, nonExistentID, stripeAccountID)
-
-	require.NotNil(t, err)
+	require.Error(t, err)
 	assert.Nil(t, updated)
 }
 
@@ -84,7 +81,7 @@ func TestSetStripeAccountID_DoesNotModifyOtherFields(t *testing.T) {
 	stripeAccountID := "acct_1SwvOB2Sjs4wsi8o"
 	updated, err := repo.SetStripeAccountID(ctx, testOrg.ID, stripeAccountID)
 
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, originalName, updated.Name)
 	assert.Equal(t, originalActive, updated.Active)
 	assert.Equal(t, stripeAccountID, *updated.StripeAccountID)

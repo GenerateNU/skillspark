@@ -23,11 +23,13 @@ func NewJobScheduler(repo *storage.Repository, sc stripeClient.StripeClientInter
 }
 
 func (j *JobScheduler) Start() {
-	
-	j.cron.AddFunc("0 * * * *", func() {
+	_, err := j.cron.AddFunc("0 * * * *", func() {
 		log.Println("Running payment capture job...")
 		j.CapturePaymentsJob()
 	})
+	if  err != nil {
+		log.Fatalf("Failed to schedule payment capture job: %v", err)
+	}
 
 	j.cron.Start()
 	log.Println("Cron jobs started")
