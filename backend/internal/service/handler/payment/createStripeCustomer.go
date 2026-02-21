@@ -15,7 +15,7 @@ func (h *Handler) CreateStripeCustomer(ctx context.Context, input *models.Create
 	}
 
 	if (guardian.StripeCustomerID == nil) {
-		return nil, errors.New("Customer already has a Stripe account.")
+		return nil, errors.New("customer already has a Stripe account.")
 	}
 
 	customer, err := h.StripeClient.CreateCustomer(ctx, guardian.Email, guardian.Name)
