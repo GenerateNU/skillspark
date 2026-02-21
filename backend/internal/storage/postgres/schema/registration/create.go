@@ -10,6 +10,11 @@ import (
 
 func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error) {
 	tx, err := r.db.Begin(ctx)
+
+	if (err != nil) {
+		return nil, err
+	}
+
 	query, err := schema.ReadSQLBaseScript("create.sql", SqlRegistrationFiles)
 	if err != nil {
 		if err := tx.Rollback(ctx); err != nil {
