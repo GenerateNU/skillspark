@@ -28,6 +28,13 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 		filters.Latitude,
 		filters.Longitude,
 		filters.RadiusKm,
+		// still missing the price tier here
+		filters.MinAge,
+		filters.MaxAge,
+		filters.Category,
+		filters.SoldOut,
+		filters.MinDate,
+		filters.MaxDate,
 	)
 	if err != nil {
 		err := errs.InternalServerError("Failed to fetch all event occurrences: ", err.Error())

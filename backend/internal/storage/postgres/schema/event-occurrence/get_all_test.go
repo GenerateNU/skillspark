@@ -7,6 +7,7 @@ import (
 	"skillspark/internal/utils"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -134,6 +135,91 @@ func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) 
 		title := eo.Event.Title
 		desc := eo.Event.Description
 		assert.True(t, containsIgnoreCase(title, search) || containsIgnoreCase(desc, search))
+	}
+}
+
+func TestEventOccurrenceRepository_Filters_NewFilters(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+
+	ctx := context.Background()
+	testDB := testutil.SetupTestDB(t)
+	repo := NewEventOccurrenceRepository(testDB)
+
+	pagination := utils.NewPagination()
+
+	minAge := 10
+	maxAge := 15
+
+	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+		MinAge: &minAge,
+		MaxAge: &maxAge,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, eventOccurrences)
+
+	for _, eo := range eventOccurrences {
+		assert.True(t, *eo.Event.AgeRangeMin == 0 || *eo.Event.AgeRangeMin >= minAge)
+		assert.True(t, *eo.Event.AgeRangeMax == 0 || *eo.Event.AgeRangeMax <= maxAge)
+	}
+
+	minDate := time.Date(2026, 2, 1, 0, 0, 0, 0, time.UTC)
+	maxDate := time.Date(2026, 2, 10, 23, 59, 59, 0, time.UTC)
+
+	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+		MinDate: &minDate,
+		MaxDate: &maxDate,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, eventOccurrences)
+
+	for _, eo := range eventOccurrences {
+		assert.True(t, eo.StartTime.IsZero() || !eo.StartTime.Before(minDate))
+		assert.True(t, eo.EndTime.IsZero() || !eo.EndTime.After(maxDate))
+	}
+
+	category := "science"
+
+	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+		Category: &category,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, eventOccurrences)
+
+	for _, eo := range eventOccurrences {
+		found := false
+		for _, c := range eo.Event.Category {
+			if string(c) == category {
+				found = true
+				break
+			}
+		}
+		assert.True(t, found, "event %s does not contain category %s", eo.Event.Title, category)
+	}
+
+	soldOut := true
+
+	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+		SoldOut: &soldOut,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, eventOccurrences)
+
+	for _, eo := range eventOccurrences {
+		assert.True(t, eo.CurrEnrolled >= eo.MaxAttendees)
+	}
+
+	soldOut = false
+
+	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+		SoldOut: &soldOut,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, eventOccurrences)
+
+	for _, eo := range eventOccurrences {
+		assert.True(t, eo.CurrEnrolled < eo.MaxAttendees)
 	}
 }
 

@@ -50,5 +50,12 @@ AND (
         ll_to_earth($6, $7)
     )/1000 <= $8
 )
+AND ($9::int IS NULL OR (e.age_range_min >= $9))
+AND ($10::int IS NULL OR (e.age_range_max <= $10))
+AND ($11::category IS NULL OR $11::category = ANY(e.category))
+AND ($12::boolean IS NULL OR ((eo.curr_enrolled >= eo.max_attendees) = $12))
+AND ($13::timestamp IS NULL OR eo.start_time >= $13)
+AND ($14::timestamp IS NULL OR eo.end_time <= $14)
+
 ORDER BY eo.id
 LIMIT $1 OFFSET $2;
