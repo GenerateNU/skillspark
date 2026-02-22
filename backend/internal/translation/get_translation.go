@@ -14,13 +14,13 @@ type TranslateResponse struct {
 	DestinationText string `json:"destination-text"`
 }
 
-func (t *TranslateClient) GetTranslation(ctx context.Context, input string, sl string, dl string) (*string, error) {
+func (t *TranslateClient) GetTranslation(ctx context.Context, input string, src string, dst string) (*string, error) {
 	var result TranslateResponse
 
 	encodedInput := url.QueryEscape(input)
 	apiUrl := os.Getenv("TRANSLATIONS_API_URL")
 
-	params := []string{"sl=", sl, "&dl=", dl, "&text="}
+	params := []string{"sl=", src, "&dl=", dst, "&text="}
 	paramSpecs := strings.Join(params, "")
 	url := apiUrl + paramSpecs + encodedInput
 
