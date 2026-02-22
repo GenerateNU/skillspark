@@ -7,6 +7,7 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/testutil"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	stripemocks "skillspark/internal/stripeClient/mocks"
 	"testing"
 	"time"
 	"net/http"
@@ -64,11 +65,12 @@ func TestHandler_GetGuardianById(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
@@ -78,7 +80,7 @@ func TestHandler_GetGuardianById(t *testing.T) {
 
 			testDB := testutil.SetupTestDB(t)
 
-			handler := NewHandler(mockRepo, testDB, cfg)
+			handler := NewHandler(mockRepo, testDB, mockStripeClient, cfg)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByIDInput{ID: uuid.MustParse(tt.id)}
@@ -155,11 +157,12 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
@@ -169,7 +172,7 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 
 			testDB := testutil.SetupTestDB(t)
 
-			handler := NewHandler(mockRepo, testDB, cfg)
+			handler := NewHandler(mockRepo, testDB, mockStripeClient, cfg)
 			ctx := context.Background()
 
 			guardian, err := handler.UpdateGuardian(ctx, tt.input)
@@ -223,11 +226,12 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
@@ -237,7 +241,7 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 
 			testDB := testutil.SetupTestDB(t)
 
-			handler := NewHandler(mockRepo, testDB, cfg)
+			handler := NewHandler(mockRepo, testDB, mockStripeClient, cfg)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByChildIDInput{ChildID: uuid.MustParse(tt.childID)}
@@ -303,13 +307,14 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			supabaseMock.SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
@@ -319,7 +324,7 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 
 			testDB := testutil.SetupTestDB(t)
 
-			handler := NewHandler(mockRepo, testDB, cfg)
+			handler := NewHandler(mockRepo, testDB, mockStripeClient, cfg)
 			ctx := context.Background()
 
 			input := &models.DeleteGuardianInput{ID: uuid.MustParse(tt.id)}

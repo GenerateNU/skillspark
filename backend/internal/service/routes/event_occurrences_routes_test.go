@@ -51,7 +51,6 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 	eight := 8
 	twelve := 12
 	jpg := "events/robotics_workshop.jpg"
-	addr := "Suite 15"
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	event := models.Event{
 		ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
@@ -66,6 +65,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 		UpdatedAt:        time.Now(),
 	}
 
+	addr := "Suite 15"
 	location := models.Location{
 		ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
 		Latitude:     13.7650000,
@@ -105,6 +105,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 					MaxAttendees: 15,
 					Language:     "en",
 					CurrEnrolled: 8,
+					Price:        50000,
 					CreatedAt:    time.Now(),
 					UpdatedAt:    time.Now(),
 				}, nil)
@@ -225,6 +226,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 				"end_time":      end,
 				"max_attendees": 10,
 				"language":      "en",
+				"price":         50000,
 			},
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
 				m.On(
@@ -241,6 +243,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 					MaxAttendees: 10,
 					Language:     "en",
 					CurrEnrolled: 0,
+					Price:        50000,
 					CreatedAt:    time.Now(),
 					UpdatedAt:    time.Now(),
 				}, nil)
@@ -257,6 +260,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 				"end_time":      end,
 				"max_attendees": 0,
 				"language":      "en",
+				"price":         50000,
 			},
 			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
@@ -271,6 +275,21 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 				"end_time":      end,
 				"max_attendees": 10,
 				"language":      "e",
+				"price":         50000,
+			},
+			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "missing price",
+			payload: map[string]interface{}{
+				"manager_id":    nil,
+				"event_id":      uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+				"location_id":   uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+				"start_time":    start,
+				"end_time":      end,
+				"max_attendees": 10,
+				"language":      "en",
 			},
 			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
@@ -429,6 +448,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 				"max_attendees": max,
 				"language":      lang,
 				"curr_enrolled": curr,
+				"price":         75000,
 			},
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
 				m.On(
@@ -445,6 +465,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					MaxAttendees: 10,
 					Language:     "th",
 					CurrEnrolled: 8,
+					Price:        75000,
 					CreatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
 					UpdatedAt:    time.Now(),
 				}, nil)
@@ -513,6 +534,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					MaxAttendees: 15,
 					Language:     "en",
 					CurrEnrolled: 5,
+					Price:        50000,
 					CreatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
 					UpdatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
 				}, nil)

@@ -80,3 +80,25 @@ func (m *MockOrganizationRepository) GetEventOccurrencesByOrganizationID(ctx con
 	}
 	return eventOccurrences.([]models.EventOccurrence), nil
 }
+
+func (m *MockOrganizationRepository) SetStripeAccountID(ctx context.Context, orgID uuid.UUID, stripeAccountID string) (*models.Organization, error) {
+	args := m.Called(ctx, orgID, stripeAccountID)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Organization), nil
+}
+
+func (m *MockOrganizationRepository) SetStripeAccountActivated(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error) {
+	args := m.Called(ctx, stripeAccountID, activated)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(*errs.HTTPError)
+	}
+	return args.Get(0).(*models.Organization), nil
+}

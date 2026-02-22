@@ -37,6 +37,10 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, eventOccurrences)
 	assert.Equal(t, count, int64(len(eventOccurrences)))
+	
+	if len(eventOccurrences) > 0 {
+		assert.GreaterOrEqual(t, eventOccurrences[0].Price, 0)
+	}
 }
 
 func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.T) {
@@ -63,6 +67,10 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.
 	assert.Nil(t, err1)
 	assert.NotNil(t, eventOccurrences1)
 	assert.Equal(t, 4, len(eventOccurrences1))
+	
+	for _, eo := range eventOccurrences1 {
+		assert.GreaterOrEqual(t, eo.Price, 0)
+	}
 
 	// test page 2 with limit 4
 	pagination2 := utils.Pagination{Page: 2, Limit: 4}
@@ -70,6 +78,10 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.
 	assert.Nil(t, err2)
 	assert.NotNil(t, eventOccurrences2)
 	assert.Equal(t, 4, len(eventOccurrences2))
+	
+	for _, eo := range eventOccurrences2 {
+		assert.GreaterOrEqual(t, eo.Price, 0)
+	}
 
 	// test page 3 with limit 4
 	pagination3 := utils.Pagination{Page: 3, Limit: 4}
@@ -77,6 +89,10 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.
 	assert.Nil(t, err3)
 	assert.NotNil(t, eventOccurrences3)
 	assert.Equal(t, 4, len(eventOccurrences3))
+	
+	for _, eo := range eventOccurrences3 {
+		assert.GreaterOrEqual(t, eo.Price, 0)
+	}
 }
 
 func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) {

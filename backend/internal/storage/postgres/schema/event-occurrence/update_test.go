@@ -29,6 +29,7 @@ func TestEventOccurrenceRepository_UpdateEventOccurrence(t *testing.T) {
 	max := 10
 	lang := "th"
 	curr := 8
+	price := 75000
 
 	eventOccurrenceInput := func() *models.UpdateEventOccurrenceInput {
 		input := &models.UpdateEventOccurrenceInput{}
@@ -41,6 +42,7 @@ func TestEventOccurrenceRepository_UpdateEventOccurrence(t *testing.T) {
 		input.Body.MaxAttendees = &max
 		input.Body.Language = &lang
 		input.Body.CurrEnrolled = &curr
+		input.Body.Price = &price
 		return input
 	}()
 
@@ -56,6 +58,7 @@ func TestEventOccurrenceRepository_UpdateEventOccurrence(t *testing.T) {
 	assert.Equal(t, *eventOccurrenceInput.Body.MaxAttendees, eventOccurrence.MaxAttendees)
 	assert.Equal(t, *eventOccurrenceInput.Body.Language, eventOccurrence.Language)
 	assert.Equal(t, *eventOccurrenceInput.Body.CurrEnrolled, eventOccurrence.CurrEnrolled)
+	assert.Equal(t, *eventOccurrenceInput.Body.Price, eventOccurrence.Price)
 
 	// check updated event occurrence in database
 	id := eventOccurrence.ID
@@ -70,4 +73,5 @@ func TestEventOccurrenceRepository_UpdateEventOccurrence(t *testing.T) {
 	assert.Equal(t, 10, retrievedEventOccurrence.MaxAttendees)
 	assert.Equal(t, "th", retrievedEventOccurrence.Language)
 	assert.Equal(t, 8, retrievedEventOccurrence.CurrEnrolled)
+	assert.Equal(t, 75000, retrievedEventOccurrence.Price)
 }

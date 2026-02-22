@@ -15,6 +15,7 @@ import (
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/storage/postgres/schema/user"
 	"skillspark/internal/utils"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -27,6 +28,7 @@ type LocationRepository interface {
 	GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, error)
 	CreateLocation(ctx context.Context, location *models.CreateLocationInput) (*models.Location, error)
 	GetAllLocations(ctx context.Context, pagination utils.Pagination) ([]models.Location, error)
+	GetLocationByOrganizationID(ctx context.Context, orgID uuid.UUID) (*models.Location, error)
 }
 
 type SchoolRepository interface {
@@ -41,6 +43,8 @@ type OrganizationRepository interface {
 	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, error)
 	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error)
 	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID) ([]models.EventOccurrence, error)
+	SetStripeAccountID(ctx context.Context, orgID uuid.UUID, stripeAccountID string) (*models.Organization, error)
+	SetStripeAccountActivated(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error)
 }
 
 type ManagerRepository interface {
@@ -60,6 +64,7 @@ type GuardianRepository interface {
 	GetGuardianByUserID(ctx context.Context, userID uuid.UUID) (*models.Guardian, error)
 	GetGuardianByAuthID(ctx context.Context, authID string) (*models.Guardian, error)
 	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
+	SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string,) (*models.Guardian, error)
 	DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error)
 }
 
@@ -88,12 +93,15 @@ type EventOccurrenceRepository interface {
 }
 
 type RegistrationRepository interface {
-	CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error)
+	CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error)
 	GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput, tx *pgx.Tx) (*models.GetRegistrationByIDOutput, error)
 	GetRegistrationsByChildID(ctx context.Context, input *models.GetRegistrationsByChildIDInput) (*models.GetRegistrationsByChildIDOutput, error)
 	GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error)
 	GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error)
+	GetRegistrationsForCapture(ctx context.Context, startWindow time.Time, endWindow time.Time) ([]models.Registration, error)
 	UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error)
+	CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error)
+	UpdateRegistrationPaymentStatus(ctx context.Context, input *models.UpdateRegistrationPaymentStatusInput) (*models.UpdateRegistrationPaymentStatusOutput, error)
 }
 
 type ReviewRepository interface {

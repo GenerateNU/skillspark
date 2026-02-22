@@ -11,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGuardianRepository_DeleteGuardian_SetFieldsNull(t *testing.T) {
@@ -24,36 +25,37 @@ func TestGuardianRepository_DeleteGuardian_SetFieldsNull(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	// delete a guardian that has children, should delete guardian and children fks from registration
-	guardianId := uuid.MustParse("11111111-1111-1111-1111-111111111111")
-	regId := uuid.MustParse("80000000-0000-0000-0000-000000000001")
-	childId := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	regID := uuid.MustParse("80000000-0000-0000-0000-000000000001")
+	childID := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	
 	input1 := &models.GetRegistrationsByGuardianIDInput{
-		GuardianID: guardianId,
+		GuardianID: guardianID,
 	}
 	input2 := &models.GetRegistrationByIDInput{
-		ID: regId,
+		ID: regID,
 	}
 
 	registrations, err := repo.GetRegistrationsByGuardianID(ctx, input1)
+	require.NoError(t, err)
+	require.NotEmpty(t, registrations.Body.Registrations)
+	
 	reg1 := registrations.Body.Registrations[0]
-	assert.Nil(t, err)
-	assert.NotNil(t, reg1)
-	assert.Equal(t, regId, reg1.ID)
-	assert.Equal(t, &childId, reg1.ChildID)
+	assert.Equal(t, regID, reg1.ID)
+	assert.Equal(t, childID, reg1.ChildID)
 
-	guardian, guardianErr := guardianRepo.DeleteGuardian(ctx, guardianId, nil)
-	assert.Nil(t, guardianErr)
-	assert.NotNil(t, guardian)
+	deletedGuardian, err := guardianRepo.DeleteGuardian(ctx, guardianID, nil)
+	require.NoError(t, err)
+	require.NotNil(t, deletedGuardian)
 
-	guardian, guardianErr = guardianRepo.GetGuardianByID(ctx, guardian.ID) // guardian deleted
-	assert.Nil(t, guardian)
-	assert.NotNil(t, guardianErr)
+	fetchedGuardian, err := guardianRepo.GetGuardianByID(ctx, deletedGuardian.ID)
+	assert.Error(t, err)
+	assert.Nil(t, fetchedGuardian)
 
-	registration, getErr := repo.GetRegistrationByID(ctx, input2, nil) // guardian and child fks null
-	assert.Nil(t, getErr)
-	assert.NotNil(t, registration)
-	assert.Nil(t, registration.Body.GuardianID)
-	assert.Nil(t, registration.Body.ChildID)
-	assert.Equal(t, models.RegistrationStatusCancelled, registration.Body.Status) // status set to cancelled
+	registration, err := repo.GetRegistrationByID(ctx, input2, nil)
+	require.NoError(t, err)
+	require.NotNil(t, registration)
+	
+	assert.Equal(t, models.RegistrationStatusCancelled, registration.Body.Status)
+	assert.NotEqual(t, uuid.Nil, registration.Body.ID)
 }

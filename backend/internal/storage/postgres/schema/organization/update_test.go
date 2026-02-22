@@ -18,7 +18,6 @@ func TestUpdateOrganization(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	// Create an organization first
 	active := true
 	createInput := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
@@ -31,7 +30,6 @@ func TestUpdateOrganization(t *testing.T) {
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 
-	// Update it
 	newName := "Updated Name"
 	newActive := false
 	updateInput := &models.UpdateOrganizationInput{
@@ -47,12 +45,15 @@ func TestUpdateOrganization(t *testing.T) {
 	require.NotNil(t, updated)
 	assert.Equal(t, "Updated Name", updated.Name)
 	assert.False(t, updated.Active)
+	assert.Nil(t, updated.StripeAccountID)
+	assert.False(t, updated.StripeAccountActivated)
 
-	// Verify update persisted
 	fetched, getErr := repo.GetOrganizationByID(ctx, created.ID)
 	require.Nil(t, getErr)
 	assert.Equal(t, "Updated Name", fetched.Name)
 	assert.False(t, fetched.Active)
+	assert.Nil(t, fetched.StripeAccountID)
+	assert.False(t, fetched.StripeAccountActivated)
 }
 
 func TestUpdateOrganization_WithLocation(t *testing.T) {
@@ -61,7 +62,6 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	// Create organization
 	active := true
 	createInput := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
@@ -74,7 +74,6 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 
-	// Update with location
 	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 	newName := "Test Org with Location"
 	updateInput := &models.UpdateOrganizationInput{
@@ -90,6 +89,8 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	require.NotNil(t, updated)
 	assert.Equal(t, "Test Org with Location", updated.Name)
 	assert.Equal(t, &locationID, updated.LocationID)
+	assert.Nil(t, updated.StripeAccountID)
+	assert.False(t, updated.StripeAccountActivated)
 }
 
 func TestUpdateOrganization_NotFound(t *testing.T) {
@@ -98,7 +99,6 @@ func TestUpdateOrganization_NotFound(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	// Try to update non-existent organization
 	nonExistentID := uuid.New()
 	newName := "Does Not Exist"
 	updateInput := &models.UpdateOrganizationInput{
@@ -112,4 +112,36 @@ func TestUpdateOrganization_NotFound(t *testing.T) {
 
 	require.NotNil(t, err)
 	assert.Nil(t, updated)
+}
+
+func TestUpdateOrganization_DoesNotModifyStripeFields(t *testing.T) {
+	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
+	ctx := context.Background()
+	t.Parallel()
+
+	active := true
+	createInput := func() *models.CreateOrganizationInput {
+		i := &models.CreateOrganizationInput{}
+		i.Body.Name = "Stripe Test Org"
+		i.Body.Active = &active
+		return i
+	}()
+
+	created, createErr := repo.CreateOrganization(ctx, createInput, nil)
+	require.Nil(t, createErr)
+
+	newName := "Updated Stripe Org"
+	updateInput := &models.UpdateOrganizationInput{
+		ID: created.ID,
+		Body: models.UpdateOrganizationBody{
+			Name: &newName,
+		},
+	}
+
+	updated, updateErr := repo.UpdateOrganization(ctx, updateInput, nil)
+	require.Nil(t, updateErr)
+	assert.Equal(t, "Updated Stripe Org", updated.Name)
+	assert.Nil(t, updated.StripeAccountID)
+	assert.False(t, updated.StripeAccountActivated)
 }

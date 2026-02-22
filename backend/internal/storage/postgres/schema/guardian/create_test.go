@@ -39,8 +39,8 @@ func TestGuardianRepository_Create_David_Kim(t *testing.T) {
 	assert.NotNil(t, guardian.CreatedAt)
 	assert.NotNil(t, guardian.UpdatedAt)
 	assert.Equal(t, guardianInput.Body.Name, guardian.Name)
+	assert.Nil(t, guardian.StripeCustomerID)
 
-	// Verify we can retrieve the created guardian
 	retrievedGuardian, err := repo.GetGuardianByID(ctx, guardian.ID)
 	if err != nil {
 		t.Fatalf("Failed to retrieve guardian: %v", err)
@@ -49,6 +49,7 @@ func TestGuardianRepository_Create_David_Kim(t *testing.T) {
 	assert.NotNil(t, retrievedGuardian)
 	assert.Equal(t, guardian.UserID, retrievedGuardian.UserID)
 	assert.Equal(t, guardianInput.Body.Name, retrievedGuardian.Name)
+	assert.Nil(t, retrievedGuardian.StripeCustomerID)
 }
 
 func TestGuardianRepository_Create_Constraints(t *testing.T) {

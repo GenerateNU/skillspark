@@ -35,6 +35,7 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 		input.Body.EndTime = end
 		input.Body.MaxAttendees = 10
 		input.Body.Language = "en"
+		input.Body.Price = 50000
 		return input
 	}()
 
@@ -50,6 +51,7 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 	assert.Equal(t, 10, eventOccurrence.MaxAttendees)
 	assert.Equal(t, "en", eventOccurrence.Language)
 	assert.Equal(t, 0, eventOccurrence.CurrEnrolled)
+	assert.Equal(t, 50000, eventOccurrence.Price)
 
 	// check created event occurrence in database
 	id := eventOccurrence.ID
@@ -64,4 +66,5 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 	assert.Equal(t, 10, retrievedEventOccurrence.MaxAttendees)
 	assert.Equal(t, "en", retrievedEventOccurrence.Language)
 	assert.Equal(t, 0, retrievedEventOccurrence.CurrEnrolled)
+	assert.Equal(t, 50000, retrievedEventOccurrence.Price)
 }

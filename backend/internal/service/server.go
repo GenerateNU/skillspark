@@ -9,6 +9,7 @@ import (
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
+	"skillspark/internal/stripeClient"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -24,6 +25,7 @@ import (
 type App struct {
 	Server *fiber.App
 	Repo   *storage.Repository
+	StripeClient stripeClient.StripeClientInterface
 	API    huma.API
 }
 
@@ -32,10 +34,17 @@ func InitApp(config config.Config) (*App, error) {
 	ctx := context.Background()
 	repo := postgres.NewRepository(ctx, config.DB)
 	s3Client, err := s3_client.NewClient(config.S3)
+	
 	if err != nil {
 		return nil, err
 	}
-	app, humaAPI := SetupApp(config, repo, s3Client)
+
+	newStripeClient, err := stripeClient.NewStripeClient("")
+	if err != nil {
+		return nil, err
+	}
+
+	app, humaAPI := SetupApp(config, repo, s3Client, newStripeClient)
 	return &App{
 		Server: app,
 		Repo:   repo,
@@ -44,7 +53,7 @@ func InitApp(config config.Config) (*App, error) {
 }
 
 // Setup the fiber app with the specified configuration and database.
-func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client) (*fiber.App, huma.API) {
+func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, newStripeClient stripeClient.StripeClientInterface) (*fiber.App, huma.API) {
 	app := fiber.New(fiber.Config{
 		JSONEncoder:  go_json.Marshal,
 		JSONDecoder:  go_json.Unmarshal,
@@ -91,13 +100,13 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	})
 
 	// Register Huma endpoints
-	setupHumaRoutes(humaAPI, repo, config, s3Client)
+	setupHumaRoutes(humaAPI, repo, config, s3Client, newStripeClient)
 
 	return app, humaAPI
 }
 
 // Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client) {
+func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, sc stripeClient.StripeClientInterface) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
@@ -105,10 +114,11 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client)
 	routes.SetupManagerRoutes(api, repo, config)
-	routes.SetupRegistrationRoutes(api, repo)
-	routes.SetupGuardiansRoutes(api, repo, config)
+	routes.SetupRegistrationRoutes(api, repo, sc)
+	routes.SetupGuardiansRoutes(api, repo, sc, config)
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo)
 	routes.SetUpReviewRoutes(api, repo)
 	routes.SetupAuthRoutes(api, repo, config)
+	routes.SetupPaymentRoutes(api, repo, sc)
 }

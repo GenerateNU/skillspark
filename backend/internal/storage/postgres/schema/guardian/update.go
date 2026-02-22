@@ -26,6 +26,7 @@ func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *model
 
 	err = tx.QueryRow(ctx, guardianQuery, guardian.ID).Scan(
 		&updatedGuardian.UserID,
+		&updatedGuardian.StripeCustomerID,
 		&updatedGuardian.CreatedAt,
 		&updatedGuardian.UpdatedAt,
 	)

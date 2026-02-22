@@ -10,6 +10,7 @@ import (
 )
 
 func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput, tx *pgx.Tx) (*models.EventOccurrence, error) {
+	
 	query, err := schema.ReadSQLBaseScript("update.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -29,6 +30,7 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 			input.Body.MaxAttendees,
 			input.Body.Language,
 			input.Body.CurrEnrolled,
+			input.Body.Price,
 		)
 	} else {
 		row = r.db.QueryRow(ctx,
@@ -42,10 +44,10 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 			input.Body.MaxAttendees,
 			input.Body.Language,
 			input.Body.CurrEnrolled,
+			input.Body.Price,
 		)
 	}
 
-	// null fields are handled in SQL query with coalesce
 	var updatedEventOccurrence models.EventOccurrence
 
 	// populate data in struct, embedding event and location data
@@ -61,6 +63,7 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 		&updatedEventOccurrence.CreatedAt,
 		&updatedEventOccurrence.UpdatedAt,
 		&updatedEventOccurrence.Status,
+		&updatedEventOccurrence.Price,
 
 		// event fields
 		&updatedEventOccurrence.Event.ID,

@@ -30,6 +30,8 @@ func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *
 		&createdOrganization.Active,
 		&createdOrganization.PfpS3Key,
 		&createdOrganization.LocationID,
+		&createdOrganization.StripeAccountID,
+		&createdOrganization.StripeAccountActivated,
 		&createdOrganization.CreatedAt,
 		&createdOrganization.UpdatedAt,
 	)

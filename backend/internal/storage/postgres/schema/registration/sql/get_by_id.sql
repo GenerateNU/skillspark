@@ -6,6 +6,17 @@ SELECT
     r.status,
     r.created_at,
     r.updated_at,
+    r.stripe_customer_id,
+    r.org_stripe_account_id,
+    r.currency,
+    r.payment_intent_status,
+    r.cancelled_at,
+    r.stripe_payment_intent_id,
+    r.total_amount,
+    r.provider_amount,
+    r.platform_fee_amount,
+    r.paid_at,
+    r.stripe_payment_method_id,
     e.title AS event_name,
     eo.start_time AS occurrence_start_time
 FROM registration r

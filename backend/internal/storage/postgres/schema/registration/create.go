@@ -8,10 +8,11 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
+func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error) {
 	tx, err := r.db.Begin(ctx)
-	if err != nil {
-		return nil, errs.InternalServerError("Failed to begin transaction: ", err.Error())
+
+	if (err != nil) {
+		return nil, err
 	}
 
 	query, err := schema.ReadSQLBaseScript("create.sql", SqlRegistrationFiles)
@@ -23,11 +24,20 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		return nil, &errr
 	}
 
-	row := tx.QueryRow(ctx, query,
-		input.Body.ChildID,
-		input.Body.GuardianID,
-		input.Body.EventOccurrenceID,
-		input.Body.Status)
+	row := r.db.QueryRow(ctx, query,
+		input.ChildID,
+		input.GuardianID,
+		input.EventOccurrenceID,
+		input.Status,
+		input.StripePaymentIntentID,
+		input.StripeCustomerID,
+		input.OrgStripeAccountID,
+		input.StripePaymentMethodID,
+		input.TotalAmount,
+		input.ProviderAmount, 
+		input.PlatformFeeAmount, 
+		input.Currency,
+		input.PaymentIntentStatus)
 
 	var createdRegistration models.CreateRegistrationOutput
 
@@ -39,8 +49,19 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		&createdRegistration.Body.Status,
 		&createdRegistration.Body.CreatedAt,
 		&createdRegistration.Body.UpdatedAt,
+		&createdRegistration.Body.StripeCustomerID,
+		&createdRegistration.Body.OrgStripeAccountID,
+		&createdRegistration.Body.Currency,
+		&createdRegistration.Body.PaymentIntentStatus,
+		&createdRegistration.Body.CancelledAt,
+		&createdRegistration.Body.StripePaymentIntentID,
+		&createdRegistration.Body.TotalAmount,
+		&createdRegistration.Body.ProviderAmount,
+		&createdRegistration.Body.PlatformFeeAmount,
+		&createdRegistration.Body.PaidAt,
+		&createdRegistration.Body.StripePaymentMethodID,
 		&createdRegistration.Body.EventName,
-		&createdRegistration.Body.OccurrenceStartTime,
+		&createdRegistration.Body.OccurrenceStartTime, 
 	)
 
 	if err != nil {
@@ -60,7 +81,7 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		return nil, &errr
 	}
 
-	_, err = tx.Exec(ctx, incrementEventOccurrenceQuery, input.Body.EventOccurrenceID, 1)
+	_, err = tx.Exec(ctx, incrementEventOccurrenceQuery, input.EventOccurrenceID, 1)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to increment event occurrence attendee count: ", err.Error())
 		if err := tx.Rollback(ctx); err != nil {

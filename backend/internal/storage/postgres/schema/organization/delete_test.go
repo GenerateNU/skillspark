@@ -17,7 +17,6 @@ func TestDeleteOrganization(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	// Create an organization to delete
 	active := true
 	input := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
@@ -26,20 +25,20 @@ func TestDeleteOrganization(t *testing.T) {
 		return i
 	}()
 
-	created, createErr := repo.CreateOrganization(ctx, input, nil)
-	require.Nil(t, createErr)
+	created, err := repo.CreateOrganization(ctx, input, nil)
+	require.NoError(t, err)
 	require.NotNil(t, created)
 
-	// Delete the organization
-	deleted, deleteErr := repo.DeleteOrganization(ctx, created.ID)
-	require.Nil(t, deleteErr)
+	deleted, err := repo.DeleteOrganization(ctx, created.ID)
+	require.NoError(t, err)
 	require.NotNil(t, deleted)
 	assert.Equal(t, created.ID, deleted.ID)
 	assert.Equal(t, "To Be Deleted", deleted.Name)
+	assert.Nil(t, deleted.StripeAccountID)
+	assert.False(t, deleted.StripeAccountActivated)
 
-	// Verify it's gone
-	_, getErr := repo.GetOrganizationByID(ctx, created.ID)
-	assert.NotNil(t, getErr)
+	_, err = repo.GetOrganizationByID(ctx, created.ID)
+	assert.Error(t, err)
 }
 
 func TestDeleteOrganization_NotFound(t *testing.T) {
@@ -48,10 +47,9 @@ func TestDeleteOrganization_NotFound(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	// Try to delete non-existent organization
 	deleted, err := repo.DeleteOrganization(ctx, uuid.New())
 
-	require.NotNil(t, err)
+	require.Error(t, err)
 	assert.Nil(t, deleted)
 }
 
@@ -61,7 +59,6 @@ func TestDeleteOrganization_AlreadyDeleted(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	// Create organization
 	active := true
 	input := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
@@ -70,17 +67,35 @@ func TestDeleteOrganization_AlreadyDeleted(t *testing.T) {
 		return i
 	}()
 
-	created, createErr := repo.CreateOrganization(ctx, input, nil)
-	require.Nil(t, createErr)
+	created, err := repo.CreateOrganization(ctx, input, nil)
+	require.NoError(t, err)
 	require.NotNil(t, created)
 
-	// First delete should succeed
-	deleted1, deleteErr1 := repo.DeleteOrganization(ctx, created.ID)
-	require.Nil(t, deleteErr1)
-	require.NotNil(t, deleted1)
+	_, err = repo.DeleteOrganization(ctx, created.ID)
+	require.NoError(t, err)
 
-	// Second delete should fail
-	deleted2, deleteErr2 := repo.DeleteOrganization(ctx, created.ID)
-	require.NotNil(t, deleteErr2)
+	deleted2, err := repo.DeleteOrganization(ctx, created.ID)
+	require.Error(t, err)
 	assert.Nil(t, deleted2)
+}
+
+func TestDeleteOrganization_WithStripeAccount(t *testing.T) {
+	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
+	ctx := context.Background()
+	t.Parallel()
+
+	testOrg := CreateTestOrganization(t, ctx, testDB)
+	stripeAccountID := "acct_delete_test123"
+
+	_, err := repo.SetStripeAccountID(ctx, testOrg.ID, stripeAccountID)
+	require.NoError(t, err)
+	_, err = repo.SetStripeAccountActivated(ctx, stripeAccountID, true)
+	require.NoError(t, err)
+
+	deleted, err := repo.DeleteOrganization(ctx, testOrg.ID)
+	require.NoError(t, err)
+	require.NotNil(t, deleted)
+	assert.Equal(t, stripeAccountID, *deleted.StripeAccountID)
+	assert.True(t, deleted.StripeAccountActivated)
 }
