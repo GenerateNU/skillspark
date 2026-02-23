@@ -6,8 +6,34 @@ import (
 
 	"skillspark/internal/models"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/stripe/stripe-go/v84"
+	"github.com/stripe/stripe-go/v84/webhook"
 )
+
+func (h *Handler) HandlePlatformWebhook(c *fiber.Ctx) error {
+	payload := c.Body()
+	signature := c.Get("Stripe-Signature")
+
+	event, err := webhook.ConstructEvent(payload, signature, h.webhookSecret)
+	if err != nil {
+		log.Printf("Webhook signature verification failed: %v", err)
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "invalid signature",
+		})
+	}
+
+	switch event.Type {
+	case "payment_intent.payment_failed":
+		return h.handlePaymentIntentFailed(c.Context(), event)
+	case "setup_intent.succeeded":
+		return h.handleSetupIntentSucceeded(c.Context(), event)
+	default:
+		log.Printf("Unhandled platform event type: %s", event.Type)
+	}
+
+	return c.SendStatus(fiber.StatusOK)
+}
 
 func (h *Handler) handlePaymentIntentFailed(ctx context.Context, event stripe.Event) error {
 	pi, err := unmarshalEvent[stripe.PaymentIntent](event)
@@ -53,26 +79,6 @@ func (h *Handler) handleSetupIntentSucceeded(ctx context.Context, event stripe.E
 
 	log.Printf("Setup intent %s succeeded for customer %s, payment method %s attached",
 		si.ID, si.Customer.ID, si.PaymentMethod.ID)
-
-	return nil
-}
-
-func (h *Handler) handleAccountUpdated(ctx context.Context, event stripe.Event) error {
-	account, err := unmarshalEvent[stripe.Account](event)
-	if err != nil {
-		log.Printf("Failed to unmarshal account.updated: %v", err)
-		return nil
-	}
-
-	activated := account.ChargesEnabled && account.PayoutsEnabled
-
-	if _, err := h.repo.Organization.SetStripeAccountStatus(ctx, account.ID, activated); err != nil {
-		log.Printf("Failed to update stripe account activation for %s: %v", account.ID, err)
-		return nil
-	}
-
-	log.Printf("Account %s activation status updated to %v (charges_enabled=%v, payouts_enabled=%v)",
-		account.ID, activated, account.ChargesEnabled, account.PayoutsEnabled)
 
 	return nil
 }
