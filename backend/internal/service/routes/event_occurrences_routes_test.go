@@ -44,10 +44,9 @@ func setupEventOccurrencesTestAPI(
 func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 	t.Parallel()
 
-	start, _ := time.Parse(time.RFC3339, "2026-02-15 09:00:00+07")
-	end, _ := time.Parse(time.RFC3339, "2026-02-15 11:00:00+07")
+	start, _ := time.Parse(time.RFC3339, "2026-02-15T09:00:00+07:00")
+	end, _ := time.Parse(time.RFC3339, "2026-02-15T11:00:00+07:00")
 
-	category_arr := []string{"science", "technology"}
 	eight := 8
 	twelve := 12
 	jpg := "events/robotics_workshop.jpg"
@@ -59,7 +58,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 		AgeRangeMin:      &eight,
 		AgeRangeMax:      &twelve,
-		Category:         category_arr,
+		Category:         []string{"science", "technology"},
 		HeaderImageS3Key: &jpg,
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
@@ -106,6 +105,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 					Language:     "en",
 					CurrEnrolled: 8,
 					Price:        50000,
+					Currency:     "thb",
 					CreatedAt:    time.Now(),
 					UpdatedAt:    time.Now(),
 				}, nil)
@@ -146,18 +146,9 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(
-				mockRepo,
-				mockManagerRepo,
-				mockEventRepo,
-				mockLocationRepo,
-			)
+			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo)
 
-			req, err := http.NewRequest(
-				http.MethodGet,
-				"/api/v1/event-occurrences/"+tt.eventOccurrenceID,
-				nil,
-			)
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/event-occurrences/"+tt.eventOccurrenceID, nil)
 			assert.NoError(t, err)
 
 			resp, err := app.Test(req)
@@ -175,10 +166,8 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 
 	start, _ := time.Parse(time.RFC3339, "2026-02-01T00:00:00Z")
 	end, _ := time.Parse(time.RFC3339, "2026-02-01T01:00:00Z")
-
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 
-	category_arr := []string{"science", "technology"}
 	eight := 8
 	twelve := 12
 	jpg := "events/robotics_workshop.jpg"
@@ -189,7 +178,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 		AgeRangeMin:      &eight,
 		AgeRangeMax:      &twelve,
-		Category:         category_arr,
+		Category:         []string{"science", "technology"},
 		HeaderImageS3Key: &jpg,
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
@@ -227,6 +216,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 				"max_attendees": 10,
 				"language":      "en",
 				"price":         50000,
+				"currency":      "thb",
 			},
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
 				m.On(
@@ -244,6 +234,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 					Language:     "en",
 					CurrEnrolled: 0,
 					Price:        50000,
+					Currency:     "thb",
 					CreatedAt:    time.Now(),
 					UpdatedAt:    time.Now(),
 				}, nil)
@@ -251,22 +242,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			statusCode: http.StatusOK,
 		},
 		{
-			name: "max attendees below minimum",
-			payload: map[string]interface{}{
-				"manager_id":    nil,
-				"event_id":      uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-				"location_id":   uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
-				"start_time":    start,
-				"end_time":      end,
-				"max_attendees": 0,
-				"language":      "en",
-				"price":         50000,
-			},
-			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
-			statusCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "language below minimum length",
+			name: "missing currency",
 			payload: map[string]interface{}{
 				"manager_id":    nil,
 				"event_id":      uuid.MustParse("60000000-0000-0000-0000-000000000001"),
@@ -274,7 +250,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 				"start_time":    start,
 				"end_time":      end,
 				"max_attendees": 10,
-				"language":      "e",
+				"language":      "en",
 				"price":         50000,
 			},
 			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
@@ -290,6 +266,39 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 				"end_time":      end,
 				"max_attendees": 10,
 				"language":      "en",
+				"currency":      "thb",
+			},
+			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "max attendees below minimum",
+			payload: map[string]interface{}{
+				"manager_id":    nil,
+				"event_id":      uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+				"location_id":   uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+				"start_time":    start,
+				"end_time":      end,
+				"max_attendees": 0,
+				"language":      "en",
+				"price":         50000,
+				"currency":      "thb",
+			},
+			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "language below minimum length",
+			payload: map[string]interface{}{
+				"manager_id":    nil,
+				"event_id":      uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+				"location_id":   uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+				"start_time":    start,
+				"end_time":      end,
+				"max_attendees": 10,
+				"language":      "e",
+				"price":         50000,
+				"currency":      "thb",
 			},
 			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
 			statusCode: http.StatusUnprocessableEntity,
@@ -307,20 +316,12 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(
-				mockRepo,
-				mockManagerRepo,
-				mockEventRepo,
-				mockLocationRepo,
-			)
+			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo)
+
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
 
-			req, err := http.NewRequest(
-				http.MethodPost,
-				"/api/v1/event-occurrences",
-				bytes.NewBuffer(bodyBytes),
-			)
+			req, err := http.NewRequest(http.MethodPost, "/api/v1/event-occurrences", bytes.NewBuffer(bodyBytes))
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
 
@@ -354,21 +355,20 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 	t.Parallel()
 
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
-	mid_new := uuid.MustParse("50000000-0000-0000-0000-000000000005")
+	midNew := uuid.MustParse("50000000-0000-0000-0000-000000000005")
 	eid := uuid.MustParse("60000000-0000-0000-0000-00000000000e")
 	lid := uuid.MustParse("10000000-0000-0000-0000-000000000008")
-	start, _ := time.Parse(time.RFC3339, "2026-02-22 09:00:00+07")
-	end, _ := time.Parse(time.RFC3339, "2026-02-22 11:00:00+07")
-	start_new, _ := time.Parse(time.RFC3339, "2026-02-15 10:00:00+07")
-	end_new, _ := time.Parse(time.RFC3339, "2026-02-15 12:00:00+07")
-	max := 10
-	lang := "th"
-	curr := 8
+	start, _ := time.Parse(time.RFC3339, "2026-02-22T09:00:00+07:00")
+	end, _ := time.Parse(time.RFC3339, "2026-02-22T11:00:00+07:00")
+	startNew, _ := time.Parse(time.RFC3339, "2026-02-15T10:00:00+07:00")
+	endNew, _ := time.Parse(time.RFC3339, "2026-02-15T12:00:00+07:00")
 
-	category_arr := []string{"science", "technology"}
 	eight := 8
 	twelve := 12
+	ten := 10
+	fifteen := 15
 	jpg := "events/robotics_workshop.jpg"
+
 	event := models.Event{
 		ID:               eid,
 		Title:            "Junior Robotics Workshop",
@@ -376,23 +376,20 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 		AgeRangeMin:      &eight,
 		AgeRangeMax:      &twelve,
-		Category:         category_arr,
+		Category:         []string{"science", "technology"},
 		HeaderImageS3Key: &jpg,
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
 	}
 
-	category_arr_new := []string{"technology", "math"}
-	ten := 10
-	fifteen := 15
-	event_new := models.Event{
+	eventNew := models.Event{
 		ID:               uuid.MustParse("60000000-0000-0000-0000-00000000000e"),
 		Title:            "Python for Kids",
 		Description:      "Introduction to Python programming. Build simple programs and games while learning core concepts.",
 		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000005"),
 		AgeRangeMin:      &ten,
 		AgeRangeMax:      &fifteen,
-		Category:         category_arr_new,
+		Category:         []string{"technology", "math"},
 		HeaderImageS3Key: nil,
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
@@ -414,7 +411,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 		UpdatedAt:    time.Now(),
 	}
 
-	location_new := models.Location{
+	locationNew := models.Location{
 		ID:           lid,
 		Latitude:     13.7400000,
 		Longitude:    100.5450000,
@@ -437,18 +434,19 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 		statusCode int
 	}{
 		{
-			name: "valid payload with all fields changed except current enrolled",
+			name: "valid payload with all fields changed",
 			id:   uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 			payload: map[string]interface{}{
-				"manager_id":    mid_new,
+				"manager_id":    midNew,
 				"event_id":      eid,
 				"location_id":   lid,
-				"start_time":    start_new,
-				"end_time":      end_new,
-				"max_attendees": max,
-				"language":      lang,
-				"curr_enrolled": curr,
+				"start_time":    startNew,
+				"end_time":      endNew,
+				"max_attendees": 10,
+				"language":      "th",
+				"curr_enrolled": 8,
 				"price":         75000,
+				"currency":      "thb",
 			},
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
 				m.On(
@@ -457,15 +455,16 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					mock.AnythingOfType("*models.UpdateEventOccurrenceInput"),
 				).Return(&models.EventOccurrence{
 					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
-					ManagerId:    &mid_new,
-					Event:        event_new,
-					Location:     location_new,
-					StartTime:    start_new,
-					EndTime:      end_new,
+					ManagerId:    &midNew,
+					Event:        eventNew,
+					Location:     locationNew,
+					StartTime:    startNew,
+					EndTime:      endNew,
 					MaxAttendees: 10,
 					Language:     "th",
 					CurrEnrolled: 8,
 					Price:        75000,
+					Currency:     "thb",
 					CreatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
 					UpdatedAt:    time.Now(),
 				}, nil)
@@ -476,13 +475,6 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 			name: "current enrolled below minimum",
 			id:   uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 			payload: map[string]interface{}{
-				"manager_id":    nil,
-				"event_id":      nil,
-				"location_id":   nil,
-				"start_time":    nil,
-				"end_time":      nil,
-				"max_attendees": nil,
-				"language":      nil,
 				"curr_enrolled": -1,
 			},
 			mockSetup:  func(*repomocks.MockEventOccurrenceRepository) {},
@@ -501,21 +493,12 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(
-				mockRepo,
-				mockManagerRepo,
-				mockEventRepo,
-				mockLocationRepo,
-			)
+			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
 
-			req, err := http.NewRequest(
-				http.MethodPatch,
-				"/api/v1/event-occurrences/"+tt.id.String(),
-				bytes.NewBuffer(bodyBytes),
-			)
+			req, err := http.NewRequest(http.MethodPatch, "/api/v1/event-occurrences/"+tt.id.String(), bytes.NewBuffer(bodyBytes))
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
 
@@ -535,6 +518,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					Language:     "en",
 					CurrEnrolled: 5,
 					Price:        50000,
+					Currency:     "thb",
 					CreatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
 					UpdatedAt:    time.Date(2026, time.January, 20, 21, 41, 2, 0, time.Local),
 				}, nil)
@@ -620,7 +604,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
-			name:  "no filters, just default pagination",
+			name:  "no filters just default pagination",
 			query: "?page=1&limit=5",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
 				m.On(
@@ -643,21 +627,11 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
-
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(
-				mockRepo,
-				mockManagerRepo,
-				mockEventRepo,
-				mockLocationRepo,
-			)
+			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo)
 
-			req, err := http.NewRequest(
-				http.MethodGet,
-				"/api/v1/event-occurrences"+tt.query,
-				nil,
-			)
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/event-occurrences"+tt.query, nil)
 			assert.NoError(t, err)
 
 			resp, err := app.Test(req)

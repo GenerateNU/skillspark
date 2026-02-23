@@ -46,8 +46,6 @@ type CreateRegistrationInput struct {
 		GuardianID        uuid.UUID          `json:"guardian_id" doc:"ID of the guardian registering the child" format:"uuid" required:"true"`
 		EventOccurrenceID uuid.UUID          `json:"event_occurrence_id" doc:"ID of the event occurrence to register for" format:"uuid" required:"true"`
 		PaymentMethodID   *string            `json:"payment_method_id" doc:"Stripe payment method ID to use"`
-		Currency          string             `json:"currency" doc:"Currency code (e.g., thb, usd)" default:"thb"`
-		Amount            int64				 `json:"amount" doc:"the amount being paid in the lowest denomination of a currency (ex: cents for USD)"`
 		Status            RegistrationStatus `json:"status" doc:"Initial status of the registration" default:"registered" enum:"registered,cancelled"`
 	} `json:"body"`
 }
@@ -87,7 +85,9 @@ type UpdateRegistrationOutput struct {
 }
 
 type CancelRegistrationInput struct {
-	ID uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to cancel"`
+    ID                  uuid.UUID           `path:"id"`
+    Status              *RegistrationStatus `json:"status,omitempty"`
+    PaymentIntentStatus *string             `json:"payment_intent_status,omitempty"`
 }
 
 type CancelRegistrationOutput struct {
@@ -111,6 +111,10 @@ type UpdateRegistrationPaymentStatusOutput struct {
 
 type GetRegistrationByIDInput struct {
 	ID uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to retrieve" required:"true"`
+}
+
+type GetRegistrationByPaymentIntentIDInput struct {
+    PaymentIntentID string `path:"payment_intent_id" doc:"Stripe payment intent ID"`
 }
 
 type GetRegistrationByIDOutput struct {

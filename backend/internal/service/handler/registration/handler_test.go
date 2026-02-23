@@ -402,7 +402,6 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
 				i.Body.Status = models.RegistrationStatusRegistered
-				i.Body.Currency = "usd"
 				i.Body.PaymentMethodID = &paymentMethodID
 				return i
 			}(),

@@ -13,7 +13,7 @@ type StripeClientInterface interface {
 	CreateCustomer(ctx context.Context, email string, name string) (*stripe.Customer, error)
 	CreateSetupIntent(ctx context.Context, stripeCustomerID string) (string, error)
 	CreatePaymentIntent(ctx context.Context, input *models.CreatePaymentIntentInput) (*models.CreatePaymentIntentOutput, error)
-	GetAccount(ctx context.Context, accountID string) (*stripe.V2CoreAccount, error)
+	GetPaymentMethodsByCustomerID(ctx context.Context, customerID string) (*models.GetPaymentMethodsByGuardianIDOutput, error)
 	DetachPaymentMethod(ctx context.Context, paymentMethodID string) error
 	CreateLoginLink(ctx context.Context, accountID string) (string, error)
 	CancelPaymentIntent(ctx context.Context, input *models.CancelPaymentIntentInput) (*models.CancelPaymentIntentOutput, error)

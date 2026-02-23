@@ -36,17 +36,12 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 		return nil, err
 	}
 
-	paymentMethod := input.Body.PaymentMethodID
-	if paymentMethod == nil {
-		paymentMethod = guardian.StripeCustomerID
-	}
-
 	piInput := models.CreatePaymentIntentInput{}
 	piInput.Body.Amount = int64(eventOccurrence.Price)
-	piInput.Body.Currency = input.Body.Currency
+	piInput.Body.Currency = eventOccurrence.Currency
 	piInput.Body.GuardianStripeID = *guardian.StripeCustomerID
 	piInput.Body.OrgStripeID = *org.StripeAccountID
-	piInput.Body.PaymentMethodID = paymentMethod
+	piInput.Body.PaymentMethodID = *input.Body.PaymentMethodID
 	piInput.Body.EventDate = eventOccurrence.StartTime
 
 	paymentIntent, err := h.StripeClient.CreatePaymentIntent(ctx, &piInput)

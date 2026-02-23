@@ -30,7 +30,7 @@ func TestStripeClient_CapturePaymentIntent_Success(t *testing.T) {
 	createPIInput.Body.Currency = "usd"
 	createPIInput.Body.GuardianStripeID = testStripeCustomerID
 	createPIInput.Body.OrgStripeID = testStripeAccountID
-	createPIInput.Body.PaymentMethodID = &paymentMethodID
+	createPIInput.Body.PaymentMethodID = paymentMethodID
 
 	createdPI, err := client.CreatePaymentIntent(ctx, createPIInput)
 	require.NoError(t, err)
@@ -89,7 +89,7 @@ func TestStripeClient_CapturePaymentIntent_AlreadyCaptured(t *testing.T) {
 	createPIInput.Body.Currency = "usd"
 	createPIInput.Body.GuardianStripeID = testStripeCustomerID
 	createPIInput.Body.OrgStripeID = testStripeAccountID
-	createPIInput.Body.PaymentMethodID = &paymentMethodID
+	createPIInput.Body.PaymentMethodID = paymentMethodID
 
 	createdPI, err := client.CreatePaymentIntent(ctx, createPIInput)
 	require.NoError(t, err)
@@ -127,7 +127,7 @@ func TestStripeClient_CapturePaymentIntent_CanceledIntent(t *testing.T) {
 	createPIInput.Body.Currency = "usd"
 	createPIInput.Body.GuardianStripeID = testStripeCustomerID
 	createPIInput.Body.OrgStripeID = testStripeAccountID
-	createPIInput.Body.PaymentMethodID = &paymentMethodID
+	createPIInput.Body.PaymentMethodID = paymentMethodID
 
 	createdPI, err := client.CreatePaymentIntent(ctx, createPIInput)
 	require.NoError(t, err)

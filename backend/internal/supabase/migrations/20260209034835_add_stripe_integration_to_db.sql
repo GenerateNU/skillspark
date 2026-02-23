@@ -38,7 +38,8 @@ ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(255) UNIQUE;
 
 
 ALTER TABLE event_occurrence
-ADD COLUMN IF NOT EXISTS price INTEGER NOT NULL DEFAULT 0; -- Price in bhat
+ADD COLUMN IF NOT EXISTS price INTEGER NOT NULL DEFAULT 0, -- Price in bhat
+ADD COLUMN IF NOT EXISTS currency VARCHAR(3) NOT NULL DEFAULT 'thb';
 
 CREATE INDEX IF NOT EXISTS idx_event_occurrence_price ON event_occurrence(price);
 

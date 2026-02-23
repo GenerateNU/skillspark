@@ -2,7 +2,6 @@ package stripeClient
 
 import (
 	"context"
-	"errors"
 	"skillspark/internal/models"
 	"time"
 
@@ -16,36 +15,22 @@ func (sc *StripeClient) CreatePaymentIntent(ctx context.Context, input *models.C
 	const applicationFeePercentage = 10 // CHANGE THIS TO BE THE APPLICATION FEE PERCENTAGE
 
 	applicationFeeTotal := (input.Body.Amount * int64(applicationFeePercentage)) / 100 
-	organizationProfit := input.Body.Amount - applicationFeeTotal
-
-	if input.Body.PaymentMethodID == nil || *input.Body.PaymentMethodID == "" {
-		return nil, errors.New("payment method required for booking")
-	}
-
 	
 	params := &stripe.PaymentIntentCreateParams{
   		Amount: stripe.Int64(input.Body.Amount),
   		Currency: stripe.String(input.Body.Currency),
-		OnBehalfOf: stripe.String(input.Body.OrgStripeID),
 		Customer: stripe.String(input.Body.GuardianStripeID),
+		PaymentMethod: stripe.String(input.Body.PaymentMethodID),
 		ApplicationFeeAmount: stripe.Int64(applicationFeeTotal),
 		TransferData: &stripe.PaymentIntentCreateTransferDataParams{
 			Destination: stripe.String(input.Body.OrgStripeID),
-			Amount: stripe.Int64(organizationProfit),
 		},
 		OffSession: stripe.Bool(true),
 		Metadata: map[string]string{
 			"event_date":      input.Body.EventDate.Format(time.RFC3339),
 		},
-	}
-
-	if input.Body.PaymentMethodID != nil {
-		// reusing saved card
-		params.PaymentMethod = stripe.String(*input.Body.PaymentMethodID)
-		params.OffSession = stripe.Bool(true)
-	} else {
-		// New card - save for future use
-		params.SetupFutureUsage = stripe.String("off_session")
+		Confirm: stripe.Bool(true),
+		CaptureMethod: stripe.String("manual"),
 	}
 
 	intent, err := sc.client.V1PaymentIntents.Create(ctx, params)
@@ -59,7 +44,7 @@ func (sc *StripeClient) CreatePaymentIntent(ctx context.Context, input *models.C
 	output.Body.PaymentIntentID = intent.ID
 	output.Body.Status = string(intent.Status)
 	output.Body.TotalAmount = int(intent.Amount)
-	output.Body.ProviderAmount = int(intent.TransferData.Amount)
+	output.Body.ProviderAmount = int(intent.Amount) - int(intent.ApplicationFeeAmount)
 	output.Body.PlatformFeeAmount = int(intent.ApplicationFeeAmount)
 	output.Body.Currency = input.Body.Currency
 	

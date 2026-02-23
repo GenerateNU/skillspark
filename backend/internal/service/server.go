@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"os"
 	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
@@ -101,6 +102,11 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	// Register Huma endpoints
 	setupHumaRoutes(humaAPI, repo, config, s3Client, newStripeClient)
+
+	routes.SetupWebhookRoutes(app, repo,
+    	os.Getenv("STRIPE_WEBHOOK_SECRET"),
+    	os.Getenv("STRIPE_CONNECT_WEBHOOK_SECRET"),
+	)
 
 	return app, humaAPI
 }

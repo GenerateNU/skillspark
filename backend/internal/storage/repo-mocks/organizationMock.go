@@ -92,7 +92,7 @@ func (m *MockOrganizationRepository) SetStripeAccountID(ctx context.Context, org
 	return args.Get(0).(*models.Organization), nil
 }
 
-func (m *MockOrganizationRepository) SetStripeAccountActivated(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error) {
+func (m *MockOrganizationRepository) SetStripeAccountStatus(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error) {
 	args := m.Called(ctx, stripeAccountID, activated)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {

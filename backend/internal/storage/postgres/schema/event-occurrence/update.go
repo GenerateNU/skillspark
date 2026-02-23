@@ -31,6 +31,7 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 			input.Body.Language,
 			input.Body.CurrEnrolled,
 			input.Body.Price,
+			input.Body.Currency,
 		)
 	} else {
 		row = r.db.QueryRow(ctx,
@@ -45,6 +46,7 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 			input.Body.Language,
 			input.Body.CurrEnrolled,
 			input.Body.Price,
+			input.Body.Currency,
 		)
 	}
 
@@ -64,6 +66,7 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 		&updatedEventOccurrence.UpdatedAt,
 		&updatedEventOccurrence.Status,
 		&updatedEventOccurrence.Price,
+		&updatedEventOccurrence.Currency,
 
 		// event fields
 		&updatedEventOccurrence.Event.ID,

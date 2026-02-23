@@ -10,6 +10,7 @@ SELECT
     eo.updated_at,
     eo.status,
     eo.price,
+    eo.currency,
 
     e.id,
     e.title,

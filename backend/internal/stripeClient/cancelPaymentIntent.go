@@ -9,7 +9,7 @@ import (
 
 func (sc *StripeClient) CancelPaymentIntent(ctx context.Context, input *models.CancelPaymentIntentInput) (*models.CancelPaymentIntentOutput, error) {
 	params := &stripe.PaymentIntentCancelParams{}
-	params.SetStripeAccount(input.StripeAccountID)
+	// params.SetStripeAccount(input.StripeAccountID)
 
 	pi, err := sc.client.V1PaymentIntents.Cancel(ctx, input.PaymentIntentID, params)
 	if err != nil {

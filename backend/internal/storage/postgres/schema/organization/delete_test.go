@@ -90,7 +90,7 @@ func TestDeleteOrganization_WithStripeAccount(t *testing.T) {
 
 	_, err := repo.SetStripeAccountID(ctx, testOrg.ID, stripeAccountID)
 	require.NoError(t, err)
-	_, err = repo.SetStripeAccountActivated(ctx, stripeAccountID, true)
+	_, err = repo.SetStripeAccountStatus(ctx, stripeAccountID, true)
 	require.NoError(t, err)
 
 	deleted, err := repo.DeleteOrganization(ctx, testOrg.ID)

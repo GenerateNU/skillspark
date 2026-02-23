@@ -24,7 +24,8 @@ type EventOccurrence struct {
 	MaxAttendees int                   `json:"max_attendees" db:"max_attendees"`
 	Language     string                `json:"language" db:"language"`
 	CurrEnrolled int                   `json:"curr_enrolled" db:"curr_enrolled"`
-	Price        int                   `json:"price" db:"price" doc:"Price in cents (e.g., 10000 = ฿100)"`
+	Price        int                   `json:"price" db:"price" doc:"Price in cents (e.g., 10000 = $100)"`
+	Currency     string                `json:"currency" db:"currency" doc:"Currency code (e.g., thb, usd)"`
 	CreatedAt    time.Time             `json:"created_at" db:"created_at"`
 	UpdatedAt    time.Time             `json:"updated_at" db:"updated_at"`
 	Status       EventOccurrenceStatus `json:"status" db:"status" doc:"Current status of the event occurrence" enum:"scheduled,cancelled"`
@@ -79,6 +80,7 @@ type CreateEventOccurrenceInput struct {
 		MaxAttendees int        `json:"max_attendees" doc:"Maximum number of attendees" minimum:"1" maximum:"100"`
 		Language     string     `json:"language" doc:"Primary language used for the event occurrence" minLength:"2" maxLength:"30"`
 		Price        int        `json:"price" doc:"Price in cents (e.g., 10000 = ฿100)" minimum:"0"`
+		Currency     string     `json:"currency" doc:"Currency code (e.g., thb, usd)"`
 	} `json:"body" doc:"New event occurrence to add"`
 }
 
@@ -97,7 +99,8 @@ type UpdateEventOccurrenceInput struct {
 		MaxAttendees *int       `json:"max_attendees,omitempty" doc:"Maximum number of attendees" minimum:"1" maximum:"100"`
 		Language     *string    `json:"language,omitempty" doc:"Primary language used for the event occurrence" minLength:"2" maxLength:"30"`
 		CurrEnrolled *int       `json:"curr_enrolled,omitempty" doc:"Number of students currently enrolled in the event occurrence" minimum:"0" maximum:"100"`
-		Price        *int       `json:"price,omitempty" doc:"Price in cents" minimum:"0"`
+		Price        *int       `json:"price,omitempty" doc:"Price in lowest denomination of currency" minimum:"0"`
+		Currency *string `json:"currency,omitempty" doc:"Currency code" minLength:"3" maxLength:"3"`
 	} `json:"body" doc:"Event occurrence fields to update"`
 }
 

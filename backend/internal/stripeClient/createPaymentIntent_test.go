@@ -43,7 +43,7 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 		input.Body.Currency = "usd"
 		input.Body.GuardianStripeID = customer.ID
 		input.Body.OrgStripeID = org.Body.Account.ID
-		input.Body.PaymentMethodID = &paymentMethodID
+		input.Body.PaymentMethodID = paymentMethodID
 		input.Body.EventDate = time.Now().Add(24 * time.Hour)
 		input.Body.RegistrationID = uuid.New()
 		input.Body.GuardianID = uuid.New()
@@ -85,7 +85,7 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 		input.Body.Currency = "usd"
 		input.Body.GuardianStripeID = customer.ID
 		input.Body.OrgStripeID = org.Body.Account.ID
-		input.Body.PaymentMethodID = nil
+		input.Body.PaymentMethodID = ""
 		input.Body.EventDate = time.Now().Add(24 * time.Hour)
 		input.Body.RegistrationID = uuid.New()
 		input.Body.GuardianID = uuid.New()
@@ -116,7 +116,7 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 		input.Body.Currency = "usd"
 		input.Body.GuardianStripeID = customer.ID
 		input.Body.OrgStripeID = org.Body.Account.ID
-		input.Body.PaymentMethodID = &emptyPM
+		input.Body.PaymentMethodID = emptyPM
 		input.Body.EventDate = time.Now().Add(24 * time.Hour)
 		input.Body.RegistrationID = uuid.New()
 		input.Body.GuardianID = uuid.New()
@@ -144,7 +144,7 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 		input.Body.Currency = "usd"
 		input.Body.GuardianStripeID = "cus_nonexistent123"
 		input.Body.OrgStripeID = org.Body.Account.ID
-		input.Body.PaymentMethodID = &paymentMethodID
+		input.Body.PaymentMethodID = paymentMethodID
 		input.Body.EventDate = time.Now().Add(24 * time.Hour)
 		input.Body.RegistrationID = uuid.New()
 		input.Body.GuardianID = uuid.New()
@@ -167,7 +167,7 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 		input.Body.Currency = "usd"
 		input.Body.GuardianStripeID = customer.ID
 		input.Body.OrgStripeID = "acct_nonexistent123"
-		input.Body.PaymentMethodID = &paymentMethodID
+		input.Body.PaymentMethodID = paymentMethodID
 		input.Body.EventDate = time.Now().Add(24 * time.Hour)
 		input.Body.RegistrationID = uuid.New()
 		input.Body.GuardianID = uuid.New()

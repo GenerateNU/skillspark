@@ -7,8 +7,8 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *OrganizationRepository) SetStripeAccountActivated(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error) {
-	query, err := schema.ReadSQLBaseScript("set_stripe_account_activated.sql", SqlOrganizationFiles)
+func (r *OrganizationRepository) SetStripeAccountStatus(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error) {
+	query, err := schema.ReadSQLBaseScript("set_stripe_account_status.sql", SqlOrganizationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr

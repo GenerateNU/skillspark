@@ -22,7 +22,7 @@ func TestSetStripeAccountActivated(t *testing.T) {
 	require.NoError(t, err)
 	require.False(t, orgWithAccount.StripeAccountActivated)
 
-	updated, err := repo.SetStripeAccountActivated(ctx, stripeAccountID, true)
+	updated, err := repo.SetStripeAccountStatus(ctx, stripeAccountID, true)
 	require.NoError(t, err)
 	require.NotNil(t, updated)
 	assert.Equal(t, testOrg.ID, updated.ID)
@@ -45,10 +45,10 @@ func TestSetStripeAccountActivated_Deactivate(t *testing.T) {
 
 	_, err := repo.SetStripeAccountID(ctx, testOrg.ID, stripeAccountID)
 	require.NoError(t, err)
-	_, err = repo.SetStripeAccountActivated(ctx, stripeAccountID, true)
+	_, err = repo.SetStripeAccountStatus(ctx, stripeAccountID, true)
 	require.NoError(t, err)
 
-	deactivated, err := repo.SetStripeAccountActivated(ctx, stripeAccountID, false)
+	deactivated, err := repo.SetStripeAccountStatus(ctx, stripeAccountID, false)
 	require.NoError(t, err)
 	require.NotNil(t, deactivated)
 	assert.False(t, deactivated.StripeAccountActivated)
@@ -60,7 +60,7 @@ func TestSetStripeAccountActivated_NotFound(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	updated, err := repo.SetStripeAccountActivated(ctx, "acct_doesnotexist123", true)
+	updated, err := repo.SetStripeAccountStatus(ctx, "acct_doesnotexist123", true)
 	require.Error(t, err)
 	assert.Nil(t, updated)
 }
@@ -79,7 +79,7 @@ func TestSetStripeAccountActivated_DoesNotModifyOtherFields(t *testing.T) {
 	originalName := orgWithAccount.Name
 	originalActive := orgWithAccount.Active
 
-	updated, err := repo.SetStripeAccountActivated(ctx, stripeAccountID, true)
+	updated, err := repo.SetStripeAccountStatus(ctx, stripeAccountID, true)
 	require.NoError(t, err)
 	assert.Equal(t, originalName, updated.Name)
 	assert.Equal(t, originalActive, updated.Active)
@@ -99,15 +99,15 @@ func TestSetStripeAccountActivated_MultipleToggle(t *testing.T) {
 	_, err := repo.SetStripeAccountID(ctx, testOrg.ID, stripeAccountID)
 	require.NoError(t, err)
 
-	activated, err := repo.SetStripeAccountActivated(ctx, stripeAccountID, true)
+	activated, err := repo.SetStripeAccountStatus(ctx, stripeAccountID, true)
 	require.NoError(t, err)
 	assert.True(t, activated.StripeAccountActivated)
 
-	deactivated, err := repo.SetStripeAccountActivated(ctx, stripeAccountID, false)
+	deactivated, err := repo.SetStripeAccountStatus(ctx, stripeAccountID, false)
 	require.NoError(t, err)
 	assert.False(t, deactivated.StripeAccountActivated)
 
-	reactivated, err := repo.SetStripeAccountActivated(ctx, stripeAccountID, true)
+	reactivated, err := repo.SetStripeAccountStatus(ctx, stripeAccountID, true)
 	require.NoError(t, err)
 	assert.True(t, reactivated.StripeAccountActivated)
 }

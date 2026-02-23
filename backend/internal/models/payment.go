@@ -39,6 +39,29 @@ type CreateStripeOnboardingLinkClientInput struct {
 	}
 }
 
+type GetPaymentMethodsByGuardianIDInput struct {
+	GuardianID uuid.UUID `path:"guardian_id" doc:"Guardian ID"`
+}
+
+type PaymentMethodCard struct {
+	Brand    string `json:"brand"`
+	Last4    string `json:"last4"`
+	ExpMonth int64  `json:"exp_month"`
+	ExpYear  int64  `json:"exp_year"`
+}
+
+type PaymentMethod struct {
+	ID   string            `json:"id"`
+	Type string            `json:"type"`
+	Card PaymentMethodCard `json:"card"`
+}
+
+type GetPaymentMethodsByGuardianIDOutput struct {
+	Body struct {
+		PaymentMethods []PaymentMethod `json:"payment_methods"`
+	}
+}
+
 type CreateStripeOnboardingLinkOutput struct {
 	Body struct {
 		OnboardingURL string `json:"onboarding_url" doc:"Stripe-hosted onboarding page URL"`
@@ -81,7 +104,7 @@ type CreatePaymentIntentInput struct {
 		Amount          int64     `json:"amount" doc:"Total amount in cents" minimum:"1"` // Stripe requires int64
 		Currency        string    `json:"currency" doc:"Currency code (e.g., thb, usd)" pattern:"^[a-z]{3}$"`
 		EventDate       time.Time `json:"event_date" doc:"Event date and time"`
-		PaymentMethodID *string   `json:"payment_method_id,omitempty" doc:"Stripe payment method ID (required for bookings)"`
+		PaymentMethodID  string   `json:"payment_method_id,omitempty" doc:"Stripe payment method ID (required for bookings)"`
 		GuardianStripeID string
 		OrgStripeID      string
 	}
@@ -125,4 +148,21 @@ type CapturePaymentIntentOutput struct {
 		Amount          int64  `json:"amount" doc:"Amount captured in cents"`
 		Currency        string `json:"currency" doc:"Currency code"`
 	} `json:"body" doc:"Capture result"`
+}
+
+type CancelRegistrationWithPaymentInput struct {
+	ID                  uuid.UUID              `json:"id"`
+	CancelledAt         time.Time              `json:"cancelled_at"`
+	Status              RegistrationStatus     `json:"status"`
+	PaymentIntentStatus string                 `json:"payment_intent_status"`
+}
+
+type GetRegistrationByPaymentIntentIDOutput struct {
+	ID                  uuid.UUID          `json:"id"`
+	EventOccurrenceID   uuid.UUID          `json:"event_occurrence_id"`
+	GuardianID          uuid.UUID          `json:"guardian_id"`
+	ChildID             uuid.UUID          `json:"child_id"`
+	Status              RegistrationStatus `json:"status"`
+	StripePaymentIntentID string           `json:"stripe_payment_intent_id"`
+	OrgStripeAccountID  string             `json:"org_stripe_account_id"`
 }

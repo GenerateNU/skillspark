@@ -114,3 +114,8 @@ func (m *MockStripeClient) CreateLoginLink(
 	args := m.Called(ctx, accountID)
 	return args.String(0), args.Error(1)
 }
+
+func (m *MockStripeClient) GetPaymentMethodsByCustomerID(ctx context.Context, customerID string) (*models.GetPaymentMethodsByGuardianIDOutput, error) {
+	args := m.Called(ctx, customerID)
+	return args.Get(0).(*models.GetPaymentMethodsByGuardianIDOutput), args.Error(1)
+}
