@@ -8,38 +8,44 @@ import (
 )
 
 func (j *JobScheduler) CapturePaymentsJob() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("CapturePaymentsJob panicked: %v", r)
+		}
+	}()
+
 	ctx := context.Background()
-	
+
 	now := time.Now()
 	startWindow := now.Add(24 * time.Hour)
 	endWindow := now.Add(25 * time.Hour)
 
 	registrations, err := j.repo.Registration.GetRegistrationsForCapture(ctx, startWindow, endWindow)
-
 	if err != nil {
+		log.Printf("Failed to get registrations for capture: %v", err)
 		return
 	}
 
 	log.Printf("Found %d registrations to capture", len(registrations))
 
 	for _, registration := range registrations {
-
 		stripeInput := &models.CapturePaymentIntentInput{
 			PaymentIntentID: registration.StripePaymentIntentID,
-			StripeAccountID: registration.OrgStripeAccountID,
 		}
 
 		stripeOutput, err := j.stripeClient.CapturePaymentIntent(ctx, stripeInput)
-
 		if err != nil {
 			log.Printf("Failed to capture payment for registration %s: %v", registration.ID, err)
+			continue
+		}
+		if stripeOutput == nil {
+			log.Printf("Nil output for registration %s, skipping", registration.ID)
 			continue
 		}
 
 		updateInput := &models.UpdateRegistrationPaymentStatusInput{
 			ID: registration.ID,
 		}
-
 		updateInput.Body.PaymentIntentStatus = stripeOutput.Body.Status
 
 		_, err = j.repo.Registration.UpdateRegistrationPaymentStatus(ctx, updateInput)

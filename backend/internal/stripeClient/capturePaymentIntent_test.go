@@ -38,7 +38,6 @@ func TestStripeClient_CapturePaymentIntent_Success(t *testing.T) {
 
 	captureInput := &models.CapturePaymentIntentInput{
 		PaymentIntentID: createdPI.Body.PaymentIntentID,
-		StripeAccountID: testStripeAccountID,
 	}
 
 	captured, err := client.CapturePaymentIntent(ctx, captureInput)
@@ -62,7 +61,6 @@ func TestStripeClient_CapturePaymentIntent_InvalidID(t *testing.T) {
 
 	captureInput := &models.CapturePaymentIntentInput{
 		PaymentIntentID: "pi_invalid_id",
-		StripeAccountID: testStripeAccountID,
 	}
 
 	captured, err := client.CapturePaymentIntent(ctx, captureInput)
@@ -96,7 +94,6 @@ func TestStripeClient_CapturePaymentIntent_AlreadyCaptured(t *testing.T) {
 
 	captureInput := &models.CapturePaymentIntentInput{
 		PaymentIntentID: createdPI.Body.PaymentIntentID,
-		StripeAccountID: testStripeAccountID,
 	}
 
 	captured1, err := client.CapturePaymentIntent(ctx, captureInput)
@@ -134,14 +131,12 @@ func TestStripeClient_CapturePaymentIntent_CanceledIntent(t *testing.T) {
 
 	cancelInput := &models.CancelPaymentIntentInput{
 		PaymentIntentID: createdPI.Body.PaymentIntentID,
-		StripeAccountID: testStripeAccountID,
 	}
 	_, err = client.CancelPaymentIntent(ctx, cancelInput)
 	require.NoError(t, err)
 
 	captureInput := &models.CapturePaymentIntentInput{
 		PaymentIntentID: createdPI.Body.PaymentIntentID,
-		StripeAccountID: testStripeAccountID,
 	}
 
 	captured, err := client.CapturePaymentIntent(ctx, captureInput)

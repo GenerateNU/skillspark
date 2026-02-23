@@ -124,7 +124,6 @@ type CreatePaymentIntentOutput struct {
 
 type CancelPaymentIntentInput struct {
 	PaymentIntentID string `json:"payment_intent_id" doc:"Stripe payment intent ID to cancel/refund"`
-	StripeAccountID string `json:"stripe_account_id" doc:"Organization's Stripe account ID"`
 }
 
 type CancelPaymentIntentOutput struct {
@@ -138,7 +137,6 @@ type CancelPaymentIntentOutput struct {
 
 type CapturePaymentIntentInput struct {
 	PaymentIntentID string `json:"payment_intent_id" doc:"Stripe payment intent ID to capture"`
-	StripeAccountID string `json:"stripe_account_id" doc:"Organization's Stripe account ID"`
 }
 
 type CapturePaymentIntentOutput struct {

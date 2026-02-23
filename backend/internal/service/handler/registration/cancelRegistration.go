@@ -26,7 +26,6 @@ func (h *Handler) CancelRegistration(ctx context.Context, input *models.CancelRe
 	case "succeeded":
 		refundInput := &models.CancelPaymentIntentInput{
 			PaymentIntentID: registration.Body.StripePaymentIntentID,
-			StripeAccountID: registration.Body.OrgStripeAccountID,
 		}
 		
 		refundOutput, err := h.StripeClient.CancelPaymentIntent(ctx, refundInput)
@@ -37,7 +36,6 @@ func (h *Handler) CancelRegistration(ctx context.Context, input *models.CancelRe
 	case "requires_capture":
 		cancelInput := &models.CancelPaymentIntentInput{
 			PaymentIntentID: registration.Body.StripePaymentIntentID,
-			StripeAccountID: registration.Body.OrgStripeAccountID,
 		}
 		
 		_, err := h.StripeClient.CancelPaymentIntent(ctx, cancelInput)
