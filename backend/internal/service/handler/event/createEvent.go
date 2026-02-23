@@ -11,7 +11,9 @@ func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInpu
 	var key *string
 	var url *string
 
-	initInput := h.CreateTranslateStruct(ctx, input, nil, nil)
+	misc := ""
+
+	initInput := h.CreateTranslateStruct(ctx, input, &misc, &misc)
 	event, err := h.EventRepository.CreateEvent(ctx, initInput, key)
 	if err != nil {
 		e := errs.InternalServerError("Invalid creation" + err.Error())

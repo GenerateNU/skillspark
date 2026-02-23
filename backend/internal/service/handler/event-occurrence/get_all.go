@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/models"
 	"skillspark/internal/utils"
+	"time"
 )
 
 func (h *Handler) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string) ([]models.EventOccurrence, error) {
@@ -11,5 +12,29 @@ func (h *Handler) GetAllEventOccurrences(ctx context.Context, pagination utils.P
 	if err != nil {
 		return nil, err
 	}
+
+	for idx := range eventOccurrence {
+		err = h.AssignURLS(ctx, eventOccurrence, idx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return eventOccurrence, nil
+}
+
+func (h *Handler) AssignURLS(ctx context.Context, occurrences []models.EventOccurrence, idx int) error {
+	var url string
+	var err error
+	key := occurrences[idx].Event.HeaderImageS3Key
+	if key != nil {
+		url, err = h.s3Client.GeneratePresignedURL(ctx, *key, time.Hour)
+		if err != nil {
+			return err
+		}
+	}
+
+	occurrences[idx].Event.PresignedURL = &url
+	return nil
+
 }
