@@ -317,11 +317,19 @@ endif
 # ------------------------
 dev:
 	@echo "$(BOLD)Starting development server...$(NC)"
-	@set -a; source .env; set +a; go run cmd/main.go
+	@if [ ! -r .env ]; then \
+		echo "$(RED)Missing required .env file (or not readable): $(PWD)/.env$(NC)"; \
+		exit 1; \
+	fi; \
+	set -a; . ./.env; set +a; go run cmd/main.go
 
 run:
 	@echo "$(BOLD)Starting server...$(NC)"
-	@set -a; source .env; set +a; go run cmd/main.go
+	@if [ ! -r .env ]; then \
+		echo "$(RED)Missing required .env file (or not readable): $(PWD)/.env$(NC)"; \
+		exit 1; \
+	fi; \
+	set -a; . ./.env; set +a; go run cmd/main.go
 
 build:
 	@echo "$(BOLD)Building application...$(NC)"
