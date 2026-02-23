@@ -36,7 +36,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
 				// translation succeeds
 				translated := "งานยอดเยี่ยม!"
-				translateMock.On("GetTranslation", mock.Anything, "Great event!").Return(&translated, nil)
+				translateMock.On("GetTranslation", mock.Anything, "Great event!", mock.Anything, mock.Anything).Return(&translated, nil)
 
 				// registration exists
 				regRepo.On(
@@ -82,7 +82,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			}(),
 			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
 				// translation fails
-				translateMock.On("GetTranslation", mock.Anything, "Great event!").Return(nil, errors.New("translation service unavailable"))
+				translateMock.On("GetTranslation", mock.Anything, "Great event!", mock.Anything, mock.Anything).Return(nil, errors.New("translation service unavailable"))
 			},
 			wantErr: true,
 		},
@@ -99,7 +99,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
 				// translation succeeds
 				translated := "งานยอดเยี่ยม!"
-				translateMock.On("GetTranslation", mock.Anything, "Great event!").Return(&translated, nil)
+				translateMock.On("GetTranslation", mock.Anything, "Great event!", mock.Anything, mock.Anything).Return(&translated, nil)
 
 				regRepo.On(
 					"GetRegistrationByID",
@@ -124,7 +124,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
 				// translation succeeds
 				translated := "งานยอดเยี่ยม!"
-				translateMock.On("GetTranslation", mock.Anything, "Great event!").Return(&translated, nil)
+				translateMock.On("GetTranslation", mock.Anything, "Great event!", mock.Anything, mock.Anything).Return(&translated, nil)
 
 				// registration exists
 				regRepo.On(
@@ -160,7 +160,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
 				// translation succeeds
 				translated := "งานยอดเยี่ยม!"
-				translateMock.On("GetTranslation", mock.Anything, "Great event!").Return(&translated, nil)
+				translateMock.On("GetTranslation", mock.Anything, "Great event!", mock.Anything, mock.Anything).Return(&translated, nil)
 
 				// registration exists
 				regRepo.On(

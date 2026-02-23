@@ -234,7 +234,7 @@ func TestCreateRegistration_IncreasesAttendeeCount(t *testing.T) {
 	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 	occurrenceID := occurrence.ID
 
-	initialOccurrence, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID)
+	initialOccurrence, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID, "en-US")
 	require.Nil(t, err)
 	require.NotNil(t, initialOccurrence)
 	initialCount := initialOccurrence.CurrEnrolled
@@ -253,7 +253,7 @@ func TestCreateRegistration_IncreasesAttendeeCount(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, created)
 
-	updatedOccurrence, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID)
+	updatedOccurrence, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID, "en-US")
 	require.Nil(t, err)
 	require.NotNil(t, updatedOccurrence)
 	assert.Equal(t, initialCount+1, updatedOccurrence.CurrEnrolled, "Attendee count should increase by 1 after successful registration")

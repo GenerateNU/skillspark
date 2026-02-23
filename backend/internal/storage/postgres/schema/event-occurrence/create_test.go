@@ -53,7 +53,7 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 
 	// check created event occurrence in database
 	id := eventOccurrence.ID
-	retrievedEventOccurrence, err := repo.GetEventOccurrenceByID(ctx, id)
+	retrievedEventOccurrence, err := repo.GetEventOccurrenceByID(ctx, id, "en-US")
 	assert.Nil(t, err)
 	assert.NotNil(t, retrievedEventOccurrence)
 	assert.Equal(t, &mid, retrievedEventOccurrence.ManagerId)

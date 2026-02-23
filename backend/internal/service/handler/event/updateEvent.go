@@ -14,7 +14,7 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 
 	translationResp, err := h.CallTranslateAPI(ctx, input.Body.Title, input.Body.Description, input.AcceptLanguage)
 	if err != nil {
-		e := errs.InternalServerError("Invalid registration_id: registration does not exist", err.Error())
+		e := errs.InternalServerError("Translation failed", err.Error())
 		return nil, e
 	}
 
@@ -24,15 +24,14 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 		var err error
 		url, key, err = h.UpdateEventS3Helper(ctx, s3Client, input, image_data)
 		if err != nil {
-			e := errs.InternalServerError("Invalid registration_id: registration does not exist", err.Error())
+			e := errs.InternalServerError("S3 upload failed", err.Error())
 			return nil, e
 		}
 	}
 
 	event, err := h.EventRepository.UpdateEvent(ctx, updateInput, key)
 	if err != nil {
-		e := errs.InternalServerError("Invalid registration_id: registration does not exist", err.Error())
-		return nil, e
+		return nil, err
 	}
 
 	event.PresignedURL = url

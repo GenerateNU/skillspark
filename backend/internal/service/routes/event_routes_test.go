@@ -143,7 +143,7 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
 				translation := "จูเนียร์ โรโบติกส์|*|ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
-				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -257,7 +257,7 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
 				translation := "หุ่นยนต์ขั้นสูง|*|"
-				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -286,7 +286,7 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
 				translation := "หุ่นยนต์ขั้นสูง|*|"
-				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			statusCode: http.StatusNotFound,
 		},
@@ -490,6 +490,7 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 					"GetEventOccurrencesByEventID",
 					mock.Anything,
 					uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+					mock.Anything,
 				).Return([]models.EventOccurrence{
 					{
 						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),

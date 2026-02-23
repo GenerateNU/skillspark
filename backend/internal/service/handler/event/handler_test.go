@@ -99,7 +99,7 @@ func TestHandler_CreateEvent(t *testing.T) {
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
 				translation := "จูเนียร์ โรโบติกส์|*|ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
-				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			wantErr: false,
 			wantURL: false,
@@ -150,7 +150,7 @@ func TestHandler_CreateEvent(t *testing.T) {
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
 				translation := "จูเนียร์ โรโบติกส์|*|ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
-				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			wantErr: false,
 			wantURL: true,
@@ -262,7 +262,7 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
 				translation := "หุ่นยนต์ที่อัปเดต|*|"
-				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			wantErr: false,
 			wantURL: false,
@@ -293,7 +293,7 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
 				translation := "หุ่นยนต์ที่อัปเดตพร้อมรูปภาพ|*|"
-				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			wantErr: false,
 			wantURL: true,
@@ -321,7 +321,7 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
 				translation := "เหตุการณ์ว่างเปล่า|*|"
-				m.On("GetTranslation", mock.Anything, mock.Anything).Return(&translation, nil)
+				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
 			},
 			wantErr: false,
 			wantURL: false,
@@ -486,6 +486,7 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 					"GetEventOccurrencesByEventID",
 					mock.Anything,
 					uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+					mock.Anything,
 				).Return([]models.EventOccurrence{
 					{
 						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),
@@ -528,6 +529,7 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 					"GetEventOccurrencesByEventID",
 					mock.Anything,
 					uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+					mock.Anything,
 				).Return(make([]models.EventOccurrence, 0), nil)
 			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {

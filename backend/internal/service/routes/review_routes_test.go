@@ -53,7 +53,7 @@ func TestCreateReview_Success(t *testing.T) {
 	translateRepo := new(translatemocks.TranslateMock)
 	translated := "งานดี"
 	translateRepo.
-		On("GetTranslation", mock.Anything, "Great event").
+		On("GetTranslation", mock.Anything, "Great event", mock.Anything, mock.Anything).
 		Return(&translated, nil)
 
 	regRepo := new(repomocks.MockRegistrationRepository)
