@@ -119,3 +119,8 @@ func (m *MockStripeClient) GetPaymentMethodsByCustomerID(ctx context.Context, cu
 	args := m.Called(ctx, customerID)
 	return args.Get(0).(*models.GetPaymentMethodsByGuardianIDOutput), args.Error(1)
 }
+
+func (m *MockStripeClient) AttachPaymentMethod(ctx context.Context, paymentMethodID string, customerID string) error {
+	args := m.Called(ctx, paymentMethodID, customerID)
+	return args.Error(0)
+}

@@ -166,3 +166,17 @@ type GetRegistrationByPaymentIntentIDOutput struct {
 	StripePaymentIntentID string           `json:"stripe_payment_intent_id"`
 	OrgStripeAccountID  string             `json:"org_stripe_account_id"`
 }
+
+type AttachPaymentMethodInput struct {
+    GuardianID uuid.UUID `path:"guardian_id" doc:"Guardian ID"`
+    Body struct {
+        PaymentMethodID string `json:"payment_method_id" doc:"Stripe payment method ID to attach (e.g. pm_card_visa)"`
+    }
+}
+
+type AttachPaymentMethodOutput struct {
+    Body struct {
+        PaymentMethodID string `path:"payment_method_id" doc:"Attached payment method ID"`
+        CustomerID      string `json:"customer_id" doc:"Stripe customer ID the payment method was attached to"`
+    }
+}

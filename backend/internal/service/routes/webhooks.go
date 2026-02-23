@@ -11,5 +11,5 @@ func SetupWebhookRoutes(app *fiber.App, repo *storage.Repository, webhookSecret 
 	handler := webhook.NewHandler(repo, webhookSecret, connectWebhookSecret)
 
 	app.Post("/api/v1/webhooks/stripe", handler.HandlePlatformWebhook)
-	app.Post("/api/v1/webhooks/stripe/connect", handler.HandleConnectWebhook)
+	app.Post("/api/v1/webhooks/stripe/account", handler.HandleAccountWebhook)
 }

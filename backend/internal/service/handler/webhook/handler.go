@@ -48,7 +48,7 @@ func (h *Handler) HandlePlatformWebhook(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusOK)
 }
 
-func (h *Handler) HandleConnectWebhook(c *fiber.Ctx) error {
+func (h *Handler) HandleAccountWebhook(c *fiber.Ctx) error {
 	payload := c.Body()
 	signature := c.Get("Stripe-Signature")
 
