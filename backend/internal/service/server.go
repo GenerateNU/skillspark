@@ -11,6 +11,7 @@ import (
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
 	"skillspark/internal/stripeClient"
+	"skillspark/jobs"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -44,6 +45,11 @@ func InitApp(config config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	jobScheduler := jobs.NewJobScheduler(repo, newStripeClient)
+	jobScheduler.Start()
+	defer jobScheduler.Stop()
+
 
 	app, humaAPI := SetupApp(config, repo, s3Client, newStripeClient)
 	return &App{

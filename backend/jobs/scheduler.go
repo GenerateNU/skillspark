@@ -33,6 +33,8 @@ func (j *JobScheduler) Start() {
 
 	j.cron.Start()
 	log.Println("Cron jobs started")
+
+	go j.CapturePaymentsJob()
 }
 
 func (j *JobScheduler) Stop() {
