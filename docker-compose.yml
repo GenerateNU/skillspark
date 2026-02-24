@@ -1,8 +1,8 @@
 services:
   web-frontend:
     build:
-      context: ./frontend  # Changed from ./frontend/apps/web
-      dockerfile: apps/web/Dockerfile  # Path relative to context
+      context: .  # repo root
+      dockerfile: frontend/apps/web/Dockerfile
     ports:
       - "80:80"
     depends_on:

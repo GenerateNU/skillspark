@@ -11,16 +11,34 @@ import (
 )
 
 var language string
-
-func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string) ([]models.EventOccurrence, error) {
-	language = AcceptLanguage
+  
+func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error) {
+  language = AcceptLanguage
 	query, err := schema.ReadSQLBaseScript("get_all.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err
 	}
 
-	rows, err := r.db.Query(ctx, query, pagination.Limit, pagination.GetOffset())
+	rows, err := r.db.Query(
+		ctx,
+		query,
+		pagination.Limit,
+		pagination.GetOffset(),
+		filters.Search,
+		filters.MinDurationMinutes,
+		filters.MaxDurationMinutes,
+		filters.Latitude,
+		filters.Longitude,
+		filters.RadiusKm,
+		// still missing the price tier here
+		filters.MinAge,
+		filters.MaxAge,
+		filters.Category,
+		filters.SoldOut,
+		filters.MinDate,
+		filters.MaxDate,
+	)
 	if err != nil {
 		err := errs.InternalServerError("Failed to fetch all event occurrences: ", err.Error())
 		return nil, &err

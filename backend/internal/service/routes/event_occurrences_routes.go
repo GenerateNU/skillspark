@@ -12,8 +12,95 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
+func parsePagination(input *models.GetAllEventOccurrencesInput) utils.Pagination {
+	page := input.Page
+	if page == 0 {
+		page = 1
+	}
+	limit := input.Limit
+	if limit == 0 {
+		limit = 10
+	}
+	return utils.Pagination{Page: page, Limit: limit}
+}
+
+func validateInputFilters(input *models.GetAllEventOccurrencesInput) error {
+
+	if (input.Latitude.Set || input.Longitude.Set || input.RadiusKm != 0) &&
+		!(input.Latitude.Set && input.Longitude.Set && input.RadiusKm != 0) {
+		return huma.Error400BadRequest("lat, lng, and radius_km must all be provided together")
+	}
+
+	if input.RadiusKm < 0 {
+		return huma.Error400BadRequest("radius_km must be positive")
+	}
+
+	if input.MinDuration != 0 && input.MaxDuration != 0 && input.MinDuration > input.MaxDuration {
+		return huma.Error400BadRequest("min_duration cannot be larger than max_duration")
+	}
+
+	if input.PriceTier != "" && input.PriceTier != "$" && input.PriceTier != "$$" && input.PriceTier != "$$$" {
+		return huma.Error400BadRequest("price tier must be one of $, $$, $$$")
+	}
+
+	if input.MinAge != 0 && input.MaxAge != 0 && input.MinAge > input.MaxAge {
+		return huma.Error400BadRequest("min age cannot be larger than max age")
+	}
+
+	if !input.MinDate.IsZero() && !input.MaxDate.IsZero() && input.MinDate.After(input.MaxDate) {
+		return huma.Error400BadRequest("min_date cannot be later than max_date")
+	}
+
+	return nil
+}
+
+func mapToDBFilters(input *models.GetAllEventOccurrencesInput) models.GetAllEventOccurrencesFilter {
+	var filters models.GetAllEventOccurrencesFilter
+
+	if input.Search != "" {
+		filters.Search = &input.Search
+	}
+
+	if input.Latitude.Set && input.Longitude.Set && input.RadiusKm != 0 {
+		filters.Latitude = &input.Latitude.Value
+		filters.Longitude = &input.Longitude.Value
+		filters.RadiusKm = &input.RadiusKm
+	}
+
+	if input.MinDuration != 0 {
+		filters.MinDurationMinutes = &input.MinDuration
+	}
+
+	if input.MaxDuration != 0 {
+		filters.MaxDurationMinutes = &input.MaxDuration
+	}
+
+	if input.PriceTier != "" {
+		filters.PriceTier = &input.PriceTier
+	}
+
+	if input.MinAge != 0 {
+		filters.MinAge = &input.MinAge
+	}
+
+	if input.MaxAge != 0 {
+		filters.MaxAge = &input.MaxAge
+	}
+
+	if !input.MinDate.IsZero() {
+		filters.MinDate = &input.MinDate
+	}
+
+	if !input.MaxDate.IsZero() {
+		filters.MaxDate = &input.MaxDate
+	}
+
+	return filters
+}
+
 func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface) {
 	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence, repo.Manager, repo.Event, repo.Location, s3Client)
+
 	huma.Register(api, huma.Operation{
 		OperationID: "get-all-event-occurrences",
 		Method:      http.MethodGet,
@@ -22,20 +109,16 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository, s3Clien
 		Description: "Returns a list of all event occurrences in the database",
 		Tags:        []string{"Event Occurrences"},
 	}, func(ctx context.Context, input *models.GetAllEventOccurrencesInput) (*models.GetAllEventOccurrencesOutput, error) {
-		page := input.Page
-		if page == 0 {
-			page = 1
-		}
-		limit := input.Limit
-		if limit == 0 {
-			limit = 10
+
+		pagination := parsePagination(input)
+
+		if err := validateInputFilters(input); err != nil {
+			return nil, err
 		}
 
-		pagination := utils.Pagination{
-			Page:  page,
-			Limit: limit,
-		}
-		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination, input.AcceptLanguage)
+		filters := mapToDBFilters(input)
+
+		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination, input.AcceptLanguage, filters)
 		if err != nil {
 			return nil, err
 		}

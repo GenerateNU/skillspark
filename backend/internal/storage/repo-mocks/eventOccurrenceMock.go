@@ -14,8 +14,8 @@ type MockEventOccurrenceRepository struct {
 	mock.Mock
 }
 
-func (m *MockEventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string) ([]models.EventOccurrence, error) {
-	args := m.Called(ctx, pagination, AcceptLanguage)
+func (m *MockEventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string, filter models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error) {
+	args := m.Called(ctx, pagination, AcceptLanguage, filter)
 	eventOccurrences := args.Get(0)
 	if eventOccurrences == nil {
 		if args.Get(1) == nil {

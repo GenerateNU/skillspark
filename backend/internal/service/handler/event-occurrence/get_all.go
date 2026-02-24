@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-func (h *Handler) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string) ([]models.EventOccurrence, error) {
-	eventOccurrence, err := h.EventOccurrenceRepository.GetAllEventOccurrences(ctx, pagination, AcceptLanguage)
+func (h *Handler) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error) {
+	eventOccurrence, err := h.EventOccurrenceRepository.GetAllEventOccurrences(ctx, pagination, AcceptLanguage, filters)
 	if err != nil {
 		return nil, err
 	}
