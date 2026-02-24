@@ -314,7 +314,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).Return(&models.EventOccurrence{
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).Return(&models.EventOccurrence{
 					ID: eventOccurrenceID,
 				}, nil)
 				childRepo.On("GetChildByID", mock.Anything, childID).Return(&models.Child{
@@ -350,7 +350,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, invalidEventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, invalidEventOccurrenceID, mock.Anything).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("EventOccurrence", "id", invalidEventOccurrenceID.String()).Code,
 						Message: "Event occurrence not found",
@@ -369,7 +369,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).Return(&models.EventOccurrence{
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).Return(&models.EventOccurrence{
 					ID: eventOccurrenceID,
 				}, nil)
 				childRepo.On("GetChildByID", mock.Anything, invalidChildID).
@@ -391,7 +391,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).Return(&models.EventOccurrence{
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).Return(&models.EventOccurrence{
 					ID: eventOccurrenceID,
 				}, nil)
 				childRepo.On("GetChildByID", mock.Anything, childID).Return(&models.Child{
