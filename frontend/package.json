@@ -11,6 +11,8 @@
     "generate:api": "cd packages/api-client && bun run generate"
   },
   "dependencies": {
+    "@expo-google-fonts/archivo": "^0.4.2",
+    "expo-font": "^14.0.11",
     "react-native-maps": "^1.27.1"
   }
 }

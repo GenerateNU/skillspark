@@ -38,6 +38,9 @@ const getBaseURL = () => {
   return 'http://localhost:8080';
 };
 
+// NOTE: This axios instance is preserved for future use or interceptor logic,
+// but the customInstance function below uses native fetch to be lightweight
+// and fully controllable.
 const apiClient = axios.create({
   baseURL: getBaseURL(),
   timeout: 10000,
@@ -144,15 +147,26 @@ export async function customInstance<T>(
     if (response.status === 401) {
       handleLogout();
     }
-    const error = await response.json().catch(() => ({ 
+    const errorBody = await response.json().catch(() => null);
+    
+    // Throw an error object that preserves the status so react-query can handle it
+    throw { 
       message: 'An error occurred',
-      detail: `HTTP ${response.status}` 
-    }));
-    throw error;
+      detail: `HTTP ${response.status}`,
+      status: response.status,
+      data: errorBody
+    };
   }
 
-  const data = await response.json();
-  return data;
+  const data = await response.json().catch(() => null);
+
+  // CRITICAL FIX: Return the structure expected by Orval generated types
+  // The generated types define the return type T as: { data: ..., status: number, headers: ... }
+  return {
+    data,
+    status: response.status,
+    headers: response.headers
+  } as T;
 }
 
 export default apiClient;

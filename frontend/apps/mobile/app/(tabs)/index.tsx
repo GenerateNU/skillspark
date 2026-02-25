@@ -209,6 +209,8 @@ function EventOccurrencesList() {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [search, setSearch] = useState("");
 
+  console.log("response:", JSON.stringify(response));
+
   const toggleFilter = (f: string) =>
     setActiveFilters((prev) =>
       prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]
@@ -232,7 +234,7 @@ function EventOccurrencesList() {
     );
   }
 
-  if (!response || !Array.isArray(response)) {
+  if (!response || !Array.isArray(response.data)) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
         <ThemedText>No events available</ThemedText>
@@ -240,11 +242,11 @@ function EventOccurrencesList() {
     );
   }
 
-  const upcomingEvents = response
+  const upcomingEvents = response.data
     .filter((o) => new Date(o.start_time) >= new Date())
     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
-  const allCategories = getUniqueCategories(response);
+  const allCategories = getUniqueCategories(response.data);
   const featuredEvent = upcomingEvents[0];
   const listEvents = upcomingEvents.slice(1);
 

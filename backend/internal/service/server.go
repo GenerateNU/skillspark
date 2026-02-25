@@ -100,7 +100,6 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
-	routes.SetupExamplesRoutes(api, repo)
 	routes.SetupOrganizationRoutes(api, repo, s3Client)
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client)
