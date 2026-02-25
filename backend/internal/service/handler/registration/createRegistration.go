@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"skillspark/internal/models"
+	"time"
 )
 
 func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
@@ -11,6 +12,14 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 	eventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID)
 	if err != nil {
 		return nil, err
+	}
+
+	if eventOccurrence.StartTime.Before(time.Now()) {
+		return nil, errors.New("event occurrence has already started")
+	}
+
+	if eventOccurrence.CurrEnrolled >= eventOccurrence.MaxAttendees {
+		return nil, errors.New("event occurrence has reached max registration")
 	}
 
 	guardian, err := h.GuardianRepository.GetGuardianByID(ctx, input.Body.GuardianID)

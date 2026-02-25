@@ -26,15 +26,12 @@ func (j *JobScheduler) CapturePaymentsJob() {
 		return
 	}
 
-	log.Printf("Found %d registrations to capture", len(registrations))
-
 	for _, registration := range registrations {
 		stripeInput := &models.CapturePaymentIntentInput{
 			PaymentIntentID: registration.StripePaymentIntentID,
 		}
 
 		stripeOutput, err := j.stripeClient.CapturePaymentIntent(ctx, stripeInput)
-		log.Printf("Capture result - output: %v, err: %v", stripeOutput, err)
 		if err != nil {
 			log.Printf("Failed to capture payment for registration %s: %v", registration.ID, err)
 			continue

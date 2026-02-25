@@ -15,10 +15,10 @@ func (s *StripeClient) GetPaymentMethodsByCustomerID(ctx context.Context, custom
 	}
 	params.Context = ctx
 
-	iter := s.client.V1PaymentMethods.List(ctx, params)
+	pmList := s.client.V1PaymentMethods.List(ctx, params)
 
 	var paymentMethods []models.PaymentMethod
-	for pm, err := range iter {
+	for pm, err := range pmList {
 		if err != nil {
 			return nil, err
 		}
