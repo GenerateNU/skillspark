@@ -14,7 +14,9 @@ export default function LoginScreen() {
     }
 
     try {
-      useLoginGuardian()
+      useLoginGuardian();
+    } catch {
+      
     }
   }
   
@@ -36,7 +38,7 @@ export default function LoginScreen() {
           />
           <Button
             title={"Log In"}
-            onPress={handleLogIn()}
+            onPress={handleLogIn}
           />
         </ThemedView>
      );
