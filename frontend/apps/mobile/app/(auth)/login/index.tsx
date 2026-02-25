@@ -2,10 +2,21 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useState } from "react";
 import { Button, StyleSheet, TextInput } from "react-native";
+import { useLoginGuardian } from '@skillspark/api-client';
 
 export default function LoginScreen() {
   const [emailText, setEmailText] = useState("");
   const [passwordText, setPasswordText] = useState("");
+
+  const handleLogIn = () => {
+    if ((emailText === "") || (passwordText === "")) {
+      throw new Error("Missing email or password");
+    }
+
+    try {
+      useLoginGuardian()
+    }
+  }
   
   return (
         <ThemedView style={styles.titleContainer}>
@@ -25,7 +36,7 @@ export default function LoginScreen() {
           />
           <Button
             title={"Log In"}
-            onPress={() => console.log(emailText + "\n" + passwordText)}
+            onPress={handleLogIn()}
           />
         </ThemedView>
      );

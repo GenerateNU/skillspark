@@ -1,16 +1,8 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
-import { useColorScheme } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
-
-export const unstable_settings = {
-  anchor: "login",
-};
-
-export default function AuthStackLayout() {
-  const queryClient = new QueryClient({
+const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 1000 * 60 * 5,
@@ -19,6 +11,7 @@ export default function AuthStackLayout() {
     },
   });
 
+export default function AuthStackLayout() {
   return (
       <QueryClientProvider client={queryClient}>
         <Stack>
