@@ -2,6 +2,8 @@
 
 SkillSpark is a unified platform for students in Thailand to discover and engage with diverse activities and experiences. We're building a product that gives people the chance to explore and easily access all the learning opportunities this country has to offer—a platform to spark their curiosity and develop new skills!
 
+![Alt](https://repobeats.axiom.co/api/embed/7a2b916ef32a4eb189667f00f38d5a1c48d238a8.svg "Repobeats analytics image")
+
 ## Tech Stack
 
 ### Backend
