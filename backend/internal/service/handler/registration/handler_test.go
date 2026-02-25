@@ -363,9 +363,12 @@ func TestHandler_CreateRegistration(t *testing.T) {
 	invalidEventOccurrenceID := uuid.New()
 
 	validEventOccurrence := &models.EventOccurrence{
-		ID:        eventOccurrenceID,
-		Price:     10000,
-		StartTime: time.Now().Add(25 * time.Hour),
+		ID:           eventOccurrenceID,
+		Price:        10000,
+		Currency:     "thb",
+		StartTime:    time.Now().Add(25 * time.Hour),
+		CurrEnrolled: 5,
+		MaxAttendees: 15,
 		Event: models.Event{
 			ID:             uuid.New(),
 			OrganizationID: organizationID,
@@ -568,7 +571,65 @@ func TestHandler_CreateRegistration(t *testing.T) {
 					Return(validGuardian, nil)
 
 				childRepo.On("GetChildByID", mock.Anything, childID).
-					Return(&models.Child{ID: childID, GuardianID: uuid.New()}, nil) // different guardian
+					Return(&models.Child{ID: childID, GuardianID: uuid.New()}, nil)
+			},
+			wantErr: true,
+		},
+		{
+			name: "event occurrence already started",
+			input: func() *models.CreateRegistrationInput {
+				i := &models.CreateRegistrationInput{}
+				i.Body.ChildID = childID
+				i.Body.GuardianID = guardianID
+				i.Body.EventOccurrenceID = eventOccurrenceID
+				i.Body.Status = models.RegistrationStatusRegistered
+				i.Body.PaymentMethodID = &paymentMethodID
+				return i
+			}(),
+			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+					Return(&models.EventOccurrence{
+						ID:           eventOccurrenceID,
+						Price:        10000,
+						Currency:     "thb",
+						StartTime:    time.Now().Add(-1 * time.Hour), // already started
+						CurrEnrolled: 5,
+						MaxAttendees: 15,
+						Event: models.Event{
+							ID:             uuid.New(),
+							OrganizationID: organizationID,
+							Title:          "STEM Club",
+						},
+					}, nil)
+			},
+			wantErr: true,
+		},
+		{
+			name: "event occurrence at max capacity",
+			input: func() *models.CreateRegistrationInput {
+				i := &models.CreateRegistrationInput{}
+				i.Body.ChildID = childID
+				i.Body.GuardianID = guardianID
+				i.Body.EventOccurrenceID = eventOccurrenceID
+				i.Body.Status = models.RegistrationStatusRegistered
+				i.Body.PaymentMethodID = &paymentMethodID
+				return i
+			}(),
+			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+					Return(&models.EventOccurrence{
+						ID:           eventOccurrenceID,
+						Price:        10000,
+						Currency:     "thb",
+						StartTime:    time.Now().Add(25 * time.Hour),
+						CurrEnrolled: 15, // at max
+						MaxAttendees: 15,
+						Event: models.Event{
+							ID:             uuid.New(),
+							OrganizationID: organizationID,
+							Title:          "STEM Club",
+						},
+					}, nil)
 			},
 			wantErr: true,
 		},
