@@ -42,6 +42,12 @@ type GetAllEventOccurrencesInput struct {
 	PriceTier   string          `query:"price"`
 	MinDuration int             `query:"min_duration"`
 	MaxDuration int             `query:"max_duration"`
+	MinAge      int             `query:"min_age"`
+	MaxAge      int             `query:"max_age"`
+	Category    string          `query:"category"`
+	SoldOut     bool            `query:"soldout"`
+	MinDate     time.Time       `query:"min_date"`
+	MaxDate     time.Time       `query:"max_date"`
 }
 
 type GetAllEventOccurrencesFilter struct {
@@ -52,6 +58,12 @@ type GetAllEventOccurrencesFilter struct {
 	PriceTier          *string
 	MinDurationMinutes *int
 	MaxDurationMinutes *int
+	MinAge             *int
+	MaxAge             *int
+	Category           *string
+	SoldOut            *bool
+	MinDate            *time.Time
+	MaxDate            *time.Time
 }
 
 type GetAllEventOccurrencesOutput struct {

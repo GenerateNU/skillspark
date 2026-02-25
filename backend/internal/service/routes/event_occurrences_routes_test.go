@@ -598,6 +598,45 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
+			name:       "min_age greater than max_age should return 400",
+			query:      "?min_age=18&max_age=10",
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository) {},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name:       "min_date after max_date should return 400",
+			query:      "?min_date=2026-02-10T00:00:00Z&max_date=2026-02-01T00:00:00Z",
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository) {},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name:  "only min_age provided should succeed",
+			query: "?min_age=18",
+			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+					Return([]models.EventOccurrence{}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:  "valid date range should succeed",
+			query: "?min_date=2026-02-01T00:00:00Z&max_date=2026-02-10T00:00:00Z",
+			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+					Return([]models.EventOccurrence{}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:  "only max_date provided should succeed",
+			query: "?max_date=2026-02-10T00:00:00Z",
+			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+					Return([]models.EventOccurrence{}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
 			name:  "no filters, just default pagination",
 			query: "?page=1&limit=5",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
