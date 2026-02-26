@@ -13,6 +13,7 @@ import (
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	stripemocks "skillspark/internal/stripeClient/mocks"
 	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -28,6 +29,7 @@ func setupEventOccurrencesTestAPI(
 	managerRepo *repomocks.MockManagerRepository,
 	eventRepo *repomocks.MockEventRepository,
 	locationRepo *repomocks.MockLocationRepository,
+	sc *stripemocks.MockStripeClient,
 ) (*fiber.App, huma.API) {
 	app := fiber.New()
 	api := humafiber.New(app, huma.DefaultConfig("Test API", "1.0.0"))
@@ -37,7 +39,7 @@ func setupEventOccurrencesTestAPI(
 		Event:           eventRepo,
 		Location:        locationRepo,
 	}
-	routes.SetupEventOccurrencesRoutes(api, repo)
+	routes.SetupEventOccurrencesRoutes(api, repo, sc)
 	return app, api
 }
 
@@ -144,9 +146,10 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo)
+			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockStripeClient)
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/event-occurrences/"+tt.eventOccurrenceID, nil)
 			assert.NoError(t, err)
@@ -314,9 +317,11 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
+
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo)
+			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockStripeClient)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -491,9 +496,11 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
+
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo)
+			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockStripeClient)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -705,9 +712,11 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
+
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo)
+			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockStripeClient)
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/event-occurrences"+tt.query, nil)
 			assert.NoError(t, err)
