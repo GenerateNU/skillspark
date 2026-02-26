@@ -29,11 +29,8 @@ func setupRegistrationTestAPI(
 	organizationRepo *repomocks.MockOrganizationRepository,
 	stripeClient *stripemocks.MockStripeClient,
 ) (*fiber.App, huma.API) {
-
 	app := fiber.New()
-
 	api := humafiber.New(app, huma.DefaultConfig("Test API", "1.0.0"))
-
 	repo := &storage.Repository{
 		Registration:    registrationRepo,
 		Child:           childRepo,
@@ -41,17 +38,15 @@ func setupRegistrationTestAPI(
 		EventOccurrence: eventOccurrenceRepo,
 		Organization:    organizationRepo,
 	}
-
 	SetupRegistrationRoutes(api, repo, stripeClient)
-
 	return app, api
 }
 
 func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 	t.Parallel()
 
-	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
-	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	childIDEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIDEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 
 	tests := []struct {
 		name       string
@@ -63,32 +58,29 @@ func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 			name: "valid UUID",
 			ID:   "80000000-0000-0000-0000-000000000001",
 			mockSetup: func(m *repomocks.MockRegistrationRepository) {
-				m.On(
-					"GetRegistrationByID",
-					mock.Anything,
-					mock.AnythingOfType("*models.GetRegistrationByIDInput"),
-				).Return(&models.GetRegistrationByIDOutput{
-					Body: models.Registration{
-						ID:                     uuid.MustParse("80000000-0000-0000-0000-000000000001"),
-						ChildID:                childIdEx,
-						GuardianID:             guardianIdEx,
-						EventOccurrenceID:      uuid.MustParse("70000000-0000-0000-0000-000000000001"),
-						Status:                 models.RegistrationStatusRegistered,
-						EventName:              "STEM Club",
-						OccurrenceStartTime:    time.Now(),
-						CreatedAt:              time.Now(),
-						UpdatedAt:              time.Now(),
-						StripePaymentIntentID:  "pi_test_123",
-						StripeCustomerID:       "cus_test_123",
-						OrgStripeAccountID:     "acct_test_123",
-						StripePaymentMethodID:  "pm_test_123",
-						TotalAmount:            10000,
-						ProviderAmount:         8500,
-						PlatformFeeAmount:      1500,
-						Currency:               "thb",
-						PaymentIntentStatus:    "requires_capture",
-					},
-				}, nil)
+				m.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
+					Return(&models.GetRegistrationByIDOutput{
+						Body: models.Registration{
+							ID:                    uuid.MustParse("80000000-0000-0000-0000-000000000001"),
+							ChildID:               childIDEx,
+							GuardianID:            guardianIDEx,
+							EventOccurrenceID:     uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+							Status:                models.RegistrationStatusRegistered,
+							EventName:             "STEM Club",
+							OccurrenceStartTime:   time.Now(),
+							CreatedAt:             time.Now(),
+							UpdatedAt:             time.Now(),
+							StripePaymentIntentID: "pi_test_123",
+							StripeCustomerID:      "cus_test_123",
+							OrgStripeAccountID:    "acct_test_123",
+							StripePaymentMethodID: "pm_test_123",
+							TotalAmount:           10000,
+							ProviderAmount:        8500,
+							PlatformFeeAmount:     1500,
+							Currency:              "thb",
+							PaymentIntentStatus:   "requires_capture",
+						},
+					}, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -115,11 +107,7 @@ func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 
 			app, _ := setupRegistrationTestAPI(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
 
-			req, err := http.NewRequest(
-				http.MethodGet,
-				"/api/v1/registrations/"+tt.ID,
-				nil,
-			)
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/"+tt.ID, nil)
 			assert.NoError(t, err)
 
 			resp, err := app.Test(req)
@@ -135,8 +123,8 @@ func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 func TestHumaValidation_GetRegistrationsByChildID(t *testing.T) {
 	t.Parallel()
 
-	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
-	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	childIDEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIDEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 
 	tests := []struct {
 		name       string
@@ -151,24 +139,24 @@ func TestHumaValidation_GetRegistrationsByChildID(t *testing.T) {
 				output := &models.GetRegistrationsByChildIDOutput{}
 				output.Body.Registrations = []models.Registration{
 					{
-						ID:                     uuid.New(),
-						ChildID:                childIdEx,
-						GuardianID:             guardianIdEx,
-						EventOccurrenceID:      uuid.MustParse("70000000-0000-0000-0000-000000000001"),
-						Status:                 models.RegistrationStatusRegistered,
-						EventName:              "STEM Club",
-						OccurrenceStartTime:    time.Now(),
-						CreatedAt:              time.Now(),
-						UpdatedAt:              time.Now(),
-						StripePaymentIntentID:  "pi_test_123",
-						StripeCustomerID:       "cus_test_123",
-						OrgStripeAccountID:     "acct_test_123",
-						StripePaymentMethodID:  "pm_test_123",
-						TotalAmount:            10000,
-						ProviderAmount:         8500,
-						PlatformFeeAmount:      1500,
-						Currency:               "thb",
-						PaymentIntentStatus:    "requires_capture",
+						ID:                    uuid.New(),
+						ChildID:               childIDEx,
+						GuardianID:            guardianIDEx,
+						EventOccurrenceID:     uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+						Status:                models.RegistrationStatusRegistered,
+						EventName:             "STEM Club",
+						OccurrenceStartTime:   time.Now(),
+						CreatedAt:             time.Now(),
+						UpdatedAt:             time.Now(),
+						StripePaymentIntentID: "pi_test_123",
+						StripeCustomerID:      "cus_test_123",
+						OrgStripeAccountID:    "acct_test_123",
+						StripePaymentMethodID: "pm_test_123",
+						TotalAmount:           10000,
+						ProviderAmount:        8500,
+						PlatformFeeAmount:     1500,
+						Currency:              "thb",
+						PaymentIntentStatus:   "requires_capture",
 					},
 				}
 				m.On("GetRegistrationsByChildID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByChildIDInput")).Return(output, nil)
@@ -198,11 +186,7 @@ func TestHumaValidation_GetRegistrationsByChildID(t *testing.T) {
 
 			app, _ := setupRegistrationTestAPI(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
 
-			req, err := http.NewRequest(
-				http.MethodGet,
-				"/api/v1/registrations/child/"+tt.childID,
-				nil,
-			)
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/child/"+tt.childID, nil)
 			assert.NoError(t, err)
 
 			resp, err := app.Test(req)
@@ -218,8 +202,8 @@ func TestHumaValidation_GetRegistrationsByChildID(t *testing.T) {
 func TestHumaValidation_GetRegistrationsByGuardianID(t *testing.T) {
 	t.Parallel()
 
-	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
-	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	childIDEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIDEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 
 	tests := []struct {
 		name       string
@@ -234,24 +218,24 @@ func TestHumaValidation_GetRegistrationsByGuardianID(t *testing.T) {
 				output := &models.GetRegistrationsByGuardianIDOutput{}
 				output.Body.Registrations = []models.Registration{
 					{
-						ID:                     uuid.New(),
-						ChildID:                childIdEx,
-						GuardianID:             guardianIdEx,
-						EventOccurrenceID:      uuid.MustParse("70000000-0000-0000-0000-000000000001"),
-						Status:                 models.RegistrationStatusRegistered,
-						EventName:              "STEM Club",
-						OccurrenceStartTime:    time.Now(),
-						CreatedAt:              time.Now(),
-						UpdatedAt:              time.Now(),
-						StripePaymentIntentID:  "pi_test_123",
-						StripeCustomerID:       "cus_test_123",
-						OrgStripeAccountID:     "acct_test_123",
-						StripePaymentMethodID:  "pm_test_123",
-						TotalAmount:            10000,
-						ProviderAmount:         8500,
-						PlatformFeeAmount:      1500,
-						Currency:               "thb",
-						PaymentIntentStatus:    "requires_capture",
+						ID:                    uuid.New(),
+						ChildID:               childIDEx,
+						GuardianID:            guardianIDEx,
+						EventOccurrenceID:     uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+						Status:                models.RegistrationStatusRegistered,
+						EventName:             "STEM Club",
+						OccurrenceStartTime:   time.Now(),
+						CreatedAt:             time.Now(),
+						UpdatedAt:             time.Now(),
+						StripePaymentIntentID: "pi_test_123",
+						StripeCustomerID:      "cus_test_123",
+						OrgStripeAccountID:    "acct_test_123",
+						StripePaymentMethodID: "pm_test_123",
+						TotalAmount:           10000,
+						ProviderAmount:        8500,
+						PlatformFeeAmount:     1500,
+						Currency:              "thb",
+						PaymentIntentStatus:   "requires_capture",
 					},
 				}
 				m.On("GetRegistrationsByGuardianID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByGuardianIDInput")).Return(output, nil)
@@ -281,11 +265,7 @@ func TestHumaValidation_GetRegistrationsByGuardianID(t *testing.T) {
 
 			app, _ := setupRegistrationTestAPI(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
 
-			req, err := http.NewRequest(
-				http.MethodGet,
-				"/api/v1/registrations/guardian/"+tt.guardianID,
-				nil,
-			)
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/guardian/"+tt.guardianID, nil)
 			assert.NoError(t, err)
 
 			resp, err := app.Test(req)
@@ -301,8 +281,8 @@ func TestHumaValidation_GetRegistrationsByGuardianID(t *testing.T) {
 func TestHumaValidation_GetRegistrationsByEventOccurrenceID(t *testing.T) {
 	t.Parallel()
 
-	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
-	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	childIDEx := uuid.MustParse("30000000-0000-0000-0000-000000000001")
+	guardianIDEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 
 	tests := []struct {
 		name              string
@@ -317,24 +297,24 @@ func TestHumaValidation_GetRegistrationsByEventOccurrenceID(t *testing.T) {
 				output := &models.GetRegistrationsByEventOccurrenceIDOutput{}
 				output.Body.Registrations = []models.Registration{
 					{
-						ID:                     uuid.New(),
-						ChildID:                childIdEx,
-						GuardianID:             guardianIdEx,
-						EventOccurrenceID:      uuid.MustParse("70000000-0000-0000-0000-000000000001"),
-						Status:                 models.RegistrationStatusRegistered,
-						EventName:              "STEM Club",
-						OccurrenceStartTime:    time.Now(),
-						CreatedAt:              time.Now(),
-						UpdatedAt:              time.Now(),
-						StripePaymentIntentID:  "pi_test_123",
-						StripeCustomerID:       "cus_test_123",
-						OrgStripeAccountID:     "acct_test_123",
-						StripePaymentMethodID:  "pm_test_123",
-						TotalAmount:            10000,
-						ProviderAmount:         8500,
-						PlatformFeeAmount:      1500,
-						Currency:               "thb",
-						PaymentIntentStatus:    "requires_capture",
+						ID:                    uuid.New(),
+						ChildID:               childIDEx,
+						GuardianID:            guardianIDEx,
+						EventOccurrenceID:     uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+						Status:                models.RegistrationStatusRegistered,
+						EventName:             "STEM Club",
+						OccurrenceStartTime:   time.Now(),
+						CreatedAt:             time.Now(),
+						UpdatedAt:             time.Now(),
+						StripePaymentIntentID: "pi_test_123",
+						StripeCustomerID:      "cus_test_123",
+						OrgStripeAccountID:    "acct_test_123",
+						StripePaymentMethodID: "pm_test_123",
+						TotalAmount:           10000,
+						ProviderAmount:        8500,
+						PlatformFeeAmount:     1500,
+						Currency:              "thb",
+						PaymentIntentStatus:   "requires_capture",
 					},
 				}
 				m.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).Return(output, nil)
@@ -364,11 +344,7 @@ func TestHumaValidation_GetRegistrationsByEventOccurrenceID(t *testing.T) {
 
 			app, _ := setupRegistrationTestAPI(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
 
-			req, err := http.NewRequest(
-				http.MethodGet,
-				"/api/v1/registrations/event_occurrence/"+tt.eventOccurrenceID,
-				nil,
-			)
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/event_occurrence/"+tt.eventOccurrenceID, nil)
 			assert.NoError(t, err)
 
 			resp, err := app.Test(req)
@@ -398,9 +374,12 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 	paymentMethodID := "pm_test_123"
 
 	validEventOccurrence := &models.EventOccurrence{
-		ID:        eventOccurrenceIDEx,
-		Price:     10000,
-		StartTime: time.Now().Add(25 * time.Hour),
+		ID:           eventOccurrenceIDEx,
+		Price:        10000,
+		Currency:     "thb",
+		StartTime:    time.Now().Add(25 * time.Hour),
+		CurrEnrolled: 5,
+		MaxAttendees: 15,
 		Event: models.Event{
 			ID:             uuid.New(),
 			OrganizationID: organizationID,
@@ -436,7 +415,7 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				childRepo.On("GetChildByID", mock.Anything, childIDEx).
 					Return(&models.Child{
 						ID:         childIDEx,
-						GuardianID: guardianIDEx, // must match guardian
+						GuardianID: guardianIDEx,
 					}, nil)
 
 				orgRepo.On("GetOrganizationByID", mock.Anything, organizationID).
@@ -607,9 +586,8 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 func TestHumaValidation_UpdateRegistration(t *testing.T) {
 	t.Parallel()
 
-	childIdEx := uuid.MustParse("30000000-0000-0000-0000-000000000002")
-	guardianIdEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
-
+	childIDEx := uuid.MustParse("30000000-0000-0000-0000-000000000002")
+	guardianIDEx := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 	registrationID := "80000000-0000-0000-0000-000000000001"
 
 	tests := []struct {
@@ -626,36 +604,33 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 				"child_id": "30000000-0000-0000-0000-000000000002",
 			},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository) {
-				childRepo.On("GetChildByID", mock.Anything, childIdEx).Return(&models.Child{
-					ID: childIdEx,
+				childRepo.On("GetChildByID", mock.Anything, childIDEx).Return(&models.Child{
+					ID: childIDEx,
 				}, nil)
-				
-				regRepo.On(
-					"UpdateRegistration",
-					mock.Anything,
-					mock.AnythingOfType("*models.UpdateRegistrationInput"),
-				).Return(&models.UpdateRegistrationOutput{
-					Body: models.Registration{
-						ID:                     uuid.MustParse(registrationID),
-						ChildID:                childIdEx,
-						GuardianID:             guardianIdEx,
-						EventOccurrenceID:      uuid.MustParse("70000000-0000-0000-0000-000000000001"),
-						Status:                 models.RegistrationStatusRegistered,
-						EventName:              "STEM Club",
-						OccurrenceStartTime:    time.Now(),
-						CreatedAt:              time.Now(),
-						UpdatedAt:              time.Now(),
-						StripePaymentIntentID:  "pi_test_123",
-						StripeCustomerID:       "cus_test_123",
-						OrgStripeAccountID:     "acct_test_123",
-						StripePaymentMethodID:  "pm_test_123",
-						TotalAmount:            10000,
-						ProviderAmount:         8500,
-						PlatformFeeAmount:      1500,
-						Currency:               "thb",
-						PaymentIntentStatus:    "requires_capture",
-					},
-				}, nil)
+
+				regRepo.On("UpdateRegistration", mock.Anything, mock.AnythingOfType("*models.UpdateRegistrationInput")).
+					Return(&models.UpdateRegistrationOutput{
+						Body: models.Registration{
+							ID:                    uuid.MustParse(registrationID),
+							ChildID:               childIDEx,
+							GuardianID:            guardianIDEx,
+							EventOccurrenceID:     uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+							Status:                models.RegistrationStatusRegistered,
+							EventName:             "STEM Club",
+							OccurrenceStartTime:   time.Now(),
+							CreatedAt:             time.Now(),
+							UpdatedAt:             time.Now(),
+							StripePaymentIntentID: "pi_test_123",
+							StripeCustomerID:      "cus_test_123",
+							OrgStripeAccountID:    "acct_test_123",
+							StripePaymentMethodID: "pm_test_123",
+							TotalAmount:           10000,
+							ProviderAmount:        8500,
+							PlatformFeeAmount:     1500,
+							Currency:              "thb",
+							PaymentIntentStatus:   "requires_capture",
+						},
+					}, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -666,32 +641,29 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 				"status": "cancelled",
 			},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository) {
-				regRepo.On(
-					"UpdateRegistration",
-					mock.Anything,
-					mock.AnythingOfType("*models.UpdateRegistrationInput"),
-				).Return(&models.UpdateRegistrationOutput{
-					Body: models.Registration{
-						ID:                     uuid.MustParse(registrationID),
-						ChildID:                childIdEx,
-						GuardianID:             guardianIdEx,
-						EventOccurrenceID:      uuid.MustParse("70000000-0000-0000-0000-000000000001"),
-						Status:                 models.RegistrationStatusCancelled,
-						EventName:              "STEM Club",
-						OccurrenceStartTime:    time.Now(),
-						CreatedAt:              time.Now(),
-						UpdatedAt:              time.Now(),
-						StripePaymentIntentID:  "pi_test_123",
-						StripeCustomerID:       "cus_test_123",
-						OrgStripeAccountID:     "acct_test_123",
-						StripePaymentMethodID:  "pm_test_123",
-						TotalAmount:            10000,
-						ProviderAmount:         8500,
-						PlatformFeeAmount:      1500,
-						Currency:               "thb",
-						PaymentIntentStatus:    "requires_capture",
-					},
-				}, nil)
+				regRepo.On("UpdateRegistration", mock.Anything, mock.AnythingOfType("*models.UpdateRegistrationInput")).
+					Return(&models.UpdateRegistrationOutput{
+						Body: models.Registration{
+							ID:                    uuid.MustParse(registrationID),
+							ChildID:               childIDEx,
+							GuardianID:            guardianIDEx,
+							EventOccurrenceID:     uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+							Status:                models.RegistrationStatusCancelled,
+							EventName:             "STEM Club",
+							OccurrenceStartTime:   time.Now(),
+							CreatedAt:             time.Now(),
+							UpdatedAt:             time.Now(),
+							StripePaymentIntentID: "pi_test_123",
+							StripeCustomerID:      "cus_test_123",
+							OrgStripeAccountID:    "acct_test_123",
+							StripePaymentMethodID: "pm_test_123",
+							TotalAmount:           10000,
+							ProviderAmount:        8500,
+							PlatformFeeAmount:     1500,
+							Currency:              "thb",
+							PaymentIntentStatus:   "requires_capture",
+						},
+					}, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -724,11 +696,7 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
 
-			req, err := http.NewRequest(
-				http.MethodPatch,
-				"/api/v1/registrations/"+tt.id,
-				bytes.NewBuffer(bodyBytes),
-			)
+			req, err := http.NewRequest(http.MethodPatch, "/api/v1/registrations/"+tt.id, bytes.NewBuffer(bodyBytes))
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
 
@@ -737,8 +705,8 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 			defer func() { _ = resp.Body.Close() }()
 
 			if tt.statusCode != resp.StatusCode {
-				bodyBytes, _ := io.ReadAll(resp.Body)
-				t.Logf("Response body: %s", string(bodyBytes))
+				body, _ := io.ReadAll(resp.Body)
+				t.Logf("Response body: %s", string(body))
 			}
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)

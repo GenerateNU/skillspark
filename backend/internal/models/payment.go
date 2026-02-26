@@ -165,6 +165,19 @@ type GetRegistrationByPaymentIntentIDOutput struct {
 	OrgStripeAccountID  string             `json:"org_stripe_account_id"`
 }
 
+type RefundPaymentInput struct {
+	PaymentIntentID string           `json:"stripe_payment_intent_id"`
+}
+
+type RefundPaymentOutput struct {
+    Body struct {
+        RefundID string `json:"refund_id"`
+        Status   string `json:"status"`
+        Amount   int64  `json:"amount"`
+        Currency string `json:"currency"`
+    }
+}
+
 type AttachPaymentMethodInput struct {
     GuardianID uuid.UUID `path:"guardian_id" doc:"Guardian ID"`
     Body struct {

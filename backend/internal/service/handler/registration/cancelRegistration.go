@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	"time"
 )
 
 func (h *Handler) CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error) {
@@ -24,15 +25,23 @@ func (h *Handler) CancelRegistration(ctx context.Context, input *models.CancelRe
 	var refundStatus string
 	switch registration.Body.PaymentIntentStatus {
 	case "succeeded":
-		refundInput := &models.CancelPaymentIntentInput{
+		eventoccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, registration.Body.EventOccurrenceID)
+		if err != nil {
+			return nil, err
+		}
+		if (eventoccurrence.StartTime.Before(time.Now().AddDate(0, 0, 1))) {
+			refundStatus = "no_refund_needed"
+		} else {
+			refundInput := &models.RefundPaymentInput{
 			PaymentIntentID: registration.Body.StripePaymentIntentID,
+			}
+			refundOutput, err := h.StripeClient.RefundPayment(ctx, refundInput)
+			if err != nil {
+				return nil, errs.InternalServerError("Failed to refund payment: ", err.Error())
+			}
+			refundStatus = refundOutput.Body.Status
 		}
 		
-		refundOutput, err := h.StripeClient.CancelPaymentIntent(ctx, refundInput)
-		if err != nil {
-			return nil, errs.InternalServerError("Failed to refund payment: ", err.Error())
-		}
-		refundStatus = refundOutput.Body.Status
 	case "requires_capture":
 		cancelInput := &models.CancelPaymentIntentInput{
 			PaymentIntentID: registration.Body.StripePaymentIntentID,

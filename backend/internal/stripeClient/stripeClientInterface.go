@@ -18,5 +18,6 @@ type StripeClientInterface interface {
 	CreateLoginLink(ctx context.Context, accountID string) (string, error)
 	CancelPaymentIntent(ctx context.Context, input *models.CancelPaymentIntentInput) (*models.CancelPaymentIntentOutput, error)
 	CapturePaymentIntent(ctx context.Context, input *models.CapturePaymentIntentInput) (*models.CapturePaymentIntentOutput, error)
+	RefundPayment(ctx context.Context, input *models.RefundPaymentInput) (*models.RefundPaymentOutput, error)
 	AttachPaymentMethod(ctx context.Context, paymentMethodID string, customerID string) error
 }

@@ -117,7 +117,18 @@ func (m *MockStripeClient) CreateLoginLink(
 
 func (m *MockStripeClient) GetPaymentMethodsByCustomerID(ctx context.Context, customerID string) (*models.GetPaymentMethodsByGuardianIDOutput, error) {
 	args := m.Called(ctx, customerID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
 	return args.Get(0).(*models.GetPaymentMethodsByGuardianIDOutput), args.Error(1)
+}
+
+func (m *MockStripeClient) RefundPayment(ctx context.Context, input *models.RefundPaymentInput) (*models.RefundPaymentOutput, error) {
+	args := m.Called(ctx, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.RefundPaymentOutput), args.Error(1)
 }
 
 func (m *MockStripeClient) AttachPaymentMethod(ctx context.Context, paymentMethodID string, customerID string) error {
