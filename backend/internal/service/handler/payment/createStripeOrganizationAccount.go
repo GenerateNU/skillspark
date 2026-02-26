@@ -18,7 +18,7 @@ func (h *Handler) CreateOrgStripeAccount(
 	}
 
 	if org.StripeAccountID != nil {
-		return nil, errors.New("Stripe account already exists for this organization.")
+		return nil, errors.New("Stripe account already exists for this organization")
 	}
 
 	manager, manErr := h.ManagerRepository.GetManagerByOrgID(ctx, input.OrganizationID)

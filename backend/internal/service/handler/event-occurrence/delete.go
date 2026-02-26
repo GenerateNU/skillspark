@@ -2,8 +2,9 @@ package eventoccurrence
 
 import (
 	"context"
-	"time"
+	"log"
 	"skillspark/internal/models"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -34,6 +35,7 @@ func (h *Handler) CancelEventOccurrence(ctx context.Context, id uuid.UUID) (stri
 					PaymentIntentID: reg.StripePaymentIntentID,
 				}
 				if _, err := h.StripeClient.RefundPayment(ctx, refundInput); err != nil {
+					log.Printf("Failed to refund registration %s: %v", reg.ID, err)
 				}
 			}
 		case "requires_capture":
@@ -41,6 +43,7 @@ func (h *Handler) CancelEventOccurrence(ctx context.Context, id uuid.UUID) (stri
 				PaymentIntentID: reg.StripePaymentIntentID,
 			}
 			if _, err := h.StripeClient.CancelPaymentIntent(ctx, cancelInput); err != nil {
+				log.Printf("Failed to cancel registration %s: %v", reg.ID, err)
 			}
 		}
 	}
