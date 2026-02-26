@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 	"skillspark/internal/models"
-	"strings"
 )
 
-func (h *Handler) CallTranslateAPI(ctx context.Context, description_en *string, AcceptLanguage string) (*string, error) {
+func (h *Handler) CallTranslateAPI(ctx context.Context, src_description *string, AcceptLanguage string) (*string, error) {
 	var sl string
 	var dl string
 
@@ -18,12 +17,13 @@ func (h *Handler) CallTranslateAPI(ctx context.Context, description_en *string, 
 		return *s
 	}
 
-	description := deref(description_en)
+	description := deref(src_description)
 
-	if strings.Contains(AcceptLanguage, "th") {
+	switch AcceptLanguage {
+	case "th-TH":
 		sl = "th"
 		dl = "en"
-	} else {
+	case "en-US":
 		sl = "en"
 		dl = "th"
 	}
@@ -33,8 +33,6 @@ func (h *Handler) CallTranslateAPI(ctx context.Context, description_en *string, 
 		return nil, err
 	}
 
-	// returns english if AcceptLanguage is thai
-	// returns thai if AcceptLanguage is english
 	response, err := h.TranslateClient.GetTranslation(ctx, description, sl, dl)
 	if err != nil {
 		return nil, err
@@ -56,10 +54,11 @@ func (h *Handler) CreateTranslateStruct(ctx context.Context, event *models.Creat
 		},
 	}
 
-	if strings.Contains(event.AcceptLanguage, "th") {
+	switch event.AcceptLanguage {
+	case "th-TH":
 		dbInitInput.Body.Description_EN = *translation
 		dbInitInput.Body.Description_TH = &eventBody.Description
-	} else {
+	case "en-US":
 		dbInitInput.Body.Description_EN = eventBody.Description
 		dbInitInput.Body.Description_TH = translation
 	}

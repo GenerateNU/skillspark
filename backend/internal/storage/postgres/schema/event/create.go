@@ -25,10 +25,11 @@ func (r *EventRepository) CreateEvent(ctx context.Context, event *models.CreateE
 		return nil, &err
 	}
 
-	if event.AcceptLanguage == "th" {
+	switch event.AcceptLanguage {
+	case "th-TH":
 		createdEvent.Title = titleTH
 		createdEvent.Description = descTH
-	} else {
+	case "en-US":
 		createdEvent.Title = titleEN
 		createdEvent.Description = descEN
 	}

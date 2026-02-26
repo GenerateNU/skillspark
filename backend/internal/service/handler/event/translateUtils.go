@@ -12,7 +12,7 @@ type EventTranslationResponse struct {
 	TranslatedDescription *string `json:"translated_description"`
 }
 
-func (h *Handler) CallTranslateAPI(ctx context.Context, title *string, description *string, AcceptLanguage string) (*EventTranslationResponse, error) {
+func (h *Handler) CallTranslateAPI(ctx context.Context, src_title *string, src_description *string, AcceptLanguage string) (*EventTranslationResponse, error) {
 	var sl string
 	var dl string
 	deref := func(s *string) string {
@@ -22,23 +22,24 @@ func (h *Handler) CallTranslateAPI(ctx context.Context, title *string, descripti
 		return *s
 	}
 
-	title_t := deref(title)
-	description_t := deref(description)
+	title_deref := deref(src_title)
+	description_deref := deref(src_description)
 
-	if title_t == "" && description_t == "" {
+	if title_deref == "" && description_deref == "" {
 		err := fmt.Errorf("no title or description provided")
 		return nil, err
 	}
 
-	if strings.Contains(AcceptLanguage, "th") {
+	switch AcceptLanguage {
+	case "th-TH":
 		sl = "th"
 		dl = "en"
-	} else {
+	case "en-US":
 		sl = "en"
 		dl = "th"
 	}
 
-	translationString := title_t + "|*|" + description_t
+	translationString := title_deref + "|*|" + description_deref
 
 	response, err := h.TranslateClient.GetTranslation(ctx, translationString, sl, dl)
 	if err != nil {
@@ -73,12 +74,13 @@ func (h *Handler) CreateTranslateStruct(ctx context.Context, event *models.Creat
 		},
 	}
 
-	if strings.Contains(event.AcceptLanguage, "th") {
+	switch event.AcceptLanguage {
+	case "th-TH":
 		dbInitInput.Body.Title_EN = *translatedTitle
 		dbInitInput.Body.Title_TH = &eventBody.Title
 		dbInitInput.Body.Description_EN = *translatedDescription
 		dbInitInput.Body.Description_TH = &eventBody.Description
-	} else {
+	case "en-US":
 		dbInitInput.Body.Title_EN = eventBody.Title
 		dbInitInput.Body.Title_TH = translatedTitle
 		dbInitInput.Body.Description_TH = translatedDescription
@@ -103,12 +105,13 @@ func (h *Handler) UpdateTranslateStruct(ctx context.Context, event *models.Updat
 		},
 	}
 
-	if strings.Contains(event.AcceptLanguage, "th") {
+	switch event.AcceptLanguage {
+	case "th-TH":
 		dbInitInput.Body.Title_EN = translatedTitle
 		dbInitInput.Body.Title_TH = eventBody.Title
 		dbInitInput.Body.Description_EN = translatedDescription
 		dbInitInput.Body.Description_TH = eventBody.Description
-	} else {
+	case "en-US":
 		dbInitInput.Body.Title_EN = eventBody.Title
 		dbInitInput.Body.Title_TH = translatedTitle
 		dbInitInput.Body.Description_TH = translatedDescription

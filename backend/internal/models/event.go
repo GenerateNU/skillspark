@@ -55,8 +55,6 @@ type UpdateEventDBInput struct {
 	Body           UpdateDBBody
 }
 
-// ----------------------------
-
 type CreateEventInput struct {
 	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
 	Body           CreateEventBody
