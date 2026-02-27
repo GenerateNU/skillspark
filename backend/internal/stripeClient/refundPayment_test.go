@@ -55,8 +55,6 @@ func TestStripeClient_RefundPayment(t *testing.T) {
 		assert.Equal(t, "succeeded", result.Body.Status)
 		assert.Equal(t, int64(10000), result.Body.Amount)
 		assert.Equal(t, "usd", result.Body.Currency)
-
-		t.Logf("Refund created: %s status=%s amount=%d", result.Body.RefundID, result.Body.Status, result.Body.Amount)
 	})
 
 	t.Run("fails when already refunded", func(t *testing.T) {
