@@ -10,7 +10,6 @@ import (
 )
 
 func TestStripeClient_CancelPaymentIntent_RequiresCapture(t *testing.T) {
-	t.Skip("Requires Express account with transfer capability - use handler mocks instead")
 	
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test")
@@ -48,47 +47,38 @@ func TestStripeClient_CancelPaymentIntent_RequiresCapture(t *testing.T) {
 }
 
 func TestStripeClient_CancelPaymentIntent_Succeeded(t *testing.T) {
-	t.Skip("Requires Express account with transfer capability - use handler mocks instead")
-	
-	if testing.Short() {
-		t.Skip("Skipping Stripe integration test")
-	}
+    if testing.Short() {
+        t.Skip("Skipping Stripe integration test")
+    }
 
-	apiKey := getTestStripeAPIKey(t)
-	client, _ := NewStripeClient(apiKey)
-	ctx := context.Background()
+    apiKey := getTestStripeAPIKey(t)
+    client, _ := NewStripeClient(apiKey)
+    ctx := context.Background()
 
-	paymentMethodID := "pm_card_visa"
+    // create and capture a payment intent first
+    createPIInput := &models.CreatePaymentIntentInput{}
+    createPIInput.Body.Amount = 10000
+    createPIInput.Body.Currency = "usd"
+    createPIInput.Body.GuardianStripeID = testStripeCustomerID
+    createPIInput.Body.OrgStripeID = testStripeAccountID
+    createPIInput.Body.PaymentMethodID = "pm_card_visa"
 
-	createPIInput := &models.CreatePaymentIntentInput{}
-	createPIInput.Body.Amount = 10000
-	createPIInput.Body.Currency = "usd"
-	createPIInput.Body.GuardianStripeID = testStripeCustomerID
-	createPIInput.Body.OrgStripeID = testStripeAccountID
-	createPIInput.Body.PaymentMethodID = paymentMethodID
+    createdPI, err := client.CreatePaymentIntent(ctx, createPIInput)
+    require.NoError(t, err)
 
-	createdPI, err := client.CreatePaymentIntent(ctx, createPIInput)
-	require.NoError(t, err)
+    _, err = client.CapturePaymentIntent(ctx, &models.CapturePaymentIntentInput{
+        PaymentIntentID: createdPI.Body.PaymentIntentID,
+    })
+    require.NoError(t, err)
 
-	captureInput := &models.CapturePaymentIntentInput{
-		PaymentIntentID: createdPI.Body.PaymentIntentID,
-	}
-	captured, err := client.CapturePaymentIntent(ctx, captureInput)
-	require.NoError(t, err)
-	require.Equal(t, "succeeded", captured.Body.Status)
+    // attempting to cancel a succeeded intent should fail
+    cancelled, err := client.CancelPaymentIntent(ctx, &models.CancelPaymentIntentInput{
+        PaymentIntentID: createdPI.Body.PaymentIntentID,
+    })
 
-	cancelInput := &models.CancelPaymentIntentInput{
-		PaymentIntentID: createdPI.Body.PaymentIntentID,
-	}
-
-	cancelled, err := client.CancelPaymentIntent(ctx, cancelInput)
-
-	require.NoError(t, err)
-	require.NotNil(t, cancelled)
-	assert.Equal(t, createdPI.Body.PaymentIntentID, cancelled.Body.PaymentIntentID)
-	assert.Equal(t, "succeeded", cancelled.Body.Status)
-	assert.Equal(t, int64(10000), cancelled.Body.Amount)
-	assert.Equal(t, "usd", cancelled.Body.Currency)
+    require.Error(t, err)
+    assert.Nil(t, cancelled)
+    assert.Contains(t, err.Error(), "succeeded")
 }
 
 func TestStripeClient_CancelPaymentIntent_InvalidID(t *testing.T) {
@@ -111,7 +101,6 @@ func TestStripeClient_CancelPaymentIntent_InvalidID(t *testing.T) {
 }
 
 func TestStripeClient_CancelPaymentIntent_AlreadyCanceled(t *testing.T) {
-	t.Skip("Requires Express account with transfer capability - use handler mocks instead")
 	
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test")

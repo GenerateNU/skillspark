@@ -11,7 +11,6 @@ import (
 )
 
 func TestStripeClient_CreateOrganizationAccount(t *testing.T) {
-	t.Skip("V2 API account creation is slow and times out - skip for now")
 	
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test in short mode")

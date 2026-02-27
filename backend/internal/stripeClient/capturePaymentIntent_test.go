@@ -13,7 +13,6 @@ const testStripeAccountID = "acct_1T0lX12SjspRdSkp"
 const testStripeCustomerID = "cus_TwTqKNe9HwjesR"
 
 func TestStripeClient_CapturePaymentIntent_Success(t *testing.T) {
-	t.Skip("Requires Express account with transfer capability - use handler mocks instead")
 	
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test")
@@ -70,7 +69,6 @@ func TestStripeClient_CapturePaymentIntent_InvalidID(t *testing.T) {
 }
 
 func TestStripeClient_CapturePaymentIntent_AlreadyCaptured(t *testing.T) {
-	t.Skip("Requires Express account with transfer capability - use handler mocks instead")
 	
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test")
@@ -107,7 +105,6 @@ func TestStripeClient_CapturePaymentIntent_AlreadyCaptured(t *testing.T) {
 }
 
 func TestStripeClient_CapturePaymentIntent_CanceledIntent(t *testing.T) {
-	t.Skip("Requires Express account with transfer capability - use handler mocks instead")
 	
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test")
