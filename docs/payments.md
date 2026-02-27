@@ -168,7 +168,7 @@ In a separate terminal, run stripe
 Put the signing secret your receive in your .env file as STRIPE_ACCOUNT_WEBHOOK_SECRET
 This listener is for the webhooks related to account, so it registers that the account has updated, so when you update anything about the account, it runs and updates whether the account can receive payments.
 
-<b>You need to update the keys in your env every time you run the command<b>
+<b>You need to update the keys in your env every time you run the command</b>
 
 ---
 
