@@ -7,7 +7,7 @@ import (
 )
 
 func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
-	_, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID)
+	_, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID, "")
 	if err != nil {
 		return nil, errs.BadRequest("Invalid event_occurrence_id: event occurrence does not exist")
 	}

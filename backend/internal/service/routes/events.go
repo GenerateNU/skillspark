@@ -4,16 +4,18 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/s3_client"
 	"skillspark/internal/service/handler/event"
 	"skillspark/internal/storage"
+	translations "skillspark/internal/translation"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface) {
-	eventHandler := event.NewHandler(repo.Event, s3Client)
+func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface, translateClient translations.TranslationInterface) {
+	eventHandler := event.NewHandler(repo.Event, s3Client, translateClient)
 
 	// POST /api/v1/events
 	huma.Register(api, huma.Operation{
@@ -37,7 +39,8 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 		}
 
 		eventModel := models.CreateEventInput{
-			Body: eventBody,
+			AcceptLanguage: input.AcceptLanguage,
+			Body:           eventBody,
 		}
 
 		updateBody := models.UpdateEventBody{
@@ -51,14 +54,16 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 
 		image_data, err := io.ReadAll(formData.HeaderImage)
 		if err != nil {
-			return nil, err
+			e := errs.BadRequest("error no one" + err.Error())
+			return nil, e
 		}
 
 		// io.readall on input
 		event, err := eventHandler.CreateEvent(ctx, &eventModel, &updateBody, &image_data, s3Client)
 
 		if err != nil {
-			return nil, err
+			e := errs.BadRequest("error two" + err.Error())
+			return nil, e
 		}
 
 		return &models.CreateEventOutput{
@@ -88,8 +93,9 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 		}
 
 		eventModel := models.UpdateEventInput{
-			ID:   input.ID,
-			Body: eventBody,
+			AcceptLanguage: input.AcceptLanguage,
+			ID:             input.ID,
+			Body:           eventBody,
 		}
 
 		image_data, err := io.ReadAll(formData.HeaderImage)

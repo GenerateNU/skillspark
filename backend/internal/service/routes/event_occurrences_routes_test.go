@@ -10,6 +10,7 @@ import (
 
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	s3mocks "skillspark/internal/s3_client/mocks"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
@@ -28,6 +29,7 @@ func setupEventOccurrencesTestAPI(
 	managerRepo *repomocks.MockManagerRepository,
 	eventRepo *repomocks.MockEventRepository,
 	locationRepo *repomocks.MockLocationRepository,
+	s3Client *s3mocks.S3ClientMock,
 ) (*fiber.App, huma.API) {
 	app := fiber.New()
 	api := humafiber.New(app, huma.DefaultConfig("Test API", "1.0.0"))
@@ -37,7 +39,7 @@ func setupEventOccurrencesTestAPI(
 		Event:           eventRepo,
 		Location:        locationRepo,
 	}
-	routes.SetupEventOccurrencesRoutes(api, repo)
+	routes.SetupEventOccurrencesRoutes(api, repo, s3Client)
 	return app, api
 }
 
@@ -95,6 +97,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 					"GetEventOccurrenceByID",
 					mock.Anything,
 					uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+					mock.Anything,
 				).Return(&models.EventOccurrence{
 					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 					ManagerId:    &mid,
@@ -125,6 +128,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 					"GetEventOccurrenceByID",
 					mock.Anything,
 					uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+					mock.Anything,
 				).Return(nil, &errs.HTTPError{
 					Code:    errs.NotFound("EventOccurrence", "id", "00000000-0000-0000-0000-000000000000").GetStatus(),
 					Message: "Not found",
@@ -143,6 +147,8 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockS3 := new(s3mocks.S3ClientMock)
+			mockS3.On("GeneratePresignedURL", mock.Anything, mock.Anything, mock.Anything).Return("https://test-bucket.s3.amazonaws.com/presigned", nil)
 			tt.mockSetup(mockRepo)
 
 			app, _ := setupEventOccurrencesTestAPI(
@@ -150,6 +156,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 				mockManagerRepo,
 				mockEventRepo,
 				mockLocationRepo,
+				mockS3,
 			)
 
 			req, err := http.NewRequest(
@@ -286,6 +293,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockS3 := new(s3mocks.S3ClientMock)
 			tt.mockSetup(mockRepo)
 
 			app, _ := setupEventOccurrencesTestAPI(
@@ -293,6 +301,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 				mockManagerRepo,
 				mockEventRepo,
 				mockLocationRepo,
+				mockS3,
 			)
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -435,6 +444,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					"UpdateEventOccurrence",
 					mock.Anything,
 					mock.AnythingOfType("*models.UpdateEventOccurrenceInput"),
+					mock.Anything,
 				).Return(&models.EventOccurrence{
 					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 					ManagerId:    &mid_new,
@@ -478,6 +488,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockS3 := new(s3mocks.S3ClientMock)
 			tt.mockSetup(mockRepo)
 
 			app, _ := setupEventOccurrencesTestAPI(
@@ -485,6 +496,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 				mockManagerRepo,
 				mockEventRepo,
 				mockLocationRepo,
+				mockS3,
 			)
 
 			bodyBytes, err := json.Marshal(tt.payload)
@@ -503,6 +515,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					"GetEventOccurrenceByID",
 					mock.Anything,
 					uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+					mock.Anything,
 				).Return(&models.EventOccurrence{
 					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 					ManagerId:    &mid,
@@ -566,6 +579,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 					"GetAllEventOccurrences",
 					mock.Anything,
 					utils.Pagination{Page: 1, Limit: 10},
+					mock.Anything,
 					models.GetAllEventOccurrencesFilter{
 						Search:             &search,
 						Latitude:           &lat,
@@ -613,7 +627,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			name:  "only min_age provided should succeed",
 			query: "?min_age=18",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]models.EventOccurrence{}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -622,7 +636,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			name:  "valid date range should succeed",
 			query: "?min_date=2026-02-01T00:00:00Z&max_date=2026-02-10T00:00:00Z",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]models.EventOccurrence{}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -631,7 +645,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			name:  "only max_date provided should succeed",
 			query: "?max_date=2026-02-10T00:00:00Z",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]models.EventOccurrence{}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -644,6 +658,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 					"GetAllEventOccurrences",
 					mock.Anything,
 					utils.Pagination{Page: 1, Limit: 5},
+					mock.Anything,
 					models.GetAllEventOccurrencesFilter{},
 				).Return([]models.EventOccurrence{}, nil)
 			},
@@ -663,11 +678,13 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 
 			tt.mockSetup(mockRepo)
 
+			mockS3 := new(s3mocks.S3ClientMock)
 			app, _ := setupEventOccurrencesTestAPI(
 				mockRepo,
 				mockManagerRepo,
 				mockEventRepo,
 				mockLocationRepo,
+				mockS3,
 			)
 
 			req, err := http.NewRequest(

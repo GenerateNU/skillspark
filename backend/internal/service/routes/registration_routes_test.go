@@ -358,7 +358,7 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"status":              "registered",
 			},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, uuid.MustParse(eventOccurrenceID)).Return(&models.EventOccurrence{
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, uuid.MustParse(eventOccurrenceID), mock.Anything).Return(&models.EventOccurrence{
 					ID: uuid.MustParse(eventOccurrenceID),
 				}, nil)
 				childRepo.On("GetChildByID", mock.Anything, uuid.MustParse(childID)).Return(&models.Child{

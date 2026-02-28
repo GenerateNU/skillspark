@@ -10,6 +10,7 @@ import (
 )
 
 func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput, tx *pgx.Tx) (*models.EventOccurrence, error) {
+	language = input.AcceptLanguage
 	query, err := schema.ReadSQLBaseScript("update.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -47,6 +48,8 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 
 	// null fields are handled in SQL query with coalesce
 	var updatedEventOccurrence models.EventOccurrence
+	var titleEN, descriptionEN string
+	var titleTH, descriptionTH *string
 
 	// populate data in struct, embedding event and location data
 	err = row.Scan(
@@ -64,8 +67,10 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 
 		// event fields
 		&updatedEventOccurrence.Event.ID,
-		&updatedEventOccurrence.Event.Title,
-		&updatedEventOccurrence.Event.Description,
+		&titleEN,
+		&titleTH,
+		&descriptionEN,
+		&descriptionTH,
 		&updatedEventOccurrence.Event.OrganizationID,
 		&updatedEventOccurrence.Event.AgeRangeMin,
 		&updatedEventOccurrence.Event.AgeRangeMax,
@@ -88,6 +93,14 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 		&updatedEventOccurrence.Location.CreatedAt,
 		&updatedEventOccurrence.Location.UpdatedAt,
 	)
+
+	if language == "th" {
+		updatedEventOccurrence.Event.Title = *titleTH
+		updatedEventOccurrence.Event.Description = *descriptionTH
+	} else {
+		updatedEventOccurrence.Event.Title = titleEN
+		updatedEventOccurrence.Event.Description = descriptionEN
+	}
 
 	if err != nil {
 		err := errs.InternalServerError("Failed to update event occurrence: ", err.Error())

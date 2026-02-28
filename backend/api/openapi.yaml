@@ -533,6 +533,10 @@ paths:
       description: Returns event occurrences that match the event ID
       operationId: get-event-occurrences-by-event-id
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
         - name: event_id
           in: path
           description: ID of an event
@@ -543,6 +547,10 @@ paths:
       responses:
         "200":
           description: OK
+          headers:
+            Accept-Language:
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -1484,6 +1492,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: page
           in: query
           description: Page number (starts at 1)
@@ -1534,6 +1547,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: page
           in: query
           description: Page number (starts at 1)

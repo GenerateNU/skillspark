@@ -8,6 +8,7 @@ import (
 	"skillspark/internal/s3_client"
 	"skillspark/internal/service"
 	"skillspark/internal/storage"
+	translations "skillspark/internal/translation"
 
 	"gopkg.in/yaml.v3"
 )
@@ -27,8 +28,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to create S3 Client: %v\n", err)
 	}
 
+	translateClient := translations.NewClient(nil)
+
 	// Initialize app to get Huma API
-	_, humaAPI := service.SetupApp(cfg, repo, s3Client)
+	_, humaAPI := service.SetupApp(cfg, repo, s3Client, translateClient)
 
 	// Get OpenAPI spec
 	openAPI := humaAPI.OpenAPI()

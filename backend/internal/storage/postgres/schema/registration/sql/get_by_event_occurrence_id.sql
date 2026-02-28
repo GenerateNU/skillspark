@@ -6,7 +6,7 @@ SELECT
     r.status AS status,
     r.created_at AS created_at,
     r.updated_at AS updateed_at,
-    e.title AS event_name,
+    e.title_en AS event_name,
     eo.start_time AS occurrence_start_time
 FROM registration r
 JOIN event_occurrence eo ON r.event_occurrence_id = eo.id

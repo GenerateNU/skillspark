@@ -9,7 +9,7 @@ import (
 
 func (h *Handler) UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.EventOccurrence, error) {
 	// check that event occurrence exists already in database
-	ogEventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.ID)
+	ogEventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.ID, input.AcceptLanguage)
 	if err != nil {
 		return nil, err
 	}

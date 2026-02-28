@@ -21,13 +21,17 @@ func TestEventRepository_Delete_JuniorRoboticsWorkshop(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	eventInput := func() *models.CreateEventInput {
-		input := &models.CreateEventInput{}
+	eventInput := func() *models.CreateEventDBInput {
+		input := &models.CreateEventDBInput{}
 		ageMin := 8
 		ageMax := 12
+		title_ptr := "เวิร์คช็อปหุ่นยนต์สำหรับเด็ก"
+		desc_ptr := "เรียนรู้พื้นฐานหุ่นยนต์ด้วยโครงการ LEGO Mindstorms สร้างและเขียนโปรแกรมหุ่นยนต์ของคุณเอง!"
 
-		input.Body.Title = "Junior Robotics Workshop"
-		input.Body.Description = "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!"
+		input.Body.Title_EN = "Junior Robotics Workshop"
+		input.Body.Description_EN = "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!"
+		input.Body.Title_TH = &title_ptr
+		input.Body.Description_TH = &desc_ptr
 		input.Body.OrganizationID = uuid.MustParse("40000000-0000-0000-0000-000000000001")
 		input.Body.AgeRangeMin = &ageMin
 		input.Body.AgeRangeMax = &ageMax

@@ -12,7 +12,7 @@ import (
 )
 
 func (r *EventOccurrenceRepository) CancelEventOccurrence(ctx context.Context, id uuid.UUID) error {
-	eo, err := r.GetEventOccurrenceByID(ctx, id)
+	eo, err := r.GetEventOccurrenceByID(ctx, id, "")
 	if err != nil {
 		e := errs.InternalServerError(
 			"Failed to find event occurrence with given ID: ",
