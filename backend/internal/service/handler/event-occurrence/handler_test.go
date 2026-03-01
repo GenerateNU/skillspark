@@ -570,44 +570,23 @@ func TestHandler_CancelEventOccurrence(t *testing.T) {
 				regRepo.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).
 					Return(makeRegistrations("requires_capture"), nil)
 
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eoID).
-					Return(makeTestEventOccurrence(time.Now().Add(48*time.Hour)), nil)
+				sc.On("CancelPaymentIntent", mock.Anything, mock.AnythingOfType("*models.CancelPaymentIntentInput")).
+					Return(cancelledPaymentIntentOutput, nil)
 
 				eoRepo.On("CancelEventOccurrence", mock.Anything, eoID).
 					Return(nil)
-
-				sc.On("CancelPaymentIntent", mock.Anything, mock.AnythingOfType("*models.CancelPaymentIntentInput")).
-					Return(cancelledPaymentIntentOutput, nil)
 			},
 			wantErr: false,
 		},
 		{
-			name: "cancel with succeeded registrations — event more than 24hrs away — issues refunds",
+			name: "cancel with succeeded registrations — issues refunds",
 			eoID: eoID,
 			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, regRepo *repomocks.MockRegistrationRepository, sc *stripemocks.MockStripeClient) {
 				regRepo.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).
 					Return(makeRegistrations("succeeded"), nil)
-
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eoID).
-					Return(makeTestEventOccurrence(time.Now().Add(48*time.Hour)), nil)
-
-				eoRepo.On("CancelEventOccurrence", mock.Anything, eoID).
-					Return(nil)
 
 				sc.On("RefundPayment", mock.Anything, mock.AnythingOfType("*models.RefundPaymentInput")).
 					Return(refundOutput, nil)
-			},
-			wantErr: false,
-		},
-		{
-			name: "cancel with succeeded registrations — event within 24hrs — no refund",
-			eoID: eoID,
-			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, regRepo *repomocks.MockRegistrationRepository, sc *stripemocks.MockStripeClient) {
-				regRepo.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).
-					Return(makeRegistrations("succeeded"), nil)
-
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eoID).
-					Return(makeTestEventOccurrence(time.Now().Add(12*time.Hour)), nil)
 
 				eoRepo.On("CancelEventOccurrence", mock.Anything, eoID).
 					Return(nil)
@@ -623,26 +602,41 @@ func TestHandler_CancelEventOccurrence(t *testing.T) {
 				regRepo.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).
 					Return(out, nil)
 
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eoID).
-					Return(makeTestEventOccurrence(time.Now().Add(48*time.Hour)), nil)
-
 				eoRepo.On("CancelEventOccurrence", mock.Anything, eoID).
 					Return(nil)
 			},
 			wantErr: false,
 		},
 		{
-			name: "event occurrence not found",
-			eoID: uuid.New(),
+			name: "get registrations fails",
+			eoID: eoID,
 			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, regRepo *repomocks.MockRegistrationRepository, sc *stripemocks.MockStripeClient) {
 				regRepo.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).
-					Return(&models.GetRegistrationsByEventOccurrenceIDOutput{}, nil)
+					Return(nil, &errs.HTTPError{Code: 500, Message: "db error"})
+			},
+			wantErr: true,
+		},
+		{
+			name: "refund payment fails — returns error",
+			eoID: eoID,
+			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, regRepo *repomocks.MockRegistrationRepository, sc *stripemocks.MockStripeClient) {
+				regRepo.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).
+					Return(makeRegistrations("succeeded"), nil)
 
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).
-					Return(nil, &errs.HTTPError{
-						Code:    errs.NotFound("EventOccurrence", "id", uuid.New().String()).Code,
-						Message: "Not found",
-					})
+				sc.On("RefundPayment", mock.Anything, mock.AnythingOfType("*models.RefundPaymentInput")).
+					Return(nil, &errs.HTTPError{Code: 500, Message: "stripe error"})
+			},
+			wantErr: true,
+		},
+		{
+			name: "cancel payment intent fails — returns error",
+			eoID: eoID,
+			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, regRepo *repomocks.MockRegistrationRepository, sc *stripemocks.MockStripeClient) {
+				regRepo.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).
+					Return(makeRegistrations("requires_capture"), nil)
+
+				sc.On("CancelPaymentIntent", mock.Anything, mock.AnythingOfType("*models.CancelPaymentIntentInput")).
+					Return(nil, &errs.HTTPError{Code: 500, Message: "stripe error"})
 			},
 			wantErr: true,
 		},
@@ -654,9 +648,6 @@ func TestHandler_CancelEventOccurrence(t *testing.T) {
 				out.Body.Registrations = []models.Registration{}
 				regRepo.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).
 					Return(out, nil)
-
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eoID).
-					Return(makeTestEventOccurrence(time.Now().Add(48*time.Hour)), nil)
 
 				eoRepo.On("CancelEventOccurrence", mock.Anything, eoID).
 					Return(&errs.HTTPError{Code: 500, Message: "db error"})

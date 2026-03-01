@@ -37,13 +37,13 @@ func (h *Handler) handlePaymentIntentFailed(ctx context.Context, event stripe.Ev
 	pi, err := unmarshalEvent[stripe.PaymentIntent](event)
 	if err != nil {
 		log.Printf("Failed to unmarshal payment_intent.payment_failed: %v", err)
-		return nil
+		return err
 	}
 
 	registration, err := h.repo.Registration.GetRegistrationByPaymentIntentID(ctx, pi.ID)
 	if err != nil {
 		log.Printf("Registration not found for payment intent %s: %v", pi.ID, err)
-		return nil
+		return err
 	}
 
 	cancelledStatus := models.RegistrationStatusCancelled
@@ -56,7 +56,7 @@ func (h *Handler) handlePaymentIntentFailed(ctx context.Context, event stripe.Ev
 
 	if _, err := h.repo.Registration.CancelRegistration(ctx, input); err != nil {
 		log.Printf("Failed to cancel registration %s: %v", registration.ID, err)
-		return nil
+		return err
 	}
 
 	log.Printf("Cancelled registration %s due to failed payment intent %s", registration.ID, pi.ID)

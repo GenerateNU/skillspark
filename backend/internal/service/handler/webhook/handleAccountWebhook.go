@@ -35,14 +35,14 @@ func (h *Handler) handleAccountUpdated(ctx context.Context, event stripe.Event) 
 	account, err := unmarshalEvent[stripe.Account](event)
 	if err != nil {
 		log.Printf("Failed to unmarshal account.updated: %v", err)
-		return nil
+		return err
 	}
 
 	activated := account.ChargesEnabled && account.PayoutsEnabled
 
 	if _, err := h.repo.Organization.SetStripeAccountStatus(ctx, account.ID, activated); err != nil {
 		log.Printf("Failed to update stripe account activation for %s: %v", account.ID, err)
-		return nil
+		return err
 	}
 
 	log.Printf("Account %s activation status updated to %v (charges_enabled=%v, payouts_enabled=%v)",
