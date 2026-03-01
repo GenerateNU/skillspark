@@ -23,6 +23,11 @@ func TestGetAllOrganizations_BasicPagination(t *testing.T) {
 	require.NotNil(t, orgs)
 	assert.GreaterOrEqual(t, len(orgs), 3)
 	assert.LessOrEqual(t, len(orgs), 10)
+	
+	if len(orgs) > 0 {
+		assert.Nil(t, orgs[0].StripeAccountID)
+		assert.False(t, orgs[0].StripeAccountActivated)
+	}
 }
 
 func TestGetAllOrganizations_SecondPage(t *testing.T) {
@@ -45,6 +50,7 @@ func TestGetAllOrganizations_SecondPage(t *testing.T) {
 
 	if len(secondPageOrgs) > 0 && len(firstPageOrgs) > 0 {
 		assert.NotEqual(t, firstPageOrgs[0].ID, secondPageOrgs[0].ID)
+		assert.False(t, secondPageOrgs[0].StripeAccountActivated)
 	}
 }
 
@@ -52,7 +58,6 @@ func TestGetAllOrganizations_SmallPageSize(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	repo := NewOrganizationRepository(testDB)
 	ctx := context.Background()
-
 	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 2}
@@ -61,6 +66,10 @@ func TestGetAllOrganizations_SmallPageSize(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
 	assert.Equal(t, 2, len(orgs))
+	
+	for _, org := range orgs {
+		assert.False(t, org.StripeAccountActivated)
+	}
 }
 
 func TestGetAllOrganizations_SingleItemPerPage(t *testing.T) {
@@ -75,6 +84,9 @@ func TestGetAllOrganizations_SingleItemPerPage(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
 	assert.Equal(t, 1, len(orgs))
+	
+	assert.Nil(t, orgs[0].StripeAccountID)
+	assert.False(t, orgs[0].StripeAccountActivated)
 }
 
 func TestGetAllOrganizations_PageBeyondData(t *testing.T) {
@@ -103,6 +115,10 @@ func TestGetAllOrganizations_AllDataOnePage(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
 	assert.GreaterOrEqual(t, len(orgs), 3)
+	
+	for _, org := range orgs {
+		assert.False(t, org.StripeAccountActivated)
+	}
 }
 
 func TestGetAllOrganizations_OrderByCreatedAt(t *testing.T) {
@@ -122,6 +138,7 @@ func TestGetAllOrganizations_OrderByCreatedAt(t *testing.T) {
 			orgs[i].CreatedAt.After(orgs[i+1].CreatedAt) || orgs[i].CreatedAt.Equal(orgs[i+1].CreatedAt),
 			"Organizations should be ordered by created_at DESC",
 		)
+		assert.False(t, orgs[i].StripeAccountActivated)
 	}
 }
 
@@ -137,4 +154,9 @@ func TestGetAllOrganizations_ZeroOffset(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
 	assert.Equal(t, 3, len(orgs))
+	
+	for _, org := range orgs {
+		assert.Nil(t, org.StripeAccountID)
+		assert.False(t, org.StripeAccountActivated)
+	}
 }

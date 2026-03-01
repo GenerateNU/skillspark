@@ -291,14 +291,12 @@ paths:
           in: query
           explode: false
           schema:
-            type: number
-            format: double
+            type: string
         - name: lng
           in: query
           explode: false
           schema:
-            type: number
-            format: double
+            type: string
         - name: radius_km
           in: query
           explode: false
@@ -322,6 +320,40 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: min_age
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+        - name: max_age
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+        - name: category
+          in: query
+          explode: false
+          schema:
+            type: string
+        - name: soldout
+          in: query
+          explode: false
+          schema:
+            type: boolean
+        - name: min_date
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: date-time
+        - name: max_date
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: date-time
       responses:
         "200":
           description: OK
@@ -675,6 +707,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetGreetingOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/guardians/{guardian_id}/payment-methods:
+    get:
+      tags:
+        - Payments
+      summary: Get all payment methods for a guardian
+      description: Retrieves all saved payment methods for a specific guardian
+      operationId: get-guardian-payment-methods
+      parameters:
+        - name: guardian_id
+          in: path
+          description: Guardian ID
+          required: true
+          schema:
+            type: string
+            description: Guardian ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPaymentMethodsByGuardianIDOutputBody'
         default:
           description: Error
           content:
@@ -1301,7 +1361,7 @@ paths:
       tags:
         - Registrations
       summary: Update a registration
-      description: Update an existing registration's details
+      description: Update the child associated with a registration
       operationId: update-registration
       parameters:
         - name: id
@@ -1317,6 +1377,68 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateRegistrationInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: The updated registration with full details
+                $ref: '#/components/schemas/Registration'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/registrations/{id}/cancel:
+    post:
+      tags:
+        - Registrations
+      summary: Cancel a registration
+      description: Cancel a registration and process refund if applicable
+      operationId: cancel-registration
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelRegistrationOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/registrations/{id}/payment-status:
+    patch:
+      tags:
+        - Registrations
+      summary: Update registration payment status
+      description: Update the payment intent status for a registration (typically called by webhooks)
+      operationId: update-registration-payment-status
+      parameters:
+        - name: id
+          in: path
+          description: Registration ID
+          required: true
+          schema:
+            type: string
+            description: Registration ID
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRegistrationPaymentStatusInputBody'
         required: true
       responses:
         "200":
@@ -1612,6 +1734,188 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/stripe/attach-pm/{guardian_id}:
+    post:
+      tags:
+        - Payments
+      summary: Attach a payment method to a guardian (testing only)
+      description: Directly attaches a Stripe payment method to a guardian's customer account. For development/testing only.
+      operationId: attach-payment-method
+      parameters:
+        - name: guardian_id
+          in: path
+          description: Guardian ID
+          required: true
+          schema:
+            type: string
+            description: Guardian ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttachPaymentMethodInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachPaymentMethodOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/stripe/customer/{guardian_id}:
+    post:
+      tags:
+        - Payments
+      summary: Create a new Stripe Customer
+      description: Create a new Stripe Customer
+      operationId: create-stripe-customer
+      parameters:
+        - name: guardian_id
+          in: path
+          description: Guardian ID
+          required: true
+          schema:
+            type: string
+            description: Guardian ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Updated guardian with Stripe customer ID
+                $ref: '#/components/schemas/Guardian'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/stripe/login/{organization_id}:
+    post:
+      tags:
+        - Payments
+      summary: Create Stripe dashboard login link for organization
+      description: Generates a login link for organization to access their Stripe Express dashboard
+      operationId: create-org-login-link
+      parameters:
+        - name: organization_id
+          in: path
+          description: Organization ID
+          required: true
+          schema:
+            type: string
+            description: Organization ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrgLoginLinkOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/stripe/onboarding/{organization_id}:
+    post:
+      tags:
+        - Payments
+      summary: Creates an onboarding link for a Stripe account
+      description: Creates an onboarding link for a Stripe account
+      operationId: create-org-stripe-onboarding-link
+      parameters:
+        - name: organization_id
+          in: path
+          description: Organization ID
+          required: true
+          schema:
+            type: string
+            description: Organization ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStripeOnboardingLinkInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateStripeOnboardingLinkOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/stripe/orgaccount/{organization_id}:
+    post:
+      tags:
+        - Payments
+      summary: Create a new Stripe account for an organization
+      description: Create a new Stripe account for an organization
+      operationId: create-org-stripe-account
+      parameters:
+        - name: organization_id
+          in: path
+          description: UUID of the existing organization
+          required: true
+          schema:
+            type: string
+            description: UUID of the existing organization
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Updated organization with Stripe account ID
+                $ref: '#/components/schemas/CreateOrgStripeAccountOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/stripe/setup-intent/{guardian_id}:
+    post:
+      tags:
+        - Payments
+      summary: Create a SetupIntent for guardian to add payment method
+      description: Creates a Stripe SetupIntent and returns client_secret for frontend to collect card details
+      operationId: create-guardian-setup-intent
+      parameters:
+        - name: guardian_id
+          in: path
+          description: Guardian ID
+          required: true
+          schema:
+            type: string
+            description: Guardian ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSetupIntentOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/users:
     get:
       tags:
@@ -1710,6 +2014,42 @@ paths:
                 $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
+    AttachPaymentMethodInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/AttachPaymentMethodInputBody.json
+          readOnly: true
+        payment_method_id:
+          type: string
+          description: Stripe payment method ID to attach (e.g. pm_card_visa)
+      required:
+        - payment_method_id
+    AttachPaymentMethodOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/AttachPaymentMethodOutputBody.json
+          readOnly: true
+        PaymentMethodID:
+          type: string
+          description: Attached payment method ID
+        customer_id:
+          type: string
+          description: Stripe customer ID the payment method was attached to
+      required:
+        - PaymentMethodID
+        - customer_id
     CancelEventOccurrenceOutputBody:
       type: object
       additionalProperties: false
@@ -1726,6 +2066,29 @@ components:
           description: Success message
       required:
         - message
+    CancelRegistrationOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CancelRegistrationOutputBody.json
+          readOnly: true
+        message:
+          type: string
+          description: Success message
+        refund_status:
+          type: string
+          description: Refund status if applicable
+        registration:
+          description: Updated registration
+          $ref: '#/components/schemas/Registration'
+      required:
+        - message
+        - registration
     Child:
       type: object
       additionalProperties: false
@@ -1831,6 +2194,9 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateEventOccurrenceInputBody.json
           readOnly: true
+        currency:
+          type: string
+          description: Currency code (e.g., thb, usd)
         end_time:
           type: string
           description: End time of the event occurrence
@@ -1855,6 +2221,11 @@ components:
           format: int64
           minimum: 1
           maximum: 100
+        price:
+          type: integer
+          description: Price in cents (e.g., 10000 = ฿100)
+          format: int64
+          minimum: 0
         start_time:
           type: string
           description: Start time of the event occurrence
@@ -1866,6 +2237,8 @@ components:
         - end_time
         - max_attendees
         - language
+        - price
+        - currency
     CreateLocationInputBody:
       type: object
       additionalProperties: false
@@ -1933,6 +2306,38 @@ components:
         - province
         - postal_code
         - country
+    CreateOrgLoginLinkOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateOrgLoginLinkOutputBody.json
+          readOnly: true
+        login_url:
+          type: string
+          description: Stripe Express dashboard login URL
+      required:
+        - login_url
+    CreateOrgStripeAccountOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateOrgStripeAccountOutputBody.json
+          readOnly: true
+        account:
+          description: Stripe account details
+          $ref: '#/components/schemas/Organization'
+      required:
+        - account
     CreateRegistrationInputBody:
       type: object
       additionalProperties: false
@@ -1956,6 +2361,9 @@ components:
           type: string
           description: ID of the guardian registering the child
           format: uuid
+        payment_method_id:
+          type: string
+          description: Stripe payment method ID to use
         status:
           type: string
           description: Initial status of the registration
@@ -1967,6 +2375,7 @@ components:
         - child_id
         - guardian_id
         - event_occurrence_id
+        - payment_method_id
         - status
     CreateReviewInputBody:
       type: object
@@ -1998,6 +2407,58 @@ components:
         - guardian_id
         - description
         - categories
+    CreateSetupIntentOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateSetupIntentOutputBody.json
+          readOnly: true
+        client_secret:
+          type: string
+          description: Stripe SetupIntent client_secret for frontend
+      required:
+        - client_secret
+    CreateStripeOnboardingLinkInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateStripeOnboardingLinkInputBody.json
+          readOnly: true
+        refresh_url:
+          type: string
+          description: URL to redirect if onboarding is exited early
+        return_url:
+          type: string
+          description: URL to redirect after successful onboarding
+      required:
+        - refresh_url
+        - return_url
+    CreateStripeOnboardingLinkOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateStripeOnboardingLinkOutputBody.json
+          readOnly: true
+        onboarding_url:
+          type: string
+          description: Stripe-hosted onboarding page URL
+      required:
+        - onboarding_url
     CreateUserInputBody:
       type: object
       additionalProperties: false
@@ -2181,6 +2642,9 @@ components:
         curr_enrolled:
           type: integer
           format: int64
+        currency:
+          type: string
+          description: Currency code (e.g., thb, usd)
         end_time:
           type: string
           format: date-time
@@ -2196,6 +2660,10 @@ components:
           type: string
         max_attendees:
           type: integer
+          format: int64
+        price:
+          type: integer
+          description: Price in cents (e.g., 10000 = $100)
           format: int64
         start_time:
           type: string
@@ -2219,6 +2687,8 @@ components:
         - max_attendees
         - language
         - curr_enrolled
+        - price
+        - currency
         - created_at
         - updated_at
         - status
@@ -2242,6 +2712,23 @@ components:
       required:
         - message
         - timestamp
+    GetPaymentMethodsByGuardianIDOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GetPaymentMethodsByGuardianIDOutputBody.json
+          readOnly: true
+        payment_methods:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentMethod'
+      required:
+        - payment_methods
     GetRegistrationsByChildIDOutputBody:
       type: object
       additionalProperties: false
@@ -2321,6 +2808,8 @@ components:
         name:
           type: string
         profile_picture_s3_key:
+          type: string
+        stripe_customer_id:
           type: string
         updated_at:
           type: string
@@ -2687,6 +3176,11 @@ components:
           type: string
         presigned_url:
           type: string
+        stripe_account_activated:
+          type: boolean
+          default: false
+        stripe_account_id:
+          type: string
         updated_at:
           type: string
           format: date-time
@@ -2697,6 +3191,8 @@ components:
         - presigned_url
         - created_at
         - updated_at
+        - stripe_account_id
+        - stripe_account_activated
     PatchManagerInputBody:
       type: object
       additionalProperties: false
@@ -2734,6 +3230,39 @@ components:
           description: Username of the guardian
       required:
         - id
+    PaymentMethod:
+      type: object
+      additionalProperties: false
+      properties:
+        card:
+          $ref: '#/components/schemas/PaymentMethodCard'
+        id:
+          type: string
+        type:
+          type: string
+      required:
+        - id
+        - type
+        - card
+    PaymentMethodCard:
+      type: object
+      additionalProperties: false
+      properties:
+        brand:
+          type: string
+        exp_month:
+          type: integer
+          format: int64
+        exp_year:
+          type: integer
+          format: int64
+        last4:
+          type: string
+      required:
+        - brand
+        - last4
+        - exp_month
+        - exp_year
     Registration:
       type: object
       additionalProperties: false
@@ -2745,6 +3274,10 @@ components:
           examples:
             - http://localhost:8080/schemas/Registration.json
           readOnly: true
+        cancelled_at:
+          type: string
+          description: Timestamp when registration was cancelled
+          format: date-time
         child_id:
           type: string
           description: ID of the registered child
@@ -2752,9 +3285,12 @@ components:
           type: string
           description: Timestamp when registration was created
           format: date-time
+        currency:
+          type: string
+          description: Currency code (e.g., thb, usd)
         event_name:
           type: string
-          description: Name of the event (joined from events table)
+          description: Name of the event
         event_occurrence_id:
           type: string
           description: ID of the event occurrence
@@ -2768,12 +3304,43 @@ components:
           type: string
           description: Start time of the event occurrence
           format: date-time
+        org_stripe_account_id:
+          type: string
+          description: Organization's Stripe account ID
+        paid_at:
+          type: string
+          description: Timestamp when payment was completed
+          format: date-time
+        payment_intent_status:
+          type: string
+          description: Stripe payment intent status
+        platform_fee_amount:
+          type: integer
+          description: Platform fee amount in cents
+          format: int64
+        provider_amount:
+          type: integer
+          description: Amount provider receives in cents
+          format: int64
         status:
           type: string
           description: Current status of the registration
           enum:
             - registered
             - cancelled
+        stripe_customer_id:
+          type: string
+          description: Stripe customer ID
+        stripe_payment_intent_id:
+          type: string
+          description: Stripe payment intent ID
+        stripe_payment_method_id:
+          type: string
+          description: Stripe payment method ID
+        total_amount:
+          type: integer
+          description: Total amount in cents
+          format: int64
         updated_at:
           type: string
           description: Timestamp when registration was last updated
@@ -2784,6 +3351,15 @@ components:
         - guardian_id
         - event_occurrence_id
         - status
+        - stripe_payment_intent_id
+        - stripe_customer_id
+        - org_stripe_account_id
+        - stripe_payment_method_id
+        - total_amount
+        - provider_amount
+        - platform_fee_amount
+        - currency
+        - payment_intent_status
         - created_at
         - updated_at
         - event_name
@@ -2910,6 +3486,11 @@ components:
           format: int64
           minimum: 0
           maximum: 100
+        currency:
+          type: string
+          description: Currency code
+          minLength: 3
+          maxLength: 3
         end_time:
           type: string
           description: End time of the event occurrence
@@ -2934,6 +3515,11 @@ components:
           format: int64
           minimum: 1
           maximum: 100
+        price:
+          type: integer
+          description: Price in lowest denomination of currency
+          format: int64
+          minimum: 0
         start_time:
           type: string
           description: Start time of the event occurrence
@@ -2998,6 +3584,22 @@ components:
           enum:
             - registered
             - cancelled
+    UpdateRegistrationPaymentStatusInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateRegistrationPaymentStatusInputBody.json
+          readOnly: true
+        payment_intent_status:
+          type: string
+          description: New payment intent status from Stripe
+      required:
+        - payment_intent_status
     UserOutputBody:
       type: object
       additionalProperties: false
