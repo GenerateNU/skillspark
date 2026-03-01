@@ -2,6 +2,7 @@ package eventoccurrence
 
 import (
 	"context"
+	"errors"
 	"skillspark/internal/models"
 
 	"github.com/google/uuid"
@@ -32,6 +33,8 @@ func (h *Handler) CancelEventOccurrence(ctx context.Context, id uuid.UUID) (stri
 			if _, err := h.StripeClient.CancelPaymentIntent(ctx, cancelInput); err != nil {
 				return "", err
 			}
+		default:
+			return "", errors.New("Payment intent must be requires_capture or succeeded")
 		}
 	}
 

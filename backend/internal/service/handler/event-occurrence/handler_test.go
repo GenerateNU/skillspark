@@ -641,6 +641,15 @@ func TestHandler_CancelEventOccurrence(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "unknown payment intent status — returns error",
+			eoID: eoID,
+			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, regRepo *repomocks.MockRegistrationRepository, sc *stripemocks.MockStripeClient) {
+				regRepo.On("GetRegistrationsByEventOccurrenceID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationsByEventOccurrenceIDInput")).
+					Return(makeRegistrations("requires_payment_method"), nil)
+			},
+			wantErr: true,
+		},
+		{
 			name: "cancel event occurrence repo fails",
 			eoID: eoID,
 			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, regRepo *repomocks.MockRegistrationRepository, sc *stripemocks.MockStripeClient) {
