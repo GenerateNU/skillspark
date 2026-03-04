@@ -1,6 +1,12 @@
 terraform {
   required_version = ">= 1.0"
 
+  backend "s3" {
+    bucket = "skillspark-dev"
+    key    = "terraform/dev.tfstate"
+    region = "us-east-2"
+  }
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -20,10 +26,3 @@ terraform {
 provider "aws" {
   region = var.aws_region
 }
-
-# Data source for current AWS account
-data "aws_caller_identity" "current" {}
-
-# Data source for current AWS region
-data "aws_region" "current" {}
-

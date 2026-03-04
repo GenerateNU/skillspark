@@ -40,4 +40,3 @@ func main() {
 	slog.Info("Starting Lambda function")
 	lambda.Start(lambdaHandler)
 }
-
