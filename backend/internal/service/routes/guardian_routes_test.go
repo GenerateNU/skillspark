@@ -151,6 +151,41 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 			statusCode: http.StatusOK,
 		},
 		{
+			name:       "valid payload with expo push token",
+			guardianID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+			payload: map[string]interface{}{
+				"name":                "Jane Doe",
+				"email":               "jane@example.com",
+				"username":            "janedoe",
+				"language_preference": "es",
+				"expo_push_token":     "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]",
+			},
+			mockSetup: func(m *repomocks.MockGuardianRepository) {
+				token := "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
+				m.On(
+					"UpdateGuardian",
+					mock.Anything,
+					mock.MatchedBy(func(input *models.UpdateGuardianInput) bool {
+						return input.ID == uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11") &&
+							input.Body.Name == "Jane Doe" &&
+							input.Body.ExpoPushToken != nil &&
+							*input.Body.ExpoPushToken == "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
+					}),
+				).Return(&models.Guardian{
+					ID:                 uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+					UserID:             uuid.New(),
+					Name:               "Jane Doe",
+					Email:              "jane@example.com",
+					Username:           "janedoe",
+					LanguagePreference: "es",
+					ExpoPushToken:      &token,
+					CreatedAt:          time.Now(),
+					UpdatedAt:          time.Now(),
+				}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
 			name:       "invalid UUID",
 			guardianID: "not-a-uuid",
 			payload: map[string]interface{}{

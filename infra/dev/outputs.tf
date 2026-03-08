@@ -32,3 +32,19 @@ output "lambda_role_arn" {
   description = "ARN of the Lambda execution role"
   value       = module.notifications.lambda_role_arn
 }
+
+output "backend_iam_user" {
+  description = "IAM username for the backend (use in AWS console)"
+  value       = aws_iam_user.backend.name
+}
+
+output "backend_access_key_id" {
+  description = "AWS_ACCESS_KEY_ID for the backend"
+  value       = aws_iam_access_key.backend.id
+}
+
+output "backend_secret_access_key" {
+  description = "AWS_SECRET_ACCESS_KEY for the backend"
+  value       = aws_iam_access_key.backend.secret
+  sensitive   = true
+}

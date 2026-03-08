@@ -1,26 +1,18 @@
-# Build Lambda binary
+# Build Lambda binary and package into zip
 resource "null_resource" "lambda_build" {
   triggers = {
     source_hash = sha256(join("", [
-      for f in fileset("${var.lambda_source_path}", "**/*.go") : filesha256("${var.lambda_source_path}/${f}")
+      for f in fileset("${path.module}/lambda", "**/*.go") : filesha256("${path.module}/lambda/${f}")
     ]))
   }
 
   provisioner "local-exec" {
     command = <<-EOT
-      mkdir -p ${path.module}/lambda && \
-      cd ${var.lambda_source_path} && \
-      GOOS=linux GOARCH=amd64 go build -o ${path.module}/lambda/bootstrap .
+      cd ${path.module}/lambda && \
+      GOOS=linux GOARCH=amd64 go build -o ${path.module}/lambda/bootstrap . && \
+      zip -j ${path.module}/lambda_function.zip ${path.module}/lambda/bootstrap
     EOT
   }
-}
-
-# Archive Lambda function binary
-data "archive_file" "lambda_zip" {
-  depends_on  = [null_resource.lambda_build]
-  type        = "zip"
-  source_file = "${path.module}/lambda/bootstrap"
-  output_path = "${path.module}/lambda_function.zip"
 }
 
 # IAM role for Lambda function
@@ -81,20 +73,18 @@ resource "aws_iam_role_policy" "lambda_sqs_policy" {
 
 # Lambda function
 resource "aws_lambda_function" "notification_processor" {
-  filename                       = data.archive_file.lambda_zip.output_path
+  filename                       = "${path.module}/lambda_function.zip"
   function_name                  = "${var.project_name}-${var.environment}-notification-processor"
   role                           = aws_iam_role.lambda_role.arn
   handler                        = "bootstrap"
   runtime                        = var.lambda_runtime
   timeout                        = var.lambda_timeout
   memory_size                    = var.lambda_memory_size
-  reserved_concurrent_executions = var.lambda_reserved_concurrency
 
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  source_code_hash = null_resource.lambda_build.triggers["source_hash"]
 
   depends_on = [
     null_resource.lambda_build,
-    data.archive_file.lambda_zip,
     aws_iam_role_policy.lambda_sqs_policy
   ]
 
@@ -113,16 +103,16 @@ resource "aws_lambda_function" "notification_processor" {
 }
 
 # CloudWatch log group for Lambda function
-# resource "aws_cloudwatch_log_group" "lambda_logs" {
-#   name              = "/aws/lambda/${var.project_name}-${var.environment}-notification-processor"
-#   retention_in_days = 14
+resource "aws_cloudwatch_log_group" "lambda_logs" {
+  name              = "/aws/lambda/${var.project_name}-${var.environment}-notification-processor"
+  retention_in_days = 14
 
-#   tags = {
-#     Name        = "${var.project_name}-${var.environment}-notification-processor-logs"
-#     Environment = var.environment
-#     Project     = var.project_name
-#   }
-# }
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-notification-processor-logs"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
 
 # Event source mapping: SQS to Lambda
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {

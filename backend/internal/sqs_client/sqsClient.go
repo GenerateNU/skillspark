@@ -17,9 +17,23 @@ type Client struct {
 }
 
 func NewClient(sqsConfig sqs_config.SQS) (*Client, error) {
+	var region, accessKey, secretKey, queueURL string
+
+	if sqsConfig.UseLocalStack {
+		region = sqsConfig.LocalStackRegion
+		accessKey = sqsConfig.LocalStackAccessKey
+		secretKey = sqsConfig.LocalStackSecretKey
+		queueURL = sqsConfig.LocalStackQueueURL
+	} else {
+		region = sqsConfig.Region
+		accessKey = sqsConfig.AccessKey
+		secretKey = sqsConfig.SecretKey
+		queueURL = sqsConfig.QueueURL
+	}
+
 	opts := []func(*config.LoadOptions) error{
-		config.WithRegion(sqsConfig.Region),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(sqsConfig.AccessKey, sqsConfig.SecretKey, "")),
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
 	}
 	if sqsConfig.UseLocalStack {
 		opts = append(opts, config.WithBaseEndpoint(sqsConfig.LocalStackEndpoint))
@@ -32,7 +46,6 @@ func NewClient(sqsConfig sqs_config.SQS) (*Client, error) {
 
 	return &Client{
 		SQS:      sqs.NewFromConfig(cfg),
-		QueueURL: sqsConfig.QueueURL,
+		QueueURL: queueURL,
 	}, nil
 }
-

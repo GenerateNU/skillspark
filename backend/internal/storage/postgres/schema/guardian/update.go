@@ -24,8 +24,9 @@ func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *model
 		return nil, &err
 	}
 
-	err = tx.QueryRow(ctx, guardianQuery, guardian.ID).Scan(
+	err = tx.QueryRow(ctx, guardianQuery, guardian.ID, guardian.Body.ExpoPushToken).Scan(
 		&updatedGuardian.UserID,
+		&updatedGuardian.ExpoPushToken,
 		&updatedGuardian.CreatedAt,
 		&updatedGuardian.UpdatedAt,
 	)

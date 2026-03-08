@@ -34,11 +34,6 @@ variable "lambda_memory_size" {
   default     = 256
 }
 
-variable "lambda_reserved_concurrency" {
-  description = "Lambda reserved concurrency (for rate limiting: 2 messages/sec)"
-  type        = number
-  default     = 2
-}
 
 variable "sqs_batch_size" {
   description = "Maximum number of records to retrieve in a single batch"
@@ -83,9 +78,4 @@ variable "expo_access_token" {
   default     = ""
 }
 
-variable "lambda_source_path" {
-  description = "Path to the Lambda function source code"
-  type        = string
-  default     = "./lambda"
-}
 
