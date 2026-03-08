@@ -50,7 +50,7 @@ func InitApp(config config.Config) (*App, error) {
 	notifService := notification.NewService(repo, sqsClient)
 	scheduler := notification.NewScheduler(repo, sqsClient)
 	
-	app, humaAPI := SetupApp(config, repo, s3Client)
+	app, humaAPI := SetupApp(config, repo, s3Client, notifService)
 	return &App{
 		Server:      app,
 		Repo:        repo,
@@ -61,7 +61,7 @@ func InitApp(config config.Config) (*App, error) {
 }
 
 // Setup the fiber app with the specified configuration and database.
-func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client) (*fiber.App, huma.API) {
+func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, notifService *notification.Service) (*fiber.App, huma.API) {
 	app := fiber.New(fiber.Config{
 		JSONEncoder:  go_json.Marshal,
 		JSONDecoder:  go_json.Unmarshal,
@@ -108,13 +108,13 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	})
 
 	// Register Huma endpoints
-	setupHumaRoutes(humaAPI, repo, config, s3Client)
+	setupHumaRoutes(humaAPI, repo, config, s3Client, notifService)
 
 	return app, humaAPI
 }
 
 // Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client) {
+func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, notifService *notification.Service) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
@@ -122,7 +122,7 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client)
 	routes.SetupManagerRoutes(api, repo, config)
-	routes.SetupRegistrationRoutes(api, repo)
+	routes.SetupRegistrationRoutes(api, repo, notifService)
 	routes.SetupGuardiansRoutes(api, repo, config)
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo)

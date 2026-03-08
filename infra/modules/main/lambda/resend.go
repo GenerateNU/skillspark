@@ -32,7 +32,7 @@ func NewResendClient() (*ResendClient, error) {
 	// Default from address - can be overridden via environment variable
 	from := os.Getenv("RESEND_FROM_EMAIL")
 	if from == "" {
-		from = "notifications@skillspark.app" // Default, should be configured
+		from = "onboarding@resend.dev" // Default, should be configured
 	}
 
 	return &ResendClient{

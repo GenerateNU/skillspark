@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// Initialize app to get Huma API
-	_, humaAPI := service.SetupApp(cfg, repo, s3Client)
+	_, humaAPI := service.SetupApp(cfg, repo, s3Client, nil)
 
 	// Get OpenAPI spec
 	openAPI := humaAPI.OpenAPI()

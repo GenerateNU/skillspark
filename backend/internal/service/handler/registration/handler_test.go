@@ -67,7 +67,7 @@ func TestHandler_GetRegistrationByID(t *testing.T) {
 			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
 			tt.mockSetup(mockRegRepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, nil)
 			ctx := context.Background()
 
 			input := &models.GetRegistrationByIDInput{ID: uuid.MustParse(tt.id)}
@@ -134,7 +134,7 @@ func TestHandler_GetRegistrationsByChildID(t *testing.T) {
 			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
 			tt.mockSetup(mockRegRepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, nil)
 			ctx := context.Background()
 
 			input := &models.GetRegistrationsByChildIDInput{ChildID: uuid.MustParse(tt.childID)}
@@ -202,7 +202,7 @@ func TestHandler_GetRegistrationsByGuardianID(t *testing.T) {
 			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
 			tt.mockSetup(mockRegRepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, nil)
 			ctx := context.Background()
 
 			input := &models.GetRegistrationsByGuardianIDInput{GuardianID: uuid.MustParse(tt.guardianID)}
@@ -269,7 +269,7 @@ func TestHandler_GetRegistrationsByEventOccurrenceID(t *testing.T) {
 			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
 			tt.mockSetup(mockRegRepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, nil)
 			ctx := context.Background()
 
 			input := &models.GetRegistrationsByEventOccurrenceIDInput{EventOccurrenceID: uuid.MustParse(tt.eventOccurrenceID)}
@@ -417,7 +417,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
 			tt.mockSetup(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, nil)
 			ctx := context.Background()
 
 			registration, err := handler.CreateRegistration(ctx, tt.input)
@@ -521,7 +521,7 @@ func TestHandler_UpdateRegistration(t *testing.T) {
 			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
 			tt.mockSetup(mockRegRepo, mockChildRepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, nil)
 			ctx := context.Background()
 
 			registration, err := handler.UpdateRegistration(ctx, tt.input)

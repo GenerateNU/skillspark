@@ -4,14 +4,15 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/models"
+	"skillspark/internal/notification"
 	"skillspark/internal/service/handler/registration"
 	"skillspark/internal/storage"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupRegistrationRoutes(api huma.API, repo *storage.Repository) {
-	registrationHandler := registration.NewHandler(repo.Registration, repo.Child, repo.Guardian, repo.EventOccurrence)
+func SetupRegistrationRoutes(api huma.API, repo *storage.Repository, notifService *notification.Service) {
+	registrationHandler := registration.NewHandler(repo.Registration, repo.Child, repo.Guardian, repo.EventOccurrence, notifService)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "create-registration",

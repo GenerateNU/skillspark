@@ -17,16 +17,27 @@ type Client struct {
 }
 
 func NewClient(bucket s3_config.S3) (*Client, error) {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(bucket.Region),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(bucket.AccessKey,
-			bucket.SecretKey, "")))
+	opts := []func(*config.LoadOptions) error{
+		config.WithRegion(bucket.Region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(bucket.AccessKey, bucket.SecretKey, "")),
+	}
+	if bucket.UseLocalStack {
+		opts = append(opts, config.WithBaseEndpoint(bucket.LocalStackEndpoint))
+	}
 
+	cfg, err := config.LoadDefaultConfig(context.TODO(), opts...)
 	if err != nil {
 		return nil, fmt.Errorf("unable to load AWS SDK config: %w", err)
 	}
 
+	s3Client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		if bucket.UseLocalStack {
+			o.UsePathStyle = true
+		}
+	})
+
 	return &Client{
-		S3:     s3.NewFromConfig(cfg),
+		S3:     s3Client,
 		Bucket: bucket.Bucket,
 	}, nil
 }

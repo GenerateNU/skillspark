@@ -17,10 +17,15 @@ type Client struct {
 }
 
 func NewClient(sqsConfig sqs_config.SQS) (*Client, error) {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(sqsConfig.Region),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(sqsConfig.AccessKey,
-			sqsConfig.SecretKey, "")))
+	opts := []func(*config.LoadOptions) error{
+		config.WithRegion(sqsConfig.Region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(sqsConfig.AccessKey, sqsConfig.SecretKey, "")),
+	}
+	if sqsConfig.UseLocalStack {
+		opts = append(opts, config.WithBaseEndpoint(sqsConfig.LocalStackEndpoint))
+	}
 
+	cfg, err := config.LoadDefaultConfig(context.TODO(), opts...)
 	if err != nil {
 		return nil, fmt.Errorf("unable to load AWS SDK config: %w", err)
 	}

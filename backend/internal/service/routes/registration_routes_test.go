@@ -38,7 +38,7 @@ func setupRegistrationTestAPI(
 		EventOccurrence: eventOccurrenceRepo,
 	}
 
-	SetupRegistrationRoutes(api, repo)
+	SetupRegistrationRoutes(api, repo, nil)
 
 	return app, api
 }
