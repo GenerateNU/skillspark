@@ -406,6 +406,111 @@ func TestHandler_UpdateEvent(t *testing.T) {
 	}
 }
 
+func TestHandler_CreateEvent_AcceptLanguageInvariant(t *testing.T) {
+	invalidLanguages := []struct {
+		name string
+		lang string
+	}{
+		{name: "empty AcceptLanguage", lang: ""},
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLanguages {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			input := &models.CreateEventInput{}
+			input.AcceptLanguage = tt.lang
+			input.Body.Title = "Test Event"
+			input.Body.Description = "Test Description"
+
+			mockRepo := new(repomocks.MockEventRepository)
+			mockS3 := createMockS3Client()
+			mockTranslate := createMockTranslateClient()
+			handler := NewHandler(mockRepo, mockS3, mockTranslate)
+
+			event, err := handler.CreateEvent(context.Background(), input, &models.UpdateEventBody{}, nil, mockS3)
+			assert.Nil(t, event, "expected nil event for invalid AcceptLanguage")
+			assert.NotNil(t, err, "expected error for invalid AcceptLanguage")
+			assert.Contains(t, err.Error(), "Invalid AcceptLanguage")
+		})
+	}
+}
+
+func TestHandler_UpdateEvent_AcceptLanguageInvariant(t *testing.T) {
+	invalidLanguages := []struct {
+		name string
+		lang string
+	}{
+		{name: "empty AcceptLanguage", lang: ""},
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLanguages {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			input := &models.UpdateEventInput{}
+			input.AcceptLanguage = tt.lang
+			input.ID = uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+			title := "Updated Title"
+			desc := "Updated Description"
+			input.Body.Title = &title
+			input.Body.Description = &desc
+
+			mockRepo := new(repomocks.MockEventRepository)
+			mockS3 := createMockS3Client()
+			mockTranslate := createMockTranslateClient()
+			handler := NewHandler(mockRepo, mockS3, mockTranslate)
+
+			event, err := handler.UpdateEvent(context.Background(), input, nil, mockS3)
+			assert.Nil(t, event, "expected nil event for invalid AcceptLanguage")
+			assert.NotNil(t, err, "expected error for invalid AcceptLanguage")
+			assert.Contains(t, err.Error(), "Invalid AcceptLanguage")
+		})
+	}
+}
+
+func TestHandler_GetEventOccurrencesByEventId_AcceptLanguageInvariant(t *testing.T) {
+	invalidLanguages := []struct {
+		name string
+		lang string
+	}{
+		{name: "empty AcceptLanguage", lang: ""},
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLanguages {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			input := &models.GetEventOccurrencesByEventIDInput{
+				ID:             uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+				AcceptLanguage: tt.lang,
+			}
+
+			mockRepo := new(repomocks.MockEventRepository)
+			mockS3 := createMockS3Client()
+			mockTranslate := createMockTranslateClient()
+			handler := NewHandler(mockRepo, mockS3, mockTranslate)
+
+			occurrences, err := handler.GetEventOccurrencesByEventID(context.Background(), input, mockS3)
+			assert.Nil(t, occurrences, "expected nil occurrences for invalid AcceptLanguage")
+			assert.NotNil(t, err, "expected error for invalid AcceptLanguage")
+			assert.Contains(t, err.Error(), "Invalid AcceptLanguage")
+		})
+	}
+}
+
 func TestHandler_DeleteEvent(t *testing.T) {
 	tests := []struct {
 		name      string

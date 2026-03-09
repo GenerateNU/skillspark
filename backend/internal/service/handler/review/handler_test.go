@@ -248,6 +248,155 @@ func TestHandler_CreateReview(t *testing.T) {
 	}
 }
 
+func TestHandler_CreateReview_AcceptLanguageInvariant(t *testing.T) {
+	invalidLanguages := []struct {
+		name string
+		lang string
+	}{
+		{name: "empty AcceptLanguage", lang: ""},
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLanguages {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			in := &models.CreateReviewInput{}
+			in.AcceptLanguage = tt.lang
+			in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
+			in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
+			in.Body.Description = "Great event!"
+			in.Body.Categories = []string{"fun", "engaging"}
+
+			handler := &Handler{
+				ReviewRepository:       new(repomocks.MockReviewRepository),
+				RegistrationRepository: new(repomocks.MockRegistrationRepository),
+				GuardianRepository:     new(repomocks.MockGuardianRepository),
+				TranslateClient:        new(translatemocks.TranslateMock),
+			}
+
+			out, err := handler.CreateReview(context.Background(), in)
+			assert.Nil(t, out, "expected nil output for invalid AcceptLanguage")
+			assert.NotNil(t, err, "expected error for invalid AcceptLanguage")
+			assert.Contains(t, err.Error(), "Invalid AcceptLanguage")
+		})
+	}
+
+	// Verify both valid languages are accepted (no early rejection)
+	validLanguages := []string{"en-US", "th-TH"}
+	for _, lang := range validLanguages {
+		lang := lang
+		t.Run("accepted_"+lang, func(t *testing.T) {
+			t.Parallel()
+
+			in := &models.CreateReviewInput{}
+			in.AcceptLanguage = lang
+			in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
+			in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
+			in.Body.Description = "Great event!"
+			in.Body.Categories = []string{"fun", "engaging"}
+
+			mockTranslate := new(translatemocks.TranslateMock)
+			translated := "translated"
+			result := map[string]*string{"Great event!": &translated}
+			mockTranslate.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
+
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockRegRepo.On("GetRegistrationByID", mock.Anything, mock.Anything, mock.Anything).Return(&models.GetRegistrationByIDOutput{
+				Body: models.Registration{ID: uuid.MustParse("99999999-0000-0000-0000-000000000001")},
+			}, nil)
+
+			mockGuardianRepo := new(repomocks.MockGuardianRepository)
+			mockGuardianRepo.On("GetGuardianByID", mock.Anything, mock.Anything).Return(&models.Guardian{
+				ID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+			}, nil)
+
+			mockReviewRepo := new(repomocks.MockReviewRepository)
+			mockReviewRepo.On("CreateReview", mock.Anything, mock.Anything).Return(&models.Review{
+				ID:          uuid.New(),
+				Description: "Great event!",
+				Categories:  []string{"fun", "engaging"},
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			}, nil)
+
+			handler := &Handler{
+				ReviewRepository:       mockReviewRepo,
+				RegistrationRepository: mockRegRepo,
+				GuardianRepository:     mockGuardianRepo,
+				TranslateClient:        mockTranslate,
+			}
+
+			out, err := handler.CreateReview(context.Background(), in)
+			assert.Nil(t, err, "expected no error for valid AcceptLanguage %s", lang)
+			assert.NotNil(t, out, "expected non-nil output for valid AcceptLanguage %s", lang)
+		})
+	}
+}
+
+func TestHandler_GetReviewsByEventID_AcceptLanguageInvariant(t *testing.T) {
+	invalidLanguages := []struct {
+		name string
+		lang string
+	}{
+		{name: "empty AcceptLanguage", lang: ""},
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLanguages {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			handler := &Handler{
+				EventRepository:  new(repomocks.MockEventRepository),
+				ReviewRepository: new(repomocks.MockReviewRepository),
+			}
+
+			pagination := utils.Pagination{Page: 1, Limit: 10}
+			reviews, err := handler.GetReviewsByEventID(context.Background(), uuid.New(), tt.lang, pagination)
+			assert.Nil(t, reviews, "expected nil reviews for invalid AcceptLanguage")
+			assert.Error(t, err, "expected error for invalid AcceptLanguage")
+			assert.Contains(t, err.Error(), "Invalid AcceptLanguage")
+		})
+	}
+}
+
+func TestHandler_GetReviewsByGuardianID_AcceptLanguageInvariant(t *testing.T) {
+	invalidLanguages := []struct {
+		name string
+		lang string
+	}{
+		{name: "empty AcceptLanguage", lang: ""},
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLanguages {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			handler := &Handler{
+				GuardianRepository: new(repomocks.MockGuardianRepository),
+				ReviewRepository:   new(repomocks.MockReviewRepository),
+			}
+
+			pagination := utils.Pagination{Page: 1, Limit: 10}
+			reviews, err := handler.GetReviewsByGuardianID(context.Background(), uuid.New(), tt.lang, pagination)
+			assert.Nil(t, reviews, "expected nil reviews for invalid AcceptLanguage")
+			assert.Error(t, err, "expected error for invalid AcceptLanguage")
+			assert.Contains(t, err.Error(), "Invalid AcceptLanguage")
+		})
+	}
+}
+
 func TestHandler_DeleteReview(t *testing.T) {
 	tests := []struct {
 		name      string
