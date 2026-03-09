@@ -48,6 +48,8 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 		&updatedOrganization.Active,
 		&updatedOrganization.PfpS3Key,
 		&updatedOrganization.LocationID,
+		&updatedOrganization.StripeAccountID,
+		&updatedOrganization.StripeAccountActivated,
 		&updatedOrganization.CreatedAt,
 		&updatedOrganization.UpdatedAt,
 	)

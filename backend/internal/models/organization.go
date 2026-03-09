@@ -8,14 +8,16 @@ import (
 )
 
 type Organization struct {
-	ID           uuid.UUID  `json:"id" db:"id"`
-	Name         string     `json:"name" db:"name"`
-	Active       bool       `json:"active" db:"active"`
-	PfpS3Key     *string    `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
+	ID         uuid.UUID  `json:"id" db:"id"`
+	Name       string     `json:"name" db:"name"`
+	Active     bool       `json:"active" db:"active"`
+	PfpS3Key   *string    `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
 	PresignedURL *string    `json:"presigned_url"`
-	LocationID   *uuid.UUID `json:"location_id,omitempty" db:"location_id"`
-	CreatedAt    time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt    time.Time  `json:"updated_at" db:"updated_at"`
+	LocationID *uuid.UUID `json:"location_id,omitempty" db:"location_id"`
+	CreatedAt  time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt  time.Time  `json:"updated_at" db:"updated_at"`
+	StripeAccountID *string `json:"stripe_account_id" db:"stripe_account_id"`
+	StripeAccountActivated bool `json:"stripe_account_activated" db:"stripe_account_activated" default:"false"`
 }
 
 // CreateOrganizationRouteInput is the multipart form input for creating an organization with an image

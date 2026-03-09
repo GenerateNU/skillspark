@@ -8,7 +8,9 @@ SELECT
     eo.curr_enrolled,
     eo.created_at,
     eo.updated_at,
-    eo.status, 
+    eo.status,
+    eo.price,
+    eo.currency,
 
     e.id,
     e.title,

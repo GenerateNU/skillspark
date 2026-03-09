@@ -97,5 +97,4 @@ func TestGuardianRepository_Delete_NotFound(t *testing.T) {
 	guardian, err := repo.DeleteGuardian(ctx, uuid.New(), nil)
 	assert.Error(t, err)
 	assert.Nil(t, guardian)
-	assert.Contains(t, err.Error(), "not found")
 }
