@@ -5,11 +5,11 @@ import (
 	"sync"
 )
 
-func (t *TranslateClient) CallTranslateAPI(ctx context.Context, srcInputs []*string, AcceptLanguage string) (map[int]*string, error) {
+func (t *TranslateClient) CallTranslateAPI(ctx context.Context, srcInputs []*string, AcceptLanguage string) (map[string]*string, error) {
 	var sl string
 	var dl string
 	var wg sync.WaitGroup
-	response := make(map[int]*string)
+	response := make(map[string]*string)
 	errors := make(chan error, len(srcInputs))
 
 	derefedInputs := CreateDerefedSlice(srcInputs)
@@ -32,7 +32,7 @@ func (t *TranslateClient) CallTranslateAPI(ctx context.Context, srcInputs []*str
 			if err != nil {
 				errors <- err
 			}
-			response[idx] = output
+			response[text] = output
 		}()
 
 	}
