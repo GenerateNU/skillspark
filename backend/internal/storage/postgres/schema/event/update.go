@@ -26,10 +26,10 @@ func (r *EventRepository) UpdateEvent(ctx context.Context, input *models.UpdateE
 		return nil, &err
 	}
 
-	if input.AcceptLanguage == "th" && titleTH != nil {
+	if input.AcceptLanguage == "th-TH" && titleTH != nil {
 		event.Title = *titleTH
 		event.Description = *descTH
-	} else {
+	} else if input.AcceptLanguage == "en-US" {
 		event.Title = titleEN
 		event.Description = descEN
 	}

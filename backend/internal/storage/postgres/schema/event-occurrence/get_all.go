@@ -11,9 +11,9 @@ import (
 )
 
 var language string
-  
+
 func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error) {
-  language = AcceptLanguage
+	language = AcceptLanguage
 	query, err := schema.ReadSQLBaseScript("get_all.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -100,10 +100,11 @@ func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error)
 		&createdEventOccurrence.Location.UpdatedAt,
 	)
 
-	if language == "th" {
+	switch language {
+	case "th-TH":
 		createdEventOccurrence.Event.Title = *titleTH
 		createdEventOccurrence.Event.Description = *descriptionTH
-	} else {
+	case "en-US":
 		createdEventOccurrence.Event.Title = titleEN
 		createdEventOccurrence.Event.Description = descriptionEN
 	}

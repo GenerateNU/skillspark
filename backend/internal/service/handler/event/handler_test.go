@@ -57,6 +57,7 @@ func TestHandler_CreateEvent(t *testing.T) {
 			name: "successful create event without image",
 			input: func() *models.CreateEventInput {
 				input := &models.CreateEventInput{}
+				input.AcceptLanguage = "en-US"
 				ageMin := 8
 				ageMax := 12
 
@@ -98,8 +99,13 @@ func TestHandler_CreateEvent(t *testing.T) {
 				// No S3 calls expected when no image
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
-				translation := "จูเนียร์ โรโบติกส์|*|ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
-				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
+				translatedTitle := "จูเนียร์ โรโบติกส์"
+				translatedDesc := "ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
+				result := map[string]*string{
+					"Junior Robotics":   &translatedTitle,
+					"Intro to robotics": &translatedDesc,
+				}
+				m.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 			},
 			wantErr: false,
 			wantURL: false,
@@ -108,6 +114,7 @@ func TestHandler_CreateEvent(t *testing.T) {
 			name: "successful create event with image - returns valid presigned URL",
 			input: func() *models.CreateEventInput {
 				input := &models.CreateEventInput{}
+				input.AcceptLanguage = "en-US"
 				ageMin := 8
 				ageMax := 12
 
@@ -149,8 +156,13 @@ func TestHandler_CreateEvent(t *testing.T) {
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
-				translation := "จูเนียร์ โรโบติกส์|*|ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
-				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
+				translatedTitle := "จูเนียร์ โรโบติกส์"
+				translatedDesc := "ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
+				result := map[string]*string{
+					"Junior Robotics":   &translatedTitle,
+					"Intro to robotics": &translatedDesc,
+				}
+				m.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 			},
 			wantErr: false,
 			wantURL: true,
@@ -159,6 +171,7 @@ func TestHandler_CreateEvent(t *testing.T) {
 			name: "internal server error on create",
 			input: func() *models.CreateEventInput {
 				input := &models.CreateEventInput{}
+				input.AcceptLanguage = "en-US"
 				input.Body.Title = "Error Event"
 				return input
 			}(),
@@ -242,9 +255,12 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			name: "successful update event without image",
 			input: func() *models.UpdateEventInput {
 				input := &models.UpdateEventInput{}
+				input.AcceptLanguage = "en-US"
 				input.ID = eventID
 				title := "Updated Robotics"
+				desc := "Intro to robotics"
 				input.Body.Title = &title
+				input.Body.Description = &desc
 				return input
 			}(),
 			imageData: nil,
@@ -261,8 +277,13 @@ func TestHandler_UpdateEvent(t *testing.T) {
 				// No S3 calls expected when no image
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
-				translation := "หุ่นยนต์ที่อัปเดต|*|"
-				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
+				translatedTitle := "หุ่นยนต์ที่อัปเดต"
+				translatedDesc := "ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
+				result := map[string]*string{
+					"Updated Robotics":  &translatedTitle,
+					"Intro to robotics": &translatedDesc,
+				}
+				m.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 			},
 			wantErr: false,
 			wantURL: false,
@@ -271,9 +292,12 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			name: "successful update event with image - returns valid presigned URL",
 			input: func() *models.UpdateEventInput {
 				input := &models.UpdateEventInput{}
+				input.AcceptLanguage = "en-US"
 				input.ID = eventID
 				title := "Updated Robotics with Image"
+				desc := "Intro to robotics"
 				input.Body.Title = &title
+				input.Body.Description = &desc
 				return input
 			}(),
 			imageData: createDummyImageData(),
@@ -292,8 +316,13 @@ func TestHandler_UpdateEvent(t *testing.T) {
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
-				translation := "หุ่นยนต์ที่อัปเดตพร้อมรูปภาพ|*|"
-				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
+				translatedTitle := "หุ่นยนต์ที่อัปเดตพร้อมรูปภาพ"
+				translatedDesc := "ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
+				result := map[string]*string{
+					"Updated Robotics with Image": &translatedTitle,
+					"Intro to robotics":           &translatedDesc,
+				}
+				m.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 			},
 			wantErr: false,
 			wantURL: true,
@@ -302,9 +331,12 @@ func TestHandler_UpdateEvent(t *testing.T) {
 			name: "no occurrences found - returns message string",
 			input: func() *models.UpdateEventInput {
 				input := &models.UpdateEventInput{}
+				input.AcceptLanguage = "en-US"
 				input.ID = uuid.MustParse("00000000-0000-0000-0000-000000000000")
 				title := "Empty Event"
+				desc := ""
 				input.Body.Title = &title
+				input.Body.Description = &desc
 				return input
 			}(),
 			imageData: nil,
@@ -320,8 +352,12 @@ func TestHandler_UpdateEvent(t *testing.T) {
 				// No S3 calls expected
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
-				translation := "เหตุการณ์ว่างเปล่า|*|"
-				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
+				translatedTitle := "เหตุการณ์ว่างเปล่า"
+				result := map[string]*string{
+					"Empty Event": &translatedTitle,
+					"":            nil,
+				}
+				m.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 			},
 			wantErr: false,
 			wantURL: false,
@@ -554,7 +590,7 @@ func TestHandler_GetEventOccurrencesByEventId(t *testing.T) {
 			handler := NewHandler(mockRepo, mockS3, mockTranslate)
 			ctx := context.Background()
 
-			input := &models.GetEventOccurrencesByEventIDInput{ID: uuid.MustParse(tt.id)}
+			input := &models.GetEventOccurrencesByEventIDInput{ID: uuid.MustParse(tt.id), AcceptLanguage: "en-US"}
 			eventOccurrences, err := handler.GetEventOccurrencesByEventID(ctx, input, mockS3)
 
 			assert.Nil(t, err)

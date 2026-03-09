@@ -82,10 +82,11 @@ func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error)
 	)
 
 	// Default to English
-	if language == "th" {
+	switch language {
+	case "th-TH":
 		createdEventOccurrence.Event.Title = *titleTH
 		createdEventOccurrence.Event.Description = *descriptionTH
-	} else {
+	case "en-US":
 		createdEventOccurrence.Event.Title = titleEN
 		createdEventOccurrence.Event.Description = descriptionEN
 	}

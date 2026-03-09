@@ -3,10 +3,17 @@ package eventoccurrence
 import (
 	"cmp"
 	"context"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 )
 
 func (h *Handler) CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error) {
+
+	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
+		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
+		return nil, &e
+	}
+
 	// check that foreign keys exist in the database
 	managerId := input.Body.ManagerId
 	eventId := input.Body.EventId

@@ -142,8 +142,13 @@ func TestHumaValidation_CreateEvent(t *testing.T) {
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
-				translation := "จูเนียร์ โรโบติกส์|*|ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
-				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
+				translatedTitle := "จูเนียร์ โรโบติกส์"
+				translatedDesc := "ความรู้เบื้องต้นเกี่ยวกับหุ่นยนต์"
+				result := map[string]*string{
+					"Junior Robotics":          &translatedTitle,
+					"Introduction to robotics": &translatedDesc,
+				}
+				m.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -256,8 +261,13 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
-				translation := "หุ่นยนต์ขั้นสูง|*|"
-				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
+				translatedTitle := "หุ่นยนต์ขั้นสูง"
+				translatedDesc := ""
+				result := map[string]*string{
+					"Advanced Robotics": &translatedTitle,
+					"":                  &translatedDesc,
+				}
+				m.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -285,8 +295,13 @@ func TestHumaValidation_UpdateEvent(t *testing.T) {
 				m.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			},
 			mockTranslateSetup: func(m *translatemocks.TranslateMock) {
-				translation := "หุ่นยนต์ขั้นสูง|*|"
-				m.On("GetTranslation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&translation, nil)
+				translatedTitle := "หุ่นยนต์ขั้นสูง"
+				translatedDesc := ""
+				result := map[string]*string{
+					"Advanced Robotics": &translatedTitle,
+					"":                  &translatedDesc,
+				}
+				m.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 			},
 			statusCode: http.StatusNotFound,
 		},
@@ -555,6 +570,7 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 				nil,
 			)
 			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)

@@ -12,13 +12,23 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 	var key *string
 	var url *string
 
-	translationResp, err := h.CallTranslateAPI(ctx, input.Body.Title, input.Body.Description, input.AcceptLanguage)
+	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
+		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
+		return nil, &e
+	}
+
+	translateInput := []*string{input.Body.Title, input.Body.Description}
+
+	translationResp, err := h.TranslateClient.CallTranslateAPI(ctx, translateInput, input.AcceptLanguage)
 	if err != nil {
 		e := errs.InternalServerError("Translation failed", err.Error())
 		return nil, e
 	}
 
-	updateInput := h.UpdateTranslateStruct(ctx, input, translationResp.TranslatedTitle, translationResp.TranslatedDescription)
+	translatedTitle := translationResp[*input.Body.Title]
+	translatedDescription := translationResp[*input.Body.Description]
+
+	updateInput := h.UpdateTranslateStruct(ctx, input, translatedTitle, translatedDescription)
 
 	if image_data != nil {
 		var err error

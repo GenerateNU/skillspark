@@ -94,10 +94,11 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 		&updatedEventOccurrence.Location.UpdatedAt,
 	)
 
-	if language == "th" {
+	switch language {
+	case "th-TH":
 		updatedEventOccurrence.Event.Title = *titleTH
 		updatedEventOccurrence.Event.Description = *descriptionTH
-	} else {
+	case "en-US":
 		updatedEventOccurrence.Event.Title = titleEN
 		updatedEventOccurrence.Event.Description = descriptionEN
 	}

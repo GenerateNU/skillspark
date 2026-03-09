@@ -66,10 +66,11 @@ func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, 
 		&eventOccurrence.Location.UpdatedAt,
 	)
 
-	if language == "th" {
+	switch language {
+	case "th-TH":
 		eventOccurrence.Event.Title = *titleTH
 		eventOccurrence.Event.Description = *descriptionTH
-	} else {
+	case "en-US":
 		eventOccurrence.Event.Title = titleEN
 		eventOccurrence.Event.Description = descriptionEN
 	}

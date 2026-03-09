@@ -63,6 +63,7 @@ func TestHandler_CreateEventOccurrence(t *testing.T) {
 			name: "successful creation",
 			input: func() *models.CreateEventOccurrenceInput {
 				input := &models.CreateEventOccurrenceInput{}
+				input.AcceptLanguage = "en-US"
 				input.Body.ManagerId = &mid
 				input.Body.EventId = event.ID
 				input.Body.LocationId = location.ID
@@ -278,7 +279,7 @@ func TestHandler_GetEventOccurrenceById(t *testing.T) {
 			handler := NewHandler(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockS3)
 			ctx := context.Background()
 
-			input := &models.GetEventOccurrenceByIDInput{ID: uuid.MustParse(tt.id)}
+			input := &models.GetEventOccurrenceByIDInput{ID: uuid.MustParse(tt.id), AcceptLanguage: "en-US"}
 			eventOccurrence, err := handler.GetEventOccurrenceByID(ctx, input)
 
 			if tt.wantErr {
@@ -383,6 +384,7 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 			name: "new current enrolled exceeds original max attendees",
 			input: func() *models.UpdateEventOccurrenceInput {
 				input := &models.UpdateEventOccurrenceInput{}
+				input.AcceptLanguage = "en-US"
 				input.ID = uuid.MustParse("70000000-0000-0000-0000-000000000002")
 				input.Body.ManagerId = nil
 				input.Body.EventId = nil
@@ -420,6 +422,7 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 			name: "new current enrolled exceeds new max attendees",
 			input: func() *models.UpdateEventOccurrenceInput {
 				input := &models.UpdateEventOccurrenceInput{}
+				input.AcceptLanguage = "en-US"
 				input.ID = uuid.MustParse("70000000-0000-0000-0000-000000000002")
 				input.Body.ManagerId = nil
 				input.Body.EventId = nil
@@ -457,6 +460,7 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 			name: "successfully updated current enrolled",
 			input: func() *models.UpdateEventOccurrenceInput {
 				input := &models.UpdateEventOccurrenceInput{}
+				input.AcceptLanguage = "en-US"
 				input.ID = uuid.MustParse("70000000-0000-0000-0000-000000000002")
 				input.Body.ManagerId = nil
 				input.Body.EventId = nil
@@ -494,6 +498,7 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 			name: "successfully updated all fields except current enrolled",
 			input: func() *models.UpdateEventOccurrenceInput {
 				input := &models.UpdateEventOccurrenceInput{}
+				input.AcceptLanguage = "en-US"
 				input.ID = uuid.MustParse("70000000-0000-0000-0000-000000000002")
 				input.Body.ManagerId = &mid_new
 				input.Body.EventId = &eid

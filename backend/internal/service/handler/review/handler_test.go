@@ -27,6 +27,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			name: "successful create review",
 			input: func() *models.CreateReviewInput {
 				in := &models.CreateReviewInput{}
+				in.AcceptLanguage = "en-US"
 				in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
 				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
 				in.Body.Description = "Great event!"
@@ -36,7 +37,10 @@ func TestHandler_CreateReview(t *testing.T) {
 			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
 				// translation succeeds
 				translated := "งานยอดเยี่ยม!"
-				translateMock.On("GetTranslation", mock.Anything, "Great event!", mock.Anything, mock.Anything).Return(&translated, nil)
+				result := map[string]*string{
+					"Great event!": &translated,
+				}
+				translateMock.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 
 				// registration exists
 				regRepo.On(
@@ -74,6 +78,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			name: "translation fails",
 			input: func() *models.CreateReviewInput {
 				in := &models.CreateReviewInput{}
+				in.AcceptLanguage = "en-US"
 				in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
 				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
 				in.Body.Description = "Great event!"
@@ -82,7 +87,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			}(),
 			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
 				// translation fails
-				translateMock.On("GetTranslation", mock.Anything, "Great event!", mock.Anything, mock.Anything).Return(nil, errors.New("translation service unavailable"))
+				translateMock.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("translation service unavailable"))
 			},
 			wantErr: true,
 		},
@@ -90,6 +95,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			name: "invalid registration_id",
 			input: func() *models.CreateReviewInput {
 				in := &models.CreateReviewInput{}
+				in.AcceptLanguage = "en-US"
 				in.Body.RegistrationID = uuid.MustParse("99999999-0000-0000-0000-000000000000")
 				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
 				in.Body.Description = "Great event!"
@@ -99,7 +105,10 @@ func TestHandler_CreateReview(t *testing.T) {
 			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
 				// translation succeeds
 				translated := "งานยอดเยี่ยม!"
-				translateMock.On("GetTranslation", mock.Anything, "Great event!", mock.Anything, mock.Anything).Return(&translated, nil)
+				result := map[string]*string{
+					"Great event!": &translated,
+				}
+				translateMock.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 
 				regRepo.On(
 					"GetRegistrationByID",
@@ -115,6 +124,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			name: "invalid guardian_id",
 			input: func() *models.CreateReviewInput {
 				in := &models.CreateReviewInput{}
+				in.AcceptLanguage = "en-US"
 				in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
 				in.Body.GuardianID = uuid.MustParse("22222222-2222-2222-2222-222222222222")
 				in.Body.Description = "Great event!"
@@ -124,7 +134,10 @@ func TestHandler_CreateReview(t *testing.T) {
 			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
 				// translation succeeds
 				translated := "งานยอดเยี่ยม!"
-				translateMock.On("GetTranslation", mock.Anything, "Great event!", mock.Anything, mock.Anything).Return(&translated, nil)
+				result := map[string]*string{
+					"Great event!": &translated,
+				}
+				translateMock.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 
 				// registration exists
 				regRepo.On(
@@ -151,6 +164,7 @@ func TestHandler_CreateReview(t *testing.T) {
 			name: "create review fails in repository",
 			input: func() *models.CreateReviewInput {
 				in := &models.CreateReviewInput{}
+				in.AcceptLanguage = "en-US"
 				in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
 				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
 				in.Body.Description = "Great event!"
@@ -160,7 +174,10 @@ func TestHandler_CreateReview(t *testing.T) {
 			mockSetup: func(reviewRepo *repomocks.MockReviewRepository, regRepo *repomocks.MockRegistrationRepository, guardianRepo *repomocks.MockGuardianRepository, translateMock *translatemocks.TranslateMock) {
 				// translation succeeds
 				translated := "งานยอดเยี่ยม!"
-				translateMock.On("GetTranslation", mock.Anything, "Great event!", mock.Anything, mock.Anything).Return(&translated, nil)
+				result := map[string]*string{
+					"Great event!": &translated,
+				}
+				translateMock.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).Return(result, nil)
 
 				// registration exists
 				regRepo.On(

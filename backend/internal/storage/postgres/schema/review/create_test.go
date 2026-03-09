@@ -90,6 +90,7 @@ func TestCreateReview_FailsInvalidGuardian(t *testing.T) {
 		i.Body.Description_EN = "Test review"
 		i.Body.Description_TH = &descriptionTH
 		i.Body.Categories = []string{"informative"}
+		i.AcceptLanguage = "en-US"
 		return i
 	}()
 

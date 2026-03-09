@@ -6,8 +6,8 @@ import (
 )
 
 func (t *TranslateClient) CallTranslateAPI(ctx context.Context, srcInputs []*string, AcceptLanguage string) (map[string]*string, error) {
-	var sl string
-	var dl string
+	var sourceLanguage string
+	var destLanguage string
 	var wg sync.WaitGroup
 	response := make(map[string]*string)
 	errors := make(chan error, len(srcInputs))
@@ -16,11 +16,11 @@ func (t *TranslateClient) CallTranslateAPI(ctx context.Context, srcInputs []*str
 
 	switch AcceptLanguage {
 	case "th-TH":
-		sl = "th"
-		dl = "en"
+		sourceLanguage = "th"
+		destLanguage = "en"
 	case "en-US":
-		sl = "en"
-		dl = "th"
+		sourceLanguage = "en"
+		destLanguage = "th"
 	}
 
 	for idx := range derefedInputs {
@@ -28,7 +28,7 @@ func (t *TranslateClient) CallTranslateAPI(ctx context.Context, srcInputs []*str
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			output, err := t.GetTranslation(ctx, text, sl, dl)
+			output, err := t.GetTranslation(ctx, text, sourceLanguage, destLanguage)
 			if err != nil {
 				errors <- err
 			}

@@ -37,6 +37,7 @@ func TestEventRepository_Create_JuniorRoboticsWorkshop(t *testing.T) {
 		input.Body.AgeRangeMin = &ageMin
 		input.Body.AgeRangeMax = &ageMax
 		input.Body.Category = []string{"science", "technology"}
+		input.AcceptLanguage = "en-US"
 
 		return input
 	}()

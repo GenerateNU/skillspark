@@ -2,63 +2,8 @@ package event
 
 import (
 	"context"
-	"fmt"
 	"skillspark/internal/models"
-	"strings"
 )
-
-type EventTranslationResponse struct {
-	TranslatedTitle       *string `json:"translated_title"`
-	TranslatedDescription *string `json:"translated_description"`
-}
-
-func (h *Handler) CallTranslateAPI(ctx context.Context, src_title *string, src_description *string, AcceptLanguage string) (*EventTranslationResponse, error) {
-	var sl string
-	var dl string
-	deref := func(s *string) string {
-		if s == nil {
-			return ""
-		}
-		return *s
-	}
-
-	title_deref := deref(src_title)
-	description_deref := deref(src_description)
-
-	if title_deref == "" && description_deref == "" {
-		err := fmt.Errorf("no title or description provided")
-		return nil, err
-	}
-
-	switch AcceptLanguage {
-	case "th-TH":
-		sl = "th"
-		dl = "en"
-	case "en-US":
-		sl = "en"
-		dl = "th"
-	}
-
-	translationString := title_deref + "|*|" + description_deref
-
-	response, err := h.TranslateClient.GetTranslation(ctx, translationString, sl, dl)
-	if err != nil {
-		return nil, err
-	}
-
-	parsedResponse := strings.Split(*response, "|*|")
-	if len(parsedResponse) != 2 {
-		err := fmt.Errorf("unexpected response length")
-		return nil, err
-	}
-
-	translatedTitle := parsedResponse[0]
-	translatedDescription := parsedResponse[1]
-
-	return &EventTranslationResponse{TranslatedTitle: &translatedTitle,
-		TranslatedDescription: &translatedDescription}, nil
-
-}
 
 func (h *Handler) CreateTranslateStruct(ctx context.Context, event *models.CreateEventInput, translatedTitle *string, translatedDescription *string) *models.CreateEventDBInput {
 

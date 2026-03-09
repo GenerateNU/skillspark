@@ -52,9 +52,12 @@ func TestCreateReview_Success(t *testing.T) {
 
 	translateRepo := new(translatemocks.TranslateMock)
 	translated := "งานดี"
+	result := map[string]*string{
+		"Great event": &translated,
+	}
 	translateRepo.
-		On("GetTranslation", mock.Anything, "Great event", mock.Anything, mock.Anything).
-		Return(&translated, nil)
+		On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).
+		Return(result, nil)
 
 	regRepo := new(repomocks.MockRegistrationRepository)
 	regRepo.

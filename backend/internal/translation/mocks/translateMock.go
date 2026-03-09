@@ -20,3 +20,14 @@ func (m *TranslateMock) GetTranslation(ctx context.Context, input string, sl str
 	}
 	return args.Get(0).(*string), nil
 }
+
+func (m *TranslateMock) CallTranslateAPI(ctx context.Context, srcInputs []*string, AcceptLanguage string) (map[string]*string, error) {
+	args := m.Called(ctx, srcInputs, AcceptLanguage)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(error)
+	}
+	return args.Get(0).(map[string]*string), args.Error(1)
+}

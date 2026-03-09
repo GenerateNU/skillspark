@@ -8,12 +8,19 @@ import (
 
 func (h *Handler) CreateReview(ctx context.Context, input *models.CreateReviewInput) (*models.CreateReviewOutput, *errs.HTTPError) {
 
-	description, err := h.CallTranslateAPI(ctx, &input.Body.Description, input.AcceptLanguage)
+	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
+		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
+		return nil, &e
+	}
+
+	translateInput := []*string{&input.Body.Description}
+
+	description, err := h.TranslateClient.CallTranslateAPI(ctx, translateInput, input.AcceptLanguage)
 	if err != nil {
 		e := errs.BadRequest("Invalid registration_id: registration does not exist")
 		return nil, &e
 	}
-	CreateReviewInput := h.CreateTranslateStruct(ctx, input, description)
+	CreateReviewInput := h.CreateTranslateStruct(ctx, input, description[input.Body.Description])
 
 	if _, err := h.RegistrationRepository.GetRegistrationByID(ctx, &models.GetRegistrationByIDInput{
 		ID: input.Body.RegistrationID,

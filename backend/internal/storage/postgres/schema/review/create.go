@@ -33,9 +33,10 @@ func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.Creat
 		return nil, &err
 	}
 
-	if input.AcceptLanguage == "th" {
+	switch input.AcceptLanguage {
+	case "th-TH":
 		createdReview.Description = descTH
-	} else {
+	case "en-US":
 		createdReview.Description = descEN
 	}
 

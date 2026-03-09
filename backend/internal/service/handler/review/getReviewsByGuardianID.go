@@ -11,6 +11,11 @@ import (
 
 func (h *Handler) GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
 
+	if AcceptLanguage != "en-US" && AcceptLanguage != "th-TH" {
+		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
+		return nil, &e
+	}
+
 	if _, err := h.GuardianRepository.GetGuardianByID(ctx, id); err != nil {
 		return nil, errs.BadRequest("Invalid guardian_id: guardian does not exist")
 	}

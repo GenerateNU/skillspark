@@ -37,6 +37,7 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 		input.Body.AgeRangeMin = &ageMin
 		input.Body.AgeRangeMax = &ageMax
 		input.Body.Category = []string{"science", "technology"}
+		input.AcceptLanguage = "en-US"
 
 		return input
 	}()
@@ -62,6 +63,7 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	updateInput.Body.AgeRangeMin = &newAgeMin
 	updateInput.Body.AgeRangeMax = &newAgeMax
 	updateInput.Body.Category = &newCategory
+	updateInput.AcceptLanguage = "en-US"
 
 	imageKey := "events/robotics_workshop.jpg"
 	updatedEvent, err := repo.UpdateEvent(ctx, updateInput, &imageKey)

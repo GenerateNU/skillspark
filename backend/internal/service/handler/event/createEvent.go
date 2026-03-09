@@ -8,10 +8,16 @@ import (
 )
 
 func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInput, updateBody *models.UpdateEventBody, imageData *[]byte, s3Client s3_client.S3Interface) (*models.Event, error) {
+
 	var key *string
 	var url *string
 
 	misc := ""
+
+	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
+		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
+		return nil, &e
+	}
 
 	initInput := h.CreateTranslateStruct(ctx, input, &misc, &misc)
 	event, err := h.EventRepository.CreateEvent(ctx, initInput, key)
@@ -73,11 +79,17 @@ func (h *Handler) CreateEventS3Helper(ctx context.Context, s3Client s3_client.S3
 }
 
 func (h *Handler) TranslationHelper(ctx context.Context, event *models.Event, updateInput *models.UpdateEventInput) (*models.UpdateEventDBInput, error) {
-	translationResp, err := h.CallTranslateAPI(ctx, &event.Title, &event.Description, updateInput.AcceptLanguage)
+
+	translateInput := []*string{&event.Title, &event.Description}
+	translationResp, err := h.TranslateClient.CallTranslateAPI(ctx, translateInput, updateInput.AcceptLanguage)
 	if err != nil {
 		return nil, err
 	}
-	translationsReinsertion := h.UpdateTranslateStruct(ctx, updateInput, translationResp.TranslatedTitle, translationResp.TranslatedDescription)
+
+	translatedTitle := translationResp[event.Title]
+	translatedDescription := translationResp[event.Description]
+
+	translationsReinsertion := h.UpdateTranslateStruct(ctx, updateInput, translatedTitle, translatedDescription)
 	_, err = h.EventRepository.UpdateEvent(ctx, translationsReinsertion, nil)
 	if err != nil {
 		return nil, err

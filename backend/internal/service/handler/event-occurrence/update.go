@@ -8,6 +8,12 @@ import (
 )
 
 func (h *Handler) UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput) (*models.EventOccurrence, error) {
+
+	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
+		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
+		return nil, &e
+	}
+
 	// check that event occurrence exists already in database
 	ogEventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.ID, input.AcceptLanguage)
 	if err != nil {
