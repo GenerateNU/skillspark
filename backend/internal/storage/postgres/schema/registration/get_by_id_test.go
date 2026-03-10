@@ -21,7 +21,8 @@ func TestGetRegistrationByID(t *testing.T) {
 	registrationID := reg.ID
 
 	getInput := &models.GetRegistrationByIDInput{
-		ID: registrationID,
+		AcceptLanguage: "en-US",
+		ID:             registrationID,
 	}
 
 	retrieved, err := repo.GetRegistrationByID(ctx, getInput, nil)
@@ -37,7 +38,7 @@ func TestGetRegistrationByID(t *testing.T) {
 	assert.NotZero(t, retrieved.Body.CreatedAt)
 	assert.NotZero(t, retrieved.Body.UpdatedAt)
 	assert.NotZero(t, retrieved.Body.OccurrenceStartTime)
-	
+
 	// Verify payment fields
 	assert.NotEmpty(t, retrieved.Body.StripePaymentIntentID)
 	assert.NotEmpty(t, retrieved.Body.StripeCustomerID)
@@ -63,7 +64,8 @@ func TestGetRegistrationByID_VerifyEventDetails(t *testing.T) {
 	registrationID := reg.ID
 
 	getInput := &models.GetRegistrationByIDInput{
-		ID: registrationID,
+		AcceptLanguage: "en-US",
+		ID:             registrationID,
 	}
 
 	retrieved, err := repo.GetRegistrationByID(ctx, getInput, nil)
