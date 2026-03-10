@@ -47,7 +47,7 @@ SELECT
     u.platform_fee_amount,
     u.paid_at,
     u.stripe_payment_method_id,
-    e.title AS event_name,
+    e.title_en AS event_name,
     eo.start_time AS occurrence_start_time
 FROM updated u
 JOIN event_occurrence eo ON u.event_occurrence_id = eo.id

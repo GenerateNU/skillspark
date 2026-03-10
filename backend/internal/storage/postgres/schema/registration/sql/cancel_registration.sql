@@ -45,7 +45,7 @@ SELECT
     cr.cancelled_at,
     cr.created_at,
     cr.updated_at,
-    e.title       AS event_name,
+    e.title_en    AS event_name,
     eo.start_time AS occurrence_start_time
 FROM cancelled_registration cr
 JOIN event_occurrence eo ON eo.id = cr.event_occurrence_id
