@@ -59,5 +59,8 @@ AND ($12::boolean IS NULL OR ((eo.curr_enrolled >= eo.max_attendees) = $12))
 AND ($13::timestamp IS NULL OR eo.start_time >= $13)
 AND ($14::timestamp IS NULL OR eo.end_time <= $14)
 
+AND ($15::int IS NULL OR (eo.price >= $15))
+AND ($16::int IS NULL OR (eo.price < $16))
+
 ORDER BY eo.id
 LIMIT $1 OFFSET $2;
