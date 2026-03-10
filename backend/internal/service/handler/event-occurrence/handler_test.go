@@ -18,8 +18,8 @@ import (
 
 // shared fixtures
 var (
-	testMid     = uuid.MustParse("50000000-0000-0000-0000-000000000001")
-	testEOID    = uuid.MustParse("70000000-0000-0000-0000-000000000002")
+	testMid      = uuid.MustParse("50000000-0000-0000-0000-000000000001")
+	testEOID     = uuid.MustParse("70000000-0000-0000-0000-000000000002")
 	testStart, _ = time.Parse(time.RFC3339, "2026-02-22T09:00:00+07:00")
 	testEnd, _   = time.Parse(time.RFC3339, "2026-02-22T11:00:00+07:00")
 )
@@ -81,10 +81,11 @@ func newHandler(
 	managerRepo *repomocks.MockManagerRepository,
 	eventRepo *repomocks.MockEventRepository,
 	locationRepo *repomocks.MockLocationRepository,
+	s3 *s3mocks.S3ClientMock,
 	regRepo *repomocks.MockRegistrationRepository,
 	sc *stripemocks.MockStripeClient,
 ) *Handler {
-	return NewHandler(eoRepo, managerRepo, eventRepo, locationRepo, regRepo, sc)
+	return NewHandler(eoRepo, managerRepo, eventRepo, locationRepo, s3, regRepo, sc)
 }
 
 func TestHandler_CreateEventOccurrence(t *testing.T) {
@@ -148,7 +149,7 @@ func TestHandler_CreateEventOccurrence(t *testing.T) {
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			mockS3 := new(s3mocks.S3ClientMock)
-      mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
@@ -238,7 +239,9 @@ func TestHandler_CreateEventOccurrence_AcceptLanguageInvariant(t *testing.T) {
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			mockS3 := new(s3mocks.S3ClientMock)
-			handler := NewHandler(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockS3)
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
+			handler := NewHandler(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockS3, mockRegRepo, mockStripeClient)
 
 			occurrence, err := handler.CreateEventOccurrence(context.Background(), input)
 			assert.Nil(t, occurrence, "expected nil occurrence for invalid AcceptLanguage")
@@ -274,7 +277,9 @@ func TestHandler_GetEventOccurrenceById_AcceptLanguageInvariant(t *testing.T) {
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			mockS3 := new(s3mocks.S3ClientMock)
-			handler := NewHandler(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockS3)
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
+			handler := NewHandler(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockS3, mockRegRepo, mockStripeClient)
 
 			occurrence, err := handler.GetEventOccurrenceByID(context.Background(), input)
 			assert.Nil(t, occurrence, "expected nil occurrence for invalid AcceptLanguage")
@@ -309,7 +314,9 @@ func TestHandler_UpdateEventOccurrence_AcceptLanguageInvariant(t *testing.T) {
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			mockS3 := new(s3mocks.S3ClientMock)
-			handler := NewHandler(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockS3)
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
+			handler := NewHandler(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockS3, mockRegRepo, mockStripeClient)
 
 			occurrence, err := handler.UpdateEventOccurrence(context.Background(), input)
 			assert.Nil(t, occurrence, "expected nil occurrence for invalid AcceptLanguage")
@@ -340,7 +347,7 @@ func TestHandler_GetEventOccurrenceById(t *testing.T) {
 			name: "successful get event occurrence by id",
 			id:   "70000000-0000-0000-0000-000000000001",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetEventOccurrenceByID", mock.Anything, uuid.MustParse("70000000-0000-0000-0000-000000000001")).
+				m.On("GetEventOccurrenceByID", mock.Anything, uuid.MustParse("70000000-0000-0000-0000-000000000001"), mock.Anything).
 					Return(&models.EventOccurrence{
 						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 						ManagerId:    &testMid,
@@ -361,7 +368,7 @@ func TestHandler_GetEventOccurrenceById(t *testing.T) {
 			name: "event occurrence not found",
 			id:   "00000000-0000-0000-0000-000000000000",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetEventOccurrenceByID", mock.Anything, uuid.MustParse("00000000-0000-0000-0000-000000000000")).
+				m.On("GetEventOccurrenceByID", mock.Anything, uuid.MustParse("00000000-0000-0000-0000-000000000000"), mock.Anything).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("EventOccurrence", "id", "00000000-0000-0000-0000-000000000000").GetStatus(),
 						Message: "Not found",
@@ -384,7 +391,7 @@ func TestHandler_GetEventOccurrenceById(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			mockS3 := new(s3mocks.S3ClientMock)
 			mockS3.On("GeneratePresignedURL", mock.Anything, mock.Anything, mock.Anything).Return("https://test-bucket.s3.amazonaws.com/presigned", nil)
-      mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
@@ -467,12 +474,13 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 			name: "new current enrolled exceeds original max attendees",
 			input: func() *models.UpdateEventOccurrenceInput {
 				input := &models.UpdateEventOccurrenceInput{}
+				input.AcceptLanguage = "en-US"
 				input.ID = testEOID
 				input.Body.CurrEnrolled = &currBad
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetEventOccurrenceByID", mock.Anything, testEOID).
+				m.On("GetEventOccurrenceByID", mock.Anything, testEOID, mock.Anything).
 					Return(makeTestEventOccurrence(testStart), nil)
 			},
 			wantErr: true,
@@ -493,7 +501,7 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 				return input
 			}(),
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetEventOccurrenceByID", mock.Anything, testEOID).
+				m.On("GetEventOccurrenceByID", mock.Anything, testEOID, mock.Anything).
 					Return(makeTestEventOccurrence(testStart), nil)
 			},
 			wantErr: true,
@@ -525,8 +533,8 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 					ManagerId:    &testMid,
 					Event:        event,
 					Location:     location,
-					StartTime:    start,
-					EndTime:      end,
+					StartTime:    testStart,
+					EndTime:      testEnd,
 					MaxAttendees: 15,
 					Language:     "en",
 					CurrEnrolled: 8,
@@ -581,7 +589,7 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			mockS3 := new(s3mocks.S3ClientMock)
-      mockRegRepo := new(repomocks.MockRegistrationRepository)
+			mockRegRepo := new(repomocks.MockRegistrationRepository)
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
@@ -596,11 +604,11 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 					mock.Anything,
 				).Return(&models.EventOccurrence{
 					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
-					ManagerId:    &mid,
+					ManagerId:    &testMid,
 					Event:        event,
 					Location:     location,
-					StartTime:    start,
-					EndTime:      end,
+					StartTime:    testStart,
+					EndTime:      testEnd,
 					MaxAttendees: 15,
 					Language:     "en",
 					CurrEnrolled: 5,
@@ -822,11 +830,12 @@ func TestHandler_CancelEventOccurrence(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockS3 := new(s3mocks.S3ClientMock)
 			mockRegRepo := new(repomocks.MockRegistrationRepository)
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockEORepo, mockRegRepo, mockStripeClient)
 
-			handler := newHandler(mockEORepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockRegRepo, mockStripeClient)
+			handler := newHandler(mockEORepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockS3, mockRegRepo, mockStripeClient)
 			ctx := context.Background()
 
 			msg, err := handler.CancelEventOccurrence(ctx, tt.eoID)

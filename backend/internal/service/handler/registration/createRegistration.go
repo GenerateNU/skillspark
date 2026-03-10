@@ -8,7 +8,8 @@ import (
 )
 
 func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
-	_, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID, "en-US")
+
+	eventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID, "en-US")
 	if err != nil {
 		return nil, err
 	}

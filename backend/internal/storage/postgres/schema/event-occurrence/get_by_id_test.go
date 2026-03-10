@@ -23,7 +23,6 @@ func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	eventOccurrence1, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000001"), "en-US")
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 
-	eventOccurrence1, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000001"))
 	assert.NoError(t, err)
 	assert.NotNil(t, eventOccurrence1)
 	assert.Equal(t, &mid, eventOccurrence1.ManagerId)

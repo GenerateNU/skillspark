@@ -151,7 +151,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			mockS3 := new(s3mocks.S3ClientMock)
-      mockStripeClient := new(stripemocks.MockStripeClient)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			mockS3.On("GeneratePresignedURL", mock.Anything, mock.Anything, mock.Anything).Return("https://test-bucket.s3.amazonaws.com/presigned", nil)
 			tt.mockSetup(mockRepo)
 
@@ -161,7 +161,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 				mockEventRepo,
 				mockLocationRepo,
 				mockS3,
-        mockStripeClient
+				mockStripeClient,
 			)
 
 			req, err := http.NewRequest(
@@ -335,7 +335,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			mockS3 := new(s3mocks.S3ClientMock)
-      mockStripeClient := new(stripemocks.MockStripeClient)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
 			app, _ := setupEventOccurrencesTestAPI(
@@ -344,7 +344,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 				mockEventRepo,
 				mockLocationRepo,
 				mockS3,
-        mockStripeClient
+				mockStripeClient,
 			)
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -521,7 +521,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			mockS3 := new(s3mocks.S3ClientMock)
-      mockStripeClient := new(stripemocks.MockStripeClient)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
 			app, _ := setupEventOccurrencesTestAPI(
@@ -530,7 +530,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 				mockEventRepo,
 				mockLocationRepo,
 				mockS3,
-        mockStripeClient
+				mockStripeClient,
 			)
 
 			bodyBytes, err := json.Marshal(tt.payload)
@@ -757,7 +757,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 				mockEventRepo,
 				mockLocationRepo,
 				mockS3,
-        mockStripeClient
+				mockStripeClient,
 			)
 
 			req, err := http.NewRequest(

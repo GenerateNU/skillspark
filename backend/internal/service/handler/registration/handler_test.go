@@ -408,7 +408,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
@@ -477,7 +477,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, invalidEventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, invalidEventOccurrenceID, mock.Anything).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("EventOccurrence", "id", invalidEventOccurrenceID.String()).Code,
 						Message: "Event occurrence not found",
@@ -496,7 +496,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, invalidGuardianID).
@@ -518,7 +518,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
@@ -543,7 +543,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
@@ -563,7 +563,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
@@ -586,7 +586,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(&models.EventOccurrence{
 						ID:           eventOccurrenceID,
 						Price:        10000,
@@ -615,7 +615,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(&models.EventOccurrence{
 						ID:           eventOccurrenceID,
 						Price:        10000,
@@ -865,7 +865,7 @@ func TestHandler_CancelRegistration(t *testing.T) {
 				regRepo.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
 					Return(validRegistration("succeeded", time.Now().Add(48*time.Hour)), nil)
 
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence(time.Now().Add(48*time.Hour)), nil)
 
 				sc.On("RefundPayment", mock.Anything, mock.AnythingOfType("*models.RefundPaymentInput")).
@@ -883,7 +883,7 @@ func TestHandler_CancelRegistration(t *testing.T) {
 				regRepo.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
 					Return(validRegistration("succeeded", time.Now().Add(12*time.Hour)), nil)
 
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence(time.Now().Add(12*time.Hour)), nil)
 
 				regRepo.On("CancelRegistration", mock.Anything, mock.AnythingOfType("*models.CancelRegistrationInput")).
@@ -936,7 +936,7 @@ func TestHandler_CancelRegistration(t *testing.T) {
 				regRepo.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
 					Return(validRegistration("succeeded", time.Now().Add(48*time.Hour)), nil)
 
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence(time.Now().Add(48*time.Hour)), nil)
 
 				sc.On("RefundPayment", mock.Anything, mock.AnythingOfType("*models.RefundPaymentInput")).
