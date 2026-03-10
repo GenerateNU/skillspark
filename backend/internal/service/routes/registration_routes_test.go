@@ -109,6 +109,7 @@ func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/"+tt.ID, nil)
 			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -188,6 +189,7 @@ func TestHumaValidation_GetRegistrationsByChildID(t *testing.T) {
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/child/"+tt.childID, nil)
 			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -267,6 +269,7 @@ func TestHumaValidation_GetRegistrationsByGuardianID(t *testing.T) {
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/guardian/"+tt.guardianID, nil)
 			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -346,6 +349,7 @@ func TestHumaValidation_GetRegistrationsByEventOccurrenceID(t *testing.T) {
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/event_occurrence/"+tt.eventOccurrenceID, nil)
 			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -568,6 +572,7 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 			req, err := http.NewRequest(http.MethodPost, "/api/v1/registrations", bytes.NewBuffer(bodyBytes))
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -705,6 +710,7 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 			req, err := http.NewRequest(http.MethodPatch, "/api/v1/registrations/"+tt.id, bytes.NewBuffer(bodyBytes))
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)

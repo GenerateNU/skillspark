@@ -664,6 +664,7 @@ func TestHumaValidation_GetEventOccurrencesByOrganizationId(t *testing.T) {
 					"GetEventOccurrencesByOrganizationID",
 					mock.Anything,
 					uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+					mock.Anything,
 				).Return([]models.EventOccurrence{
 					{
 						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),
