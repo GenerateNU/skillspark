@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"net/http"
+	"os"
 	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
@@ -11,6 +12,8 @@ import (
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
 	translations "skillspark/internal/translation"
+	"skillspark/internal/stripeClient"
+	"skillspark/jobs"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -26,6 +29,7 @@ import (
 type App struct {
 	Server *fiber.App
 	Repo   *storage.Repository
+	StripeClient stripeClient.StripeClientInterface
 	API    huma.API
 }
 
@@ -34,14 +38,23 @@ func InitApp(config config.Config) (*App, error) {
 	ctx := context.Background()
 	repo := postgres.NewRepository(ctx, config.DB)
 	s3Client, err := s3_client.NewClient(config.S3)
+	
 	if err != nil {
 		return nil, err
 	}
 
 	c := &http.Client{}
 	translateClient := translations.NewClient(c)
+  newStripeClient, err := stripeClient.NewStripeClient("")
+	if err != nil {
+		return nil, err
+	}
 
-	app, humaAPI := SetupApp(config, repo, s3Client, translateClient)
+	jobScheduler := jobs.NewJobScheduler(repo, newStripeClient)
+	jobScheduler.Start()
+	defer jobScheduler.Stop()
+
+	app, humaAPI := SetupApp(config, repo, s3Client, translateClient, newStripeClient)
 	return &App{
 		Server: app,
 		Repo:   repo,
@@ -50,7 +63,7 @@ func InitApp(config config.Config) (*App, error) {
 }
 
 // Setup the fiber app with the specified configuration and database.
-func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, translateClient *translations.TranslateClient) (*fiber.App, huma.API) {
+func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, translateClient *translations.TranslateClient, newStripeClient stripeClient.StripeClientInterface) (*fiber.App, huma.API) {
 	app := fiber.New(fiber.Config{
 		JSONEncoder:  go_json.Marshal,
 		JSONDecoder:  go_json.Unmarshal,
@@ -97,13 +110,13 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	})
 
 	// Register Huma endpoints
-	setupHumaRoutes(humaAPI, repo, config, s3Client, translateClient)
+	setupHumaRoutes(humaAPI, repo, config, s3Client, translateClient, newStripeClient)
 
 	return app, humaAPI
 }
 
 // Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient) {
+func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
@@ -111,10 +124,11 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
 	routes.SetupManagerRoutes(api, repo, config)
-	routes.SetupRegistrationRoutes(api, repo)
-	routes.SetupGuardiansRoutes(api, repo, config)
+	routes.SetupRegistrationRoutes(api, repo, sc)
+	routes.SetupGuardiansRoutes(api, repo, sc, config)
 	routes.SetupChildRoutes(api, repo)
-	routes.SetupEventOccurrencesRoutes(api, repo, s3Client)
+	routes.SetupEventOccurrencesRoutes(api, repo, s3Client, sc)
 	routes.SetUpReviewRoutes(api, repo, translateClient)
 	routes.SetupAuthRoutes(api, repo, config)
+	routes.SetupPaymentRoutes(api, repo, sc)
 }

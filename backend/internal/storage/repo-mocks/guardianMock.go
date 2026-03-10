@@ -2,7 +2,6 @@ package repomocks
 
 import (
 	"context"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 
 	"github.com/google/uuid"
@@ -20,7 +19,7 @@ func (m *MockGuardianRepository) CreateGuardian(ctx context.Context, guardian *m
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Guardian), nil
 }
@@ -31,7 +30,7 @@ func (m *MockGuardianRepository) GetGuardianByChildID(ctx context.Context, child
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Guardian), nil
 }
@@ -42,7 +41,7 @@ func (m *MockGuardianRepository) GetGuardianByID(ctx context.Context, id uuid.UU
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Guardian), nil
 }
@@ -53,7 +52,7 @@ func (m *MockGuardianRepository) GetGuardianByUserID(ctx context.Context, userID
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Guardian), nil
 }
@@ -64,7 +63,7 @@ func (m *MockGuardianRepository) UpdateGuardian(ctx context.Context, guardian *m
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Guardian), nil
 }
@@ -75,7 +74,7 @@ func (m *MockGuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUI
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Guardian), nil
 }
@@ -86,7 +85,18 @@ func (m *MockGuardianRepository) GetGuardianByAuthID(ctx context.Context, authID
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
+	}
+	return args.Get(0).(*models.Guardian), nil
+}
+
+func (m *MockGuardianRepository) SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string) (*models.Guardian, error) {
+	args := m.Called(ctx, guardianID, stripeCustomerID)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Guardian), nil
 }

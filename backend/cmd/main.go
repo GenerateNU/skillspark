@@ -36,6 +36,8 @@ func main() {
 		}
 	}()
 
+	slog.Info("Cron jobs started")
+
 	port := cfg.Application.Port
 
 	// Listen for connections with a goroutine

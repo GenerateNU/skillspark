@@ -2,7 +2,6 @@ package repomocks
 
 import (
 	"context"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/utils"
 
@@ -20,7 +19,7 @@ func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, inp
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Organization), nil
 }
@@ -31,7 +30,7 @@ func (m *MockOrganizationRepository) GetOrganizationByID(ctx context.Context, id
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Organization), nil
 }
@@ -42,7 +41,7 @@ func (m *MockOrganizationRepository) GetAllOrganizations(ctx context.Context, pa
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).([]models.Organization), nil
 }
@@ -53,7 +52,7 @@ func (m *MockOrganizationRepository) UpdateOrganization(ctx context.Context, inp
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Organization), nil
 }
@@ -64,7 +63,7 @@ func (m *MockOrganizationRepository) DeleteOrganization(ctx context.Context, id 
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Organization), nil
 }
@@ -79,4 +78,26 @@ func (m *MockOrganizationRepository) GetEventOccurrencesByOrganizationID(ctx con
 		return nil, args.Get(1).(error)
 	}
 	return eventOccurrences.([]models.EventOccurrence), nil
+}
+
+func (m *MockOrganizationRepository) SetStripeAccountID(ctx context.Context, orgID uuid.UUID, stripeAccountID string) (*models.Organization, error) {
+	args := m.Called(ctx, orgID, stripeAccountID)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(error)
+	}
+	return args.Get(0).(*models.Organization), nil
+}
+
+func (m *MockOrganizationRepository) SetStripeAccountStatus(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error) {
+	args := m.Called(ctx, stripeAccountID, activated)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(error)
+	}
+	return args.Get(0).(*models.Organization), nil
 }

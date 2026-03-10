@@ -23,13 +23,11 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	// get the total number of event occurrences in the test database
 	var count int64
 	row := testDB.QueryRow(ctx, "SELECT COUNT(*) FROM event_occurrence")
-	sqlErr := row.Scan(&count)
-	assert.Nil(t, sqlErr)
+	err := row.Scan(&count)
+	require.NoError(t, err)
 
-	// default pagination
 	pagination := utils.NewPagination()
 
 	// check that all 15 event occurrences in the test database are returned
@@ -37,6 +35,11 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, eventOccurrences)
 	assert.Equal(t, count, int64(len(eventOccurrences)))
+
+	for _, eo := range eventOccurrences {
+		assert.Greater(t, eo.Price, 0)
+		assert.Equal(t, "thb", eo.Currency)
+	}
 }
 
 func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.T) {
@@ -49,34 +52,50 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.
 	ctx := context.Background()
 	t.Parallel()
 
-	// get the total number of event occurrences in the test database
 	var count int64
 	row := testDB.QueryRow(ctx, "SELECT COUNT(*) FROM event_occurrence")
-	sqlErr := row.Scan(&count)
-	assert.Nil(t, sqlErr)
-
+	err := row.Scan(&count)
+	require.NoError(t, err)
 	assert.GreaterOrEqual(t, count, int64(12))
 
-	// test page 1 with limit 4
 	pagination1 := utils.Pagination{Page: 1, Limit: 4}
 	eventOccurrences1, err1 := repo.GetAllEventOccurrences(ctx, pagination1, "en-US", models.GetAllEventOccurrencesFilter{})
 	assert.Nil(t, err1)
 	assert.NotNil(t, eventOccurrences1)
 	assert.Equal(t, 4, len(eventOccurrences1))
+	for _, eo := range eventOccurrences1 {
+		assert.Greater(t, eo.Price, 0)
+		assert.Equal(t, "thb", eo.Currency)
+	}
 
-	// test page 2 with limit 4
 	pagination2 := utils.Pagination{Page: 2, Limit: 4}
 	eventOccurrences2, err2 := repo.GetAllEventOccurrences(ctx, pagination2, "en-US", models.GetAllEventOccurrencesFilter{})
 	assert.Nil(t, err2)
 	assert.NotNil(t, eventOccurrences2)
 	assert.Equal(t, 4, len(eventOccurrences2))
+	for _, eo := range eventOccurrences2 {
+		assert.Greater(t, eo.Price, 0)
+		assert.Equal(t, "thb", eo.Currency)
+	}
 
-	// test page 3 with limit 4
 	pagination3 := utils.Pagination{Page: 3, Limit: 4}
 	eventOccurrences3, err3 := repo.GetAllEventOccurrences(ctx, pagination3, "en-US", models.GetAllEventOccurrencesFilter{})
 	assert.Nil(t, err3)
 	assert.NotNil(t, eventOccurrences3)
 	assert.Equal(t, 4, len(eventOccurrences3))
+	for _, eo := range eventOccurrences3 {
+		assert.Greater(t, eo.Price, 0)
+		assert.Equal(t, "thb", eo.Currency)
+	}
+
+	// verify pages don't overlap
+	ids1 := make(map[string]bool)
+	for _, eo := range eventOccurrences1 {
+		ids1[eo.ID.String()] = true
+	}
+	for _, eo := range eventOccurrences2 {
+		assert.False(t, ids1[eo.ID.String()], "page 2 should not contain items from page 1")
+	}
 }
 
 func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) {
@@ -87,11 +106,12 @@ func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) 
 	ctx := context.Background()
 	testDB := testutil.SetupTestDB(t)
 	repo := NewEventOccurrenceRepository(testDB)
+	t.Parallel()
 
 	pagination := utils.NewPagination()
 
-	minDur := 60  // minutes
-	maxDur := 120 // minutes
+	minDur := 60
+	maxDur := 120
 
 	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
 		MinDurationMinutes: &minDur,
@@ -99,11 +119,11 @@ func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) 
 	})
 	require.NoError(t, err)
 	require.NotNil(t, eventOccurrences)
-
 	for _, eo := range eventOccurrences {
 		duration := int(eo.EndTime.Sub(eo.StartTime).Minutes())
 		assert.GreaterOrEqual(t, duration, minDur)
 		assert.LessOrEqual(t, duration, maxDur)
+		assert.Equal(t, "thb", eo.Currency)
 	}
 
 	lat := 13.74
@@ -117,10 +137,10 @@ func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) 
 	})
 	require.NoError(t, err)
 	require.NotNil(t, eventOccurrences)
-
 	for _, eo := range eventOccurrences {
 		dist := DistanceKm(eo.Location.Latitude, eo.Location.Longitude, lat, lng)
 		assert.LessOrEqual(t, dist, radiusKm)
+		assert.Equal(t, "thb", eo.Currency)
 	}
 
 	search := "Robotics"
@@ -130,11 +150,9 @@ func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) 
 	})
 	require.NoError(t, err)
 	require.NotNil(t, eventOccurrences)
-
 	for _, eo := range eventOccurrences {
-		title := eo.Event.Title
-		desc := eo.Event.Description
-		assert.True(t, containsIgnoreCase(title, search) || containsIgnoreCase(desc, search))
+		assert.True(t, containsIgnoreCase(eo.Event.Title, search) || containsIgnoreCase(eo.Event.Description, search))
+		assert.Equal(t, "thb", eo.Currency)
 	}
 }
 

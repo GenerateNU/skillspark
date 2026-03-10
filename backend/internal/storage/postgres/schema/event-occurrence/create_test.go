@@ -35,12 +35,13 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 		input.Body.EndTime = end
 		input.Body.MaxAttendees = 10
 		input.Body.Language = "en"
+		input.Body.Price = 50000
+		input.Body.Currency = "thb"
 		return input
 	}()
 
-	// check created event occurrence struct
 	eventOccurrence, err := repo.CreateEventOccurrence(ctx, eventOccurrenceInput)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, eventOccurrence)
 	assert.Equal(t, &mid, eventOccurrence.ManagerId)
 	assert.Equal(t, uuid.MustParse("60000000-0000-0000-0000-000000000001"), eventOccurrence.Event.ID)
@@ -50,6 +51,8 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 	assert.Equal(t, 10, eventOccurrence.MaxAttendees)
 	assert.Equal(t, "en", eventOccurrence.Language)
 	assert.Equal(t, 0, eventOccurrence.CurrEnrolled)
+	assert.Equal(t, 50000, eventOccurrence.Price)
+	assert.Equal(t, "thb", eventOccurrence.Currency)
 
 	// check created event occurrence in database
 	id := eventOccurrence.ID
@@ -64,4 +67,6 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 	assert.Equal(t, 10, retrievedEventOccurrence.MaxAttendees)
 	assert.Equal(t, "en", retrievedEventOccurrence.Language)
 	assert.Equal(t, 0, retrievedEventOccurrence.CurrEnrolled)
+	assert.Equal(t, 50000, retrievedEventOccurrence.Price)
+	assert.Equal(t, "thb", retrievedEventOccurrence.Currency)
 }

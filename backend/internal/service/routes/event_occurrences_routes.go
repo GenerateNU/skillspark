@@ -7,6 +7,7 @@ import (
 	"skillspark/internal/s3_client"
 	eventoccurrence "skillspark/internal/service/handler/event-occurrence"
 	"skillspark/internal/storage"
+	"skillspark/internal/stripeClient"
 	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -98,8 +99,8 @@ func mapToDBFilters(input *models.GetAllEventOccurrencesInput) models.GetAllEven
 	return filters
 }
 
-func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface) {
-	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence, repo.Manager, repo.Event, repo.Location, s3Client)
+func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface, sc stripeClient.StripeClientInterface) {
+	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence, repo.Manager, repo.Event, repo.Location, s3Client, repo.Registration, sc)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-all-event-occurrences",

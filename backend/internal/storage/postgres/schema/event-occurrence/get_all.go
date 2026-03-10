@@ -70,6 +70,8 @@ func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error)
 		&createdEventOccurrence.CreatedAt,
 		&createdEventOccurrence.UpdatedAt,
 		&createdEventOccurrence.Status,
+		&createdEventOccurrence.Price,
+		&createdEventOccurrence.Currency,
 
 		// event fields
 		&createdEventOccurrence.Event.ID,

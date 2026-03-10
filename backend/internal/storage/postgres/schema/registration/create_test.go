@@ -12,94 +12,59 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
+ 
 func TestCreateRegistration(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
-	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 	t.Parallel()
 
-	child := child.CreateTestChild(t, ctx, testDB)
-	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
-	childID := child.ID
-	guardianID := child.GuardianID
-	occurrenceID := occurrence.ID
+	created := CreateTestRegistration(t, ctx, testDB)
 
-	input := func() *models.CreateRegistrationInput {
-		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = child.ID
-		i.Body.GuardianID = child.GuardianID
-		i.Body.EventOccurrenceID = occurrence.ID
-		i.Body.Status = models.RegistrationStatusRegistered
-		return i
-	}()
-
-	created, err := repo.CreateRegistration(ctx, input)
-
-	require.Nil(t, err)
 	require.NotNil(t, created)
-	assert.Equal(t, &childID, created.Body.ChildID)
-	assert.Equal(t, &guardianID, created.Body.GuardianID)
-	assert.Equal(t, occurrenceID, created.Body.EventOccurrenceID)
-	assert.Equal(t, models.RegistrationStatusRegistered, created.Body.Status)
-	assert.NotEqual(t, uuid.Nil, created.Body.ID)
-	assert.NotZero(t, created.Body.CreatedAt)
-	assert.NotZero(t, created.Body.UpdatedAt)
-	assert.NotEmpty(t, created.Body.EventName)
-	assert.NotZero(t, created.Body.OccurrenceStartTime)
+	assert.NotEqual(t, uuid.Nil, created.ID)
+	assert.NotEqual(t, uuid.Nil, created.ChildID)
+	assert.NotEqual(t, uuid.Nil, created.GuardianID)
+	assert.NotEqual(t, uuid.Nil, created.EventOccurrenceID)
+	assert.Equal(t, models.RegistrationStatusRegistered, created.Status)
+	assert.NotZero(t, created.CreatedAt)
+	assert.NotZero(t, created.UpdatedAt)
+	assert.NotEmpty(t, created.EventName)
+	assert.NotZero(t, created.OccurrenceStartTime)
+	
+	// Verify payment fields
+	assert.NotEmpty(t, created.StripePaymentIntentID)
+	assert.NotEmpty(t, created.StripeCustomerID)
+	assert.Equal(t, "acct_test_123", created.OrgStripeAccountID)
+	assert.Equal(t, "pm_test_123", created.StripePaymentMethodID)
+	assert.Equal(t, 10000, created.TotalAmount)
+	assert.Equal(t, 8500, created.ProviderAmount)
+	assert.Equal(t, 1500, created.PlatformFeeAmount)
+	assert.Equal(t, "usd", created.Currency)
+	assert.Equal(t, "requires_capture", created.PaymentIntentStatus)
+	assert.Nil(t, created.CancelledAt)
+	assert.Nil(t, created.PaidAt)
 }
 
 func TestCreateRegistration_VerifyEventNameJoin(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
-	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 	t.Parallel()
 
-	child := child.CreateTestChild(t, ctx, testDB)
-	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	created := CreateTestRegistration(t, ctx, testDB)
 
-	input := func() *models.CreateRegistrationInput {
-		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = child.ID
-		i.Body.GuardianID = child.GuardianID
-		i.Body.EventOccurrenceID = occurrence.ID
-		i.Body.Status = models.RegistrationStatusRegistered
-		return i
-	}()
-
-	created, err := repo.CreateRegistration(ctx, input)
-
-	require.Nil(t, err)
 	require.NotNil(t, created)
-	assert.NotEmpty(t, created.Body.EventName)
+	assert.NotEmpty(t, created.EventName)
 }
 
 func TestCreateRegistration_VerifyOccurrenceStartTime(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
-	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 	t.Parallel()
 
-	child := child.CreateTestChild(t, ctx, testDB)
-	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
-	childID := child.ID
-	guardianID := child.GuardianID
-	occurrenceID := occurrence.ID
+	created := CreateTestRegistration(t, ctx, testDB)
 
-	input := func() *models.CreateRegistrationInput {
-		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = childID
-		i.Body.GuardianID = guardianID
-		i.Body.EventOccurrenceID = occurrenceID
-		i.Body.Status = models.RegistrationStatusRegistered
-		return i
-	}()
-
-	created, err := repo.CreateRegistration(ctx, input)
-
-	require.Nil(t, err)
 	require.NotNil(t, created)
-	assert.NotZero(t, created.Body.OccurrenceStartTime)
+	assert.NotZero(t, created.OccurrenceStartTime)
 }
 
 func TestCreateRegistration_MultipleRegistrationsForSameChild(t *testing.T) {
@@ -109,34 +74,44 @@ func TestCreateRegistration_MultipleRegistrationsForSameChild(t *testing.T) {
 	t.Parallel()
 
 	child := child.CreateTestChild(t, ctx, testDB)
-	childID := child.ID
-	guardianID := child.GuardianID
 	o1 := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
-	o1ID := o1.ID
 	o2 := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
-	o2ID := o2.ID
 
-	input1 := func() *models.CreateRegistrationInput {
-		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = childID
-		i.Body.GuardianID = guardianID
-		i.Body.EventOccurrenceID = o1ID
-		i.Body.Status = models.RegistrationStatusRegistered
-		return i
-	}()
+	input1 := &models.CreateRegistrationWithPaymentData{
+		ChildID:                child.ID,
+		GuardianID:             child.GuardianID,
+		EventOccurrenceID:      o1.ID,
+		Status:                 models.RegistrationStatusRegistered,
+		StripePaymentIntentID:  "pi_test_1",
+		StripeCustomerID:       "cus_test_123",
+		OrgStripeAccountID:     "acct_test_123",
+		StripePaymentMethodID:  "pm_test_123",
+		TotalAmount:            10000,
+		ProviderAmount:         8500,
+		PlatformFeeAmount:      1500,
+		Currency:               "usd",
+		PaymentIntentStatus:    "requires_capture",
+	}
 
 	created1, err := repo.CreateRegistration(ctx, input1)
 	require.Nil(t, err)
 	require.NotNil(t, created1)
 
-	input2 := func() *models.CreateRegistrationInput {
-		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = childID
-		i.Body.GuardianID = guardianID
-		i.Body.EventOccurrenceID = o2ID
-		i.Body.Status = models.RegistrationStatusRegistered
-		return i
-	}()
+	input2 := &models.CreateRegistrationWithPaymentData{
+		ChildID:                child.ID,
+		GuardianID:             child.GuardianID,
+		EventOccurrenceID:      o2.ID,
+		Status:                 models.RegistrationStatusRegistered,
+		StripePaymentIntentID:  "pi_test_2",
+		StripeCustomerID:       "cus_test_123",
+		OrgStripeAccountID:     "acct_test_123",
+		StripePaymentMethodID:  "pm_test_123",
+		TotalAmount:            10000,
+		ProviderAmount:         8500,
+		PlatformFeeAmount:      1500,
+		Currency:               "usd",
+		PaymentIntentStatus:    "requires_capture",
+	}
 
 	created2, err := repo.CreateRegistration(ctx, input2)
 	require.Nil(t, err)
@@ -154,17 +129,22 @@ func TestCreateRegistration_InvalidChildID(t *testing.T) {
 
 	child := child.CreateTestChild(t, ctx, testDB)
 	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
-	guardianID := child.GuardianID
-	occurrenceID := occurrence.ID
 
-	input := func() *models.CreateRegistrationInput {
-		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = uuid.New()
-		i.Body.GuardianID = guardianID
-		i.Body.EventOccurrenceID = occurrenceID
-		i.Body.Status = models.RegistrationStatusRegistered
-		return i
-	}()
+	input := &models.CreateRegistrationWithPaymentData{
+		ChildID:                uuid.New(),
+		GuardianID:             child.GuardianID,
+		EventOccurrenceID:      occurrence.ID,
+		Status:                 models.RegistrationStatusRegistered,
+		StripePaymentIntentID:  "pi_test_123",
+		StripeCustomerID:       "cus_test_123",
+		OrgStripeAccountID:     "acct_test_123",
+		StripePaymentMethodID:  "pm_test_123",
+		TotalAmount:            10000,
+		ProviderAmount:         8500,
+		PlatformFeeAmount:      1500,
+		Currency:               "usd",
+		PaymentIntentStatus:    "requires_capture",
+	}
 
 	created, err := repo.CreateRegistration(ctx, input)
 
@@ -180,17 +160,22 @@ func TestCreateRegistration_InvalidGuardianID(t *testing.T) {
 
 	child := child.CreateTestChild(t, ctx, testDB)
 	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
-	childID := child.ID
-	occurrenceID := occurrence.ID
 
-	input := func() *models.CreateRegistrationInput {
-		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = childID
-		i.Body.GuardianID = uuid.New()
-		i.Body.EventOccurrenceID = occurrenceID
-		i.Body.Status = models.RegistrationStatusRegistered
-		return i
-	}()
+	input := &models.CreateRegistrationWithPaymentData{
+		ChildID:                child.ID,
+		GuardianID:             uuid.New(),
+		EventOccurrenceID:      occurrence.ID,
+		Status:                 models.RegistrationStatusRegistered,
+		StripePaymentIntentID:  "pi_test_123",
+		StripeCustomerID:       "cus_test_123",
+		OrgStripeAccountID:     "acct_test_123",
+		StripePaymentMethodID:  "pm_test_123",
+		TotalAmount:            10000,
+		ProviderAmount:         8500,
+		PlatformFeeAmount:      1500,
+		Currency:               "usd",
+		PaymentIntentStatus:    "requires_capture",
+	}
 
 	created, err := repo.CreateRegistration(ctx, input)
 
@@ -205,17 +190,22 @@ func TestCreateRegistration_InvalidEventOccurrenceID(t *testing.T) {
 	t.Parallel()
 
 	child := child.CreateTestChild(t, ctx, testDB)
-	childID := child.ID
-	guardianID := child.GuardianID
 
-	input := func() *models.CreateRegistrationInput {
-		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = childID
-		i.Body.GuardianID = guardianID
-		i.Body.EventOccurrenceID = uuid.New()
-		i.Body.Status = models.RegistrationStatusRegistered
-		return i
-	}()
+	input := &models.CreateRegistrationWithPaymentData{
+		ChildID:                child.ID,
+		GuardianID:             child.GuardianID,
+		EventOccurrenceID:      uuid.New(),
+		Status:                 models.RegistrationStatusRegistered,
+		StripePaymentIntentID:  "pi_test_123",
+		StripeCustomerID:       "cus_test_123",
+		OrgStripeAccountID:     "acct_test_123",
+		StripePaymentMethodID:  "pm_test_123",
+		TotalAmount:            10000,
+		ProviderAmount:         8500,
+		PlatformFeeAmount:      1500,
+		Currency:               "usd",
+		PaymentIntentStatus:    "requires_capture",
+	}
 
 	created, err := repo.CreateRegistration(ctx, input)
 
@@ -239,12 +229,21 @@ func TestCreateRegistration_IncreasesAttendeeCount(t *testing.T) {
 	require.NotNil(t, initialOccurrence)
 	initialCount := initialOccurrence.CurrEnrolled
 
-	input := func() *models.CreateRegistrationInput {
-		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = child.ID
-		i.Body.GuardianID = child.GuardianID
-		i.Body.EventOccurrenceID = occurrenceID
-		i.Body.Status = models.RegistrationStatusRegistered
+	input := func() *models.CreateRegistrationWithPaymentData {
+		i := &models.CreateRegistrationWithPaymentData{}
+		i.ChildID = child.ID
+		i.GuardianID = child.GuardianID
+		i.EventOccurrenceID = occurrenceID
+		i.Status = models.RegistrationStatusRegistered
+		i.StripePaymentIntentID = "pi_test_123"
+		i.StripeCustomerID = "cus_test_123"
+		i.OrgStripeAccountID = "acct_test_123"
+		i.StripePaymentMethodID = "pm_test_123"
+		i.TotalAmount = 10000
+		i.ProviderAmount = 8500
+		i.PlatformFeeAmount = 1500
+		i.Currency = "thb"
+		i.PaymentIntentStatus = "requires_capture"
 		return i
 	}()
 

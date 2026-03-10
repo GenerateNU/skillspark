@@ -30,6 +30,8 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 			input.Body.MaxAttendees,
 			input.Body.Language,
 			input.Body.CurrEnrolled,
+			input.Body.Price,
+			input.Body.Currency,
 		)
 	} else {
 		row = r.db.QueryRow(ctx,
@@ -43,10 +45,11 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 			input.Body.MaxAttendees,
 			input.Body.Language,
 			input.Body.CurrEnrolled,
+			input.Body.Price,
+			input.Body.Currency,
 		)
 	}
 
-	// null fields are handled in SQL query with coalesce
 	var updatedEventOccurrence models.EventOccurrence
 	var titleEN, descriptionEN string
 	var titleTH, descriptionTH *string
@@ -64,6 +67,8 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 		&updatedEventOccurrence.CreatedAt,
 		&updatedEventOccurrence.UpdatedAt,
 		&updatedEventOccurrence.Status,
+		&updatedEventOccurrence.Price,
+		&updatedEventOccurrence.Currency,
 
 		// event fields
 		&updatedEventOccurrence.Event.ID,

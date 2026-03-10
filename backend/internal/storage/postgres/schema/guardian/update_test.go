@@ -43,7 +43,6 @@ func TestGuardianRepository_Update_David_Kim(t *testing.T) {
 	assert.NotNil(t, guardian.UpdatedAt)
 	assert.Equal(t, guardianInput.ID, guardian.ID)
 
-	// Verify we can retrieve the updated guardian
 	retrievedGuardian, err := repo.GetGuardianByID(ctx, guardianInput.ID)
 	if err != nil {
 		t.Fatalf("Failed to retrieve guardian: %v", err)
@@ -73,4 +72,35 @@ func TestGuardianRepository_Update_Errors(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, guardian)
 	})
+}
+
+func TestGuardianRepository_Update_DoesNotModifyStripeCustomerID(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+
+	testDB := testutil.SetupTestDB(t)
+	repo := NewGuardianRepository(testDB)
+	ctx := context.Background()
+	t.Parallel()
+
+	guardian := CreateTestGuardian(t, ctx, testDB)
+	stripeCustomerID := "cus_test123"
+	
+	_, err := repo.SetStripeCustomerID(ctx, guardian.ID, stripeCustomerID)
+	assert.NoError(t, err)
+
+	updateInput := &models.UpdateGuardianInput{}
+	updateInput.ID = guardian.ID
+	updateInput.Body.Name = "Updated Name"
+
+	updated, err := repo.UpdateGuardian(ctx, updateInput)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, updated)
+	assert.Equal(t, "Updated Name", updated.Name)
+	assert.NotNil(t, updated.StripeCustomerID, "StripeCustomerID should not be nil")
+	if updated.StripeCustomerID != nil {
+		assert.Equal(t, stripeCustomerID, *updated.StripeCustomerID)
+	}
 }
