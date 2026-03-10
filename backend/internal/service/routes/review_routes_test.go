@@ -126,7 +126,7 @@ func TestGetReviewsByEventID(t *testing.T) {
 
 	eventRepo := new(repomocks.MockEventRepository)
 	eventRepo.
-		On("GetEventByID", mock.Anything, eventID).
+		On("GetEventByID", mock.Anything, eventID, mock.Anything).
 		Return(&models.Event{ID: eventID}, nil)
 
 	reviewRepo := new(repomocks.MockReviewRepository)

@@ -360,7 +360,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 					OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 					Role:           "Director",
 				}, nil)
-				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything).Return(&event, nil)
+				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything, mock.Anything).Return(&event, nil)
 				mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything).Return(&location, nil)
 			}
 
@@ -567,7 +567,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 					Role:           "Director",
 				}, nil)
-				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything).Return(&event, nil)
+				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything, mock.Anything).Return(&event, nil)
 				mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything).Return(&location, nil)
 			}
 

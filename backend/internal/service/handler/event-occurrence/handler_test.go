@@ -162,7 +162,7 @@ func TestHandler_CreateEventOccurrence(t *testing.T) {
 				OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 				Role:           "Director",
 			}, nil)
-			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything).Return(&models.Event{
+			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything, mock.Anything).Return(&models.Event{
 				ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
 				Title:            "Junior Robotics Workshop",
 				Description:      "Learn the basics of robotics",
@@ -623,7 +623,7 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 				OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 				Role:           "Director",
 			}, nil)
-			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything).Return(&models.Event{
+			mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything, mock.Anything).Return(&models.Event{
 				ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
 				Title:            "Junior Robotics Workshop",
 				OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),

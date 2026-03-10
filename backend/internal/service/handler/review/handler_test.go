@@ -472,7 +472,7 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 			acceptLanguage: "en-US",
 			mockSetup: func(eventRepo *repomocks.MockEventRepository, reviewRepo *repomocks.MockReviewRepository) {
 				// Event exists
-				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000001")).
+				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000001"), "en-US").
 					Return(&models.Event{ID: uuid.MustParse("10000000-0000-0000-0000-000000000001")}, nil)
 
 				// Reviews returned
@@ -505,7 +505,7 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 			eventID:        uuid.MustParse("99999999-0000-0000-0000-000000000000"),
 			acceptLanguage: "en-US",
 			mockSetup: func(eventRepo *repomocks.MockEventRepository, reviewRepo *repomocks.MockReviewRepository) {
-				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("99999999-0000-0000-0000-000000000000")).
+				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("99999999-0000-0000-0000-000000000000"), "en-US").
 					Return(nil, errs.BadRequest("event does not exist"))
 			},
 			wantReviews: nil,
@@ -516,7 +516,7 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 			eventID:        uuid.MustParse("10000000-0000-0000-0000-000000000002"),
 			acceptLanguage: "en-US",
 			mockSetup: func(eventRepo *repomocks.MockEventRepository, reviewRepo *repomocks.MockReviewRepository) {
-				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000002")).
+				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000002"), "en-US").
 					Return(&models.Event{ID: uuid.MustParse("10000000-0000-0000-0000-000000000002")}, nil)
 
 				reviewRepo.On("GetReviewsByEventID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000002"), "en-US", mock.AnythingOfType("utils.Pagination")).
