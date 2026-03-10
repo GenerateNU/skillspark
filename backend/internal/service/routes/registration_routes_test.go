@@ -403,7 +403,7 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"status":              "registered",
 			},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceIDEx).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceIDEx, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianIDEx).
@@ -478,7 +478,8 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"payment_method_id":   paymentMethodID,
 				"status":              "registered",
 			},
-			mockSetup:  func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {},
+			mockSetup: func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {
+			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
@@ -489,7 +490,8 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"payment_method_id":   paymentMethodID,
 				"status":              "registered",
 			},
-			mockSetup:  func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {},
+			mockSetup: func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {
+			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
@@ -500,7 +502,8 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"payment_method_id": paymentMethodID,
 				"status":            "registered",
 			},
-			mockSetup:  func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {},
+			mockSetup: func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {
+			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
@@ -512,7 +515,8 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"payment_method_id":   paymentMethodID,
 				"status":              "registered",
 			},
-			mockSetup:  func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {},
+			mockSetup: func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {
+			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
@@ -524,7 +528,8 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"payment_method_id":   paymentMethodID,
 				"status":              "registered",
 			},
-			mockSetup:  func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {},
+			mockSetup: func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {
+			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
@@ -536,7 +541,8 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"payment_method_id":   paymentMethodID,
 				"status":              "not-a-valid-status",
 			},
-			mockSetup:  func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {},
+			mockSetup: func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient) {
+			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 	}
