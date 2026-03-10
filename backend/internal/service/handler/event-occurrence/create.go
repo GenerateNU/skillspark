@@ -24,7 +24,7 @@ func (h *Handler) CreateEventOccurrence(ctx context.Context, input *models.Creat
 		_, managerErr = h.ManagerRepository.GetManagerByID(ctx, *managerId)
 	}
 
-	_, eventErr := h.EventRepository.GetEventByID(ctx, eventId)
+	_, eventErr := h.EventRepository.GetEventByID(ctx, eventId, input.AcceptLanguage)
 	_, locationErr := h.LocationRepository.GetLocationByID(ctx, locationId)
 
 	if managerErr != nil || eventErr != nil || locationErr != nil {

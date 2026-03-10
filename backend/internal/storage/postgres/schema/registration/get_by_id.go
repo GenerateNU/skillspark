@@ -11,6 +11,10 @@ import (
 )
 
 func (r *RegistrationRepository) GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput, tx *pgx.Tx) (*models.GetRegistrationByIDOutput, error) {
+
+	var titleEN string
+	var titleTH *string
+
 	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlRegistrationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -45,7 +49,8 @@ func (r *RegistrationRepository) GetRegistrationByID(ctx context.Context, input 
 		&registration.Body.PlatformFeeAmount,
 		&registration.Body.PaidAt,
 		&registration.Body.StripePaymentMethodID,
-		&registration.Body.EventName,
+		&titleEN,
+		&titleTH,
 		&registration.Body.OccurrenceStartTime,
 	)
 
@@ -56,6 +61,13 @@ func (r *RegistrationRepository) GetRegistrationByID(ctx context.Context, input 
 		}
 		err := errs.InternalServerError("Failed to fetch registration by id: ", err.Error())
 		return nil, &err
+	}
+
+	switch input.AcceptLanguage {
+	case "th-TH":
+		registration.Body.EventName = *titleTH
+	case "en-US":
+		registration.Body.EventName = titleEN
 	}
 
 	return &registration, nil

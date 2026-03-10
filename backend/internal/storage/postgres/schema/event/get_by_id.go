@@ -11,7 +11,11 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *EventRepository) GetEventByID(ctx context.Context, id uuid.UUID) (*models.Event, error) {
+func (r *EventRepository) GetEventByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.Event, error) {
+
+	var titleEN, descriptionEN string
+	var titleTH, descriptionTH *string
+
 	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlEventFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -22,8 +26,10 @@ func (r *EventRepository) GetEventByID(ctx context.Context, id uuid.UUID) (*mode
 	var event models.Event
 	err = row.Scan(
 		&event.ID,
-		&event.Title,
-		&event.Description,
+		&titleEN,
+		&titleTH,
+		&descriptionEN,
+		&descriptionTH,
 		&event.OrganizationID,
 		&event.AgeRangeMin,
 		&event.AgeRangeMax,
@@ -40,6 +46,15 @@ func (r *EventRepository) GetEventByID(ctx context.Context, id uuid.UUID) (*mode
 		}
 		err := errs.InternalServerError("Failed to fetch event by id: ", err.Error())
 		return nil, &err
+	}
+
+	switch AcceptLanguage {
+	case "th-TH":
+		event.Title = *titleTH
+		event.Description = *descriptionTH
+	case "en-US":
+		event.Title = titleEN
+		event.Description = descriptionEN
 	}
 
 	return &event, nil

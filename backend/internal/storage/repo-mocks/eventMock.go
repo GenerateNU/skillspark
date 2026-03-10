@@ -51,8 +51,8 @@ func (m *MockEventRepository) GetEventOccurrencesByEventID(ctx context.Context, 
 	return eventOccurrences.([]models.EventOccurrence), nil
 }
 
-func (m *MockEventRepository) GetEventByID(ctx context.Context, id uuid.UUID) (*models.Event, error) {
-	args := m.Called(ctx, id)
+func (m *MockEventRepository) GetEventByID(ctx context.Context, id uuid.UUID, acceptLanguage string) (*models.Event, error) {
+	args := m.Called(ctx, id, acceptLanguage)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil

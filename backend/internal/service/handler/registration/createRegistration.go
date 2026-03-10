@@ -3,11 +3,17 @@ package registration
 import (
 	"context"
 	"errors"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"time"
 )
 
 func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
+
+	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
+		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
+		return nil, &e
+	}
 
 	eventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID, "en-US")
 	if err != nil {
@@ -59,6 +65,7 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 	}
 
 	completeRegistration := &models.CreateRegistrationWithPaymentData{
+		AcceptLanguage:        input.AcceptLanguage,
 		ChildID:               input.Body.ChildID,
 		GuardianID:            input.Body.GuardianID,
 		EventOccurrenceID:     input.Body.EventOccurrenceID,

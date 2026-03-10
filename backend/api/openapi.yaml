@@ -265,6 +265,11 @@ paths:
       description: Returns a list of all event occurrences in the database
       operationId: get-all-event-occurrences
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: page
           in: query
           explode: false
@@ -376,6 +381,12 @@ paths:
       summary: Create an event occurrence
       description: Creates a new event occurrence in the database
       operationId: post-event-occurrence
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
       requestBody:
         content:
           application/json:
@@ -405,6 +416,11 @@ paths:
       description: Returns an event occurrence that matches the ID
       operationId: get-event-occurrences-by-id
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: id
           in: path
           description: ID of an event occurrence
@@ -460,6 +476,11 @@ paths:
       description: Updates an event occurrence in the database
       operationId: patch-event-occurrence
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: id
           in: path
           description: ID of the event occurrence to update
@@ -495,6 +516,12 @@ paths:
       summary: Create a new event
       description: Creates a new event
       operationId: create-event
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
       requestBody:
         content:
           multipart/form-data:
@@ -629,6 +656,11 @@ paths:
       description: Updates an existing event
       operationId: update-event
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: id
           in: path
           required: true
@@ -1285,6 +1317,11 @@ paths:
       description: Returns event occurrences that match the organization ID
       operationId: get-event-occurrences-by-organization-id
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: organization_id
           in: path
           description: ID of an organization
@@ -1315,6 +1352,12 @@ paths:
       summary: Create a new registration
       description: Create a new registration for a child to attend an event occurrence
       operationId: create-registration
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
       requestBody:
         content:
           application/json:
@@ -1343,6 +1386,11 @@ paths:
       description: Retrieve a specific registration by its unique identifier
       operationId: get-registration-by-id
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: id
           in: path
           description: Registration ID to retrieve
@@ -1372,6 +1420,11 @@ paths:
       description: Update the child associated with a registration
       operationId: update-registration
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: id
           in: path
           description: Registration ID to update
@@ -1408,6 +1461,11 @@ paths:
       description: Cancel a registration and process refund if applicable
       operationId: cancel-registration
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: id
           in: path
           required: true
@@ -1434,6 +1492,11 @@ paths:
       description: Update the payment intent status for a registration (typically called by webhooks)
       operationId: update-registration-payment-status
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: id
           in: path
           description: Registration ID
@@ -1470,6 +1533,11 @@ paths:
       description: Retrieve all registrations for a specific child
       operationId: get-registrations-by-child-id
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: child_id
           in: path
           description: Child ID to retrieve registrations for
@@ -1499,6 +1567,11 @@ paths:
       description: Retrieve all registrations for a specific event occurrence
       operationId: get-registrations-by-event-occurrence-id
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: event_occurrence_id
           in: path
           description: Event Occurrence ID to retrieve registrations for
@@ -1528,6 +1601,11 @@ paths:
       description: Retrieve all registrations for children under a specific guardian
       operationId: get-registrations-by-guardian-id
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
         - name: guardian_id
           in: path
           description: Guardian ID to retrieve registrations for
@@ -1556,6 +1634,12 @@ paths:
       summary: Creates a review
       description: Creates a review
       operationId: create-review
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
       requestBody:
         content:
           application/json:

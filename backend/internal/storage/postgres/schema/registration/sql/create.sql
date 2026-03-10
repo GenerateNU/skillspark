@@ -54,7 +54,8 @@ SELECT
     i.platform_fee_amount,
     i.paid_at,
     i.stripe_payment_method_id,
-    e.title_en AS event_name,
+    e.title_en,
+    e.title_th,
     eo.start_time AS occurrence_start_time
 FROM inserted i
 JOIN event_occurrence eo ON i.event_occurrence_id = eo.id

@@ -41,7 +41,8 @@ func (rs RegistrationStatus) IsValid() bool {
 }
 
 type CreateRegistrationInput struct {
-	Body struct {
+	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	Body           struct {
 		ChildID           uuid.UUID          `json:"child_id" doc:"ID of the child to register" format:"uuid" required:"true"`
 		GuardianID        uuid.UUID          `json:"guardian_id" doc:"ID of the guardian registering the child" format:"uuid" required:"true"`
 		EventOccurrenceID uuid.UUID          `json:"event_occurrence_id" doc:"ID of the event occurrence to register for" format:"uuid" required:"true"`
@@ -51,19 +52,20 @@ type CreateRegistrationInput struct {
 }
 
 type CreateRegistrationWithPaymentData struct {
-	ChildID                  uuid.UUID
-	GuardianID               uuid.UUID
-	EventOccurrenceID        uuid.UUID
-	Status                   RegistrationStatus
-	StripePaymentIntentID    string
-	StripeCustomerID         string
-	OrgStripeAccountID       string
-	StripePaymentMethodID    string
-	TotalAmount              int
-	ProviderAmount           int
-	PlatformFeeAmount        int
-	Currency                 string
-	PaymentIntentStatus      string
+	AcceptLanguage        string `header:"Accept-Language" default:"en-US"`
+	ChildID               uuid.UUID
+	GuardianID            uuid.UUID
+	EventOccurrenceID     uuid.UUID
+	Status                RegistrationStatus
+	StripePaymentIntentID string
+	StripeCustomerID      string
+	OrgStripeAccountID    string
+	StripePaymentMethodID string
+	TotalAmount           int
+	ProviderAmount        int
+	PlatformFeeAmount     int
+	Currency              string
+	PaymentIntentStatus   string
 }
 
 type CreateRegistrationOutput struct {
@@ -71,8 +73,9 @@ type CreateRegistrationOutput struct {
 }
 
 type UpdateRegistrationInput struct {
-	ID   uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to update" required:"true"`
-	Body struct {
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	ID             uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to update" required:"true"`
+	Body           struct {
 		ChildID           *uuid.UUID          `json:"child_id,omitempty" doc:"Updated child ID (optional)" format:"uuid"`
 		GuardianID        *uuid.UUID          `json:"guardian_id,omitempty" doc:"Updated guardian ID (optional)" format:"uuid"`
 		EventOccurrenceID *uuid.UUID          `json:"event_occurrence_id,omitempty" doc:"Updated event occurrence ID (optional)" format:"uuid"`
@@ -85,23 +88,25 @@ type UpdateRegistrationOutput struct {
 }
 
 type CancelRegistrationInput struct {
-    ID                  uuid.UUID           `path:"id"`
-    Status              *RegistrationStatus `json:"status,omitempty"`
-    PaymentIntentStatus *string             `json:"payment_intent_status,omitempty"`
+	AcceptLanguage      string              `header:"Accept-Language" default:"en-US"`
+	ID                  uuid.UUID           `path:"id"`
+	Status              *RegistrationStatus `json:"status,omitempty"`
+	PaymentIntentStatus *string             `json:"payment_intent_status,omitempty"`
 }
 
 type CancelRegistrationOutput struct {
 	Body struct {
-		Message      string             `json:"message" doc:"Success message"`
-		RefundStatus string             `json:"refund_status,omitempty" doc:"Refund status if applicable"`
+		Message      string       `json:"message" doc:"Success message"`
+		RefundStatus string       `json:"refund_status,omitempty" doc:"Refund status if applicable"`
 		Registration Registration `json:"registration" doc:"Updated registration"`
 	} `json:"body"`
 }
 
 type UpdateRegistrationPaymentStatusInput struct {
-	ID uuid.UUID `path:"id" format:"uuid" doc:"Registration ID"`
-	Body struct {
-		PaymentIntentStatus string     `json:"payment_intent_status" doc:"New payment intent status from Stripe"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	ID             uuid.UUID `path:"id" format:"uuid" doc:"Registration ID"`
+	Body           struct {
+		PaymentIntentStatus string `json:"payment_intent_status" doc:"New payment intent status from Stripe"`
 	} `json:"body"`
 }
 
@@ -110,11 +115,13 @@ type UpdateRegistrationPaymentStatusOutput struct {
 }
 
 type GetRegistrationByIDInput struct {
-	ID uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to retrieve" required:"true"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	ID             uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to retrieve" required:"true"`
 }
 
 type GetRegistrationByPaymentIntentIDInput struct {
-    PaymentIntentID string `path:"payment_intent_id" doc:"Stripe payment intent ID"`
+	AcceptLanguage  string `header:"Accept-Language" default:"en-US"`
+	PaymentIntentID string `path:"payment_intent_id" doc:"Stripe payment intent ID"`
 }
 
 type GetRegistrationByIDOutput struct {
@@ -122,7 +129,8 @@ type GetRegistrationByIDOutput struct {
 }
 
 type GetRegistrationsByChildIDInput struct {
-	ChildID uuid.UUID `path:"child_id" format:"uuid" doc:"Child ID to retrieve registrations for" required:"true"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	ChildID        uuid.UUID `path:"child_id" format:"uuid" doc:"Child ID to retrieve registrations for" required:"true"`
 }
 
 type GetRegistrationsByChildIDOutput struct {
@@ -132,7 +140,8 @@ type GetRegistrationsByChildIDOutput struct {
 }
 
 type GetRegistrationsByGuardianIDInput struct {
-	GuardianID uuid.UUID `path:"guardian_id" format:"uuid" doc:"Guardian ID to retrieve registrations for" required:"true"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	GuardianID     uuid.UUID `path:"guardian_id" format:"uuid" doc:"Guardian ID to retrieve registrations for" required:"true"`
 }
 
 type GetRegistrationsByGuardianIDOutput struct {
@@ -142,6 +151,7 @@ type GetRegistrationsByGuardianIDOutput struct {
 }
 
 type GetRegistrationsByEventOccurrenceIDInput struct {
+	AcceptLanguage    string    `header:"Accept-Language" default:"en-US"`
 	EventOccurrenceID uuid.UUID `path:"event_occurrence_id" format:"uuid" doc:"Event Occurrence ID to retrieve registrations for" required:"true"`
 }
 

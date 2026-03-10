@@ -42,7 +42,7 @@ type OrganizationRepository interface {
 	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, error)
 	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, error)
 	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error)
-	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID) ([]models.EventOccurrence, error)
+	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID, AcceptLanguage string) ([]models.EventOccurrence, error)
 	SetStripeAccountID(ctx context.Context, orgID uuid.UUID, stripeAccountID string) (*models.Organization, error)
 	SetStripeAccountStatus(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error)
 }
@@ -64,7 +64,7 @@ type GuardianRepository interface {
 	GetGuardianByUserID(ctx context.Context, userID uuid.UUID) (*models.Guardian, error)
 	GetGuardianByAuthID(ctx context.Context, authID string) (*models.Guardian, error)
 	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
-	SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string,) (*models.Guardian, error)
+	SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string) (*models.Guardian, error)
 	DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error)
 }
 
@@ -73,7 +73,7 @@ type EventRepository interface {
 	UpdateEvent(ctx context.Context, location *models.UpdateEventDBInput, HeaderImageS3Key *string) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID, AcceptLanguage string) ([]models.EventOccurrence, error)
-	GetEventByID(ctx context.Context, id uuid.UUID) (*models.Event, error)
+	GetEventByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.Event, error)
 }
 
 type ChildRepository interface {
@@ -95,7 +95,7 @@ type EventOccurrenceRepository interface {
 type RegistrationRepository interface {
 	CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error)
 	GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput, tx *pgx.Tx) (*models.GetRegistrationByIDOutput, error)
-	GetRegistrationByPaymentIntentID(ctx context.Context, paymentIntentID string) (*models.Registration, error)
+	GetRegistrationByPaymentIntentID(ctx context.Context, paymentIntentID string, AcceptLanguage string) (*models.Registration, error)
 	GetRegistrationsByChildID(ctx context.Context, input *models.GetRegistrationsByChildIDInput) (*models.GetRegistrationsByChildIDOutput, error)
 	GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error)
 	GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error)

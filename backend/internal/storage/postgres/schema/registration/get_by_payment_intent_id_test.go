@@ -19,7 +19,7 @@ func TestGetRegistrationByPaymentIntentID(t *testing.T) {
 	created := CreateTestRegistration(t, ctx, testDB)
 	require.NotEmpty(t, created.StripePaymentIntentID)
 
-	registration, err := repo.GetRegistrationByPaymentIntentID(ctx, created.StripePaymentIntentID)
+	registration, err := repo.GetRegistrationByPaymentIntentID(ctx, created.StripePaymentIntentID, "en-US")
 
 	require.NoError(t, err)
 	require.NotNil(t, registration)
@@ -43,7 +43,7 @@ func TestGetRegistrationByPaymentIntentID_NotFound(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	registration, err := repo.GetRegistrationByPaymentIntentID(ctx, "pi_doesnotexist")
+	registration, err := repo.GetRegistrationByPaymentIntentID(ctx, "pi_doesnotexist", "en-US")
 
 	require.Error(t, err)
 	assert.Nil(t, registration)
@@ -55,7 +55,7 @@ func TestGetRegistrationByPaymentIntentID_EmptyID(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	registration, err := repo.GetRegistrationByPaymentIntentID(ctx, "")
+	registration, err := repo.GetRegistrationByPaymentIntentID(ctx, "", "en-US")
 
 	require.Error(t, err)
 	assert.Nil(t, registration)
@@ -72,7 +72,7 @@ func TestGetRegistrationByPaymentIntentID_AfterCancel(t *testing.T) {
 	_, err := repo.CancelRegistration(ctx, &models.CancelRegistrationInput{ID: created.ID})
 	require.NoError(t, err)
 
-	registration, err := repo.GetRegistrationByPaymentIntentID(ctx, created.StripePaymentIntentID)
+	registration, err := repo.GetRegistrationByPaymentIntentID(ctx, created.StripePaymentIntentID, "en-US")
 
 	require.NoError(t, err)
 	require.NotNil(t, registration)

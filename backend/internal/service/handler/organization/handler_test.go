@@ -772,3 +772,37 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 		})
 	}
 }
+
+func TestHandler_GetEventOccurrencesByOrganizationID_AcceptLanguageInvariant(t *testing.T) {
+	invalidLanguages := []struct {
+		name string
+		lang string
+	}{
+		{name: "empty AcceptLanguage", lang: ""},
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLanguages {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			input := &models.GetEventOccurrencesByOrganizationIDInput{
+				AcceptLanguage: tt.lang,
+				ID:             uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+			}
+
+			mockOrgRepo := new(repomocks.MockOrganizationRepository)
+			mockLocRepo := new(repomocks.MockLocationRepository)
+			mockS3 := createMockS3Client()
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+
+			result, err := handler.GetEventOccurrencesByOrganizationID(context.Background(), input)
+			assert.Nil(t, result, "expected nil result for invalid AcceptLanguage")
+			assert.NotNil(t, err, "expected error for invalid AcceptLanguage")
+			assert.Contains(t, err.Error(), "Invalid AcceptLanguage")
+		})
+	}
+}

@@ -32,7 +32,7 @@ func (h *Handler) UpdateEventOccurrence(ctx context.Context, input *models.Updat
 
 	eventId := input.Body.EventId
 	if eventId != nil {
-		_, eventErr = h.EventRepository.GetEventByID(ctx, *eventId)
+		_, eventErr = h.EventRepository.GetEventByID(ctx, *eventId, input.AcceptLanguage)
 	}
 
 	locationId := input.Body.LocationId

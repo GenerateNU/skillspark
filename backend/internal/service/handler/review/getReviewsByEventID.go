@@ -16,7 +16,7 @@ func (h *Handler) GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptL
 		return nil, &e
 	}
 
-	if _, err := h.EventRepository.GetEventByID(ctx, id); err != nil {
+	if _, err := h.EventRepository.GetEventByID(ctx, id, AcceptLanguage); err != nil {
 		return nil, errs.BadRequest("Invalid event_id: event does not exist" + err.Error())
 	}
 
