@@ -698,7 +698,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			name:  "only min_age provided should succeed",
 			query: "?min_age=18",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]models.EventOccurrence{}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -707,7 +707,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			name:  "valid date range should succeed",
 			query: "?min_date=2026-02-01T00:00:00Z&max_date=2026-02-10T00:00:00Z",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]models.EventOccurrence{}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -716,7 +716,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			name:  "only max_date provided should succeed",
 			query: "?max_date=2026-02-10T00:00:00Z",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]models.EventOccurrence{}, nil)
 			},
 			statusCode: http.StatusOK,

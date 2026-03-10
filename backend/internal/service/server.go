@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"net/http"
-	"os"
 	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
@@ -11,8 +10,8 @@ import (
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
-	translations "skillspark/internal/translation"
 	"skillspark/internal/stripeClient"
+	translations "skillspark/internal/translation"
 	"skillspark/jobs"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -27,10 +26,10 @@ import (
 )
 
 type App struct {
-	Server *fiber.App
-	Repo   *storage.Repository
+	Server       *fiber.App
+	Repo         *storage.Repository
 	StripeClient stripeClient.StripeClientInterface
-	API    huma.API
+	API          huma.API
 }
 
 // Initialize the App union type containing a fiber app and repository.
@@ -38,14 +37,14 @@ func InitApp(config config.Config) (*App, error) {
 	ctx := context.Background()
 	repo := postgres.NewRepository(ctx, config.DB)
 	s3Client, err := s3_client.NewClient(config.S3)
-	
+
 	if err != nil {
 		return nil, err
 	}
 
 	c := &http.Client{}
 	translateClient := translations.NewClient(c)
-  newStripeClient, err := stripeClient.NewStripeClient("")
+	newStripeClient, err := stripeClient.NewStripeClient("")
 	if err != nil {
 		return nil, err
 	}
