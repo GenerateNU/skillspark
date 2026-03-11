@@ -2,15 +2,16 @@ package guardian
 
 import (
 	"context"
+	"net/http"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	supabaseMock "skillspark/internal/service/handler/auth"
 	"skillspark/internal/storage/postgres/testutil"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	stripemocks "skillspark/internal/stripeClient/mocks"
 	"testing"
 	"time"
-	"net/http"
-	supabaseMock "skillspark/internal/service/handler/auth"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -64,11 +65,12 @@ func TestHandler_GetGuardianById(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
@@ -78,7 +80,7 @@ func TestHandler_GetGuardianById(t *testing.T) {
 
 			testDB := testutil.SetupTestDB(t)
 
-			handler := NewHandler(mockRepo, testDB, cfg)
+			handler := NewHandler(mockRepo, testDB, mockStripeClient, cfg)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByIDInput{ID: uuid.MustParse(tt.id)}
@@ -155,11 +157,12 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
@@ -169,7 +172,7 @@ func TestHandler_UpdateGuardian(t *testing.T) {
 
 			testDB := testutil.SetupTestDB(t)
 
-			handler := NewHandler(mockRepo, testDB, cfg)
+			handler := NewHandler(mockRepo, testDB, mockStripeClient, cfg)
 			ctx := context.Background()
 
 			guardian, err := handler.UpdateGuardian(ctx, tt.input)
@@ -223,11 +226,12 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
@@ -237,7 +241,7 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 
 			testDB := testutil.SetupTestDB(t)
 
-			handler := NewHandler(mockRepo, testDB, cfg)
+			handler := NewHandler(mockRepo, testDB, mockStripeClient, cfg)
 			ctx := context.Background()
 
 			input := &models.GetGuardianByChildIDInput{ChildID: uuid.MustParse(tt.childID)}
@@ -259,57 +263,58 @@ func TestHandler_GetGuardianByChildId(t *testing.T) {
 
 func TestHandler_DeleteGuardian(t *testing.T) {
 	tests := []struct {
-		name      string
-		id        string
-		mockSetup func(*repomocks.MockGuardianRepository)
-		authResponse  interface{}
-		authStatus    int
-		wantErr   bool
+		name         string
+		id           string
+		mockSetup    func(*repomocks.MockGuardianRepository)
+		authResponse interface{}
+		authStatus   int
+		wantErr      bool
 	}{
 		{
-			name: "successful delete guardian", 
+			name: "successful delete guardian",
 			id:   "761ef221-6a5a-463e-8b1f-a3a9296c7fb9",
 			mockSetup: func(m *repomocks.MockGuardianRepository) {
-				m.On("DeleteGuardian", 
-				mock.Anything, 
-				uuid.MustParse("761ef221-6a5a-463e-8b1f-a3a9296c7fb9"),
-				mock.Anything,
+				m.On("DeleteGuardian",
+					mock.Anything,
+					uuid.MustParse("761ef221-6a5a-463e-8b1f-a3a9296c7fb9"),
+					mock.Anything,
 				).Return(&models.Guardian{
-					ID:        uuid.MustParse("761ef221-6a5a-463e-8b1f-a3a9296c7fb9"),
-					UserID:    uuid.MustParse("484de30a-aaa3-4a3a-aeb7-14d7f7ddbe26"),
+					ID:     uuid.MustParse("761ef221-6a5a-463e-8b1f-a3a9296c7fb9"),
+					UserID: uuid.MustParse("484de30a-aaa3-4a3a-aeb7-14d7f7ddbe26"),
 				}, nil)
 			},
-			authResponse: []string {},
-			authStatus: http.StatusOK,
-			wantErr: false,
+			authResponse: []string{},
+			authStatus:   http.StatusOK,
+			wantErr:      false,
 		},
 		{
 			name: "guardian not found",
 			id:   "00000000-0000-0000-0000-000000000000",
 			mockSetup: func(m *repomocks.MockGuardianRepository) {
-				m.On("DeleteGuardian", 
-				mock.Anything, 
-				uuid.MustParse("00000000-0000-0000-0000-000000000000"),
-				mock.Anything,
+				m.On("DeleteGuardian",
+					mock.Anything,
+					uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+					mock.Anything,
 				).Return(nil, &errs.HTTPError{
-						Code:    errs.NotFound("Guardian", "id", "00000000-0000-0000-0000-000000000000").Code,
-						Message: "Not found",
-					})
+					Code:    errs.NotFound("Guardian", "id", "00000000-0000-0000-0000-000000000000").Code,
+					Message: "Not found",
+				})
 			},
-			authResponse: []string {},
-			authStatus: http.StatusOK,
-			wantErr: true,
+			authResponse: []string{},
+			authStatus:   http.StatusOK,
+			wantErr:      true,
 		},
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			supabaseMock.SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockRepo := new(repomocks.MockGuardianRepository)
+			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRepo)
 
 			cfg := config.Supabase{
@@ -319,7 +324,7 @@ func TestHandler_DeleteGuardian(t *testing.T) {
 
 			testDB := testutil.SetupTestDB(t)
 
-			handler := NewHandler(mockRepo, testDB, cfg)
+			handler := NewHandler(mockRepo, testDB, mockStripeClient, cfg)
 			ctx := context.Background()
 
 			input := &models.DeleteGuardianInput{ID: uuid.MustParse(tt.id)}

@@ -26,6 +26,8 @@ func (r *OrganizationRepository) GetOrganizationByID(ctx context.Context, id uui
 		&org.Active,
 		&org.PfpS3Key,
 		&org.LocationID,
+		&org.StripeAccountID,
+		&org.StripeAccountActivated,
 		&org.CreatedAt,
 		&org.UpdatedAt,
 	)

@@ -22,7 +22,7 @@ func (r *GuardianRepository) GetGuardianByUserID(ctx context.Context, id uuid.UU
 
 	var guardian models.Guardian
 
-	err = row.Scan(&guardian.ID, &guardian.UserID, &guardian.Name, &guardian.Email, &guardian.Username, &guardian.ProfilePictureS3Key, &guardian.LanguagePreference, &guardian.CreatedAt, &guardian.UpdatedAt)
+	err = row.Scan(&guardian.ID, &guardian.UserID, &guardian.Name, &guardian.Email, &guardian.Username, &guardian.ProfilePictureS3Key, &guardian.LanguagePreference, &guardian.StripeCustomerID, &guardian.CreatedAt, &guardian.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			err := errs.NotFound("Guardian", "user_id", id)

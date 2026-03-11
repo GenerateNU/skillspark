@@ -42,6 +42,9 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend == 'true'
     continue-on-error: false  # Tests block PR
+    env:
+      STRIPE_SECRET_TEST_KEY: ${{ secrets.STRIPE_SECRET_TEST_KEY }}
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4

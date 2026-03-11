@@ -1,5 +1,7 @@
 import { Redirect, Stack } from "expo-router";
 import "react-native-reanimated";
+import "../global.css";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/auth-context';
 import { useAuthContext } from "@/hooks/use-auth-context";
