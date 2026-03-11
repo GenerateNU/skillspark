@@ -34,7 +34,7 @@ export default function ProfileScreen() {
 
   return (
     <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         bounces={false}
@@ -56,10 +56,10 @@ export default function ProfileScreen() {
           <View style={styles.familyRow}>
             {children.length > 0 ? (
               children.map((child: any) => (
-                <FamilyCard 
+                <FamilyCard
                   key={child.id}
                   initials={child.name?.charAt(0)}
-                  name={child.name} 
+                  name={child.name}
                   date={`Born ${child.birth_year}`}
                 />
               ))
@@ -79,12 +79,12 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Preferences</ThemedText>
           <View style={[styles.listGroup, { backgroundColor: listBackgroundColor, borderColor }]}>
-            <ListItem label="Payment" />
-            <ListItem 
-              label="Family Information" 
+            <ListItem label="Payment" onPress={() => router.push('/payment')} />
+            <ListItem
+              label="Family Information"
               onPress={() => router.push('/family')}
             />
-            <ListItem label="Settings" isLast />
+            <ListItem label="Settings" isLast onPress={() => router.push('/settings')} />
           </View>
         </View>
         <View style={{ height: 20 }} />
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   profileSection: {
-    alignItems: 'center', 
+    alignItems: 'center',
     marginBottom: 20,
     marginTop: 5,
   },
