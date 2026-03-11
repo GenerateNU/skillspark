@@ -18,7 +18,7 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 		return nil, errs.BadRequest("Invalid child_id: child does not exist")
 	}
 
-	_, err = h.GuardianRepository.GetGuardianByID(ctx, input.Body.GuardianID)
+	guardian, err := h.GuardianRepository.GetGuardianByID(ctx, input.Body.GuardianID)
 	if err != nil {
 		return nil, errs.BadRequest("Invalid guardian_id: guardian does not exist")
 	}
@@ -35,10 +35,9 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 			registration.Body.EventName,
 			registration.Body.OccurrenceStartTime.Format("January 2, 2006 at 3:04 PM"),
 		)
-		myEmail := "bobbypalazzi@gmail.com"
 		if notifErr := h.NotificationService.SendNotification(ctx, &models.SendNotificationInput{
 			NotificationType: models.NotificationTypeEmail,
-			RecipientEmail:   &myEmail,
+			RecipientEmail:   &guardian.Email, // this is where you hardcode email to test
 			Subject:          &subject,
 			Body:             body,
 		}); notifErr != nil {

@@ -47,8 +47,13 @@ func InitApp(config config.Config) (*App, error) {
 	}
 	
 	// Initialize notification service and scheduler
-	notifService := notification.NewService(repo, sqsClient)
-	scheduler := notification.NewScheduler(repo, sqsClient)
+	var notifService *notification.Service
+	var scheduler *notification.Scheduler
+	
+	if config.TestMode { 
+		notifService = notification.NewService(repo, sqsClient)
+		scheduler = notification.NewScheduler(repo, sqsClient)
+	}
 	
 	app, humaAPI := SetupApp(config, repo, s3Client, notifService)
 	return &App{

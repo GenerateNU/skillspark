@@ -41,10 +41,12 @@ func main() {
 	// Start notification scheduler in background
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	
-	go func() {
-		app.Scheduler.StartScheduler(ctx)
-	}()
+
+	if !cfg.TestMode {
+		go func() {
+			app.Scheduler.StartScheduler(ctx)
+		}()
+	}
 
 	// Listen for connections with a goroutine
 	go func() {
