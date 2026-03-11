@@ -39,6 +39,8 @@ type GetAllEventOccurrencesInput struct {
 	Latitude       OptionalFloat64 `query:"lat"`
 	Longitude      OptionalFloat64 `query:"lng"`
 	RadiusKm       float64         `query:"radius_km"`
+	MinPrice       int             `query:"min_price"`
+	MaxPrice       int             `query:"max_price"`
 	PriceTier      string          `query:"price"`
 	MinDuration    int             `query:"min_duration"`
 	MaxDuration    int             `query:"max_duration"`
@@ -55,7 +57,8 @@ type GetAllEventOccurrencesFilter struct {
 	Latitude           *float64
 	Longitude          *float64
 	RadiusKm           *float64
-	PriceTier          *string
+	MinPrice           *int
+	MaxPrice           *int
 	MinDurationMinutes *int
 	MaxDurationMinutes *int
 	MinAge             *int

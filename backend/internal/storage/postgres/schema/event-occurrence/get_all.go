@@ -10,6 +10,11 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+type PriceRange struct {
+	MinPrice int
+	MaxPrice *int
+}
+
 var language string
 
 func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error) {
@@ -31,14 +36,16 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 		filters.Latitude,
 		filters.Longitude,
 		filters.RadiusKm,
-		// still missing the price tier here
 		filters.MinAge,
 		filters.MaxAge,
 		filters.Category,
 		filters.SoldOut,
 		filters.MinDate,
 		filters.MaxDate,
+		filters.MinPrice,
+		filters.MaxPrice,
 	)
+
 	if err != nil {
 		err := errs.InternalServerError("Failed to fetch all event occurrences: ", err.Error())
 		return nil, &err

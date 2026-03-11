@@ -595,7 +595,6 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 	radius := 5.0
 	minDuration := 30
 	maxDuration := 120
-	priceTier := "$$"
 
 	tests := []struct {
 		name       string
@@ -617,7 +616,8 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 						Latitude:           &lat,
 						Longitude:          &lng,
 						RadiusKm:           &radius,
-						PriceTier:          &priceTier,
+						MinPrice:           nil,
+						MaxPrice:           nil,
 						MinDurationMinutes: &minDuration,
 						MaxDurationMinutes: &maxDuration,
 					},
@@ -721,6 +721,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
+
 		{
 			name:  "no filters just default pagination",
 			query: "?page=1&limit=5",
