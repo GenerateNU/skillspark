@@ -44,6 +44,13 @@ func validateInputFilters(input *models.GetAllEventOccurrencesInput) error {
 		return huma.Error400BadRequest("min_price cannot be larger than max_price")
 	}
 
+	if input.PriceTier != "" {
+		validTiers := map[string]bool{"$": true, "$$": true, "$$$": true}
+		if !validTiers[input.PriceTier] {
+			return huma.Error400BadRequest("price must be one of $, $$, $$$")
+		}
+	}
+
 	if input.MinAge != 0 && input.MaxAge != 0 && input.MinAge > input.MaxAge {
 		return huma.Error400BadRequest("min age cannot be larger than max age")
 	}
