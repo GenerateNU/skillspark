@@ -39,8 +39,8 @@ func validateInputFilters(input *models.GetAllEventOccurrencesInput) error {
 		return huma.Error400BadRequest("min_duration cannot be larger than max_duration")
 	}
 
-	if input.PriceTier != "" && input.PriceTier != "$" && input.PriceTier != "$$" && input.PriceTier != "$$$" {
-		return huma.Error400BadRequest("price tier must be one of $, $$, $$$")
+	if input.MinPrice != 0 && input.MaxPrice != 0 && input.MinPrice > input.MaxPrice {
+		return huma.Error400BadRequest("min_price cannot be larger than max_price")
 	}
 
 	if input.MinAge != 0 && input.MaxAge != 0 && input.MinAge > input.MaxAge {
@@ -75,8 +75,12 @@ func mapToDBFilters(input *models.GetAllEventOccurrencesInput) models.GetAllEven
 		filters.MaxDurationMinutes = &input.MaxDuration
 	}
 
-	if input.PriceTier != "" {
-		filters.PriceTier = &input.PriceTier
+	if input.MinPrice != 0 {
+		filters.MinPrice = &input.MinPrice
+	}
+
+	if input.MaxPrice != 0 {
+		filters.MaxPrice = &input.MaxPrice
 	}
 
 	if input.MinAge != 0 {
