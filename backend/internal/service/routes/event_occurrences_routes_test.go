@@ -15,7 +15,6 @@ import (
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	stripemocks "skillspark/internal/stripeClient/mocks"
-	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -609,7 +608,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 				m.On(
 					"GetAllEventOccurrences",
 					mock.Anything,
-					utils.Pagination{Page: 1, Limit: 10},
+					mock.Anything,
 					mock.Anything,
 					models.GetAllEventOccurrencesFilter{
 						Search:             &search,
