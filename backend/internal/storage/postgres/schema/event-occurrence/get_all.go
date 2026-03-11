@@ -23,29 +23,6 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 		return nil, &err
 	}
 
-	max3000 := 3000
-	max6000 := 6000
-
-	// this part determines what the price range is, for $, $$ and $$$
-	priceRange := map[string]PriceRange{
-		"$":   {MinPrice: 0, MaxPrice: &max3000},
-		"$$":  {MinPrice: 3001, MaxPrice: &max6000},
-		"$$$": {MinPrice: 6001, MaxPrice: nil}, // no upper bound
-	}
-
-	var min interface{} = nil
-	var max interface{} = nil
-
-	if filters.PriceTier != nil {
-		rng := priceRange[*filters.PriceTier]
-
-		min = rng.MinPrice
-
-		if rng.MaxPrice != nil {
-			max = *rng.MaxPrice
-		}
-	}
-
 	rows, err := r.db.Query(
 		ctx,
 		query,
@@ -63,9 +40,10 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 		filters.SoldOut,
 		filters.MinDate,
 		filters.MaxDate,
-		min, // 15
-		max, // 16
+		filters.MinPrice,
+		filters.MaxPrice,
 	)
+
 	if err != nil {
 		err := errs.InternalServerError("Failed to fetch all event occurrences: ", err.Error())
 		return nil, &err
