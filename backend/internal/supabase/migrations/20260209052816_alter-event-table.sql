@@ -1,4 +1,4 @@
--- Add new columns (_en required, _th nullable for future translations)
+
 ALTER TABLE event
 ADD COLUMN title_en TEXT,
 ADD COLUMN title_th TEXT,
