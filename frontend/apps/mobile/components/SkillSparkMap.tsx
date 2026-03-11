@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { StyleSheet } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
@@ -34,10 +33,10 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
   } : undefined;
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView className="flex-1">
       <MapView
         ref={mapRef}
-        style={styles.map}
+        style={{ width: '100%', height: '100%' }}
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
         showsUserLocation={true}
@@ -68,8 +67,3 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: { width: '100%', height: '100%' },
-});

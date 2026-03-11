@@ -2,12 +2,11 @@ package repomocks
 
 import (
 	"context"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/mock"
 	"github.com/jackc/pgx/v5"
+	"github.com/stretchr/testify/mock"
 )
 
 type MockManagerRepository struct {
@@ -20,7 +19,7 @@ func (m *MockManagerRepository) GetManagerByID(ctx context.Context, id uuid.UUID
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Manager), nil
 }
@@ -31,7 +30,7 @@ func (m *MockManagerRepository) GetManagerByUserID(ctx context.Context, userID u
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Manager), nil
 }
@@ -42,7 +41,7 @@ func (m *MockManagerRepository) GetManagerByOrgID(ctx context.Context, org_id uu
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Manager), nil
 }
@@ -53,7 +52,7 @@ func (m *MockManagerRepository) CreateManager(ctx context.Context, manager *mode
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Manager), nil
 }
@@ -64,7 +63,7 @@ func (m *MockManagerRepository) DeleteManager(ctx context.Context, id uuid.UUID,
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Manager), nil
 }
@@ -75,7 +74,7 @@ func (m *MockManagerRepository) PatchManager(ctx context.Context, manager *model
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Manager), nil
 }
@@ -86,7 +85,7 @@ func (m *MockManagerRepository) GetManagerByAuthID(ctx context.Context, authID s
 		if args.Get(1) == nil {
 			return nil, nil
 		}
-		return nil, args.Get(1).(*errs.HTTPError)
+		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Manager), nil
 }
