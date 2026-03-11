@@ -303,11 +303,18 @@ paths:
           schema:
             type: number
             format: double
-        - name: price
+        - name: min_price
           in: query
           explode: false
           schema:
-            type: string
+            type: integer
+            format: int64
+        - name: max_price
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
         - name: min_duration
           in: query
           explode: false
