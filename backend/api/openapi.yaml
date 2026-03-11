@@ -291,14 +291,12 @@ paths:
           in: query
           explode: false
           schema:
-            type: number
-            format: double
+            type: string
         - name: lng
           in: query
           explode: false
           schema:
-            type: number
-            format: double
+            type: string
         - name: radius_km
           in: query
           explode: false
@@ -322,6 +320,40 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: min_age
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+        - name: max_age
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+        - name: category
+          in: query
+          explode: false
+          schema:
+            type: string
+        - name: soldout
+          in: query
+          explode: false
+          schema:
+            type: boolean
+        - name: min_date
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: date-time
+        - name: max_date
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: date-time
       responses:
         "200":
           description: OK
@@ -2353,7 +2385,10 @@ components:
           readOnly: true
         guardian_id:
           type: string
+        token:
+          type: string
       required:
+        - token
         - guardian_id
     GuardianSignUpInputBody:
       type: object
@@ -2383,7 +2418,6 @@ components:
         - email
         - username
         - password
-        - profile_picture_s3_key
         - language_preference
     GuardianSignUpOutputBody:
       type: object
@@ -2595,7 +2629,10 @@ components:
           readOnly: true
         manager_id:
           type: string
+        token:
+          type: string
       required:
+        - token
         - manager_id
     ManagerSignUpInputBody:
       type: object

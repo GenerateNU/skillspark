@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"skillspark/internal/errs"
 	"skillspark/internal/auth"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 )
 
@@ -27,6 +27,7 @@ func (h *Handler) GuardianLogin(ctx context.Context, input *models.LoginInput) (
 	guardianOutput := &models.GuardianLoginOutput{}
 
 	guardianOutput.Body.GuardianID = guardian.ID
+	guardianOutput.Body.Token = res.AccessToken
 
 	guardianOutput.AccessTokenCookie = http.Cookie{
 		Name:     "jwt",
@@ -59,6 +60,7 @@ func (h *Handler) ManagerLogin(ctx context.Context, input *models.LoginInput) (*
 	managerOutput := &models.ManagerLoginOutput{}
 
 	managerOutput.Body.ManagerID = manager.ID
+	managerOutput.Body.Token = res.AccessToken
 
 	managerOutput.AccessTokenCookie = http.Cookie{
 		Name:     "jwt",

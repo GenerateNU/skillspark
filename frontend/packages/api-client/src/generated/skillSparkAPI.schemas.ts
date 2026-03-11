@@ -218,7 +218,6 @@ export interface ErrorDetail {
 }
 
 export interface ErrorModel {
-  message: string;
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   /** A human-readable explanation specific to this occurrence of the problem. */
@@ -380,6 +379,7 @@ export interface GuardianLoginOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   guardian_id: string;
+  token: string;
 }
 
 export interface GuardianSignUpInputBody {
@@ -389,7 +389,7 @@ export interface GuardianSignUpInputBody {
   language_preference: string;
   name: string;
   password: string;
-  profile_picture_s3_key: string;
+  profile_picture_s3_key?: string;
   username: string;
 }
 
@@ -450,6 +450,7 @@ export interface ManagerLoginOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   manager_id: string;
+  token: string;
 }
 
 export interface ManagerSignUpInputBody {
@@ -668,12 +669,18 @@ page?: number;
  */
 limit?: number;
 search?: string;
-lat?: number;
-lng?: number;
+lat?: string;
+lng?: string;
 radius_km?: number;
 price?: string;
 min_duration?: number;
 max_duration?: number;
+min_age?: number;
+max_age?: number;
+category?: string;
+soldout?: boolean;
+min_date?: string;
+max_date?: string;
 };
 
 export type CreateEventBody = {
