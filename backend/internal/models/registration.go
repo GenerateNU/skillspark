@@ -41,7 +41,7 @@ func (rs RegistrationStatus) IsValid() bool {
 }
 
 type CreateRegistrationInput struct {
-	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Body           struct {
 		ChildID           uuid.UUID          `json:"child_id" doc:"ID of the child to register" format:"uuid" required:"true"`
 		GuardianID        uuid.UUID          `json:"guardian_id" doc:"ID of the guardian registering the child" format:"uuid" required:"true"`
@@ -52,7 +52,7 @@ type CreateRegistrationInput struct {
 }
 
 type CreateRegistrationWithPaymentData struct {
-	AcceptLanguage        string `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage        string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ChildID               uuid.UUID
 	GuardianID            uuid.UUID
 	EventOccurrenceID     uuid.UUID
@@ -73,7 +73,7 @@ type CreateRegistrationOutput struct {
 }
 
 type UpdateRegistrationInput struct {
-	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ID             uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to update" required:"true"`
 	Body           struct {
 		ChildID           *uuid.UUID          `json:"child_id,omitempty" doc:"Updated child ID (optional)" format:"uuid"`
@@ -88,7 +88,7 @@ type UpdateRegistrationOutput struct {
 }
 
 type CancelRegistrationInput struct {
-	AcceptLanguage      string              `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage      string              `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ID                  uuid.UUID           `path:"id"`
 	Status              *RegistrationStatus `json:"status,omitempty"`
 	PaymentIntentStatus *string             `json:"payment_intent_status,omitempty"`
@@ -103,7 +103,7 @@ type CancelRegistrationOutput struct {
 }
 
 type UpdateRegistrationPaymentStatusInput struct {
-	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ID             uuid.UUID `path:"id" format:"uuid" doc:"Registration ID"`
 	Body           struct {
 		PaymentIntentStatus string `json:"payment_intent_status" doc:"New payment intent status from Stripe"`
@@ -115,12 +115,12 @@ type UpdateRegistrationPaymentStatusOutput struct {
 }
 
 type GetRegistrationByIDInput struct {
-	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ID             uuid.UUID `path:"id" format:"uuid" doc:"Registration ID to retrieve" required:"true"`
 }
 
 type GetRegistrationByPaymentIntentIDInput struct {
-	AcceptLanguage  string `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage  string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	PaymentIntentID string `path:"payment_intent_id" doc:"Stripe payment intent ID"`
 }
 
@@ -129,7 +129,7 @@ type GetRegistrationByIDOutput struct {
 }
 
 type GetRegistrationsByChildIDInput struct {
-	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ChildID        uuid.UUID `path:"child_id" format:"uuid" doc:"Child ID to retrieve registrations for" required:"true"`
 }
 
@@ -140,7 +140,7 @@ type GetRegistrationsByChildIDOutput struct {
 }
 
 type GetRegistrationsByGuardianIDInput struct {
-	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	GuardianID     uuid.UUID `path:"guardian_id" format:"uuid" doc:"Guardian ID to retrieve registrations for" required:"true"`
 }
 
@@ -151,7 +151,7 @@ type GetRegistrationsByGuardianIDOutput struct {
 }
 
 type GetRegistrationsByEventOccurrenceIDInput struct {
-	AcceptLanguage    string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage    string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	EventOccurrenceID uuid.UUID `path:"event_occurrence_id" format:"uuid" doc:"Event Occurrence ID to retrieve registrations for" required:"true"`
 }
 

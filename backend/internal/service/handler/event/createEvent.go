@@ -14,12 +14,7 @@ func (h *Handler) CreateEvent(ctx context.Context, input *models.CreateEventInpu
 
 	misc := ""
 
-	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
-		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
-		return nil, &e
-	}
-
-	initInput := h.CreateTranslateStruct(ctx, input, &misc, &misc)
+	initInput := h.CreateEventTranslateStruct(ctx, input, &misc, &misc)
 	event, err := h.EventRepository.CreateEvent(ctx, initInput, key)
 	if err != nil {
 		e := errs.InternalServerError("Invalid creation" + err.Error())
@@ -89,7 +84,7 @@ func (h *Handler) TranslationHelper(ctx context.Context, event *models.Event, up
 	translatedTitle := translationResp[event.Title]
 	translatedDescription := translationResp[event.Description]
 
-	translationsReinsertion := h.UpdateTranslateStruct(ctx, updateInput, translatedTitle, translatedDescription)
+	translationsReinsertion := h.UpdateEventTranslateStruct(ctx, updateInput, translatedTitle, translatedDescription)
 	_, err = h.EventRepository.UpdateEvent(ctx, translationsReinsertion, nil)
 	if err != nil {
 		return nil, err

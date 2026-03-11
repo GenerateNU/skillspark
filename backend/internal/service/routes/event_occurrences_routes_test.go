@@ -781,3 +781,100 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 		})
 	}
 }
+
+func TestHumaValidation_EventOccurrence_InvalidAcceptLanguage(t *testing.T) {
+	t.Parallel()
+
+	invalidLangs := []struct {
+		name string
+		lang string
+	}{
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLangs {
+		tt := tt
+		t.Run("CreateEventOccurrence/"+tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			body, _ := json.Marshal(map[string]interface{}{
+				"event_id":    "60000000-0000-0000-0000-000000000001",
+				"location_id": "10000000-0000-0000-0000-000000000004",
+			})
+
+			app, _ := setupEventOccurrencesTestAPI(
+				new(repomocks.MockEventOccurrenceRepository),
+				new(repomocks.MockManagerRepository),
+				new(repomocks.MockEventRepository),
+				new(repomocks.MockLocationRepository),
+				new(s3mocks.S3ClientMock),
+				new(stripemocks.MockStripeClient),
+			)
+
+			req, err := http.NewRequest(http.MethodPost, "/api/v1/event-occurrences", bytes.NewBuffer(body))
+			assert.NoError(t, err)
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Accept-Language", tt.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on POST /api/v1/event-occurrences", tt.lang)
+		})
+
+		tt2 := tt
+		t.Run("GetEventOccurrenceById/"+tt2.name, func(t *testing.T) {
+			t.Parallel()
+
+			app, _ := setupEventOccurrencesTestAPI(
+				new(repomocks.MockEventOccurrenceRepository),
+				new(repomocks.MockManagerRepository),
+				new(repomocks.MockEventRepository),
+				new(repomocks.MockLocationRepository),
+				new(s3mocks.S3ClientMock),
+				new(stripemocks.MockStripeClient),
+			)
+
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/event-occurrences/70000000-0000-0000-0000-000000000001", nil)
+			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", tt2.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on GET /api/v1/event-occurrences/{id}", tt2.lang)
+		})
+
+		tt3 := tt
+		t.Run("UpdateEventOccurrence/"+tt3.name, func(t *testing.T) {
+			t.Parallel()
+
+			app, _ := setupEventOccurrencesTestAPI(
+				new(repomocks.MockEventOccurrenceRepository),
+				new(repomocks.MockManagerRepository),
+				new(repomocks.MockEventRepository),
+				new(repomocks.MockLocationRepository),
+				new(s3mocks.S3ClientMock),
+				new(stripemocks.MockStripeClient),
+			)
+
+			req, err := http.NewRequest(http.MethodPatch, "/api/v1/event-occurrences/70000000-0000-0000-0000-000000000002", bytes.NewBufferString("{}"))
+			assert.NoError(t, err)
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Accept-Language", tt3.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on PATCH /api/v1/event-occurrences/{id}", tt3.lang)
+		})
+	}
+}

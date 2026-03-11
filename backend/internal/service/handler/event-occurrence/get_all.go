@@ -2,18 +2,12 @@ package eventoccurrence
 
 import (
 	"context"
-	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/utils"
 	"time"
 )
 
 func (h *Handler) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error) {
-
-	if AcceptLanguage != "en-US" && AcceptLanguage != "th-TH" {
-		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
-		return nil, &e
-	}
 
 	eventOccurrence, err := h.EventOccurrenceRepository.GetAllEventOccurrences(ctx, pagination, AcceptLanguage, filters)
 	if err != nil {

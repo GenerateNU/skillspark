@@ -45,24 +45,24 @@ type UpdateDBBody struct {
 }
 
 type CreateEventDBInput struct {
-	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Body           CreateDBBody
 }
 
 type UpdateEventDBInput struct {
-	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ID             uuid.UUID `path:"id"`
 	Body           UpdateDBBody
 }
 
 type CreateEventInput struct {
-	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Body           CreateEventBody
 }
 
 // CreateEventRouteInput is the multipart form input for creating an event with an image
 type CreateEventRouteInput struct {
-	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	RawBody        huma.MultipartFormFiles[CreateEventFormData]
 }
 
@@ -93,7 +93,7 @@ type CreateEventOutput struct {
 }
 
 type UpdateEventRouteInput struct {
-	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ID             uuid.UUID `path:"id"`
 	RawBody        huma.MultipartFormFiles[UpdateEventFormData]
 }
@@ -117,7 +117,7 @@ type UpdateEventBody struct {
 }
 
 type UpdateEventInput struct {
-	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ID             uuid.UUID `path:"id"`
 	Body           UpdateEventBody
 }
@@ -138,11 +138,11 @@ type DeleteEventOutput struct {
 
 // get by event id
 type GetEventOccurrencesByEventIDInput struct {
-	AcceptLanguage string    `header:"Accept-Language"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ID             uuid.UUID `path:"event_id" doc:"ID of an event"`
 }
 
 type GetEventOccurrencesByEventIDOutput struct {
-	AcceptLanguage string            `header:"Accept-Language"`
+	AcceptLanguage string            `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Body           []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
 }

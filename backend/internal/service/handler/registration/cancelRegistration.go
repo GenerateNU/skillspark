@@ -9,11 +9,6 @@ import (
 
 func (h *Handler) CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error) {
 
-	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
-		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
-		return nil, &e
-	}
-
 	getInput := &models.GetRegistrationByIDInput{
 		ID: input.ID,
 	}

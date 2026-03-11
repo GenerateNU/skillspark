@@ -5,7 +5,7 @@ import (
 	"skillspark/internal/models"
 )
 
-func (h *Handler) CreateTranslateStruct(ctx context.Context, event *models.CreateEventInput, translatedTitle *string, translatedDescription *string) *models.CreateEventDBInput {
+func (h *Handler) CreateEventTranslateStruct(ctx context.Context, event *models.CreateEventInput, translatedTitle *string, translatedDescription *string) *models.CreateEventDBInput {
 
 	eventBody := event.Body
 
@@ -35,7 +35,7 @@ func (h *Handler) CreateTranslateStruct(ctx context.Context, event *models.Creat
 	return dbInitInput
 }
 
-func (h *Handler) UpdateTranslateStruct(ctx context.Context, event *models.UpdateEventInput, translatedTitle *string, translatedDescription *string) *models.UpdateEventDBInput {
+func (h *Handler) UpdateEventTranslateStruct(ctx context.Context, event *models.UpdateEventInput, translatedTitle *string, translatedDescription *string) *models.UpdateEventDBInput {
 
 	eventBody := event.Body
 

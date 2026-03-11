@@ -736,3 +736,43 @@ func TestHumaValidation_GetEventOccurrencesByOrganizationId(t *testing.T) {
 		})
 	}
 }
+
+func TestHumaValidation_Organization_InvalidAcceptLanguage(t *testing.T) {
+	t.Parallel()
+
+	invalidLangs := []struct {
+		name string
+		lang string
+	}{
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLangs {
+		tt := tt
+		t.Run("GetEventOccurrencesByOrganizationId/"+tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockOrganizationRepository)
+			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockS3 := new(s3mocks.S3ClientMock)
+			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo, mockS3)
+
+			req, err := http.NewRequest(
+				http.MethodGet,
+				"/api/v1/organizations/40000000-0000-0000-0000-000000000001/event-occurrences/",
+				nil,
+			)
+			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", tt.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on GET /api/v1/organizations/{id}/event-occurrences/", tt.lang)
+		})
+	}
+}

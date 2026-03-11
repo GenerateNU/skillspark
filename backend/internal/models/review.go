@@ -25,7 +25,7 @@ type CreateReviewDBBody struct {
 }
 
 type CreateReviewDBInput struct {
-	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Body           CreateReviewDBBody
 }
 
@@ -41,7 +41,7 @@ type GetReviewInput struct {
 }
 
 type CreateReviewInput struct {
-	AcceptLanguage string `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Body           struct {
 		RegistrationID uuid.UUID `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
 		GuardianID     uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian"`
@@ -52,14 +52,14 @@ type CreateReviewInput struct {
 
 type GetReviewsByGuardianIDInput struct {
 	ID             uuid.UUID `path:"id"`
-	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Page           int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
 	PageSize       int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
 }
 
 type GetReviewsByEventIDInput struct {
 	ID             uuid.UUID `path:"id"`
-	AcceptLanguage string    `header:"Accept-Language" default:"en-US"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Page           int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
 	PageSize       int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
 }

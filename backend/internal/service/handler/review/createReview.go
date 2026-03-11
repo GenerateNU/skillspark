@@ -8,11 +8,6 @@ import (
 
 func (h *Handler) CreateReview(ctx context.Context, input *models.CreateReviewInput) (*models.CreateReviewOutput, *errs.HTTPError) {
 
-	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
-		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
-		return nil, &e
-	}
-
 	translateInput := []*string{&input.Body.Description}
 
 	description, err := h.TranslateClient.CallTranslateAPI(ctx, translateInput, input.AcceptLanguage)

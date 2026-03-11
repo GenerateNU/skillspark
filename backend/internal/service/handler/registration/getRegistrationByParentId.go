@@ -10,11 +10,6 @@ import (
 
 func (h *Handler) GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error) {
 
-	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
-		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
-		return nil, &e
-	}
-
 	guardianID, err := uuid.Parse(input.GuardianID.String())
 	if err != nil {
 		return nil, errs.BadRequest("Invalid guardian ID format")

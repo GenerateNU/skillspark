@@ -11,11 +11,6 @@ import (
 
 func (h *Handler) GetEventOccurrenceByID(ctx context.Context, input *models.GetEventOccurrenceByIDInput) (*models.EventOccurrence, error) {
 
-	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
-		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
-		return nil, &e
-	}
-
 	id, parse_err := uuid.Parse(input.ID.String())
 	if parse_err != nil {
 		return nil, errs.BadRequest("Invalid ID format")

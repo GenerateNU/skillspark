@@ -581,3 +581,93 @@ func TestHumaValidation_GetEventOccurrencesByEventId(t *testing.T) {
 		})
 	}
 }
+
+func TestHumaValidation_Event_InvalidAcceptLanguage(t *testing.T) {
+	t.Parallel()
+
+	invalidLangs := []struct {
+		name string
+		lang string
+	}{
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLangs {
+		tt := tt
+		t.Run("CreateEvent/"+tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			body, contentType := createEventMultipartForm(map[string]string{
+				"title":           "Test Event",
+				"description":     "Test Description",
+				"organization_id": "40000000-0000-0000-0000-000000000001",
+			}, false)
+
+			mockRepo := new(repomocks.MockEventRepository)
+			mockS3 := createMockS3Client()
+			mockTranslate := createMockTranslateClient()
+			app, _ := setupEventTestAPI(mockRepo, mockS3, mockTranslate)
+
+			req, err := http.NewRequest(http.MethodPost, "/api/v1/events", body)
+			assert.NoError(t, err)
+			req.Header.Set("Content-Type", contentType)
+			req.Header.Set("Accept-Language", tt.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on POST /api/v1/events", tt.lang)
+		})
+
+		tt2 := tt
+		t.Run("UpdateEvent/"+tt2.name, func(t *testing.T) {
+			t.Parallel()
+
+			body, contentType := createEventMultipartForm(map[string]string{
+				"title": "Updated Title",
+			}, false)
+
+			mockRepo := new(repomocks.MockEventRepository)
+			mockS3 := createMockS3Client()
+			mockTranslate := createMockTranslateClient()
+			app, _ := setupEventTestAPI(mockRepo, mockS3, mockTranslate)
+
+			req, err := http.NewRequest(http.MethodPatch, "/api/v1/events/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", body)
+			assert.NoError(t, err)
+			req.Header.Set("Content-Type", contentType)
+			req.Header.Set("Accept-Language", tt2.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on PATCH /api/v1/events/{id}", tt2.lang)
+		})
+
+		tt3 := tt
+		t.Run("GetEventOccurrencesByEventID/"+tt3.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockEventRepository)
+			mockS3 := createMockS3Client()
+			mockTranslate := createMockTranslateClient()
+			app, _ := setupEventTestAPI(mockRepo, mockS3, mockTranslate)
+
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/events/60000000-0000-0000-0000-000000000001/event-occurrences/", nil)
+			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", tt3.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on GET /api/v1/events/{id}/event-occurrences/", tt3.lang)
+		})
+	}
+}

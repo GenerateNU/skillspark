@@ -10,11 +10,6 @@ import (
 
 func (h *Handler) GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error) {
 
-	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
-		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
-		return nil, &e
-	}
-
 	eventOccurrenceID, err := uuid.Parse(input.EventOccurrenceID.String())
 	if err != nil {
 		return nil, errs.BadRequest("Invalid child ID format")

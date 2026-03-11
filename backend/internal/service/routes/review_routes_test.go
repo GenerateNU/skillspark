@@ -258,3 +258,98 @@ func TestDeleteReview(t *testing.T) {
 
 	reviewRepo.AssertExpectations(t)
 }
+
+func TestHumaValidation_Review_InvalidAcceptLanguage(t *testing.T) {
+	t.Parallel()
+
+	invalidLangs := []struct {
+		name string
+		lang string
+	}{
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLangs {
+		tt := tt
+		t.Run("CreateReview/"+tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			body, _ := json.Marshal(map[string]interface{}{
+				"registration_id": "10000000-0000-0000-0000-000000000001",
+				"guardian_id":     "11111111-1111-1111-1111-111111111111",
+				"description":     "Great event!",
+				"categories":      []string{"fun", "engaging"},
+			})
+
+			app, _ := setupReviewTestAPI(
+				new(repomocks.MockReviewRepository),
+				new(repomocks.MockRegistrationRepository),
+				new(repomocks.MockGuardianRepository),
+				new(repomocks.MockEventRepository),
+				new(translatemocks.TranslateMock),
+			)
+
+			req, err := http.NewRequest(http.MethodPost, "/api/v1/review", bytes.NewBuffer(body))
+			assert.NoError(t, err)
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Accept-Language", tt.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on POST /api/v1/review", tt.lang)
+		})
+
+		tt2 := tt
+		t.Run("GetReviewsByEventID/"+tt2.name, func(t *testing.T) {
+			t.Parallel()
+
+			app, _ := setupReviewTestAPI(
+				new(repomocks.MockReviewRepository),
+				new(repomocks.MockRegistrationRepository),
+				new(repomocks.MockGuardianRepository),
+				new(repomocks.MockEventRepository),
+				new(translatemocks.TranslateMock),
+			)
+
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/review/event/60000000-0000-0000-0000-000000000001", nil)
+			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", tt2.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on GET /api/v1/review/event/{id}", tt2.lang)
+		})
+
+		tt3 := tt
+		t.Run("GetReviewsByGuardianID/"+tt3.name, func(t *testing.T) {
+			t.Parallel()
+
+			app, _ := setupReviewTestAPI(
+				new(repomocks.MockReviewRepository),
+				new(repomocks.MockRegistrationRepository),
+				new(repomocks.MockGuardianRepository),
+				new(repomocks.MockEventRepository),
+				new(translatemocks.TranslateMock),
+			)
+
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/review/guardian/11111111-1111-1111-1111-111111111111", nil)
+			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", tt3.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on GET /api/v1/review/guardian/{id}", tt3.lang)
+		})
+	}
+}

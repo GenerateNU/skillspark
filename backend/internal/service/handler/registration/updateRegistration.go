@@ -8,11 +8,6 @@ import (
 
 func (h *Handler) UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error) {
 
-	if input.AcceptLanguage != "en-US" && input.AcceptLanguage != "th-TH" {
-		e := errs.BadRequest("Invalid AcceptLanguage parameter: language does not exist")
-		return nil, &e
-	}
-
 	if input.Body.ChildID != nil {
 		if _, err := h.ChildRepository.GetChildByID(ctx, *input.Body.ChildID); err != nil {
 			return nil, errs.BadRequest("Invalid child_id: child does not exist")
