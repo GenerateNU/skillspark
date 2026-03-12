@@ -4,20 +4,13 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
-
-	"github.com/google/uuid"
 )
 
-func (h *Handler) DeleteSaved(ctx context.Context, input *models.DeleteSavedInput) error {
+func (h *Handler) DeleteSaved(ctx context.Context, input *models.DeleteSavedInput) (string, *errs.HTTPError) {
 
-	id, err := uuid.Parse(input.ID.String())
-	if err != nil {
-		return errs.BadRequest("Invalid ID format")
-	}
-
-	httpErr := h.SavedRepository.DeleteSaved(ctx, id)
+	httpErr := h.SavedRepository.DeleteSaved(ctx, input.ID)
 	if httpErr != nil {
-		return httpErr
+		return "", httpErr.(*errs.HTTPError)
 	}
-	return nil
+	return "Review successfully deleted.", nil
 }

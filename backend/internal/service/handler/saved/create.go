@@ -6,12 +6,14 @@ import (
 	"skillspark/internal/models"
 )
 
-func (h *Handler) CreateSaved(ctx context.Context, input *models.CreateSavedInput) (*models.Saved, *errs.HTTPError) {
+func (h *Handler) CreateSaved(ctx context.Context, input *models.CreateSavedInput) (*models.CreateSavedOutput, *errs.HTTPError) {
 
 	saved, err := h.SavedRepository.CreateSaved(ctx, input)
 	if err != nil {
 		return nil, err.(*errs.HTTPError)
 	}
 
-	return saved, nil
+	return &models.CreateSavedOutput{
+		Body: *saved,
+	}, nil
 }
