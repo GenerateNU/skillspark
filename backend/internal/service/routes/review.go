@@ -6,14 +6,15 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/service/handler/review"
 	"skillspark/internal/storage"
+	translations "skillspark/internal/translation"
 	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetUpReviewRoutes(api huma.API, repo *storage.Repository) {
+func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient translations.TranslationInterface) {
 
-	reviewHandler := review.NewHandler(repo.Registration, repo.Review, repo.Guardian, repo.Event)
+	reviewHandler := review.NewHandler(repo.Registration, repo.Review, repo.Guardian, repo.Event, translateClient)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-review-by-guardian-id",
@@ -38,7 +39,7 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository) {
 			Limit: limit,
 		}
 
-		reviews, err := reviewHandler.GetReviewsByGuardianID(ctx, input.ID, pagination)
+		reviews, err := reviewHandler.GetReviewsByGuardianID(ctx, input.ID, input.AcceptLanguage, pagination)
 		if err != nil {
 			return nil, err
 		}
@@ -71,7 +72,7 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository) {
 			Limit: limit,
 		}
 
-		reviews, err := reviewHandler.GetReviewsByEventID(ctx, input.ID, pagination)
+		reviews, err := reviewHandler.GetReviewsByEventID(ctx, input.ID, input.AcceptLanguage, pagination)
 		if err != nil {
 			return nil, err
 		}

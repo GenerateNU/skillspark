@@ -69,6 +69,9 @@ func (r *RegistrationRepository) UpdateRegistration(ctx context.Context, input *
 
 	var updated models.UpdateRegistrationOutput
 
+	var titleEN string
+	var titleTH *string
+
 	err = row.Scan(
 		&updated.Body.ID,
 		&updated.Body.ChildID,
@@ -88,7 +91,8 @@ func (r *RegistrationRepository) UpdateRegistration(ctx context.Context, input *
 		&updated.Body.PlatformFeeAmount,
 		&updated.Body.PaidAt,
 		&updated.Body.StripePaymentMethodID,
-		&updated.Body.EventName,
+		&titleEN,
+		&titleTH,
 		&updated.Body.OccurrenceStartTime,
 	)
 	if err != nil {
@@ -113,6 +117,14 @@ func (r *RegistrationRepository) UpdateRegistration(ctx context.Context, input *
 		}
 		return nil, errs.InternalServerError("Failed to commit transaction: ", err.Error())
 	}
+
+	switch input.AcceptLanguage {
+	case "th-TH":
+		updated.Body.EventName = *titleTH
+	case "en-US":
+		updated.Body.EventName = titleEN
+	}
+
 	return &updated, nil
 }
 

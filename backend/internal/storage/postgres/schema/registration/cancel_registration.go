@@ -11,6 +11,10 @@ import (
 )
 
 func (r *RegistrationRepository) CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error) {
+
+	var titleEN string
+	var titleTH *string
+
 	cancelQuery, err := schema.ReadSQLBaseScript("cancel_registration.sql", SqlRegistrationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read cancel query: ", err.Error())
@@ -61,7 +65,8 @@ func (r *RegistrationRepository) CancelRegistration(ctx context.Context, input *
 		&output.Body.Registration.CancelledAt,
 		&output.Body.Registration.CreatedAt,
 		&output.Body.Registration.UpdatedAt,
-		&output.Body.Registration.EventName,
+		&titleEN,
+		&titleTH,
 		&output.Body.Registration.OccurrenceStartTime,
 	)
 	if err != nil {
@@ -82,6 +87,13 @@ func (r *RegistrationRepository) CancelRegistration(ctx context.Context, input *
 	if err = tx.Commit(ctx); err != nil {
 		errr := errs.InternalServerError("Failed to commit transaction: ", err.Error())
 		return nil, &errr
+	}
+
+	switch input.AcceptLanguage {
+	case "th-TH":
+		output.Body.Registration.EventName = *titleTH
+	case "en-US":
+		output.Body.Registration.EventName = titleEN
 	}
 
 	return &output, nil

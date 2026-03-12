@@ -19,9 +19,10 @@ func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
+	// check that get by id works for 3 different event occurrences
+	eventOccurrence1, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000001"), "en-US")
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 
-	eventOccurrence1, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000001"))
 	assert.NoError(t, err)
 	assert.NotNil(t, eventOccurrence1)
 	assert.Equal(t, &mid, eventOccurrence1.ManagerId)
@@ -33,8 +34,8 @@ func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	assert.Greater(t, eventOccurrence1.Price, 0)
 	assert.Equal(t, "thb", eventOccurrence1.Currency)
 
-	eventOccurrence2, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000003"))
-	assert.NoError(t, err)
+	eventOccurrence2, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000003"), "en-US")
+	assert.Nil(t, err)
 	assert.NotNil(t, eventOccurrence2)
 	assert.Equal(t, &mid, eventOccurrence2.ManagerId)
 	assert.Equal(t, uuid.MustParse("60000000-0000-0000-0000-000000000002"), eventOccurrence2.Event.ID)
@@ -45,9 +46,9 @@ func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	assert.Greater(t, eventOccurrence2.Price, 0)
 	assert.Equal(t, "thb", eventOccurrence2.Currency)
 
-	eventOccurrence3, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000002"))
-	assert.NoError(t, err)
-	assert.NotNil(t, eventOccurrence3)
+	eventOccurrence3, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000002"), "en-US")
+	assert.Nil(t, err)
+	assert.NotNil(t, eventOccurrence1)
 	assert.Equal(t, &mid, eventOccurrence3.ManagerId)
 	assert.Equal(t, uuid.MustParse("60000000-0000-0000-0000-000000000001"), eventOccurrence3.Event.ID)
 	assert.Equal(t, uuid.MustParse("10000000-0000-0000-0000-000000000004"), eventOccurrence3.Location.ID)

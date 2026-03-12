@@ -63,8 +63,10 @@ func TestEventOccurrenceRepository_UpdateEventOccurrence(t *testing.T) {
 	assert.Equal(t, *eventOccurrenceInput.Body.Price, eventOccurrence.Price)
 	assert.Equal(t, *eventOccurrenceInput.Body.Currency, eventOccurrence.Currency)
 
-	retrievedEventOccurrence, err := repo.GetEventOccurrenceByID(ctx, eventOccurrence.ID)
-	assert.NoError(t, err)
+	// check updated event occurrence in database
+	id := eventOccurrence.ID
+	retrievedEventOccurrence, err := repo.GetEventOccurrenceByID(ctx, id, "en-US")
+	assert.Nil(t, err)
 	assert.NotNil(t, retrievedEventOccurrence)
 	assert.Equal(t, &midNew, retrievedEventOccurrence.ManagerId)
 	assert.Equal(t, eid, retrievedEventOccurrence.Event.ID)

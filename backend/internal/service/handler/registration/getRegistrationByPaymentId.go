@@ -6,7 +6,8 @@ import (
 )
 
 func (h *Handler) GetRegistrationByPaymentIntentID(ctx context.Context, input *models.GetRegistrationByPaymentIntentIDInput) (*models.GetRegistrationByIDOutput, error) {
-	registration, err := h.RegistrationRepository.GetRegistrationByPaymentIntentID(ctx, input.PaymentIntentID)
+
+	registration, err := h.RegistrationRepository.GetRegistrationByPaymentIntentID(ctx, input.PaymentIntentID, input.AcceptLanguage)
 	if err != nil {
 		return nil, err
 	}

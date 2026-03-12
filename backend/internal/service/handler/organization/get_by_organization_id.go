@@ -9,12 +9,13 @@ import (
 )
 
 func (h *Handler) GetEventOccurrencesByOrganizationID(ctx context.Context, input *models.GetEventOccurrencesByOrganizationIDInput) ([]models.EventOccurrence, error) {
+
 	id, parse_err := uuid.Parse(input.ID.String())
 	if parse_err != nil {
 		return nil, errs.BadRequest("Invalid ID format")
 	}
 
-	eventOccurrence, err := h.OrganizationRepository.GetEventOccurrencesByOrganizationID(ctx, id)
+	eventOccurrence, err := h.OrganizationRepository.GetEventOccurrencesByOrganizationID(ctx, id, input.AcceptLanguage)
 	if err != nil {
 		return nil, err
 	}

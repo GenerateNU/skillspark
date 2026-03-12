@@ -30,9 +30,10 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences(t *testing.T) {
 
 	pagination := utils.NewPagination()
 
-	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{})
-	require.NoError(t, err)
-	require.NotNil(t, eventOccurrences)
+	// check that all 15 event occurrences in the test database are returned
+	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{})
+	assert.Nil(t, err)
+	assert.NotNil(t, eventOccurrences)
 	assert.Equal(t, count, int64(len(eventOccurrences)))
 
 	for _, eo := range eventOccurrences {
@@ -58,9 +59,9 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.
 	assert.GreaterOrEqual(t, count, int64(12))
 
 	pagination1 := utils.Pagination{Page: 1, Limit: 4}
-	eventOccurrences1, err := repo.GetAllEventOccurrences(ctx, pagination1, models.GetAllEventOccurrencesFilter{})
-	require.NoError(t, err)
-	require.NotNil(t, eventOccurrences1)
+	eventOccurrences1, err1 := repo.GetAllEventOccurrences(ctx, pagination1, "en-US", models.GetAllEventOccurrencesFilter{})
+	assert.Nil(t, err1)
+	assert.NotNil(t, eventOccurrences1)
 	assert.Equal(t, 4, len(eventOccurrences1))
 	for _, eo := range eventOccurrences1 {
 		assert.Greater(t, eo.Price, 0)
@@ -68,9 +69,9 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.
 	}
 
 	pagination2 := utils.Pagination{Page: 2, Limit: 4}
-	eventOccurrences2, err := repo.GetAllEventOccurrences(ctx, pagination2, models.GetAllEventOccurrencesFilter{})
-	require.NoError(t, err)
-	require.NotNil(t, eventOccurrences2)
+	eventOccurrences2, err2 := repo.GetAllEventOccurrences(ctx, pagination2, "en-US", models.GetAllEventOccurrencesFilter{})
+	assert.Nil(t, err2)
+	assert.NotNil(t, eventOccurrences2)
 	assert.Equal(t, 4, len(eventOccurrences2))
 	for _, eo := range eventOccurrences2 {
 		assert.Greater(t, eo.Price, 0)
@@ -78,9 +79,9 @@ func TestEventOccurrenceRepository_GetAllEventOccurrences_Pagination(t *testing.
 	}
 
 	pagination3 := utils.Pagination{Page: 3, Limit: 4}
-	eventOccurrences3, err := repo.GetAllEventOccurrences(ctx, pagination3, models.GetAllEventOccurrencesFilter{})
-	require.NoError(t, err)
-	require.NotNil(t, eventOccurrences3)
+	eventOccurrences3, err3 := repo.GetAllEventOccurrences(ctx, pagination3, "en-US", models.GetAllEventOccurrencesFilter{})
+	assert.Nil(t, err3)
+	assert.NotNil(t, eventOccurrences3)
 	assert.Equal(t, 4, len(eventOccurrences3))
 	for _, eo := range eventOccurrences3 {
 		assert.Greater(t, eo.Price, 0)
@@ -112,7 +113,7 @@ func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) 
 	minDur := 60
 	maxDur := 120
 
-	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
 		MinDurationMinutes: &minDur,
 		MaxDurationMinutes: &maxDur,
 	})
@@ -129,7 +130,7 @@ func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) 
 	lng := 100.545
 	radiusKm := 5.0
 
-	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
 		Latitude:  &lat,
 		Longitude: &lng,
 		RadiusKm:  &radiusKm,
@@ -144,7 +145,7 @@ func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) 
 
 	search := "Robotics"
 
-	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
 		Search: &search,
 	})
 	require.NoError(t, err)
@@ -169,7 +170,7 @@ func TestEventOccurrenceRepository_Filters_NewFilters(t *testing.T) {
 	minAge := 10
 	maxAge := 15
 
-	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+	eventOccurrences, err := repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
 		MinAge: &minAge,
 		MaxAge: &maxAge,
 	})
@@ -184,7 +185,7 @@ func TestEventOccurrenceRepository_Filters_NewFilters(t *testing.T) {
 	minDate := time.Date(2026, 2, 1, 0, 0, 0, 0, time.UTC)
 	maxDate := time.Date(2026, 2, 10, 23, 59, 59, 0, time.UTC)
 
-	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
 		MinDate: &minDate,
 		MaxDate: &maxDate,
 	})
@@ -198,7 +199,7 @@ func TestEventOccurrenceRepository_Filters_NewFilters(t *testing.T) {
 
 	category := "science"
 
-	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
 		Category: &category,
 	})
 	require.NoError(t, err)
@@ -217,7 +218,7 @@ func TestEventOccurrenceRepository_Filters_NewFilters(t *testing.T) {
 
 	soldOut := true
 
-	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
 		SoldOut: &soldOut,
 	})
 	require.NoError(t, err)
@@ -229,7 +230,7 @@ func TestEventOccurrenceRepository_Filters_NewFilters(t *testing.T) {
 
 	soldOut = false
 
-	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, models.GetAllEventOccurrencesFilter{
+	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
 		SoldOut: &soldOut,
 	})
 	require.NoError(t, err)

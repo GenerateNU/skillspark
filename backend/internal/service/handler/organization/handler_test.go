@@ -700,6 +700,7 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 					"GetEventOccurrencesByOrganizationID",
 					mock.Anything,
 					uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+					"en-US",
 				).Return([]models.EventOccurrence{
 					{
 						ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),
@@ -739,6 +740,7 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 					"GetEventOccurrencesByOrganizationID",
 					mock.Anything,
 					uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+					"en-US",
 				).Return(make([]models.EventOccurrence, 0), nil)
 			},
 			wantErr: false,
@@ -758,7 +760,10 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 			handler := NewHandler(mockRepo, mockLocationRepo, mockS3)
 			ctx := context.Background()
 
-			input := &models.GetEventOccurrencesByOrganizationIDInput{ID: uuid.MustParse(tt.id)}
+			input := &models.GetEventOccurrencesByOrganizationIDInput{
+				AcceptLanguage: "en-US",
+				ID:             uuid.MustParse(tt.id),
+			}
 			eventOccurrences, err := handler.GetEventOccurrencesByOrganizationID(ctx, input)
 
 			assert.Nil(t, err)

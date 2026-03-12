@@ -11,12 +11,13 @@ import (
 )
 
 func (h *Handler) GetEventOccurrencesByEventID(ctx context.Context, input *models.GetEventOccurrencesByEventIDInput, s3Client s3_client.S3Interface) ([]models.EventOccurrence, error) {
+
 	id, parse_err := uuid.Parse(input.ID.String())
 	if parse_err != nil {
 		return nil, errs.BadRequest("Invalid ID format")
 	}
 
-	eventOccurrence, err := h.EventRepository.GetEventOccurrencesByEventID(ctx, id)
+	eventOccurrence, err := h.EventRepository.GetEventOccurrencesByEventID(ctx, id, input.AcceptLanguage)
 	if err != nil {
 		return nil, err
 	}

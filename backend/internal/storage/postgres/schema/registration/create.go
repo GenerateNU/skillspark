@@ -11,7 +11,10 @@ import (
 func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error) {
 	tx, err := r.db.Begin(ctx)
 
-	if (err != nil) {
+	var titleEN string
+	var titleTH *string
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -34,8 +37,8 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		input.OrgStripeAccountID,
 		input.StripePaymentMethodID,
 		input.TotalAmount,
-		input.ProviderAmount, 
-		input.PlatformFeeAmount, 
+		input.ProviderAmount,
+		input.PlatformFeeAmount,
 		input.Currency,
 		input.PaymentIntentStatus)
 
@@ -60,8 +63,9 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		&createdRegistration.Body.PlatformFeeAmount,
 		&createdRegistration.Body.PaidAt,
 		&createdRegistration.Body.StripePaymentMethodID,
-		&createdRegistration.Body.EventName,
-		&createdRegistration.Body.OccurrenceStartTime, 
+		&titleEN,
+		&titleTH,
+		&createdRegistration.Body.OccurrenceStartTime,
 	)
 
 	if err != nil {
@@ -96,6 +100,13 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 			slog.Error("Failed to rollback transaction: " + err.Error())
 		}
 		return nil, errs.InternalServerError("Failed to commit transaction: ", err.Error())
+	}
+
+	switch input.AcceptLanguage {
+	case "th-TH":
+		createdRegistration.Body.EventName = *titleTH
+	case "en-US":
+		createdRegistration.Body.EventName = titleEN
 	}
 	return &createdRegistration, nil
 }
