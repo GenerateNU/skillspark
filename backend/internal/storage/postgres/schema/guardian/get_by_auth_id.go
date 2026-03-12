@@ -19,7 +19,13 @@ func (r *GuardianRepository) GetGuardianByAuthID(ctx context.Context, authID str
 
 	row := r.db.QueryRow(ctx, query, authID)
 	var guardian models.Guardian
-	err = row.Scan(&guardian.ID, &guardian.UserID, &guardian.CreatedAt, &guardian.UpdatedAt)
+	err = row.Scan(
+		&guardian.ID,
+		&guardian.UserID,
+		&guardian.StripeCustomerID,
+		&guardian.CreatedAt,
+		&guardian.UpdatedAt,
+	)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { StyleSheet, Linking, Button, ActivityIndicator, View } from 'react-native';
+import { Linking, Button, ActivityIndicator, View } from 'react-native';
 import * as Location from 'expo-location';
 import { useGetAllEventOccurrences } from '@skillspark/api-client';
 import type { EventOccurrence } from '@skillspark/api-client';
@@ -67,17 +67,17 @@ export default function MapScreen() {
 
   if (isLocationLoading || isApiLoading) {
     return (
-      <ThemedView style={styles.centerContainer}>
+      <ThemedView className="flex-1 items-center justify-center p-5">
         <ActivityIndicator size="large" />
-        <ThemedText style={{ marginTop: 10 }}>Loading Map Data...</ThemedText>
+        <ThemedText className="mt-[10px]">Loading Map Data...</ThemedText>
       </ThemedView>
     );
   }
 
   if (locationPermissionDenied) {
     return (
-      <ThemedView style={styles.centerContainer}>
-        <ThemedText style={styles.errorText}>
+      <ThemedView className="flex-1 items-center justify-center p-5">
+        <ThemedText className="mb-5 text-center text-base">
           Permission to access location was denied. Please enable it in settings.
         </ThemedText>
         <Button title="Open Settings" onPress={() => Linking.openSettings()} />
@@ -86,52 +86,23 @@ export default function MapScreen() {
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView className="flex-1">
       <SkillSparkMap 
         locations={mapLocations} 
         userLocation={userLocation} 
       />
 
       {!isApiLoading && error && (
-         <View style={styles.emptyStateContainer}>
-            <ThemedText style={styles.emptyStateText}>An error occurred while fetching events.</ThemedText>
+         <View className="absolute top-[60px] self-center rounded-[20px] bg-[rgba(0,0,0,0.6)] px-5 py-[10px]">
+            <ThemedText className="text-sm font-semibold text-white">An error occurred while fetching events.</ThemedText>
          </View>
       )}
 
       {!isApiLoading && !error && mapLocations.length === 0 && (
-         <View style={styles.emptyStateContainer}>
-            <ThemedText style={styles.emptyStateText}>No events found nearby.</ThemedText>
+         <View className="absolute top-[60px] self-center rounded-[20px] bg-[rgba(0,0,0,0.6)] px-5 py-[10px]">
+            <ThemedText className="text-sm font-semibold text-white">No events found nearby.</ThemedText>
          </View>
       )}
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  centerContainer: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    padding: 20 
-  },
-  errorText: {
-    textAlign: 'center',
-    marginBottom: 20,
-    fontSize: 16,
-  },
-  emptyStateContainer: {
-    position: 'absolute',
-    top: 60,
-    alignSelf: 'center',
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  emptyStateText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-  }
-});
