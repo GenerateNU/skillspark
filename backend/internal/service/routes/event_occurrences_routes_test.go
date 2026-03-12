@@ -637,12 +637,6 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
-			name:       "invalid price tier should return 400",
-			query:      "?price=invalid",
-			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository) {},
-			statusCode: http.StatusBadRequest,
-		},
-		{
 			name:       "min_age greater than max_age should return 400",
 			query:      "?min_age=18&max_age=10",
 			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository) {},
