@@ -12,6 +12,7 @@ import (
 	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/review"
+	"skillspark/internal/storage/postgres/schema/saved"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/storage/postgres/schema/user"
 	"skillspark/internal/utils"
@@ -64,7 +65,7 @@ type GuardianRepository interface {
 	GetGuardianByUserID(ctx context.Context, userID uuid.UUID) (*models.Guardian, error)
 	GetGuardianByAuthID(ctx context.Context, authID string) (*models.Guardian, error)
 	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
-	SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string,) (*models.Guardian, error)
+	SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string) (*models.Guardian, error)
 	DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error)
 }
 
@@ -119,6 +120,12 @@ type UserRepository interface {
 	DeleteUser(ctx context.Context, id uuid.UUID) (*models.User, error)
 }
 
+type SavedRepository interface {
+	CreateSaved(ctx context.Context, saved *models.CreateSavedInput) (*models.Saved, error)
+	DeleteSaved(ctx context.Context, id uuid.UUID) error
+	GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination) ([]models.Saved, error)
+}
+
 type Repository struct {
 	db              *pgxpool.Pool
 	Location        LocationRepository
@@ -132,6 +139,7 @@ type Repository struct {
 	Registration    RegistrationRepository
 	Review          ReviewRepository
 	User            UserRepository
+	Saved           SavedRepository
 }
 
 // Close closes the database connection pool
@@ -160,5 +168,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		User:            user.NewUserRepository(db),
 		Registration:    registration.NewRegistrationRepository(db),
 		Review:          review.NewReviewRepository(db),
+		Saved:           saved.NewSavedRepository(db),
 	}
 }

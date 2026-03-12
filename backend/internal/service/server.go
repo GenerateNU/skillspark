@@ -25,10 +25,10 @@ import (
 )
 
 type App struct {
-	Server *fiber.App
-	Repo   *storage.Repository
+	Server       *fiber.App
+	Repo         *storage.Repository
 	StripeClient stripeClient.StripeClientInterface
-	API    huma.API
+	API          huma.API
 }
 
 // Initialize the App union type containing a fiber app and repository.
@@ -36,7 +36,7 @@ func InitApp(config config.Config) (*App, error) {
 	ctx := context.Background()
 	repo := postgres.NewRepository(ctx, config.DB)
 	s3Client, err := s3_client.NewClient(config.S3)
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,6 @@ func InitApp(config config.Config) (*App, error) {
 	jobScheduler := jobs.NewJobScheduler(repo, newStripeClient)
 	jobScheduler.Start()
 	defer jobScheduler.Stop()
-
 
 	app, humaAPI := SetupApp(config, repo, s3Client, newStripeClient)
 	return &App{
@@ -110,8 +109,8 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	setupHumaRoutes(humaAPI, repo, config, s3Client, newStripeClient)
 
 	routes.SetupWebhookRoutes(app, repo,
-    	os.Getenv("STRIPE_WEBHOOK_SECRET"),
-    	os.Getenv("STRIPE_ACCOUNT_WEBHOOK_SECRET"),
+		os.Getenv("STRIPE_WEBHOOK_SECRET"),
+		os.Getenv("STRIPE_ACCOUNT_WEBHOOK_SECRET"),
 	)
 
 	return app, humaAPI
@@ -133,4 +132,5 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetUpReviewRoutes(api, repo)
 	routes.SetupAuthRoutes(api, repo, config)
 	routes.SetupPaymentRoutes(api, repo, sc)
+	routes.SetUpSavedRoutes(api, repo)
 }
