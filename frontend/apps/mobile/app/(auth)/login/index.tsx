@@ -1,21 +1,32 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { router } from "expo-router";
-import { useState } from "react";
+import React, { useState } from "react";
 import { TextInput, TouchableOpacity, Text, View } from "react-native";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import { useForm, Controller } from "react-hook-form";
+
+type LoginFormData = {
+  email: string;
+  password: string;
+};
 
 export default function LoginScreen() {
-  const [emailText, setEmailText] = useState("");
-  const [passwordText, setPasswordText] = useState("");
   const [errorText, setErrorText] = useState("");
   const { login } = useAuthContext();
 
-  const handleLogIn = () => {
-    if (emailText === "" || passwordText === "") {
-      setErrorText("Missing email or password");
+  const { control, handleSubmit } = useForm<LoginFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    }
+  });
+
+  const onSubmit = (formData: LoginFormData) => {
+    if (formData.email === "" || formData.password === "") {
+      setErrorText("Missing email or password")
     } else {
-      login(emailText, passwordText, setErrorText);
+      login(formData.email, formData.password, setErrorText);
     }
   };
 
@@ -39,20 +50,36 @@ export default function LoginScreen() {
       </ThemedText>
 
       <View style={{ width: "100%", paddingHorizontal: 24, gap: 16, alignItems: "center" }}>
-        <TextInput
-          style={inputStyle}
-          placeholder="Email"
-          onChangeText={setEmailText}
-          value={emailText}
-          keyboardType="email-address"
-          autoCapitalize="none"
+        <Controller
+          control={control}
+          name="email"
+          render={({ field: { onChange, value } }) => (
+            <View style={{ width: "100%", gap: 4 }}>
+              <TextInput
+                style={inputStyle}
+                placeholder="Email"
+                onChangeText={onChange}
+                value={value}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+          )}
         />
-        <TextInput
-          style={inputStyle}
-          placeholder="Password"
-          onChangeText={setPasswordText}
-          value={passwordText}
-          secureTextEntry={true}
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, value } }) => (
+            <View style={{ width: "100%", gap: 4 }}>
+              <TextInput
+                style={inputStyle}
+                placeholder="Password"
+                onChangeText={onChange}
+                value={value}
+                secureTextEntry={true}
+              />
+            </View>
+          )}
         />
         <TouchableOpacity
           style={{
@@ -62,7 +89,7 @@ export default function LoginScreen() {
             width: "100%",
             alignItems: "center",
           }}
-          onPress={handleLogIn}
+          onPress={handleSubmit(onSubmit)}
           activeOpacity={0.5}
         >
           <Text style={{ color: "white", fontSize: 16, fontWeight: "500" }}>Log In</Text>

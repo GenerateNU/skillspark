@@ -23,7 +23,6 @@ interface AuthContextType {
     onError: (msg: string) => void
   ) => void;
   logout: () => void;
-  debug: () => void; // temp
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -103,22 +102,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.replace('/(auth)/login');
   }
 
-  const debug = async () => {
-    console.log(`token: ${jwt}`);
-    console.log(`guardian_id: ${guardianId}`);
-  }
-
   return (
     <AuthContext.Provider 
         value={{
           guardianId,
           jwt,
-          isAuthenticated: !!jwt && !!guardianId,
+          isAuthenticated: !!(jwt && guardianId),
           isLoading,
           login,
           signup,
           logout,
-          debug
         }}
     >
       {children}

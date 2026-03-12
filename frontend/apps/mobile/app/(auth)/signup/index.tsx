@@ -4,32 +4,56 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { TextInput, TouchableOpacity, Text, View } from "react-native";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import { Controller, useForm } from "react-hook-form";
+
+type SignupFormData = {
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+  language_preference: string;
+  profile_picture_s3_key: string | undefined;
+};
 
 export default function SignupScreen() {
-  const [nameText, setNameText] = useState("");
-  const [emailText, setEmailText] = useState("");
-  const [usernameText, setUsernameText] = useState("");
-  const [passwordText, setPasswordText] = useState("");
-  const [langPrefText, setLangPrefText] = useState("");
-  const [s3KeyText] = useState(undefined);
   const [errorText, setErrorText] = useState("");
   const { signup } = useAuthContext();
 
-  const handleSignUp = () => {
-    if (nameText === "" 
-      || emailText === "" 
-      || usernameText === ""
-      || passwordText === ""
-      || langPrefText === "") {
+  const { control, handleSubmit } = useForm<SignupFormData>({
+      defaultValues: {
+        name: "",
+        email: "",
+        username: "",
+        password: "",
+        language_preference: "",
+        profile_picture_s3_key: undefined
+      }
+    }
+  );
+
+  const onSubmit = (formData: SignupFormData) => {
+    if (formData.name === "" 
+      || formData.email === "" 
+      || formData.username === ""
+      || formData.password === ""
+      || formData.language_preference === "") {
       setErrorText("Missing a required field");
     } else {
-      signup(nameText, emailText, usernameText, passwordText, langPrefText, s3KeyText, setErrorText); 
+      signup(
+        formData.name, 
+        formData.email, 
+        formData.username, 
+        formData.password, 
+        formData.language_preference, 
+        formData.profile_picture_s3_key, 
+        setErrorText
+      ); 
     }
   };
 
   const handleGoToLogIn = () => {
-      router.push("/(auth)/login");
-    };
+    router.push("/(auth)/login");
+  };
 
   const inputStyle = {
     width: "100%" as const,
@@ -45,44 +69,83 @@ export default function SignupScreen() {
       <ThemedText type="title" style={{ fontSize: 30, fontWeight: "bold", marginBottom: 30 }}>
         Sign Up
       </ThemedText>
-
       <View style={{ width: "100%", paddingHorizontal: 24, gap: 16, alignItems: "center" }}>
-        <TextInput 
-          style={inputStyle} 
-          placeholder="Full Name" 
-          onChangeText={setNameText} 
-          value={nameText} 
-          autoCapitalize="none" 
-        />
-        <TextInput 
-          style={inputStyle} 
-          placeholder="Email" 
-          onChangeText={setEmailText} 
-          value={emailText} 
-          keyboardType="email-address" 
-          autoCapitalize="none" 
-        />
-        <TextInput 
-          style={inputStyle} 
-          placeholder="Username" 
-          onChangeText={setUsernameText} 
-          value={usernameText} 
-          autoCapitalize="none" 
-        />
-        <TextInput 
-          style={inputStyle} 
-          placeholder="Password" 
-          onChangeText={setPasswordText} 
-          value={passwordText} 
-          secureTextEntry={true} 
-        />
-        <TextInput 
-          style={inputStyle} 
-          placeholder="Language Preference" 
-          onChangeText={setLangPrefText} 
-          value={langPrefText} 
-          autoCapitalize="none" 
-        />
+        <Controller
+        control={control}
+        name="name"
+        render={({ field: { onChange, value } }) => (
+          <View style={{ width: "100%", gap: 4 }}>
+            <TextInput
+              style={inputStyle}
+              placeholder="Full Name"
+              onChangeText={onChange}
+              value={value}
+              autoCapitalize="none"
+            />
+          </View>
+        )}
+      />
+      <Controller
+        control={control}
+        name="email"
+        render={({ field: { onChange, value } }) => (
+          <View style={{ width: "100%", gap: 4 }}>
+            <TextInput
+              style={inputStyle}
+              placeholder="Email"
+              onChangeText={onChange}
+              value={value}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+        )}
+      />
+      <Controller
+        control={control}
+        name="username"
+        render={({ field: { onChange, value } }) => (
+          <View style={{ width: "100%", gap: 4 }}>
+            <TextInput
+              style={inputStyle}
+              placeholder="Username"
+              onChangeText={onChange}
+              value={value}
+              autoCapitalize="none"
+            />
+          </View>
+        )}
+      />
+      <Controller
+        control={control}
+        name="password"
+        render={({ field: { onChange, value } }) => (
+          <View style={{ width: "100%", gap: 4 }}>
+            <TextInput
+              style={inputStyle}
+              placeholder="Password"
+              onChangeText={onChange}
+              value={value}
+              secureTextEntry={true}
+            />
+          </View>
+        )}
+      />
+      <Controller
+        control={control}
+        name="language_preference"
+        render={({ field: { onChange, value } }) => (
+          <View style={{ width: "100%", gap: 4 }}>
+            <TextInput
+              style={inputStyle}
+              placeholder="Language Preference"
+              onChangeText={onChange}
+              value={value}
+              autoCapitalize="none"
+            />
+          </View>
+        )}
+      />
         <TouchableOpacity
           style={{
             backgroundColor: "#3b82f6",
@@ -91,7 +154,7 @@ export default function SignupScreen() {
             width: "100%",
             alignItems: "center",
           }}
-          onPress={handleSignUp}
+          onPress={handleSubmit(onSubmit)}
           activeOpacity={0.8}
         >
           <Text style={{ color: "white", fontSize: 16, fontWeight: "500" }}>Sign Up</Text>
