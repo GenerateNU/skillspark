@@ -5,9 +5,7 @@ export const LoginRedirect = () => {
   const { isAuthenticated, isLoading } = useAuthContext();
 
   if (isLoading) {
-    return (
-      <Stack />
-    );
+    return <Stack />;
   }
 
   return (
@@ -20,4 +18,4 @@ export const LoginRedirect = () => {
       {isAuthenticated && <Redirect href="/(app)/(tabs)" />}
     </>
   );
-}
+};

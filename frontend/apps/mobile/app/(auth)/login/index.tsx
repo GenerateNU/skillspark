@@ -2,9 +2,13 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { TextInput, TouchableOpacity, Text, View } from "react-native";
+import { View } from "react-native";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { ErrorMessage } from "@/components/ErrorMessage";
+import { PageRedirectButton } from "@/components/PageRedirectButton";
+import { SubmitButton } from "@/components/SubmitButton";
+import { AuthFormInput } from "@/components/AuthFormInput";
 
 type LoginFormData = {
   email: string;
@@ -19,12 +23,12 @@ export default function LoginScreen() {
     defaultValues: {
       email: "",
       password: "",
-    }
+    },
   });
 
   const onSubmit = (formData: LoginFormData) => {
     if (formData.email === "" || formData.password === "") {
-      setErrorText("Missing email or password")
+      setErrorText("Missing email or password");
     } else {
       login(formData.email, formData.password, setErrorText);
     }
@@ -34,79 +38,44 @@ export default function LoginScreen() {
     router.push("/(auth)/signup");
   };
 
-  const inputStyle = {
-    width: "100%" as const,
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
-  };
-
   return (
-    <ThemedView style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <ThemedText type="title" style={{ fontSize: 30, fontWeight: "bold", marginBottom: 30 }}>
+    <ThemedView
+      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+    >
+      <ThemedText
+        type="title"
+        style={{ fontSize: 30, fontWeight: "bold", marginBottom: 30 }}
+      >
         Log In
       </ThemedText>
 
-      <View style={{ width: "100%", paddingHorizontal: 24, gap: 16, alignItems: "center" }}>
-        <Controller
+      <View
+        style={{
+          width: "100%",
+          paddingHorizontal: 24,
+          gap: 16,
+          alignItems: "center",
+        }}
+      >
+        <AuthFormInput
           control={control}
           name="email"
-          render={({ field: { onChange, value } }) => (
-            <View style={{ width: "100%", gap: 4 }}>
-              <TextInput
-                style={inputStyle}
-                placeholder="Email"
-                onChangeText={onChange}
-                value={value}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
-          )}
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
-        <Controller
+        <AuthFormInput
           control={control}
           name="password"
-          render={({ field: { onChange, value } }) => (
-            <View style={{ width: "100%", gap: 4 }}>
-              <TextInput
-                style={inputStyle}
-                placeholder="Password"
-                onChangeText={onChange}
-                value={value}
-                secureTextEntry={true}
-              />
-            </View>
-          )}
+          placeholder="Password"
+          secureTextEntry={true}
         />
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#3b82f6",
-            borderRadius: 8,
-            padding: 10,
-            width: "100%",
-            alignItems: "center",
-          }}
-          onPress={handleSubmit(onSubmit)}
-          activeOpacity={0.5}
-        >
-          <Text style={{ color: "white", fontSize: 16, fontWeight: "500" }}>Log In</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            borderRadius: 8,
-            padding: 10,
-            width: "100%",
-            alignItems: "center",
-          }}
+        <SubmitButton label="Log In" onPress={handleSubmit(onSubmit)} />
+        <PageRedirectButton
+          label="Don't have an account? Sign up"
           onPress={handleGoToSignUp}
-          activeOpacity={0.5}
-        >
-        <Text style={{ color: "#3b82f6", fontSize: 16, fontWeight: "500" }}>Don&apos;t have an account? Sign up</Text>
-        </TouchableOpacity>
-        <Text style={{ color: "#ef4444", fontSize: 16, textAlign: "center" }}>{errorText}</Text>
+        />
+        <ErrorMessage message={errorText} />
       </View>
     </ThemedView>
   );

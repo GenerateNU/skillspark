@@ -12,7 +12,7 @@ type GuardianSignUpInput struct {
 		Email               string  `json:"email" db:"email"`
 		Username            string  `json:"username" db:"username"`
 		Password            string  `json:"password" db:"password"`
-		ProfilePictureS3Key *string `json:"profile_picture_s3_key" db:"profile_picture_s3_key" required:"false"`
+		ProfilePictureS3Key *string `json:"profile_picture_s3_key,omitempty" db:"profile_picture_s3_key" required:"false"`
 		LanguagePreference  string  `json:"language_preference" db:"language_preference"`
 	}
 }
