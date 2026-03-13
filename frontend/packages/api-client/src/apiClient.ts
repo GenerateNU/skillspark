@@ -138,6 +138,7 @@ export async function customInstance<T>(
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      'Accept-Language': 'en-US',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
