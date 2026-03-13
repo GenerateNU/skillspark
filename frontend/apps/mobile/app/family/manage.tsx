@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   View,
   TextInput,
   TouchableOpacity,
@@ -172,63 +171,70 @@ export default function ManageChildScreen() {
   );
 
   return (
-    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
+    <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
       <Stack.Screen options={{ headerShown: false }} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
         keyboardVerticalOffset={0}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          <View style={styles.familyBanner}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.bannerBack}>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: 10 }} showsVerticalScrollIndicator={false}>
+          <View className="flex-row items-center justify-between mb-6">
+            <TouchableOpacity onPress={() => router.back()} className="w-8 h-8 justify-center items-start">
               <IconSymbol name="chevron.left" size={24} color={theme.text} />
             </TouchableOpacity>
-            <ThemedText style={styles.bannerTitle}>Family Information</ThemedText>
+            <ThemedText className="text-xl text-center font-nunito-bold">Family Information</ThemedText>
             {isEditing ? (
               <TouchableOpacity onPress={handleDelete}>
-                <ThemedText style={{ color: '#EF4444', fontFamily: 'Archivo_600SemiBold' }}>Delete</ThemedText>
+                <ThemedText className="text-[#EF4444] font-nunito-semibold">Delete</ThemedText>
               </TouchableOpacity>
             ) : (
-              <View style={{ width: 40 }} />
+              <View className="w-10" />
             )}
           </View>
-          <ThemedText style={styles.pageTitle}>
+          <ThemedText className="text-[22px] font-nunito-semibold mb-5">
             {isEditing ? 'Edit Child Profile' : 'Create Child Profile'}
           </ThemedText>
           <TextInput
-            style={[styles.textInput, { backgroundColor: inputBg, color: theme.text }]}
+            className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3"
+            style={{ backgroundColor: inputBg, color: theme.text }}
             value={firstName}
             onChangeText={setFirstName}
             placeholder="First Name"
             placeholderTextColor={placeholderColor}
           />
           <TextInput
-            style={[styles.textInput, { backgroundColor: inputBg, color: theme.text }]}
+            className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3"
+            style={{ backgroundColor: inputBg, color: theme.text }}
             value={lastName}
             onChangeText={setLastName}
             placeholder="Last Name"
             placeholderTextColor={placeholderColor}
           />
-          <View style={styles.row}>
-            <View style={styles.dropdownWrapper}>
+          <View className="flex-row gap-3 mb-6" style={{ zIndex: 10 }}>
+            <View className="flex-1" style={{ zIndex: 10 }}>
               <TouchableOpacity
-                style={[styles.dropdown, { backgroundColor: inputBg }]}
+                className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between"
+                style={{ backgroundColor: inputBg }}
                 onPress={() => { setShowMonthDrop(!showMonthDrop); setShowYearDrop(false); }}
               >
-                <ThemedText style={birthMonth ? { color: theme.text } : styles.dropdownPlaceholder}>
+                <ThemedText className={birthMonth ? '' : 'text-[#9CA3AF] font-nunito'}>
                   {birthMonth || 'Month'}
                 </ThemedText>
                 <IconSymbol name="chevron.down" size={16} color="#6B7280" />
               </TouchableOpacity>
 
               {showMonthDrop && (
-                <View style={[styles.dropdownList, { backgroundColor: dropdownPopupBg, borderColor }]}>
+                <View
+                  className="absolute left-0 right-0 rounded-[10px] border"
+                  style={{ top: 52, backgroundColor: dropdownPopupBg, borderColor, zIndex: 100, elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
+                >
                   <ScrollView nestedScrollEnabled style={{ maxHeight: 180 }}>
                     {MONTHS.map(m => (
                       <TouchableOpacity
                         key={m}
-                        style={[styles.dropdownItem, { borderBottomColor: borderColor }]}
+                        className="px-4 py-3 border-b"
+                        style={{ borderBottomColor: borderColor }}
                         onPress={() => { setBirthMonth(m); setShowMonthDrop(false); }}
                       >
                         <ThemedText>{m}</ThemedText>
@@ -238,24 +244,29 @@ export default function ManageChildScreen() {
                 </View>
               )}
             </View>
-            <View style={styles.dropdownWrapper}>
+            <View className="flex-1" style={{ zIndex: 10 }}>
               <TouchableOpacity
-                style={[styles.dropdown, { backgroundColor: inputBg }]}
+                className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between"
+                style={{ backgroundColor: inputBg }}
                 onPress={() => { setShowYearDrop(!showYearDrop); setShowMonthDrop(false); }}
               >
-                <ThemedText style={birthYear ? { color: theme.text } : styles.dropdownPlaceholder}>
+                <ThemedText className={birthYear ? '' : 'text-[#9CA3AF] font-nunito'}>
                   {birthYear || 'Year'}
                 </ThemedText>
                 <IconSymbol name="chevron.down" size={16} color="#6B7280" />
               </TouchableOpacity>
 
               {showYearDrop && (
-                <View style={[styles.dropdownList, { backgroundColor: dropdownPopupBg, borderColor }]}>
+                <View
+                  className="absolute left-0 right-0 rounded-[10px] border"
+                  style={{ top: 52, backgroundColor: dropdownPopupBg, borderColor, zIndex: 100, elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
+                >
                   <ScrollView nestedScrollEnabled style={{ maxHeight: 180 }}>
                     {YEARS.map(y => (
                       <TouchableOpacity
                         key={y}
-                        style={[styles.dropdownItem, { borderBottomColor: borderColor }]}
+                        className="px-4 py-3 border-b"
+                        style={{ borderBottomColor: borderColor }}
                         onPress={() => { setBirthYear(y); setShowYearDrop(false); }}
                       >
                         <ThemedText>{y}</ThemedText>
@@ -266,33 +277,39 @@ export default function ManageChildScreen() {
               )}
             </View>
           </View>
-          <ThemedText style={styles.sectionLabel}>Interests</ThemedText>
+          <ThemedText className="text-base font-nunito-semibold mb-3">Interests</ThemedText>
           {interests.length > 0 && (
-            <View style={styles.tagsRow}>
+            <View className="flex-row flex-wrap gap-2 mb-3">
               {interests.map((tag, idx) => {
                 const color = TAG_COLORS[idx % TAG_COLORS.length];
                 return (
                   <TouchableOpacity
                     key={tag}
-                    style={[styles.tag, { backgroundColor: color.bg, borderColor: color.border }]}
+                    className="flex-row items-center px-2 py-1 rounded-full border gap-1"
+                    style={{ backgroundColor: color.bg, borderColor: color.border }}
                     onPress={() => removeInterest(tag)}
                   >
                     <IconSymbol name="camera.filters" size={13} color={color.border} />
-                    <ThemedText style={[styles.tagText, { color: color.text }]}>{tag}</ThemedText>
+                    <ThemedText className="text-xs font-nunito-medium" style={{ color: color.text }}>{tag}</ThemedText>
                   </TouchableOpacity>
                 );
               })}
             </View>
           )}
-          <TouchableOpacity style={[styles.addInterestBtn, { borderColor }]} onPress={openPicker}>
-            <ThemedText style={[styles.addInterestText, { color: theme.text }]}>Add Interest</ThemedText>
+          <TouchableOpacity
+            className="border rounded-[10px] px-4 py-[14px] flex-row items-center justify-between mb-3"
+            style={{ borderColor }}
+            onPress={openPicker}
+          >
+            <ThemedText className="text-base font-nunito" style={{ color: theme.text }}>Add Interest</ThemedText>
             <IconSymbol name="chevron.down" size={16} color="#6B7280" />
           </TouchableOpacity>
           {showPicker && (
-            <View style={[styles.pickerPanel, { borderColor }]}>
-              <View style={styles.searchRow}>
+            <View className="border rounded-[10px] overflow-hidden mb-6" style={{ borderColor }}>
+              <View className="flex-row items-center px-4 py-3 gap-2">
                 <TextInput
-                  style={[styles.searchInput, { color: theme.text }]}
+                  className="flex-1 text-base font-nunito"
+                  style={{ color: theme.text }}
                   value={searchQuery}
                   onChangeText={setSearchQuery}
                   placeholder="Input"
@@ -300,43 +317,48 @@ export default function ManageChildScreen() {
                 />
                 <IconSymbol name="magnifyingglass" size={20} color="#6B7280" />
               </View>
-              <View style={[styles.pickerDivider, { backgroundColor: borderColor }]} />
+              <View className="h-px" style={{ backgroundColor: borderColor }} />
               {filteredOptions.map(item => (
                 <TouchableOpacity
                   key={item}
-                  style={[styles.pickerItem, { borderBottomColor: inputBg }]}
+                  className="flex-row items-center justify-between px-4 py-4 border-b"
+                  style={{ borderBottomColor: inputBg }}
                   onPress={() => togglePending(item)}
                 >
-                  <ThemedText style={styles.pickerItemText}>{item}</ThemedText>
-                  <View style={[styles.checkbox, pendingInterests.includes(item) && styles.checkboxChecked]}>
+                  <ThemedText className="text-base font-nunito">{item}</ThemedText>
+                  <View
+                    className="w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center"
+                    style={{ borderColor: pendingInterests.includes(item) ? '#1F2937' : '#9CA3AF' }}
+                  >
                     {pendingInterests.includes(item) && (
                       <IconSymbol name="checkmark" size={12} color="#1F2937" />
                     )}
                   </View>
                 </TouchableOpacity>
               ))}
-              <View style={styles.pickerActions}>
-                <TouchableOpacity style={styles.addBtn} onPress={confirmPicker}>
-                  <ThemedText style={styles.addBtnText}>Add</ThemedText>
+              <View className="flex-row items-center p-4 gap-4">
+                <TouchableOpacity className="bg-[#1D4ED8] px-7 py-3 rounded-lg" onPress={confirmPicker}>
+                  <ThemedText className="text-white text-[15px] font-nunito-semibold">Add</ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setShowPicker(false)}>
-                  <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                  <ThemedText className="text-[15px] font-nunito text-[#6B7280]">Cancel</ThemedText>
                 </TouchableOpacity>
               </View>
             </View>
           )}
-          <View style={styles.availabilityRow}>
-            <ThemedText style={styles.availabilityTitle}>Availability</ThemedText>
-            <TouchableOpacity style={[styles.editBtn, { borderColor }]}>
-              <ThemedText style={styles.editBtnText}>Edit</ThemedText>
+          <View className="flex-row items-center justify-between mb-6 mt-2">
+            <ThemedText className="text-lg font-nunito-semibold">Availability</ThemedText>
+            <TouchableOpacity className="border rounded-lg px-5 py-2" style={{ borderColor }}>
+              <ThemedText className="text-[15px] font-nunito text-[#6B7280]">Edit</ThemedText>
             </TouchableOpacity>
           </View>
           <TouchableOpacity
-            style={[styles.saveButton, { backgroundColor: theme.tint, opacity: isSubmitting ? 0.7 : 1 }]}
+            className="py-4 rounded-xl items-center justify-center"
+            style={{ backgroundColor: theme.tint, opacity: isSubmitting ? 0.7 : 1 }}
             onPress={handleSave}
             disabled={isSubmitting}
           >
-            <ThemedText style={styles.saveButtonText}>
+            <ThemedText className="text-white text-base font-nunito-semibold">
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </ThemedText>
           </TouchableOpacity>
@@ -346,228 +368,3 @@ export default function ManageChildScreen() {
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scrollContent: { paddingHorizontal: 20, paddingBottom: 40, paddingTop: 10 },
-
-  familyBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  bannerBack: {
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  bannerTitle: {
-    fontSize: 20,
-    fontFamily: 'Archivo_700Bold',
-    textAlign: 'center',
-  },
-
-  pageTitle: {
-    fontSize: 22,
-    fontFamily: 'Archivo_600SemiBold',
-    marginBottom: 20,
-  },
-
-  textInput: {
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    fontFamily: 'Archivo_400Regular',
-    marginBottom: 12,
-  },
-
-  row: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
-    zIndex: 10,
-  },
-  dropdownWrapper: {
-    flex: 1,
-    zIndex: 10,
-  },
-  dropdown: {
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  dropdownPlaceholder: {
-    fontSize: 16,
-    color: '#9CA3AF',
-    fontFamily: 'Archivo_400Regular',
-  },
-  dropdownList: {
-    position: 'absolute',
-    top: 52,
-    left: 0,
-    right: 0,
-    borderRadius: 10,
-    borderWidth: 1,
-    zIndex: 100,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  dropdownItem: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-  },
-
-  sectionLabel: {
-    fontSize: 16,
-    fontFamily: 'Archivo_600SemiBold',
-    marginBottom: 12,
-  },
-
-  tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 12,
-  },
-  tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 20,
-    borderWidth: 1,
-    gap: 4,
-  },
-  tagText: {
-    fontSize: 12,
-    fontFamily: 'Archivo_500Medium',
-  },
-
-  addInterestBtn: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  addInterestText: {
-    fontSize: 16,
-    fontFamily: 'Archivo_400Regular',
-  },
-
-  pickerPanel: {
-    borderWidth: 1,
-    borderRadius: 10,
-    overflow: 'hidden',
-    marginBottom: 24,
-  },
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    fontFamily: 'Archivo_400Regular',
-  },
-  pickerDivider: {
-    height: 1,
-  },
-  pickerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-  },
-  pickerItemText: {
-    fontSize: 16,
-    fontFamily: 'Archivo_400Regular',
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 1.5,
-    borderColor: '#9CA3AF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxChecked: {
-    borderColor: '#1F2937',
-  },
-  pickerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    gap: 16,
-  },
-  addBtn: {
-    backgroundColor: '#1D4ED8',
-    paddingHorizontal: 28,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  addBtnText: {
-    color: '#FFF',
-    fontSize: 15,
-    fontFamily: 'Archivo_600SemiBold',
-  },
-  cancelText: {
-    fontSize: 15,
-    fontFamily: 'Archivo_400Regular',
-    color: '#6B7280',
-  },
-
-  availabilityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-    marginTop: 8,
-  },
-  availabilityTitle: {
-    fontSize: 18,
-    fontFamily: 'Archivo_600SemiBold',
-  },
-  editBtn: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-  },
-  editBtnText: {
-    fontSize: 15,
-    fontFamily: 'Archivo_400Regular',
-    color: '#6B7280',
-  },
-
-  saveButton: {
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontFamily: 'Archivo_600SemiBold',
-  },
-});

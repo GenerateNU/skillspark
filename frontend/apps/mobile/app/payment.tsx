@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  useColorScheme,
-} from 'react-native';
+import { View, TouchableOpacity, useColorScheme } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
@@ -22,117 +17,42 @@ export default function PaymentScreen() {
   const handleDelete = () => {};
 
   return (
-    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
+    <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+      <View className="flex-row items-center justify-between px-5 py-[14px]">
         <TouchableOpacity
           onPress={() => router.back()}
-          style={styles.backButton}
+          className="w-10 justify-center items-start"
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Payment</ThemedText>
-        <View style={styles.headerRight} />
+        <ThemedText className="text-xl text-center font-nunito-bold">Payment</ThemedText>
+        <View className="w-10" />
       </View>
-      <View style={styles.content}>
-        <ThemedText style={styles.sectionTitle}>Manage Billing</ThemedText>
-        <ThemedText style={styles.infoText}>Credit Card</ThemedText>
-        <ThemedText style={styles.infoText}>Name</ThemedText>
-        <ThemedText style={styles.cardNumber}>**** **** **** XXXX</ThemedText>
-        <View style={styles.buttonRow}>
+      <View className="px-5 pt-5">
+        <ThemedText className="text-[22px] font-nunito-bold mb-5">Manage Billing</ThemedText>
+        <ThemedText className="text-base font-nunito mb-[6px]">Credit Card</ThemedText>
+        <ThemedText className="text-base font-nunito mb-[6px]">Name</ThemedText>
+        <ThemedText className="text-base font-nunito mb-8 tracking-widest">**** **** **** XXXX</ThemedText>
+        <View className="flex-row gap-4">
           <TouchableOpacity
-            style={styles.updateBtn}
+            className="flex-1 bg-[#2563EB] py-[14px] rounded-lg items-center justify-center"
             onPress={handleUpdateBilling}
             activeOpacity={0.8}
           >
-            <ThemedText style={styles.updateBtnText}>Update Billing</ThemedText>
+            <ThemedText className="text-white text-[15px] font-nunito-semibold">Update Billing</ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.deleteBtn, { borderColor: theme.text }]}
+            className="flex-1 py-[14px] rounded-lg border-[1.5px] items-center justify-center"
+            style={{ borderColor: theme.text }}
             onPress={handleDelete}
             activeOpacity={0.8}
           >
-            <ThemedText style={[styles.deleteBtnText, { color: theme.text }]}>Delete</ThemedText>
+            <ThemedText className="text-[15px] font-nunito" style={{ color: theme.text }}>Delete</ThemedText>
           </TouchableOpacity>
         </View>
       </View>
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-  },
-  backButton: {
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontFamily: 'Archivo_700Bold',
-    textAlign: 'center',
-  },
-  headerRight: {
-    width: 40,
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontFamily: 'Archivo_700Bold',
-    marginBottom: 20,
-  },
-  infoText: {
-    fontSize: 16,
-    fontFamily: 'Archivo_400Regular',
-    marginBottom: 6,
-  },
-  cardNumber: {
-    fontSize: 16,
-    fontFamily: 'Archivo_400Regular',
-    marginBottom: 32,
-    letterSpacing: 1,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  updateBtn: {
-    flex: 1,
-    backgroundColor: '#2563EB',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  updateBtnText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontFamily: 'Archivo_600SemiBold',
-  },
-  deleteBtn: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    paddingVertical: 14,
-    borderRadius: 8,
-    borderWidth: 1.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  deleteBtnText: {
-    fontSize: 15,
-    fontFamily: 'Archivo_400Regular',
-  },
-});

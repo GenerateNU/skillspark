@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  useColorScheme,
-} from 'react-native';
+import { View, TouchableOpacity, useColorScheme } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
@@ -28,29 +23,29 @@ export default function LanguageScreen() {
   const [selected, setSelected] = useState('en');
 
   return (
-    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
+    <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+      <View className="flex-row items-center justify-between px-5 py-[14px]">
         <TouchableOpacity
           onPress={() => router.back()}
-          style={styles.backButton}
+          className="w-10 items-start justify-center"
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Settings</ThemedText>
-        <View style={styles.headerRight} />
+        <ThemedText className="text-xl text-center font-nunito-bold">Settings</ThemedText>
+        <View className="w-10" />
       </View>
-      <ThemedText style={styles.sectionLabel}>Language</ThemedText>
-      <View style={styles.list}>
+      <ThemedText className="text-2xl px-5 pt-4 pb-5 font-nunito-bold">Language</ThemedText>
+      <View className="px-5">
         {LANGUAGES.map((lang, index) => (
           <React.Fragment key={lang.code}>
             <TouchableOpacity
-              style={styles.row}
+              className="flex-row items-center py-[18px] gap-[14px]"
               onPress={() => setSelected(lang.code)}
               activeOpacity={0.6}
             >
-              <ThemedText style={styles.flag}>{lang.flag}</ThemedText>
-              <ThemedText style={styles.langLabel}>{lang.label}</ThemedText>
+              <ThemedText className="text-[38px] leading-[46px]">{lang.flag}</ThemedText>
+              <ThemedText className="flex-1 text-lg font-nunito">{lang.label}</ThemedText>
               <IconSymbol
                 name={selected === lang.code ? 'checkmark.circle.fill' : 'circle'}
                 size={26}
@@ -58,7 +53,7 @@ export default function LanguageScreen() {
               />
             </TouchableOpacity>
             {index < LANGUAGES.length - 1 && (
-              <View style={[styles.divider, { backgroundColor: dividerColor }]} />
+              <View className="h-px ml-[66px]" style={{ backgroundColor: dividerColor }} />
             )}
           </React.Fragment>
         ))}
@@ -66,58 +61,3 @@ export default function LanguageScreen() {
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-  },
-  backButton: {
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontFamily: 'Archivo_700Bold',
-    textAlign: 'center',
-  },
-  headerRight: {
-    width: 40,
-  },
-  sectionLabel: {
-    fontSize: 24,
-    fontFamily: 'Archivo_700Bold',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
-  },
-  list: {
-    paddingHorizontal: 20,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 18,
-    gap: 14,
-  },
-  flag: {
-    fontSize: 38,
-    lineHeight: 46,
-  },
-  langLabel: {
-    flex: 1,
-    fontSize: 18,
-    fontFamily: 'Archivo_400Regular',
-  },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    marginLeft: 66,
-  },
-});

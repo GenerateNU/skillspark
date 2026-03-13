@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
@@ -26,47 +26,25 @@ export function InterestTags({ interests }: { interests?: string[] | string }) {
   const overflow = tags.length - MAX_VISIBLE_TAGS;
 
   return (
-    <View style={styles.tagsRow}>
+    <View className="flex-row flex-wrap gap-[6px] mt-1">
       {visible.map((tag, i) => {
         const c = TAG_COLORS[i % TAG_COLORS.length];
         return (
           <View
             key={tag}
-            style={[
-              styles.tag,
-              { backgroundColor: c.bg, borderColor: c.border },
-            ]}
+            className="flex-row items-center gap-1 px-2 py-1 rounded-full border"
+            style={{ backgroundColor: c.bg, borderColor: c.border }}
           >
             <IconSymbol name="camera.filters" size={13} color={c.border} />
-            <ThemedText style={[styles.tagText, { color: c.text }]}>
+            <ThemedText className="text-xs font-nunito-medium" style={{ color: c.text }}>
               {tag}
             </ThemedText>
           </View>
         );
       })}
       {overflow > 0 && (
-        <ThemedText style={styles.overflowText}>+{overflow}</ThemedText>
+        <ThemedText className="text-[13px] text-[#6B7280] font-nunito-medium self-center">+{overflow}</ThemedText>
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 },
-  tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  tagText: { fontSize: 12, fontFamily: 'Archivo_500Medium' },
-  overflowText: {
-    fontSize: 13,
-    color: '#6B7280',
-    fontFamily: 'Archivo_500Medium',
-    alignSelf: 'center',
-  },
-});

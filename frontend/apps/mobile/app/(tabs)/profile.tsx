@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, ActivityIndicator, useColorScheme } from 'react-native';
+import { View, ScrollView, ActivityIndicator, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
@@ -18,7 +18,7 @@ export default function ProfileScreen() {
 
   const listBackgroundColor = colorScheme === 'dark' ? '#1c1c1e' : '#F9FAFB';
   const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
-  
+
   const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(GUARDIAN_ID);
   const { data: childrenResponse, isLoading: familyLoading } = useGetChildrenByGuardianId(GUARDIAN_ID);
   const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
@@ -26,34 +26,39 @@ export default function ProfileScreen() {
 
   if (guardianLoading || familyLoading) {
     return (
-      <ThemedView style={[styles.loadingContainer, { paddingTop: insets.top }]}>
+      <ThemedView className="flex-1 items-center justify-center" style={{ paddingTop: insets.top }}>
         <ActivityIndicator size="large" />
       </ThemedView>
     );
   }
 
   return (
-    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
+    <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ paddingTop: 10, paddingBottom: 20 }}
         bounces={false}
       >
-        <View style={styles.profileSection}>
-          <View style={[styles.avatarContainer, { backgroundColor: listBackgroundColor }]}>
+        <View className="items-center mb-5 mt-[5px]">
+          <View
+            className="w-[72px] h-[72px] rounded-full items-center justify-center mb-[10px]"
+            style={{ backgroundColor: listBackgroundColor }}
+          >
             <IconSymbol name="photo" size={32} color="#9CA3AF" />
           </View>
-          <ThemedText style={styles.userName}>
+          <ThemedText className="text-xl leading-6 mb-[2px] text-center font-nunito-semibold">
             {guardian?.name}
           </ThemedText>
-          <ThemedText style={styles.userHandle}>
+          <ThemedText className="text-sm text-[#6B7280] leading-[18px] text-center mb-[2px] font-nunito">
             @{guardian?.username}
           </ThemedText>
-          <ThemedText style={styles.contactText}>Contact</ThemedText>
+          <ThemedText className="text-sm text-[#6B7280] leading-[18px] text-center font-nunito">
+            Contact
+          </ThemedText>
         </View>
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Family</ThemedText>
-          <View style={styles.familyRow}>
+        <View className="px-5 mb-4">
+          <ThemedText className="text-base mb-2 font-nunito-semibold">Family</ThemedText>
+          <View className="flex-row flex-wrap justify-between gap-[10px]">
             {children.length > 0 ? (
               children.map((child: any) => (
                 <FamilyCard
@@ -68,17 +73,23 @@ export default function ProfileScreen() {
             )}
           </View>
         </View>
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>My Bookings</ThemedText>
-          <View style={[styles.listGroup, { backgroundColor: listBackgroundColor, borderColor }]}>
+        <View className="px-5 mb-4">
+          <ThemedText className="text-base mb-2 font-nunito-semibold">My Bookings</ThemedText>
+          <View
+            className="rounded-xl overflow-hidden border"
+            style={{ backgroundColor: listBackgroundColor, borderColor }}
+          >
             <ListItem label="Upcoming" />
             <ListItem label="Previous" />
             <ListItem label="Saved" isLast />
           </View>
         </View>
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Preferences</ThemedText>
-          <View style={[styles.listGroup, { backgroundColor: listBackgroundColor, borderColor }]}>
+        <View className="px-5 mb-4">
+          <ThemedText className="text-base mb-2 font-nunito-semibold">Preferences</ThemedText>
+          <View
+            className="rounded-xl overflow-hidden border"
+            style={{ backgroundColor: listBackgroundColor, borderColor }}
+          >
             <ListItem label="Payment" onPress={() => router.push('/payment')} />
             <ListItem
               label="Family Information"
@@ -87,87 +98,8 @@ export default function ProfileScreen() {
             <ListItem label="Settings" isLast onPress={() => router.push('/settings')} />
           </View>
         </View>
-        <View style={{ height: 20 }} />
+        <View className="h-5" />
       </ScrollView>
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingBottom: 5,
-    paddingTop: 5,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontFamily: 'Archivo_700Bold',
-  },
-  scrollContent: {
-    paddingTop: 10,
-    paddingBottom: 20,
-  },
-  profileSection: {
-    alignItems: 'center',
-    marginBottom: 20,
-    marginTop: 5,
-  },
-  avatarContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  userName: {
-    fontSize: 20,
-    fontFamily: 'Archivo_600SemiBold',
-    lineHeight: 24,
-    marginBottom: 2,
-    textAlign: 'center',
-  },
-  userHandle: {
-    fontSize: 14,
-    fontFamily: 'Archivo_400Regular',
-    color: '#6B7280',
-    lineHeight: 18,
-    textAlign: 'center',
-    marginBottom: 2,
-  },
-  contactText: {
-    fontSize: 14,
-    fontFamily: 'Archivo_400Regular',
-    color: '#6B7280',
-    lineHeight: 18,
-    textAlign: 'center',
-  },
-  section: {
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    marginBottom: 8,
-    fontFamily: 'Archivo_600SemiBold',
-  },
-  familyRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  listGroup: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-  },
-});

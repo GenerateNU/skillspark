@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, useColorScheme } from 'react-native';
+import { View, useColorScheme } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 
 type FamilyCardProps = {
@@ -10,51 +10,19 @@ type FamilyCardProps = {
 
 export function FamilyCard({ initials, name, date }: FamilyCardProps) {
   const colorScheme = useColorScheme();
-  
+
   const backgroundColor = colorScheme === 'dark' ? '#27272a' : '#F3F4F6';
   const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
-      <View style={[styles.initialsCircle, { borderColor }]}>
-        <ThemedText style={styles.initialsText}>{initials}</ThemedText>
+    <View className="w-[48%] rounded-xl p-[10px] flex-row items-center" style={{ backgroundColor }}>
+      <View className="w-8 h-8 rounded-2xl border items-center justify-center mr-2" style={{ borderColor }}>
+        <ThemedText className="text-xs font-nunito-semibold">{initials}</ThemedText>
       </View>
       <View>
-        <ThemedText style={styles.name}>{name}</ThemedText>
-        <ThemedText style={styles.date}>{date}</ThemedText>
+        <ThemedText className="text-sm font-nunito-medium">{name}</ThemedText>
+        <ThemedText className="text-[10px] text-[#6B7280] font-nunito">{date}</ThemedText>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: '48%', 
-    borderRadius: 12,
-    padding: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  initialsCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  initialsText: {
-    fontSize: 12,
-    fontFamily: 'Archivo_600SemiBold',
-  },
-  name: {
-    fontSize: 14,
-    fontFamily: 'Archivo_500Medium',
-  },
-  date: {
-    fontSize: 10,
-    fontFamily: 'Archivo_400Regular',
-    color: '#6B7280',
-  },
-});

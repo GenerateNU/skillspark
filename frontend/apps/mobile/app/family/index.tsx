@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity, ActivityIndicator, useColorScheme } from 'react-native';
+import { View, ScrollView, TouchableOpacity, ActivityIndicator, useColorScheme } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
@@ -7,8 +7,8 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useGetChildrenByGuardianId, useGetGuardianById } from '@skillspark/api-client';
 import { Colors } from '@/constants/theme';
-import { ChildListItem } from '@/components/ChildListItem'; //
-import { SectionHeader } from '@/components/SectionHeader'; //
+import { ChildListItem } from '@/components/ChildListItem';
+import { SectionHeader } from '@/components/SectionHeader';
 
 const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
 
@@ -30,45 +30,45 @@ export default function FamilyListScreen() {
 
   if (guardianLoading || childrenLoading) {
     return (
-      <ThemedView style={styles.loadingContainer}>
+      <ThemedView className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
       </ThemedView>
     );
   }
 
   return (
-    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
+    <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+      <View className="flex-row items-center justify-between px-5 py-3">
         <TouchableOpacity
           onPress={() => router.back()}
-          style={styles.backButton}
+          className="w-10 justify-center items-start"
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Family Information</ThemedText>
-        <View style={styles.headerRight} />
+        <ThemedText className="text-xl text-center font-nunito-bold">Family Information</ThemedText>
+        <View className="w-10" />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <TouchableOpacity style={styles.row} activeOpacity={0.7}>
-          <View style={styles.iconAvatar}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8 }} showsVerticalScrollIndicator={false}>
+        <TouchableOpacity className="flex-row items-start py-3 gap-3" activeOpacity={0.7}>
+          <View className="w-11 h-11 items-center justify-center">
             <IconSymbol name="person.circle" size={40} color={theme.text} />
           </View>
-          <View style={styles.rowInfo}>
-            <ThemedText style={styles.rowTitle}>{guardian?.name}</ThemedText>
-            <ThemedText style={styles.rowSub}>@{guardian?.username}</ThemedText>
-            <ThemedText style={styles.rowSub}>{guardian?.email}</ThemedText>
+          <View className="flex-1 gap-[2px]">
+            <ThemedText className="text-base font-nunito-semibold">{guardian?.name}</ThemedText>
+            <ThemedText className="text-[13px] text-[#6B7280] font-nunito">@{guardian?.username}</ThemedText>
+            <ThemedText className="text-[13px] text-[#6B7280] font-nunito">{guardian?.email}</ThemedText>
           </View>
         </TouchableOpacity>
-        <View style={styles.divider} />
+        <View className="h-px my-1 bg-[#E5E7EB]" />
         <SectionHeader
           title="Child Profile"
           actionLabel="add profile +"
           onAction={handleAddChild}
         />
         {children.length === 0 && (
-          <ThemedText style={styles.emptyText}>No child profiles added yet.</ThemedText>
+          <ThemedText className="text-[#9CA3AF] text-sm pb-3 font-nunito">No child profiles added yet.</ThemedText>
         )}
         {children.map((child: any, idx: number) => (
           <React.Fragment key={child.id}>
@@ -76,91 +76,27 @@ export default function FamilyListScreen() {
               child={child}
               onPress={() => handleEditChild()}
             />
-            {idx < children.length - 1 && <View style={styles.divider} />}
+            {idx < children.length - 1 && <View className="h-px my-1 bg-[#E5E7EB]" />}
           </React.Fragment>
         ))}
-        <View style={styles.divider} />
+        <View className="h-px my-1 bg-[#E5E7EB]" />
         <SectionHeader
           title="Emergency Contact"
           actionLabel="add contact +"
           onAction={() => {}}
         />
-        <TouchableOpacity style={styles.row} activeOpacity={0.7}>
-          <View style={styles.iconAvatar}>
+        <TouchableOpacity className="flex-row items-start py-3 gap-3" activeOpacity={0.7}>
+          <View className="w-11 h-11 items-center justify-center">
             <IconSymbol name="person.circle" size={40} color={theme.text} />
           </View>
-          <View style={styles.rowInfo}>
-            <ThemedText style={styles.rowTitle}>Martha Smith</ThemedText>
-            <ThemedText style={styles.rowSub}>(555) 123-4567</ThemedText>
+          <View className="flex-1 gap-[2px]">
+            <ThemedText className="text-base font-nunito-semibold">Martha Smith</ThemedText>
+            <ThemedText className="text-[13px] text-[#6B7280] font-nunito">(555) 123-4567</ThemedText>
           </View>
           <IconSymbol name="chevron.right" size={18} color="#9CA3AF" />
         </TouchableOpacity>
-        <View style={{ height: 40 }} />
+        <View className="h-10" />
       </ScrollView>
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  backButton: {
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start'
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontFamily: 'Archivo_700Bold',
-    textAlign: 'center'
-  },
-  headerRight: {
-    width: 40
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 8
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E5E7EB',
-    marginVertical: 4
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: 12,
-    gap: 12,
-  },
-  iconAvatar: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  rowInfo: {
-    flex: 1,
-    gap: 2
-  },
-  rowTitle: {
-    fontSize: 16,
-    fontFamily: 'Archivo_600SemiBold'
-  },
-  rowSub: {
-    fontSize: 13,
-    color: '#6B7280',
-    fontFamily: 'Archivo_400Regular'
-  },
-  emptyText: {
-    color: '#9CA3AF',
-    fontSize: 14,
-    paddingBottom: 12
-  },
-});

@@ -13,7 +13,7 @@ export default function FamilyLayout() {
         headerShown: true,
         headerTintColor: theme.tint,
         headerStyle: { backgroundColor: theme.background },
-        headerTitleStyle: { fontFamily: 'Archivo_600SemiBold', color: theme.text },
+        headerTitleStyle: { fontFamily: 'NunitoSans_600SemiBold', color: theme.text },
         headerBackTitle: "", 
       }}
     >

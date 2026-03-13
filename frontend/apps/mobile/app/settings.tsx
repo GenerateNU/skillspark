@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  useColorScheme,
-} from 'react-native';
+import { View, TouchableOpacity, useColorScheme } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
@@ -26,92 +21,44 @@ export default function SettingsScreen() {
   const handleDeleteAccount = () => {};
 
   return (
-    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
+    <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+      <View className="flex-row items-center justify-between px-5 py-[14px]">
         <TouchableOpacity
           onPress={() => router.back()}
-          style={styles.backButton}
+          className="w-10 justify-center items-start"
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Settings</ThemedText>
-        <View style={styles.headerRight} />
+        <ThemedText className="text-xl text-center font-nunito-bold">Settings</ThemedText>
+        <View className="w-10" />
       </View>
-      <View style={styles.content}>
-        <View style={[styles.card, { backgroundColor: cardBg }]}>
-          <TouchableOpacity style={styles.row} activeOpacity={0.6} onPress={() => router.push('/language')}>
-            <ThemedText style={styles.rowText}>Language</ThemedText>
+      <View className="px-4 pt-5">
+        <View className="rounded-2xl overflow-hidden" style={{ backgroundColor: cardBg }}>
+          <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6} onPress={() => router.push('/language')}>
+            <ThemedText className="text-[17px] font-nunito">Language</ThemedText>
             <IconSymbol name="chevron.right" size={16} color="#9CA3AF" />
           </TouchableOpacity>
-          <View style={[styles.divider, { backgroundColor: dividerColor }]} />
-          <TouchableOpacity style={styles.row} activeOpacity={0.6}>
-            <ThemedText style={styles.rowText}>Terms and Conditions</ThemedText>
+          <View className="h-px" style={{ backgroundColor: dividerColor }} />
+          <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6}>
+            <ThemedText className="text-[17px] font-nunito">Terms and Conditions</ThemedText>
             <IconSymbol name="chevron.right" size={16} color="#9CA3AF" />
           </TouchableOpacity>
-          <View style={[styles.divider, { backgroundColor: dividerColor }]} />
-          <TouchableOpacity style={styles.row} activeOpacity={0.6}>
-            <ThemedText style={styles.rowText}>Privacy Policy</ThemedText>
+          <View className="h-px" style={{ backgroundColor: dividerColor }} />
+          <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6}>
+            <ThemedText className="text-[17px] font-nunito">Privacy Policy</ThemedText>
             <IconSymbol name="chevron.right" size={16} color="#9CA3AF" />
           </TouchableOpacity>
-          <View style={[styles.divider, { backgroundColor: dividerColor }]} />
-          <TouchableOpacity style={styles.row} activeOpacity={0.6} onPress={handleLogOut}>
-            <ThemedText style={styles.rowText}>Log Out</ThemedText>
+          <View className="h-px" style={{ backgroundColor: dividerColor }} />
+          <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6} onPress={handleLogOut}>
+            <ThemedText className="text-[17px] font-nunito">Log Out</ThemedText>
           </TouchableOpacity>
-          <View style={[styles.divider, { backgroundColor: dividerColor }]} />
-          <TouchableOpacity style={styles.row} activeOpacity={0.6} onPress={handleDeleteAccount}>
-            <ThemedText style={styles.rowText}>Delete Account</ThemedText>
+          <View className="h-px" style={{ backgroundColor: dividerColor }} />
+          <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6} onPress={handleDeleteAccount}>
+            <ThemedText className="text-[17px] font-nunito">Delete Account</ThemedText>
           </TouchableOpacity>
         </View>
       </View>
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-  },
-  backButton: {
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontFamily: 'Archivo_700Bold',
-    textAlign: 'center',
-  },
-  headerRight: {
-    width: 40,
-  },
-  content: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
-  },
-  card: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 18,
-  },
-  rowText: {
-    fontSize: 17,
-    fontFamily: 'Archivo_400Regular',
-  },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-  },
-});

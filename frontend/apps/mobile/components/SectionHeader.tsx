@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, useColorScheme } from 'react-native';
+import { View, TouchableOpacity, useColorScheme } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 
@@ -14,11 +14,11 @@ export function SectionHeader({ title, actionLabel, onAction }: SectionHeaderPro
   const theme = Colors[colorScheme ?? 'light'];
 
   return (
-    <View style={styles.sectionHeaderRow}>
-      <ThemedText style={styles.sectionTitle}>{title}</ThemedText>
+    <View className="flex-row justify-between items-center py-[14px]">
+      <ThemedText className="text-[17px] font-nunito-bold">{title}</ThemedText>
       {actionLabel && (
         <TouchableOpacity onPress={onAction}>
-          <ThemedText style={[styles.addLink, { color: theme.tint }]}>
+          <ThemedText className="text-sm font-nunito-medium" style={{ color: theme.tint }}>
             {actionLabel}
           </ThemedText>
         </TouchableOpacity>
@@ -26,14 +26,3 @@ export function SectionHeader({ title, actionLabel, onAction }: SectionHeaderPro
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 14,
-  },
-  sectionTitle: { fontSize: 17, fontFamily: 'Archivo_700Bold' },
-  addLink: { fontSize: 14, fontFamily: 'Archivo_500Medium' },
-});
