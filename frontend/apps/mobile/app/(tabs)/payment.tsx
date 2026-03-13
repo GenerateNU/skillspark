@@ -20,7 +20,7 @@ export default function PaymentScreen() {
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
       <View className="flex-row items-center justify-between px-5 py-[14px]">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/profile')}
           className="w-10 justify-center items-start"
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >

@@ -10,7 +10,7 @@ export default function FamilyLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: true,
+        headerShown: false,
         headerTintColor: theme.tint,
         headerStyle: { backgroundColor: theme.background },
         headerTitleStyle: { fontFamily: 'NunitoSans_600SemiBold', color: theme.text },
