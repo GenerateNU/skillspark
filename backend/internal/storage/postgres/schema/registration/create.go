@@ -65,6 +65,9 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		&createdRegistration.Body.StripePaymentMethodID,
 		&createdRegistration.Body.EventName,
 		&createdRegistration.Body.OccurrenceStartTime,
+		&titleEN,
+		&titleTH,
+		&createdRegistration.Body.OccurrenceStartTime,
 	)
 
 	if err != nil {
