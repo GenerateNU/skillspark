@@ -1,13 +1,14 @@
-import type { Organization } from "@skillspark/api-client";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-interface SidebarProps {
-  organizations: Organization[];
-  activeId: string | null;
-  onSelect: (id: string) => void;
-}
+export function Sidebar() {
+  const location = useLocation();
 
-export function Sidebar({ organizations, activeId, onSelect }: SidebarProps) {
+  const navItems = [
+    { to: "/", label: "My Organization" },
+    { to: "/events", label: "Events" },
+    { to: "/profile", label: "Manage Profile" },
+  ];
+
   return (
     <aside className="w-1/8 shrink-0 bg-white border-r border-gray-200 flex flex-col h-full">
       <Link
@@ -26,41 +27,31 @@ export function Sidebar({ organizations, activeId, onSelect }: SidebarProps) {
       </Link>
 
       <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5 overflow-y-auto">
-        <p className="text-base font-semibold text-gray-400 uppercase tracking-wider px-2 mb-2">Organizations</p>
-        {organizations.length === 0 && (
-          <p className="text-xs text-gray-400 px-2 py-1">No organizations yet</p>
-        )}
-        {organizations.map(function (org: Organization) {
-          const active: boolean = org.id === activeId;
-          const initial: string = org.name ? org.name.charAt(0).toUpperCase() : "?";
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2 mb-2">Navigation</p>
+        {navItems.map(function (item: { to: string; label: string }) {
+          const active: boolean = location.pathname === item.to;
           return (
-            <button
-              key={org.id}
-              onClick={function () { onSelect(org.id); }}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm font-medium transition-colors text-left ${active ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`}
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm font-medium transition-colors ${active ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`}
             >
-              <div className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0 ${active ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"}`}>
-                {initial}
-              </div>
-              <span className="truncate">{org.name}</span>
-              {!org.active && (
-                <span className="ml-auto text-xs text-gray-400 font-normal shrink-0">Inactive</span>
-              )}
-            </button>
+              {item.label}
+            </Link>
           );
         })}
       </nav>
 
       <Link
-  to="/profile"
-  className="w-full px-4 py-3 border-t border-gray-200 flex items-center gap-2.5 hover:bg-gray-50 transition-colors"
->
-  <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0">A</div>
-  <div className="min-w-0 text-left">
-    <p className="text-base font-semibold text-gray-800 truncate">Admin User</p>
-    <p className="text-base text-gray-400 truncate">admin@skillspark.co</p>
-  </div>
-</Link>
+        to="/profile"
+        className="w-full px-4 py-3 border-t border-gray-200 flex items-center gap-2.5 hover:bg-gray-50 transition-colors"
+      >
+        <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0">A</div>
+        <div className="min-w-0 text-left">
+          <p className="text-base font-semibold text-gray-800 truncate">Admin User</p>
+          <p className="text-base text-gray-400 truncate">admin@skillspark.co</p>
+        </div>
+      </Link>
     </aside>
   );
 }

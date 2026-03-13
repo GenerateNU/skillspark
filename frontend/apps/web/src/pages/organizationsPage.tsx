@@ -7,24 +7,20 @@ import { blankMgr, type ManagerErrors, fmtDate } from "../components/types";
 import { validateMgr } from "../components/validation";
 
 interface OrganizationsPageProps {
-  organizations: Organization[];
-  activeOrgId: string | null;
-  onOrganizationsChange: (orgs: Organization[]) => void;
-  onActiveOrgChange: (id: string) => void;
+  organization: Organization | null;
+  onOrganizationChange: (org: Organization) => void;
 }
 
-export function OrganizationsPage({ organizations, activeOrgId, onOrganizationsChange, onActiveOrgChange }: OrganizationsPageProps) {
+export function OrganizationsPage({ organization, onOrganizationChange }: OrganizationsPageProps) {
   const [showCreate, setShowCreate] = useState<boolean>(false);
   const [addingMgr, setAddingMgr] = useState<boolean>(false);
   const [mgr, setMgr] = useState<Manager>(blankMgr());
   const [mgrErrors, setMgrErrors] = useState<ManagerErrors>({});
-
   const [managers, setManagers] = useState<Manager[]>([]);
 
   const handleRegister = useCallback(function (org: Organization): void {
-    onOrganizationsChange([org, ...organizations]);
-    onActiveOrgChange(org.id);
-  }, [organizations, onOrganizationsChange, onActiveOrgChange]);
+    onOrganizationChange(org);
+  }, [onOrganizationChange]);
 
   const handleAddManager = useCallback(function (orgId: string, newMgr: Manager): void {
     setManagers(function (prev: Manager[]) {
@@ -34,7 +30,9 @@ export function OrganizationsPage({ organizations, activeOrgId, onOrganizationsC
 
   const handleRemoveManager = useCallback(function (orgId: string, mgrId: string): void {
     setManagers(function (prev: Manager[]) {
-      return prev.filter(function (m: Manager) { return !(m.id === mgrId && m.organization_id === orgId); });
+      return prev.filter(function (m: Manager) {
+        return !(m.id === mgrId && m.organization_id === orgId);
+      });
     });
   }, []);
 
@@ -42,17 +40,19 @@ export function OrganizationsPage({ organizations, activeOrgId, onOrganizationsC
     managers.map(function (m: Manager) { return m.email.toLowerCase(); })
   );
 
-  const activeOrg: Organization | null = organizations.find(function (o: Organization) { return o.id === activeOrgId; }) || null;
-
-  const orgManagers: Manager[] = managers.filter(function (m: Manager) { return m.organization_id === activeOrgId; });
+  const orgManagers: Manager[] = managers.filter(function (m: Manager) {
+    return m.organization_id === organization?.id;
+  });
 
   function submitMgr(): void {
-    if (!activeOrg) return;
+    if (!organization) return;
     const e: ManagerErrors = validateMgr(mgr);
-    const existingEmails: Set<string> = new Set(orgManagers.map(function (m: Manager) { return m.email.toLowerCase(); }));
+    const existingEmails: Set<string> = new Set(
+      orgManagers.map(function (m: Manager) { return m.email.toLowerCase(); })
+    );
     if (mgr.email && existingEmails.has(mgr.email.trim().toLowerCase())) e.email = "Email already in use";
     if (Object.keys(e).length) { setMgrErrors(e); return; }
-    handleAddManager(activeOrg.id, mgr);
+    handleAddManager(organization.id, mgr);
     setMgr(blankMgr());
     setAddingMgr(false);
     setMgrErrors({});
@@ -61,33 +61,26 @@ export function OrganizationsPage({ organizations, activeOrgId, onOrganizationsC
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4 shrink-0">
-        <div>
-          <h1 className="text-base font-semibold text-gray-900">
-            {activeOrg ? activeOrg.name : "Organizations"}
-          </h1>
-          <p className="text-xs text-gray-500">
-            {organizations.length} {organizations.length === 1 ? "organization" : "organizations"} registered
-          </p>
-        </div>
-        <div className="ml-auto">
-          <Btn onClick={function () { setShowCreate(true); }} icon={<IconPlus />}>
-            Add organization
-          </Btn>
-        </div>
+        <h1 className="text-base font-semibold text-gray-900">
+          {organization ? organization.name : "My Organization"}
+        </h1>
+        {!organization && (
+          <div className="ml-auto cursor-pointer">
+            <Btn onClick={function () { setShowCreate(true); }} icon={<IconPlus />}>
+              Register organization
+            </Btn>
+          </div>
+        )}
       </div>
 
       <div className="flex-1 overflow-auto bg-gray-50 p-6">
-        {!activeOrg ? (
+        {!organization ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+            <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center mb-3 cursor-pointer" onClick={function () { setShowCreate(true); }}>
               <IconPlus />
             </div>
-            <p className="text-sm font-semibold text-gray-700">No organization selected</p>
-            <p className="text-sm text-gray-400 mt-1">
-              {organizations.length === 0
-                ? "Click \"Add organization\" to register the first one."
-                : "Select an organization from the sidebar."}
-            </p>
+            <p className="text-sm font-semibold text-gray-700">No organization yet</p>
+            <p className="text-sm text-gray-400 mt-1">Register your organization to get started.</p>
           </div>
         ) : (
           <div className="max-w-2xl flex flex-col gap-6">
@@ -96,16 +89,16 @@ export function OrganizationsPage({ organizations, activeOrgId, onOrganizationsC
             <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
               <div className="px-5 py-4 flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Details</h2>
-                <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded ring-1 ${activeOrg.active ? "bg-green-50 text-green-700 ring-green-200" : "bg-gray-100 text-gray-500 ring-gray-200"}`}>
-                  {activeOrg.active ? "Active" : "Inactive"}
+                <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded ring-1 ${organization.active ? "bg-green-50 text-green-700 ring-green-200" : "bg-gray-100 text-gray-500 ring-gray-200"}`}>
+                  {organization.active ? "Active" : "Inactive"}
                 </span>
               </div>
               {[
-                { label: "ID", value: activeOrg.id },
-                { label: "Location ID", value: activeOrg.location_id || "—" },
-                { label: "Profile Image Key", value: activeOrg.pfp_s3_key || "—" },
-                { label: "Created", value: fmtDate(activeOrg.created_at) },
-                { label: "Updated", value: fmtDate(activeOrg.updated_at) },
+                { label: "ID", value: organization.id },
+                { label: "Location ID", value: organization.location_id || "—" },
+                { label: "Profile Image Key", value: organization.pfp_s3_key || "—" },
+                { label: "Created", value: fmtDate(organization.created_at) },
+                { label: "Updated", value: fmtDate(organization.updated_at) },
               ].map(function (row: { label: string; value: string }) {
                 return (
                   <div key={row.label} className="px-5 py-3 grid grid-cols-3 gap-4">
@@ -151,7 +144,7 @@ export function OrganizationsPage({ organizations, activeOrgId, onOrganizationsC
                       <span className="text-xs font-medium px-2 py-0.5 rounded bg-blue-50 text-blue-700 ring-1 ring-blue-200">Only manager</span>
                     ) : (
                       <button
-                        onClick={function () { handleRemoveManager(activeOrg.id, m.id); }}
+                        onClick={function () { handleRemoveManager(organization.id, m.id); }}
                         className="text-xs text-gray-400 hover:text-red-600 font-medium transition-colors"
                       >
                         Remove
@@ -195,7 +188,6 @@ export function OrganizationsPage({ organizations, activeOrgId, onOrganizationsC
                 </div>
               )}
             </div>
-
           </div>
         )}
       </div>
