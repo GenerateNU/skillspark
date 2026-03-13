@@ -19,7 +19,7 @@ func TestOrganizationRepository_GetEventOccurrenceByOrganizationId(t *testing.T)
 	ctx := context.Background()
 
 	// check that get by organization id returns multiple event occurrences with the same organization id
-	eventOccurrences, err := repo.GetEventOccurrencesByOrganizationID(ctx, uuid.MustParse("40000000-0000-0000-0000-000000000001"))
+	eventOccurrences, err := repo.GetEventOccurrencesByOrganizationID(ctx, uuid.MustParse("40000000-0000-0000-0000-000000000001"), "en-US")
 	assert.Nil(t, err)
 	assert.NotNil(t, eventOccurrences)
 	for i := range eventOccurrences {

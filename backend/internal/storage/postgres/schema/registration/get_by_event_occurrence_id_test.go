@@ -22,6 +22,7 @@ func TestGetRegistrationsByEventOccurrenceID(t *testing.T) {
 	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
+		AcceptLanguage:    "en-US",
 		EventOccurrenceID: r.EventOccurrenceID,
 	}
 
@@ -64,6 +65,7 @@ func TestGetRegistrationsByEventOccurrenceID_MultipleRegistrations(t *testing.T)
 	eventOccurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000001")
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
+		AcceptLanguage:    "en-US",
 		EventOccurrenceID: eventOccurrenceID,
 	}
 
@@ -91,6 +93,7 @@ func TestGetRegistrationsByEventOccurrenceID_NoRegistrations(t *testing.T) {
 	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
+		AcceptLanguage:    "en-US",
 		EventOccurrenceID: occurrence.ID,
 	}
 
@@ -110,6 +113,7 @@ func TestGetRegistrationsByEventOccurrenceID_VerifyEventDetails(t *testing.T) {
 	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
+		AcceptLanguage:    "en-US",
 		EventOccurrenceID: r.EventOccurrenceID,
 	}
 

@@ -22,7 +22,7 @@ func TestEventRepository_GetEventById(t *testing.T) {
 	ctx := context.Background()
 
 	// check that get by id works for 2 different events
-	event1, err := repo.GetEventByID(ctx, uuid.MustParse("60000000-0000-0000-0000-000000000001"))
+	event1, err := repo.GetEventByID(ctx, uuid.MustParse("60000000-0000-0000-0000-000000000001"), "en-US")
 	assert.Nil(t, err)
 	assert.NotNil(t, event1)
 	assert.Equal(t, "Junior Robotics Workshop", event1.Title)
@@ -33,7 +33,7 @@ func TestEventRepository_GetEventById(t *testing.T) {
 	assert.Equal(t, category_arr1, event1.Category)
 	assert.Equal(t, "events/robotics_workshop.jpg", *event1.HeaderImageS3Key)
 
-	event2, err := repo.GetEventByID(ctx, uuid.MustParse("60000000-0000-0000-0000-000000000002"))
+	event2, err := repo.GetEventByID(ctx, uuid.MustParse("60000000-0000-0000-0000-000000000002"), "en-US")
 	assert.Nil(t, err)
 	assert.NotNil(t, event2)
 	assert.Equal(t, "Chemistry for Kids", event2.Title)

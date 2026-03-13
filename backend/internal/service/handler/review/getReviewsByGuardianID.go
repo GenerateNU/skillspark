@@ -9,13 +9,13 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Review, error) {
+func (h *Handler) GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
 
 	if _, err := h.GuardianRepository.GetGuardianByID(ctx, id); err != nil {
 		return nil, errs.BadRequest("Invalid guardian_id: guardian does not exist")
 	}
 
-	reviews, httpErr := h.ReviewRepository.GetReviewsByGuardianID(ctx, id, pagination)
+	reviews, httpErr := h.ReviewRepository.GetReviewsByGuardianID(ctx, id, AcceptLanguage, pagination)
 	if httpErr != nil {
 		return nil, httpErr
 	}

@@ -25,7 +25,7 @@ func (h *Handler) CancelRegistration(ctx context.Context, input *models.CancelRe
 	var refundStatus string
 	switch registration.Body.PaymentIntentStatus {
 	case "succeeded":
-		eventoccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, registration.Body.EventOccurrenceID)
+		eventoccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, registration.Body.EventOccurrenceID, "en-US")
 		if err != nil {
 			return nil, err
 		}

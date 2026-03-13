@@ -32,22 +32,24 @@ type EventOccurrence struct {
 }
 
 type GetAllEventOccurrencesInput struct {
-	Page        int             `query:"page" minimum:"1" default:"1"`
-	Limit       int             `query:"limit" minimum:"1" maximum:"100" default:"100"`
-	Search      string          `query:"search"`
-	Latitude    OptionalFloat64 `query:"lat"`
-	Longitude   OptionalFloat64 `query:"lng"`
-	RadiusKm    float64         `query:"radius_km"`
-	MinPrice    int             `query:"min_price"`
-	MaxPrice    int             `query:"max_price"`
-	MinDuration int             `query:"min_duration"`
-	MaxDuration int             `query:"max_duration"`
-	MinAge      int             `query:"min_age"`
-	MaxAge      int             `query:"max_age"`
-	Category    string          `query:"category"`
-	SoldOut     bool            `query:"soldout"`
-	MinDate     time.Time       `query:"min_date"`
-	MaxDate     time.Time       `query:"max_date"`
+	AcceptLanguage string          `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	Page           int             `query:"page" minimum:"1" default:"1"`
+	Limit          int             `query:"limit" minimum:"1" maximum:"100" default:"100"`
+	Search         string          `query:"search"`
+	Latitude       OptionalFloat64 `query:"lat"`
+	Longitude      OptionalFloat64 `query:"lng"`
+	RadiusKm       float64         `query:"radius_km"`
+	MinPrice       int             `query:"min_price"`
+	MaxPrice       int             `query:"max_price"`
+	PriceTier      string          `query:"price"`
+	MinDuration    int             `query:"min_duration"`
+	MaxDuration    int             `query:"max_duration"`
+	MinAge         int             `query:"min_age"`
+	MaxAge         int             `query:"max_age"`
+	Category       string          `query:"category"`
+	SoldOut        bool            `query:"soldout"`
+	MinDate        time.Time       `query:"min_date"`
+	MaxDate        time.Time       `query:"max_date"`
 }
 
 type GetAllEventOccurrencesFilter struct {
@@ -72,7 +74,8 @@ type GetAllEventOccurrencesOutput struct {
 }
 
 type GetEventOccurrenceByIDInput struct {
-	ID uuid.UUID `path:"id" doc:"ID of an event occurrence"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	ID             uuid.UUID `path:"id" doc:"ID of an event occurrence"`
 }
 
 type OptionalFloat64 struct {
@@ -85,7 +88,8 @@ type GetEventOccurrenceByIDOutput struct {
 }
 
 type CreateEventOccurrenceInput struct {
-	Body struct {
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	Body           struct {
 		ManagerId    *uuid.UUID `json:"manager_id,omitempty" doc:"ID of a manager in the database"`
 		EventId      uuid.UUID  `json:"event_id" doc:"ID of an event in the database"`
 		LocationId   uuid.UUID  `json:"location_id" doc:"ID of a location in the database"`
@@ -103,8 +107,9 @@ type CreateEventOccurrenceOutput struct {
 }
 
 type UpdateEventOccurrenceInput struct {
-	ID   uuid.UUID `path:"id" doc:"ID of the event occurrence to update"`
-	Body struct {
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	ID             uuid.UUID `path:"id" doc:"ID of the event occurrence to update"`
+	Body           struct {
 		ManagerId    *uuid.UUID `json:"manager_id,omitempty" doc:"ID of a manager in the database"`
 		EventId      *uuid.UUID `json:"event_id,omitempty" doc:"ID of an event in the database"`
 		LocationId   *uuid.UUID `json:"location_id,omitempty" doc:"ID of a location in the database"`

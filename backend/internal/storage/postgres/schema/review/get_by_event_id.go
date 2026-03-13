@@ -11,8 +11,9 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *ReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Review, error) {
+func (r *ReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
 
+	language = AcceptLanguage
 	baseQuery, err := schema.ReadSQLBaseScript("get_by_event_id.sql", SqlReviewFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -26,10 +27,11 @@ func (r *ReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.UUID
 	}
 	defer rows.Close()
 
-	reviews, err := pgx.CollectRows(rows, ScanReviews)
+	reviews, err := pgx.CollectRows(rows, r.ScanReviews)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to collect reviews: ", err.Error())
 		return nil, &errr
 	}
+
 	return reviews, nil
 }

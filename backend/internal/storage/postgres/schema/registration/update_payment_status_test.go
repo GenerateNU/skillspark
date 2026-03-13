@@ -22,7 +22,8 @@ func TestUpdateRegistrationPaymentStatus(t *testing.T) {
 	require.Nil(t, created.PaidAt)
 
 	input := &models.UpdateRegistrationPaymentStatusInput{
-		ID: created.ID,
+		AcceptLanguage: "en-US",
+		ID:             created.ID,
 	}
 	input.Body.PaymentIntentStatus = "succeeded"
 

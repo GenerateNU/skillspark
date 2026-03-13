@@ -10,6 +10,7 @@ import (
 )
 
 func (r *RegistrationRepository) GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error) {
+
 	query, err := schema.ReadSQLBaseScript("get_by_event_occurrence_id.sql", SqlRegistrationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -23,7 +24,7 @@ func (r *RegistrationRepository) GetRegistrationsByEventOccurrenceID(ctx context
 	}
 	defer rows.Close()
 
-	registrations, err := pgx.CollectRows(rows, scanRegistration)
+	registrations, err := pgx.CollectRows(rows, scanRegistrationWithLang(input.AcceptLanguage))
 	if err != nil {
 		errr := errs.InternalServerError("Failed to collect registrations: ", err.Error())
 		return nil, &errr

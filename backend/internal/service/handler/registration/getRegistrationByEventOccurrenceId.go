@@ -9,12 +9,13 @@ import (
 )
 
 func (h *Handler) GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error) {
+
 	eventOccurrenceID, err := uuid.Parse(input.EventOccurrenceID.String())
 	if err != nil {
 		return nil, errs.BadRequest("Invalid child ID format")
 	}
 
-	registrations, httpErr := h.RegistrationRepository.GetRegistrationsByEventOccurrenceID(ctx, &models.GetRegistrationsByEventOccurrenceIDInput{EventOccurrenceID: eventOccurrenceID})
+	registrations, httpErr := h.RegistrationRepository.GetRegistrationsByEventOccurrenceID(ctx, &models.GetRegistrationsByEventOccurrenceIDInput{EventOccurrenceID: eventOccurrenceID, AcceptLanguage: input.AcceptLanguage})
 	if httpErr != nil {
 		return nil, httpErr
 	}

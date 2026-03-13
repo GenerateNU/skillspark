@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/s3_client"
 )
@@ -11,15 +12,29 @@ func (h *Handler) UpdateEvent(ctx context.Context, input *models.UpdateEventInpu
 	var key *string
 	var url *string
 
+	translateInput := []*string{input.Body.Title, input.Body.Description}
+
+	translationResp, err := h.TranslateClient.CallTranslateAPI(ctx, translateInput, input.AcceptLanguage)
+	if err != nil {
+		e := errs.InternalServerError("Translation failed", err.Error())
+		return nil, e
+	}
+
+	translatedTitle := translationResp[*input.Body.Title]
+	translatedDescription := translationResp[*input.Body.Description]
+
+	updateInput := h.UpdateEventTranslateStruct(ctx, input, translatedTitle, translatedDescription)
+
 	if image_data != nil {
 		var err error
 		url, key, err = h.UpdateEventS3Helper(ctx, s3Client, input, image_data)
 		if err != nil {
-			return nil, err
+			e := errs.InternalServerError("S3 upload failed", err.Error())
+			return nil, e
 		}
 	}
 
-	event, err := h.EventRepository.UpdateEvent(ctx, input, key)
+	event, err := h.EventRepository.UpdateEvent(ctx, updateInput, key)
 	if err != nil {
 		return nil, err
 	}
