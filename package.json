@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "husky",
     "dev:backend": "cd backend && go run .",
-    "install:all": "cd frontend && npm install",
+    "install:all": "cd frontend && bun install",
     "dev:web": "npm run dev -w frontend/apps/web",
     "dev:mobile": "npm run start -w frontend/apps/mobile",
     "generate:api": "npm run generate -w frontend/packages/api-client"
