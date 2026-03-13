@@ -100,7 +100,8 @@ type DeleteOrganizationOutput struct {
 }
 
 type GetEventOccurrencesByOrganizationIDInput struct {
-	ID uuid.UUID `path:"organization_id" doc:"ID of an organization"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	ID             uuid.UUID `path:"organization_id" doc:"ID of an organization"`
 }
 
 type GetEventOccurrencesByOrganizationIDOutput struct {

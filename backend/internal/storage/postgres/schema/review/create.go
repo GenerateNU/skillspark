@@ -7,8 +7,9 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.CreateReviewInput) (*models.Review, error) {
+func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.CreateReviewDBInput) (*models.Review, error) {
 	query, err := schema.ReadSQLBaseScript("create.sql", SqlReviewFiles)
+
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
@@ -17,17 +18,26 @@ func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.Creat
 	row := r.db.QueryRow(ctx, query,
 		input.Body.RegistrationID,
 		input.Body.GuardianID,
-		input.Body.Description,
+		input.Body.Description_EN,
+		input.Body.Description_TH,
 		input.Body.Categories,
 	)
 
 	var createdReview models.Review
+	var descEN, descTH string
 
-	err = row.Scan(&createdReview.ID, &createdReview.RegistrationID, &createdReview.GuardianID, &createdReview.Description, &createdReview.Categories, &createdReview.CreatedAt, &createdReview.UpdatedAt)
+	err = row.Scan(&createdReview.ID, &createdReview.RegistrationID, &createdReview.GuardianID, &descEN, &descTH, &createdReview.Categories, &createdReview.CreatedAt, &createdReview.UpdatedAt)
 
 	if err != nil {
 		err := errs.InternalServerError("Failed to create child: ", err.Error())
 		return nil, &err
+	}
+
+	switch input.AcceptLanguage {
+	case "th-TH":
+		createdReview.Description = descTH
+	case "en-US":
+		createdReview.Description = descEN
 	}
 
 	return &createdReview, nil

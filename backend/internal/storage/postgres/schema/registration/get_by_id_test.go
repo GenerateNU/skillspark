@@ -21,7 +21,8 @@ func TestGetRegistrationByID(t *testing.T) {
 	registrationID := reg.ID
 
 	getInput := &models.GetRegistrationByIDInput{
-		ID: registrationID,
+		AcceptLanguage: "en-US",
+		ID:             registrationID,
 	}
 
 	retrieved, err := repo.GetRegistrationByID(ctx, getInput, nil)
@@ -63,7 +64,8 @@ func TestGetRegistrationByID_VerifyEventDetails(t *testing.T) {
 	registrationID := reg.ID
 
 	getInput := &models.GetRegistrationByIDInput{
-		ID: registrationID,
+		AcceptLanguage: "en-US",
+		ID:             registrationID,
 	}
 
 	retrieved, err := repo.GetRegistrationByID(ctx, getInput, nil)

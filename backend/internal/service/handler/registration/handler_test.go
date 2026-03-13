@@ -81,7 +81,10 @@ func TestHandler_GetRegistrationByID(t *testing.T) {
 			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
 			ctx := context.Background()
 
-			input := &models.GetRegistrationByIDInput{ID: uuid.MustParse(tt.id)}
+			input := &models.GetRegistrationByIDInput{
+				AcceptLanguage: "en-US",
+				ID:             uuid.MustParse(tt.id),
+			}
 			registration, err := handler.GetRegistrationByID(ctx, input)
 
 			if tt.wantErr {
@@ -164,7 +167,7 @@ func TestHandler_GetRegistrationsByChildID(t *testing.T) {
 			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
 			ctx := context.Background()
 
-			input := &models.GetRegistrationsByChildIDInput{ChildID: uuid.MustParse(tt.childID)}
+			input := &models.GetRegistrationsByChildIDInput{AcceptLanguage: "en-US", ChildID: uuid.MustParse(tt.childID)}
 			registrations, err := handler.GetRegistrationsByChildID(ctx, input)
 
 			if tt.wantErr {
@@ -247,7 +250,7 @@ func TestHandler_GetRegistrationsByGuardianID(t *testing.T) {
 			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
 			ctx := context.Background()
 
-			input := &models.GetRegistrationsByGuardianIDInput{GuardianID: uuid.MustParse(tt.guardianID)}
+			input := &models.GetRegistrationsByGuardianIDInput{AcceptLanguage: "en-US", GuardianID: uuid.MustParse(tt.guardianID)}
 			registrations, err := handler.GetRegistrationsByGuardianID(ctx, input)
 
 			if tt.wantErr {
@@ -331,7 +334,7 @@ func TestHandler_GetRegistrationsByEventOccurrenceID(t *testing.T) {
 			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
 			ctx := context.Background()
 
-			input := &models.GetRegistrationsByEventOccurrenceIDInput{EventOccurrenceID: uuid.MustParse(tt.eventOccurrenceID)}
+			input := &models.GetRegistrationsByEventOccurrenceIDInput{AcceptLanguage: "en-US", EventOccurrenceID: uuid.MustParse(tt.eventOccurrenceID)}
 			registrations, err := handler.GetRegistrationsByEventOccurrenceID(ctx, input)
 
 			if tt.wantErr {
@@ -400,6 +403,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			name: "successful create",
 			input: func() *models.CreateRegistrationInput {
 				i := &models.CreateRegistrationInput{}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = childID
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
@@ -408,7 +412,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
@@ -470,6 +474,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			name: "invalid event_occurrence_id",
 			input: func() *models.CreateRegistrationInput {
 				i := &models.CreateRegistrationInput{}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = childID
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = invalidEventOccurrenceID
@@ -477,7 +482,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, invalidEventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, invalidEventOccurrenceID, mock.Anything).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("EventOccurrence", "id", invalidEventOccurrenceID.String()).Code,
 						Message: "Event occurrence not found",
@@ -489,6 +494,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			name: "invalid guardian_id",
 			input: func() *models.CreateRegistrationInput {
 				i := &models.CreateRegistrationInput{}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = childID
 				i.Body.GuardianID = invalidGuardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
@@ -496,7 +502,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, invalidGuardianID).
@@ -511,6 +517,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			name: "invalid child_id",
 			input: func() *models.CreateRegistrationInput {
 				i := &models.CreateRegistrationInput{}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = invalidChildID
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
@@ -518,7 +525,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
@@ -536,6 +543,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			name: "guardian missing stripe customer ID",
 			input: func() *models.CreateRegistrationInput {
 				i := &models.CreateRegistrationInput{}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = childID
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
@@ -543,7 +551,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
@@ -555,6 +563,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			name: "child does not belong to guardian",
 			input: func() *models.CreateRegistrationInput {
 				i := &models.CreateRegistrationInput{}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = childID
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
@@ -563,7 +572,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
@@ -578,6 +587,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			name: "event occurrence already started",
 			input: func() *models.CreateRegistrationInput {
 				i := &models.CreateRegistrationInput{}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = childID
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
@@ -586,7 +596,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(&models.EventOccurrence{
 						ID:           eventOccurrenceID,
 						Price:        10000,
@@ -607,6 +617,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			name: "event occurrence at max capacity",
 			input: func() *models.CreateRegistrationInput {
 				i := &models.CreateRegistrationInput{}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = childID
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
@@ -615,7 +626,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(&models.EventOccurrence{
 						ID:           eventOccurrenceID,
 						Price:        10000,
@@ -687,6 +698,7 @@ func TestHandler_UpdateRegistration(t *testing.T) {
 			name: "successful update child",
 			input: func() *models.UpdateRegistrationInput {
 				i := &models.UpdateRegistrationInput{ID: existingID}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = &newChildID
 				return i
 			}(),
@@ -724,6 +736,7 @@ func TestHandler_UpdateRegistration(t *testing.T) {
 			name: "registration not found",
 			input: func() *models.UpdateRegistrationInput {
 				i := &models.UpdateRegistrationInput{ID: existingID}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = &newChildID
 				return i
 			}(),
@@ -744,6 +757,7 @@ func TestHandler_UpdateRegistration(t *testing.T) {
 			name: "invalid child_id on update",
 			input: func() *models.UpdateRegistrationInput {
 				i := &models.UpdateRegistrationInput{ID: existingID}
+				i.AcceptLanguage = "en-US"
 				i.Body.ChildID = &invalidChildID
 				return i
 			}(),
@@ -845,7 +859,7 @@ func TestHandler_CancelRegistration(t *testing.T) {
 	}{
 		{
 			name:  "cancel requires_capture — cancels payment intent",
-			input: &models.CancelRegistrationInput{ID: registrationID},
+			input: &models.CancelRegistrationInput{AcceptLanguage: "en-US", ID: registrationID},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, eoRepo *repomocks.MockEventOccurrenceRepository, sc *stripemocks.MockStripeClient) {
 				regRepo.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
 					Return(validRegistration("requires_capture", time.Now().Add(48*time.Hour)), nil)
@@ -860,12 +874,12 @@ func TestHandler_CancelRegistration(t *testing.T) {
 		},
 		{
 			name:  "cancel succeeded — event more than 24hrs away — issues refund",
-			input: &models.CancelRegistrationInput{ID: registrationID},
+			input: &models.CancelRegistrationInput{AcceptLanguage: "en-US", ID: registrationID},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, eoRepo *repomocks.MockEventOccurrenceRepository, sc *stripemocks.MockStripeClient) {
 				regRepo.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
 					Return(validRegistration("succeeded", time.Now().Add(48*time.Hour)), nil)
 
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence(time.Now().Add(48*time.Hour)), nil)
 
 				sc.On("RefundPayment", mock.Anything, mock.AnythingOfType("*models.RefundPaymentInput")).
@@ -878,12 +892,12 @@ func TestHandler_CancelRegistration(t *testing.T) {
 		},
 		{
 			name:  "cancel succeeded — event within 24hrs — no refund",
-			input: &models.CancelRegistrationInput{ID: registrationID},
+			input: &models.CancelRegistrationInput{AcceptLanguage: "en-US", ID: registrationID},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, eoRepo *repomocks.MockEventOccurrenceRepository, sc *stripemocks.MockStripeClient) {
 				regRepo.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
 					Return(validRegistration("succeeded", time.Now().Add(12*time.Hour)), nil)
 
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence(time.Now().Add(12*time.Hour)), nil)
 
 				regRepo.On("CancelRegistration", mock.Anything, mock.AnythingOfType("*models.CancelRegistrationInput")).
@@ -893,7 +907,7 @@ func TestHandler_CancelRegistration(t *testing.T) {
 		},
 		{
 			name:  "registration already cancelled",
-			input: &models.CancelRegistrationInput{ID: registrationID},
+			input: &models.CancelRegistrationInput{AcceptLanguage: "en-US", ID: registrationID},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, eoRepo *repomocks.MockEventOccurrenceRepository, sc *stripemocks.MockStripeClient) {
 				regRepo.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
 					Return(&models.GetRegistrationByIDOutput{
@@ -907,7 +921,7 @@ func TestHandler_CancelRegistration(t *testing.T) {
 		},
 		{
 			name:  "registration not found",
-			input: &models.CancelRegistrationInput{ID: uuid.New()},
+			input: &models.CancelRegistrationInput{AcceptLanguage: "en-US", ID: uuid.New()},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, eoRepo *repomocks.MockEventOccurrenceRepository, sc *stripemocks.MockStripeClient) {
 				regRepo.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
 					Return(nil, &errs.HTTPError{
@@ -919,7 +933,7 @@ func TestHandler_CancelRegistration(t *testing.T) {
 		},
 		{
 			name:  "stripe cancel fails",
-			input: &models.CancelRegistrationInput{ID: registrationID},
+			input: &models.CancelRegistrationInput{AcceptLanguage: "en-US", ID: registrationID},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, eoRepo *repomocks.MockEventOccurrenceRepository, sc *stripemocks.MockStripeClient) {
 				regRepo.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
 					Return(validRegistration("requires_capture", time.Now().Add(48*time.Hour)), nil)
@@ -931,12 +945,12 @@ func TestHandler_CancelRegistration(t *testing.T) {
 		},
 		{
 			name:  "stripe refund fails",
-			input: &models.CancelRegistrationInput{ID: registrationID},
+			input: &models.CancelRegistrationInput{AcceptLanguage: "en-US", ID: registrationID},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, eoRepo *repomocks.MockEventOccurrenceRepository, sc *stripemocks.MockStripeClient) {
 				regRepo.On("GetRegistrationByID", mock.Anything, mock.AnythingOfType("*models.GetRegistrationByIDInput")).
 					Return(validRegistration("succeeded", time.Now().Add(48*time.Hour)), nil)
 
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence(time.Now().Add(48*time.Hour)), nil)
 
 				sc.On("RefundPayment", mock.Anything, mock.AnythingOfType("*models.RefundPaymentInput")).

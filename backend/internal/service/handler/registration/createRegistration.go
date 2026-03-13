@@ -9,7 +9,7 @@ import (
 
 func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
 
-	eventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID)
+	eventOccurrence, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, input.Body.EventOccurrenceID, "en-US")
 	if err != nil {
 		return nil, err
 	}
@@ -59,6 +59,7 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 	}
 
 	completeRegistration := &models.CreateRegistrationWithPaymentData{
+		AcceptLanguage:        input.AcceptLanguage,
 		ChildID:               input.Body.ChildID,
 		GuardianID:            input.Body.GuardianID,
 		EventOccurrenceID:     input.Body.EventOccurrenceID,

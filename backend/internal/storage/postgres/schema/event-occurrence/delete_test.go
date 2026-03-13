@@ -32,7 +32,7 @@ func TestEventOccurrenceRepository_CancelEventOccurrence(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Fetch the event occurrence again
-	updatedEo, err := repo.GetEventOccurrenceByID(ctx, eo.ID)
+	updatedEo, err := repo.GetEventOccurrenceByID(ctx, eo.ID, "en-US")
 	assert.NoError(t, err)
 
 	// Verify the status was set to 'cancelled'
@@ -72,7 +72,7 @@ func TestEventOccurrenceRepository_CancelEventOccurrence_Within24HoursFails(t *t
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Cannot delete event happening within the next 24 hours")
 
-	storedEO, getErr := repo.GetEventOccurrenceByID(ctx, eventOccurrence.ID)
+	storedEO, getErr := repo.GetEventOccurrenceByID(ctx, eventOccurrence.ID, "en-US")
 	assert.NoError(t, getErr)
 	assert.NotNil(t, storedEO)
 	assert.Equal(t, eventOccurrence.ID, storedEO.ID)

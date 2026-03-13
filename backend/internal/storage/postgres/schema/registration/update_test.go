@@ -46,7 +46,8 @@ func TestUpdateRegistration(t *testing.T) {
 	require.NotNil(t, created)
 
 	updateInput := &models.UpdateRegistrationInput{
-		ID: created.Body.ID,
+		AcceptLanguage: "en-US",
+		ID:             created.Body.ID,
 	}
 	updateInput.Body.ChildID = &child2.ID
 
@@ -163,7 +164,7 @@ func TestUpdateRegistration_DecrementsAttendeeCount(t *testing.T) {
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 
-	occurrenceAfterCreate, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID)
+	occurrenceAfterCreate, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID, "en-US")
 	require.Nil(t, err)
 	require.NotNil(t, occurrenceAfterCreate)
 	countAfterCreate := occurrenceAfterCreate.CurrEnrolled
@@ -179,7 +180,7 @@ func TestUpdateRegistration_DecrementsAttendeeCount(t *testing.T) {
 	require.NotNil(t, updated)
 	assert.Equal(t, models.RegistrationStatusCancelled, updated.Body.Status)
 
-	occurrenceAfterCancel, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID)
+	occurrenceAfterCancel, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID, "en-US")
 	require.Nil(t, err)
 	require.NotNil(t, occurrenceAfterCancel)
 	assert.Equal(t, countAfterCreate-1, occurrenceAfterCancel.CurrEnrolled, "Attendee count should decrease by 1 after cancelling registration")

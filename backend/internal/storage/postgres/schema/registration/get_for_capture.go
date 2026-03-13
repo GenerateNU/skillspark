@@ -24,7 +24,7 @@ func (r *RegistrationRepository) GetRegistrationsForCapture(ctx context.Context,
 	}
 	defer rows.Close()
 
-	registrations, err := pgx.CollectRows(rows, scanRegistration)
+	registrations, err := pgx.CollectRows(rows, scanRegistrationWithLang("en-US"))
 	if err != nil {
 		errr := errs.InternalServerError("Failed to collect registrations: ", err.Error())
 		return nil, &errr

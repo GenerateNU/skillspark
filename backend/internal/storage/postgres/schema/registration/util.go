@@ -28,6 +28,7 @@ func CreateTestRegistration(
 	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, db)
 
 	input := &models.CreateRegistrationWithPaymentData{
+		AcceptLanguage:        "en-US",
 		ChildID:               child.ID,
 		GuardianID:            child.GuardianID,
 		EventOccurrenceID:     occurrence.ID,

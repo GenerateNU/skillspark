@@ -11,6 +11,9 @@ import (
 func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error) {
 	tx, err := r.db.Begin(ctx)
 
+	var titleEN string
+	var titleTH *string
+
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +99,13 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 			slog.Error("Failed to rollback transaction: " + err.Error())
 		}
 		return nil, errs.InternalServerError("Failed to commit transaction: ", err.Error())
+	}
+
+	switch input.AcceptLanguage {
+	case "th-TH":
+		createdRegistration.Body.EventName = *titleTH
+	case "en-US":
+		createdRegistration.Body.EventName = titleEN
 	}
 	return &createdRegistration, nil
 }

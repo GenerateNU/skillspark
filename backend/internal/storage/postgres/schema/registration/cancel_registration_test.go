@@ -27,7 +27,8 @@ func TestCancelRegistration(t *testing.T) {
 	require.NoError(t, row.Scan(&enrolledBefore))
 
 	input := &models.CancelRegistrationInput{
-		ID: created.ID,
+		AcceptLanguage: "en-US",
+		ID:             created.ID,
 	}
 
 	cancelled, err := repo.CancelRegistration(ctx, input)
@@ -62,7 +63,8 @@ func TestCancelRegistration_AlreadyCancelled(t *testing.T) {
 	created := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.CancelRegistrationInput{
-		ID: created.ID,
+		AcceptLanguage: "en-US",
+		ID:             created.ID,
 	}
 	_, err := repo.CancelRegistration(ctx, input)
 	require.NoError(t, err)
@@ -82,7 +84,8 @@ func TestCancelRegistration_NotFound(t *testing.T) {
 	t.Parallel()
 
 	input := &models.CancelRegistrationInput{
-		ID: uuid.New(),
+		AcceptLanguage: "en-US",
+		ID:             uuid.New(),
 	}
 
 	cancelled, err := repo.CancelRegistration(ctx, input)
@@ -100,7 +103,8 @@ func TestCancelRegistration_VerifyPersistence(t *testing.T) {
 	created := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.CancelRegistrationInput{
-		ID: created.ID,
+		AcceptLanguage: "en-US",
+		ID:             created.ID,
 	}
 	cancelled, err := repo.CancelRegistration(ctx, input)
 	require.NoError(t, err)
@@ -124,6 +128,7 @@ func TestCancelRegistration_WithPaymentIntentStatus(t *testing.T) {
 	cancelledStatus := models.RegistrationStatusCancelled
 	piStatus := "canceled"
 	input := &models.CancelRegistrationInput{
+		AcceptLanguage:      "en-US",
 		ID:                  created.ID,
 		Status:              &cancelledStatus,
 		PaymentIntentStatus: &piStatus,

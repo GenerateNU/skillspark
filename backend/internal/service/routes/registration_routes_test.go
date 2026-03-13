@@ -109,6 +109,7 @@ func TestHumaValidation_GetRegistrationByID(t *testing.T) {
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/"+tt.ID, nil)
 			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -188,6 +189,7 @@ func TestHumaValidation_GetRegistrationsByChildID(t *testing.T) {
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/child/"+tt.childID, nil)
 			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -267,6 +269,7 @@ func TestHumaValidation_GetRegistrationsByGuardianID(t *testing.T) {
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/guardian/"+tt.guardianID, nil)
 			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -346,6 +349,7 @@ func TestHumaValidation_GetRegistrationsByEventOccurrenceID(t *testing.T) {
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/registrations/event_occurrence/"+tt.eventOccurrenceID, nil)
 			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -403,7 +407,7 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"status":              "registered",
 			},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceIDEx).
+				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceIDEx, mock.Anything).
 					Return(validEventOccurrence, nil)
 
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianIDEx).
@@ -568,6 +572,7 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 			req, err := http.NewRequest(http.MethodPost, "/api/v1/registrations", bytes.NewBuffer(bodyBytes))
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -705,6 +710,7 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 			req, err := http.NewRequest(http.MethodPatch, "/api/v1/registrations/"+tt.id, bytes.NewBuffer(bodyBytes))
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Accept-Language", "en-US")
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
@@ -718,5 +724,83 @@ func TestHumaValidation_UpdateRegistration(t *testing.T) {
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRegRepo.AssertExpectations(t)
 		})
+	}
+}
+
+func TestHumaValidation_InvalidAcceptLanguage(t *testing.T) {
+	t.Parallel()
+
+	invalidLangs := []struct {
+		name string
+		lang string
+	}{
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	type endpoint struct {
+		name   string
+		method string
+		path   string
+		body   []byte
+	}
+
+	minimalCreateBody, _ := json.Marshal(map[string]interface{}{
+		"child_id":            "30000000-0000-0000-0000-000000000001",
+		"guardian_id":         "11111111-1111-1111-1111-111111111111",
+		"event_occurrence_id": "70000000-0000-0000-0000-000000000001",
+		"status":              "registered",
+	})
+	minimalUpdateBody, _ := json.Marshal(map[string]interface{}{"status": "cancelled"})
+	minimalPaymentStatusBody, _ := json.Marshal(map[string]interface{}{"payment_intent_status": "succeeded"})
+
+	endpoints := []endpoint{
+		{name: "GetRegistrationByID", method: http.MethodGet, path: "/api/v1/registrations/80000000-0000-0000-0000-000000000001"},
+		{name: "GetRegistrationsByChildID", method: http.MethodGet, path: "/api/v1/registrations/child/30000000-0000-0000-0000-000000000001"},
+		{name: "GetRegistrationsByGuardianID", method: http.MethodGet, path: "/api/v1/registrations/guardian/11111111-1111-1111-1111-111111111111"},
+		{name: "GetRegistrationsByEventOccurrenceID", method: http.MethodGet, path: "/api/v1/registrations/event_occurrence/70000000-0000-0000-0000-000000000001"},
+		{name: "CreateRegistration", method: http.MethodPost, path: "/api/v1/registrations", body: minimalCreateBody},
+		{name: "UpdateRegistration", method: http.MethodPatch, path: "/api/v1/registrations/80000000-0000-0000-0000-000000000001", body: minimalUpdateBody},
+		{name: "CancelRegistration", method: http.MethodPost, path: "/api/v1/registrations/80000000-0000-0000-0000-000000000001/cancel"},
+		{name: "UpdateRegistrationPaymentStatus", method: http.MethodPatch, path: "/api/v1/registrations/80000000-0000-0000-0000-000000000001/payment-status", body: minimalPaymentStatusBody},
+	}
+
+	for _, ep := range endpoints {
+		ep := ep
+		for _, tt := range invalidLangs {
+			tt := tt
+			t.Run(ep.name+"/"+tt.name, func(t *testing.T) {
+				t.Parallel()
+
+				app, _ := setupRegistrationTestAPI(
+					new(repomocks.MockRegistrationRepository),
+					new(repomocks.MockChildRepository),
+					new(repomocks.MockGuardianRepository),
+					new(repomocks.MockEventOccurrenceRepository),
+					new(repomocks.MockOrganizationRepository),
+					new(stripemocks.MockStripeClient),
+				)
+
+				var reqBody io.Reader
+				if ep.body != nil {
+					reqBody = bytes.NewBuffer(ep.body)
+				}
+
+				req, err := http.NewRequest(ep.method, ep.path, reqBody)
+				assert.NoError(t, err)
+				if ep.body != nil {
+					req.Header.Set("Content-Type", "application/json")
+				}
+				req.Header.Set("Accept-Language", tt.lang)
+
+				resp, err := app.Test(req)
+				assert.NoError(t, err)
+				defer func() { _ = resp.Body.Close() }()
+
+				assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+					"expected 422 for invalid Accept-Language %q on %s %s", tt.lang, ep.method, ep.path)
+			})
+		}
 	}
 }

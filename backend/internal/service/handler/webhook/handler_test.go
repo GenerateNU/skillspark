@@ -63,7 +63,7 @@ func TestHandler_HandlePaymentIntentFailed(t *testing.T) {
 			name:  "successful — cancels registration",
 			event: makePaymentIntentEvent(piID, stripe.PaymentIntentStatusRequiresPaymentMethod),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository) {
-				regRepo.On("GetRegistrationByPaymentIntentID", mock.Anything, piID).
+				regRepo.On("GetRegistrationByPaymentIntentID", mock.Anything, piID, "en-US").
 					Return(&models.Registration{
 						ID: regID,
 					}, nil)
@@ -77,7 +77,7 @@ func TestHandler_HandlePaymentIntentFailed(t *testing.T) {
 			name:  "registration not found — returns error",
 			event: makePaymentIntentEvent(piID, stripe.PaymentIntentStatusRequiresPaymentMethod),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository) {
-				regRepo.On("GetRegistrationByPaymentIntentID", mock.Anything, piID).
+				regRepo.On("GetRegistrationByPaymentIntentID", mock.Anything, piID, "en-US").
 					Return(nil, &errs.HTTPError{Code: 404, Message: "registration not found"})
 			},
 			wantErr: true,
@@ -86,7 +86,7 @@ func TestHandler_HandlePaymentIntentFailed(t *testing.T) {
 			name:  "cancel registration fails — returns error",
 			event: makePaymentIntentEvent(piID, stripe.PaymentIntentStatusRequiresPaymentMethod),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository) {
-				regRepo.On("GetRegistrationByPaymentIntentID", mock.Anything, piID).
+				regRepo.On("GetRegistrationByPaymentIntentID", mock.Anything, piID, "en-US").
 					Return(&models.Registration{
 						ID: regID,
 					}, nil)

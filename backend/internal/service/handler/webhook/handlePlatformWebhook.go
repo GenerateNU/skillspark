@@ -40,7 +40,7 @@ func (h *Handler) handlePaymentIntentFailed(ctx context.Context, event stripe.Ev
 		return err
 	}
 
-	registration, err := h.repo.Registration.GetRegistrationByPaymentIntentID(ctx, pi.ID)
+	registration, err := h.repo.Registration.GetRegistrationByPaymentIntentID(ctx, pi.ID, "en-US")
 	if err != nil {
 		log.Printf("Registration not found for payment intent %s: %v", pi.ID, err)
 		return err

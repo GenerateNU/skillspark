@@ -21,7 +21,7 @@ func (h *Handler) UpdateRegistration(ctx context.Context, input *models.UpdateRe
 	}
 
 	if input.Body.EventOccurrenceID != nil {
-		if _, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, *input.Body.EventOccurrenceID); err != nil {
+		if _, err := h.EventOccurrenceRepository.GetEventOccurrenceByID(ctx, *input.Body.EventOccurrenceID, "en-US"); err != nil {
 			return nil, errs.BadRequest("Invalid event_occurrence_id: event occurrence does not exist")
 		}
 	}
