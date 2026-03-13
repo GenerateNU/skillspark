@@ -26,7 +26,19 @@ export default function FamilyListScreen() {
 
   const handleAddChild = () => {};
 
-  const handleEditChild = () => {};
+  const handleEditChild = (child: any) => {
+    router.push({
+      pathname: '/family/manage',
+      params: {
+        id: child.id,
+        name: child.name,
+        birth_month: child.birth_month,
+        birth_year: child.birth_year,
+        school_id: child.school_id ?? '',
+        interests: child.interests ?? [],
+      },
+    });
+  };
 
   if (guardianLoading || childrenLoading) {
     return (
@@ -50,46 +62,46 @@ export default function FamilyListScreen() {
         <View className="w-10" />
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8 }} showsVerticalScrollIndicator={false}>
-        <TouchableOpacity className="flex-row items-start py-3 gap-3" activeOpacity={0.7}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12 }} showsVerticalScrollIndicator={false}>
+        <TouchableOpacity className="flex-row items-start py-4 gap-3" activeOpacity={0.7}>
           <View className="w-11 h-11 items-center justify-center">
             <IconSymbol name="person.circle" size={40} color={theme.text} />
           </View>
-          <View className="flex-1 gap-[2px]">
+          <View className="flex-1 gap-1">
             <ThemedText className="text-base font-nunito-semibold">{guardian?.name}</ThemedText>
             <ThemedText className="text-[13px] text-[#6B7280] font-nunito">@{guardian?.username}</ThemedText>
             <ThemedText className="text-[13px] text-[#6B7280] font-nunito">{guardian?.email}</ThemedText>
           </View>
         </TouchableOpacity>
-        <View className="h-px my-1 bg-[#E5E7EB]" />
+        <View className="h-px my-3 bg-[#E5E7EB]" />
         <SectionHeader
           title="Child Profile"
           actionLabel="add profile +"
           onAction={handleAddChild}
         />
         {children.length === 0 && (
-          <ThemedText className="text-[#9CA3AF] text-sm pb-3 font-nunito">No child profiles added yet.</ThemedText>
+          <ThemedText className="text-[#9CA3AF] text-sm pb-4 font-nunito">No child profiles added yet.</ThemedText>
         )}
         {children.map((child: any, idx: number) => (
           <React.Fragment key={child.id}>
             <ChildListItem
               child={child}
-              onPress={() => handleEditChild()}
+              onPress={() => handleEditChild(child)}
             />
-            {idx < children.length - 1 && <View className="h-px my-1 bg-[#E5E7EB]" />}
+            {idx < children.length - 1 && <View className="h-px my-3 bg-[#E5E7EB]" />}
           </React.Fragment>
         ))}
-        <View className="h-px my-1 bg-[#E5E7EB]" />
+        <View className="h-px my-3 bg-[#E5E7EB]" />
         <SectionHeader
           title="Emergency Contact"
           actionLabel="add contact +"
           onAction={() => {}}
         />
-        <TouchableOpacity className="flex-row items-start py-3 gap-3" activeOpacity={0.7}>
+        <TouchableOpacity className="flex-row items-start py-4 gap-3" activeOpacity={0.7}>
           <View className="w-11 h-11 items-center justify-center">
             <IconSymbol name="person.circle" size={40} color={theme.text} />
           </View>
-          <View className="flex-1 gap-[2px]">
+          <View className="flex-1 gap-1">
             <ThemedText className="text-base font-nunito-semibold">Martha Smith</ThemedText>
             <ThemedText className="text-[13px] text-[#6B7280] font-nunito">(555) 123-4567</ThemedText>
           </View>

@@ -73,10 +73,7 @@ export default function ManageChildScreen() {
     : [];
   const [interests, setInterests] = useState<string[]>(initialInterests);
 
-  // Interest picker state
-  const [showPicker, setShowPicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [pendingInterests, setPendingInterests] = useState<string[]>([]);
 
   // Dropdown state
   const [showMonthDrop, setShowMonthDrop] = useState(false);
@@ -149,21 +146,10 @@ export default function ManageChildScreen() {
 
   const removeInterest = (tag: string) => setInterests(prev => prev.filter(i => i !== tag));
 
-  const openPicker = () => {
-    setPendingInterests([...interests]);
-    setSearchQuery('');
-    setShowPicker(true);
-  };
-
-  const togglePending = (item: string) => {
-    setPendingInterests(prev =>
+  const toggleInterest = (item: string) => {
+    setInterests(prev =>
       prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
     );
-  };
-
-  const confirmPicker = () => {
-    setInterests(pendingInterests);
-    setShowPicker(false);
   };
 
   const filteredOptions = INTEREST_OPTIONS.filter(o =>
@@ -279,7 +265,7 @@ export default function ManageChildScreen() {
           </View>
           <ThemedText className="text-base font-nunito-semibold mb-3">Interests</ThemedText>
           {interests.length > 0 && (
-            <View className="flex-row flex-wrap gap-2 mb-3">
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3" contentContainerStyle={{ gap: 8, paddingRight: 4 }}>
               {interests.map((tag, idx) => {
                 const color = TAG_COLORS[idx % TAG_COLORS.length];
                 return (
@@ -294,63 +280,43 @@ export default function ManageChildScreen() {
                   </TouchableOpacity>
                 );
               })}
-            </View>
+            </ScrollView>
           )}
-          <TouchableOpacity
-            className="border rounded-[10px] px-4 py-[14px] flex-row items-center justify-between mb-3"
-            style={{ borderColor }}
-            onPress={openPicker}
-          >
-            <ThemedText className="text-base font-nunito" style={{ color: theme.text }}>Add Interest</ThemedText>
-            <IconSymbol name="chevron.down" size={16} color="#6B7280" />
-          </TouchableOpacity>
-          {showPicker && (
-            <View className="border rounded-[10px] overflow-hidden mb-6" style={{ borderColor }}>
-              <View className="flex-row items-center px-4 py-3 gap-2">
-                <TextInput
-                  className="flex-1 text-base font-nunito"
-                  style={{ color: theme.text }}
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  placeholder="Input"
-                  placeholderTextColor={placeholderColor}
-                />
-                <IconSymbol name="magnifyingglass" size={20} color="#6B7280" />
-              </View>
-              <View className="h-px" style={{ backgroundColor: borderColor }} />
+          <View className="border rounded-[10px] overflow-hidden mb-6" style={{ borderColor }}>
+            <View className="flex-row items-center px-4 py-3 gap-2">
+              <TextInput
+                className="flex-1 text-base font-nunito"
+                style={{ color: theme.text }}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Search interests..."
+                placeholderTextColor={placeholderColor}
+              />
+              <IconSymbol name="magnifyingglass" size={20} color="#6B7280" />
+            </View>
+            <View className="h-px" style={{ backgroundColor: borderColor }} />
+            <View onStartShouldSetResponder={() => true} onMoveShouldSetResponder={() => true}>
+            <ScrollView nestedScrollEnabled showsVerticalScrollIndicator style={{ maxHeight: 220 }}>
               {filteredOptions.map(item => (
                 <TouchableOpacity
                   key={item}
                   className="flex-row items-center justify-between px-4 py-4 border-b"
                   style={{ borderBottomColor: inputBg }}
-                  onPress={() => togglePending(item)}
+                  onPress={() => toggleInterest(item)}
                 >
                   <ThemedText className="text-base font-nunito">{item}</ThemedText>
                   <View
                     className="w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center"
-                    style={{ borderColor: pendingInterests.includes(item) ? '#1F2937' : '#9CA3AF' }}
+                    style={{ borderColor: interests.includes(item) ? '#1F2937' : '#9CA3AF' }}
                   >
-                    {pendingInterests.includes(item) && (
+                    {interests.includes(item) && (
                       <IconSymbol name="checkmark" size={12} color="#1F2937" />
                     )}
                   </View>
                 </TouchableOpacity>
               ))}
-              <View className="flex-row items-center p-4 gap-4">
-                <TouchableOpacity className="bg-[#1D4ED8] px-7 py-3 rounded-lg" onPress={confirmPicker}>
-                  <ThemedText className="text-white text-[15px] font-nunito-semibold">Add</ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowPicker(false)}>
-                  <ThemedText className="text-[15px] font-nunito text-[#6B7280]">Cancel</ThemedText>
-                </TouchableOpacity>
-              </View>
+            </ScrollView>
             </View>
-          )}
-          <View className="flex-row items-center justify-between mb-6 mt-2">
-            <ThemedText className="text-lg font-nunito-semibold">Availability</ThemedText>
-            <TouchableOpacity className="border rounded-lg px-5 py-2" style={{ borderColor }}>
-              <ThemedText className="text-[15px] font-nunito text-[#6B7280]">Edit</ThemedText>
-            </TouchableOpacity>
           </View>
           <TouchableOpacity
             className="py-4 rounded-xl items-center justify-center"
