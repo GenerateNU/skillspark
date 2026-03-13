@@ -63,8 +63,6 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		&createdRegistration.Body.PlatformFeeAmount,
 		&createdRegistration.Body.PaidAt,
 		&createdRegistration.Body.StripePaymentMethodID,
-		&createdRegistration.Body.EventName,
-		&createdRegistration.Body.OccurrenceStartTime,
 		&titleEN,
 		&titleTH,
 		&createdRegistration.Body.OccurrenceStartTime,
