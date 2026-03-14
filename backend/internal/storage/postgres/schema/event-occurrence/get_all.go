@@ -10,7 +10,13 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error) {
+type PriceRange struct {
+	MinPrice int
+	MaxPrice *int
+}
+
+func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error) {
+	lang := AcceptLanguage
 	query, err := schema.ReadSQLBaseScript("get_all.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -28,21 +34,25 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 		filters.Latitude,
 		filters.Longitude,
 		filters.RadiusKm,
-		// still missing the price tier here
 		filters.MinAge,
 		filters.MaxAge,
 		filters.Category,
 		filters.SoldOut,
 		filters.MinDate,
 		filters.MaxDate,
+		filters.MinPrice,
+		filters.MaxPrice,
 	)
+
 	if err != nil {
 		err := errs.InternalServerError("Failed to fetch all event occurrences: ", err.Error())
 		return nil, &err
 	}
 	defer rows.Close()
 
-	eventOccurrences, err := pgx.CollectRows(rows, scanEventOccurrence)
+	eventOccurrences, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (models.EventOccurrence, error) {
+		return scanEventOccurrence(row, lang)
+	})
 	if err != nil {
 		err := errs.InternalServerError("Failed to scan all event occurrences: ", err.Error())
 		return nil, &err
@@ -50,8 +60,10 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 	return eventOccurrences, nil
 }
 
-func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error) {
+func scanEventOccurrence(row pgx.CollectableRow, language string) (models.EventOccurrence, error) {
 	var createdEventOccurrence models.EventOccurrence
+	var titleEN, descriptionEN string
+	var titleTH, descriptionTH *string
 	// populate data from each row
 	err := row.Scan(
 		// event occurrence fields
@@ -65,11 +77,15 @@ func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error)
 		&createdEventOccurrence.CreatedAt,
 		&createdEventOccurrence.UpdatedAt,
 		&createdEventOccurrence.Status,
+		&createdEventOccurrence.Price,
+		&createdEventOccurrence.Currency,
 
 		// event fields
 		&createdEventOccurrence.Event.ID,
-		&createdEventOccurrence.Event.Title,
-		&createdEventOccurrence.Event.Description,
+		&titleEN,
+		&titleTH,
+		&descriptionEN,
+		&descriptionTH,
 		&createdEventOccurrence.Event.OrganizationID,
 		&createdEventOccurrence.Event.AgeRangeMin,
 		&createdEventOccurrence.Event.AgeRangeMax,
@@ -92,5 +108,15 @@ func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error)
 		&createdEventOccurrence.Location.CreatedAt,
 		&createdEventOccurrence.Location.UpdatedAt,
 	)
+
+	switch language {
+	case "th-TH":
+		createdEventOccurrence.Event.Title = *titleTH
+		createdEventOccurrence.Event.Description = *descriptionTH
+	case "en-US":
+		createdEventOccurrence.Event.Title = titleEN
+		createdEventOccurrence.Event.Description = descriptionEN
+	}
+
 	return createdEventOccurrence, err
 }

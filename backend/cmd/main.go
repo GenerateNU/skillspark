@@ -36,17 +36,8 @@ func main() {
 		}
 	}()
 
+
 	port := cfg.Application.Port
-
-	// Start notification scheduler in background
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	if !cfg.TestMode {
-		go func() {
-			app.Scheduler.StartScheduler(ctx)
-		}()
-	}
 
 	// Listen for connections with a goroutine
 	go func() {
@@ -63,8 +54,6 @@ func main() {
 
 	slog.Info("Shutting down server")
 
-	// Cancel scheduler context
-	cancel()
 
 	// Shutdown server with timeout
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)

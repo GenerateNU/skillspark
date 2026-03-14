@@ -28,12 +28,21 @@ func TestGetReviewsByEventID(t *testing.T) {
 	child := child.CreateTestChild(t, ctx, testDB)
 	eo := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 
-	input := func() *models.CreateRegistrationInput {
-		i := &models.CreateRegistrationInput{}
-		i.Body.ChildID = child.ID
-		i.Body.GuardianID = child.GuardianID
-		i.Body.EventOccurrenceID = eo.ID
-		i.Body.Status = models.RegistrationStatusRegistered
+	input := func() *models.CreateRegistrationWithPaymentData {
+		i := &models.CreateRegistrationWithPaymentData{}
+		i.ChildID = child.ID
+		i.GuardianID = child.GuardianID
+		i.EventOccurrenceID = eo.ID
+		i.Status = models.RegistrationStatusRegistered
+		i.StripePaymentIntentID = "pi_test_123"
+		i.StripeCustomerID = "cus_test_123"
+		i.OrgStripeAccountID = "acct_test_123"
+		i.StripePaymentMethodID = "pm_test_123"
+		i.TotalAmount = 10000
+		i.ProviderAmount = 8500
+		i.PlatformFeeAmount = 1500
+		i.Currency = "thb"
+		i.PaymentIntentStatus = "requires_capture"
 		return i
 	}()
 
@@ -43,10 +52,12 @@ func TestGetReviewsByEventID(t *testing.T) {
 
 	for i := 0; i < 3; i++ {
 
-		input := &models.CreateReviewInput{}
+		descriptionTH := "รีวิวหมายเลข " + strconv.Itoa(i+2)
+		input := &models.CreateReviewDBInput{}
 		input.Body.RegistrationID = regoutput.Body.ID
 		input.Body.GuardianID = child.GuardianID
-		input.Body.Description = "Review number " + strconv.Itoa(i+2)
+		input.Body.Description_EN = "Review number " + strconv.Itoa(i+2)
+		input.Body.Description_TH = &descriptionTH
 		input.Body.Categories = []string{"interesting"}
 
 		r, err := repo.CreateReview(ctx, input)
@@ -57,7 +68,7 @@ func TestGetReviewsByEventID(t *testing.T) {
 	}
 
 	pagination := utils.Pagination{Limit: 10, Page: 1}
-	reviews, err := repo.GetReviewsByEventID(ctx, eo.Event.ID, pagination)
+	reviews, err := repo.GetReviewsByEventID(ctx, eo.Event.ID, "en-US", pagination)
 	require.Nil(t, err)
 	require.Len(t, reviews, len(expectedReviews))
 
@@ -80,7 +91,7 @@ func TestGetReviewsByEventID_NoReviews(t *testing.T) {
 	e := event.CreateTestEvent(t, ctx, testDB)
 
 	pagination := utils.Pagination{Limit: 10, Page: 1}
-	reviews, err := repo.GetReviewsByEventID(ctx, e.ID, pagination)
+	reviews, err := repo.GetReviewsByEventID(ctx, e.ID, "en-US", pagination)
 
 	require.Nil(t, err)
 	require.NotNil(t, reviews)

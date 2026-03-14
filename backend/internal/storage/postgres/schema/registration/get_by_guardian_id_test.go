@@ -20,7 +20,8 @@ func TestGetRegistrationsByGuardianID(t *testing.T) {
 	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByGuardianIDInput{
-		GuardianID: *r.GuardianID,
+		AcceptLanguage: "en-US",
+		GuardianID:     r.GuardianID,
 	}
 
 	result, err := repo.GetRegistrationsByGuardianID(ctx, input)
@@ -39,6 +40,17 @@ func TestGetRegistrationsByGuardianID(t *testing.T) {
 		assert.NotZero(t, reg.CreatedAt)
 		assert.NotZero(t, reg.UpdatedAt)
 		assert.NotZero(t, reg.OccurrenceStartTime)
+
+		// Verify payment fields
+		assert.NotEmpty(t, reg.StripePaymentIntentID)
+		assert.NotEmpty(t, reg.StripeCustomerID)
+		assert.NotEmpty(t, reg.OrgStripeAccountID)
+		assert.NotEmpty(t, reg.StripePaymentMethodID)
+		assert.NotZero(t, reg.TotalAmount)
+		assert.NotZero(t, reg.ProviderAmount)
+		assert.NotZero(t, reg.PlatformFeeAmount)
+		assert.NotEmpty(t, reg.Currency)
+		assert.NotEmpty(t, reg.PaymentIntentStatus)
 	}
 }
 
@@ -51,7 +63,8 @@ func TestGetRegistrationsByGuardianID_MultipleChildren(t *testing.T) {
 	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 
 	input := &models.GetRegistrationsByGuardianIDInput{
-		GuardianID: guardianID,
+		AcceptLanguage: "en-US",
+		GuardianID:     guardianID,
 	}
 
 	result, err := repo.GetRegistrationsByGuardianID(ctx, input)
@@ -62,8 +75,8 @@ func TestGetRegistrationsByGuardianID_MultipleChildren(t *testing.T) {
 
 	childIDs := make(map[uuid.UUID]bool)
 	for _, reg := range result.Body.Registrations {
-		assert.Equal(t, &guardianID, reg.GuardianID)
-		childIDs[*reg.ChildID] = true
+		assert.Equal(t, guardianID, reg.GuardianID)
+		childIDs[reg.ChildID] = true
 	}
 
 	assert.GreaterOrEqual(t, len(childIDs), 1)
@@ -78,7 +91,8 @@ func TestGetRegistrationsByGuardianID_NoRegistrations(t *testing.T) {
 	guardianID := uuid.New()
 
 	input := &models.GetRegistrationsByGuardianIDInput{
-		GuardianID: guardianID,
+		AcceptLanguage: "en-US",
+		GuardianID:     guardianID,
 	}
 
 	result, err := repo.GetRegistrationsByGuardianID(ctx, input)
@@ -98,7 +112,8 @@ func TestGetRegistrationsByGuardianID_VerifyEventDetails(t *testing.T) {
 	guardianID := reg.GuardianID
 
 	input := &models.GetRegistrationsByGuardianIDInput{
-		GuardianID: *guardianID,
+		AcceptLanguage: "en-US",
+		GuardianID:     guardianID,
 	}
 
 	result, err := repo.GetRegistrationsByGuardianID(ctx, input)

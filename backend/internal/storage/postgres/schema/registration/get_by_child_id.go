@@ -23,7 +23,7 @@ func (r *RegistrationRepository) GetRegistrationsByChildID(ctx context.Context, 
 	}
 	defer rows.Close()
 
-	registrations, err := pgx.CollectRows(rows, scanRegistration)
+	registrations, err := pgx.CollectRows(rows, scanRegistrationWithLang(input.AcceptLanguage))
 	if err != nil {
 		errr := errs.InternalServerError("Failed to collect registrations: ", err.Error())
 		return nil, &errr
@@ -36,18 +36,41 @@ func (r *RegistrationRepository) GetRegistrationsByChildID(ctx context.Context, 
 	return &output, nil
 }
 
-func scanRegistration(row pgx.CollectableRow) (models.Registration, error) {
-	var registration models.Registration
-	err := row.Scan(
-		&registration.ID,
-		&registration.ChildID,
-		&registration.GuardianID,
-		&registration.EventOccurrenceID,
-		&registration.Status,
-		&registration.CreatedAt,
-		&registration.UpdatedAt,
-		&registration.EventName,
-		&registration.OccurrenceStartTime,
-	)
-	return registration, err
+func scanRegistrationWithLang(lang string) pgx.RowToFunc[models.Registration] {
+	return func(row pgx.CollectableRow) (models.Registration, error) {
+		var registration models.Registration
+		var titleEN string
+		var titleTH *string
+		err := row.Scan(
+			&registration.ID,
+			&registration.ChildID,
+			&registration.GuardianID,
+			&registration.EventOccurrenceID,
+			&registration.Status,
+			&registration.CreatedAt,
+			&registration.UpdatedAt,
+			&registration.StripeCustomerID,
+			&registration.OrgStripeAccountID,
+			&registration.Currency,
+			&registration.PaymentIntentStatus,
+			&registration.CancelledAt,
+			&registration.StripePaymentIntentID,
+			&registration.TotalAmount,
+			&registration.ProviderAmount,
+			&registration.PlatformFeeAmount,
+			&registration.PaidAt,
+			&registration.StripePaymentMethodID,
+			&titleEN,
+			&titleTH,
+			&registration.OccurrenceStartTime,
+		)
+
+		switch lang {
+		case "th-TH":
+			registration.EventName = *titleTH
+		case "en-US":
+			registration.EventName = titleEN
+		}
+		return registration, err
+	}
 }

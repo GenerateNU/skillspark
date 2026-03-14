@@ -3,6 +3,7 @@ package repomocks
 import (
 	"context"
 	"skillspark/internal/models"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -13,7 +14,7 @@ type MockRegistrationRepository struct {
 	mock.Mock
 }
 
-func (m *MockRegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationInput) (*models.CreateRegistrationOutput, error) {
+func (m *MockRegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error) {
 	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -61,10 +62,42 @@ func (m *MockRegistrationRepository) GetRegistrationsByEventOccurrenceID(ctx con
 	return args.Get(0).(*models.GetRegistrationsByEventOccurrenceIDOutput), args.Error(1)
 }
 
+func (m *MockRegistrationRepository) GetRegistrationsForCapture(ctx context.Context, startWindow time.Time, endWindow time.Time) ([]models.Registration, error) {
+	args := m.Called(ctx, startWindow, endWindow)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.Registration), args.Error(1)
+}
+
+func (m *MockRegistrationRepository) CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error) {
+	args := m.Called(ctx, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.CancelRegistrationOutput), args.Error(1)
+}
+
+func (m *MockRegistrationRepository) UpdateRegistrationPaymentStatus(ctx context.Context, input *models.UpdateRegistrationPaymentStatusInput) (*models.UpdateRegistrationPaymentStatusOutput, error) {
+	args := m.Called(ctx, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.UpdateRegistrationPaymentStatusOutput), args.Error(1)
+}
+
 func (m *MockEventOccurrenceRepository) DeleteEventOccurrence(
 	ctx context.Context,
 	id uuid.UUID,
 ) error {
 	args := m.Called(ctx, id)
 	return args.Error(0)
+}
+
+func (m *MockRegistrationRepository) GetRegistrationByPaymentIntentID(ctx context.Context, paymentIntentID string, acceptLanguage string) (*models.Registration, error) {
+	args := m.Called(ctx, paymentIntentID, acceptLanguage)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Registration), args.Error(1)
 }

@@ -22,12 +22,15 @@ func TestCreateReview(t *testing.T) {
 	guardianID := registration.GuardianID
 	registrationID := registration.ID
 
-	input := func() *models.CreateReviewInput {
-		i := &models.CreateReviewInput{}
+	descriptionTH := "รีวิวทดสอบ"
+	input := func() *models.CreateReviewDBInput {
+		i := &models.CreateReviewDBInput{}
 		i.Body.RegistrationID = registrationID
-		i.Body.GuardianID = *guardianID
-		i.Body.Description = "Test review"
+		i.Body.GuardianID = guardianID
+		i.Body.Description_EN = "Test review"
+		i.Body.Description_TH = &descriptionTH
 		i.Body.Categories = []string{"informative"}
+		i.AcceptLanguage = "en-US"
 		return i
 	}()
 
@@ -37,8 +40,8 @@ func TestCreateReview(t *testing.T) {
 	require.NotNil(t, created)
 
 	assert.Equal(t, registrationID, created.RegistrationID)
-	assert.Equal(t, *guardianID, created.GuardianID)
-	assert.Equal(t, input.Body.Description, created.Description)
+	assert.Equal(t, guardianID, created.GuardianID)
+	assert.Equal(t, input.Body.Description_EN, created.Description)
 	assert.Equal(t, input.Body.Categories, created.Categories)
 	assert.NotEqual(t, uuid.Nil, created.ID)
 	assert.NotZero(t, created.CreatedAt)
@@ -54,11 +57,13 @@ func TestCreateReview_FailsInvalidRegistration(t *testing.T) {
 	validRegistration := registration.CreateTestRegistration(t, ctx, testDB)
 	validGuardianID := validRegistration.GuardianID
 
-	input := func() *models.CreateReviewInput {
-		i := &models.CreateReviewInput{}
+	descriptionTH := "รีวิวทดสอบ"
+	input := func() *models.CreateReviewDBInput {
+		i := &models.CreateReviewDBInput{}
 		i.Body.RegistrationID = uuid.New()
-		i.Body.GuardianID = *validGuardianID
-		i.Body.Description = "Test review"
+		i.Body.GuardianID = validGuardianID
+		i.Body.Description_EN = "Test review"
+		i.Body.Description_TH = &descriptionTH
 		i.Body.Categories = []string{"informative"}
 		return i
 	}()
@@ -78,12 +83,15 @@ func TestCreateReview_FailsInvalidGuardian(t *testing.T) {
 
 	registration := registration.CreateTestRegistration(t, ctx, testDB)
 
-	input := func() *models.CreateReviewInput {
-		i := &models.CreateReviewInput{}
+	descriptionTH := "รีวิวทดสอบ"
+	input := func() *models.CreateReviewDBInput {
+		i := &models.CreateReviewDBInput{}
 		i.Body.RegistrationID = registration.ID
 		i.Body.GuardianID = uuid.New()
-		i.Body.Description = "Test review"
+		i.Body.Description_EN = "Test review"
+		i.Body.Description_TH = &descriptionTH
 		i.Body.Categories = []string{"informative"}
+		i.AcceptLanguage = "en-US"
 		return i
 	}()
 

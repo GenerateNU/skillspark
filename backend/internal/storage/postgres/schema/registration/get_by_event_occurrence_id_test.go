@@ -22,6 +22,7 @@ func TestGetRegistrationsByEventOccurrenceID(t *testing.T) {
 	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
+		AcceptLanguage:    "en-US",
 		EventOccurrenceID: r.EventOccurrenceID,
 	}
 
@@ -41,6 +42,17 @@ func TestGetRegistrationsByEventOccurrenceID(t *testing.T) {
 		assert.NotZero(t, reg.CreatedAt)
 		assert.NotZero(t, reg.UpdatedAt)
 		assert.NotZero(t, reg.OccurrenceStartTime)
+
+		// Verify payment fields
+		assert.NotEmpty(t, reg.StripePaymentIntentID)
+		assert.NotEmpty(t, reg.StripeCustomerID)
+		assert.NotEmpty(t, reg.OrgStripeAccountID)
+		assert.NotEmpty(t, reg.StripePaymentMethodID)
+		assert.NotZero(t, reg.TotalAmount)
+		assert.NotZero(t, reg.ProviderAmount)
+		assert.NotZero(t, reg.PlatformFeeAmount)
+		assert.NotEmpty(t, reg.Currency)
+		assert.NotEmpty(t, reg.PaymentIntentStatus)
 	}
 }
 
@@ -53,6 +65,7 @@ func TestGetRegistrationsByEventOccurrenceID_MultipleRegistrations(t *testing.T)
 	eventOccurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000001")
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
+		AcceptLanguage:    "en-US",
 		EventOccurrenceID: eventOccurrenceID,
 	}
 
@@ -80,6 +93,7 @@ func TestGetRegistrationsByEventOccurrenceID_NoRegistrations(t *testing.T) {
 	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
+		AcceptLanguage:    "en-US",
 		EventOccurrenceID: occurrence.ID,
 	}
 
@@ -99,6 +113,7 @@ func TestGetRegistrationsByEventOccurrenceID_VerifyEventDetails(t *testing.T) {
 	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByEventOccurrenceIDInput{
+		AcceptLanguage:    "en-US",
 		EventOccurrenceID: r.EventOccurrenceID,
 	}
 

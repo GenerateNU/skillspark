@@ -11,8 +11,11 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *ReviewRepository) GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Review, error) {
+var language string
 
+func (r *ReviewRepository) GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
+
+	language = AcceptLanguage
 	baseQuery, err := schema.ReadSQLBaseScript("get_by_guardian_id.sql", SqlReviewFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -26,17 +29,11 @@ func (r *ReviewRepository) GetReviewsByGuardianID(ctx context.Context, id uuid.U
 	}
 	defer rows.Close()
 
-	reviews, err := pgx.CollectRows(rows, ScanReviews)
+	reviews, err := pgx.CollectRows(rows, r.ScanReviews)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to collect reviews: ", err.Error())
 		return nil, &errr
 	}
 
 	return reviews, nil
-}
-
-func ScanReviews(row pgx.CollectableRow) (models.Review, error) {
-	var review models.Review
-	err := row.Scan(&review.ID, &review.RegistrationID, &review.GuardianID, &review.Description, &review.Categories, &review.CreatedAt, &review.UpdatedAt)
-	return review, err
 }

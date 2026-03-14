@@ -20,9 +20,10 @@ func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	t.Parallel()
 
 	// check that get by id works for 3 different event occurrences
-	eventOccurrence1, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000001"))
+	eventOccurrence1, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000001"), "en-US")
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
-	assert.Nil(t, err)
+
+	assert.NoError(t, err)
 	assert.NotNil(t, eventOccurrence1)
 	assert.Equal(t, &mid, eventOccurrence1.ManagerId)
 	assert.Equal(t, uuid.MustParse("60000000-0000-0000-0000-000000000001"), eventOccurrence1.Event.ID)
@@ -30,8 +31,10 @@ func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	assert.Equal(t, 15, eventOccurrence1.MaxAttendees)
 	assert.Equal(t, "en", eventOccurrence1.Language)
 	assert.Equal(t, 8, eventOccurrence1.CurrEnrolled)
+	assert.Greater(t, eventOccurrence1.Price, 0)
+	assert.Equal(t, "thb", eventOccurrence1.Currency)
 
-	eventOccurrence2, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000003"))
+	eventOccurrence2, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000003"), "en-US")
 	assert.Nil(t, err)
 	assert.NotNil(t, eventOccurrence2)
 	assert.Equal(t, &mid, eventOccurrence2.ManagerId)
@@ -40,8 +43,10 @@ func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	assert.Equal(t, 12, eventOccurrence2.MaxAttendees)
 	assert.Equal(t, "en", eventOccurrence2.Language)
 	assert.Equal(t, 10, eventOccurrence2.CurrEnrolled)
+	assert.Greater(t, eventOccurrence2.Price, 0)
+	assert.Equal(t, "thb", eventOccurrence2.Currency)
 
-	eventOccurrence3, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000002"))
+	eventOccurrence3, err := repo.GetEventOccurrenceByID(ctx, uuid.MustParse("70000000-0000-0000-0000-000000000002"), "en-US")
 	assert.Nil(t, err)
 	assert.NotNil(t, eventOccurrence1)
 	assert.Equal(t, &mid, eventOccurrence3.ManagerId)
@@ -50,5 +55,6 @@ func TestEventOccurrenceRepository_GetEventOccurrenceById(t *testing.T) {
 	assert.Equal(t, 15, eventOccurrence3.MaxAttendees)
 	assert.Equal(t, "en", eventOccurrence3.Language)
 	assert.Equal(t, 5, eventOccurrence3.CurrEnrolled)
-
+	assert.Greater(t, eventOccurrence3.Price, 0)
+	assert.Equal(t, "thb", eventOccurrence3.Currency)
 }

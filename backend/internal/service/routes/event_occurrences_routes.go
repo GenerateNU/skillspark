@@ -4,8 +4,10 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 	eventoccurrence "skillspark/internal/service/handler/event-occurrence"
 	"skillspark/internal/storage"
+	"skillspark/internal/stripeClient"
 	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -38,8 +40,8 @@ func validateInputFilters(input *models.GetAllEventOccurrencesInput) error {
 		return huma.Error400BadRequest("min_duration cannot be larger than max_duration")
 	}
 
-	if input.PriceTier != "" && input.PriceTier != "$" && input.PriceTier != "$$" && input.PriceTier != "$$$" {
-		return huma.Error400BadRequest("price tier must be one of $, $$, $$$")
+	if input.MinPrice != 0 && input.MaxPrice != 0 && input.MinPrice > input.MaxPrice {
+		return huma.Error400BadRequest("min_price cannot be larger than max_price")
 	}
 
 	if input.MinAge != 0 && input.MaxAge != 0 && input.MinAge > input.MaxAge {
@@ -74,8 +76,12 @@ func mapToDBFilters(input *models.GetAllEventOccurrencesInput) models.GetAllEven
 		filters.MaxDurationMinutes = &input.MaxDuration
 	}
 
-	if input.PriceTier != "" {
-		filters.PriceTier = &input.PriceTier
+	if input.MinPrice != 0 {
+		filters.MinPrice = &input.MinPrice
+	}
+
+	if input.MaxPrice != 0 {
+		filters.MaxPrice = &input.MaxPrice
 	}
 
 	if input.MinAge != 0 {
@@ -97,8 +103,8 @@ func mapToDBFilters(input *models.GetAllEventOccurrencesInput) models.GetAllEven
 	return filters
 }
 
-func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
-	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence, repo.Manager, repo.Event, repo.Location)
+func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface, sc stripeClient.StripeClientInterface) {
+	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence, repo.Manager, repo.Event, repo.Location, s3Client, repo.Registration, sc)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-all-event-occurrences",
@@ -117,7 +123,7 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository) {
 
 		filters := mapToDBFilters(input)
 
-		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination, filters)
+		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination, input.AcceptLanguage, filters)
 		if err != nil {
 			return nil, err
 		}

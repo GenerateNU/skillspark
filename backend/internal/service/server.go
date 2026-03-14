@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"net/http"
+	"os"
 	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
@@ -11,6 +13,9 @@ import (
 	"skillspark/internal/sqs_client"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
+	"skillspark/internal/stripeClient"
+	translations "skillspark/internal/translation"
+	"skillspark/jobs"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -24,10 +29,10 @@ import (
 )
 
 type App struct {
-	Server     *fiber.App
-	Repo       *storage.Repository
-	API        huma.API
-	Scheduler  *notification.Scheduler
+	Server       *fiber.App
+	Repo         *storage.Repository
+	StripeClient stripeClient.StripeClientInterface
+	API          huma.API
 	NotifService *notification.Service
 }
 
@@ -36,6 +41,7 @@ func InitApp(config config.Config) (*App, error) {
 	ctx := context.Background()
 	repo := postgres.NewRepository(ctx, config.DB)
 	s3Client, err := s3_client.NewClient(config.S3)
+
 	if err != nil {
 		return nil, err
 	}
@@ -48,25 +54,35 @@ func InitApp(config config.Config) (*App, error) {
 	
 	// Initialize notification service and scheduler
 	var notifService *notification.Service
-	var scheduler *notification.Scheduler
 	
 	if config.TestMode { 
 		notifService = notification.NewService(repo, sqsClient)
-		scheduler = notification.NewScheduler(repo, sqsClient)
 	}
 	
-	app, humaAPI := SetupApp(config, repo, s3Client, notifService)
+
+	c := &http.Client{}
+	translateClient := translations.NewClient(c)
+	newStripeClient, err := stripeClient.NewStripeClient("")
+	if err != nil {
+		return nil, err
+	}
+
+	jobScheduler := jobs.NewJobScheduler(repo, newStripeClient, *notifService)
+	jobScheduler.Start()
+	defer jobScheduler.Stop()
+
+	app, humaAPI := SetupApp(config, repo, s3Client, translateClient, newStripeClient, *notifService)
 	return &App{
 		Server:      app,
 		Repo:        repo,
 		API:         humaAPI,
-		Scheduler:   scheduler,
 		NotifService: notifService,
+		StripeClient: newStripeClient,
 	}, nil
 }
 
 // Setup the fiber app with the specified configuration and database.
-func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, notifService *notification.Service) (*fiber.App, huma.API) {
+func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, translateClient *translations.TranslateClient, newStripeClient stripeClient.StripeClientInterface, notifService notification.Service) (*fiber.App, huma.API) {
 	app := fiber.New(fiber.Config{
 		JSONEncoder:  go_json.Marshal,
 		JSONDecoder:  go_json.Unmarshal,
@@ -100,6 +116,10 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	humaAPI := humafiber.New(app, humaConfig)
 
+	// Register public routes BEFORE auth middleware
+	routes.SetupAuthRoutes(humaAPI, repo, config)
+
+	// Apply auth middleware — only affects routes registered after this point
 	if !config.TestMode {
 		humaAPI.UseMiddleware(auth.AuthMiddleware(humaAPI, &config.Supabase))
 	}
@@ -112,25 +132,30 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 		return c.Status(fiber.StatusOK).SendString("Welcome to SkillSpark!")
 	})
 
-	// Register Huma endpoints
-	setupHumaRoutes(humaAPI, repo, config, s3Client, notifService)
+	// Register protected Huma endpoints
+	setupProtectedHumaRoutes(humaAPI, repo, config, s3Client, translateClient, newStripeClient, notifService)
+
+	routes.SetupWebhookRoutes(app, repo,
+		os.Getenv("STRIPE_WEBHOOK_SECRET"),
+		os.Getenv("STRIPE_ACCOUNT_WEBHOOK_SECRET"),
+	)
 
 	return app, humaAPI
 }
 
-// Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, notifService *notification.Service) {
+// Setup protected Huma routes (behind auth middleware)
+func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface, notifService notification.Service) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
 	routes.SetupOrganizationRoutes(api, repo, s3Client)
 	routes.SetupSchoolsRoutes(api, repo)
-	routes.SetupEventRoutes(api, repo, s3Client)
+	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
 	routes.SetupManagerRoutes(api, repo, config)
-	routes.SetupRegistrationRoutes(api, repo, notifService)
-	routes.SetupGuardiansRoutes(api, repo, config)
+	routes.SetupRegistrationRoutes(api, repo, sc, &notifService)
+	routes.SetupGuardiansRoutes(api, repo, sc, config)
 	routes.SetupChildRoutes(api, repo)
-	routes.SetupEventOccurrencesRoutes(api, repo)
-	routes.SetUpReviewRoutes(api, repo)
-	routes.SetupAuthRoutes(api, repo, config)
+	routes.SetupEventOccurrencesRoutes(api, repo, s3Client, sc)
+	routes.SetUpReviewRoutes(api, repo, translateClient)
+	routes.SetupPaymentRoutes(api, repo, sc)
 }

@@ -7,6 +7,7 @@ import (
 )
 
 func (h *Handler) CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error) {
+
 	// check that foreign keys exist in the database
 	managerId := input.Body.ManagerId
 	eventId := input.Body.EventId
@@ -17,7 +18,7 @@ func (h *Handler) CreateEventOccurrence(ctx context.Context, input *models.Creat
 		_, managerErr = h.ManagerRepository.GetManagerByID(ctx, *managerId)
 	}
 
-	_, eventErr := h.EventRepository.GetEventByID(ctx, eventId)
+	_, eventErr := h.EventRepository.GetEventByID(ctx, eventId, input.AcceptLanguage)
 	_, locationErr := h.LocationRepository.GetLocationByID(ctx, locationId)
 
 	if managerErr != nil || eventErr != nil || locationErr != nil {

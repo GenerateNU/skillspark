@@ -1,7 +1,7 @@
 WITH new_row AS (
-    INSERT INTO event_occurrence (manager_id, event_id, location_id, start_time, end_time, max_attendees, language)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING id, manager_id, event_id, location_id, start_time, end_time, max_attendees, language, curr_enrolled, created_at, updated_at, status
+    INSERT INTO event_occurrence (manager_id, event_id, location_id, start_time, end_time, max_attendees, language, price, currency)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    RETURNING id, manager_id, event_id, location_id, start_time, end_time, max_attendees, language, curr_enrolled, created_at, updated_at, status, price, currency
 ) 
 SELECT 
     eo.id,
@@ -14,10 +14,14 @@ SELECT
     eo.created_at,
     eo.updated_at,
     eo.status,
+    eo.price,
+    eo.currency,
 
     e.id,
-    e.title,
-    e.description,
+    e.title_en,
+    e.title_th,
+    e.description_en,
+    e.description_th,
     e.organization_id,
     e.age_range_min,
     e.age_range_max,

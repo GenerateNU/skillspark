@@ -8,10 +8,19 @@ import (
 
 func (h *Handler) CreateReview(ctx context.Context, input *models.CreateReviewInput) (*models.CreateReviewOutput, *errs.HTTPError) {
 
+	translateInput := []*string{&input.Body.Description}
+
+	description, err := h.TranslateClient.CallTranslateAPI(ctx, translateInput, input.AcceptLanguage)
+	if err != nil {
+		e := errs.BadRequest("Invalid registration_id: registration does not exist")
+		return nil, &e
+	}
+	CreateReviewInput := h.CreateTranslateStruct(ctx, input, description[input.Body.Description])
+
 	if _, err := h.RegistrationRepository.GetRegistrationByID(ctx, &models.GetRegistrationByIDInput{
 		ID: input.Body.RegistrationID,
 	}, nil); err != nil {
-		e := errs.BadRequest("Invalid registration_id: registration does not exist")
+		e := errs.BadRequest("Invalid registration_id: registration does not exist" + err.Error())
 		return nil, &e
 	}
 
@@ -20,7 +29,7 @@ func (h *Handler) CreateReview(ctx context.Context, input *models.CreateReviewIn
 		return nil, &e
 	}
 
-	review, err := h.ReviewRepository.CreateReview(ctx, input)
+	review, err := h.ReviewRepository.CreateReview(ctx, CreateReviewInput)
 	if err != nil {
 		if httpErr, ok := err.(*errs.HTTPError); ok {
 			return nil, httpErr

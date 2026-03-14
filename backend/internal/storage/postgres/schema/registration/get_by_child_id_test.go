@@ -20,7 +20,8 @@ func TestGetRegistrationsByChildID(t *testing.T) {
 	r := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByChildIDInput{
-		ChildID: *r.ChildID,
+		AcceptLanguage: "en-US",
+		ChildID:        r.ChildID,
 	}
 
 	result, err := repo.GetRegistrationsByChildID(ctx, input)
@@ -39,6 +40,17 @@ func TestGetRegistrationsByChildID(t *testing.T) {
 		assert.NotZero(t, reg.CreatedAt)
 		assert.NotZero(t, reg.UpdatedAt)
 		assert.NotZero(t, reg.OccurrenceStartTime)
+
+		// Verify payment fields
+		assert.NotEmpty(t, reg.StripePaymentIntentID)
+		assert.NotEmpty(t, reg.StripeCustomerID)
+		assert.NotEmpty(t, reg.OrgStripeAccountID)
+		assert.NotEmpty(t, reg.StripePaymentMethodID)
+		assert.NotZero(t, reg.TotalAmount)
+		assert.NotZero(t, reg.ProviderAmount)
+		assert.NotZero(t, reg.PlatformFeeAmount)
+		assert.NotEmpty(t, reg.Currency)
+		assert.NotEmpty(t, reg.PaymentIntentStatus)
 	}
 }
 
@@ -51,7 +63,8 @@ func TestGetRegistrationsByChildID_MultipleRegistrations(t *testing.T) {
 	childID := uuid.MustParse("30000000-0000-0000-0000-000000000001")
 
 	input := &models.GetRegistrationsByChildIDInput{
-		ChildID: childID,
+		AcceptLanguage: "en-US",
+		ChildID:        childID,
 	}
 
 	result, err := repo.GetRegistrationsByChildID(ctx, input)
@@ -62,7 +75,7 @@ func TestGetRegistrationsByChildID_MultipleRegistrations(t *testing.T) {
 
 	registrationIDs := make(map[uuid.UUID]bool)
 	for _, reg := range result.Body.Registrations {
-		assert.Equal(t, &childID, reg.ChildID)
+		assert.Equal(t, childID, reg.ChildID)
 		registrationIDs[reg.ID] = true
 	}
 
@@ -78,7 +91,8 @@ func TestGetRegistrationsByChildID_NoRegistrations(t *testing.T) {
 	childID := uuid.New()
 
 	input := &models.GetRegistrationsByChildIDInput{
-		ChildID: childID,
+		AcceptLanguage: "en-US",
+		ChildID:        childID,
 	}
 
 	result, err := repo.GetRegistrationsByChildID(ctx, input)
@@ -97,7 +111,8 @@ func TestGetRegistrationsByChildID_VerifyEventDetails(t *testing.T) {
 	reg := CreateTestRegistration(t, ctx, testDB)
 
 	input := &models.GetRegistrationsByChildIDInput{
-		ChildID: *reg.ChildID,
+		AcceptLanguage: "en-US",
+		ChildID:        reg.ChildID,
 	}
 
 	result, err := repo.GetRegistrationsByChildID(ctx, input)

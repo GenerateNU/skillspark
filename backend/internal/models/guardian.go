@@ -14,6 +14,7 @@ type Guardian struct {
 	Username            string    `json:"username" db:"username"`
 	ProfilePictureS3Key *string   `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
 	LanguagePreference  string    `json:"language_preference" db:"language_preference"`
+	StripeCustomerID    *string   `json:"stripe_customer_id,omitempty" db:"stripe_customer_id"`
 	AuthID              uuid.UUID `json:"auth_id" db:"auth_id"`
 	ExpoPushToken       *string   `json:"expo_push_token" db:"expo_push_token"`
 	CreatedAt           time.Time `json:"created_at" db:"created_at"`
@@ -73,4 +74,12 @@ type GetGuardianByChildIDOutput struct {
 
 type GetGuardianByIDOutput struct {
 	Body *Guardian `json:"body"`
+}
+
+type CreateStripeCustomerInput struct {
+	GuardianID uuid.UUID `path:"guardian_id" doc:"Guardian ID"`
+}
+
+type CreateStripeCustomerOutput struct {
+	Body Guardian `json:"body" doc:"Updated guardian with Stripe customer ID"`
 }

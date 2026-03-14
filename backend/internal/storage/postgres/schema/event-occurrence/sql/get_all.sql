@@ -8,11 +8,15 @@ SELECT
     eo.curr_enrolled,
     eo.created_at,
     eo.updated_at,
-    eo.status, 
+    eo.status,
+    eo.price,
+    eo.currency,
 
     e.id,
-    e.title,
-    e.description,
+    e.title_en,
+    e.title_th,
+    e.description_en,
+    e.description_th,
     e.organization_id,
     e.age_range_min,
     e.age_range_max,
@@ -38,7 +42,7 @@ JOIN event e ON e.id = eo.event_id
 JOIN location l ON l.id = eo.location_id
 
 WHERE 1=1
-AND ($3::text IS NULL OR e.title ILIKE '%' || $3 || '%' OR e.description ILIKE '%' || $3 || '%')
+AND ($3::text IS NULL OR e.title_en ILIKE '%' || $3 || '%' OR e.description_en ILIKE '%' || $3 || '%' OR e.title_th ILIKE '%' || $3 || '%' OR e.description_th ILIKE '%' || $3 || '%')
 AND ($4::int IS NULL OR EXTRACT(EPOCH FROM (eo.end_time - eo.start_time))/60 >= $4)
 AND ($5::int IS NULL OR EXTRACT(EPOCH FROM (eo.end_time - eo.start_time))/60 <= $5)
 AND (
@@ -56,6 +60,9 @@ AND ($11::category IS NULL OR $11::category = ANY(e.category))
 AND ($12::boolean IS NULL OR ((eo.curr_enrolled >= eo.max_attendees) = $12))
 AND ($13::timestamp IS NULL OR eo.start_time >= $13)
 AND ($14::timestamp IS NULL OR eo.end_time <= $14)
+
+AND ($15::int IS NULL OR (eo.price >= $15))
+AND ($16::int IS NULL OR (eo.price < $16))
 
 ORDER BY eo.id
 LIMIT $1 OFFSET $2;
