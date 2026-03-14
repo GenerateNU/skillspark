@@ -24,7 +24,9 @@ export default function FamilyListScreen() {
   const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
   const children = childrenResponse?.status === 200 ? childrenResponse.data : [];
 
-  const handleAddChild = () => {};
+  const handleAddChild = () => {
+    router.push('/family/manage');
+  };
 
   const handleEditChild = (child: any) => {
     router.push({

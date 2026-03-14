@@ -15,15 +15,16 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useCreateChild, useUpdateChild, useDeleteChild } from '@skillspark/api-client';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCreateChild, useUpdateChild, useDeleteChild, getGetChildrenByGuardianIdQueryKey } from '@skillspark/api-client';
 
 const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
 
 const INTEREST_OPTIONS = [
-  'Soccer', 'Basketball', 'Baseball', 'Swimming', 'Tennis',
-  'Music', 'Art', 'Dance', 'Drama', 'Coding',
-  'Reading', 'Science', 'Math', 'Chess', 'Cooking',
+  'science', 'math', 'music', 'art', 'sports', 'technology', 'language', 'other',
 ];
+
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const TAG_COLORS = [
   { bg: '#E6F4EA', border: '#4CAF50', text: '#2E7D32' },
@@ -64,7 +65,7 @@ export default function ManageChildScreen() {
 
   const [birthMonth, setBirthMonth] = useState(initialMonthStr);
   const [birthYear, setBirthYear] = useState(params.birth_year as string || '');
-  const [schoolId] = useState(params.school_id as string || '');
+  const [schoolId, setSchoolId] = useState(params.school_id as string || '');
 
   const initialInterests = Array.isArray(params.interests)
     ? params.interests
@@ -75,17 +76,16 @@ export default function ManageChildScreen() {
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Dropdown state
   const [showMonthDrop, setShowMonthDrop] = useState(false);
   const [showYearDrop, setShowYearDrop] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const queryClient = useQueryClient();
   const createChildMutation = useCreateChild();
   const updateChildMutation = useUpdateChild();
   const deleteChildMutation = useDeleteChild();
 
-  // Dynamic Colors based on Theme
   const inputBg = colorScheme === 'dark' ? '#27272a' : '#F3F4F6';
   const dropdownPopupBg = colorScheme === 'dark' ? '#1c1c1e' : '#FFFFFF';
   const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
@@ -112,6 +112,7 @@ export default function ManageChildScreen() {
       } else {
         await createChildMutation.mutateAsync({ data: childData });
       }
+      await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(GUARDIAN_ID) });
       router.back();
     } catch (error) {
       console.error(error);
@@ -133,6 +134,7 @@ export default function ManageChildScreen() {
             setIsSubmitting(true);
             try {
               await deleteChildMutation.mutateAsync({ id: params.id as string });
+              await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(GUARDIAN_ID) });
               router.back();
             } catch {
               Alert.alert('Error', 'Failed to delete.');
@@ -263,6 +265,14 @@ export default function ManageChildScreen() {
               )}
             </View>
           </View>
+          <TextInput
+            className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-6"
+            style={{ backgroundColor: inputBg, color: theme.text }}
+            value={schoolId}
+            onChangeText={setSchoolId}
+            placeholder="School ID"
+            placeholderTextColor={placeholderColor}
+          />
           <ThemedText className="text-base font-nunito-semibold mb-3">Interests</ThemedText>
           {interests.length > 0 && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3" contentContainerStyle={{ gap: 8, paddingRight: 4 }}>
@@ -276,7 +286,7 @@ export default function ManageChildScreen() {
                     onPress={() => removeInterest(tag)}
                   >
                     <IconSymbol name="camera.filters" size={13} color={color.border} />
-                    <ThemedText className="text-xs font-nunito-medium" style={{ color: color.text }}>{tag}</ThemedText>
+                    <ThemedText className="text-xs font-nunito-medium" style={{ color: color.text }}>{capitalize(tag)}</ThemedText>
                   </TouchableOpacity>
                 );
               })}
@@ -296,7 +306,7 @@ export default function ManageChildScreen() {
             </View>
             <View className="h-px" style={{ backgroundColor: borderColor }} />
             <View onStartShouldSetResponder={() => true} onMoveShouldSetResponder={() => true}>
-            <ScrollView nestedScrollEnabled showsVerticalScrollIndicator style={{ maxHeight: 220 }}>
+            <ScrollView nestedScrollEnabled showsVerticalScrollIndicator style={{ maxHeight: 150 }}>
               {filteredOptions.map(item => (
                 <TouchableOpacity
                   key={item}
@@ -304,7 +314,7 @@ export default function ManageChildScreen() {
                   style={{ borderBottomColor: inputBg }}
                   onPress={() => toggleInterest(item)}
                 >
-                  <ThemedText className="text-base font-nunito">{item}</ThemedText>
+                  <ThemedText className="text-base font-nunito">{capitalize(item)}</ThemedText>
                   <View
                     className="w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center"
                     style={{ borderColor: interests.includes(item) ? '#1F2937' : '#9CA3AF' }}
