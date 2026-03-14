@@ -35,7 +35,7 @@ func (m *MockSavedRepository) GetByGuardianID(ctx context.Context, id uuid.UUID,
 	return args.Get(0).([]models.Saved), args.Error(1)
 }
 
-func (m *MockReviewRepository) DeleteSaved(ctx context.Context, id uuid.UUID) error {
+func (m *MockSavedRepository) DeleteSaved(ctx context.Context, id uuid.UUID) error {
 	args := m.Called(ctx, id)
 	return args.Error(0)
 }
