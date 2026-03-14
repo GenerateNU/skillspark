@@ -12,7 +12,7 @@ services:
     container_name: web-frontend
     labels:
       - "description=Frontend available at http://localhost"
-  
+
   backend:
     build:
       context: ./backend
@@ -36,6 +36,32 @@ services:
       - "description=Backend available at http://localhost:8080"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3,sqs,lambda,iam,logs
+      - DEFAULT_REGION=us-east-1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-}
+      - EXPO_ACCESS_TOKEN=${EXPO_ACCESS_TOKEN:-}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./scripts/localstack-init.sh:/etc/localstack/init/ready.d/init.sh
+      - ./infra/modules/main/lambda_function.zip:/tmp/lambda-zip/lambda_function.zip:ro
+    networks:
+      - app-network
+    container_name: localstack
+    profiles:
+      - localstack
+    healthcheck:
+      test: ["CMD", "awslocal", "sqs", "list-queues"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 networks:
   app-network:

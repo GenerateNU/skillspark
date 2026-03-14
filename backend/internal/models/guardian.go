@@ -16,6 +16,7 @@ type Guardian struct {
 	LanguagePreference  string    `json:"language_preference" db:"language_preference"`
 	StripeCustomerID    *string   `json:"stripe_customer_id,omitempty" db:"stripe_customer_id"`
 	AuthID              uuid.UUID `json:"auth_id" db:"auth_id"`
+	ExpoPushToken       *string   `json:"expo_push_token" db:"expo_push_token"`
 	CreatedAt           time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -55,6 +56,7 @@ type UpdateGuardianInput struct {
 		Username            string  `json:"username" doc:"Username of the guardian"`
 		ProfilePictureS3Key *string `json:"profile_picture_s3_key,omitempty" doc:"S3 key for profile picture"`
 		LanguagePreference  string  `json:"language_preference" doc:"Language preference"`
+		ExpoPushToken       *string `json:"expo_push_token,omitempty" doc:"Expo push notification token" required:"false"`
 	}
 }
 

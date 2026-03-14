@@ -29,6 +29,7 @@ func (r *GuardianRepository) CreateGuardian(ctx context.Context, guardian *model
 		&createdGuardian.LanguagePreference,
 		&createdGuardian.AuthID,
 		&createdGuardian.StripeCustomerID,
+		&createdGuardian.ExpoPushToken,
 		&createdGuardian.CreatedAt,
 		&createdGuardian.UpdatedAt,
 	)

@@ -7,8 +7,10 @@ import (
 	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
+	"skillspark/internal/notification"
 	"skillspark/internal/s3_client"
 	"skillspark/internal/service/routes"
+	"skillspark/internal/sqs_client"
 	"skillspark/internal/storage"
 	"skillspark/internal/storage/postgres"
 	"skillspark/internal/stripeClient"
@@ -31,6 +33,7 @@ type App struct {
 	Repo         *storage.Repository
 	StripeClient stripeClient.StripeClientInterface
 	API          huma.API
+	NotifService *notification.Service
 }
 
 // Initialize the App union type containing a fiber app and repository.
@@ -42,6 +45,20 @@ func InitApp(config config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	
+	// Initialize SQS client
+	sqsClient, err := sqs_client.NewClient(config.SQS)
+	if err != nil {
+		return nil, err
+	}
+	
+	// Initialize notification service and scheduler
+	var notifService *notification.Service
+	
+	if config.TestMode { 
+		notifService = notification.NewService(repo, sqsClient)
+	}
+	
 
 	c := &http.Client{}
 	translateClient := translations.NewClient(c)
@@ -50,20 +67,22 @@ func InitApp(config config.Config) (*App, error) {
 		return nil, err
 	}
 
-	jobScheduler := jobs.NewJobScheduler(repo, newStripeClient)
+	jobScheduler := jobs.NewJobScheduler(repo, newStripeClient, *notifService)
 	jobScheduler.Start()
 	defer jobScheduler.Stop()
 
-	app, humaAPI := SetupApp(config, repo, s3Client, translateClient, newStripeClient)
+	app, humaAPI := SetupApp(config, repo, s3Client, translateClient, newStripeClient, *notifService)
 	return &App{
-		Server: app,
-		Repo:   repo,
-		API:    humaAPI,
+		Server:      app,
+		Repo:        repo,
+		API:         humaAPI,
+		NotifService: notifService,
+		StripeClient: newStripeClient,
 	}, nil
 }
 
 // Setup the fiber app with the specified configuration and database.
-func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, translateClient *translations.TranslateClient, newStripeClient stripeClient.StripeClientInterface) (*fiber.App, huma.API) {
+func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, translateClient *translations.TranslateClient, newStripeClient stripeClient.StripeClientInterface, notifService notification.Service) (*fiber.App, huma.API) {
 	app := fiber.New(fiber.Config{
 		JSONEncoder:  go_json.Marshal,
 		JSONDecoder:  go_json.Unmarshal,
@@ -114,7 +133,7 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	})
 
 	// Register protected Huma endpoints
-	setupProtectedHumaRoutes(humaAPI, repo, config, s3Client, translateClient, newStripeClient)
+	setupProtectedHumaRoutes(humaAPI, repo, config, s3Client, translateClient, newStripeClient, notifService)
 
 	routes.SetupWebhookRoutes(app, repo,
 		os.Getenv("STRIPE_WEBHOOK_SECRET"),
@@ -125,7 +144,7 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 }
 
 // Setup protected Huma routes (behind auth middleware)
-func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface) {
+func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface, notifService notification.Service) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
 	routes.SetupExamplesRoutes(api, repo)
@@ -133,7 +152,7 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
 	routes.SetupManagerRoutes(api, repo, config)
-	routes.SetupRegistrationRoutes(api, repo, sc)
+	routes.SetupRegistrationRoutes(api, repo, sc, &notifService)
 	routes.SetupGuardiansRoutes(api, repo, sc, config)
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo, s3Client, sc)

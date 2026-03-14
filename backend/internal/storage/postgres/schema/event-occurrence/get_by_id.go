@@ -12,7 +12,7 @@ import (
 )
 
 func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.EventOccurrence, error) {
-	language = AcceptLanguage
+	language := AcceptLanguage
 	query, err := schema.ReadSQLBaseScript("get_by_id.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

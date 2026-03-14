@@ -78,7 +78,7 @@ func TestHandler_GetRegistrationByID(t *testing.T) {
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRegRepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient, nil)
 			ctx := context.Background()
 
 			input := &models.GetRegistrationByIDInput{
@@ -164,7 +164,7 @@ func TestHandler_GetRegistrationsByChildID(t *testing.T) {
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRegRepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient, nil)
 			ctx := context.Background()
 
 			input := &models.GetRegistrationsByChildIDInput{AcceptLanguage: "en-US", ChildID: uuid.MustParse(tt.childID)}
@@ -247,7 +247,7 @@ func TestHandler_GetRegistrationsByGuardianID(t *testing.T) {
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRegRepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient, nil)
 			ctx := context.Background()
 
 			input := &models.GetRegistrationsByGuardianIDInput{AcceptLanguage: "en-US", GuardianID: uuid.MustParse(tt.guardianID)}
@@ -331,7 +331,7 @@ func TestHandler_GetRegistrationsByEventOccurrenceID(t *testing.T) {
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRegRepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient, nil)
 			ctx := context.Background()
 
 			input := &models.GetRegistrationsByEventOccurrenceIDInput{AcceptLanguage: "en-US", EventOccurrenceID: uuid.MustParse(tt.eventOccurrenceID)}
@@ -657,7 +657,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient, nil)
 			ctx := context.Background()
 
 			registration, err := handler.CreateRegistration(ctx, tt.input)
@@ -784,7 +784,7 @@ func TestHandler_UpdateRegistration(t *testing.T) {
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRegRepo, mockChildRepo)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient, nil)
 			ctx := context.Background()
 
 			registration, err := handler.UpdateRegistration(ctx, tt.input)
@@ -972,7 +972,7 @@ func TestHandler_CancelRegistration(t *testing.T) {
 			mockStripeClient := new(stripemocks.MockStripeClient)
 			tt.mockSetup(mockRegRepo, mockEORepo, mockStripeClient)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient, nil)
 			ctx := context.Background()
 
 			result, err := handler.CancelRegistration(ctx, tt.input)
