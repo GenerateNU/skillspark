@@ -4,11 +4,12 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { PageRedirectButton } from "@/components/PageRedirectButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { AuthFormInput } from "@/components/AuthFormInput";
+import { Picker } from "@react-native-picker/picker";
 
 type SignupFormData = {
   name: string;
@@ -103,11 +104,17 @@ export default function SignupScreen() {
           placeholder="Password"
           secureTextEntry={true}
         />
-        <AuthFormInput
+        <Controller
           control={control}
           name="language_preference"
-          placeholder="Language Preference"
-          autoCapitalize="none"
+          render={({ field: { onChange, value } }) => (
+            <View style={{ width: "100%", gap: 4 }}>
+              <Picker selectedValue={value} onValueChange={onChange}>
+                <Picker.Item label="English" value={"en"} />
+                <Picker.Item label="Thai" value={"th"} />
+              </Picker>
+            </View>
+          )}
         />
         <SubmitButton label="Sign Up" onPress={handleSubmit(onSubmit)} />
         <PageRedirectButton
