@@ -209,8 +209,6 @@ function EventOccurrencesList() {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [search, setSearch] = useState("");
 
-  console.log("response:", JSON.stringify(response));
-
   const toggleFilter = (f: string) =>
     setActiveFilters((prev) =>
       prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]
