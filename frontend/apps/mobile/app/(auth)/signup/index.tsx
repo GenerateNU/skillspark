@@ -9,7 +9,7 @@ import { ErrorMessage } from "@/components/ErrorMessage";
 import { PageRedirectButton } from "@/components/PageRedirectButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { AuthFormInput } from "@/components/AuthFormInput";
-import { Picker } from "@react-native-picker/picker";
+import { Dropdown } from "@/components/Dropdown";
 
 type SignupFormData = {
   name: string;
@@ -108,12 +108,15 @@ export default function SignupScreen() {
           control={control}
           name="language_preference"
           render={({ field: { onChange, value } }) => (
-            <View style={{ width: "100%", gap: 4 }}>
-              <Picker selectedValue={value} onValueChange={onChange}>
-                <Picker.Item label="English" value={"en"} />
-                <Picker.Item label="Thai" value={"th"} />
-              </Picker>
-            </View>
+            <Dropdown
+              value={value}
+              onChange={onChange}
+              options={[
+                { label: 'English', value: 'en' },
+                { label: 'Thai', value: 'th' },
+              ]}
+              placeholder="Select a language..."
+            />
           )}
         />
         <SubmitButton label="Sign Up" onPress={handleSubmit(onSubmit)} />

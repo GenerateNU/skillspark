@@ -26,6 +26,7 @@ export const AuthFormInput = <T extends FieldValues>({
               padding: 10,
               fontSize: 16,
             }}
+            placeholderTextColor="#9ca3af"
             onChangeText={onChange}
             value={value}
             {...props}
