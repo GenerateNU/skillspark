@@ -1,0 +1,82 @@
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { router } from "expo-router";
+import React, { useState } from "react";
+import { View } from "react-native";
+import { useAuthContext } from "@/hooks/use-auth-context";
+import { useForm } from "react-hook-form";
+import { ErrorMessage } from "@/components/ErrorMessage";
+import { PageRedirectButton } from "@/components/PageRedirectButton";
+import { SubmitButton } from "@/components/SubmitButton";
+import { AuthFormInput } from "@/components/AuthFormInput";
+
+type LoginFormData = {
+  email: string;
+  password: string;
+};
+
+export default function LoginScreen() {
+  const [errorText, setErrorText] = useState("");
+  const { login } = useAuthContext();
+
+  const { control, handleSubmit } = useForm<LoginFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = (formData: LoginFormData) => {
+    if (formData.email === "" || formData.password === "") {
+      setErrorText("Missing email or password");
+    } else {
+      login(formData.email, formData.password, setErrorText);
+    }
+  };
+
+  const handleGoToSignUp = () => {
+    router.push("/(auth)/signup");
+  };
+
+  return (
+    <ThemedView
+      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+    >
+      <ThemedText
+        type="title"
+        style={{ fontSize: 30, fontWeight: "bold", marginBottom: 30 }}
+      >
+        Log In
+      </ThemedText>
+
+      <View
+        style={{
+          width: "100%",
+          paddingHorizontal: 24,
+          gap: 16,
+          alignItems: "center",
+        }}
+      >
+        <AuthFormInput
+          control={control}
+          name="email"
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <AuthFormInput
+          control={control}
+          name="password"
+          placeholder="Password"
+          secureTextEntry={true}
+        />
+        <SubmitButton label="Log In" onPress={handleSubmit(onSubmit)} />
+        <PageRedirectButton
+          label="Don't have an account? Sign up"
+          onPress={handleGoToSignUp}
+        />
+        <ErrorMessage message={errorText} />
+      </View>
+    </ThemedView>
+  );
+}

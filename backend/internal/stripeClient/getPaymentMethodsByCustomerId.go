@@ -7,7 +7,6 @@ import (
 	"github.com/stripe/stripe-go/v84"
 )
 
-
 func (s *StripeClient) GetPaymentMethodsByCustomerID(ctx context.Context, customerID string) (*models.GetPaymentMethodsByGuardianIDOutput, error) {
 	params := &stripe.PaymentMethodListParams{
 		Customer: stripe.String(customerID),
@@ -23,8 +22,8 @@ func (s *StripeClient) GetPaymentMethodsByCustomerID(ctx context.Context, custom
 			return nil, err
 		}
 		paymentMethods = append(paymentMethods, models.PaymentMethod{
-			ID:       pm.ID,
-			Type:     string(pm.Type),
+			ID:   pm.ID,
+			Type: string(pm.Type),
 			Card: models.PaymentMethodCard{
 				Brand:    string(pm.Card.Brand),
 				Last4:    pm.Card.Last4,

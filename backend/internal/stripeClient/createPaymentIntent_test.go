@@ -13,13 +13,13 @@ import (
 )
 
 func TestStripeClient_CreatePaymentIntent(t *testing.T) {
-	
+
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test in short mode")
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client,_ := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates payment intent with test payment method", func(t *testing.T) {
@@ -168,10 +168,10 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 		amount := int64(10000)
 		expectedFee := int64(1000)
 		expectedOrgProfit := int64(9000)
-		
+
 		calculatedFee := (amount * 10) / 100
 		calculatedProfit := amount - calculatedFee
-		
+
 		assert.Equal(t, expectedFee, calculatedFee)
 		assert.Equal(t, expectedOrgProfit, calculatedProfit)
 	})

@@ -3,7 +3,6 @@ package auth
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -17,7 +16,7 @@ import (
 // checks if password is strong enough
 func validatePasswordStrength(password string) error {
 	if len(password) < 8 {
-		return errors.New("password must be atleast 8 characters long")
+		return errs.BadRequest("Password must be at least 8 characters long")
 	}
 	hasUpper := regexp.MustCompile(`[A-Z]`).MatchString(password)
 	hasLower := regexp.MustCompile(`[a-z]`).MatchString(password)
@@ -25,13 +24,11 @@ func validatePasswordStrength(password string) error {
 	hasSpecial := regexp.MustCompile(`[!@#~$%^&*()+|_.,;<>?/{}\-]`).MatchString(password)
 
 	if !hasUpper || !hasLower || !hasDigit || !hasSpecial {
-		return errors.New("password must include uppercase, lowercase, digit and special characters")
+		return errs.BadRequest("Password must include uppercase, lowercase, digit and special characters")
 	}
 
 	return nil
 }
-
-
 
 // Creates a new user in Supabase auth
 func SupabaseSignup(cfg *config.Supabase, email string, password string) (models.SignupResponse, error) {
@@ -66,7 +63,7 @@ func SupabaseSignup(cfg *config.Supabase, email string, password string) (models
 		slog.Error("Error executing request: ", "err", err)
 		return models.SignupResponse{}, err
 	}
-	
+
 	defer func() { _ = res.Body.Close() }()
 
 	body, err := io.ReadAll(res.Body)

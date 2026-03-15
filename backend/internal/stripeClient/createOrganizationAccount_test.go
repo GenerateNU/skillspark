@@ -11,13 +11,13 @@ import (
 )
 
 func TestStripeClient_CreateOrganizationAccount(t *testing.T) {
-	
+
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test in short mode")
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client,_ := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates Express account", func(t *testing.T) {
@@ -88,7 +88,7 @@ func TestStripeClient_CreateOrganizationAccount(t *testing.T) {
 
 func getTestStripeAPIKey(t *testing.T) string {
 	_ = godotenv.Load("../../.env")
-	
+
 	apiKey := os.Getenv("STRIPE_SECRET_TEST_KEY")
 	if apiKey == "" {
 		t.Skip("STRIPE_SECRET_TEST_KEY not set, skipping Stripe integration tests")

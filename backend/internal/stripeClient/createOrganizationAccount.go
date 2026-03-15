@@ -55,8 +55,8 @@ func (sc *StripeClient) CreateOrganizationAccount(
 		return nil, err
 	}
 
-    output := &models.CreateOrgStripeAccountClientOutput{}
-    output.Body.Account = *acct
+	output := &models.CreateOrgStripeAccountClientOutput{}
+	output.Body.Account = *acct
 
 	return output, nil
 }
