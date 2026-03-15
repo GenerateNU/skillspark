@@ -10,7 +10,7 @@ func (h *Handler) CreateOrgStripeAccount(
 	ctx context.Context,
 	input *models.CreateOrgStripeAccountInput,
 ) (*models.CreateOrgStripeAccountOutput, error) {
-	
+
 	org, orgErr := h.OrganizationRepository.GetOrganizationByID(ctx, input.OrganizationID)
 
 	if orgErr != nil {
@@ -35,13 +35,13 @@ func (h *Handler) CreateOrgStripeAccount(
 
 	stripeAccount, err := h.StripeClient.CreateOrganizationAccount(ctx, org.Name, manager.Email, GetCountryCode(location.Country))
 
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 
 	updatedOrg, err := h.OrganizationRepository.SetStripeAccountID(ctx, input.OrganizationID, stripeAccount.Body.Account.ID)
 
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 
@@ -49,7 +49,7 @@ func (h *Handler) CreateOrgStripeAccount(
 	output.Body.Account = *updatedOrg
 
 	return &output, nil
-	
+
 }
 
 var countryNameToCode = map[string]string{
@@ -57,7 +57,7 @@ var countryNameToCode = map[string]string{
 	"United States": "US",
 }
 
-func GetCountryCode(countryName string) (string) {
+func GetCountryCode(countryName string) string {
 	code, ok := countryNameToCode[countryName]
 	if !ok {
 		return ""

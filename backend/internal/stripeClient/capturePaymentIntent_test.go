@@ -13,13 +13,13 @@ const testStripeAccountID = "acct_1T0lX12SjspRdSkp"
 const testStripeCustomerID = "cus_TwTqKNe9HwjesR"
 
 func TestStripeClient_CapturePaymentIntent_Success(t *testing.T) {
-	
+
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test")
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client,_ := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	paymentMethodID := "pm_card_visa"
@@ -55,7 +55,7 @@ func TestStripeClient_CapturePaymentIntent_InvalidID(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client,_ := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	captureInput := &models.CapturePaymentIntentInput{
@@ -69,13 +69,13 @@ func TestStripeClient_CapturePaymentIntent_InvalidID(t *testing.T) {
 }
 
 func TestStripeClient_CapturePaymentIntent_AlreadyCaptured(t *testing.T) {
-	
+
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test")
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client,_ := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	paymentMethodID := "pm_card_visa"
@@ -105,13 +105,13 @@ func TestStripeClient_CapturePaymentIntent_AlreadyCaptured(t *testing.T) {
 }
 
 func TestStripeClient_CapturePaymentIntent_CanceledIntent(t *testing.T) {
-	
+
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test")
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client,_ := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	paymentMethodID := "pm_card_visa"

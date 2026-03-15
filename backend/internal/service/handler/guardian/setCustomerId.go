@@ -10,7 +10,7 @@ func (h *Handler) CreateStripeCustomer(
 	ctx context.Context,
 	input *models.CreateStripeCustomerInput,
 ) (*models.CreateStripeCustomerOutput, error) {
-	
+
 	guardian, err := h.GuardianRepository.GetGuardianByID(ctx, input.GuardianID)
 	if err != nil {
 		return nil, err

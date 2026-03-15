@@ -8,28 +8,26 @@ import (
 	"github.com/stripe/stripe-go/v84"
 )
 
-
-
 func (sc *StripeClient) CreatePaymentIntent(ctx context.Context, input *models.CreatePaymentIntentInput) (*models.CreatePaymentIntentOutput, error) {
-	
+
 	const applicationFeePercentage = 10 // CHANGE THIS TO BE THE APPLICATION FEE PERCENTAGE
 
-	applicationFeeTotal := (input.Body.Amount * int64(applicationFeePercentage)) / 100 
-	
+	applicationFeeTotal := (input.Body.Amount * int64(applicationFeePercentage)) / 100
+
 	params := &stripe.PaymentIntentCreateParams{
-  		Amount: stripe.Int64(input.Body.Amount),
-  		Currency: stripe.String(input.Body.Currency),
-		Customer: stripe.String(input.Body.GuardianStripeID),
-		PaymentMethod: stripe.String(input.Body.PaymentMethodID),
+		Amount:               stripe.Int64(input.Body.Amount),
+		Currency:             stripe.String(input.Body.Currency),
+		Customer:             stripe.String(input.Body.GuardianStripeID),
+		PaymentMethod:        stripe.String(input.Body.PaymentMethodID),
 		ApplicationFeeAmount: stripe.Int64(applicationFeeTotal),
 		TransferData: &stripe.PaymentIntentCreateTransferDataParams{
 			Destination: stripe.String(input.Body.OrgStripeID),
 		},
 		OffSession: stripe.Bool(true),
 		Metadata: map[string]string{
-			"event_date":      input.Body.EventDate.Format(time.RFC3339),
+			"event_date": input.Body.EventDate.Format(time.RFC3339),
 		},
-		Confirm: stripe.Bool(true),
+		Confirm:       stripe.Bool(true),
 		CaptureMethod: stripe.String("manual"),
 	}
 
@@ -38,7 +36,6 @@ func (sc *StripeClient) CreatePaymentIntent(ctx context.Context, input *models.C
 		return nil, err
 	}
 
-	
 	output := &models.CreatePaymentIntentOutput{}
 	output.Body.ClientSecret = intent.ClientSecret
 	output.Body.PaymentIntentID = intent.ID
@@ -47,6 +44,6 @@ func (sc *StripeClient) CreatePaymentIntent(ctx context.Context, input *models.C
 	output.Body.ProviderAmount = int(intent.Amount) - int(intent.ApplicationFeeAmount)
 	output.Body.PlatformFeeAmount = int(intent.ApplicationFeeAmount)
 	output.Body.Currency = input.Body.Currency
-	
+
 	return output, nil
 }

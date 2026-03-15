@@ -13,11 +13,11 @@ func (sc *StripeClient) CreateLoginLink(
 		Account: stripe.String(accountID),
 	}
 	params.Context = ctx
-	
+
 	link, err := sc.client.V1LoginLinks.Create(ctx, params)
 	if err != nil {
 		return "", err
 	}
-	
+
 	return link.URL, nil
 }

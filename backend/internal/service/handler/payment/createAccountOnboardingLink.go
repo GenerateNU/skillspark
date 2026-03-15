@@ -10,14 +10,14 @@ func (h *Handler) CreateAccountOnboardingLink(ctx context.Context, input *models
 
 	org, err := h.OrganizationRepository.GetOrganizationByID(ctx, input.OrganizationID)
 
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 
 	stripeId := org.StripeAccountID
 
 	if stripeId == nil {
-		return nil, errors.New("this organization does not have a Stripe Account");
+		return nil, errors.New("this organization does not have a Stripe Account")
 	}
 
 	stripeClientInput := models.CreateStripeOnboardingLinkClientInput{}
@@ -27,7 +27,7 @@ func (h *Handler) CreateAccountOnboardingLink(ctx context.Context, input *models
 
 	link, err := h.StripeClient.CreateAccountOnboardingLink(ctx, &stripeClientInput)
 
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 

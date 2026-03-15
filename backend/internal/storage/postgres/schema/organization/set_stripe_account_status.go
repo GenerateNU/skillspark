@@ -13,9 +13,9 @@ func (r *OrganizationRepository) SetStripeAccountStatus(ctx context.Context, str
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
 	}
-	
+
 	row := r.db.QueryRow(ctx, query, activated, stripeAccountID)
-	
+
 	var updatedOrganization models.Organization
 	err = row.Scan(
 		&updatedOrganization.ID,
@@ -36,6 +36,6 @@ func (r *OrganizationRepository) SetStripeAccountStatus(ctx context.Context, str
 		errr := errs.InternalServerError("Failed to update stripe activation: ", err.Error())
 		return nil, &errr
 	}
-	
+
 	return &updatedOrganization, nil
 }

@@ -14,7 +14,7 @@ func TestStripeClient_CreateCustomer(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client,_ := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates customer with email and name", func(t *testing.T) {
@@ -77,7 +77,7 @@ func TestStripeClient_CreateCustomer(t *testing.T) {
 	t.Run("Successfully creates customer with duplicate email", func(t *testing.T) {
 		// Stripe allows duplicate emails (unlike accounts)
 		email := "duplicate@example.com"
-		
+
 		customer1, err := client.CreateCustomer(ctx, email, "First Customer")
 		require.NoError(t, err)
 		require.NotNil(t, customer1)
@@ -94,7 +94,7 @@ func TestStripeClient_CreateCustomer(t *testing.T) {
 
 	t.Run("Successfully creates customer with long name", func(t *testing.T) {
 		longName := "Somchai Withveryverylonglastnamethatexceedsthirtychars"
-		
+
 		customer, err := client.CreateCustomer(
 			ctx,
 			"longname@example.com",

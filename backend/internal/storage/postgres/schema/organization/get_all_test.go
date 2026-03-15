@@ -23,7 +23,7 @@ func TestGetAllOrganizations_BasicPagination(t *testing.T) {
 	require.NotNil(t, orgs)
 	assert.GreaterOrEqual(t, len(orgs), 3)
 	assert.LessOrEqual(t, len(orgs), 10)
-	
+
 	if len(orgs) > 0 {
 		assert.Nil(t, orgs[0].StripeAccountID)
 		assert.False(t, orgs[0].StripeAccountActivated)
@@ -66,7 +66,7 @@ func TestGetAllOrganizations_SmallPageSize(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
 	assert.Equal(t, 2, len(orgs))
-	
+
 	for _, org := range orgs {
 		assert.False(t, org.StripeAccountActivated)
 	}
@@ -84,7 +84,7 @@ func TestGetAllOrganizations_SingleItemPerPage(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
 	assert.Equal(t, 1, len(orgs))
-	
+
 	assert.Nil(t, orgs[0].StripeAccountID)
 	assert.False(t, orgs[0].StripeAccountActivated)
 }
@@ -115,7 +115,7 @@ func TestGetAllOrganizations_AllDataOnePage(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
 	assert.GreaterOrEqual(t, len(orgs), 3)
-	
+
 	for _, org := range orgs {
 		assert.False(t, org.StripeAccountActivated)
 	}
@@ -154,7 +154,7 @@ func TestGetAllOrganizations_ZeroOffset(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
 	assert.Equal(t, 3, len(orgs))
-	
+
 	for _, org := range orgs {
 		assert.Nil(t, org.StripeAccountID)
 		assert.False(t, org.StripeAccountActivated)

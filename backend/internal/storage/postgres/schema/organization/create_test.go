@@ -33,7 +33,7 @@ func TestCreateOrganization(t *testing.T) {
 	assert.Equal(t, "Test Corp", created.Name)
 	assert.True(t, created.Active)
 	assert.NotEqual(t, uuid.Nil, created.ID)
-	
+
 	// Verify Stripe fields default correctly
 	assert.Nil(t, created.StripeAccountID)
 	assert.False(t, created.StripeAccountActivated)
