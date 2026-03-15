@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
+import { Colors, AppColors } from '@/constants/theme';
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -31,12 +31,14 @@ export default function PaymentScreen() {
       </View>
       <View className="px-5 pt-5">
         <ThemedText className="text-[22px] font-nunito-bold mb-5">Manage Billing</ThemedText>
+        {/* TODO: Replace with real payment method data from billing API */}
         <ThemedText className="text-base font-nunito mb-[6px]">Credit Card</ThemedText>
         <ThemedText className="text-base font-nunito mb-[6px]">Name</ThemedText>
         <ThemedText className="text-base font-nunito mb-8 tracking-widest">**** **** **** XXXX</ThemedText>
         <View className="flex-row gap-4">
           <TouchableOpacity
-            className="flex-1 bg-[#2563EB] py-[14px] rounded-lg items-center justify-center"
+            className="flex-1 py-[14px] rounded-lg items-center justify-center"
+            style={{ backgroundColor: AppColors.primaryBlue }}
             onPress={handleUpdateBilling}
             activeOpacity={0.8}
           >

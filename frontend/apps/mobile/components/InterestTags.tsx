@@ -2,14 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-
-const TAG_COLORS = [
-  { bg: '#E6F4EA', border: '#4CAF50', text: '#2E7D32' },
-  { bg: '#FFF8E1', border: '#FFC107', text: '#F57F17' },
-  { bg: '#FCE4EC', border: '#E91E63', text: '#880E4F' },
-  { bg: '#E3F2FD', border: '#2196F3', text: '#0D47A1' },
-  { bg: '#F3E5F5', border: '#9C27B0', text: '#4A148C' },
-];
+import { AppColors, TAG_COLORS } from '@/constants/theme';
 
 const MAX_VISIBLE_TAGS = 3;
 
@@ -43,7 +36,7 @@ export function InterestTags({ interests }: { interests?: string[] | string }) {
         );
       })}
       {overflow > 0 && (
-        <ThemedText className="text-[13px] text-[#6B7280] font-nunito-medium self-center">+{overflow}</ThemedText>
+        <ThemedText className="text-[13px] font-nunito-medium self-center" style={{ color: AppColors.mutedText }}>+{overflow}</ThemedText>
       )}
     </View>
   );

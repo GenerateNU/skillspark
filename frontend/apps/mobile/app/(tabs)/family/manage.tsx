@@ -13,11 +13,12 @@ import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Colors } from '@/constants/theme';
+import { Colors, AppColors, TAG_COLORS } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCreateChild, useUpdateChild, useDeleteChild, getGetChildrenByGuardianIdQueryKey } from '@skillspark/api-client';
 
+// TODO: Replace with authenticated user's guardian ID
 const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
 
 const INTEREST_OPTIONS = [
@@ -25,14 +26,6 @@ const INTEREST_OPTIONS = [
 ];
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
-const TAG_COLORS = [
-  { bg: '#E6F4EA', border: '#4CAF50', text: '#2E7D32' },
-  { bg: '#FFF8E1', border: '#FFC107', text: '#F57F17' },
-  { bg: '#FCE4EC', border: '#E91E63', text: '#880E4F' },
-  { bg: '#E3F2FD', border: '#2196F3', text: '#0D47A1' },
-  { bg: '#F3E5F5', border: '#9C27B0', text: '#4A148C' },
-];
 
 const MONTHS = [
   'January','February','March','April','May','June',
@@ -65,6 +58,7 @@ export default function ManageChildScreen() {
 
   const [birthMonth, setBirthMonth] = useState(initialMonthStr);
   const [birthYear, setBirthYear] = useState(params.birth_year as string || '');
+  // TODO: Replace raw school_id text input with a school picker that shows the school name
   const [schoolId, setSchoolId] = useState(params.school_id as string || '');
 
   const initialInterests = Array.isArray(params.interests)
@@ -85,11 +79,6 @@ export default function ManageChildScreen() {
   const createChildMutation = useCreateChild();
   const updateChildMutation = useUpdateChild();
   const deleteChildMutation = useDeleteChild();
-
-  const inputBg = colorScheme === 'dark' ? '#27272a' : '#F3F4F6';
-  const dropdownPopupBg = colorScheme === 'dark' ? '#1c1c1e' : '#FFFFFF';
-  const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
-  const placeholderColor = '#9CA3AF';
 
   const handleSave = async () => {
     if (!firstName || !birthYear || !birthMonth || !schoolId) {
@@ -174,7 +163,7 @@ export default function ManageChildScreen() {
             <ThemedText className="text-xl text-center font-nunito-bold">Family Information</ThemedText>
             {isEditing ? (
               <TouchableOpacity onPress={handleDelete}>
-                <ThemedText className="text-[#EF4444] font-nunito-semibold">Delete</ThemedText>
+                <ThemedText className="font-nunito-semibold" style={{ color: AppColors.danger }}>Delete</ThemedText>
               </TouchableOpacity>
             ) : (
               <View className="w-10" />
@@ -185,44 +174,44 @@ export default function ManageChildScreen() {
           </ThemedText>
           <TextInput
             className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3"
-            style={{ backgroundColor: inputBg, color: theme.text }}
+            style={{ backgroundColor: theme.inputBg, color: theme.text }}
             value={firstName}
             onChangeText={setFirstName}
             placeholder="First Name"
-            placeholderTextColor={placeholderColor}
+            placeholderTextColor={AppColors.placeholderText}
           />
           <TextInput
             className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3"
-            style={{ backgroundColor: inputBg, color: theme.text }}
+            style={{ backgroundColor: theme.inputBg, color: theme.text }}
             value={lastName}
             onChangeText={setLastName}
             placeholder="Last Name"
-            placeholderTextColor={placeholderColor}
+            placeholderTextColor={AppColors.placeholderText}
           />
           <View className="flex-row gap-3 mb-6" style={{ zIndex: 10 }}>
             <View className="flex-1" style={{ zIndex: 10 }}>
               <TouchableOpacity
                 className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between"
-                style={{ backgroundColor: inputBg }}
+                style={{ backgroundColor: theme.inputBg }}
                 onPress={() => { setShowMonthDrop(!showMonthDrop); setShowYearDrop(false); }}
               >
-                <ThemedText className={birthMonth ? '' : 'text-[#9CA3AF] font-nunito'}>
+                <ThemedText className={birthMonth ? '' : 'font-nunito'} style={birthMonth ? {} : { color: AppColors.placeholderText }}>
                   {birthMonth || 'Month'}
                 </ThemedText>
-                <IconSymbol name="chevron.down" size={16} color="#6B7280" />
+                <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
               </TouchableOpacity>
 
               {showMonthDrop && (
                 <View
                   className="absolute left-0 right-0 rounded-[10px] border"
-                  style={{ top: 52, backgroundColor: dropdownPopupBg, borderColor, zIndex: 100, elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
+                  style={{ top: 52, backgroundColor: theme.dropdownBg, borderColor: theme.borderColor, zIndex: 100, elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
                 >
                   <ScrollView nestedScrollEnabled style={{ maxHeight: 180 }}>
                     {MONTHS.map(m => (
                       <TouchableOpacity
                         key={m}
                         className="px-4 py-3 border-b"
-                        style={{ borderBottomColor: borderColor }}
+                        style={{ borderBottomColor: theme.borderColor }}
                         onPress={() => { setBirthMonth(m); setShowMonthDrop(false); }}
                       >
                         <ThemedText>{m}</ThemedText>
@@ -235,26 +224,26 @@ export default function ManageChildScreen() {
             <View className="flex-1" style={{ zIndex: 10 }}>
               <TouchableOpacity
                 className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between"
-                style={{ backgroundColor: inputBg }}
+                style={{ backgroundColor: theme.inputBg }}
                 onPress={() => { setShowYearDrop(!showYearDrop); setShowMonthDrop(false); }}
               >
-                <ThemedText className={birthYear ? '' : 'text-[#9CA3AF] font-nunito'}>
+                <ThemedText className={birthYear ? '' : 'font-nunito'} style={birthYear ? {} : { color: AppColors.placeholderText }}>
                   {birthYear || 'Year'}
                 </ThemedText>
-                <IconSymbol name="chevron.down" size={16} color="#6B7280" />
+                <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
               </TouchableOpacity>
 
               {showYearDrop && (
                 <View
                   className="absolute left-0 right-0 rounded-[10px] border"
-                  style={{ top: 52, backgroundColor: dropdownPopupBg, borderColor, zIndex: 100, elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
+                  style={{ top: 52, backgroundColor: theme.dropdownBg, borderColor: theme.borderColor, zIndex: 100, elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
                 >
                   <ScrollView nestedScrollEnabled style={{ maxHeight: 180 }}>
                     {YEARS.map(y => (
                       <TouchableOpacity
                         key={y}
                         className="px-4 py-3 border-b"
-                        style={{ borderBottomColor: borderColor }}
+                        style={{ borderBottomColor: theme.borderColor }}
                         onPress={() => { setBirthYear(y); setShowYearDrop(false); }}
                       >
                         <ThemedText>{y}</ThemedText>
@@ -265,13 +254,14 @@ export default function ManageChildScreen() {
               )}
             </View>
           </View>
+          {/* TODO: Replace with school picker that resolves school_id to a human-readable school name */}
           <TextInput
             className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-6"
-            style={{ backgroundColor: inputBg, color: theme.text }}
+            style={{ backgroundColor: theme.inputBg, color: theme.text }}
             value={schoolId}
             onChangeText={setSchoolId}
             placeholder="School ID"
-            placeholderTextColor={placeholderColor}
+            placeholderTextColor={AppColors.placeholderText}
           />
           <ThemedText className="text-base font-nunito-semibold mb-3">Interests</ThemedText>
           {interests.length > 0 && (
@@ -292,7 +282,7 @@ export default function ManageChildScreen() {
               })}
             </ScrollView>
           )}
-          <View className="border rounded-[10px] overflow-hidden mb-6" style={{ borderColor }}>
+          <View className="border rounded-[10px] overflow-hidden mb-6" style={{ borderColor: theme.borderColor }}>
             <View className="flex-row items-center px-4 py-3 gap-2">
               <TextInput
                 className="flex-1 text-base font-nunito"
@@ -300,27 +290,27 @@ export default function ManageChildScreen() {
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 placeholder="Search interests..."
-                placeholderTextColor={placeholderColor}
+                placeholderTextColor={AppColors.placeholderText}
               />
-              <IconSymbol name="magnifyingglass" size={20} color="#6B7280" />
+              <IconSymbol name="magnifyingglass" size={20} color={AppColors.mutedText} />
             </View>
-            <View className="h-px" style={{ backgroundColor: borderColor }} />
+            <View className="h-px" style={{ backgroundColor: theme.borderColor }} />
             <View onStartShouldSetResponder={() => true} onMoveShouldSetResponder={() => true}>
             <ScrollView nestedScrollEnabled showsVerticalScrollIndicator style={{ maxHeight: 150 }}>
               {filteredOptions.map(item => (
                 <TouchableOpacity
                   key={item}
                   className="flex-row items-center justify-between px-4 py-4 border-b"
-                  style={{ borderBottomColor: inputBg }}
+                  style={{ borderBottomColor: theme.inputBg }}
                   onPress={() => toggleInterest(item)}
                 >
                   <ThemedText className="text-base font-nunito">{capitalize(item)}</ThemedText>
                   <View
                     className="w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center"
-                    style={{ borderColor: interests.includes(item) ? '#1F2937' : '#9CA3AF' }}
+                    style={{ borderColor: interests.includes(item) ? AppColors.checkboxSelected : AppColors.subtleText }}
                   >
                     {interests.includes(item) && (
-                      <IconSymbol name="checkmark" size={12} color="#1F2937" />
+                      <IconSymbol name="checkmark" size={12} color={AppColors.checkboxSelected} />
                     )}
                   </View>
                 </TouchableOpacity>

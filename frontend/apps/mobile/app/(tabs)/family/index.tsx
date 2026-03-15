@@ -6,10 +6,11 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useGetChildrenByGuardianId, useGetGuardianById } from '@skillspark/api-client';
-import { Colors } from '@/constants/theme';
+import { Colors, AppColors } from '@/constants/theme';
 import { ChildListItem } from '@/components/ChildListItem';
 import { SectionHeader } from '@/components/SectionHeader';
 
+// TODO: Replace with authenticated user's guardian ID
 const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
 
 export default function FamilyListScreen() {
@@ -71,18 +72,18 @@ export default function FamilyListScreen() {
           </View>
           <View className="flex-1 gap-1">
             <ThemedText className="text-base font-nunito-semibold">{guardian?.name}</ThemedText>
-            <ThemedText className="text-[13px] text-[#6B7280] font-nunito">@{guardian?.username}</ThemedText>
-            <ThemedText className="text-[13px] text-[#6B7280] font-nunito">{guardian?.email}</ThemedText>
+            <ThemedText className="text-[13px] font-nunito" style={{ color: AppColors.mutedText }}>@{guardian?.username}</ThemedText>
+            <ThemedText className="text-[13px] font-nunito" style={{ color: AppColors.mutedText }}>{guardian?.email}</ThemedText>
           </View>
         </TouchableOpacity>
-        <View className="h-px my-3 bg-[#E5E7EB]" />
+        <View className="h-px my-3" style={{ backgroundColor: AppColors.divider }} />
         <SectionHeader
           title="Child Profile"
           actionLabel="add profile +"
           onAction={handleAddChild}
         />
         {children.length === 0 && (
-          <ThemedText className="text-[#9CA3AF] text-sm pb-4 font-nunito">No child profiles added yet.</ThemedText>
+          <ThemedText className="text-sm pb-4 font-nunito" style={{ color: AppColors.subtleText }}>No child profiles added yet.</ThemedText>
         )}
         {children.map((child: any, idx: number) => (
           <React.Fragment key={child.id}>
@@ -90,24 +91,25 @@ export default function FamilyListScreen() {
               child={child}
               onPress={() => handleEditChild(child)}
             />
-            {idx < children.length - 1 && <View className="h-px my-3 bg-[#E5E7EB]" />}
+            {idx < children.length - 1 && <View className="h-px my-3" style={{ backgroundColor: AppColors.divider }} />}
           </React.Fragment>
         ))}
-        <View className="h-px my-3 bg-[#E5E7EB]" />
+        <View className="h-px my-3" style={{ backgroundColor: AppColors.divider }} />
         <SectionHeader
           title="Emergency Contact"
           actionLabel="add contact +"
           onAction={() => {}}
         />
+        {/* TODO: Replace with real emergency contact data from API */}
         <TouchableOpacity className="flex-row items-start py-4 gap-3" activeOpacity={0.7}>
           <View className="w-11 h-11 items-center justify-center">
             <IconSymbol name="person.circle" size={40} color={theme.text} />
           </View>
           <View className="flex-1 gap-1">
             <ThemedText className="text-base font-nunito-semibold">Martha Smith</ThemedText>
-            <ThemedText className="text-[13px] text-[#6B7280] font-nunito">(555) 123-4567</ThemedText>
+            <ThemedText className="text-[13px] font-nunito" style={{ color: AppColors.mutedText }}>(555) 123-4567</ThemedText>
           </View>
-          <IconSymbol name="chevron.right" size={18} color="#9CA3AF" />
+          <IconSymbol name="chevron.right" size={18} color={AppColors.subtleText} />
         </TouchableOpacity>
         <View className="h-10" />
       </ScrollView>
