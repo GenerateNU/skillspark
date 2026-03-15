@@ -227,7 +227,7 @@ function EventOccurrencesList() {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
         <ThemedText style={{ color: "#EF4444", fontWeight: "600" }}>Error loading events</ThemedText>
-        <ThemedText>{error.message || "An error occurred"}</ThemedText>
+        <ThemedText>{error.detail || "An error occurred"}</ThemedText>
       </View>
     );
   }

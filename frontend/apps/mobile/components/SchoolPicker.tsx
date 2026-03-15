@@ -3,7 +3,7 @@ import { View, TouchableOpacity, ScrollView, useColorScheme } from 'react-native
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors, AppColors } from '@/constants/theme';
-import { useGetAllSchools } from '@skillspark/api-client';
+import { useGetAllSchools, School } from '@skillspark/api-client';
 
 type SchoolPickerProps = {
   value: string;
@@ -16,8 +16,8 @@ export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
   const [showDrop, setShowDrop] = useState(false);
 
   const { data, isLoading, isError } = useGetAllSchools();
-  const schools = data?.data ?? [];
-  const selectedSchool = schools.find(s => s.id === value);
+  const schools = Array.isArray(data?.data) ? data.data : [];
+  const selectedSchool = schools.find((s: School) => s.id === value);
 
   const placeholderLabel = isLoading ? 'Loading schools...' : isError ? 'Failed to load schools' : 'Select School';
 
