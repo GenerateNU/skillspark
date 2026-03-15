@@ -18,7 +18,7 @@ func SetUpSavedRoutes(api huma.API, repo *storage.Repository) {
 	huma.Register(api, huma.Operation{
 		OperationID: "get-saved-by-guardian-id",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/review/saved/{id}",
+		Path:        "/api/v1/saved/{id}",
 		Summary:     "Get saved by guardian ID",
 		Description: "Returns all saved event occurrences with the given guardian ID",
 		Tags:        []string{"Saved"},
