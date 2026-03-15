@@ -13,7 +13,7 @@ import (
 
 func SetUpSavedRoutes(api huma.API, repo *storage.Repository) {
 
-	savedHandler := saved.NewHandler(repo.Saved)
+	savedHandler := saved.NewHandler(repo.Saved, repo.Guardian)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-saved-by-guardian-id",
