@@ -41,7 +41,6 @@ type GetAllEventOccurrencesInput struct {
 	RadiusKm       float64         `query:"radius_km"`
 	MinPrice       int             `query:"min_price"`
 	MaxPrice       int             `query:"max_price"`
-	PriceTier      string          `query:"price"`
 	MinDuration    int             `query:"min_duration"`
 	MaxDuration    int             `query:"max_duration"`
 	MinAge         int             `query:"min_age"`

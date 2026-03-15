@@ -1802,6 +1802,107 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/saved:
+    post:
+      tags:
+        - Saved
+      summary: Creates a saved event occurrence
+      description: Creates a saved event occurrence
+      operationId: create-saved
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSavedInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saved'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/saved/{id}:
+    get:
+      tags:
+        - Saved
+      summary: Get saved by guardian ID
+      description: Returns all saved event occurrences with the given guardian ID
+      operationId: get-saved-by-guardian-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: page_size
+          in: query
+          description: Number of items per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of items per page
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of saved event occurrences
+                items:
+                  $ref: '#/components/schemas/Saved'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    delete:
+      tags:
+        - Saved
+      summary: Delete an existing saved by id
+      description: Deletes an existing saved by id
+      operationId: delete-saved
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteSavedOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/schools:
     get:
       tags:
@@ -2516,6 +2617,26 @@ components:
         - guardian_id
         - description
         - categories
+    CreateSavedInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateSavedInputBody.json
+          readOnly: true
+        event_occurrence_id:
+          type: string
+          description: ID of the event occurrence of this saved event.
+        guardian_id:
+          type: string
+          description: ID of the guardian that saved this.
+      required:
+        - guardian_id
+        - event_occurrence_id
     CreateSetupIntentOutputBody:
       type: object
       additionalProperties: false
@@ -2620,6 +2741,22 @@ components:
           format: uri
           examples:
             - http://localhost:8080/schemas/DeleteReviewOutputBody.json
+          readOnly: true
+        message:
+          type: string
+          description: Success message
+      required:
+        - message
+    DeleteSavedOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DeleteSavedOutputBody.json
           readOnly: true
         message:
           type: string
@@ -3515,6 +3652,35 @@ components:
         - guardian_id
         - description
         - categories
+        - created_at
+        - updated_at
+    Saved:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/Saved.json
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        event_occurrence_id:
+          type: string
+        guardian_id:
+          type: string
+        id:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - guardian_id
+        - event_occurrence_id
         - created_at
         - updated_at
     School:
