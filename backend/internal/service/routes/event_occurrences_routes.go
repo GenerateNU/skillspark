@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 	eventoccurrence "skillspark/internal/service/handler/event-occurrence"
 	"skillspark/internal/storage"
 	"skillspark/internal/stripeClient"
@@ -102,8 +103,8 @@ func mapToDBFilters(input *models.GetAllEventOccurrencesInput) models.GetAllEven
 	return filters
 }
 
-func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository, sc stripeClient.StripeClientInterface) {
-	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence, repo.Manager, repo.Event, repo.Location, repo.Registration, sc)
+func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface, sc stripeClient.StripeClientInterface) {
+	eventOccurrenceHandler := eventoccurrence.NewHandler(repo.EventOccurrence, repo.Manager, repo.Event, repo.Location, s3Client, repo.Registration, sc)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-all-event-occurrences",
@@ -122,7 +123,7 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository, sc stri
 
 		filters := mapToDBFilters(input)
 
-		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination, filters)
+		eventOccurrences, err := eventOccurrenceHandler.GetAllEventOccurrences(ctx, pagination, input.AcceptLanguage, filters)
 		if err != nil {
 			return nil, err
 		}

@@ -10,11 +10,11 @@ import (
 
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	s3mocks "skillspark/internal/s3_client/mocks"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	stripemocks "skillspark/internal/stripeClient/mocks"
-	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -29,6 +29,7 @@ func setupEventOccurrencesTestAPI(
 	managerRepo *repomocks.MockManagerRepository,
 	eventRepo *repomocks.MockEventRepository,
 	locationRepo *repomocks.MockLocationRepository,
+	s3Client *s3mocks.S3ClientMock,
 	sc *stripemocks.MockStripeClient,
 ) (*fiber.App, huma.API) {
 	app := fiber.New()
@@ -39,7 +40,7 @@ func setupEventOccurrencesTestAPI(
 		Event:           eventRepo,
 		Location:        locationRepo,
 	}
-	routes.SetupEventOccurrencesRoutes(api, repo, sc)
+	routes.SetupEventOccurrencesRoutes(api, repo, s3Client, sc)
 	return app, api
 }
 
@@ -96,6 +97,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 					"GetEventOccurrenceByID",
 					mock.Anything,
 					uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+					mock.Anything,
 				).Return(&models.EventOccurrence{
 					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000001"),
 					ManagerId:    &mid,
@@ -128,6 +130,7 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 					"GetEventOccurrenceByID",
 					mock.Anything,
 					uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+					mock.Anything,
 				).Return(nil, &errs.HTTPError{
 					Code:    errs.NotFound("EventOccurrence", "id", "00000000-0000-0000-0000-000000000000").GetStatus(),
 					Message: "Not found",
@@ -146,12 +149,25 @@ func TestHumaValidation_GetEventOccurrenceById(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockS3 := new(s3mocks.S3ClientMock)
 			mockStripeClient := new(stripemocks.MockStripeClient)
+			mockS3.On("GeneratePresignedURL", mock.Anything, mock.Anything, mock.Anything).Return("https://test-bucket.s3.amazonaws.com/presigned", nil)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockStripeClient)
+			app, _ := setupEventOccurrencesTestAPI(
+				mockRepo,
+				mockManagerRepo,
+				mockEventRepo,
+				mockLocationRepo,
+				mockS3,
+				mockStripeClient,
+			)
 
-			req, err := http.NewRequest(http.MethodGet, "/api/v1/event-occurrences/"+tt.eventOccurrenceID, nil)
+			req, err := http.NewRequest(
+				http.MethodGet,
+				"/api/v1/event-occurrences/"+tt.eventOccurrenceID,
+				nil,
+			)
 			assert.NoError(t, err)
 
 			resp, err := app.Test(req)
@@ -317,12 +333,18 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockS3 := new(s3mocks.S3ClientMock)
 			mockStripeClient := new(stripemocks.MockStripeClient)
-
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockStripeClient)
-
+			app, _ := setupEventOccurrencesTestAPI(
+				mockRepo,
+				mockManagerRepo,
+				mockEventRepo,
+				mockLocationRepo,
+				mockS3,
+				mockStripeClient,
+			)
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
 
@@ -337,7 +359,7 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 					OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 					Role:           "Director",
 				}, nil)
-				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything).Return(&event, nil)
+				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything, mock.Anything).Return(&event, nil)
 				mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything).Return(&location, nil)
 			}
 
@@ -458,6 +480,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					"UpdateEventOccurrence",
 					mock.Anything,
 					mock.AnythingOfType("*models.UpdateEventOccurrenceInput"),
+					mock.Anything,
 				).Return(&models.EventOccurrence{
 					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 					ManagerId:    &midNew,
@@ -496,11 +519,18 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 			mockManagerRepo := new(repomocks.MockManagerRepository)
 			mockEventRepo := new(repomocks.MockEventRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockS3 := new(s3mocks.S3ClientMock)
 			mockStripeClient := new(stripemocks.MockStripeClient)
-
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockStripeClient)
+			app, _ := setupEventOccurrencesTestAPI(
+				mockRepo,
+				mockManagerRepo,
+				mockEventRepo,
+				mockLocationRepo,
+				mockS3,
+				mockStripeClient,
+			)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -514,6 +544,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					"GetEventOccurrenceByID",
 					mock.Anything,
 					uuid.MustParse("70000000-0000-0000-0000-000000000002"),
+					mock.Anything,
 				).Return(&models.EventOccurrence{
 					ID:           uuid.MustParse("70000000-0000-0000-0000-000000000002"),
 					ManagerId:    &mid,
@@ -535,7 +566,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					OrganizationID: uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 					Role:           "Director",
 				}, nil)
-				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything).Return(&event, nil)
+				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything, mock.Anything).Return(&event, nil)
 				mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything).Return(&location, nil)
 			}
 
@@ -577,7 +608,8 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 				m.On(
 					"GetAllEventOccurrences",
 					mock.Anything,
-					utils.Pagination{Page: 1, Limit: 10},
+					mock.Anything,
+					mock.Anything,
 					models.GetAllEventOccurrencesFilter{
 						Search:             &search,
 						Latitude:           &lat,
@@ -604,7 +636,6 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository) {},
 			statusCode: http.StatusBadRequest,
 		},
-
 		{
 			name:       "min_age greater than max_age should return 400",
 			query:      "?min_age=18&max_age=10",
@@ -621,7 +652,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			name:  "only min_age provided should succeed",
 			query: "?min_age=18",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]models.EventOccurrence{}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -630,7 +661,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			name:  "valid date range should succeed",
 			query: "?min_date=2026-02-01T00:00:00Z&max_date=2026-02-10T00:00:00Z",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]models.EventOccurrence{}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -639,7 +670,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			name:  "only max_date provided should succeed",
 			query: "?max_date=2026-02-10T00:00:00Z",
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository) {
-				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything).
+				m.On("GetAllEventOccurrences", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]models.EventOccurrence{}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -652,7 +683,8 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 				m.On(
 					"GetAllEventOccurrences",
 					mock.Anything,
-					utils.Pagination{Page: 1, Limit: 5},
+					mock.Anything,
+					mock.Anything,
 					models.GetAllEventOccurrencesFilter{},
 				).Return([]models.EventOccurrence{}, nil)
 			},
@@ -673,9 +705,21 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupEventOccurrencesTestAPI(mockRepo, mockManagerRepo, mockEventRepo, mockLocationRepo, mockStripeClient)
+			mockS3 := new(s3mocks.S3ClientMock)
+			app, _ := setupEventOccurrencesTestAPI(
+				mockRepo,
+				mockManagerRepo,
+				mockEventRepo,
+				mockLocationRepo,
+				mockS3,
+				mockStripeClient,
+			)
 
-			req, err := http.NewRequest(http.MethodGet, "/api/v1/event-occurrences"+tt.query, nil)
+			req, err := http.NewRequest(
+				http.MethodGet,
+				"/api/v1/event-occurrences"+tt.query,
+				nil,
+			)
 			assert.NoError(t, err)
 
 			resp, err := app.Test(req)
@@ -689,6 +733,103 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHumaValidation_EventOccurrence_InvalidAcceptLanguage(t *testing.T) {
+	t.Parallel()
+
+	invalidLangs := []struct {
+		name string
+		lang string
+	}{
+		{name: "unsupported locale fr-FR", lang: "fr-FR"},
+		{name: "lowercase en-us", lang: "en-us"},
+		{name: "random string", lang: "invalid"},
+	}
+
+	for _, tt := range invalidLangs {
+		tt := tt
+		t.Run("CreateEventOccurrence/"+tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			body, _ := json.Marshal(map[string]interface{}{
+				"event_id":    "60000000-0000-0000-0000-000000000001",
+				"location_id": "10000000-0000-0000-0000-000000000004",
+			})
+
+			app, _ := setupEventOccurrencesTestAPI(
+				new(repomocks.MockEventOccurrenceRepository),
+				new(repomocks.MockManagerRepository),
+				new(repomocks.MockEventRepository),
+				new(repomocks.MockLocationRepository),
+				new(s3mocks.S3ClientMock),
+				new(stripemocks.MockStripeClient),
+			)
+
+			req, err := http.NewRequest(http.MethodPost, "/api/v1/event-occurrences", bytes.NewBuffer(body))
+			assert.NoError(t, err)
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Accept-Language", tt.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on POST /api/v1/event-occurrences", tt.lang)
+		})
+
+		tt2 := tt
+		t.Run("GetEventOccurrenceById/"+tt2.name, func(t *testing.T) {
+			t.Parallel()
+
+			app, _ := setupEventOccurrencesTestAPI(
+				new(repomocks.MockEventOccurrenceRepository),
+				new(repomocks.MockManagerRepository),
+				new(repomocks.MockEventRepository),
+				new(repomocks.MockLocationRepository),
+				new(s3mocks.S3ClientMock),
+				new(stripemocks.MockStripeClient),
+			)
+
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/event-occurrences/70000000-0000-0000-0000-000000000001", nil)
+			assert.NoError(t, err)
+			req.Header.Set("Accept-Language", tt2.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on GET /api/v1/event-occurrences/{id}", tt2.lang)
+		})
+
+		tt3 := tt
+		t.Run("UpdateEventOccurrence/"+tt3.name, func(t *testing.T) {
+			t.Parallel()
+
+			app, _ := setupEventOccurrencesTestAPI(
+				new(repomocks.MockEventOccurrenceRepository),
+				new(repomocks.MockManagerRepository),
+				new(repomocks.MockEventRepository),
+				new(repomocks.MockLocationRepository),
+				new(s3mocks.S3ClientMock),
+				new(stripemocks.MockStripeClient),
+			)
+
+			req, err := http.NewRequest(http.MethodPatch, "/api/v1/event-occurrences/70000000-0000-0000-0000-000000000002", bytes.NewBufferString("{}"))
+			assert.NoError(t, err)
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Accept-Language", tt3.lang)
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+				"expected 422 for invalid Accept-Language %q on PATCH /api/v1/event-occurrences/{id}", tt3.lang)
 		})
 	}
 }

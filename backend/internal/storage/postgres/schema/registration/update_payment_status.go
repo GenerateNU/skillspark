@@ -11,6 +11,9 @@ import (
 )
 
 func (r *RegistrationRepository) UpdateRegistrationPaymentStatus(ctx context.Context, input *models.UpdateRegistrationPaymentStatusInput) (*models.UpdateRegistrationPaymentStatusOutput, error) {
+	var titleEN string
+	var titleTH *string
+
 	query, err := schema.ReadSQLBaseScript("update_payment_status.sql", SqlRegistrationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -40,7 +43,8 @@ func (r *RegistrationRepository) UpdateRegistrationPaymentStatus(ctx context.Con
 		&output.Body.PlatformFeeAmount,
 		&output.Body.PaidAt,
 		&output.Body.StripePaymentMethodID,
-		&output.Body.EventName,
+		&titleEN,
+		&titleTH,
 		&output.Body.OccurrenceStartTime,
 	)
 
@@ -51,6 +55,13 @@ func (r *RegistrationRepository) UpdateRegistrationPaymentStatus(ctx context.Con
 		}
 		errr := errs.InternalServerError("Failed to update payment status: ", err.Error())
 		return nil, &errr
+	}
+
+	switch input.AcceptLanguage {
+	case "th-TH":
+		output.Body.EventName = *titleTH
+	case "en-US":
+		output.Body.EventName = titleEN
 	}
 
 	return &output, nil

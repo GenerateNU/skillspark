@@ -28,19 +28,20 @@ func CreateTestRegistration(
 	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, db)
 
 	input := &models.CreateRegistrationWithPaymentData{
-		ChildID:                child.ID,
-		GuardianID:             child.GuardianID,
-		EventOccurrenceID:      occurrence.ID,
-		Status:                 models.RegistrationStatusRegistered,
-		StripePaymentIntentID:  "pi_test_" + child.ID.String()[:8],
-		StripeCustomerID:       "cus_test_" + child.GuardianID.String()[:8],
-		OrgStripeAccountID:     "acct_test_123",
-		StripePaymentMethodID:  "pm_test_123",
-		TotalAmount:            10000, // $100.00
-		ProviderAmount:         8500,  // $85.00
-		PlatformFeeAmount:      1500,  // $15.00
-		Currency:               "usd",
-		PaymentIntentStatus:    "requires_capture",
+		AcceptLanguage:        "en-US",
+		ChildID:               child.ID,
+		GuardianID:            child.GuardianID,
+		EventOccurrenceID:     occurrence.ID,
+		Status:                models.RegistrationStatusRegistered,
+		StripePaymentIntentID: "pi_test_" + child.ID.String()[:8],
+		StripeCustomerID:      "cus_test_" + child.GuardianID.String()[:8],
+		OrgStripeAccountID:    "acct_test_123",
+		StripePaymentMethodID: "pm_test_123",
+		TotalAmount:           10000, // $100.00
+		ProviderAmount:        8500,  // $85.00
+		PlatformFeeAmount:     1500,  // $15.00
+		Currency:              "usd",
+		PaymentIntentStatus:   "requires_capture",
 	}
 
 	registration, err := repo.CreateRegistration(ctx, input)

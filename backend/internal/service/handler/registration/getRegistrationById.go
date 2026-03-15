@@ -9,12 +9,13 @@ import (
 )
 
 func (h *Handler) GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput) (*models.GetRegistrationByIDOutput, error) {
+
 	id, err := uuid.Parse(input.ID.String())
 	if err != nil {
 		return nil, errs.BadRequest("Invalid ID format")
 	}
 
-	registration, httpErr := h.RegistrationRepository.GetRegistrationByID(ctx, &models.GetRegistrationByIDInput{ID: id}, nil)
+	registration, httpErr := h.RegistrationRepository.GetRegistrationByID(ctx, &models.GetRegistrationByIDInput{ID: id, AcceptLanguage: input.AcceptLanguage}, nil)
 	if httpErr != nil {
 		return nil, httpErr
 	}

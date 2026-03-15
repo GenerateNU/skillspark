@@ -4,8 +4,8 @@ import (
 	"context"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
-	"skillspark/internal/storage/postgres/schema/guardian"
 	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
+	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
@@ -20,25 +20,25 @@ func TestUpdateRegistration(t *testing.T) {
 	ctx := context.Background()
 
 	child1 := child.CreateTestChild(t, ctx, testDB)
-	child2 := child.CreateTestChild(t, ctx,testDB)
+	child2 := child.CreateTestChild(t, ctx, testDB)
 	childID := child1.ID
 	guardianID := child1.GuardianID
 	occurrenceID := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB).ID
 
 	createInput := &models.CreateRegistrationWithPaymentData{
-		ChildID:                childID,
-		GuardianID:             guardianID,
-		EventOccurrenceID:      occurrenceID,
-		Status:                 models.RegistrationStatusRegistered,
-		StripePaymentIntentID:  "pi_test_123",
-		StripeCustomerID:       "cus_test_123",
-		OrgStripeAccountID:     "acct_test_123",
-		StripePaymentMethodID:  "pm_test_123",
-		TotalAmount:            10000,
-		ProviderAmount:         8500,
-		PlatformFeeAmount:      1500,
-		Currency:               "usd",
-		PaymentIntentStatus:    "requires_capture",
+		ChildID:               childID,
+		GuardianID:            guardianID,
+		EventOccurrenceID:     occurrenceID,
+		Status:                models.RegistrationStatusRegistered,
+		StripePaymentIntentID: "pi_test_123",
+		StripeCustomerID:      "cus_test_123",
+		OrgStripeAccountID:    "acct_test_123",
+		StripePaymentMethodID: "pm_test_123",
+		TotalAmount:           10000,
+		ProviderAmount:        8500,
+		PlatformFeeAmount:     1500,
+		Currency:              "usd",
+		PaymentIntentStatus:   "requires_capture",
 	}
 
 	created, createErr := repo.CreateRegistration(ctx, createInput)
@@ -46,7 +46,8 @@ func TestUpdateRegistration(t *testing.T) {
 	require.NotNil(t, created)
 
 	updateInput := &models.UpdateRegistrationInput{
-		ID: created.Body.ID,
+		AcceptLanguage: "en-US",
+		ID:             created.Body.ID,
 	}
 	updateInput.Body.ChildID = &child2.ID
 
@@ -83,19 +84,19 @@ func TestUpdateRegistration_InvalidChildID(t *testing.T) {
 	occurrenceID1 := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB).ID
 
 	createInput := &models.CreateRegistrationWithPaymentData{
-		ChildID:                childID,
-		GuardianID:             guardianID,
-		EventOccurrenceID:      occurrenceID1,
-		Status:                 models.RegistrationStatusRegistered,
-		StripePaymentIntentID:  "pi_test_123",
-		StripeCustomerID:       "cus_test_123",
-		OrgStripeAccountID:     "acct_test_123",
-		StripePaymentMethodID:  "pm_test_123",
-		TotalAmount:            10000,
-		ProviderAmount:         8500,
-		PlatformFeeAmount:      1500,
-		Currency:               "usd",
-		PaymentIntentStatus:    "requires_capture",
+		ChildID:               childID,
+		GuardianID:            guardianID,
+		EventOccurrenceID:     occurrenceID1,
+		Status:                models.RegistrationStatusRegistered,
+		StripePaymentIntentID: "pi_test_123",
+		StripeCustomerID:      "cus_test_123",
+		OrgStripeAccountID:    "acct_test_123",
+		StripePaymentMethodID: "pm_test_123",
+		TotalAmount:           10000,
+		ProviderAmount:        8500,
+		PlatformFeeAmount:     1500,
+		Currency:              "usd",
+		PaymentIntentStatus:   "requires_capture",
 	}
 
 	created, createErr := repo.CreateRegistration(ctx, createInput)
@@ -120,7 +121,7 @@ func TestUpdateRegistration_NotFound(t *testing.T) {
 
 	nonExistentID := uuid.New()
 	childID := child.CreateTestChild(t, ctx, testDB).ID
-	
+
 	updateInput := &models.UpdateRegistrationInput{
 		ID: nonExistentID,
 	}
@@ -131,7 +132,6 @@ func TestUpdateRegistration_NotFound(t *testing.T) {
 	require.NotNil(t, err)
 	assert.Nil(t, updated)
 }
-
 
 func TestUpdateRegistration_DecrementsAttendeeCount(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
@@ -145,26 +145,26 @@ func TestUpdateRegistration_DecrementsAttendeeCount(t *testing.T) {
 	occurrenceID := occurrence.ID
 
 	createInput := &models.CreateRegistrationWithPaymentData{
-		ChildID:                childID,
-		GuardianID:             guardianID,
-		EventOccurrenceID:      occurrenceID,
-		Status:                 models.RegistrationStatusRegistered,
-		StripePaymentIntentID:  "pi_test_123",
-		StripeCustomerID:       "cus_test_123",
-		OrgStripeAccountID:     "acct_test_123",
-		StripePaymentMethodID:  "pm_test_123",
-		TotalAmount:            10000,
-		ProviderAmount:         8500,
-		PlatformFeeAmount:      1500,
-		Currency:               "usd",
-		PaymentIntentStatus:    "requires_capture",
+		ChildID:               childID,
+		GuardianID:            guardianID,
+		EventOccurrenceID:     occurrenceID,
+		Status:                models.RegistrationStatusRegistered,
+		StripePaymentIntentID: "pi_test_123",
+		StripeCustomerID:      "cus_test_123",
+		OrgStripeAccountID:    "acct_test_123",
+		StripePaymentMethodID: "pm_test_123",
+		TotalAmount:           10000,
+		ProviderAmount:        8500,
+		PlatformFeeAmount:     1500,
+		Currency:              "usd",
+		PaymentIntentStatus:   "requires_capture",
 	}
 
 	created, createErr := repo.CreateRegistration(ctx, createInput)
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 
-	occurrenceAfterCreate, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID)
+	occurrenceAfterCreate, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID, "en-US")
 	require.Nil(t, err)
 	require.NotNil(t, occurrenceAfterCreate)
 	countAfterCreate := occurrenceAfterCreate.CurrEnrolled
@@ -180,7 +180,7 @@ func TestUpdateRegistration_DecrementsAttendeeCount(t *testing.T) {
 	require.NotNil(t, updated)
 	assert.Equal(t, models.RegistrationStatusCancelled, updated.Body.Status)
 
-	occurrenceAfterCancel, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID)
+	occurrenceAfterCancel, err := eventOccurrenceRepo.GetEventOccurrenceByID(ctx, occurrenceID, "en-US")
 	require.Nil(t, err)
 	require.NotNil(t, occurrenceAfterCancel)
 	assert.Equal(t, countAfterCreate-1, occurrenceAfterCancel.CurrEnrolled, "Attendee count should decrease by 1 after cancelling registration")

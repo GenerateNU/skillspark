@@ -60,7 +60,7 @@ func TestGetSavedByGuardianID_Success(t *testing.T) {
 
 	req, err := http.NewRequest(
 		http.MethodGet,
-		"/api/v1/review/saved/"+guardianID.String(),
+		"/api/v1/saved/"+guardianID.String(),
 		nil,
 	)
 	assert.NoError(t, err)
@@ -112,7 +112,7 @@ func TestGetSavedByGuardianID_WithPagination(t *testing.T) {
 
 	req, err := http.NewRequest(
 		http.MethodGet,
-		"/api/v1/review/saved/"+guardianID.String()+"?page=2&limit=5",
+		"/api/v1/saved/"+guardianID.String()+"?page=2&limit=5",
 		nil,
 	)
 	assert.NoError(t, err)

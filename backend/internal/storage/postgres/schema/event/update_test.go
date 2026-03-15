@@ -22,17 +22,22 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	createInput := func() *models.CreateEventInput {
-		input := &models.CreateEventInput{}
+	createInput := func() *models.CreateEventDBInput {
+		input := &models.CreateEventDBInput{}
 		ageMin := 8
 		ageMax := 12
+		title_ptr := "เวิร์คช็อปหุ่นยนต์สำหรับเด็ก"
+		desc_ptr := "เรียนรู้พื้นฐานหุ่นยนต์ด้วยโครงการ LEGO Mindstorms สร้างและเขียนโปรแกรมหุ่นยนต์ของคุณเอง!"
 
-		input.Body.Title = "Junior Robotics Workshop"
-		input.Body.Description = "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!"
+		input.Body.Title_EN = "Junior Robotics Workshop"
+		input.Body.Description_EN = "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!"
+		input.Body.Title_TH = &title_ptr
+		input.Body.Description_TH = &desc_ptr
 		input.Body.OrganizationID = uuid.MustParse("40000000-0000-0000-0000-000000000001")
 		input.Body.AgeRangeMin = &ageMin
 		input.Body.AgeRangeMax = &ageMax
 		input.Body.Category = []string{"science", "technology"}
+		input.AcceptLanguage = "en-US"
 
 		return input
 	}()
@@ -42,7 +47,7 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, createdEvent)
 
-	updateInput := &models.UpdateEventInput{}
+	updateInput := &models.UpdateEventDBInput{}
 	updateInput.ID = createdEvent.ID
 
 	newTitle := "Advanced Robotics Workshop"
@@ -52,12 +57,13 @@ func TestEventRepository_Update_JuniorRoboticsWorkshop(t *testing.T) {
 	newAgeMax := 14
 	newCategory := []string{"science", "technology"}
 
-	updateInput.Body.Title = &newTitle
-	updateInput.Body.Description = &newDescription
+	updateInput.Body.Title_EN = &newTitle
+	updateInput.Body.Description_EN = &newDescription
 	updateInput.Body.OrganizationID = &newOrgID
 	updateInput.Body.AgeRangeMin = &newAgeMin
 	updateInput.Body.AgeRangeMax = &newAgeMax
 	updateInput.Body.Category = &newCategory
+	updateInput.AcceptLanguage = "en-US"
 
 	imageKey := "events/robotics_workshop.jpg"
 	updatedEvent, err := repo.UpdateEvent(ctx, updateInput, &imageKey)
@@ -88,13 +94,13 @@ func TestEventRepository_Update_NotFound(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	updateInput := &models.UpdateEventInput{}
+	updateInput := &models.UpdateEventDBInput{}
 	updateInput.ID = uuid.New()
 
 	title := "Non-existent Event"
 	orgID := uuid.New()
 
-	updateInput.Body.Title = &title
+	updateInput.Body.Title_EN = &title
 	updateInput.Body.OrganizationID = &orgID
 
 	updatedEvent, err := repo.UpdateEvent(ctx, updateInput, nil)

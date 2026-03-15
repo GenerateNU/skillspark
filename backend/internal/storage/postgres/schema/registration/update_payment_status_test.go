@@ -22,7 +22,8 @@ func TestUpdateRegistrationPaymentStatus(t *testing.T) {
 	require.Nil(t, created.PaidAt)
 
 	input := &models.UpdateRegistrationPaymentStatusInput{
-		ID: created.ID,
+		AcceptLanguage: "en-US",
+		ID:             created.ID,
 	}
 	input.Body.PaymentIntentStatus = "succeeded"
 
@@ -34,7 +35,7 @@ func TestUpdateRegistrationPaymentStatus(t *testing.T) {
 	assert.Equal(t, "succeeded", updated.Body.PaymentIntentStatus)
 	assert.NotNil(t, updated.Body.PaidAt)
 	assert.NotZero(t, updated.Body.PaidAt)
-	
+
 	assert.Equal(t, created.ChildID, updated.Body.ChildID)
 	assert.Equal(t, created.GuardianID, updated.Body.GuardianID)
 	assert.Equal(t, created.EventOccurrenceID, updated.Body.EventOccurrenceID)

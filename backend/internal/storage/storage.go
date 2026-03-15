@@ -43,7 +43,7 @@ type OrganizationRepository interface {
 	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, error)
 	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, error)
 	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error)
-	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID) ([]models.EventOccurrence, error)
+	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID, AcceptLanguage string) ([]models.EventOccurrence, error)
 	SetStripeAccountID(ctx context.Context, orgID uuid.UUID, stripeAccountID string) (*models.Organization, error)
 	SetStripeAccountStatus(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error)
 }
@@ -70,11 +70,11 @@ type GuardianRepository interface {
 }
 
 type EventRepository interface {
-	CreateEvent(ctx context.Context, location *models.CreateEventInput, HeaderImageS3Key *string) (*models.Event, error)
-	UpdateEvent(ctx context.Context, location *models.UpdateEventInput, HeaderImageS3Key *string) (*models.Event, error)
+	CreateEvent(ctx context.Context, location *models.CreateEventDBInput, HeaderImageS3Key *string) (*models.Event, error)
+	UpdateEvent(ctx context.Context, location *models.UpdateEventDBInput, HeaderImageS3Key *string) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
-	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID) ([]models.EventOccurrence, error)
-	GetEventByID(ctx context.Context, id uuid.UUID) (*models.Event, error)
+	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID, AcceptLanguage string) ([]models.EventOccurrence, error)
+	GetEventByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.Event, error)
 }
 
 type ChildRepository interface {
@@ -86,8 +86,8 @@ type ChildRepository interface {
 }
 
 type EventOccurrenceRepository interface {
-	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error)
-	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID) (*models.EventOccurrence, error)
+	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error)
+	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.EventOccurrence, error)
 	CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error)
 	UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput, tx *pgx.Tx) (*models.EventOccurrence, error)
 	CancelEventOccurrence(ctx context.Context, id uuid.UUID) error
@@ -96,7 +96,7 @@ type EventOccurrenceRepository interface {
 type RegistrationRepository interface {
 	CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error)
 	GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput, tx *pgx.Tx) (*models.GetRegistrationByIDOutput, error)
-	GetRegistrationByPaymentIntentID(ctx context.Context, paymentIntentID string) (*models.Registration, error)
+	GetRegistrationByPaymentIntentID(ctx context.Context, paymentIntentID string, AcceptLanguage string) (*models.Registration, error)
 	GetRegistrationsByChildID(ctx context.Context, input *models.GetRegistrationsByChildIDInput) (*models.GetRegistrationsByChildIDOutput, error)
 	GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error)
 	GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error)
@@ -107,9 +107,9 @@ type RegistrationRepository interface {
 }
 
 type ReviewRepository interface {
-	CreateReview(ctx context.Context, input *models.CreateReviewInput) (*models.Review, error)
-	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Review, error)
-	GetReviewsByEventID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Review, error)
+	CreateReview(ctx context.Context, input *models.CreateReviewDBInput) (*models.Review, error)
+	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
+	GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	DeleteReview(ctx context.Context, id uuid.UUID) error
 }
 
