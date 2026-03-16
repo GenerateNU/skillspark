@@ -151,7 +151,6 @@ func TestEventOccurrenceRepository_Filters_SearchDurationLocation(t *testing.T) 
 	require.NoError(t, err)
 	require.NotNil(t, eventOccurrences)
 	for _, eo := range eventOccurrences {
-		t.Logf("title=%s description=%s", eo.Event.Title, eo.Event.Description)
 		assert.True(t, containsIgnoreCase(eo.Event.Title, search) || containsIgnoreCase(eo.Event.Description, search))
 		assert.Equal(t, "thb", eo.Currency)
 	}
