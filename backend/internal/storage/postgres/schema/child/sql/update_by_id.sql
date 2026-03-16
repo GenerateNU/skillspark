@@ -4,7 +4,7 @@ SET
     school_id = COALESCE($2, c.school_id),
     birth_month = COALESCE($3, c.birth_month),
     birth_year = COALESCE($4, c.birth_year),
-    interests = COALESCE($5, c.interests),
+    interests = COALESCE($5::category[], c.interests),
     guardian_id = COALESCE($6, c.guardian_id),
     updated_at = NOW()
 FROM school s

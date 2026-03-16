@@ -28,7 +28,7 @@ func TestGetRegistrationsForCapture(t *testing.T) {
 
 	require.NoError(t, err)
 	require.NotNil(t, registrations)
-	
+
 	found := false
 	for _, r := range registrations {
 		if r.ID == reg.ID {

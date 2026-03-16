@@ -5,8 +5,8 @@ import (
 	"skillspark/internal/models"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/mock"
 	"github.com/jackc/pgx/v5"
+	"github.com/stretchr/testify/mock"
 )
 
 type MockGuardianRepository struct {

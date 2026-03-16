@@ -12,7 +12,7 @@ func (sc *StripeClient) DetachPaymentMethod(
 ) error {
 	params := &stripe.PaymentMethodDetachParams{}
 	params.Context = ctx
-	
+
 	_, err := sc.client.V1PaymentMethods.Detach(ctx, paymentMethodID, params)
 	return err
 }

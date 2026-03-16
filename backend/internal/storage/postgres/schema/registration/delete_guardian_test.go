@@ -28,7 +28,7 @@ func TestGuardianRepository_DeleteGuardian_SetFieldsNull(t *testing.T) {
 	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 	regID := uuid.MustParse("80000000-0000-0000-0000-000000000001")
 	childID := uuid.MustParse("30000000-0000-0000-0000-000000000001")
-	
+
 	input1 := &models.GetRegistrationsByGuardianIDInput{
 		GuardianID: guardianID,
 	}
@@ -39,7 +39,7 @@ func TestGuardianRepository_DeleteGuardian_SetFieldsNull(t *testing.T) {
 	registrations, err := repo.GetRegistrationsByGuardianID(ctx, input1)
 	require.NoError(t, err)
 	require.NotEmpty(t, registrations.Body.Registrations)
-	
+
 	reg1 := registrations.Body.Registrations[0]
 	assert.Equal(t, regID, reg1.ID)
 	assert.Equal(t, childID, reg1.ChildID)
@@ -55,7 +55,7 @@ func TestGuardianRepository_DeleteGuardian_SetFieldsNull(t *testing.T) {
 	registration, err := repo.GetRegistrationByID(ctx, input2, nil)
 	require.NoError(t, err)
 	require.NotNil(t, registration)
-	
+
 	assert.Equal(t, models.RegistrationStatusCancelled, registration.Body.Status)
 	assert.NotEqual(t, uuid.Nil, registration.Body.ID)
 }

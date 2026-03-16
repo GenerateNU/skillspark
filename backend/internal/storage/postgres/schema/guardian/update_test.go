@@ -86,7 +86,7 @@ func TestGuardianRepository_Update_DoesNotModifyStripeCustomerID(t *testing.T) {
 
 	guardian := CreateTestGuardian(t, ctx, testDB)
 	stripeCustomerID := "cus_test123"
-	
+
 	_, err := repo.SetStripeCustomerID(ctx, guardian.ID, stripeCustomerID)
 	assert.NoError(t, err)
 
