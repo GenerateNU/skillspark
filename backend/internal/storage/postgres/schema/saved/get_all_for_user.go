@@ -33,17 +33,10 @@ func (r *SavedRepository) GetByGuardianID(ctx context.Context, user_id uuid.UUID
 	}
 	defer rows.Close()
 
-	saved, err := pgx.CollectRows(rows, scanSaved)
+	saved, err := pgx.CollectRows(rows, pgx.RowToStructByName[models.Saved])
 	if err != nil {
 		err := errs.InternalServerError("Failed to scan all event occurrences: ", err.Error())
 		return nil, &err
 	}
 	return saved, nil
-}
-
-func scanSaved(row pgx.CollectableRow) (models.Saved, error) {
-	var createdSaved models.Saved
-	// populate data from each row
-	err := row.Scan(&createdSaved.ID, &createdSaved.GuardianID, &createdSaved.EventOccurrenceID, &createdSaved.CreatedAt, &createdSaved.UpdatedAt)
-	return createdSaved, err
 }
