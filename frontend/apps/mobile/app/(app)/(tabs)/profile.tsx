@@ -8,8 +8,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useGetGuardianById, useGetChildrenByGuardianId } from '@skillspark/api-client';
 import { FamilyCard } from '@/components/FamilyCard';
 import { ListItem } from '@/components/ListItem';
-
-const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
+import { useAuthContext } from '@/hooks/use-auth-context';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -19,8 +18,10 @@ export default function ProfileScreen() {
   const listBackgroundColor = colorScheme === 'dark' ? '#1c1c1e' : '#F9FAFB';
   const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
 
-  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(GUARDIAN_ID);
-  const { data: childrenResponse, isLoading: familyLoading } = useGetChildrenByGuardianId(GUARDIAN_ID);
+  const { guardianId } = useAuthContext();
+
+  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(guardianId as string);
+  const { data: childrenResponse, isLoading: familyLoading } = useGetChildrenByGuardianId(guardianId as string);
   const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
   const children = childrenResponse?.status === 200 ? childrenResponse.data : [];
 
