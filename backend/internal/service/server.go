@@ -138,4 +138,5 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetupEventOccurrencesRoutes(api, repo, s3Client, sc)
 	routes.SetUpReviewRoutes(api, repo, translateClient)
 	routes.SetupPaymentRoutes(api, repo, sc)
+	routes.SetUpSavedRoutes(api, repo)
 }
