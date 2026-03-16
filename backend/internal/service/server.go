@@ -97,6 +97,10 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	humaAPI := humafiber.New(app, humaConfig)
 
+	// Register public routes BEFORE auth middleware
+	routes.SetupAuthRoutes(humaAPI, repo, config)
+
+	// Apply auth middleware — only affects routes registered after this point
 	if !config.TestMode {
 		humaAPI.UseMiddleware(auth.AuthMiddleware(humaAPI, &config.Supabase))
 	}
@@ -109,8 +113,8 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 		return c.Status(fiber.StatusOK).SendString("Welcome to SkillSpark!")
 	})
 
-	// Register Huma endpoints
-	setupHumaRoutes(humaAPI, repo, config, s3Client, translateClient, newStripeClient)
+	// Register protected Huma endpoints
+	setupProtectedHumaRoutes(humaAPI, repo, config, s3Client, translateClient, newStripeClient)
 
 	routes.SetupWebhookRoutes(app, repo,
 		os.Getenv("STRIPE_WEBHOOK_SECRET"),
@@ -120,11 +124,10 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	return app, humaAPI
 }
 
-// Setup Huma routes
-func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface) {
+// Setup protected Huma routes (behind auth middleware)
+func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
-	routes.SetupExamplesRoutes(api, repo)
 	routes.SetupOrganizationRoutes(api, repo, s3Client)
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
@@ -134,6 +137,5 @@ func setupHumaRoutes(api huma.API, repo *storage.Repository, config config.Confi
 	routes.SetupChildRoutes(api, repo)
 	routes.SetupEventOccurrencesRoutes(api, repo, s3Client, sc)
 	routes.SetUpReviewRoutes(api, repo, translateClient)
-	routes.SetupAuthRoutes(api, repo, config)
 	routes.SetupPaymentRoutes(api, repo, sc)
 }

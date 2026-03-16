@@ -1,11 +1,27 @@
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { IconSymbol } from "@/components/ui/icon-symbol";
+import React from 'react';
+import { View, TouchableOpacity, useColorScheme } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Colors } from '@/constants/theme';
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { PageRedirectButton } from "@/components/PageRedirectButton";
 
-export default function TabTwoScreen() {
+export default function SettingsScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? 'light'];
+
+  const cardBg = colorScheme === 'dark' ? '#1c1c1e' : '#EFEFEF';
+  const dividerColor = colorScheme === 'dark' ? '#3a3a3c' : '#D1D5DB';
+
+  const handleLogOut = () => {};
+
+  const handleDeleteAccount = () => {};
+
   const { logout } = useAuthContext();
 
   const handleLogOut = () => {
@@ -13,29 +29,44 @@ export default function TabTwoScreen() {
   };
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="gearshape"
-          style={{
-            color: "#808080",
-            bottom: -90,
-            left: -35,
-            position: "absolute",
-          }}
-        />
-      }
-    >
-      <ThemedView className="flex-col gap-2">
-        <ThemedText className="flex-col gap-8" type="title">
-          Settings
-        </ThemedText>
-        <ThemedText>This is where you can change your settings</ThemedText>
-        <PageRedirectButton label="Log out" onPress={handleLogOut} />
-      </ThemedView>
-    </ParallaxScrollView>
+    <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+      <View className="flex-row items-center justify-between px-5 py-[14px]">
+        <TouchableOpacity
+          onPress={() => router.navigate('/profile')}
+          className="w-10 justify-center items-start"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <IconSymbol name="chevron.left" size={24} color={theme.text} />
+        </TouchableOpacity>
+        <ThemedText className="text-xl text-center font-nunito-bold">Settings</ThemedText>
+        <View className="w-10" />
+      </View>
+      <View className="px-4 pt-5">
+        <View className="rounded-2xl overflow-hidden" style={{ backgroundColor: cardBg }}>
+          <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6} onPress={() => router.push('/language')}>
+            <ThemedText className="text-[17px] font-nunito">Language</ThemedText>
+            <IconSymbol name="chevron.right" size={16} color="#9CA3AF" />
+          </TouchableOpacity>
+          <View className="h-px" style={{ backgroundColor: dividerColor }} />
+          <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6}>
+            <ThemedText className="text-[17px] font-nunito">Terms and Conditions</ThemedText>
+            <IconSymbol name="chevron.right" size={16} color="#9CA3AF" />
+          </TouchableOpacity>
+          <View className="h-px" style={{ backgroundColor: dividerColor }} />
+          <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6}>
+            <ThemedText className="text-[17px] font-nunito">Privacy Policy</ThemedText>
+            <IconSymbol name="chevron.right" size={16} color="#9CA3AF" />
+          </TouchableOpacity>
+          <View className="h-px" style={{ backgroundColor: dividerColor }} />
+          <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6} onPress={handleLogOut}>
+            <ThemedText className="text-[17px] font-nunito">Log Out</ThemedText>
+          </TouchableOpacity>
+          <View className="h-px" style={{ backgroundColor: dividerColor }} />
+          <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6} onPress={handleDeleteAccount}>
+            <ThemedText className="text-[17px] font-nunito">Delete Account</ThemedText>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ThemedView>
   );
 }
