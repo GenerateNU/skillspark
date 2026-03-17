@@ -16,11 +16,6 @@ type Handler struct {
 	NotificationService       *notification.Service
 }
 
-// func NewHandler(registrationRepo storage.RegistrationRepository, childRepo storage.ChildRepository, guardianRepo storage.GuardianRepository, eventOccurrenceRepo storage.EventOccurrenceRepository, notifService *notification.Service) *Handler {
-// 	OrganizationRepository    storage.OrganizationRepository
-// 	StripeClient              stripeClient.StripeClientInterface
-// }
-
 func NewHandler(registrationRepo storage.RegistrationRepository, childRepo storage.ChildRepository, 
 	guardianRepo storage.GuardianRepository, eventOccurrenceRepo storage.EventOccurrenceRepository, 
 	organizationRepo storage.OrganizationRepository, sc stripeClient.StripeClientInterface, notifService *notification.Service) *Handler {

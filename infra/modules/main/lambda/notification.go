@@ -66,9 +66,7 @@ func (p *NotificationProcessor) ProcessNotification(ctx context.Context, message
 			return fmt.Errorf("failed to send push notification: %w", err)
 		}
 
-		slog.Info("Push notification sent",
-			"token", *message.RecipientPushToken,
-		)
+		slog.Info("Push notification sent")
 	}
 
 	return nil
