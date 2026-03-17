@@ -1,6 +1,8 @@
 import {
   GuardianLoginOutputBody,
   GuardianSignUpOutputBody,
+  loginGuardianResponse,
+  signupGuardianResponse,
   useLoginGuardian,
   useSignupGuardian,
 } from "@skillspark/api-client";
@@ -62,8 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loginFunc(
       { data: { email, password } },
       {
-        onSuccess: async (resp) => {
-          const success = resp as unknown as GuardianLoginOutputBody;
+        onSuccess: async (resp: loginGuardianResponse) => {
+          const success = resp.data as GuardianLoginOutputBody;
           await SecureStore.setItemAsync("token", success.token);
           setJWT(success.token);
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
@@ -71,8 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           router.replace("/(app)/(tabs)");
         },
         onError: (err) => {
-          const fail = err as Error;
-          onError(fail.message ?? "An unexpected error occurred");
+          const fail = err as unknown as { data?: { message?: string }};
+          onError(fail.data?.message ?? "An unexpected error occurred");
         },
       },
     );
@@ -99,8 +101,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       },
       {
-        onSuccess: async (resp) => {
-          const success = resp as unknown as GuardianSignUpOutputBody;
+        onSuccess: async (resp: signupGuardianResponse) => {
+          const success = resp.data as GuardianSignUpOutputBody;
+          console.log(JSON.stringify(resp));
           await SecureStore.setItemAsync("token", success.token);
           setJWT(success.token);
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
@@ -108,9 +111,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           router.replace("/(app)/(tabs)");
         },
         onError: (err) => {
-          const fail = err as unknown as { message?: string; detail?: string };
+          const fail = err as unknown as { data?: { message?: string }};
           onError(
-            fail.message ?? fail.detail ?? "An unexpected error occurred",
+            fail.data?.message ?? "An unexpected error occurred",
           );
         },
       },

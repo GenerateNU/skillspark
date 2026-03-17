@@ -323,21 +323,6 @@ export interface CreateStripeOnboardingLinkOutputBody {
   onboarding_url: string;
 }
 
-export interface CreateUserInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** User email address */
-  email: string;
-  /** Full name (optional) */
-  full_name?: string;
-  /**
-   * Username
-   * @minLength 3
-   * @maxLength 50
-   */
-  username: string;
-}
-
 export interface DeleteEventOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -444,15 +429,6 @@ export interface EventOccurrence {
   updated_at: string;
 }
 
-export interface GetGreetingOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** Greeting message */
-  message: string;
-  /** Server timestamp */
-  timestamp: string;
-}
-
 export interface PaymentMethodCard {
   brand: string;
   exp_month: number;
@@ -541,19 +517,6 @@ export interface HealthOutputBody {
   status: string;
   /** API version */
   version: string;
-}
-
-export interface Item {
-  email: string;
-  id: string;
-  username: string;
-}
-
-export interface ListUsersOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  total: number;
-  users: Item[];
 }
 
 export interface LoginInputBody {
@@ -784,19 +747,6 @@ export interface UpdateRegistrationPaymentStatusInputBody {
   payment_intent_status: string;
 }
 
-export interface UserOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** User email */
-  email: string;
-  /** Full name */
-  full_name?: string;
-  /** User ID */
-  id: string;
-  /** Username */
-  username: string;
-}
-
 export type GetAllEventOccurrencesParams = {
 /**
  * @minimum 1
@@ -813,6 +763,7 @@ lng?: string;
 radius_km?: number;
 min_price?: number;
 max_price?: number;
+price?: string;
 min_duration?: number;
 max_duration?: number;
 min_age?: number;
