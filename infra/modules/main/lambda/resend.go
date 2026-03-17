@@ -15,13 +15,6 @@ const (
 	resendAPIURL = "https://api.resend.com/emails"
 )
 
-// ResendClient handles email sending via Resend API
-type ResendClient struct {
-	apiKey  string
-	client  *http.Client
-	from    string
-}
-
 // NewResendClient creates a new Resend client
 func NewResendClient() (*ResendClient, error) {
 	apiKey := os.Getenv("RESEND_API_KEY")
@@ -42,20 +35,6 @@ func NewResendClient() (*ResendClient, error) {
 		},
 		from: from,
 	}, nil
-}
-
-// ResendEmailRequest represents the request payload for Resend API
-type ResendEmailRequest struct {
-	From    string   `json:"from"`
-	To      []string `json:"to"`
-	Subject string   `json:"subject"`
-	Text    string   `json:"text"`
-	HTML    string   `json:"html,omitempty"`
-}
-
-// ResendEmailResponse represents the response from Resend API
-type ResendEmailResponse struct {
-	ID string `json:"id"`
 }
 
 // SendEmail sends an email via Resend API

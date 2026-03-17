@@ -1,6 +1,9 @@
 package main
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"net/http"
+)
 
 // NotificationType represents the type of notification
 type NotificationType string
@@ -52,3 +55,23 @@ type Handler struct {
 	processor *NotificationProcessor
 }
 
+// ResendClient handles email sending via Resend API
+type ResendClient struct {
+	apiKey  string
+	client  *http.Client
+	from    string
+}
+
+// ResendEmailRequest represents the request payload for Resend API
+type ResendEmailRequest struct {
+	From    string   `json:"from"`
+	To      []string `json:"to"`
+	Subject string   `json:"subject"`
+	Text    string   `json:"text"`
+	HTML    string   `json:"html,omitempty"`
+}
+
+// ResendEmailResponse represents the response from Resend API
+type ResendEmailResponse struct {
+	ID string `json:"id"`
+}
