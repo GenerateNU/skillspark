@@ -180,7 +180,7 @@ function EventCard({ item }: { item: EventOccurrence }) {
               <View style={{ width: 1, height: 14, backgroundColor: "#D1D5DB", marginHorizontal: 10 }} />
             </>
           )}
-          <Text style={{ fontSize: 12, color: "#374151", fontWeight: "500" }}>🚌 {duration}</Text>
+          <Text style={{ fontSize: 12, color: "#374151", fontWeight: "500" }}>{duration}</Text>
         </View>
       </View>
 
