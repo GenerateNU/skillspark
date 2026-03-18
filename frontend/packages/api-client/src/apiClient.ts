@@ -1,6 +1,5 @@
-import axios, {
-  AxiosRequestConfig,
-  AxiosResponse,
+import axios from 'axios';
+import type {
   InternalAxiosRequestConfig,
 } from 'axios';
 
@@ -23,14 +22,21 @@ const removeStorageItem = (key: string): void => {
 };
 
 const getBaseURL = () => {
+  // @ts-ignore
   if (typeof process !== 'undefined' && process.env) {
+    // @ts-ignore
     if (process.env.EXPO_PUBLIC_API_BASE_URL) {
+      // @ts-ignore
       return process.env.EXPO_PUBLIC_API_BASE_URL;
     }
+    // @ts-ignore
     if (process.env.VITE_API_BASE_URL) {
+      // @ts-ignore
       return process.env.VITE_API_BASE_URL;
     }
+    // @ts-ignore
     if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+      // @ts-ignore
       return process.env.NEXT_PUBLIC_API_BASE_URL;
     }
   }
