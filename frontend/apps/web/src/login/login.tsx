@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useAuthContext } from "../../contexts/use-auth-context";
 import { useNavigate } from "react-router-dom";
+import { AuthProvider } from "../../contexts/auth-context";
 
 type LoginFormData = {
   email: string;
@@ -12,7 +13,7 @@ export default function Login() {
   const [errorText, setErrorText] = useState("");
   const { login } = useAuthContext();
   const navigate = useNavigate();
-  
+
   const { register, handleSubmit } = useForm<LoginFormData>({
     defaultValues: {
       email: "",
@@ -29,6 +30,7 @@ export default function Login() {
   };
 
     return (
+      <AuthProvider>
     <div className="flex flex-col items-center justify-center h-screen">
       <h1 className="text-4xl font-bold pb-16">Log In</h1>
       <form
@@ -61,5 +63,6 @@ export default function Login() {
         </button>
       </form>
     </div>
+    </AuthProvider>
   );
 }
