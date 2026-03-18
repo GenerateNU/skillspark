@@ -5,6 +5,8 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
+
+	"github.com/jackc/pgx/v5"
 )
 
 func (r *NotificationRepository) GetPendingNotifications(ctx context.Context) ([]models.Notification, error) {
@@ -13,6 +15,7 @@ func (r *NotificationRepository) GetPendingNotifications(ctx context.Context) ([
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
 	}
+	
 
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
@@ -21,33 +24,9 @@ func (r *NotificationRepository) GetPendingNotifications(ctx context.Context) ([
 	}
 	defer rows.Close()
 
-	var notifications []models.Notification
-
-	for rows.Next() {
-		var notification models.Notification
-		err := rows.Scan(
-			&notification.ID,
-			&notification.NotificationType,
-			&notification.RecipientEmail,
-			&notification.RecipientPushToken,
-			&notification.Subject,
-			&notification.Body,
-			&notification.Metadata,
-			&notification.ScheduledFor,
-			&notification.SentAt,
-			&notification.Status,
-			&notification.CreatedAt,
-			&notification.UpdatedAt,
-		)
-		if err != nil {
-			errr := errs.InternalServerError("Failed to scan notification: ", err.Error())
-			return nil, &errr
-		}
-		notifications = append(notifications, notification)
-	}
-
-	if err := rows.Err(); err != nil {
-		errr := errs.InternalServerError("Error iterating notifications: ", err.Error())
+	notifications, err := pgx.CollectRows(rows, pgx.RowToStructByName[models.Notification])
+	if err != nil {
+		errr := errs.InternalServerError("Failed to scan notification: ", err.Error())
 		return nil, &errr
 	}
 
