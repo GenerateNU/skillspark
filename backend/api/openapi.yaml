@@ -270,6 +270,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: page
           in: query
           explode: false
@@ -320,6 +323,11 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: price
+          in: query
+          explode: false
+          schema:
+            type: string
         - name: min_duration
           in: query
           explode: false
@@ -394,6 +402,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
       requestBody:
         content:
           application/json:
@@ -428,6 +439,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: ID of an event occurrence
@@ -488,6 +502,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: ID of the event occurrence to update
@@ -529,6 +546,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
       requestBody:
         content:
           multipart/form-data:
@@ -603,6 +623,10 @@ paths:
           in: header
           schema:
             type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: event_id
           in: path
           description: ID of an event
@@ -617,6 +641,10 @@ paths:
             Accept-Language:
               schema:
                 type: string
+                default: en-US
+                enum:
+                  - en-US
+                  - th-TH
           content:
             application/json:
               schema:
@@ -668,6 +696,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           required: true
@@ -1329,6 +1360,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: organization_id
           in: path
           description: ID of an organization
@@ -1365,6 +1399,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
       requestBody:
         content:
           application/json:
@@ -1398,6 +1435,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: Registration ID to retrieve
@@ -1432,6 +1472,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: Registration ID to update
@@ -1473,6 +1516,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           required: true
@@ -1504,6 +1550,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: Registration ID
@@ -1545,6 +1594,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: child_id
           in: path
           description: Child ID to retrieve registrations for
@@ -1579,6 +1631,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: event_occurrence_id
           in: path
           description: Event Occurrence ID to retrieve registrations for
@@ -1613,6 +1668,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: guardian_id
           in: path
           description: Guardian ID to retrieve registrations for
@@ -1647,6 +1705,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
       requestBody:
         content:
           application/json:
@@ -1710,6 +1771,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: page
           in: query
           description: Page number (starts at 1)
@@ -1765,6 +1829,9 @@ paths:
           schema:
             type: string
             default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: page
           in: query
           description: Page number (starts at 1)
@@ -3434,10 +3501,8 @@ components:
         - id
         - name
         - active
-        - presigned_url
         - created_at
         - updated_at
-        - stripe_account_id
         - stripe_account_activated
     PatchManagerInputBody:
       type: object

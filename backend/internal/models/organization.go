@@ -12,11 +12,11 @@ type Organization struct {
 	Name                   string     `json:"name" db:"name"`
 	Active                 bool       `json:"active" db:"active"`
 	PfpS3Key               *string    `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
-	PresignedURL           *string    `json:"presigned_url"`
+	PresignedURL           *string    `json:"presigned_url,omitempty"`
 	LocationID             *uuid.UUID `json:"location_id,omitempty" db:"location_id"`
 	CreatedAt              time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt              time.Time  `json:"updated_at" db:"updated_at"`
-	StripeAccountID        *string    `json:"stripe_account_id" db:"stripe_account_id"`
+	StripeAccountID        *string    `json:"stripe_account_id,omitempty" db:"stripe_account_id"`
 	StripeAccountActivated bool       `json:"stripe_account_activated" db:"stripe_account_activated" default:"false"`
 }
 

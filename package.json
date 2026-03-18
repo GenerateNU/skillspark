@@ -17,5 +17,8 @@
   "workspaces": [
     "frontend/apps/*",
     "frontend/packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@types/node": "^25.5.0"
+  }
 }
