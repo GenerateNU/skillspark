@@ -6,7 +6,6 @@ import (
 	"skillspark/internal/storage/postgres/schema/child"
 	"skillspark/internal/storage/postgres/schema/event"
 	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
-	geocode_cache "skillspark/internal/storage/postgres/schema/geocode_cache"
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
@@ -127,11 +126,6 @@ type SavedRepository interface {
 	GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination) ([]models.Saved, error)
 }
 
-type GeocodeCacheRepository interface {
-	GetGeocodeCache(ctx context.Context, normalizedAddress string) (*models.GeocodeCache, error)
-	CreateGeocodeCache(ctx context.Context, normalizedAddress, rawAddress string, lat, lng float64) (*models.GeocodeCache, error)
-}
-
 type Repository struct {
 	db              *pgxpool.Pool
 	Location        LocationRepository
@@ -146,7 +140,6 @@ type Repository struct {
 	Review          ReviewRepository
 	User            UserRepository
 	Saved           SavedRepository
-	GeocodeCache    GeocodeCacheRepository
 }
 
 // Close closes the database connection pool
@@ -176,6 +169,5 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Registration:    registration.NewRegistrationRepository(db),
 		Review:          review.NewReviewRepository(db),
 		Saved:           saved.NewSavedRepository(db),
-		GeocodeCache:    geocode_cache.NewGeocodeCacheRepository(db),
 	}
 }

@@ -1,13 +1,18 @@
 package geocoding
 
 import (
-	"skillspark/internal/geocoding"
+	"context"
+	"skillspark/internal/errs"
 )
 
-type Handler struct {
-	service *geocoding.Service
+type Geocoder interface {
+	Geocode(ctx context.Context, address string) (lat, lng float64, httpErr *errs.HTTPError)
 }
 
-func NewHandler(service *geocoding.Service) *Handler {
+type Handler struct {
+	service Geocoder
+}
+
+func NewHandler(service Geocoder) *Handler {
 	return &Handler{service: service}
 }

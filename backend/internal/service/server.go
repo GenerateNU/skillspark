@@ -141,7 +141,7 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetupPaymentRoutes(api, repo, sc)
 	routes.SetUpSavedRoutes(api, repo)
 	// Prevents erroring for geocoding routes, mostly for if API key is not set
-	if err := routes.SetupGeocodingRoutes(api, repo); err != nil {
+	if err := routes.SetupGeocodingRoutes(api); err != nil {
 		slog.Warn("geocoding routes not registered", "reason", err.Error())
 	}
 }
