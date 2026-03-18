@@ -24,7 +24,7 @@ func TestGetById(t *testing.T) {
 	require.NotNil(t, org)
 	assert.Equal(t, "Test Corp", org.Name)
 	assert.True(t, org.Active)
-	
+
 	assert.Nil(t, org.StripeAccountID)
 	assert.False(t, org.StripeAccountActivated)
 }

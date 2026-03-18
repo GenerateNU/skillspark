@@ -30,7 +30,7 @@ func (j *JobScheduler) Start() {
 		log.Println("Running payment capture job...")
 		j.CapturePaymentsJob()
 	})
-	if  err != nil {
+	if err != nil {
 		log.Fatalf("Failed to schedule payment capture job: %v", err)
 	}
 	

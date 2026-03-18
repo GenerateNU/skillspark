@@ -21,17 +21,17 @@ func (r *LocationRepository) GetLocationByOrganizationID(ctx context.Context, or
 	row := r.db.QueryRow(ctx, query, orgID)
 	var location models.Location
 	err = row.Scan(
-		&location.ID, 
-		&location.Latitude, 
-		&location.Longitude, 
-		&location.AddressLine1, 
-		&location.AddressLine2, 
-		&location.Subdistrict, 
-		&location.District, 
-		&location.Province, 
-		&location.PostalCode, 
-		&location.Country, 
-		&location.CreatedAt, 
+		&location.ID,
+		&location.Latitude,
+		&location.Longitude,
+		&location.AddressLine1,
+		&location.AddressLine2,
+		&location.Subdistrict,
+		&location.District,
+		&location.Province,
+		&location.PostalCode,
+		&location.Country,
+		&location.CreatedAt,
 		&location.UpdatedAt,
 	)
 

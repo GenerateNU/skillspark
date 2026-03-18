@@ -2,9 +2,9 @@ package stripemocks
 
 import (
 	"context"
-	"skillspark/internal/models"
 	"github.com/stretchr/testify/mock"
 	"github.com/stripe/stripe-go/v84"
+	"skillspark/internal/models"
 )
 
 type MockStripeClient struct {

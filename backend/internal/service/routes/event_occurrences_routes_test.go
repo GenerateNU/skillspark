@@ -675,6 +675,7 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
+
 		{
 			name:  "no filters just default pagination",
 			query: "?page=1&limit=5",

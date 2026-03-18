@@ -14,7 +14,7 @@ func TestStripeClient_CreateSetupIntent(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
-	client,_ := NewStripeClient(apiKey)
+	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates setup intent for valid customer", func(t *testing.T) {
@@ -28,7 +28,7 @@ func TestStripeClient_CreateSetupIntent(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.NotEmpty(t, clientSecret)
-		assert.Contains(t, clientSecret, "seti_") // Setup intent secret starts with seti_
+		assert.Contains(t, clientSecret, "seti_")    // Setup intent secret starts with seti_
 		assert.Contains(t, clientSecret, "_secret_") // Contains _secret_ in the middle
 
 		t.Logf("Created setup intent with client secret: %s", clientSecret[:20]+"...")

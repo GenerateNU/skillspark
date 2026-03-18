@@ -13,6 +13,7 @@ import (
 	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/review"
+	"skillspark/internal/storage/postgres/schema/saved"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/storage/postgres/schema/user"
 	"skillspark/internal/utils"
@@ -126,6 +127,12 @@ type NotificationRepository interface {
 	UpdateNotificationStatus(ctx context.Context, id uuid.UUID, status models.NotificationStatus) (*models.Notification, error)
 }
 
+type SavedRepository interface {
+	CreateSaved(ctx context.Context, saved *models.CreateSavedInput) (*models.Saved, error)
+	DeleteSaved(ctx context.Context, id uuid.UUID) error
+	GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination) ([]models.Saved, error)
+}
+
 type Repository struct {
 	db              *pgxpool.Pool
 	Location        LocationRepository
@@ -140,6 +147,7 @@ type Repository struct {
 	Review          ReviewRepository
 	User            UserRepository
 	Notification    NotificationRepository
+	Saved           SavedRepository
 }
 
 // Close closes the database connection pool
@@ -169,5 +177,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Registration:    registration.NewRegistrationRepository(db),
 		Review:          review.NewReviewRepository(db),
 		Notification:    notification.NewNotificationRepository(db),
+		Saved:           saved.NewSavedRepository(db),
 	}
 }

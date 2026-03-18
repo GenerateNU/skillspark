@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"skillspark/internal/config"
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	stripemocks "skillspark/internal/stripeClient/mocks"
-	"skillspark/internal/config"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -37,7 +37,7 @@ func setupGuardianTestAPI(
 		Manager:  managerRepo,
 	}
 
-	cfg := config.Config {
+	cfg := config.Config{
 		Supabase: config.Supabase{
 			URL:            "https://example.supabase.co",
 			AnonKey:        "dummy-anon-key",
@@ -176,11 +176,11 @@ func TestHumaValidation_DeleteGuardian(t *testing.T) {
 	userID := "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e"
 
 	tests := []struct {
-		name       string
-		guardianID string
-		mockSetup  func(*repomocks.MockGuardianRepository)
-		authResponse  interface{}
-		statusCode int
+		name         string
+		guardianID   string
+		mockSetup    func(*repomocks.MockGuardianRepository)
+		authResponse interface{}
+		statusCode   int
 	}{
 		{
 			name:       "valid UUID",
@@ -192,23 +192,23 @@ func TestHumaValidation_DeleteGuardian(t *testing.T) {
 					uuid.MustParse(guardianID),
 					mock.Anything,
 				).Return(&models.Guardian{
-					ID: uuid.MustParse(guardianID),
-					UserID: uuid.MustParse(userID),
-					Name: "James Wilson",
-					Email: "james.wilson@email.com",
-					Username: "jamesw",
+					ID:                 uuid.MustParse(guardianID),
+					UserID:             uuid.MustParse(userID),
+					Name:               "James Wilson",
+					Email:              "james.wilson@email.com",
+					Username:           "jamesw",
 					LanguagePreference: "en",
 				}, nil)
 			},
-			authResponse: []string {},
-			statusCode: http.StatusOK,
+			authResponse: []string{},
+			statusCode:   http.StatusOK,
 		},
 		{
-			name:       "invalid UUID",
-			guardianID: "not-a-uuid",
-			mockSetup:  func(*repomocks.MockGuardianRepository) {},
-			authResponse: []string {},
-			statusCode: http.StatusUnprocessableEntity,
+			name:         "invalid UUID",
+			guardianID:   "not-a-uuid",
+			mockSetup:    func(*repomocks.MockGuardianRepository) {},
+			authResponse: []string{},
+			statusCode:   http.StatusUnprocessableEntity,
 		},
 	}
 

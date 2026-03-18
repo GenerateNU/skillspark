@@ -7,14 +7,14 @@ import (
 )
 
 type StripeClient struct {
-    client *stripe.Client
+	client *stripe.Client
 }
 
 func NewStripeClient(apiKey string) (*StripeClient, error) {
-    if (apiKey == "") {
-        apiKey = os.Getenv("STRIPE_SECRET_KEY")
-    }
-    return &StripeClient{
-        client: stripe.NewClient(apiKey),
-    }, nil
+	if apiKey == "" {
+		apiKey = os.Getenv("STRIPE_SECRET_KEY")
+	}
+	return &StripeClient{
+		client: stripe.NewClient(apiKey),
+	}, nil
 }

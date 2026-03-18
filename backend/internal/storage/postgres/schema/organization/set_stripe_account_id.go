@@ -15,9 +15,9 @@ func (r *OrganizationRepository) SetStripeAccountID(ctx context.Context, orgID u
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
 	}
-	
+
 	row := r.db.QueryRow(ctx, query, stripeAccountID, orgID)
-	
+
 	var updatedOrganization models.Organization
 	err = row.Scan(
 		&updatedOrganization.ID,
@@ -38,6 +38,6 @@ func (r *OrganizationRepository) SetStripeAccountID(ctx context.Context, orgID u
 		errr := errs.InternalServerError("Failed to set stripe account: ", err.Error())
 		return nil, &errr
 	}
-	
+
 	return &updatedOrganization, nil
 }

@@ -180,7 +180,7 @@ function EventCard({ item }: { item: EventOccurrence }) {
               <View style={{ width: 1, height: 14, backgroundColor: "#D1D5DB", marginHorizontal: 10 }} />
             </>
           )}
-          <Text style={{ fontSize: 12, color: "#374151", fontWeight: "500" }}>🚌 {duration}</Text>
+          <Text style={{ fontSize: 12, color: "#374151", fontWeight: "500" }}>{duration}</Text>
         </View>
       </View>
 
@@ -227,12 +227,12 @@ function EventOccurrencesList() {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
         <ThemedText style={{ color: "#EF4444", fontWeight: "600" }}>Error loading events</ThemedText>
-        <ThemedText>{error.message || "An error occurred"}</ThemedText>
+        <ThemedText>{error.detail || "An error occurred"}</ThemedText>
       </View>
     );
   }
 
-  if (!response || !Array.isArray(response)) {
+  if (!response || !Array.isArray(response.data)) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
         <ThemedText>No events available</ThemedText>
@@ -240,11 +240,11 @@ function EventOccurrencesList() {
     );
   }
 
-  const upcomingEvents = response
+  const upcomingEvents = response.data
     .filter((o) => new Date(o.start_time) >= new Date())
     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
-  const allCategories = getUniqueCategories(response);
+  const allCategories = getUniqueCategories(response.data);
   const featuredEvent = upcomingEvents[0];
   const listEvents = upcomingEvents.slice(1);
 
