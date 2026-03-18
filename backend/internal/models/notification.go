@@ -13,7 +13,6 @@ type NotificationType string
 const (
 	NotificationTypeEmail NotificationType = "email"
 	NotificationTypePush  NotificationType = "push"
-	NotificationTypeBoth  NotificationType = "both"
 )
 
 // NotificationStatus represents the status of a notification

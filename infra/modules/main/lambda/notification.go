@@ -24,8 +24,7 @@ func NewNotificationProcessor(resendClient *ResendClient, expoClient *ExpoClient
 func (p *NotificationProcessor) ProcessNotification(ctx context.Context, message NotificationMessage) error {
 	// Validate notification type
 	if message.NotificationType != NotificationTypeEmail &&
-		message.NotificationType != NotificationTypePush &&
-		message.NotificationType != NotificationTypeBoth {
+		message.NotificationType != NotificationTypePush {
 		return fmt.Errorf("invalid notification type: %s", message.NotificationType)
 	}
 
@@ -41,7 +40,7 @@ func (p *NotificationProcessor) ProcessNotification(ctx context.Context, message
 	}
 
 	// Process email notification
-	if message.NotificationType == NotificationTypeEmail || message.NotificationType == NotificationTypeBoth {
+	if message.NotificationType == NotificationTypeEmail {
 		if message.RecipientEmail == nil || *message.RecipientEmail == "" {
 			return fmt.Errorf("recipient email is required for email notification")
 		}
@@ -57,7 +56,7 @@ func (p *NotificationProcessor) ProcessNotification(ctx context.Context, message
 	}
 
 	// Process push notification
-	if message.NotificationType == NotificationTypePush || message.NotificationType == NotificationTypeBoth {
+	if message.NotificationType == NotificationTypePush {
 		if message.RecipientPushToken == nil || *message.RecipientPushToken == "" {
 			return fmt.Errorf("recipient push token is required for push notification")
 		}

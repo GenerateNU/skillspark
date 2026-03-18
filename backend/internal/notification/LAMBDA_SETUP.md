@@ -20,7 +20,7 @@ The Lambda function will receive SQS messages with the following JSON structure 
 
 ```json
 {
-  "notification_type": "email" | "push" | "both",
+  "notification_type": "email" | "push",
   "recipient_email": "user@example.com" (optional),
   "recipient_push_token": "ExponentPushToken[...]" (optional),
   "subject": "Email subject" (optional, for email notifications),
@@ -38,7 +38,6 @@ The Lambda function should:
 3. Based on `notification_type`:
    - **"email"**: Send email via Resend API
    - **"push"**: Send push notification via Expo Push Notification API
-   - **"both"**: Send both email and push notification
 4. Handle errors appropriately:
    - Log errors for debugging
    - Use SQS dead-letter queue for failed messages
@@ -99,10 +98,10 @@ def lambda_handler(event, context):
             message_body = json.loads(record['body'])
             notification_type = message_body['notification_type']
             
-            if notification_type in ['email', 'both']:
+            if notification_type == 'email':
                 send_email_via_resend(message_body)
             
-            if notification_type in ['push', 'both']:
+            if notification_type == 'push':
                 send_push_via_expo(message_body)
                 
         except Exception as e:

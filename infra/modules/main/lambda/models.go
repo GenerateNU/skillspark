@@ -11,7 +11,6 @@ type NotificationType string
 const (
 	NotificationTypeEmail NotificationType = "email"
 	NotificationTypePush  NotificationType = "push"
-	NotificationTypeBoth  NotificationType = "both"
 )
 
 // NotificationMessage represents the payload structure sent to SQS

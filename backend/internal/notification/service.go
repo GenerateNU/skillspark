@@ -72,13 +72,6 @@ func validateNotificationInput(notificationType models.NotificationType, email *
 		if pushToken == nil || *pushToken == "" {
 			return fmt.Errorf("recipient_push_token is required for push notifications")
 		}
-	case models.NotificationTypeBoth:
-		if email == nil || *email == "" {
-			return fmt.Errorf("recipient_email is required for email notifications")
-		}
-		if pushToken == nil || *pushToken == "" {
-			return fmt.Errorf("recipient_push_token is required for push notifications")
-		}
 	default:
 		return fmt.Errorf("invalid notification_type: %s", notificationType)
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	notificationmocks "skillspark/internal/notification/mocks"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	stripemocks "skillspark/internal/stripeClient/mocks"
 	"testing"
@@ -396,7 +397,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 	tests := []struct {
 		name      string
 		input     *models.CreateRegistrationInput
-		mockSetup func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient)
+		mockSetup func(*repomocks.MockRegistrationRepository, *repomocks.MockChildRepository, *repomocks.MockGuardianRepository, *repomocks.MockEventOccurrenceRepository, *repomocks.MockOrganizationRepository, *stripemocks.MockStripeClient, *notificationmocks.MockNotificationService)
 		wantErr   bool
 	}{
 		{
@@ -411,7 +412,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.PaymentMethodID = &paymentMethodID
 				return i
 			}(),
-			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
+			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
@@ -467,6 +468,9 @@ func TestHandler_CreateRegistration(t *testing.T) {
 							PaymentIntentStatus:   "requires_capture",
 						},
 					}, nil)
+
+				ns.On("SendNotification", mock.Anything, mock.AnythingOfType("*models.SendNotificationInput")).
+					Return(nil)
 			},
 			wantErr: false,
 		},
@@ -481,7 +485,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.Status = models.RegistrationStatusRegistered
 				return i
 			}(),
-			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
+			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, invalidEventOccurrenceID, mock.Anything).
 					Return(nil, &errs.HTTPError{
 						Code:    errs.NotFound("EventOccurrence", "id", invalidEventOccurrenceID.String()).Code,
@@ -501,7 +505,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.Status = models.RegistrationStatusRegistered
 				return i
 			}(),
-			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
+			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
@@ -524,7 +528,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.Status = models.RegistrationStatusRegistered
 				return i
 			}(),
-			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
+			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
@@ -550,7 +554,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.Status = models.RegistrationStatusRegistered
 				return i
 			}(),
-			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
+			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
@@ -571,7 +575,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.PaymentMethodID = &paymentMethodID
 				return i
 			}(),
-			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
+			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
@@ -595,7 +599,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.PaymentMethodID = &paymentMethodID
 				return i
 			}(),
-			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
+			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(&models.EventOccurrence{
 						ID:           eventOccurrenceID,
@@ -625,7 +629,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.PaymentMethodID = &paymentMethodID
 				return i
 			}(),
-			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
+			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(&models.EventOccurrence{
 						ID:           eventOccurrenceID,
@@ -655,9 +659,10 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			mockEORepo := new(repomocks.MockEventOccurrenceRepository)
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockStripeClient := new(stripemocks.MockStripeClient)
-			tt.mockSetup(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient)
+			mockNotifService := new(notificationmocks.MockNotificationService)
+			tt.mockSetup(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient, mockNotifService)
 
-			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient, nil)
+			handler := NewHandler(mockRegRepo, mockChildRepo, mockGuardianRepo, mockEORepo, mockOrgRepo, mockStripeClient, mockNotifService)
 			ctx := context.Background()
 
 			registration, err := handler.CreateRegistration(ctx, tt.input)
@@ -679,6 +684,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			mockEORepo.AssertExpectations(t)
 			mockOrgRepo.AssertExpectations(t)
 			mockStripeClient.AssertExpectations(t)
+			mockNotifService.AssertExpectations(t)
 		})
 	}
 }

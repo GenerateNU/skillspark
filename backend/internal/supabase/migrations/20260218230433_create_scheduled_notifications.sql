@@ -1,5 +1,5 @@
 -- Create notification type enum
-CREATE TYPE notification_type AS ENUM ('email', 'push', 'both');
+CREATE TYPE notification_type AS ENUM ('email', 'push');
 
 -- Create notification status enum
 CREATE TYPE notification_status AS ENUM ('pending', 'sent', 'failed');

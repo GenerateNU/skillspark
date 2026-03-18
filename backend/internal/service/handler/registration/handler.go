@@ -13,12 +13,12 @@ type Handler struct {
 	ChildRepository           storage.ChildRepository
 	OrganizationRepository    storage.OrganizationRepository
 	StripeClient 			  stripeClient.StripeClientInterface
-	NotificationService       *notification.Service
+	NotificationService       notification.NotificationServiceInterface
 }
 
-func NewHandler(registrationRepo storage.RegistrationRepository, childRepo storage.ChildRepository, 
-	guardianRepo storage.GuardianRepository, eventOccurrenceRepo storage.EventOccurrenceRepository, 
-	organizationRepo storage.OrganizationRepository, sc stripeClient.StripeClientInterface, notifService *notification.Service) *Handler {
+func NewHandler(registrationRepo storage.RegistrationRepository, childRepo storage.ChildRepository,
+	guardianRepo storage.GuardianRepository, eventOccurrenceRepo storage.EventOccurrenceRepository,
+	organizationRepo storage.OrganizationRepository, sc stripeClient.StripeClientInterface, notifService notification.NotificationServiceInterface) *Handler {
 	return &Handler{
 		RegistrationRepository:    registrationRepo,
 		ChildRepository:           childRepo,
