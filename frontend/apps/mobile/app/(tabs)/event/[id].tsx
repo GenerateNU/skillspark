@@ -4,8 +4,10 @@ import {
   Pressable,
   ScrollView,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
+import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetEventOccurrencesById } from "@skillspark/api-client";
@@ -44,6 +46,8 @@ function BookmarkIcon() {
 function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [descriptionTruncated, setDescriptionTruncated] = useState(false);
   const duration = formatDuration(occurrence.start_time, occurrence.end_time);
   const address = formatAddress(occurrence);
 
@@ -79,8 +83,9 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
           ) : (
             <View style={{ flex: 1, backgroundColor: "#C5C5C5" }} />
           )}
-          <Pressable
+          <TouchableOpacity
             onPress={() => router.navigate('/')}
+            activeOpacity={0.7}
             style={{
               position: "absolute",
               top: 16,
@@ -100,7 +105,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
           >
             <MaterialIcons name="chevron-left" size={20} color={AppColors.primaryText} />
             <Text style={{ fontSize: 15, color: AppColors.primaryText, fontWeight: "500" }}>Back</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
         <View
           style={{
@@ -159,15 +164,28 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
             <StarRating size={17} />
           </View>
           <Text
+            numberOfLines={descriptionExpanded ? undefined : 5}
+            onTextLayout={(e) => {
+              if (!descriptionExpanded) {
+                setDescriptionTruncated(e.nativeEvent.lines.length >= 5);
+              }
+            }}
             style={{
               fontSize: 14,
               color: AppColors.secondaryText,
               lineHeight: 22,
-              marginBottom: 18,
+              marginBottom: descriptionTruncated ? 4 : 18,
             }}
           >
             {occurrence.event.description}
           </Text>
+          {descriptionTruncated && (
+            <Pressable onPress={() => setDescriptionExpanded((prev) => !prev)} style={{ marginBottom: 14 }}>
+              <Text style={{ fontSize: 13, color: AppColors.primaryText, fontWeight: "600" }}>
+                {descriptionExpanded ? "See less" : "See more"}
+              </Text>
+            </Pressable>
+          )}
           <View
             style={{
               flexDirection: "row",
@@ -192,7 +210,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
               ))}
             </View>
             <View style={{ alignItems: "flex-end", marginLeft: 14 }}>
-              <Text style={{ fontSize: 20, fontWeight: "700", color: AppColors.primaryText }}>$40.00</Text>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: AppColors.primaryText }}>{occurrence.price / 100} THB</Text>
               <Text style={{ fontSize: 12, color: AppColors.subtleText }}>/Session</Text>
             </View>
           </View>
@@ -280,8 +298,9 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
                 <Text style={{ fontSize: 14, color: AppColors.secondaryText, fontWeight: "500" }}>Location</Text>
               </View>
             </View>
-            <Pressable
+            <TouchableOpacity
               onPress={() => {}}
+              activeOpacity={0.7}
               style={{
                 backgroundColor: AppColors.primaryText,
                 borderRadius: 16,
@@ -290,7 +309,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
               }}
             >
               <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700" }}>Register</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
