@@ -10,37 +10,20 @@ import {
 import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useGetEventOccurrencesById } from "@skillspark/api-client";
+import {
+  useGetEventOccurrencesById,
+} from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { AppColors } from "@/constants/theme";
 import { StarRating } from "@/components/StarRating";
+import { BookmarkButton } from "@/components/BookmarkButton";
 import { formatDuration } from "@/utils/format";
 
 function formatAddress(occurrence: EventOccurrence) {
   const loc = occurrence.location;
   const parts = [loc.address_line1, loc.district].filter(Boolean);
   return parts.join(", ") || "Location";
-}
-
-function BookmarkIcon() {
-  return (
-    <View style={{ alignItems: "center" }}>
-      <View style={{ width: 22, height: 26, backgroundColor: AppColors.primaryText }} />
-      <View
-        style={{
-          width: 0,
-          height: 0,
-          borderLeftWidth: 11,
-          borderRightWidth: 11,
-          borderTopWidth: 9,
-          borderLeftColor: "transparent",
-          borderRightColor: "transparent",
-          borderTopColor: AppColors.primaryText,
-        }}
-      />
-    </View>
-  );
 }
 
 function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) {
@@ -132,8 +115,8 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
               marginBottom: 14,
             }}
           />
-          <View style={{ position: "absolute", left: 20 }}>
-            <BookmarkIcon />
+          <View style={{ position: "absolute", top: -5, left: 10 }}>
+            <BookmarkButton occurrenceId={occurrence.id} />
           </View>
           <Text
             style={{
