@@ -5,6 +5,8 @@ import {
   signupGuardianResponse,
   useLoginGuardian,
   useSignupGuardian,
+  useGetGuardianById,
+  Guardian,
 } from "@skillspark/api-client";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
@@ -13,6 +15,7 @@ import { createContext, useState, useEffect, ReactNode } from "react";
 interface AuthContextType {
   guardianId: string | null;
   jwt: string | null;
+  langPref: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (
@@ -39,22 +42,42 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [guardianId, setGuardianId] = useState<string | null>(null);
   const [jwt, setJWT] = useState<string | null>(null);
+  const [langPref, setLangPref] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { mutate: loginFunc } = useLoginGuardian();
   const { mutate: signupFunc } = useSignupGuardian();
+
+  const { data: guardianData } = useGetGuardianById(guardianId!, {
+    query: {
+      enabled: !!guardianId,
+    }
+  });
 
   useEffect(() => {
     const checkAlreadyAuth = async () => {
       const storedJWT = await SecureStore.getItemAsync("token");
       const storedGuardianId = await SecureStore.getItemAsync("guardian_id");
+      const storedLangPref = await SecureStore.getItemAsync("language_preference");
       if (storedJWT && storedGuardianId) {
         setJWT(storedJWT);
         setGuardianId(storedGuardianId);
+        setLangPref(storedLangPref);
       }
       setIsLoading(false);
     };
     checkAlreadyAuth();
   }, []);
+
+  useEffect(() => {
+    const getUpdatedLangPref = async () => {
+      if (!guardianData) return;
+      const guardian = (guardianData as unknown as { data: Guardian })?.data;
+      const pref = guardian?.language_preference ?? "en"; // default to english
+      await SecureStore.setItemAsync("language_preference", pref);
+      setLangPref(pref);
+    };
+    getUpdatedLangPref();
+  }, [guardianData]);
 
   const login = (
     email: string,
@@ -103,7 +126,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {
         onSuccess: async (resp: signupGuardianResponse) => {
           const success = resp.data as GuardianSignUpOutputBody;
-          console.log(JSON.stringify(resp));
           await SecureStore.setItemAsync("token", success.token);
           setJWT(success.token);
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
@@ -125,14 +147,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setJWT(null);
     await SecureStore.deleteItemAsync("guardian_id");
     setGuardianId(null);
+    await SecureStore.deleteItemAsync("language_preference");
+    setLangPref(null);
     router.replace("/(auth)/login");
   };
 
+  // add update const for changing the guardian
+
   return (
+    <>
     <AuthContext.Provider
       value={{
         guardianId,
         jwt,
+        langPref,
         isAuthenticated: !!(jwt && guardianId),
         isLoading,
         login,
@@ -142,5 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     >
       {children}
     </AuthContext.Provider>
+    {console.log("language: " + langPref)}
+    </>
   );
 }
