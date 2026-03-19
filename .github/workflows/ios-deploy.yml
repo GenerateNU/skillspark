@@ -1,0 +1,11 @@
+name: Deploy IOS (Caller)
+on:
+  push:
+    branches: [prod]
+
+jobs:
+  deploy:
+    uses: GenerateNU/shiperate/.github/workflows/ios-deploy.yml@main
+    with:
+      env: "node"
+    secrets: inherit
