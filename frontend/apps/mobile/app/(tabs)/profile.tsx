@@ -1,13 +1,13 @@
-import React from 'react';
-import { View, ScrollView, ActivityIndicator, useColorScheme } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { FamilyCard } from '@/components/FamilyCard';
+import { ListItem } from '@/components/ListItem';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useGetGuardianById, useGetChildrenByGuardianId } from '@skillspark/api-client';
-import { FamilyCard } from '@/components/FamilyCard';
-import { ListItem } from '@/components/ListItem';
+import { useGetChildrenByGuardianId, useGetGuardianById } from '@skillspark/api-client';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { ActivityIndicator, ScrollView, useColorScheme, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
 
@@ -81,7 +81,7 @@ export default function ProfileScreen() {
           >
             <ListItem label="Upcoming" />
             <ListItem label="Previous" />
-            <ListItem label="Saved" isLast />
+            <ListItem label="Saved" isLast onPress={() => router.push('/saved')} />
           </View>
         </View>
         <View className="px-5 mb-4">
