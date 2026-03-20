@@ -17,6 +17,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCreateChild, useUpdateChild, useDeleteChild, getGetChildrenByGuardianIdQueryKey } from '@skillspark/api-client';
 import { ChildProfileForm, MONTHS } from '@/components/ChildProfileForm';
+import { useTranslation } from 'react-i18next';
 
 // TODO: Replace with authenticated user's guardian ID
 const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
@@ -28,6 +29,7 @@ export default function ManageChildScreen() {
   const insets = useSafeAreaInsets();
   const theme = Colors[colorScheme ?? 'light'];
 
+  const { t } = useTranslation();
   const isEditing = !!params.id;
 
   // Initial State Setup
@@ -68,7 +70,7 @@ export default function ManageChildScreen() {
 
   const handleSave = async () => {
     if (!firstName || !birthYear || !birthMonth || !schoolId) {
-      Alert.alert('Error', 'Please fill in all required fields (Name, Birth Date, School ID)');
+      Alert.alert(t('common.error'), t('childProfile.requiredFieldsError'));
       return;
     }
     const name = [firstName, lastName].filter(Boolean).join(' ');
@@ -91,7 +93,7 @@ export default function ManageChildScreen() {
       router.back();
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to save. Please try again.');
+      Alert.alert(t('common.errorOccurred'), t('childProfile.saveError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -99,12 +101,12 @@ export default function ManageChildScreen() {
 
   const handleDelete = () => {
     Alert.alert(
-      'Delete Profile',
-      'Are you sure you want to remove this child profile?',
+      t('childProfile.deleteProfile'),
+      t('childProfile.deleteConfirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete', style: 'destructive',
+          text: t('payment.delete'), style: 'destructive',
           onPress: async () => {
             setIsSubmitting(true);
             try {
@@ -112,7 +114,7 @@ export default function ManageChildScreen() {
               await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(GUARDIAN_ID) });
               router.back();
             } catch {
-              Alert.alert('Error', 'Failed to delete.');
+              Alert.alert(t('common.errorOccurred'), t('childProfile.deleteError'));
               setIsSubmitting(false);
             }
           }
@@ -134,17 +136,17 @@ export default function ManageChildScreen() {
             <TouchableOpacity onPress={() => router.back()} className="w-8 h-8 justify-center items-start">
               <IconSymbol name="chevron.left" size={24} color={theme.text} />
             </TouchableOpacity>
-            <ThemedText className="text-xl text-center font-nunito-bold">Family Information</ThemedText>
+            <ThemedText className="text-xl text-center font-nunito-bold">{t('familyInformation.title')}</ThemedText>
             {isEditing ? (
               <TouchableOpacity onPress={handleDelete}>
-                <ThemedText className="font-nunito-semibold" style={{ color: AppColors.danger }}>Delete</ThemedText>
+                <ThemedText className="font-nunito-semibold" style={{ color: AppColors.danger }}>{t('payment.delete')}</ThemedText>
               </TouchableOpacity>
             ) : (
               <View className="w-10" />
             )}
           </View>
           <ThemedText className="text-[22px] font-nunito-semibold mb-5">
-            {isEditing ? 'Edit Child Profile' : 'Create Child Profile'}
+            {isEditing ? t('childProfile.editTitle') : t('childProfile.createTitle')}
           </ThemedText>
           <ChildProfileForm
             firstName={firstName}
@@ -173,7 +175,7 @@ export default function ManageChildScreen() {
             disabled={isSubmitting}
           >
             <ThemedText className="text-white text-base font-nunito-semibold">
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
+              {isSubmitting ? t('childProfile.saving') : t('childProfile.saveChanges')}
             </ThemedText>
           </TouchableOpacity>
 

@@ -5,25 +5,20 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useGetChildrenByGuardianId, useGetGuardianById } from '@skillspark/api-client';
 import { Colors, AppColors } from '@/constants/theme';
 import { ChildListItem } from '@/components/ChildListItem';
 import { SectionHeader } from '@/components/SectionHeader';
-
-// TODO: Replace with authenticated user's guardian ID
-const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
+import { useTranslation } from 'react-i18next';
+import { useGuardian } from '@/hooks/use-guardian';
 
 export default function FamilyListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
+  const { t } = useTranslation();
 
-  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(GUARDIAN_ID);
-  const { data: childrenResponse, isLoading: childrenLoading } = useGetChildrenByGuardianId(GUARDIAN_ID);
-
-  const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
-  const children = childrenResponse?.status === 200 ? childrenResponse.data : [];
+  const { guardian, children, isLoading } = useGuardian();
 
   const handleAddChild = () => {
     router.push('/family/manage');
@@ -43,7 +38,7 @@ export default function FamilyListScreen() {
     });
   };
 
-  if (guardianLoading || childrenLoading) {
+  if (isLoading) {
     return (
       <ThemedView className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
@@ -61,7 +56,7 @@ export default function FamilyListScreen() {
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText className="text-xl text-center font-nunito-bold">Family Information</ThemedText>
+        <ThemedText className="text-xl text-center font-nunito-bold">{t('familyInformation.title')}</ThemedText>
         <View className="w-10" />
       </View>
 
@@ -78,12 +73,12 @@ export default function FamilyListScreen() {
         </TouchableOpacity>
         <View className="h-px my-3" style={{ backgroundColor: AppColors.divider }} />
         <SectionHeader
-          title="Child Profile"
-          actionLabel="add profile +"
+          title={t('familyInformation.childProfile')}
+          actionLabel={t('familyInformation.addProfile')}
           onAction={handleAddChild}
         />
         {children.length === 0 && (
-          <ThemedText className="text-sm pb-4 font-nunito" style={{ color: AppColors.subtleText }}>No child profiles added yet.</ThemedText>
+          <ThemedText className="text-sm pb-4 font-nunito" style={{ color: AppColors.subtleText }}>{t('common.noChildProfilesAdded')}</ThemedText>
         )}
         {children.map((child: any, idx: number) => (
           <React.Fragment key={child.id}>
@@ -96,8 +91,8 @@ export default function FamilyListScreen() {
         ))}
         <View className="h-px my-3" style={{ backgroundColor: AppColors.divider }} />
         <SectionHeader
-          title="Emergency Contact"
-          actionLabel="add contact +"
+          title={t('familyInformation.emergencyContact')}
+          actionLabel={t('familyInformation.addContact')}
           onAction={() => {}}
         />
         {/* TODO: Replace with real emergency contact data from API */}

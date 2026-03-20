@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors, AppColors, TAG_COLORS } from '@/constants/theme';
 import { SchoolPicker } from '@/components/SchoolPicker';
+import { useTranslation } from 'react-i18next';
 
 const INTEREST_OPTIONS = [
   'science', 'math', 'music', 'art', 'sports', 'technology', 'language', 'other',
@@ -52,6 +53,7 @@ export function ChildProfileForm({
 }: ChildProfileFormProps) {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
+  const { t } = useTranslation();
 
   const removeInterest = (tag: string) => setInterests(prev => prev.filter(i => i !== tag));
 
@@ -72,7 +74,7 @@ export function ChildProfileForm({
         style={{ backgroundColor: theme.inputBg, color: theme.text }}
         value={firstName}
         onChangeText={setFirstName}
-        placeholder="First Name"
+        placeholder={t('childProfile.firstName')}
         placeholderTextColor={AppColors.placeholderText}
       />
       <TextInput
@@ -80,7 +82,7 @@ export function ChildProfileForm({
         style={{ backgroundColor: theme.inputBg, color: theme.text }}
         value={lastName}
         onChangeText={setLastName}
-        placeholder="Last Name"
+        placeholder={t('childProfile.lastName')}
         placeholderTextColor={AppColors.placeholderText}
       />
       <View className="flex-row gap-3 mb-6" style={{ zIndex: 10 }}>
@@ -91,7 +93,7 @@ export function ChildProfileForm({
             onPress={() => { setShowMonthDrop(!showMonthDrop); setShowYearDrop(false); }}
           >
             <ThemedText className={birthMonth ? '' : 'font-nunito'} style={birthMonth ? {} : { color: AppColors.placeholderText }}>
-              {birthMonth || 'Month'}
+              {birthMonth || t('childProfile.month')}
             </ThemedText>
             <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
           </TouchableOpacity>
@@ -123,7 +125,7 @@ export function ChildProfileForm({
             onPress={() => { setShowYearDrop(!showYearDrop); setShowMonthDrop(false); }}
           >
             <ThemedText className={birthYear ? '' : 'font-nunito'} style={birthYear ? {} : { color: AppColors.placeholderText }}>
-              {birthYear || 'Year'}
+              {birthYear || t('childProfile.year')}
             </ThemedText>
             <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
           </TouchableOpacity>
@@ -150,7 +152,7 @@ export function ChildProfileForm({
         </View>
       </View>
       <SchoolPicker value={schoolId} onChange={setSchoolId} />
-      <ThemedText className="text-base font-nunito-semibold mb-3">Interests</ThemedText>
+      <ThemedText className="text-base font-nunito-semibold mb-3">{t('familyInformation.interests')}</ThemedText>
       {interests.length > 0 && (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3" contentContainerStyle={{ gap: 8, paddingRight: 4 }}>
           {interests.map((tag, idx) => {
@@ -163,7 +165,7 @@ export function ChildProfileForm({
                 onPress={() => removeInterest(tag)}
               >
                 <IconSymbol name="camera.filters" size={13} color={color.border} />
-                <ThemedText className="text-xs font-nunito-medium" style={{ color: color.text }}>{capitalize(tag)}</ThemedText>
+                <ThemedText className="text-xs font-nunito-medium" style={{ color: color.text }}>{t(`interests.${tag}`, { defaultValue: capitalize(tag) })}</ThemedText>
               </TouchableOpacity>
             );
           })}
@@ -176,7 +178,7 @@ export function ChildProfileForm({
             style={{ color: theme.text }}
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder="Search interests..."
+            placeholder={t('childProfile.searchInterests')}
             placeholderTextColor={AppColors.placeholderText}
           />
           <IconSymbol name="magnifyingglass" size={20} color={AppColors.mutedText} />
@@ -191,7 +193,7 @@ export function ChildProfileForm({
                 style={{ borderBottomColor: theme.inputBg }}
                 onPress={() => toggleInterest(item)}
               >
-                <ThemedText className="text-base font-nunito">{capitalize(item)}</ThemedText>
+                <ThemedText className="text-base font-nunito">{t(`interests.${item}`, { defaultValue: capitalize(item) })}</ThemedText>
                 <View
                   className="w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center"
                   style={{ borderColor: interests.includes(item) ? AppColors.checkboxSelected : AppColors.subtleText }}
