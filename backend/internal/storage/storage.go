@@ -9,9 +9,11 @@ import (
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
+	notification "skillspark/internal/storage/postgres/schema/notification"
 	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/review"
+	"skillspark/internal/storage/postgres/schema/saved"
 	"skillspark/internal/storage/postgres/schema/school"
 	"skillspark/internal/storage/postgres/schema/user"
 	"skillspark/internal/utils"
@@ -119,6 +121,18 @@ type UserRepository interface {
 	DeleteUser(ctx context.Context, id uuid.UUID) (*models.User, error)
 }
 
+type NotificationRepository interface {
+	CreateScheduledNotification(ctx context.Context, input *models.CreateScheduledNotificationInput) (*models.Notification, error)
+	GetPendingNotifications(ctx context.Context) ([]models.Notification, error)
+	UpdateNotificationStatus(ctx context.Context, id uuid.UUID, status models.NotificationStatus) (*models.Notification, error)
+}
+
+type SavedRepository interface {
+	CreateSaved(ctx context.Context, saved *models.CreateSavedInput) (*models.Saved, error)
+	DeleteSaved(ctx context.Context, id uuid.UUID) error
+	GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination) ([]models.Saved, error)
+}
+
 type Repository struct {
 	db              *pgxpool.Pool
 	Location        LocationRepository
@@ -132,6 +146,8 @@ type Repository struct {
 	Registration    RegistrationRepository
 	Review          ReviewRepository
 	User            UserRepository
+	Notification    NotificationRepository
+	Saved           SavedRepository
 }
 
 // Close closes the database connection pool
@@ -160,5 +176,7 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		User:            user.NewUserRepository(db),
 		Registration:    registration.NewRegistrationRepository(db),
 		Review:          review.NewReviewRepository(db),
+		Notification:    notification.NewNotificationRepository(db),
+		Saved:           saved.NewSavedRepository(db),
 	}
 }
