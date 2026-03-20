@@ -25,15 +25,13 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  CancelRegistrationOutputBody,
   CreateRegistrationInputBody,
   ErrorModel,
   GetRegistrationsByChildIDOutputBody,
   GetRegistrationsByEventOccurrenceIDOutputBody,
   GetRegistrationsByGuardianIDOutputBody,
   Registration,
-  UpdateRegistrationInputBody,
-  UpdateRegistrationPaymentStatusInputBody
+  UpdateRegistrationInputBody
 } from '../skillSparkAPI.schemas';
 
 import { customInstance } from '../../apiClient';
@@ -287,7 +285,7 @@ export function useGetRegistrationById<TData = Awaited<ReturnType<typeof getRegi
 
 
 /**
- * Update the child associated with a registration
+ * Update an existing registration's details
  * @summary Update a registration
  */
 export type updateRegistrationResponse200 = {
@@ -376,186 +374,6 @@ export const useUpdateRegistration = <TError = ErrorModel,
         TContext
       > => {
       return useMutation(getUpdateRegistrationMutationOptions(options), queryClient);
-    }
-    /**
- * Cancel a registration and process refund if applicable
- * @summary Cancel a registration
- */
-export type cancelRegistrationResponse200 = {
-  data: CancelRegistrationOutputBody
-  status: 200
-}
-
-export type cancelRegistrationResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type cancelRegistrationResponseSuccess = (cancelRegistrationResponse200) & {
-  headers: Headers;
-};
-export type cancelRegistrationResponseError = (cancelRegistrationResponseDefault) & {
-  headers: Headers;
-};
-
-export type cancelRegistrationResponse = (cancelRegistrationResponseSuccess | cancelRegistrationResponseError)
-
-export const getCancelRegistrationUrl = (id: string,) => {
-
-
-  
-
-  return `/api/v1/registrations/${id}/cancel`
-}
-
-export const cancelRegistration = async (id: string, options?: RequestInit): Promise<cancelRegistrationResponse> => {
-  
-  return customInstance<cancelRegistrationResponse>(getCancelRegistrationUrl(id),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-
-
-
-
-export const getCancelRegistrationMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelRegistration>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof cancelRegistration>>, TError,{id: string}, TContext> => {
-
-const mutationKey = ['cancelRegistration'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelRegistration>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  cancelRegistration(id,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CancelRegistrationMutationResult = NonNullable<Awaited<ReturnType<typeof cancelRegistration>>>
-    
-    export type CancelRegistrationMutationError = ErrorModel
-
-    /**
- * @summary Cancel a registration
- */
-export const useCancelRegistration = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelRegistration>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof cancelRegistration>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
-      return useMutation(getCancelRegistrationMutationOptions(options), queryClient);
-    }
-    /**
- * Update the payment intent status for a registration (typically called by webhooks)
- * @summary Update registration payment status
- */
-export type updateRegistrationPaymentStatusResponse200 = {
-  data: Registration
-  status: 200
-}
-
-export type updateRegistrationPaymentStatusResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type updateRegistrationPaymentStatusResponseSuccess = (updateRegistrationPaymentStatusResponse200) & {
-  headers: Headers;
-};
-export type updateRegistrationPaymentStatusResponseError = (updateRegistrationPaymentStatusResponseDefault) & {
-  headers: Headers;
-};
-
-export type updateRegistrationPaymentStatusResponse = (updateRegistrationPaymentStatusResponseSuccess | updateRegistrationPaymentStatusResponseError)
-
-export const getUpdateRegistrationPaymentStatusUrl = (id: string,) => {
-
-
-  
-
-  return `/api/v1/registrations/${id}/payment-status`
-}
-
-export const updateRegistrationPaymentStatus = async (id: string,
-    updateRegistrationPaymentStatusInputBody: NonReadonly<UpdateRegistrationPaymentStatusInputBody>, options?: RequestInit): Promise<updateRegistrationPaymentStatusResponse> => {
-  
-  return customInstance<updateRegistrationPaymentStatusResponse>(getUpdateRegistrationPaymentStatusUrl(id),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      updateRegistrationPaymentStatusInputBody,)
-  }
-);}
-
-
-
-
-export const getUpdateRegistrationPaymentStatusMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRegistrationPaymentStatus>>, TError,{id: string;data: NonReadonly<UpdateRegistrationPaymentStatusInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateRegistrationPaymentStatus>>, TError,{id: string;data: NonReadonly<UpdateRegistrationPaymentStatusInputBody>}, TContext> => {
-
-const mutationKey = ['updateRegistrationPaymentStatus'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateRegistrationPaymentStatus>>, {id: string;data: NonReadonly<UpdateRegistrationPaymentStatusInputBody>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  updateRegistrationPaymentStatus(id,data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateRegistrationPaymentStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateRegistrationPaymentStatus>>>
-    export type UpdateRegistrationPaymentStatusMutationBody = NonReadonly<UpdateRegistrationPaymentStatusInputBody>
-    export type UpdateRegistrationPaymentStatusMutationError = ErrorModel
-
-    /**
- * @summary Update registration payment status
- */
-export const useUpdateRegistrationPaymentStatus = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRegistrationPaymentStatus>>, TError,{id: string;data: NonReadonly<UpdateRegistrationPaymentStatusInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updateRegistrationPaymentStatus>>,
-        TError,
-        {id: string;data: NonReadonly<UpdateRegistrationPaymentStatusInputBody>},
-        TContext
-      > => {
-      return useMutation(getUpdateRegistrationPaymentStatusMutationOptions(options), queryClient);
     }
     /**
  * Retrieve all registrations for a specific child
