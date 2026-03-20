@@ -1839,8 +1839,8 @@ paths:
     post:
       tags:
         - Saved
-      summary: Creates a saved event occurrence
-      description: Creates a saved event occurrence
+      summary: Creates a saved event
+      description: Creates a saved event
       operationId: create-saved
       requestBody:
         content:
@@ -1866,7 +1866,7 @@ paths:
       tags:
         - Saved
       summary: Get saved by guardian ID
-      description: Returns all saved event occurrences with the given guardian ID
+      description: Returns all saved events with the given guardian ID
       operationId: get-saved-by-guardian-id
       parameters:
         - name: id
@@ -2565,15 +2565,15 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateSavedInputBody.json
           readOnly: true
-        event_occurrence_id:
+        event_id:
           type: string
-          description: ID of the event occurrence of this saved event.
+          description: ID of this saved event.
         guardian_id:
           type: string
           description: ID of the guardian that saved this.
       required:
         - guardian_id
-        - event_occurrence_id
+        - event_id
     CreateSetupIntentOutputBody:
       type: object
       additionalProperties: false
@@ -3527,8 +3527,8 @@ components:
         created_at:
           type: string
           format: date-time
-        event_occurrence_id:
-          type: string
+        event:
+          $ref: '#/components/schemas/Event'
         guardian_id:
           type: string
         id:
@@ -3539,7 +3539,7 @@ components:
       required:
         - id
         - guardian_id
-        - event_occurrence_id
+        - event
         - created_at
         - updated_at
     School:

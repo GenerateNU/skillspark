@@ -20,7 +20,7 @@ func SetUpSavedRoutes(api huma.API, repo *storage.Repository) {
 		Method:      http.MethodGet,
 		Path:        "/api/v1/saved/{id}",
 		Summary:     "Get saved by guardian ID",
-		Description: "Returns all saved event occurrences with the given guardian ID",
+		Description: "Returns all saved events with the given guardian ID",
 		Tags:        []string{"Saved"},
 	}, func(ctx context.Context, input *models.GetSavedInput) (*models.GetSavedOutput, error) {
 
@@ -74,8 +74,8 @@ func SetUpSavedRoutes(api huma.API, repo *storage.Repository) {
 		OperationID: "create-saved",
 		Method:      http.MethodPost,
 		Path:        "/api/v1/saved",
-		Summary:     "Creates a saved event occurrence",
-		Description: "Creates a saved event occurrence",
+		Summary:     "Creates a saved event",
+		Description: "Creates a saved event",
 		Tags:        []string{"Saved"},
 	}, func(ctx context.Context, input *models.CreateSavedInput) (*models.CreateSavedOutput, error) {
 
