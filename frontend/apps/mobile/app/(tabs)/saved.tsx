@@ -55,10 +55,10 @@ export default function SavedScreen() {
     const savedEvents: Saved[] = response.status === 200 && Array.isArray(response.data)
     ? response.data
     : [];
-    
+
     const handleDeleteSaved = (savedId: string) => {
       Alert.alert(
-        'Delete Profile',
+        'Delete saved event',
         'Are you sure you want remove this saved event?',
         [
           { text: 'Cancel', style: 'cancel' },
