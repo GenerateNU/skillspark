@@ -12,5 +12,5 @@ func (h *Handler) DeleteSaved(ctx context.Context, input *models.DeleteSavedInpu
 	if httpErr != nil {
 		return "", httpErr.(*errs.HTTPError)
 	}
-	return "Review successfully deleted.", nil
+	return "Saved successfully deleted.", nil
 }

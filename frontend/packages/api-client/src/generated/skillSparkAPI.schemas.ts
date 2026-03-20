@@ -300,27 +300,19 @@ export interface CreateReviewInputBody {
   registration_id: string;
 }
 
-export interface CreateSetupIntentOutputBody {
+export interface CreateSavedInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** Stripe SetupIntent client_secret for frontend */
-  client_secret: string;
-}
-
-export interface CreateStripeOnboardingLinkInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** URL to redirect if onboarding is exited early */
-  refresh_url: string;
-  /** URL to redirect after successful onboarding */
-  return_url: string;
-}
-
-export interface CreateStripeOnboardingLinkOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** Stripe-hosted onboarding page URL */
-  onboarding_url: string;
+  /** User email address */
+  email: string;
+  /** Full name (optional) */
+  full_name?: string;
+  /**
+   * Username
+   * @minLength 3
+   * @maxLength 50
+   */
+  username: string;
 }
 
 export interface DeleteEventOutputBody {
@@ -331,6 +323,13 @@ export interface DeleteEventOutputBody {
 }
 
 export interface DeleteReviewOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Success message */
+  message: string;
+}
+
+export interface DeleteSavedOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   /** Success message */
@@ -475,6 +474,7 @@ export interface Guardian {
   auth_id: string;
   created_at: string;
   email: string;
+  expo_push_token: string;
   id: string;
   language_preference: string;
   name: string;
@@ -620,6 +620,16 @@ export interface Review {
   updated_at: string;
 }
 
+export interface Saved {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  created_at: string;
+  event: Event;
+  guardian_id: string;
+  id: string;
+  updated_at: string;
+}
+
 export interface School {
   created_at: string;
   id: string;
@@ -706,6 +716,8 @@ export interface UpdateGuardianInputBody {
   readonly $schema?: string;
   /** Email of the guardian */
   email: string;
+  /** Expo push notification token */
+  expo_push_token?: string;
   /** Language preference */
   language_preference: string;
   /** Name of the guardian */
@@ -873,6 +885,20 @@ page_size?: number;
 };
 
 export type GetReviewByGuardianIdParams = {
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+};
+
+export type GetSavedByGuardianIdParams = {
 /**
  * Page number (starts at 1)
  * @minimum 1

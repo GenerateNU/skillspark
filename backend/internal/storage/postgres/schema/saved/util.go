@@ -4,7 +4,7 @@ import (
 	"context"
 	"embed"
 	"skillspark/internal/models"
-	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
+	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"testing"
 
@@ -25,11 +25,11 @@ func CreateTestSaved(
 
 	repo := NewSavedRepository(db)
 
-	e := eventoccurrence.CreateTestEventOccurrence(t, ctx, db)
+	e := event.CreateTestEvent(t, ctx, db)
 	g := guardian.CreateTestGuardian(t, ctx, db)
 
 	input := &models.CreateSavedInput{}
-	input.Body.EventOccurrenceID = e.ID
+	input.Body.EventID = e.ID
 	input.Body.GuardianID = g.ID
 
 	c, err := repo.CreateSaved(ctx, input)
