@@ -75,8 +75,8 @@ export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatus
 
 
 /**
- * Creates a saved event occurrence
- * @summary Creates a saved event occurrence
+ * Creates a saved event
+ * @summary Creates a saved event
  */
 export type createSavedResponse200 = {
   data: Saved
@@ -152,7 +152,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CreateSavedMutationError = ErrorModel
 
     /**
- * @summary Creates a saved event occurrence
+ * @summary Creates a saved event
  */
 export const useCreateSaved = <TError = ErrorModel,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSaved>>, TError,{data: NonReadonly<CreateSavedInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
@@ -165,7 +165,7 @@ export const useCreateSaved = <TError = ErrorModel,
       return useMutation(getCreateSavedMutationOptions(options), queryClient);
     }
     /**
- * Returns all saved event occurrences with the given guardian ID
+ * Returns all saved events with the given guardian ID
  * @summary Get saved by guardian ID
  */
 export type getSavedByGuardianIdResponse200 = {

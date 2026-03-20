@@ -303,8 +303,8 @@ export interface CreateReviewInputBody {
 export interface CreateSavedInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** ID of the event occurrence of this saved event. */
-  event_occurrence_id: string;
+  /** ID of this saved event. */
+  event_id: string;
   /** ID of the guardian that saved this. */
   guardian_id: string;
 }
@@ -330,21 +330,6 @@ export interface CreateStripeOnboardingLinkOutputBody {
   readonly $schema?: string;
   /** Stripe-hosted onboarding page URL */
   onboarding_url: string;
-}
-
-export interface CreateUserInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** User email address */
-  email: string;
-  /** Full name (optional) */
-  full_name?: string;
-  /**
-   * Username
-   * @minLength 3
-   * @maxLength 50
-   */
-  username: string;
 }
 
 export interface DeleteEventOutputBody {
@@ -460,15 +445,6 @@ export interface EventOccurrence {
   updated_at: string;
 }
 
-export interface GetGreetingOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** Greeting message */
-  message: string;
-  /** Server timestamp */
-  timestamp: string;
-}
-
 export interface PaymentMethodCard {
   brand: string;
   exp_month: number;
@@ -515,6 +491,7 @@ export interface Guardian {
   auth_id: string;
   created_at: string;
   email: string;
+  expo_push_token: string;
   id: string;
   language_preference: string;
   name: string;
@@ -556,19 +533,6 @@ export interface HealthOutputBody {
   status: string;
   /** API version */
   version: string;
-}
-
-export interface Item {
-  email: string;
-  id: string;
-  username: string;
-}
-
-export interface ListUsersOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  total: number;
-  users: Item[];
 }
 
 export interface LoginInputBody {
@@ -675,7 +639,7 @@ export interface Saved {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   created_at: string;
-  event_occurrence_id: string;
+  event: Event;
   guardian_id: string;
   id: string;
   updated_at: string;
@@ -767,6 +731,8 @@ export interface UpdateGuardianInputBody {
   readonly $schema?: string;
   /** Email of the guardian */
   email: string;
+  /** Expo push notification token */
+  expo_push_token?: string;
   /** Language preference */
   language_preference: string;
   /** Name of the guardian */
@@ -806,19 +772,6 @@ export interface UpdateRegistrationPaymentStatusInputBody {
   readonly $schema?: string;
   /** New payment intent status from Stripe */
   payment_intent_status: string;
-}
-
-export interface UserOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** User email */
-  email: string;
-  /** Full name */
-  full_name?: string;
-  /** User ID */
-  id: string;
-  /** Username */
-  username: string;
 }
 
 export type GetAllEventOccurrencesParams = {

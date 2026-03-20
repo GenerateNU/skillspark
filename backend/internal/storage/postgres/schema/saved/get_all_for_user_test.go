@@ -3,7 +3,7 @@ package saved
 import (
 	"context"
 	"skillspark/internal/models"
-	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
+	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/testutil"
 	"skillspark/internal/utils"
@@ -24,18 +24,18 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 	var expectedSaved []*models.Saved
 	expectedSaved = append(expectedSaved, firstSaved)
 
-	firstEO := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
-	secondEO := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	firstEvent := event.CreateTestEvent(t, ctx, testDB)
+	secondEvent := event.CreateTestEvent(t, ctx, testDB)
 
-	eventOccurrences := []*models.EventOccurrence{
-		firstEO,
-		secondEO,
+	events := []*models.Event{
+		firstEvent,
+		secondEvent,
 	}
 
 	for i := 0; i < 2; i++ {
 
 		input := &models.CreateSavedInput{}
-		input.Body.EventOccurrenceID = eventOccurrences[i].ID
+		input.Body.EventID = events[i].ID
 		input.Body.GuardianID = firstSaved.GuardianID
 
 		r, err := repo.CreateSaved(ctx, input)
