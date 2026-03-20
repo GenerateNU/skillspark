@@ -79,8 +79,6 @@ export default function ProfileScreen() {
             className="rounded-xl overflow-hidden border"
             style={{ backgroundColor: listBackgroundColor, borderColor }}
           >
-            <ListItem label="Upcoming" />
-            <ListItem label="Previous" />
             <ListItem label="Saved" isLast onPress={() => router.push('/saved')}/>
           </View>
         </View>

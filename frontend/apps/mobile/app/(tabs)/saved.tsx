@@ -7,7 +7,7 @@ import { getGetSavedByGuardianIdQueryKey, Saved, useDeleteSaved, useGetSavedByGu
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, FlatList, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, TouchableOpacity, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
@@ -55,21 +55,32 @@ export default function SavedScreen() {
     const savedEvents: Saved[] = response.status === 200 && Array.isArray(response.data)
     ? response.data
     : [];
-
+    
     const handleDeleteSaved = (savedId: string) => {
-        deleteSavedMutation.mutate(
-        { id: savedId }, 
-        {
-            onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: getGetSavedByGuardianIdQueryKey(GUARDIAN_ID)
-            });
-            },
-            onError: (err) => console.error('Failed to delete saved event', err),
-        }
-        );
+      Alert.alert(
+        'Delete Profile',
+        'Are you sure you want remove this saved event?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete', style: 'destructive',
+            onPress: async () => {
+              deleteSavedMutation.mutate(
+              { id: savedId }, 
+              {
+                  onSuccess: () => {
+                  queryClient.invalidateQueries({
+                      queryKey: getGetSavedByGuardianIdQueryKey(GUARDIAN_ID)
+                  });
+                  },
+                  onError: (err) => console.error('Failed to delete saved event', err),
+              }
+              );
+            }
+          }
+        ]
+      );
     };
-
 
     return (
         <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>

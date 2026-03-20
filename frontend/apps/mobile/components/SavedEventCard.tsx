@@ -2,6 +2,7 @@ import { Event } from "@skillspark/api-client";
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
+import { AppColors, TAG_COLORS } from "@/constants/theme";
 import { Ionicons } from '@expo/vector-icons';
 
 
@@ -33,7 +34,7 @@ export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) 
         marginHorizontal: 20,
         marginBottom: 12,
         flexDirection: 'row',
-        backgroundColor: '#99C0EE4D',
+        backgroundColor: AppColors.savedBackground,
         borderRadius: 12,
         padding: 16,
         height: 150,
@@ -54,7 +55,7 @@ export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) 
           marginRight: 16,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#E5E7EB',
+          backgroundColor: AppColors.divider,
         }}
       >
         {event.presigned_url && (
@@ -82,7 +83,7 @@ export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) 
               <View
                 key={cat}
                 style={{
-                  backgroundColor: '#0E9888',
+                  backgroundColor: TAG_COLORS[0].bg,
                   paddingHorizontal: 10,
                   paddingVertical: 4,
                   borderRadius: 999,
@@ -90,7 +91,7 @@ export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) 
                   marginBottom: 4,
                 }}
               >
-                <Text style={{ fontSize: 12, color: '#FFFFFF', fontWeight: '500' }}>
+                <Text style={{ fontSize: 12, color: TAG_COLORS[0].text, fontWeight: '500' }}>
                   {cat}
                 </Text>
               </View>
@@ -98,17 +99,6 @@ export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) 
           </View>
         )}
 
-        {event.description && (
-          <Text style={{ fontSize: 14, color: '#555', marginTop: 6 }} numberOfLines={2}>
-            {event.description}
-          </Text>
-        )}
-
-        {event.age_range_min != null && (
-          <Text style={{ fontSize: 12, color: '#777', marginTop: 4 }}>
-            🧑 {event.age_range_min}{event.age_range_max != null ? `–${event.age_range_max}` : ''}+
-          </Text>
-        )}
       </View>
     </View>
   );
