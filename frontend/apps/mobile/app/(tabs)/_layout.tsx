@@ -46,6 +46,7 @@ export default function TabLayout() {
       <Tabs.Screen name="settings" options={{ href: null }} />
       <Tabs.Screen name="language" options={{ href: null }} />
       <Tabs.Screen name="payment" options={{ href: null }} />
+      <Tabs.Screen name="saved" options={{ href: null }} />
     </Tabs>
   );
 }

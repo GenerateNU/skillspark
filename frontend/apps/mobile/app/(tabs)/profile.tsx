@@ -81,7 +81,7 @@ export default function ProfileScreen() {
           >
             <ListItem label="Upcoming" />
             <ListItem label="Previous" />
-            <ListItem label="Saved" isLast />
+            <ListItem label="Saved" isLast onPress={}/>
           </View>
         </View>
         <View className="px-5 mb-4">
