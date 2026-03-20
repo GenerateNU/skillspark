@@ -3,7 +3,7 @@ import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 import { AppColors, TAG_COLORS } from "@/constants/theme";
-import { Ionicons } from '@expo/vector-icons';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 
 
 interface BookmarkIconProps {
@@ -13,10 +13,10 @@ interface BookmarkIconProps {
 export function BookmarkIcon({ onPress }: BookmarkIconProps) {
   return (
     <TouchableOpacity onPress={onPress}>
-      <Ionicons 
-        name="bookmark" 
-        size={24} 
-        color="#FFC107" 
+      <IconSymbol
+        name="bookmark.fill"
+        size={24}
+        color="#FFC107"
       />
     </TouchableOpacity>
   );

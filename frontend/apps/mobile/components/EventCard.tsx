@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, View, TouchableOpacity, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
@@ -40,7 +40,7 @@ export function EventCard({ pin }: EventCardProps) {
           className="mr-[15px] h-[90px] w-[90px] items-center justify-center rounded-[10px]"
           style={{ backgroundColor: placeholderColor }}
         >
-           <Ionicons name="image-outline" size={28} color="#888" />
+           <IconSymbol name="photo" size={28} color="#888" />
         </View>
         <View className="flex-1 justify-center">
           <ThemedText type="subtitle" className="mb-1 font-bold">{pin.title}</ThemedText>
@@ -48,11 +48,11 @@ export function EventCard({ pin }: EventCardProps) {
           
           <View className="mb-2 flex-row items-center">
             {[1, 2, 3, 4, 5].map((star) => (
-              <Ionicons 
-                key={star} 
-                name="star" 
-                size={16} 
-                color={star <= Math.round(pin.rating) ? "#FFC107" : "#555"} 
+              <IconSymbol
+                key={star}
+                name="star.fill"
+                size={16}
+                color={star <= Math.round(pin.rating) ? "#FFC107" : "#555"}
               />
             ))}
           </View>
@@ -62,7 +62,7 @@ export function EventCard({ pin }: EventCardProps) {
           </ThemedText>
         </View>
         <View className="ml-[10px] mt-[5px] items-end justify-start">
-            <Ionicons name="radio-button-on" size={24} color="#888" />
+            <IconSymbol name="record.circle" size={24} color="#888" />
         </View>
       </View>
       <TouchableOpacity 
