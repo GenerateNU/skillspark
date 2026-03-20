@@ -155,7 +155,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // add update const for changing the guardian
 
   return (
-    <>
     <AuthContext.Provider
       value={{
         guardianId,
@@ -170,7 +169,5 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     >
       {children}
     </AuthContext.Provider>
-    {console.log("language: " + langPref)}
-    </>
   );
 }
