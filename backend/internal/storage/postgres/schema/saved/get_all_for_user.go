@@ -8,7 +8,6 @@ import (
 	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 )
 
 func (r *SavedRepository) GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination) ([]models.Saved, error) {
@@ -33,10 +32,58 @@ func (r *SavedRepository) GetByGuardianID(ctx context.Context, user_id uuid.UUID
 	}
 	defer rows.Close()
 
-	saved, err := pgx.CollectRows(rows, pgx.RowToStructByName[models.Saved])
-	if err != nil {
-		err := errs.InternalServerError("Failed to scan all event occurrences: ", err.Error())
+	saved := []models.Saved{}
+
+	for rows.Next() {
+		var s models.Saved
+
+		var titleEN, descriptionEN string
+		var titleTH, descriptionTH *string
+
+		err := rows.Scan(
+			&s.ID,
+			&s.GuardianID,
+			&s.CreatedAt,
+			&s.UpdatedAt,
+
+			&s.Event.ID,
+			&titleEN,
+			&titleTH,
+			&descriptionEN,
+			&descriptionTH,
+			&s.Event.OrganizationID,
+			&s.Event.AgeRangeMin,
+			&s.Event.AgeRangeMax,
+			&s.Event.Category,
+			&s.Event.HeaderImageS3Key,
+			&s.Event.CreatedAt,
+			&s.Event.UpdatedAt,
+		)
+		if err != nil {
+			err := errs.InternalServerError("Failed to scan all event occurrences: ", err.Error())
+			return nil, &err
+		}
+
+		switch language {
+		case "th-TH":
+			if titleTH != nil {
+				s.Event.Title = *titleTH
+			}
+			if descriptionTH != nil {
+				s.Event.Description = *descriptionTH
+			}
+		case "en-US":
+			s.Event.Title = titleEN
+			s.Event.Description = descriptionEN
+		}
+
+		saved = append(saved, s)
+	}
+
+	if err := rows.Err(); err != nil {
+		err := errs.InternalServerError("Rows iteration error: ", err.Error())
 		return nil, &err
 	}
+
 	return saved, nil
 }
