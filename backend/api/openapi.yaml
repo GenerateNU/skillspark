@@ -323,11 +323,6 @@ paths:
           schema:
             type: integer
             format: int64
-        - name: price
-          in: query
-          explode: false
-          schema:
-            type: string
         - name: min_duration
           in: query
           explode: false

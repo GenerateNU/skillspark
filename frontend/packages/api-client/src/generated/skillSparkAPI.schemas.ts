@@ -303,16 +303,33 @@ export interface CreateReviewInputBody {
 export interface CreateSavedInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** User email address */
-  email: string;
-  /** Full name (optional) */
-  full_name?: string;
-  /**
-   * Username
-   * @minLength 3
-   * @maxLength 50
-   */
-  username: string;
+  /** ID of this saved event. */
+  event_id: string;
+  /** ID of the guardian that saved this. */
+  guardian_id: string;
+}
+
+export interface CreateSetupIntentOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe SetupIntent client_secret for frontend */
+  client_secret: string;
+}
+
+export interface CreateStripeOnboardingLinkInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** URL to redirect if onboarding is exited early */
+  refresh_url: string;
+  /** URL to redirect after successful onboarding */
+  return_url: string;
+}
+
+export interface CreateStripeOnboardingLinkOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe-hosted onboarding page URL */
+  onboarding_url: string;
 }
 
 export interface DeleteEventOutputBody {
@@ -775,7 +792,6 @@ lng?: string;
 radius_km?: number;
 min_price?: number;
 max_price?: number;
-price?: string;
 min_duration?: number;
 max_duration?: number;
 min_age?: number;
