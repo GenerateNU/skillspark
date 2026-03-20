@@ -1,21 +1,113 @@
-import React from 'react';
-import { View, ScrollView, ActivityIndicator, useColorScheme } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { SavedEventCard } from '@/components/SavedEventCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useGetGuardianById, useGetChildrenByGuardianId } from '@skillspark/api-client';
-import { FamilyCard } from '@/components/FamilyCard';
-import { ListItem } from '@/components/ListItem';
+import { Colors } from '@/constants/theme';
+import { getGetSavedByGuardianIdQueryKey, Saved, useDeleteSaved, useGetSavedByGuardianId } from '@skillspark/api-client';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { ActivityIndicator, FlatList, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
-const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
+const GUARDIAN_ID = '55555555-5555-5555-5555-555555555555';
+
 
 export default function SavedScreen() {
-  const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const router = useRouter();
 
-  const { data: savedResponse, isLoading: savedLoading } =
+    const insets = useSafeAreaInsets();
+    const colorScheme = useColorScheme();
+    const router = useRouter();
+    const theme = Colors[colorScheme ?? 'light'];
+
+    const queryClient = useQueryClient();
+
+    const { data: response, isLoading, error } = useGetSavedByGuardianId(GUARDIAN_ID);
+    const deleteSavedMutation  = useDeleteSaved();
+
+    if (isLoading) {
+        return (
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 8 }}>
+            <ActivityIndicator size="large" />
+            <ThemedText>Loading events...</ThemedText>
+        </View>
+        );
+    }
+
+    if (error) {
+        return (
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <ThemedText style={{ color: "#EF4444", fontWeight: "600" }}>Error loading events</ThemedText>
+            <ThemedText>{error.detail || "An error occurred"}</ThemedText>
+        </View>
+        );
+    }
+
+    if (!response || !Array.isArray(response.data)) {
+        return (
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <ThemedText>No events available</ThemedText>
+        </View>
+        );
+    }
+
+    const savedEvents: Saved[] = response.status === 200 && Array.isArray(response.data)
+    ? response.data
+    : [];
+
+    const handleDeleteSaved = (savedId: string) => {
+        deleteSavedMutation.mutate(
+        { id: savedId }, 
+        {
+            onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: getGetSavedByGuardianIdQueryKey(GUARDIAN_ID)
+            });
+            },
+            onError: (err) => console.error('Failed to delete saved event', err),
+        }
+        );
+    };
+
+
+    return (
+        <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+      <View className="flex-row items-center justify-between px-5 py-[14px]">
+        <TouchableOpacity
+          onPress={() => router.navigate('/profile')}
+          className="w-10 justify-center items-start"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <IconSymbol name="chevron.left" size={24} color={theme.text} />
+        </TouchableOpacity>
+        <ThemedText className="text-xl text-center font-nunito-bold">Saved</ThemedText>
+        <View className="w-10" />
+      </View>
+        <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+    {savedEvents.length === 0 ? (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+        <ThemedText className="text-center text-lg text-gray-500">
+          You have no saved events.
+        </ThemedText>
+      </View>
+    ) : (
+      <FlatList
+        data={savedEvents} // Saved[] array
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <SavedEventCard
+            event={item.event} // Event object inside Saved
+            onBookmarkPress={() => handleDeleteSaved(item.id)} // Saved.id
+          />
+        )}
+        contentContainerStyle={{ paddingTop: 10, paddingBottom: 20 }}
+        showsVerticalScrollIndicator={false}
+      />
+    )}
+  </ThemedView>
+    </ThemedView>
+
+    )
+
 } 
