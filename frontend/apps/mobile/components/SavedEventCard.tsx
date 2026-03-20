@@ -76,6 +76,28 @@ export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) 
           </View>
         </View>
 
+        {event.category && event.category.length > 0 && (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 }}>
+            {event.category.map((cat: string) => (
+              <View
+                key={cat}
+                style={{
+                  backgroundColor: '#0E9888',
+                  paddingHorizontal: 10,
+                  paddingVertical: 4,
+                  borderRadius: 999,
+                  marginRight: 6,
+                  marginBottom: 4,
+                }}
+              >
+                <Text style={{ fontSize: 12, color: '#FFFFFF', fontWeight: '500' }}>
+                  {cat}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
         {event.description && (
           <Text style={{ fontSize: 14, color: '#555', marginTop: 6 }} numberOfLines={2}>
             {event.description}
