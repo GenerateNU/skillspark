@@ -193,7 +193,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
               ))}
             </View>
             <View style={{ alignItems: "flex-end", marginLeft: 14 }}>
-              <Text style={{ fontSize: 20, fontWeight: "700", color: AppColors.primaryText }}>{occurrence.price / 100} THB</Text>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: AppColors.primaryText }}>{occurrence.price} THB</Text>
               <Text style={{ fontSize: 12, color: AppColors.subtleText }}>/Session</Text>
             </View>
           </View>
