@@ -1,3 +1,5 @@
+import { AppColors, Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { useState } from "react";
 import { View, Text, TouchableOpacity, Modal, ViewStyle } from "react-native";
 
@@ -17,26 +19,17 @@ interface DropdownProps {
 export const Dropdown = ({ value, onChange, options, placeholder, style }: DropdownProps) => {
   const [isOpen, setOpen] = useState(false);
   const selected = options.find(o => o.value === value);
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
 
   return (
     <>
       <TouchableOpacity
         onPress={() => setOpen(true)}
-        style={[
-          {
-            width: "100%",
-            borderWidth: 1,
-            borderColor: "#d1d5db",
-            borderRadius: 8,
-            padding: 10,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          },
-          style,
-        ]}
+        className="w-full flex-row justify-between items-center rounded-lg p-[10px]"
+        style={[{ borderWidth: 1, borderColor: colors.borderColor }, style]}
       >
-        <Text style={{ fontSize: 16, color: "#9ca3af" }}>
+        <Text className="text-base" style={{ color: AppColors.placeholderText }}>
           {selected ? selected.label : placeholder}
         </Text>
         <Text style={{ color: "#9ca3af" }}>▼</Text>
@@ -44,10 +37,14 @@ export const Dropdown = ({ value, onChange, options, placeholder, style }: Dropd
 
       <Modal visible={isOpen} transparent animationType="fade">
         <TouchableOpacity
-          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.1)", justifyContent: "center", padding: 24 }}
+          className="flex-1 justify-center p-6"
+          style={{ backgroundColor: "rgba(0,0,0,0.1)" }}
           onPress={() => setOpen(false)}
         >
-          <View style={{ backgroundColor: "white", borderRadius: 8, overflow: "hidden" }}>
+          <View 
+            className="rounded-lg overflow-hidden"
+            style={{ backgroundColor: colors.dropdownBg }}
+          >
             {options.map(option => (
               <TouchableOpacity
                 key={option.value}
@@ -55,14 +52,14 @@ export const Dropdown = ({ value, onChange, options, placeholder, style }: Dropd
                   onChange(option.value);
                   setOpen(false);
                 }}
+                className="p-4"
                 style={{
-                  padding: 16,
                   borderBottomWidth: 1,
-                  borderBottomColor: "#f3f4f6",
-                  backgroundColor: "white",
+                  borderBottomColor: colors.borderColor,
+                  backgroundColor: colors.dropdownBg,
                 }}
               >
-                <Text style={{ fontSize: 16, color: "#000" }}>
+                <Text className="text-base" style={{ color: colors.text }}>
                   {option.label}
                 </Text>
               </TouchableOpacity>

@@ -1,3 +1,4 @@
+import { AppColors } from "@/constants/theme";
 import { TouchableOpacity, Text } from "react-native";
 
 interface PageRedirectButtonProps {
@@ -11,16 +12,11 @@ export const PageRedirectButton = ({
 }: PageRedirectButtonProps) => {
   return (
     <TouchableOpacity
-      style={{
-        borderRadius: 8,
-        padding: 10,
-        width: "100%",
-        alignItems: "center",
-      }}
+      className="rounded-lg p-[10px] w-full items-center"
       onPress={onPress}
       activeOpacity={0.5}
     >
-      <Text style={{ color: "#3b82f6", fontSize: 16, fontWeight: "500" }}>
+      <Text className="text-base font-medium" style={{ color: AppColors.primaryBlue }}>
         {label}
       </Text>
     </TouchableOpacity>

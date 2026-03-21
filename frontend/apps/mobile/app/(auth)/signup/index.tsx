@@ -63,21 +63,16 @@ export default function SignupScreen() {
 
   return (
     <ThemedView
-      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      className="flex-1 items-center justify-center"
     >
       <ThemedText
         type="title"
-        style={{ fontSize: 30, fontWeight: "bold", marginBottom: 30 }}
+        className="text-3xl font-bold mb-8"
       >
         Sign Up
       </ThemedText>
       <View
-        style={{
-          width: "100%",
-          paddingHorizontal: 24,
-          gap: 16,
-          alignItems: "center",
-        }}
+        className="w-full px-6 gap-4 items-center"
       >
         <AuthFormInput
           control={control}

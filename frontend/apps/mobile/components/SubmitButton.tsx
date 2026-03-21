@@ -1,3 +1,4 @@
+import { AppColors } from "@/constants/theme";
 import { TouchableOpacity, Text } from "react-native";
 
 interface SubmitButtonProps {
@@ -8,17 +9,11 @@ interface SubmitButtonProps {
 export const SubmitButton = ({ label, onPress }: SubmitButtonProps) => {
   return (
     <TouchableOpacity
-      style={{
-        backgroundColor: "#3b82f6",
-        borderRadius: 8,
-        padding: 10,
-        width: "100%",
-        alignItems: "center",
-      }}
+      className="rounded-lg p-[10px] w-full items-center" style={{ backgroundColor: AppColors.primaryBlue }}
       onPress={onPress}
       activeOpacity={0.5}
     >
-      <Text style={{ color: "white", fontSize: 16, fontWeight: "500" }}>
+      <Text className="text-base font-medium text-white">
         {label}
       </Text>
     </TouchableOpacity>

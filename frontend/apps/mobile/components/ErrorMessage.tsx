@@ -1,3 +1,4 @@
+import { AppColors } from "@/constants/theme";
 import { Text } from "react-native";
 
 interface ErrorMessageProps {
@@ -6,7 +7,7 @@ interface ErrorMessageProps {
 
 export const ErrorMessage = ({ message }: ErrorMessageProps) => {
   return (
-    <Text style={{ color: "#ef4444", fontSize: 16, textAlign: "center" }}>
+    <Text className="text-base text-center" style={{ color: AppColors.danger }}>
       {message}
     </Text>
   );
