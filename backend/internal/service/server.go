@@ -78,7 +78,7 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	}))
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000,http://localhost:8080,https://cdn.scalar.com,http://127.0.0.1:8080",
+		AllowOrigins:     "http://localhost:3000,http://localhost:8080,https://cdn.scalar.com,http://127.0.0.1:8080,http://localhost",
 		AllowMethods:     "GET,POST,PUT,PATCH,DELETE,OPTIONS",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
@@ -99,6 +99,8 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	// Register public routes BEFORE auth middleware
 	routes.SetupAuthRoutes(humaAPI, repo, config)
+	routes.SetupOrganizationRoutes(humaAPI, repo, s3Client)
+	routes.SetupManagerRoutes(humaAPI, repo, config)
 
 	// Apply auth middleware — only affects routes registered after this point
 	if !config.TestMode {
@@ -128,10 +130,10 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface) {
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo)
-	routes.SetupOrganizationRoutes(api, repo, s3Client)
+	// routes.SetupOrganizationRoutes(api, repo, s3Client)
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
-	routes.SetupManagerRoutes(api, repo, config)
+	// routes.SetupManagerRoutes(api, repo, config)
 	routes.SetupRegistrationRoutes(api, repo, sc)
 	routes.SetupGuardiansRoutes(api, repo, sc, config)
 	routes.SetupChildRoutes(api, repo)
