@@ -20,8 +20,12 @@ export default function ProfileScreen() {
 
   const { guardianId } = useAuthContext();
 
-  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(guardianId as string);
-  const { data: childrenResponse, isLoading: familyLoading } = useGetChildrenByGuardianId(guardianId as string);
+  if (!guardianId) {
+    // error state
+  }
+
+  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(guardianId);
+  const { data: childrenResponse, isLoading: familyLoading } = useGetChildrenByGuardianId(guardianId);
   const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
   const children = childrenResponse?.status === 200 ? childrenResponse.data : [];
 
