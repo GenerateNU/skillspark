@@ -46,6 +46,7 @@ export const AppColors = {
   starFilled: '#FBBF24',
   checkboxSelected: '#1F2937',
   placeholderText: '#9CA3AF',
+  savedBackground: "#99C0EE4D",
 };
 
 /** Tag color palette shared across interest tag components */

@@ -33,6 +33,11 @@ const MAPPING = {
   'magnifyingglass': 'search',
   'checkmark.circle.fill': 'check-circle',
   'circle': 'radio-button-unchecked',
+  'star.fill': 'star',
+  'bookmark': 'bookmark',
+  'bookmark.fill': 'bookmark',
+  'location.fill': 'place',
+  'record.circle': 'radio-button-on',
 } as IconMapping;
 
 /**

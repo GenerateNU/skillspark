@@ -1777,6 +1777,33 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/review/event_aggregate/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get review aggregate by event id
+      description: Get review aggregate by event id
+      operationId: get-review-aggregate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Aggregate review data including breakdown by rating, total reviews, and average rating
+                $ref: '#/components/schemas/ReviewAggregate'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/review/guardian/{id}:
     get:
       tags:
@@ -2546,6 +2573,10 @@ components:
         guardian_id:
           type: string
           description: ID of the guardian
+        rating:
+          type: integer
+          description: Rating left with the review, can be 1-5 inclusive
+          format: int64
         registration_id:
           type: string
           description: ID of the linked registration
@@ -2554,6 +2585,7 @@ components:
         - guardian_id
         - description
         - categories
+        - rating
     CreateSavedInputBody:
       type: object
       additionalProperties: false
@@ -3497,12 +3529,19 @@ components:
         description:
           type: string
           description: The review text
+        event_id:
+          type: string
+          description: ID of the event
         guardian_id:
           type: string
           description: ID of the guardian
         id:
           type: string
           description: Unique review identifier
+        rating:
+          type: integer
+          description: Rating left with the review, can be 1-5 inclusive
+          format: int64
         registration_id:
           type: string
           description: ID of the linked registration
@@ -3514,10 +3553,53 @@ components:
         - id
         - registration_id
         - guardian_id
+        - event_id
         - description
         - categories
+        - rating
         - created_at
         - updated_at
+    ReviewAggregate:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ReviewAggregate.json
+          readOnly: true
+        average_rating:
+          type: number
+          format: double
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewRatingCount'
+        event_id:
+          type: string
+        total_reviews:
+          type: integer
+          format: int64
+      required:
+        - event_id
+        - total_reviews
+        - average_rating
+        - breakdown
+    ReviewRatingCount:
+      type: object
+      additionalProperties: false
+      properties:
+        rating:
+          type: integer
+          format: int64
+        review_count:
+          type: integer
+          format: int64
+      required:
+        - rating
+        - review_count
     Saved:
       type: object
       additionalProperties: false
