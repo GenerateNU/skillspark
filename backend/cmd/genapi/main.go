@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"skillspark/internal/config"
+	notifications "skillspark/internal/notification"
 	"skillspark/internal/s3_client"
 	"skillspark/internal/service"
 	"skillspark/internal/storage"
@@ -29,6 +30,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to create S3 Client: %v\n", err)
 	}
 
+	notificationsService := notifications.NewService(nil, nil)
 	translateClient := translations.NewClient(nil)
 	newStripeClient, err := stripeClient.NewStripeClient("")
 	if err != nil {
@@ -36,7 +38,7 @@ func main() {
 	}
 
 	// Initialize app to get Huma API
-	_, humaAPI := service.SetupApp(cfg, repo, s3Client, translateClient, newStripeClient)
+	_, humaAPI := service.SetupApp(cfg, repo, s3Client, translateClient, newStripeClient, *notificationsService)
 
 	// Get OpenAPI spec
 	openAPI := humaAPI.OpenAPI()

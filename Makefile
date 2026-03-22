@@ -3,7 +3,8 @@
         up down stop restart logs build clean \
         up-backend up-frontend logs-backend logs-frontend \
         build-backend build-frontend shell-backend shell-frontend setup-hooks generate-api \
-        clean-node-modules
+        clean-node-modules \
+        up-localstack up-backend-localstack logs-localstack 
 
 # Default target - show help
 .DEFAULT_GOAL := help
@@ -64,6 +65,10 @@ help:
 	@echo ""
 	@echo "$(BLUE)Dependencies:$(NC)"
 	@echo "  make clean-node-modules - Remove all node_modules and reinstall dependencies"
+	@echo "$(BLUE)LocalStack (local AWS emulation):$(NC)"
+	@echo "  make up-localstack          - Start all services + LocalStack"
+	@echo "  make up-backend-localstack  - Start only backend + LocalStack"
+	@echo "  make logs-localstack        - View LocalStack logs"
 	@echo ""
 ifeq ($(OS),Windows_NT)
 	@echo "$(YELLOW)Note: On Windows, hot reload uses 'docker watch' in a separate terminal$(NC)"
@@ -253,3 +258,39 @@ clean-node-modules:
 		(cd "$$dir" && bun install) || true; \
 	done
 	@echo "$(GREEN)All dependencies reinstalled$(NC)"
+# ------------------------
+# LocalStack
+# ------------------------
+up-localstack:
+	@echo "$(BOLD)Building Lambda binary for LocalStack...$(NC)"
+	@docker run --rm \
+		-v "$(CURDIR)/infra/modules/main/lambda:/src:ro" \
+		-v "$(CURDIR)/scripts/build-lambda-local.sh:/build.sh:ro" \
+		-v "$(CURDIR)/infra/modules/main:/output" \
+		golang:1.24-alpine sh /build.sh
+	@echo "$(BOLD)Starting all services with LocalStack...$(NC)"
+ifeq ($(OS),Windows_NT)
+	@$(DOCKER_COMPOSE) --profile localstack up --build
+else
+	@$(DOCKER_COMPOSE) --profile localstack up --build $(WATCH_FLAG)
+endif
+
+up-backend-localstack:
+	@echo "$(BOLD)Cleaning up stale containers and networks...$(NC)"
+	@$(DOCKER_COMPOSE) --profile localstack down --remove-orphans 2>/dev/null || true
+	@echo "$(BOLD)Building Lambda binary for LocalStack...$(NC)"
+	@docker run --rm \
+		-v "$(CURDIR)/infra/modules/main/lambda:/src:ro" \
+		-v "$(CURDIR)/scripts/build-lambda-local.sh:/build.sh:ro" \
+		-v "$(CURDIR)/infra/modules/main:/output" \
+		golang:1.24-alpine sh /build.sh
+	@echo "$(BOLD)Starting backend + LocalStack...$(NC)"
+ifeq ($(OS),Windows_NT)
+	@$(DOCKER_COMPOSE) --profile localstack up --build backend localstack
+else
+	@$(DOCKER_COMPOSE) --profile localstack up --build $(WATCH_FLAG) backend localstack
+endif
+
+logs-localstack:
+	@echo "$(BOLD)Viewing LocalStack logs (Ctrl+C to exit)...$(NC)"
+	@$(DOCKER_COMPOSE) logs -f localstack

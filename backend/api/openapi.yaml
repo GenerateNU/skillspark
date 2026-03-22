@@ -762,35 +762,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
-  /api/v1/greet/{name}:
-    get:
-      tags:
-        - Examples
-      summary: Get a greeting
-      description: Returns a personalized greeting message
-      operationId: get-greeting
-      parameters:
-        - name: name
-          in: path
-          description: Name to greet
-          required: true
-          schema:
-            type: string
-            description: Name to greet
-            maxLength: 30
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetGreetingOutputBody'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
   /api/v1/guardians/{guardian_id}/payment-methods:
     get:
       tags:
@@ -1873,8 +1844,8 @@ paths:
     post:
       tags:
         - Saved
-      summary: Creates a saved event occurrence
-      description: Creates a saved event occurrence
+      summary: Creates a saved event
+      description: Creates a saved event
       operationId: create-saved
       requestBody:
         content:
@@ -1900,7 +1871,7 @@ paths:
       tags:
         - Saved
       summary: Get saved by guardian ID
-      description: Returns all saved event occurrences with the given guardian ID
+      description: Returns all saved events with the given guardian ID
       operationId: get-saved-by-guardian-id
       parameters:
         - name: id
@@ -2187,102 +2158,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateSetupIntentOutputBody'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
-  /api/v1/users:
-    get:
-      tags:
-        - Users
-      summary: List all users
-      description: Returns a list of all registered users
-      operationId: list-users
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListUsersOutputBody'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
-    post:
-      tags:
-        - Users
-      summary: Create a new user
-      description: Creates a new user account with the provided information
-      operationId: create-user
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateUserInputBody'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserOutputBody'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
-  /api/v1/users/{id}:
-    get:
-      tags:
-        - Users
-      summary: Get user by ID
-      description: Returns a single user by their ID
-      operationId: get-user
-      parameters:
-        - name: id
-          in: path
-          description: User ID
-          required: true
-          schema:
-            type: string
-            description: User ID
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserOutputBody'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
-    delete:
-      tags:
-        - Users
-      summary: Delete a user
-      description: Deletes a user account by ID
-      operationId: delete-user
-      parameters:
-        - name: id
-          in: path
-          description: User ID to delete
-          required: true
-          schema:
-            type: string
-            description: User ID to delete
-      responses:
-        "204":
-          description: No Content
         default:
           description: Error
           content:
@@ -2695,15 +2570,15 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateSavedInputBody.json
           readOnly: true
-        event_occurrence_id:
+        event_id:
           type: string
-          description: ID of the event occurrence of this saved event.
+          description: ID of this saved event.
         guardian_id:
           type: string
           description: ID of the guardian that saved this.
       required:
         - guardian_id
-        - event_occurrence_id
+        - event_id
     CreateSetupIntentOutputBody:
       type: object
       additionalProperties: false
@@ -2756,32 +2631,6 @@ components:
           description: Stripe-hosted onboarding page URL
       required:
         - onboarding_url
-    CreateUserInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/CreateUserInputBody.json
-          readOnly: true
-        email:
-          type: string
-          description: User email address
-          format: email
-        full_name:
-          type: string
-          description: Full name (optional)
-        username:
-          type: string
-          description: Username
-          minLength: 3
-          maxLength: 50
-      required:
-        - email
-        - username
     DeleteEventOutputBody:
       type: object
       additionalProperties: false
@@ -3005,26 +2854,6 @@ components:
         - created_at
         - updated_at
         - status
-    GetGreetingOutputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/GetGreetingOutputBody.json
-          readOnly: true
-        message:
-          type: string
-          description: Greeting message
-        timestamp:
-          type: string
-          description: Server timestamp
-      required:
-        - message
-        - timestamp
     GetPaymentMethodsByGuardianIDOutputBody:
       type: object
       additionalProperties: false
@@ -3114,6 +2943,8 @@ components:
           format: date-time
         email:
           type: string
+        expo_push_token:
+          type: string
         id:
           type: string
         language_preference:
@@ -3140,6 +2971,7 @@ components:
         - profile_picture_s3_key
         - language_preference
         - auth_id
+        - expo_push_token
         - created_at
         - updated_at
     GuardianLoginOutputBody:
@@ -3229,41 +3061,6 @@ components:
       required:
         - status
         - version
-    Item:
-      type: object
-      additionalProperties: false
-      properties:
-        email:
-          type: string
-        id:
-          type: string
-        username:
-          type: string
-      required:
-        - id
-        - email
-        - username
-    ListUsersOutputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/ListUsersOutputBody.json
-          readOnly: true
-        total:
-          type: integer
-          format: int64
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/Item'
-      required:
-        - users
-        - total
     Location:
       type: object
       additionalProperties: false
@@ -3733,8 +3530,8 @@ components:
         created_at:
           type: string
           format: date-time
-        event_occurrence_id:
-          type: string
+        event:
+          $ref: '#/components/schemas/Event'
         guardian_id:
           type: string
         id:
@@ -3745,7 +3542,7 @@ components:
       required:
         - id
         - guardian_id
-        - event_occurrence_id
+        - event
         - created_at
         - updated_at
     School:
@@ -3878,6 +3675,9 @@ components:
         email:
           type: string
           description: Email of the guardian
+        expo_push_token:
+          type: string
+          description: Expo push notification token
         language_preference:
           type: string
           description: Language preference
@@ -3940,30 +3740,3 @@ components:
           description: New payment intent status from Stripe
       required:
         - payment_intent_status
-    UserOutputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/UserOutputBody.json
-          readOnly: true
-        email:
-          type: string
-          description: User email
-        full_name:
-          type: string
-          description: Full name
-        id:
-          type: string
-          description: User ID
-        username:
-          type: string
-          description: Username
-      required:
-        - id
-        - email
-        - username

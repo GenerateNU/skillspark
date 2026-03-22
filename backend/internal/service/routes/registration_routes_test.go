@@ -38,7 +38,7 @@ func setupRegistrationTestAPI(
 		EventOccurrence: eventOccurrenceRepo,
 		Organization:    organizationRepo,
 	}
-	SetupRegistrationRoutes(api, repo, stripeClient)
+	SetupRegistrationRoutes(api, repo, stripeClient, nil)
 	return app, api
 }
 

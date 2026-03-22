@@ -248,9 +248,9 @@ export interface Organization {
   location_id?: string;
   name: string;
   pfp_s3_key?: string;
-  presigned_url?: string;
+  presigned_url: string;
   stripe_account_activated: boolean;
-  stripe_account_id?: string;
+  stripe_account_id: string;
   updated_at: string;
 }
 
@@ -332,19 +332,68 @@ export interface CreateStripeOnboardingLinkOutputBody {
   onboarding_url: string;
 }
 
-export interface CreateUserInputBody {
+export interface CreateSavedInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** User email address */
-  email: string;
-  /** Full name (optional) */
-  full_name?: string;
-  /**
-   * Username
-   * @minLength 3
-   * @maxLength 50
-   */
-  username: string;
+  /** ID of the event occurrence of this saved event. */
+  event_occurrence_id: string;
+  /** ID of the guardian that saved this. */
+  guardian_id: string;
+}
+
+export interface CreateSetupIntentOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe SetupIntent client_secret for frontend */
+  client_secret: string;
+}
+
+export interface CreateStripeOnboardingLinkInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** URL to redirect if onboarding is exited early */
+  refresh_url: string;
+  /** URL to redirect after successful onboarding */
+  return_url: string;
+}
+
+export interface CreateStripeOnboardingLinkOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe-hosted onboarding page URL */
+  onboarding_url: string;
+}
+
+export interface CreateSavedInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** ID of this saved event. */
+  event_id: string;
+  /** ID of the guardian that saved this. */
+  guardian_id: string;
+}
+
+export interface CreateSetupIntentOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe SetupIntent client_secret for frontend */
+  client_secret: string;
+}
+
+export interface CreateStripeOnboardingLinkInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** URL to redirect if onboarding is exited early */
+  refresh_url: string;
+  /** URL to redirect after successful onboarding */
+  return_url: string;
+}
+
+export interface CreateStripeOnboardingLinkOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe-hosted onboarding page URL */
+  onboarding_url: string;
 }
 
 export interface DeleteEventOutputBody {
@@ -460,15 +509,6 @@ export interface EventOccurrence {
   updated_at: string;
 }
 
-export interface GetGreetingOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** Greeting message */
-  message: string;
-  /** Server timestamp */
-  timestamp: string;
-}
-
 export interface PaymentMethodCard {
   brand: string;
   exp_month: number;
@@ -476,13 +516,18 @@ export interface PaymentMethodCard {
   last4: string;
 }
 
-export interface PaymentMethod {
-  card: PaymentMethodCard;
-  id: string;
-  type: string;
-}
+/**
+ * Current status of the registration
+ */
+export type RegistrationStatus = typeof RegistrationStatus[keyof typeof RegistrationStatus];
 
-export interface GetPaymentMethodsByGuardianIDOutputBody {
+
+export const RegistrationStatus = {
+  registered: 'registered',
+  cancelled: 'cancelled',
+} as const;
+
+export interface Registration {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   payment_methods: PaymentMethod[];
@@ -515,6 +560,7 @@ export interface Guardian {
   auth_id: string;
   created_at: string;
   email: string;
+  expo_push_token: string;
   id: string;
   language_preference: string;
   name: string;
@@ -556,19 +602,6 @@ export interface HealthOutputBody {
   status: string;
   /** API version */
   version: string;
-}
-
-export interface Item {
-  email: string;
-  id: string;
-  username: string;
-}
-
-export interface ListUsersOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  total: number;
-  users: Item[];
 }
 
 export interface LoginInputBody {
@@ -671,16 +704,6 @@ export interface Review {
   updated_at: string;
 }
 
-export interface Saved {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  created_at: string;
-  event_occurrence_id: string;
-  guardian_id: string;
-  id: string;
-  updated_at: string;
-}
-
 export interface School {
   created_at: string;
   id: string;
@@ -767,6 +790,8 @@ export interface UpdateGuardianInputBody {
   readonly $schema?: string;
   /** Email of the guardian */
   email: string;
+  /** Expo push notification token */
+  expo_push_token?: string;
   /** Language preference */
   language_preference: string;
   /** Name of the guardian */
@@ -808,17 +833,11 @@ export interface UpdateRegistrationPaymentStatusInputBody {
   payment_intent_status: string;
 }
 
-export interface UserOutputBody {
+export interface UpdateRegistrationPaymentStatusInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** User email */
-  email: string;
-  /** Full name */
-  full_name?: string;
-  /** User ID */
-  id: string;
-  /** Username */
-  username: string;
+  /** New payment intent status from Stripe */
+  payment_intent_status: string;
 }
 
 export type GetAllEventOccurrencesParams = {
@@ -835,8 +854,6 @@ search?: string;
 lat?: string;
 lng?: string;
 radius_km?: number;
-min_price?: number;
-max_price?: number;
 price?: string;
 min_duration?: number;
 max_duration?: number;

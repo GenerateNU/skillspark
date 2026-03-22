@@ -36,8 +36,6 @@ func main() {
 		}
 	}()
 
-	slog.Info("Cron jobs started")
-
 	port := cfg.Application.Port
 
 	// Listen for connections with a goroutine
@@ -56,10 +54,10 @@ func main() {
 	slog.Info("Shutting down server")
 
 	// Shutdown server with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer shutdownCancel()
 
-	if err := app.Server.ShutdownWithContext(ctx); err != nil {
+	if err := app.Server.ShutdownWithContext(shutdownCtx); err != nil {
 		slog.Error("failed to shutdown server gracefully", "error", err)
 	}
 
