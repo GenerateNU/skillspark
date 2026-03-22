@@ -60,7 +60,7 @@ export default function ProfileScreen() {
               children.map((child: any) => (
                 <FamilyCard
                   key={child.id}
-                  initials={child.name?.charAt(0)}
+                  initials={child.name?.charAt(0) ?? ''}
                   name={child.name}
                   date={translate('profile.born', { year: child.birth_year })}
                   
@@ -77,9 +77,7 @@ export default function ProfileScreen() {
             className="rounded-xl overflow-hidden border"
             style={{ backgroundColor: listBackgroundColor, borderColor }}
           >
-            <ListItem label={translate('profile.upcoming')} />
-            <ListItem label={translate('profile.previous')} />
-            <ListItem label={translate('profile.saved')} isLast />
+            <ListItem label={translate('profile.saved')} isLast onPress={() => router.push('/saved')} />
           </View>
         </View>
         <View className="px-5 mb-4">

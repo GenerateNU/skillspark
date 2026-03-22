@@ -54,7 +54,7 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
             }}
           >
             <IconSymbol
-              name="mappin.fill"
+              name="location.fill"
               size={40}
               color={selectedPin?.id === loc.id ? "#FF4B4B" : "#FF6B6B"}
             />

@@ -64,7 +64,7 @@ export function EventCard({ pin }: EventCardProps) {
           </ThemedText>
         </View>
         <View className="ml-[10px] mt-[5px] items-end justify-start">
-            <IconSymbol name="circle.fill" size={24} color="#888" />
+            <IconSymbol name="record.circle" size={24} color="#888" />
         </View>
       </View>
       <TouchableOpacity 
