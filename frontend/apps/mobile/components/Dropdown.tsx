@@ -26,19 +26,18 @@ export const Dropdown = ({ value, onChange, options, placeholder, style }: Dropd
     <>
       <TouchableOpacity
         onPress={() => setOpen(true)}
-        className="w-full flex-row justify-between items-center rounded-lg p-[10px]"
-        style={[{ borderWidth: 1, borderColor: colors.borderColor }, style]}
+        className="w-full flex-row justify-between items-center rounded-lg p-[10px] border"
+        style={[{ borderColor: colors.borderColor }, style]}
       >
         <Text className="text-base" style={{ color: AppColors.placeholderText }}>
           {selected ? selected.label : placeholder}
         </Text>
-        <Text style={{ color: "#9ca3af" }}>▼</Text>
+        <Text style={{ color: AppColors.placeholderText }}>▼</Text>
       </TouchableOpacity>
 
       <Modal visible={isOpen} transparent animationType="fade">
         <TouchableOpacity
-          className="flex-1 justify-center p-6"
-          style={{ backgroundColor: "rgba(0,0,0,0.1)" }}
+          className="flex-1 justify-center p-6 bg-black/10"
           onPress={() => setOpen(false)}
         >
           <View 
@@ -52,9 +51,8 @@ export const Dropdown = ({ value, onChange, options, placeholder, style }: Dropd
                   onChange(option.value);
                   setOpen(false);
                 }}
-                className="p-4"
+                className="p-4 border-b"
                 style={{
-                  borderBottomWidth: 1,
                   borderBottomColor: colors.borderColor,
                   backgroundColor: colors.dropdownBg,
                 }}

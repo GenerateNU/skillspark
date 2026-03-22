@@ -1,12 +1,12 @@
 import { AppColors } from "@/constants/theme";
 import { TouchableOpacity, Text } from "react-native";
 
-interface SubmitButtonProps {
+interface ButtonProps {
   label: string;
   onPress: () => void;
 }
 
-export const SubmitButton = ({ label, onPress }: SubmitButtonProps) => {
+export const Button = ({ label, onPress }: ButtonProps) => {
   return (
     <TouchableOpacity
       className="rounded-lg p-[10px] w-full items-center" style={{ backgroundColor: AppColors.primaryBlue }}

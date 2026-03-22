@@ -7,7 +7,7 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { Controller, useForm } from "react-hook-form";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { PageRedirectButton } from "@/components/PageRedirectButton";
-import { SubmitButton } from "@/components/SubmitButton";
+import { Button } from "@/components/Button";
 import { AuthFormInput } from "@/components/AuthFormInput";
 import { Dropdown } from "@/components/Dropdown";
 
@@ -114,7 +114,7 @@ export default function SignupScreen() {
             />
           )}
         />
-        <SubmitButton label="Sign Up" onPress={handleSubmit(onSubmit)} />
+        <Button label="Sign Up" onPress={handleSubmit(onSubmit)} />
         <PageRedirectButton
           label="Already have an account? Log in"
           onPress={handleGoToLogIn}

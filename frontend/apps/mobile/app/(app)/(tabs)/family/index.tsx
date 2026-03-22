@@ -10,6 +10,7 @@ import { Colors, AppColors } from '@/constants/theme';
 import { ChildListItem } from '@/components/ChildListItem';
 import { SectionHeader } from '@/components/SectionHeader';
 import { useAuthContext } from '@/hooks/use-auth-context';
+import { ErrorScreen } from '@/components/ErrorScreen';
 
 export default function FamilyListScreen() {
   const router = useRouter();
@@ -19,13 +20,16 @@ export default function FamilyListScreen() {
 
   const { guardianId } = useAuthContext();
 
-  if (!guardianId) {
-    // error state
-
-  }
-
-  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(guardianId);
-  const { data: childrenResponse, isLoading: childrenLoading } = useGetChildrenByGuardianId(guardianId);
+  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(guardianId!, {
+    query: {
+      enabled: !!guardianId,
+    }
+  });
+  const { data: childrenResponse, isLoading: childrenLoading } = useGetChildrenByGuardianId(guardianId!, {
+    query: {
+      enabled: !!guardianId,
+    }
+  });
 
   const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
   const children = childrenResponse?.status === 200 ? childrenResponse.data : [];
@@ -47,6 +51,10 @@ export default function FamilyListScreen() {
       },
     });
   };
+
+  if (!guardianId) {
+    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+  }
 
   if (guardianLoading || childrenLoading) {
     return (

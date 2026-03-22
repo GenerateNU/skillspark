@@ -24,7 +24,7 @@ export const AuthFormInput = <T extends FieldValues>({
         <View className="w-full gap-1">
           <TextInput
             className="w-full border rounded-lg px-[10px] py-[10px] text-base"
-            style={{ borderWidth: 1, borderColor: colors.borderColor }}
+            style={{ borderColor: colors.borderColor }}
             placeholderTextColor={AppColors.placeholderText}
             onChangeText={onChange}
             value={value}

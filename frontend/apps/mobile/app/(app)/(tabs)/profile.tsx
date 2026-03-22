@@ -9,6 +9,7 @@ import { useGetGuardianById, useGetChildrenByGuardianId } from '@skillspark/api-
 import { FamilyCard } from '@/components/FamilyCard';
 import { ListItem } from '@/components/ListItem';
 import { useAuthContext } from '@/hooks/use-auth-context';
+import { ErrorScreen } from '@/components/ErrorScreen';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -20,14 +21,22 @@ export default function ProfileScreen() {
 
   const { guardianId } = useAuthContext();
 
-  if (!guardianId) {
-    // error state
-  }
-
-  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(guardianId);
-  const { data: childrenResponse, isLoading: familyLoading } = useGetChildrenByGuardianId(guardianId);
+  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(guardianId!, {
+    query: {
+      enabled: !!guardianId,
+    }
+  });
+  const { data: childrenResponse, isLoading: familyLoading } = useGetChildrenByGuardianId(guardianId!, {
+    query: {
+      enabled: !!guardianId,
+    }
+  });
   const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
   const children = childrenResponse?.status === 200 ? childrenResponse.data : [];
+
+  if (!guardianId) {
+      return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+    }
 
   if (guardianLoading || familyLoading) {
     return (

@@ -143,13 +143,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
+    router.replace("/(auth)/login");
     await SecureStore.deleteItemAsync("token");
     setJWT(null);
     await SecureStore.deleteItemAsync("guardian_id");
     setGuardianId(null);
     await SecureStore.deleteItemAsync("language_preference");
     setLangPref(null);
-    router.replace("/(auth)/login");
   };
 
   // add update const for changing the guardian

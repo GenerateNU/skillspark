@@ -7,7 +7,7 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { PageRedirectButton } from "@/components/PageRedirectButton";
-import { SubmitButton } from "@/components/SubmitButton";
+import { Button } from "@/components/Button";
 import { AuthFormInput } from "@/components/AuthFormInput";
 
 type LoginFormData = {
@@ -65,7 +65,7 @@ export default function LoginScreen() {
           placeholder="Password"
           secureTextEntry={true}
         />
-        <SubmitButton label="Log In" onPress={handleSubmit(onSubmit)} />
+        <Button label="Log In" onPress={handleSubmit(onSubmit)} />
         <PageRedirectButton
           label="Don't have an account? Sign up"
           onPress={handleGoToSignUp}
