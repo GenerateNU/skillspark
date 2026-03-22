@@ -18,6 +18,9 @@ const genOtp = (): string => {
 
 export const isValidEmail = (v: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
+export const isValidUUID = (v: string): boolean =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v.trim());
+
 export const blankMgr = (): ManagerSignUpInputBody => ({
   name: "",
   email: "",

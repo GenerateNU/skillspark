@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Drawer } from "./admin_drawer";
 import { Btn, Field, Select } from "./common";
 import { IconCheck, IconPlus } from "./icons";
-import { blankMgr, validateMgr } from "./validation";
+import { blankMgr, isValidUUID, validateMgr } from "./validation";
 import ManagerFormRow from "./admin_managerFormRow";
 import ValidatedInput from "./validatedInput";
 
@@ -51,12 +51,15 @@ export function CreateDrawer({ onClose, onCreate }: CreateDrawerProps) {
             <Btn variant="ghost" onClick={onClose}>Cancel</Btn>
             <Btn onClick={async () => {
               try {
-                if (orgName.length === 0) {
-                  throw new Error("Organization must have a name")
+                if (orgName.trim().length === 0) {
+                  throw new Error("Organization name is required");
+                }
+                if (!locationId || !isValidUUID(locationId)) {
+                  throw new Error("A valid location ID is required");
                 }
                 setStep(1);
               } catch (e) {
-                console.error(e)
+                console.error(e);
               }
             }}
             >Continue</Btn>

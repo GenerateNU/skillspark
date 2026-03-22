@@ -12,7 +12,7 @@ export function Sidebar() {
 
   const navItems: NavItem[] = [
     { to: "/admin", label: "Home", icon: <IconHome /> },
-    { to: "/admin/organizations", label: "Organizations", icon: <IconBuilding /> },
+    { to: "/admin/organization", label: "Organizations", icon: <IconBuilding /> },
   ];
 
   return (
