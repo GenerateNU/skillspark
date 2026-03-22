@@ -7,10 +7,10 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 func (r *ReviewRepository) GetAggregateReviews(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error) {
-
 	baseQuery, err := schema.ReadSQLBaseScript("get_aggregate_reviews.sql", SqlReviewFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -22,16 +22,17 @@ func (r *ReviewRepository) GetAggregateReviews(ctx context.Context, id uuid.UUID
 		errr := errs.InternalServerError("Failed to get reviews: ", err.Error())
 		return nil, &errr
 	}
-	defer rows.Close()
+
+	ratingCounts, err := pgx.CollectRows(rows, pgx.RowToStructByPos[models.ReviewRatingCount])
+	if err != nil {
+		errr := errs.InternalServerError("Failed to collect review rows: ", err.Error())
+		return nil, &errr
+	}
 
 	aggregate := &models.ReviewAggregate{EventID: id}
 	var totalWeighted int
 
-	for rows.Next() {
-		var rc models.ReviewRatingCount
-		if err := rows.Scan(&rc.Rating, &rc.ReviewCount); err != nil {
-			return nil, err
-		}
+	for _, rc := range ratingCounts {
 		aggregate.Breakdown = append(aggregate.Breakdown, rc)
 		aggregate.TotalReviews += rc.ReviewCount
 		totalWeighted += int(rc.Rating) * rc.ReviewCount
