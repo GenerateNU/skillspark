@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { IconBuilding, IconPlus } from "../components/icons";
 import { listOrganizations } from "@skillspark/api-client";
-import type { Organization, Manager } from "@skillspark/api-client";
+import type { Organization } from "@skillspark/api-client";
 import { useState, useEffect } from "react";
 import { CreateModal } from "../components/admin_createDrawer";
 
@@ -103,7 +103,7 @@ export default function HomePage() {
       {showCreate && (
         <CreateModal
           onClose={function () { setShowCreate(false); }}
-          onCreate={function (org: Organization, managers: Manager[]) {
+          onCreate={function (org: Organization) {
             setOrganizations(function (prev: Organization[]) { return [org, ...prev]; });
             setShowCreate(false);
           }}

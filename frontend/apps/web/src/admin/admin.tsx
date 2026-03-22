@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Sidebar } from "../components/admin_sidebar";
-import { OrganizationsPage } from "./organizations";
+import { O } from "./organizations";
 import HomePage from "./home";
 
 export default function Admin() {
@@ -9,7 +9,7 @@ export default function Admin() {
       <Sidebar />
       <Routes>
         <Route path="" element={<HomePage />} />
-        <Route path="/organization" element={<OrganizationsPage />} />
+        <Route path="/organization" element={<OrganizationsDeaPage />} />
       </Routes>
     </div>
   );
