@@ -4,7 +4,7 @@ import { Drawer } from "../components/admin_drawer";
 import { IconSearch, IconPlus, IconBuilding, IconChevronRight } from "../components/icons";
 import Badge from "../components/badge";
 import { Btn, Divider } from "../components/common";
-import { CreateDrawer } from "../components/admin_createDrawer";
+import { CreateModal } from "../components/admin_createDrawer";
 
 export function OrganizationsPage() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -177,7 +177,7 @@ export function OrganizationsPage() {
       )}
 
       {showCreate && (
-        <CreateDrawer
+        <CreateModal
           onClose={function () { setShowCreate(false); }}
           onCreate={handleCreate}
         />

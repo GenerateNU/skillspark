@@ -8,7 +8,7 @@ export default function Admin() {
     <div className="flex h-screen w-screen overflow-hidden bg-gray-50 font-sans">
       <Sidebar />
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="" element={<HomePage />} />
         <Route path="/organization" element={<OrganizationsPage />} />
       </Routes>
     </div>
