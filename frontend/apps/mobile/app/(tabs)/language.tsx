@@ -22,7 +22,7 @@ export default function LanguageScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
-  const { t, i18n } = useTranslation();
+  const { t: translate, i18n } = useTranslation();
 
   const theme = Colors[colorScheme ?? 'light'];
   
@@ -65,10 +65,10 @@ export default function LanguageScreen() {
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText className="text-xl text-center font-nunito-bold">{t('settings.title')}</ThemedText>
+        <ThemedText className="text-xl text-center font-nunito-bold">{translate('settings.title')}</ThemedText>
         <View className="w-10" />
       </View>
-      <ThemedText className="text-2xl px-5 pt-4 pb-5 font-nunito-bold">{t('settings.language')}</ThemedText>
+      <ThemedText className="text-2xl px-5 pt-4 pb-5 font-nunito-bold">{translate('settings.language')}</ThemedText>
       <View className="px-5">
         {LANGUAGES.map((lang, index) => (
           <React.Fragment key={lang.code}>
@@ -80,7 +80,7 @@ export default function LanguageScreen() {
               activeOpacity={0.6}
             >
               <ThemedText className="text-[38px] leading-[46px]">{lang.flag}</ThemedText>
-              <ThemedText className="flex-1 text-lg font-nunito">{t(`settings.languages.${lang.code}`)}</ThemedText>
+              <ThemedText className="flex-1 text-lg font-nunito">{translate(`settings.languages.${lang.code}`)}</ThemedText>
               <IconSymbol
                 name={selected === lang.code ? 'checkmark.circle.fill' : 'circle'}
                 size={26}

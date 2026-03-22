@@ -14,7 +14,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const {t} = useTranslation();
+  const { t: translate } = useTranslation();
 
   const listBackgroundColor = colorScheme === 'dark' ? '#1c1c1e' : '#F9FAFB';
   const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
@@ -50,11 +50,11 @@ export default function ProfileScreen() {
             @{guardian?.username}
           </ThemedText>
           <ThemedText className="text-sm text-[#6B7280] leading-[18px] text-center font-nunito">
-            {t('profile.contact')}
+            {translate('profile.contact')}
           </ThemedText>
         </View>
         <View className="px-5 mb-4">
-          <ThemedText className="text-base mb-2 font-nunito-semibold">{t('profile.family')}</ThemedText>
+          <ThemedText className="text-base mb-2 font-nunito-semibold">{translate('profile.family')}</ThemedText>
           <View className="flex-row flex-wrap justify-between gap-[10px]">
             {children.length > 0 ? (
               children.map((child: any) => (
@@ -62,38 +62,38 @@ export default function ProfileScreen() {
                   key={child.id}
                   initials={child.name?.charAt(0)}
                   name={child.name}
-                  date={t('profile.born', { year: child.birth_year })}
+                  date={translate('profile.born', { year: child.birth_year })}
                   
                 />
               ))
             ) : (
-              <ThemedText style={{ color: '#999', padding: 10 }}>{t('common.noChildrenFound')}</ThemedText>
+              <ThemedText style={{ color: '#999', padding: 10 }}>{translate('common.noChildrenFound')}</ThemedText>
             )}
           </View>
         </View>
         <View className="px-5 mb-4">
-          <ThemedText className="text-base mb-2 font-nunito-semibold">{t('profile.myBookings')}</ThemedText>
+          <ThemedText className="text-base mb-2 font-nunito-semibold">{translate('profile.myBookings')}</ThemedText>
           <View
             className="rounded-xl overflow-hidden border"
             style={{ backgroundColor: listBackgroundColor, borderColor }}
           >
-            <ListItem label={t('profile.upcoming')} />
-            <ListItem label={t('profile.previous')} />
-            <ListItem label={t('profile.saved')} isLast />
+            <ListItem label={translate('profile.upcoming')} />
+            <ListItem label={translate('profile.previous')} />
+            <ListItem label={translate('profile.saved')} isLast />
           </View>
         </View>
         <View className="px-5 mb-4">
-          <ThemedText className="text-base mb-2 font-nunito-semibold">{t('profile.preferences')}</ThemedText>
+          <ThemedText className="text-base mb-2 font-nunito-semibold">{translate('profile.preferences')}</ThemedText>
           <View
             className="rounded-xl overflow-hidden border"
             style={{ backgroundColor: listBackgroundColor, borderColor }}
           >
-            <ListItem label={t('profile.payment')} onPress={() => router.push('/payment')} />
+            <ListItem label={translate('profile.payment')} onPress={() => router.push('/payment')} />
             <ListItem
-              label={t('profile.familyInformation')}
+              label={translate('profile.familyInformation')}
               onPress={() => router.push('/family')}
             />
-            <ListItem label={t('profile.settings')} isLast onPress={() => router.push('/settings')} />
+            <ListItem label={translate('profile.settings')} isLast onPress={() => router.push('/settings')} />
           </View>
         </View>
         <View className="h-5" />

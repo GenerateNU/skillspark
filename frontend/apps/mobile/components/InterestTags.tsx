@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 const MAX_VISIBLE_TAGS = 3;
 
 export function InterestTags({ interests }: { interests?: string[] | string }) {
-  const { t } = useTranslation();
+  const { t: translate } = useTranslation();
   const tags: string[] = Array.isArray(interests)
     ? interests
     : typeof interests === 'string' && interests
@@ -32,7 +32,7 @@ export function InterestTags({ interests }: { interests?: string[] | string }) {
           >
             <IconSymbol name="camera.filters" size={13} color={c.border} />
             <ThemedText className="text-xs font-nunito-medium" style={{ color: c.text }}>
-              {t(`interests.${tag}`, { defaultValue: tag })}
+              {translate(`interests.${tag}`, { defaultValue: tag })}
             </ThemedText>
           </View>
         );

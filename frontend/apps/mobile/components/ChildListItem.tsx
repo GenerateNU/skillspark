@@ -13,7 +13,7 @@ type ChildListItemProps = {
 };
 
 export function ChildListItem({ child, onPress }: ChildListItemProps) {
-  const { t } = useTranslation();
+  const { t: translate } = useTranslation();
   return (
     <TouchableOpacity className="flex-row items-start py-3 gap-3" onPress={onPress} activeOpacity={0.7}>
       <View className="w-11 h-11 rounded-[22px] border-[1.5px] items-center justify-center" style={{ borderColor: AppColors.subtleText }}>
@@ -28,7 +28,7 @@ export function ChildListItem({ child, onPress }: ChildListItemProps) {
           {child.birth_year}
         </ThemedText>
         {child.interests && (
-          <ThemedText className="text-[13px] font-nunito" style={{ color: AppColors.mutedText }}>{t('familyInformation.interests')}</ThemedText>
+          <ThemedText className="text-[13px] font-nunito" style={{ color: AppColors.mutedText }}>{translate('familyInformation.interests')}</ThemedText>
         )}
         <InterestTags interests={child.interests} />
       </View>

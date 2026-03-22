@@ -18,9 +18,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCreateChild, useUpdateChild, useDeleteChild, getGetChildrenByGuardianIdQueryKey } from '@skillspark/api-client';
 import { ChildProfileForm, MONTHS } from '@/components/ChildProfileForm';
 import { useTranslation } from 'react-i18next';
+import { useGuardian } from '@/hooks/use-guardian';
 
-// TODO: Replace with authenticated user's guardian ID
-const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
 
 export default function ManageChildScreen() {
   const router = useRouter();
@@ -29,7 +28,7 @@ export default function ManageChildScreen() {
   const insets = useSafeAreaInsets();
   const theme = Colors[colorScheme ?? 'light'];
 
-  const { t } = useTranslation();
+  const { t: translate } = useTranslation();
   const isEditing = !!params.id;
 
   // Initial State Setup
@@ -63,6 +62,7 @@ export default function ManageChildScreen() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { guardianId } = useGuardian();
   const queryClient = useQueryClient();
   const createChildMutation = useCreateChild();
   const updateChildMutation = useUpdateChild();
@@ -70,7 +70,7 @@ export default function ManageChildScreen() {
 
   const handleSave = async () => {
     if (!firstName || !birthYear || !birthMonth || !schoolId) {
-      Alert.alert(t('common.error'), t('childProfile.requiredFieldsError'));
+      Alert.alert(translate('common.error'), translate('childProfile.requiredFieldsError'));
       return;
     }
     const name = [firstName, lastName].filter(Boolean).join(' ');
@@ -80,7 +80,7 @@ export default function ManageChildScreen() {
         name,
         birth_year: parseInt(birthYear, 10),
         birth_month: MONTHS.indexOf(birthMonth) + 1,
-        guardian_id: GUARDIAN_ID,
+        guardian_id: guardianId,
         school_id: schoolId,
         interests,
       };
@@ -89,11 +89,11 @@ export default function ManageChildScreen() {
       } else {
         await createChildMutation.mutateAsync({ data: childData });
       }
-      await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(GUARDIAN_ID) });
+      await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(guardianId) });
       router.back();
     } catch (error) {
       console.error(error);
-      Alert.alert(t('common.errorOccurred'), t('childProfile.saveError'));
+      Alert.alert(translate('common.errorOccurred'), translate('childProfile.saveError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -101,20 +101,20 @@ export default function ManageChildScreen() {
 
   const handleDelete = () => {
     Alert.alert(
-      t('childProfile.deleteProfile'),
-      t('childProfile.deleteConfirm'),
+      translate('childProfile.deleteProfile'),
+      translate('childProfile.deleteConfirm'),
       [
-        { text: t('common.cancel'), style: 'cancel' },
+        { text: translate('common.cancel'), style: 'cancel' },
         {
-          text: t('payment.delete'), style: 'destructive',
+          text: translate('payment.delete'), style: 'destructive',
           onPress: async () => {
             setIsSubmitting(true);
             try {
               await deleteChildMutation.mutateAsync({ id: params.id as string });
-              await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(GUARDIAN_ID) });
+              await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(guardianId) });
               router.back();
             } catch {
-              Alert.alert(t('common.errorOccurred'), t('childProfile.deleteError'));
+              Alert.alert(translate('common.errorOccurred'), translate('childProfile.deleteError'));
               setIsSubmitting(false);
             }
           }
@@ -136,17 +136,17 @@ export default function ManageChildScreen() {
             <TouchableOpacity onPress={() => router.back()} className="w-8 h-8 justify-center items-start">
               <IconSymbol name="chevron.left" size={24} color={theme.text} />
             </TouchableOpacity>
-            <ThemedText className="text-xl text-center font-nunito-bold">{t('familyInformation.title')}</ThemedText>
+            <ThemedText className="text-xl text-center font-nunito-bold">{translate('familyInformation.title')}</ThemedText>
             {isEditing ? (
               <TouchableOpacity onPress={handleDelete}>
-                <ThemedText className="font-nunito-semibold" style={{ color: AppColors.danger }}>{t('payment.delete')}</ThemedText>
+                <ThemedText className="font-nunito-semibold" style={{ color: AppColors.danger }}>{translate('payment.delete')}</ThemedText>
               </TouchableOpacity>
             ) : (
               <View className="w-10" />
             )}
           </View>
           <ThemedText className="text-[22px] font-nunito-semibold mb-5">
-            {isEditing ? t('childProfile.editTitle') : t('childProfile.createTitle')}
+            {isEditing ? translate('childProfile.editTitle') : translate('childProfile.createTitle')}
           </ThemedText>
           <ChildProfileForm
             firstName={firstName}
@@ -175,7 +175,7 @@ export default function ManageChildScreen() {
             disabled={isSubmitting}
           >
             <ThemedText className="text-white text-base font-nunito-semibold">
-              {isSubmitting ? t('childProfile.saving') : t('childProfile.saveChanges')}
+              {isSubmitting ? translate('childProfile.saving') : translate('childProfile.saveChanges')}
             </ThemedText>
           </TouchableOpacity>
 

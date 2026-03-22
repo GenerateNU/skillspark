@@ -16,7 +16,7 @@ export default function FamilyListScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
-  const { t } = useTranslation();
+  const { t: translate } = useTranslation();
 
   const { guardian, children, isLoading } = useGuardian();
 
@@ -56,7 +56,7 @@ export default function FamilyListScreen() {
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText className="text-xl text-center font-nunito-bold">{t('familyInformation.title')}</ThemedText>
+        <ThemedText className="text-xl text-center font-nunito-bold">{translate('familyInformation.title')}</ThemedText>
         <View className="w-10" />
       </View>
 
@@ -73,12 +73,12 @@ export default function FamilyListScreen() {
         </TouchableOpacity>
         <View className="h-px my-3" style={{ backgroundColor: AppColors.divider }} />
         <SectionHeader
-          title={t('familyInformation.childProfile')}
-          actionLabel={t('familyInformation.addProfile')}
+          title={translate('familyInformation.childProfile')}
+          actionLabel={translate('familyInformation.addProfile')}
           onAction={handleAddChild}
         />
         {children.length === 0 && (
-          <ThemedText className="text-sm pb-4 font-nunito" style={{ color: AppColors.subtleText }}>{t('common.noChildProfilesAdded')}</ThemedText>
+          <ThemedText className="text-sm pb-4 font-nunito" style={{ color: AppColors.subtleText }}>{translate('common.noChildProfilesAdded')}</ThemedText>
         )}
         {children.map((child: any, idx: number) => (
           <React.Fragment key={child.id}>
@@ -91,8 +91,8 @@ export default function FamilyListScreen() {
         ))}
         <View className="h-px my-3" style={{ backgroundColor: AppColors.divider }} />
         <SectionHeader
-          title={t('familyInformation.emergencyContact')}
-          actionLabel={t('familyInformation.addContact')}
+          title={translate('familyInformation.emergencyContact')}
+          actionLabel={translate('familyInformation.addContact')}
           onAction={() => {}}
         />
         {/* TODO: Replace with real emergency contact data from API */}

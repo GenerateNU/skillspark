@@ -19,6 +19,7 @@ import { AppColors } from "@/constants/theme";
 import { StarRating } from "@/components/StarRating";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { formatDuration } from "@/utils/format";
+import { useTranslation } from "react-i18next";
 
 function formatAddress(occurrence: EventOccurrence) {
   const loc = occurrence.location;
@@ -33,6 +34,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
   const [descriptionTruncated, setDescriptionTruncated] = useState(false);
   const duration = formatDuration(occurrence.start_time, occurrence.end_time);
   const address = formatAddress(occurrence);
+  const { t: translate } = useTranslation();
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F4F6F8" }}>
@@ -87,7 +89,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
             }}
           >
             <MaterialIcons name="chevron-left" size={20} color={AppColors.primaryText} />
-            <Text style={{ fontSize: 15, color: AppColors.primaryText, fontWeight: "500" }}>Back</Text>
+            <Text style={{ fontSize: 15, color: AppColors.primaryText, fontWeight: "500" }}>{translate('event.back')}</Text>
           </TouchableOpacity>
         </View>
         <View
@@ -165,7 +167,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
           {descriptionTruncated && (
             <Pressable onPress={() => setDescriptionExpanded((prev) => !prev)} style={{ marginBottom: 14 }}>
               <Text style={{ fontSize: 13, color: AppColors.primaryText, fontWeight: "600" }}>
-                {descriptionExpanded ? "See less" : "See more"}
+                {descriptionExpanded ? translate('event.seeLess') : translate('event.seeMore')}
               </Text>
             </Pressable>
           )}
@@ -188,13 +190,13 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
                     paddingVertical: 7,
                   }}
                 >
-                  <Text style={{ fontSize: 13, color: AppColors.secondaryText }}>{cat}</Text>
+                  <Text style={{ fontSize: 13, color: AppColors.secondaryText }}>{translate(`dashboard.categories.${cat.toLowerCase()}`, { defaultValue: cat })}</Text>
                 </View>
               ))}
             </View>
             <View style={{ alignItems: "flex-end", marginLeft: 14 }}>
               <Text style={{ fontSize: 20, fontWeight: "700", color: AppColors.primaryText }}>{occurrence.price} THB</Text>
-              <Text style={{ fontSize: 12, color: AppColors.subtleText }}>/Session</Text>
+              <Text style={{ fontSize: 12, color: AppColors.subtleText }}>{translate('event.perSession')}</Text>
             </View>
           </View>
         </View>
@@ -269,7 +271,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
                 >
                   <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#fff" }} />
                 </View>
-                <Text style={{ fontSize: 14, color: AppColors.secondaryText, fontWeight: "500" }}>Home</Text>
+                <Text style={{ fontSize: 14, color: AppColors.secondaryText, fontWeight: "500" }}>{translate('event.home')}</Text>
               </View>
               <View style={{ paddingLeft: 6, paddingVertical: 2 }}>
                 <Text style={{ fontSize: 14, color: AppColors.subtleText, lineHeight: 10 }}>•</Text>
@@ -278,7 +280,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
               </View>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                 <MaterialIcons name="location-on" size={16} color={AppColors.secondaryText} />
-                <Text style={{ fontSize: 14, color: AppColors.secondaryText, fontWeight: "500" }}>Location</Text>
+                <Text style={{ fontSize: 14, color: AppColors.secondaryText, fontWeight: "500" }}>{translate('event.location')}</Text>
               </View>
             </View>
             <TouchableOpacity
@@ -291,7 +293,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
                 paddingVertical: 14,
               }}
             >
-              <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700" }}>Register</Text>
+              <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700" }}>{translate('event.register')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -304,6 +306,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
 export default function EventOccurrenceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: response, isLoading, error } = useGetEventOccurrencesById(id);
+  const { t: translate } = useTranslation();
 
   if (isLoading) {
     return (
@@ -317,7 +320,7 @@ export default function EventOccurrenceScreen() {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 24 }}>
         <Text style={{ color: AppColors.danger, fontWeight: "600", fontSize: 16 }}>
-          Event not found
+          {translate('event.notFound')}
         </Text>
       </View>
     );

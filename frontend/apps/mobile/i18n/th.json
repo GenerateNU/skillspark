@@ -97,11 +97,25 @@
     "saving": "กำลังบันทึก...",
     "saveChanges": "บันทึกการเปลี่ยนแปลง",
     "searchInterests": "ค้นหาความสนใจ...",
+    "selectSchool": "เลือกโรงเรียน",
+    "loadingSchools": "กำลังโหลดโรงเรียน...",
+    "failedToLoadSchools": "โหลดโรงเรียนไม่สำเร็จ",
+    "noSchoolsFound": "ไม่พบโรงเรียน",
     "deleteProfile": "ลบโปรไฟล์",
     "deleteConfirm": "คุณต้องการลบโปรไฟล์เด็กนี้ใช่ไหม?",
     "requiredFieldsError": "กรุณากรอกข้อมูลที่จำเป็นทั้งหมด (ชื่อ วันเกิด รหัสโรงเรียน)",
     "saveError": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
     "deleteError": "ลบไม่สำเร็จ"
+  },
+  "event": {
+    "back": "กลับ",
+    "seeMore": "ดูเพิ่มเติม",
+    "seeLess": "ดูน้อยลง",
+    "perSession": "/เซสชัน",
+    "home": "บ้าน",
+    "location": "สถานที่",
+    "register": "ลงทะเบียน",
+    "notFound": "ไม่พบกิจกรรม"
   },
   "interests": {
     "science": "วิทยาศาสตร์",

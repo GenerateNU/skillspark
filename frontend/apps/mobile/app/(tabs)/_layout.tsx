@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { t } = useTranslation();
+  const { t: translate } = useTranslation();
 
   return (
     <Tabs
@@ -22,7 +22,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: t('nav.home'),
+          title: translate('nav.home'),
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="house.fill" color={color} />
           ),
@@ -31,7 +31,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="map"
         options={{
-          title: t('nav.map'),
+          title: translate('nav.map'),
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="map.fill" color={color} />
           ),
@@ -40,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: t('nav.profile'),
+          title: translate('nav.profile'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
         }}
       />

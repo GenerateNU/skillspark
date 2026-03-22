@@ -97,11 +97,25 @@
     "saving": "Saving...",
     "saveChanges": "Save Changes",
     "searchInterests": "Search interests...",
+    "selectSchool": "Select School",
+    "loadingSchools": "Loading schools...",
+    "failedToLoadSchools": "Failed to load schools",
+    "noSchoolsFound": "No schools found",
     "deleteProfile": "Delete Profile",
     "deleteConfirm": "Are you sure you want to remove this child profile?",
     "requiredFieldsError": "Please fill in all required fields (Name, Birth Date, School ID)",
     "saveError": "Failed to save. Please try again.",
     "deleteError": "Failed to delete."
+  },
+  "event": {
+    "back": "Back",
+    "seeMore": "See more",
+    "seeLess": "See less",
+    "perSession": "/Session",
+    "home": "Home",
+    "location": "Location",
+    "register": "Register",
+    "notFound": "Event not found"
   },
   "interests": {
     "science": "Science",

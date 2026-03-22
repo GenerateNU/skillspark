@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, ScrollView, useColorScheme } from 'react-native';
+import { View, TouchableOpacity, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors, AppColors } from '@/constants/theme';
+import { AppColors } from '@/constants/theme';
 import { useGetAllSchools, School } from '@skillspark/api-client';
+import { useTranslation } from 'react-i18next';
 
 type SchoolPickerProps = {
   value: string;
@@ -11,27 +12,28 @@ type SchoolPickerProps = {
 };
 
 export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? 'light'];
   const [showDrop, setShowDrop] = useState(false);
+  const { t: translate } = useTranslation();
 
   const { data, isLoading, isError } = useGetAllSchools();
   const schools = Array.isArray(data?.data) ? data.data : [];
   const selectedSchool = schools.find((s: School) => s.id === value);
 
-  const placeholderLabel = isLoading ? 'Loading schools...' : isError ? 'Failed to load schools' : 'Select School';
+  const placeholderLabel = isLoading
+    ? translate('childProfile.loadingSchools')
+    : isError
+    ? translate('childProfile.failedToLoadSchools')
+    : translate('childProfile.selectSchool');
 
   return (
-    <View style={{ zIndex: 20 }}>
+    <View className="z-[20]">
       <TouchableOpacity
-        className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between mb-6"
-        style={{ backgroundColor: theme.inputBg }}
+        className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between mb-6 bg-[#F3F4F6] dark:bg-[#27272a]"
         onPress={() => setShowDrop(prev => !prev)}
         disabled={isLoading || isError}
       >
         <ThemedText
-          className="font-nunito"
-          style={selectedSchool ? { color: theme.text } : { color: AppColors.placeholderText }}
+          className={`font-nunito ${selectedSchool ? '' : 'text-[#9CA3AF]'}`}
         >
           {selectedSchool ? selectedSchool.name : placeholderLabel}
         </ThemedText>
@@ -40,25 +42,14 @@ export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
 
       {showDrop && (
         <View
-          className="absolute left-0 right-0 rounded-[10px] border"
-          style={{
-            top: 52,
-            backgroundColor: theme.dropdownBg,
-            borderColor: theme.borderColor,
-            zIndex: 100,
-            elevation: 5,
-            shadowColor: '#000',
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            shadowOffset: { width: 0, height: 2 },
-          }}
+          className="absolute left-0 right-0 rounded-[10px] border top-[52px] z-[100] bg-[#FFFFFF] dark:bg-[#1c1c1e] border-[#E5E7EB] dark:border-[#3f3f46]"
+          style={{ elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
         >
-          <ScrollView nestedScrollEnabled style={{ maxHeight: 200 }}>
+          <ScrollView nestedScrollEnabled className="max-h-[200px]">
             {schools.map(school => (
               <TouchableOpacity
                 key={school.id}
-                className="px-4 py-3 border-b"
-                style={{ borderBottomColor: theme.borderColor }}
+                className="px-4 py-3 border-b border-b-[#E5E7EB] dark:border-b-[#3f3f46]"
                 onPress={() => { onChange(school.id); setShowDrop(false); }}
               >
                 <ThemedText>{school.name}</ThemedText>
@@ -66,7 +57,7 @@ export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
             ))}
             {schools.length === 0 && !isLoading && (
               <View className="px-4 py-3">
-                <ThemedText style={{ color: AppColors.mutedText }}>No schools found</ThemedText>
+                <ThemedText className="text-[#6B7280]">{translate('childProfile.noSchoolsFound')}</ThemedText>
               </View>
             )}
           </ScrollView>
