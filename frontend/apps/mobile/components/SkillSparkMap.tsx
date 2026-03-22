@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { Ionicons } from '@expo/vector-icons';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemedView } from '@/components/themed-view';
 import { EventCard } from '@/components/EventCard'; 
 
@@ -53,10 +53,10 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
               setSelectedPin(loc);
             }}
           >
-            <Ionicons 
-              name="location" 
-              size={40} 
-              color={selectedPin?.id === loc.id ? "#FF4B4B" : "#FF6B6B"} 
+            <IconSymbol
+              name="location.fill"
+              size={40}
+              color={selectedPin?.id === loc.id ? "#FF4B4B" : "#FF6B6B"}
             />
           </Marker>
         ))}
