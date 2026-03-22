@@ -1,14 +1,14 @@
-import type { Organization, ManagerSignUpInputBody } from "@skillspark/api-client";
+import type { Organization, Manager } from "@skillspark/api-client";
 import { useState, useCallback } from "react";
 import { Drawer } from "../components/admin_drawer";
 import { IconSearch, IconPlus, IconBuilding, IconChevronRight } from "../components/icons";
 import Badge from "../components/badge";
-import Btn, { Divider } from "../components/common";
-import { CreateDrawer } from "../components/admin_create_drawer";
+import { Btn, Divider } from "../components/common";
+import { CreateDrawer } from "../components/admin_createDrawer";
 
 export function OrganizationsPage() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [managers, setManagers] = useState<ManagerSignUpInputBody[]>([]);
+  const [managers, setManagers] = useState<Manager[]>([]);
   const [showCreate, setShowCreate] = useState<boolean>(false);
   const [selected, setSelected] = useState<Organization | null>(null);
   const [search, setSearch] = useState<string>("");
@@ -16,15 +16,16 @@ export function OrganizationsPage() {
   const fmtDate = (iso: string): string =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-  const handleCreate = useCallback(function (org: Organization, newManagers: ManagerSignUpInputBody[]): void {
+  const handleCreate = useCallback(function (org: Organization, newManagers: Manager[]): void {
+
     setOrganizations(function (prev: Organization[]) { return [org, ...prev]; });
-    setManagers(function (prev: ManagerSignUpInputBody[]) { return [...prev, ...newManagers]; });
+    setManagers([...managers, ...newManagers]);
     setSelected(org);
   }, []);
 
   const handleRemoveManager = useCallback(function (orgId: string, email: string): void {
-    setManagers(function (prev: ManagerSignUpInputBody[]) {
-      return prev.filter(function (m: ManagerSignUpInputBody) {
+    setManagers(function (prev: Manager[]) {
+      return prev.filter(function (m: Manager) {
         return !(m.organization_id === orgId && m.email === email);
       });
     });
@@ -35,8 +36,8 @@ export function OrganizationsPage() {
     return !q || o.name.toLowerCase().includes(q) || (o.location_id ?? "").toLowerCase().includes(q);
   });
 
-  const selectedManagers: ManagerSignUpInputBody[] = selected
-    ? managers.filter(function (m: ManagerSignUpInputBody) { return m.organization_id === selected.id; })
+  const selectedManagers: Manager[] = selected
+    ? managers.filter(function (m: Manager) { return m.organization_id === selected.id; })
     : [];
 
   return (
@@ -80,7 +81,7 @@ export function OrganizationsPage() {
             </div>
             {filtered.map(function (o: Organization, i: number) {
               const borderClass: string = i < filtered.length - 1 ? "border-b border-gray-100" : "";
-              const orgMgrCount: number = managers.filter(function (m: ManagerSignUpInputBody) { return m.organization_id === o.id; }).length;
+              const orgMgrCount: number = managers.filter(function (m: Manager) { return m.organization_id === o.id; }).length;
               return (
                 <div key={o.id}
                   className={`grid grid-cols-12 gap-4 px-6 py-3.5 items-center hover:bg-gray-50 cursor-pointer transition-colors ${borderClass}`}
@@ -144,7 +145,7 @@ export function OrganizationsPage() {
             <p className="text-sm text-gray-400">No managers assigned.</p>
           ) : (
             <div className="rounded-md border border-gray-200 overflow-hidden">
-              {selectedManagers.map(function (m: ManagerSignUpInputBody, i: number) {
+              {selectedManagers.map(function (m: Manager, i: number) {
                 const isLast: boolean = selectedManagers.length === 1;
                 const borderClass: string = i < selectedManagers.length - 1 ? "border-b border-gray-100" : "";
                 return (

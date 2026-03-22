@@ -2,7 +2,7 @@ type ButtonVariant = "primary" | "danger" | "ghost";
 
 interface BtnProps extends React.ButtonHTMLAttributes<HTMLButtonElement> { variant?: ButtonVariant; size?: "sm" | "md"; icon?: React.ReactNode; }
 
-export default function Btn({ children, variant = "primary", size = "md", icon, className = "", ...rest }: BtnProps) {
+export function Btn({ children, variant = "primary", size = "md", icon, className = "", ...rest }: BtnProps) {
   const variants: Record<ButtonVariant, string> = {
     primary: "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white border border-blue-600",
     danger:  "bg-white hover:bg-red-50 text-red-600 border border-gray-300 hover:border-red-300",

@@ -2,10 +2,14 @@ import { useState } from "react";
 
 export default function OtpCard({ password, name }: { password: string; name: string }) {
   const [copied, setCopied] = useState<boolean>(false);
-  function copy(): void {
-    if (navigator.clipboard) navigator.clipboard.writeText(password);
-    setCopied(true);
-    setTimeout(function () { setCopied(false); }, 2000);
+  async function copy(): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(password);
+      setCopied(true);
+      setTimeout(function () { setCopied(false); }, 2000);
+    } catch (e) {
+      console.error("Failed to copy to clipboard:", e);
+    }
   }
   return (
     <div className="mt-3 rounded-md border border-yellow-200 bg-yellow-50 p-3">

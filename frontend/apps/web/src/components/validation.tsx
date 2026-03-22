@@ -1,11 +1,22 @@
 import type { ManagerSignUpInputBody, CreateOrganizationBody } from "@skillspark/api-client";
+import type { ManagerFormInput } from "./admin_createDrawer";
 
 export type ManagerErrors = Partial<Record<keyof Omit<ManagerSignUpInputBody, "auth_id" | "organization_id" | "profile_picture_s3_key">, string>>;
 export type OrgErrors = Partial<Record<keyof CreateOrganizationBody, string>>;
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-const genOtp = (): string => Math.random().toString(36).slice(2, 10).toUpperCase();
-const isValidEmail = (v: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+const genOtp = (): string => {
+  const chars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+  const length: number = 12;
+  let result: string = "";
+  const array = new Uint32Array(length);
+  crypto.getRandomValues(array);
+  array.forEach(function (val: number) {
+    result += chars[val % chars.length];
+  });
+  return result;
+};
+
+export const isValidEmail = (v: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
 export const blankMgr = (): ManagerSignUpInputBody => ({
   name: "",
@@ -29,7 +40,7 @@ export function validateOrg(o: CreateOrganizationBody): OrgErrors {
   return e;
 }
 
-export function validateMgr(m: ManagerSignUpInputBody): ManagerErrors {
+export function validateMgr(m: ManagerFormInput): ManagerErrors {
   const e: ManagerErrors = {};
   if (!m.name.trim())     e.name = "Required";
   if (!m.email.trim())    e.email = "Required";
