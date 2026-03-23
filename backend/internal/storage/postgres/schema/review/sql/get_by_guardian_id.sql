@@ -1,5 +1,7 @@
-SELECT id, registration_id, guardian_id, description_en, description_th, categories, created_at, updated_at
-FROM review
-WHERE review.guardian_id = $1
-ORDER BY id
+SELECT r.id, r.registration_id, r.guardian_id, eo.event_id, r.rating, r.description_en, r.description_th, r.categories, r.created_at, r.updated_at
+FROM review r
+JOIN registration reg ON r.registration_id = reg.id
+JOIN event_occurrence eo ON reg.event_occurrence_id = eo.id
+WHERE r.guardian_id = $1
+ORDER BY r.id
 LIMIT $2 OFFSET $3;

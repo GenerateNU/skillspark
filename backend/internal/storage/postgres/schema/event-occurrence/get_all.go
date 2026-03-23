@@ -15,10 +15,8 @@ type PriceRange struct {
 	MaxPrice *int
 }
 
-var language string
-
 func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error) {
-	language = AcceptLanguage
+	lang := AcceptLanguage
 	query, err := schema.ReadSQLBaseScript("get_all.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -52,7 +50,9 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 	}
 	defer rows.Close()
 
-	eventOccurrences, err := pgx.CollectRows(rows, scanEventOccurrence)
+	eventOccurrences, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (models.EventOccurrence, error) {
+		return scanEventOccurrence(row, lang)
+	})
 	if err != nil {
 		err := errs.InternalServerError("Failed to scan all event occurrences: ", err.Error())
 		return nil, &err
@@ -60,7 +60,7 @@ func (r *EventOccurrenceRepository) GetAllEventOccurrences(ctx context.Context, 
 	return eventOccurrences, nil
 }
 
-func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error) {
+func scanEventOccurrence(row pgx.CollectableRow, language string) (models.EventOccurrence, error) {
 	var createdEventOccurrence models.EventOccurrence
 	var titleEN, descriptionEN string
 	var titleTH, descriptionTH *string

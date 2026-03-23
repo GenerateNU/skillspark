@@ -1,0 +1,34 @@
+name: Deploy EAS Build
+
+on:
+  push:
+    branches:
+      - prod
+
+jobs:
+  build:
+    name: Install and Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: bun install
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build on EAS and Auto-Submit to App Store if successful
+        working-directory: frontend/apps/mobile
+        run: eas build --platform ios --non-interactive --no-wait --profile production --auto-submit

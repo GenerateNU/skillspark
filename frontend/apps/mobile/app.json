@@ -46,6 +46,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "457b5274-1ec8-481d-ad0c-fe24ae374428"
+      }
+    },
+    "owner": "skillspark-generate"
   }
 }

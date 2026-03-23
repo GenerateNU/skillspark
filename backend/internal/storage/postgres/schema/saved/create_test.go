@@ -3,7 +3,7 @@ package saved
 import (
 	"context"
 	"skillspark/internal/models"
-	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
+	"skillspark/internal/storage/postgres/schema/event"
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
@@ -20,14 +20,13 @@ func TestCreateSaved(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	event_occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
+	event := event.CreateTestEvent(t, ctx, testDB)
 	guardian := guardian.CreateTestGuardian(t, ctx, testDB)
-	eventOccurrenceID := event_occurrence.ID
 	guardianID := guardian.ID
 
 	input := func() *models.CreateSavedInput {
 		i := &models.CreateSavedInput{}
-		i.Body.EventOccurrenceID = eventOccurrenceID
+		i.Body.EventID = event.ID
 		i.Body.GuardianID = guardianID
 		return i
 	}()
@@ -37,14 +36,15 @@ func TestCreateSaved(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, created)
 
-	assert.Equal(t, eventOccurrenceID, created.EventOccurrenceID)
+	assert.Equal(t, event.ID, created.Event.ID)
 	assert.Equal(t, guardianID, created.GuardianID)
 	assert.NotEqual(t, uuid.Nil, created.ID)
 	assert.NotZero(t, created.CreatedAt)
 	assert.NotZero(t, created.UpdatedAt)
 }
 
-func TestCreateSaved_FailsInvalidEventOccurrence(t *testing.T) {
+func TestCreateSaved_FailsInvalidEvent(t *testing.T) {
+
 	testDB := testutil.SetupTestDB(t)
 	repo := NewSavedRepository(testDB)
 	ctx := context.Background()
@@ -55,7 +55,7 @@ func TestCreateSaved_FailsInvalidEventOccurrence(t *testing.T) {
 
 	input := func() *models.CreateSavedInput {
 		i := &models.CreateSavedInput{}
-		i.Body.EventOccurrenceID = uuid.New()
+		i.Body.EventID = uuid.New()
 		i.Body.GuardianID = guardianID
 		return i
 	}()
@@ -74,12 +74,11 @@ func TestCreateSaved_FailsInvalidGuardian(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	event_occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
-	eventOccurrenceID := event_occurrence.ID
+	event := event.CreateTestEvent(t, ctx, testDB)
 
 	input := func() *models.CreateSavedInput {
 		i := &models.CreateSavedInput{}
-		i.Body.EventOccurrenceID = eventOccurrenceID
+		i.Body.EventID = event.ID
 		i.Body.GuardianID = uuid.New()
 		return i
 	}()

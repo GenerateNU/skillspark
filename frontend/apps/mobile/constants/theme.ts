@@ -35,13 +35,18 @@ export const Colors = {
 
 /** Static (non-theme-dependent) app-wide color constants */
 export const AppColors = {
+  primaryText: '#111',
+  secondaryText: '#374151',
   mutedText: '#6B7280',
   subtleText: '#9CA3AF',
+  borderLight: '#D1D5DB',
   divider: '#E5E7EB',
   primaryBlue: '#2563EB',
   danger: '#EF4444',
+  starFilled: '#FBBF24',
   checkboxSelected: '#1F2937',
   placeholderText: '#9CA3AF',
+  savedBackground: "#99C0EE4D",
 };
 
 /** Tag color palette shared across interest tag components */

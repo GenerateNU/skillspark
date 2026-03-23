@@ -9,6 +9,7 @@ import (
 	"skillspark/internal/storage/postgres/schema/guardian"
 	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
+	notification "skillspark/internal/storage/postgres/schema/notification"
 	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/review"
@@ -111,6 +112,7 @@ type ReviewRepository interface {
 	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	DeleteReview(ctx context.Context, id uuid.UUID) error
+	GetAggregateReviews(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
 }
 
 type UserRepository interface {
@@ -118,6 +120,12 @@ type UserRepository interface {
 	GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error)
 	UpdateUser(ctx context.Context, user *models.UpdateUserInput) (*models.User, error)
 	DeleteUser(ctx context.Context, id uuid.UUID) (*models.User, error)
+}
+
+type NotificationRepository interface {
+	CreateScheduledNotification(ctx context.Context, input *models.CreateScheduledNotificationInput) (*models.Notification, error)
+	GetPendingNotifications(ctx context.Context) ([]models.Notification, error)
+	UpdateNotificationStatus(ctx context.Context, id uuid.UUID, status models.NotificationStatus) (*models.Notification, error)
 }
 
 type SavedRepository interface {
@@ -139,6 +147,7 @@ type Repository struct {
 	Registration    RegistrationRepository
 	Review          ReviewRepository
 	User            UserRepository
+	Notification    NotificationRepository
 	Saved           SavedRepository
 }
 
@@ -168,6 +177,7 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		User:            user.NewUserRepository(db),
 		Registration:    registration.NewRegistrationRepository(db),
 		Review:          review.NewReviewRepository(db),
+		Notification:    notification.NewNotificationRepository(db),
 		Saved:           saved.NewSavedRepository(db),
 	}
 }

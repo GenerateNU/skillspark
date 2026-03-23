@@ -11,7 +11,7 @@ func (r *ReviewRepository) ScanReviews(row pgx.CollectableRow) (models.Review, e
 	var output models.Review
 	var desc *string
 
-	err := row.Scan(&review.ID, &review.RegistrationID, &review.GuardianID, &review.Description_EN, &review.Description_TH, &review.Categories, &review.CreatedAt, &review.UpdatedAt)
+	err := row.Scan(&review.ID, &review.RegistrationID, &review.GuardianID, &review.EventID, &review.Rating, &review.Description_EN, &review.Description_TH, &review.Categories, &review.CreatedAt, &review.UpdatedAt)
 
 	if language == "th" {
 		desc = review.Description_TH
@@ -23,6 +23,8 @@ func (r *ReviewRepository) ScanReviews(row pgx.CollectableRow) (models.Review, e
 		ID:             review.ID,
 		RegistrationID: review.RegistrationID,
 		GuardianID:     review.GuardianID,
+		EventID:        review.EventID,
+		Rating:         review.Rating,
 		Description:    *desc,
 		Categories:     review.Categories,
 		CreatedAt:      review.CreatedAt,
