@@ -6,20 +6,19 @@ import {
   useGetSavedByGuardianId,
   getGetSavedByGuardianIdQueryKey,
 } from "@skillspark/api-client";
-import type { getSavedByGuardianIdResponse, Saved } from "@skillspark/api-client";
+import type { getSavedByGuardianIdResponse, Saved, Event } from "@skillspark/api-client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { AppColors } from "@/constants/theme";
+import { useGuardian } from "@/hooks/use-guardian";
 
-// TODO: Replace with authenticated user's guardian ID
-const GUARDIAN_ID = "88888888-8888-8888-8888-888888888888";
-
-export function BookmarkButton({ occurrenceId }: { occurrenceId: string }) {
+export function BookmarkButton({ eventId, event }: { eventId: string; event: Event }) {
+  const { guardianId } = useGuardian();
   const queryClient = useQueryClient();
-  const { data: savedResponse } = useGetSavedByGuardianId(GUARDIAN_ID);
-  const savedQueryKey = getGetSavedByGuardianIdQueryKey(GUARDIAN_ID);
+  const { data: savedResponse } = useGetSavedByGuardianId(guardianId);
+  const savedQueryKey = getGetSavedByGuardianIdQueryKey(guardianId);
 
   const savedItems = savedResponse?.status === 200 ? savedResponse.data : [];
-  const savedEntry = savedItems.find((s) => s.event_occurrence_id === occurrenceId);
+  const savedEntry = savedItems.find((s) => s.event?.id === eventId);
   const isBookmarked = !!savedEntry;
 
   const optimisticOptions = (updater: (items: Saved[]) => Saved[]) => ({
@@ -45,18 +44,18 @@ export function BookmarkButton({ occurrenceId }: { occurrenceId: string }) {
   const createSaved = useCreateSaved(
     optimisticOptions((items) => [
       ...items,
-      { id: "optimistic", guardian_id: GUARDIAN_ID, event_occurrence_id: occurrenceId, created_at: "", updated_at: "" },
+      { id: "optimistic", guardian_id: guardianId, event, created_at: "", updated_at: "" },
     ])
   );
   const deleteSaved = useDeleteSaved(
-    optimisticOptions((items) => items.filter((s) => s.event_occurrence_id !== occurrenceId))
+    optimisticOptions((items) => items.filter((s) => s.event?.id !== eventId))
   );
 
   const handlePress = () => {
     if (isBookmarked && savedEntry) {
       deleteSaved.mutate({ id: savedEntry.id });
     } else {
-      createSaved.mutate({ data: { event_occurrence_id: occurrenceId, guardian_id: GUARDIAN_ID } });
+      createSaved.mutate({ data: { event_id: eventId, guardian_id: guardianId } });
     }
   };
 

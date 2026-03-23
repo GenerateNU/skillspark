@@ -7,9 +7,10 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-const language = "en-US"
+var language string
 
 func (r *SavedRepository) CreateSaved(ctx context.Context, saved *models.CreateSavedInput) (*models.Saved, error) {
+	language = saved.AcceptLanguage
 
 	query, err := schema.ReadSQLBaseScript("create.sql", SqlSavedFiles)
 	if err != nil {

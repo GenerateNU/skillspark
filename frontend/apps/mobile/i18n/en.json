@@ -107,6 +107,12 @@
     "saveError": "Failed to save. Please try again.",
     "deleteError": "Failed to delete."
   },
+  "saved": {
+    "title": "Saved",
+    "noEvents": "You have no saved events.",
+    "deleteTitle": "Delete saved event",
+    "deleteConfirm": "Are you sure you want to remove this saved event?"
+  },
   "event": {
     "back": "Back",
     "seeMore": "See more",

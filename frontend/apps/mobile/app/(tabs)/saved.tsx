@@ -9,10 +9,8 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, Alert, FlatList, TouchableOpacity, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-
-const GUARDIAN_ID = '55555555-5555-5555-5555-555555555555';
-
+import { useGuardian } from '@/hooks/use-guardian';
+import { useTranslation } from 'react-i18next';
 
 export default function SavedScreen() {
 
@@ -20,26 +18,29 @@ export default function SavedScreen() {
     const colorScheme = useColorScheme();
     const router = useRouter();
     const theme = Colors[colorScheme ?? 'light'];
+    const { guardianId } = useGuardian();
+    const { t: translate } = useTranslation();
 
     const queryClient = useQueryClient();
 
-    const { data: response, isLoading, error } = useGetSavedByGuardianId(GUARDIAN_ID);
+    const { data: response, isLoading, error } = useGetSavedByGuardianId(guardianId);
     const deleteSavedMutation  = useDeleteSaved();
 
     if (isLoading) {
         return (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 8 }}>
             <ActivityIndicator size="large" />
-            <ThemedText>Loading events...</ThemedText>
+            <ThemedText>{translate('common.loadingEvents')}</ThemedText>
         </View>
         );
     }
 
     if (error) {
+      console.log(error)
         return (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
-            <ThemedText style={{ color: "#EF4444", fontWeight: "600" }}>Error loading events</ThemedText>
-            <ThemedText>{error.detail || "An error occurred"}</ThemedText>
+            <ThemedText style={{ color: "#EF4444", fontWeight: "600" }}>{translate('common.errorLoadingEvents')}</ThemedText>
+            <ThemedText>{error.detail || translate('common.errorOccurred')}</ThemedText>
         </View>
         );
     }
@@ -47,7 +48,7 @@ export default function SavedScreen() {
     if (!response || !Array.isArray(response.data)) {
         return (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
-            <ThemedText>No events available</ThemedText>
+            <ThemedText>{translate('common.noEventsAvailable')}</ThemedText>
         </View>
         );
     }
@@ -58,19 +59,19 @@ export default function SavedScreen() {
 
     const handleDeleteSaved = (savedId: string) => {
       Alert.alert(
-        'Delete saved event',
-        'Are you sure you want remove this saved event?',
+        translate('saved.deleteTitle'),
+        translate('saved.deleteConfirm'),
         [
-          { text: 'Cancel', style: 'cancel' },
+          { text: translate('common.cancel'), style: 'cancel' },
           {
-            text: 'Delete', style: 'destructive',
+            text: translate('payment.delete'), style: 'destructive',
             onPress: async () => {
               deleteSavedMutation.mutate(
               { id: savedId }, 
               {
                   onSuccess: () => {
                   queryClient.invalidateQueries({
-                      queryKey: getGetSavedByGuardianIdQueryKey(GUARDIAN_ID)
+                      queryKey: getGetSavedByGuardianIdQueryKey(guardianId)
                   });
                   },
                   onError: (err) => console.error('Failed to delete saved event', err),
@@ -92,14 +93,14 @@ export default function SavedScreen() {
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText className="text-xl text-center font-nunito-bold">Saved</ThemedText>
+        <ThemedText className="text-xl text-center font-nunito-bold">{translate('saved.title')}</ThemedText>
         <View className="w-10" />
       </View>
         <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
     {savedEvents.length === 0 ? (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
         <ThemedText className="text-center text-lg text-gray-500">
-          You have no saved events.
+          {translate('saved.noEvents')}
         </ThemedText>
       </View>
     ) : (
