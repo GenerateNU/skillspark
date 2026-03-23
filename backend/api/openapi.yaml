@@ -3014,7 +3014,10 @@ components:
           readOnly: true
         guardian_id:
           type: string
+        token:
+          type: string
       required:
+        - token
         - guardian_id
     GuardianSignUpInputBody:
       type: object
@@ -3044,7 +3047,6 @@ components:
         - email
         - username
         - password
-        - profile_picture_s3_key
         - language_preference
     GuardianSignUpOutputBody:
       type: object
@@ -3221,7 +3223,10 @@ components:
           readOnly: true
         manager_id:
           type: string
+        token:
+          type: string
       required:
+        - token
         - manager_id
     ManagerSignUpInputBody:
       type: object

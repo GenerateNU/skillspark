@@ -506,6 +506,7 @@ export interface GuardianLoginOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   guardian_id: string;
+  token: string;
 }
 
 export interface GuardianSignUpInputBody {
@@ -515,7 +516,7 @@ export interface GuardianSignUpInputBody {
   language_preference: string;
   name: string;
   password: string;
-  profile_picture_s3_key: string;
+  profile_picture_s3_key?: string;
   username: string;
 }
 
@@ -563,6 +564,7 @@ export interface ManagerLoginOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   manager_id: string;
+  token: string;
 }
 
 export interface ManagerSignUpInputBody {
