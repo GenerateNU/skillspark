@@ -46,7 +46,7 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 	}
 
 	pagination := utils.Pagination{Limit: 10, Page: 1}
-	reviews, err := repo.GetByGuardianID(ctx, firstSaved.GuardianID, pagination)
+	reviews, err := repo.GetByGuardianID(ctx, firstSaved.GuardianID, pagination, "en-US")
 	require.Nil(t, err)
 	require.Len(t, reviews, len(expectedSaved))
 }
@@ -60,7 +60,7 @@ func TestGetReviewsByGuardianID_NoReviews(t *testing.T) {
 	g := guardian.CreateTestGuardian(t, ctx, testDB)
 
 	pagination := utils.Pagination{Limit: 10, Page: 1}
-	reviews, err := repo.GetByGuardianID(ctx, g.ID, pagination)
+	reviews, err := repo.GetByGuardianID(ctx, g.ID, pagination, "en-US")
 
 	require.Nil(t, err)
 	require.NotNil(t, reviews)
