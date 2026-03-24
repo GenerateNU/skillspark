@@ -30,7 +30,6 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 		input := &models.CreateEventOccurrenceInput{}
 		input.Body.ManagerId = &mid
 		input.Body.EventId = uuid.MustParse("60000000-0000-0000-0000-000000000001")
-		input.Body.LocationId = uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 		input.Body.StartTime = start
 		input.Body.EndTime = end
 		input.Body.MaxAttendees = 10

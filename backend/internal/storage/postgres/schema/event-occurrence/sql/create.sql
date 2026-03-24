@@ -1,7 +1,7 @@
 WITH new_row AS (
-    INSERT INTO event_occurrence (manager_id, event_id, location_id, start_time, end_time, max_attendees, language, price, currency)
+    INSERT INTO event_occurrence (manager_id, event_id, start_time, end_time, max_attendees, language, price, currency)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    RETURNING id, manager_id, event_id, location_id, start_time, end_time, max_attendees, language, curr_enrolled, created_at, updated_at, status, price, currency
+    RETURNING id, manager_id, event_id, start_time, end_time, max_attendees, language, curr_enrolled, created_at, updated_at, status, price, currency
 ) 
 SELECT 
     eo.id,
@@ -44,4 +44,5 @@ SELECT
     l.updated_at
 FROM new_row eo
 JOIN event e ON e.id = eo.event_id
-JOIN location l ON l.id = eo.location_id;
+JOIN organization o ON o.id = e.organization_id
+JOIN location l ON l.id = o.location_id;

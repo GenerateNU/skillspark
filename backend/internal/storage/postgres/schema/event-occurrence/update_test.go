@@ -38,7 +38,6 @@ func TestEventOccurrenceRepository_UpdateEventOccurrence(t *testing.T) {
 		input.ID = uuid.MustParse("70000000-0000-0000-0000-000000000002")
 		input.Body.ManagerId = &midNew
 		input.Body.EventId = &eid
-		input.Body.LocationId = &lid
 		input.Body.StartTime = &startNew
 		input.Body.EndTime = &endNew
 		input.Body.MaxAttendees = &max
@@ -54,7 +53,6 @@ func TestEventOccurrenceRepository_UpdateEventOccurrence(t *testing.T) {
 	assert.NotNil(t, eventOccurrence)
 	assert.Equal(t, eventOccurrenceInput.Body.ManagerId, eventOccurrence.ManagerId)
 	assert.Equal(t, *eventOccurrenceInput.Body.EventId, eventOccurrence.Event.ID)
-	assert.Equal(t, *eventOccurrenceInput.Body.LocationId, eventOccurrence.Location.ID)
 	assert.Equal(t, *eventOccurrenceInput.Body.StartTime, eventOccurrence.StartTime)
 	assert.Equal(t, *eventOccurrenceInput.Body.EndTime, eventOccurrence.EndTime)
 	assert.Equal(t, *eventOccurrenceInput.Body.MaxAttendees, eventOccurrence.MaxAttendees)

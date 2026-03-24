@@ -7,7 +7,6 @@ import (
 
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/event"
-	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/schema/manager"
 	"skillspark/internal/storage/postgres/testutil"
 
@@ -56,7 +55,6 @@ func TestEventOccurrenceRepository_CancelEventOccurrence_Within24HoursFails(t *t
 		input := &models.CreateEventOccurrenceInput{}
 		input.Body.ManagerId = &manager.CreateTestManager(t, ctx, testDB).ID
 		input.Body.EventId = event.CreateTestEvent(t, ctx, testDB).ID
-		input.Body.LocationId = location.CreateTestLocation(t, ctx, testDB).ID
 		input.Body.StartTime = start
 		input.Body.EndTime = end
 		input.Body.MaxAttendees = 10
