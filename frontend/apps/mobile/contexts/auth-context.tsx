@@ -7,6 +7,8 @@ import {
   useSignupGuardian,
   useGetGuardianById,
   Guardian,
+  useUpdateGuardian,
+  updateGuardianResponse,
 } from "@skillspark/api-client";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
@@ -33,6 +35,16 @@ interface AuthContextType {
     onError: (msg: string) => void,
   ) => void;
   logout: () => void;
+  update: (
+    id: string,
+    email: string,
+    language_preference: string,
+    name: string,
+    username: string,
+    onError: (msg: string) => void,
+    profile_picture_s3_key?: string | undefined,
+    expo_push_token?: string | undefined,
+  ) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -46,12 +58,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const { mutate: loginFunc } = useLoginGuardian();
   const { mutate: signupFunc } = useSignupGuardian();
+  const { mutate: updateFunc } = useUpdateGuardian();
 
   const { data: guardianData } = useGetGuardianById(guardianId!, {
     query: {
       enabled: !!guardianId,
     }
   });
+  let guardian = (guardianData as unknown as { data: Guardian })?.data;
 
   useEffect(() => {
     const checkAlreadyAuth = async () => {
@@ -70,14 +84,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const getUpdatedLangPref = async () => {
-      if (!guardianData) return;
-      const guardian = (guardianData as unknown as { data: Guardian })?.data;
+      if (!guardian) return;
       const pref = guardian?.language_preference ?? "en"; // default to english
       await SecureStore.setItemAsync("language_preference", pref);
       setLangPref(pref);
     };
     getUpdatedLangPref();
-  }, [guardianData]);
+  }, [guardian]);
 
   const login = (
     email: string,
@@ -152,7 +165,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLangPref(null);
   };
 
-  // add update const for changing the guardian
+  const update = (
+    id: string,
+    email: string,
+    language_preference: string,
+    name: string,
+    username: string,
+    onError: (msg: string) => void,
+    profile_picture_s3_key?: string | undefined,
+    expo_push_token?: string | undefined,
+  ) => {
+    updateFunc(
+      { 
+        id: id,
+        data: {
+            email,
+            language_preference,
+            name,
+            profile_picture_s3_key,
+            username,
+            expo_push_token,
+        },
+      },
+      {
+        onSuccess: async (resp: updateGuardianResponse) => {
+          guardian = resp.data as Guardian;
+          console.log(JSON.stringify(resp));
+          console.log(JSON.stringify(guardian));
+        },
+        onError: (err) => {
+          const fail = err as unknown as { data?: { message?: string }};
+          onError(fail.data?.message ?? "An unexpected error occurred");
+          console.log(JSON.stringify(err));
+        },
+      },
+    );
+  };
 
   return (
     <AuthContext.Provider
@@ -165,6 +213,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         signup,
         logout,
+        update
       }}
     >
       {children}

@@ -79,7 +79,11 @@ export default function FamilyListScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12 }} showsVerticalScrollIndicator={false}>
-        <TouchableOpacity className="flex-row items-start py-4 gap-3" activeOpacity={0.7}>
+        <TouchableOpacity 
+          className="flex-row items-start py-4 gap-3" 
+          activeOpacity={0.7}
+          onPress={() => router.navigate('/edit-profile')}
+        >
           <View className="w-11 h-11 items-center justify-center">
             <IconSymbol name="person.circle" size={40} color={theme.text} />
           </View>
