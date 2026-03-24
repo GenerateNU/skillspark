@@ -9,13 +9,10 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, Alert, FlatList, TouchableOpacity, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-
-const GUARDIAN_ID = '55555555-5555-5555-5555-555555555555';
-
+import { useAuthContext } from '@/hooks/use-auth-context';
+import { ErrorScreen } from '@/components/ErrorScreen';
 
 export default function SavedScreen() {
-
     const insets = useSafeAreaInsets();
     const colorScheme = useColorScheme();
     const router = useRouter();
@@ -23,8 +20,18 @@ export default function SavedScreen() {
 
     const queryClient = useQueryClient();
 
-    const { data: response, isLoading, error } = useGetSavedByGuardianId(GUARDIAN_ID);
+    const { guardianId } = useAuthContext();
+
+    const { data: response, isLoading, error } = useGetSavedByGuardianId(guardianId!, undefined, {
+      query: {
+        enabled: !!guardianId,
+      }
+    });
     const deleteSavedMutation  = useDeleteSaved();
+
+    if (!guardianId) {
+      return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+    }
 
     if (isLoading) {
         return (
@@ -70,7 +77,7 @@ export default function SavedScreen() {
               {
                   onSuccess: () => {
                   queryClient.invalidateQueries({
-                      queryKey: getGetSavedByGuardianIdQueryKey(GUARDIAN_ID)
+                      queryKey: getGetSavedByGuardianIdQueryKey(guardianId as string)
                   });
                   },
                   onError: (err) => console.error('Failed to delete saved event', err),
