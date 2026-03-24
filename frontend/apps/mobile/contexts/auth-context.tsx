@@ -125,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       {
         onSuccess: async (resp: signupGuardianResponse) => {
+          console.log('success!');
           const success = resp.data as GuardianSignUpOutputBody;
           await SecureStore.setItemAsync("token", success.token);
           setJWT(success.token);
@@ -133,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           router.replace("/(app)/(tabs)");
         },
         onError: (err) => {
+          console.log('failure');
           const fail = err as unknown as { data?: { message?: string }};
           onError(
             fail.data?.message ?? "An unexpected error occurred",
