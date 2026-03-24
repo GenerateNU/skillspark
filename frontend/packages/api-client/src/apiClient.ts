@@ -34,8 +34,10 @@ const getBaseURL = () => {
       return process.env.NEXT_PUBLIC_API_BASE_URL;
     }
   }
+
+  console.warn("using default")
   
-  return 'http://localhost:8080';
+  return 'http://10.110.10.192:8080';
 };
 
 // NOTE: This axios instance is preserved for future use or interceptor logic,
