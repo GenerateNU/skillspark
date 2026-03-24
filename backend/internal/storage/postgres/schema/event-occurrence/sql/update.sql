@@ -3,13 +3,13 @@ WITH updated_row AS (
     SET 
     manager_id = COALESCE($2, eo.manager_id),
     event_id = COALESCE($3, eo.event_id),
-    start_time = COALESCE($5, eo.start_time),
-    end_time = COALESCE($6, eo.end_time),
-    max_attendees = COALESCE($7, eo.max_attendees),
-    language = COALESCE($8, eo.language),
-    curr_enrolled = COALESCE($9, eo.curr_enrolled),
-    price = COALESCE($10, eo.price),
-    currency = COALESCE($11, eo.currency),
+    start_time = COALESCE($4, eo.start_time),
+    end_time = COALESCE($5, eo.end_time),
+    max_attendees = COALESCE($6, eo.max_attendees),
+    language = COALESCE($7, eo.language),
+    curr_enrolled = COALESCE($8, eo.curr_enrolled),
+    price = COALESCE($9, eo.price),
+    currency = COALESCE($10, eo.currency),
     updated_at = NOW()
 WHERE eo.id = $1
 RETURNING eo.id, eo.manager_id, eo.event_id, eo.start_time, eo.end_time, eo.max_attendees, eo.language, eo.curr_enrolled, eo.created_at, eo.updated_at, eo.status, eo.price, eo.currency)
@@ -55,4 +55,4 @@ SELECT
 FROM updated_row eo
 JOIN event e ON e.id = eo.event_id
 JOIN organization o ON o.id = e.organization_id
-JOIN location l ON l.id = o.location_id;
+LEFT JOIN location l ON l.id = o.location_id;

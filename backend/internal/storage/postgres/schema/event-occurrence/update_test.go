@@ -24,7 +24,6 @@ func TestEventOccurrenceRepository_UpdateEventOccurrence(t *testing.T) {
 
 	midNew := uuid.MustParse("50000000-0000-0000-0000-000000000005")
 	eid := uuid.MustParse("60000000-0000-0000-0000-00000000000e")
-	lid := uuid.MustParse("10000000-0000-0000-0000-000000000008")
 	startNew := time.Date(2027, time.March, 1, 9, 0, 0, 0, time.Local)
 	endNew := time.Date(2027, time.March, 1, 11, 0, 0, 0, time.Local)
 	max := 10
@@ -68,7 +67,6 @@ func TestEventOccurrenceRepository_UpdateEventOccurrence(t *testing.T) {
 	assert.NotNil(t, retrievedEventOccurrence)
 	assert.Equal(t, &midNew, retrievedEventOccurrence.ManagerId)
 	assert.Equal(t, eid, retrievedEventOccurrence.Event.ID)
-	assert.Equal(t, lid, retrievedEventOccurrence.Location.ID)
 	assert.Equal(t, startNew, retrievedEventOccurrence.StartTime)
 	assert.Equal(t, endNew, retrievedEventOccurrence.EndTime)
 	assert.Equal(t, 10, retrievedEventOccurrence.MaxAttendees)

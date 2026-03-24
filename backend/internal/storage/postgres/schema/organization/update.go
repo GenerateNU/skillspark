@@ -29,7 +29,7 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 		existing.PfpS3Key = PfpS3Key
 	}
 	if input.Body.LocationID != nil {
-		existing.LocationID = input.Body.LocationID
+		existing.LocationID = *input.Body.LocationID
 	}
 
 	row := r.db.QueryRow(ctx, query,
