@@ -9,6 +9,8 @@ import { FamilyCard } from '@/components/FamilyCard';
 import { ListItem } from '@/components/ListItem';
 import { useTranslation } from 'react-i18next';
 import { useGuardian } from '@/hooks/use-guardian';
+import { useAuthContext } from '@/hooks/use-auth-context';
+import { ErrorScreen } from '@/components/ErrorScreen';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -20,6 +22,11 @@ export default function ProfileScreen() {
   const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
 
   const { guardian, children, isLoading } = useGuardian();
+  const { guardianId } = useAuthContext();
+
+  if (!guardianId) {
+      return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+  }
 
   if (isLoading) {
     return (

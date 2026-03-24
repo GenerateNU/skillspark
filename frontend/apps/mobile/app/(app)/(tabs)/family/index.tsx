@@ -10,6 +10,8 @@ import { ChildListItem } from '@/components/ChildListItem';
 import { SectionHeader } from '@/components/SectionHeader';
 import { useTranslation } from 'react-i18next';
 import { useGuardian } from '@/hooks/use-guardian';
+import { useAuthContext } from '@/hooks/use-auth-context';
+import { ErrorScreen } from '@/components/ErrorScreen';
 
 export default function FamilyListScreen() {
   const router = useRouter();
@@ -19,6 +21,7 @@ export default function FamilyListScreen() {
   const { t: translate } = useTranslation();
 
   const { guardian, children, isLoading } = useGuardian();
+  const { guardianId } = useAuthContext();
 
   const handleAddChild = () => {
     router.push('/family/manage');
@@ -37,6 +40,10 @@ export default function FamilyListScreen() {
       },
     });
   };
+
+   if (!guardianId) {
+        return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+  }
 
   if (isLoading) {
     return (

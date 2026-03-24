@@ -12,9 +12,9 @@ export interface LocationPin {
   description: string;
   latitude: number;
   longitude: number;
-  rating: number;     
-  members: number;     
-  image?: string;     
+  rating: number;
+  members: number;
+  image?: string;
 }
 
 interface EventCardProps {
@@ -22,14 +22,17 @@ interface EventCardProps {
 }
 
 export function EventCard({ pin }: EventCardProps) {
-  const placeholderColor = useThemeColor({ light: '#D0D0D0', dark: '#333333' }, 'background');
+  const placeholderColor = useThemeColor(
+    { light: "#D0D0D0", dark: "#333333" },
+    "background",
+  );
   const { t: translate } = useTranslation();
 
   return (
     <ThemedView
       className="absolute bottom-0 left-0 right-0 rounded-t-[25px] p-5"
       style={{
-        paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+        paddingBottom: Platform.OS === "ios" ? 40 : 20,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.1,
@@ -59,7 +62,10 @@ export function EventCard({ pin }: EventCardProps) {
             ))}
           </View>
 
-          <ThemedText numberOfLines={2} className="text-sm leading-5 text-[#888]">
+          <ThemedText
+            numberOfLines={2}
+            className="text-sm leading-5 text-[#888]"
+          >
             {pin.description}
           </ThemedText>
         </View>
@@ -67,7 +73,7 @@ export function EventCard({ pin }: EventCardProps) {
             <IconSymbol name="record.circle" size={24} color="#888" />
         </View>
       </View>
-      <TouchableOpacity 
+      <TouchableOpacity
         className="w-full items-center rounded-xl bg-[#333] py-[15px]"
         activeOpacity={1} 
         onPress={() => Alert.alert(translate('dashboard.reserve'), `${translate('dashboard.reserved')}: ${pin.title}`)}

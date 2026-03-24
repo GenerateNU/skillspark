@@ -30,28 +30,30 @@ export default function MapScreen() {
     if (!Array.isArray(occurrences)) return [];
 
     return occurrences
-      .filter(occ => occ.location && occ.event)
-      .map(occ => ({
+      .filter((occ) => occ.location && occ.event)
+      .map((occ) => ({
         id: occ.id,
         title: occ.event.title,
         description: occ.event.description,
         latitude: occ.location.latitude,
         longitude: occ.location.longitude,
-        rating: 5.0, 
+        rating: 5.0,
         members: occ.curr_enrolled,
-        image: occ.event.header_image_s3_key
+        image: occ.event.header_image_s3_key,
       }));
   }, [occurrences]);
 
-  const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
-  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
+  const [userLocation, setUserLocation] =
+    useState<Location.LocationObject | null>(null);
+  const [locationPermissionDenied, setLocationPermissionDenied] =
+    useState(false);
   const [isLocationLoading, setIsLocationLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      
-      if (status !== 'granted') {
+
+      if (status !== "granted") {
         setLocationPermissionDenied(true);
         setIsLocationLoading(false);
         return;
@@ -61,7 +63,7 @@ export default function MapScreen() {
         const location = await Location.getCurrentPositionAsync({});
         setUserLocation(location);
       } catch (err) {
-        console.warn('Could not fetch location:', err);
+        console.warn("Could not fetch location:", err);
       } finally {
         setIsLocationLoading(false);
       }
@@ -90,10 +92,7 @@ export default function MapScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <SkillSparkMap 
-        locations={mapLocations} 
-        userLocation={userLocation} 
-      />
+      <SkillSparkMap locations={mapLocations} userLocation={userLocation} />
 
       {!isApiLoading && error && (
          <View className="absolute top-[60px] self-center rounded-[20px] bg-[rgba(0,0,0,0.6)] px-5 py-[10px]">

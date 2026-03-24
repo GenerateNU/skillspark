@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useTranslation } from 'react-i18next';
+import { useAuthContext } from "@/hooks/use-auth-context";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -18,9 +19,13 @@ export default function SettingsScreen() {
   const cardBg = colorScheme === 'dark' ? '#1c1c1e' : '#EFEFEF';
   const dividerColor = colorScheme === 'dark' ? '#3a3a3c' : '#D1D5DB';
 
-  const handleLogOut = () => {};
-
   const handleDeleteAccount = () => {};
+
+  const { logout } = useAuthContext();
+
+  const handleLogOut = () => {
+    logout();
+  };
 
   return (
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
