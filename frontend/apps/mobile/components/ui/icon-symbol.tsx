@@ -38,10 +38,7 @@ const MAPPING = {
   'bookmark.fill': 'bookmark',
   'location.fill': 'place',
   'record.circle': 'radio-button-on',
-  'checkmark': 'check',
-} as const satisfies Record<string, MaterialIconName>;
-
-type IconSymbolName = keyof typeof MAPPING;
+} as IconMapping;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.

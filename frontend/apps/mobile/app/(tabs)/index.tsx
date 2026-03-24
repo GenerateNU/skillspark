@@ -189,12 +189,12 @@ function EventCard({ item }: { item: EventOccurrence }) {
           </Text>
           <StarRating />
         </View>
-        <View style={{ backgroundColor: AppColors.primaryText, borderRadius: 999, paddingHorizontal: 20, paddingVertical: 10 }}>
-          <Text style={{ color: "#fff", fontWeight: "700", fontSize: 14 }}>
+        <View className={`bg-[${AppColors.primaryText}] rounded-full px-5 py-2.5`}>
+          <Text className="text-white font-bold text-sm">
             {item.curr_enrolled}/{item.max_attendees}
           </Text>
-          <View style={{ backgroundColor: "#111", borderRadius: 999, paddingHorizontal: 20, paddingVertical: 10 }}>
-            <Text style={{ color: "#fff", fontWeight: "700", fontSize: 14 }}>
+          <View className={`bg-[${AppColors.primaryText}] rounded-full px-5 py-2.5`}>
+            <Text className="text-white font-bold text-sm">
               {translate('dashboard.reserve')}
             </Text>
           </View>
@@ -229,7 +229,7 @@ function EventOccurrencesList() {
   if (error) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
-        <ThemedText style={{ color: AppColors.danger, fontWeight: "600" }}>{translate('common.errorLoadingEvents')}</ThemedText>
+        <ThemedText className={`text-[${AppColors.danger}] font-semibold`}>{translate('common.errorLoadingEvents')}</ThemedText>
         <ThemedText>{error.detail || translate('common.errorOccurred')}</ThemedText>
       </View>
     );

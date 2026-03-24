@@ -7,7 +7,6 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useTranslation } from 'react-i18next'
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect } from 'react';
 import { useGuardian } from '@/hooks/use-guardian';
 import { useUpdateGuardian, getGetGuardianByIdQueryKey } from '@skillspark/api-client';
@@ -37,11 +36,9 @@ export default function LanguageScreen() {
   const updateLanguageData = async (langCode: string) => {
     setSelected(langCode);
     await i18n.changeLanguage(langCode);
-    await AsyncStorage.setItem('lng', langCode);
     queryClient.invalidateQueries();
 
     if (guardian) {
-
       updateGuardianMutation.mutate({
         id: guardianId,
         data: {

@@ -184,7 +184,7 @@ export function ChildProfileForm({
               >
                 <ThemedText className="text-base font-nunito">{translate(`interests.${item}`, { defaultValue: capitalize(item) })}</ThemedText>
                 <View
-                  className={`w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center ${interests.includes(item) ? 'border-[#1F2937]' : 'border-[#9CA3AF]'}`}
+                  className={`w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center border-[${interests.includes(item) ? AppColors.checkboxSelected : AppColors.subtleText}]`}
                 >
                   {interests.includes(item) && (
                     <IconSymbol name="checkmark" size={12} color={AppColors.checkboxSelected} />
