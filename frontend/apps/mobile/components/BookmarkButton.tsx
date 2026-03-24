@@ -9,14 +9,18 @@ import {
 import type { getSavedByGuardianIdResponse, Saved } from "@skillspark/api-client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { AppColors } from "@/constants/theme";
-
-// TODO: Replace with authenticated user's guardian ID
-const GUARDIAN_ID = "88888888-8888-8888-8888-888888888888";
+import { useAuthContext } from "@/hooks/use-auth-context";
 
 export function BookmarkButton({ occurrenceId }: { occurrenceId: string }) {
   const queryClient = useQueryClient();
-  const { data: savedResponse } = useGetSavedByGuardianId(GUARDIAN_ID);
-  const savedQueryKey = getGetSavedByGuardianIdQueryKey(GUARDIAN_ID);
+  const { guardianId } = useAuthContext();
+
+  const { data: savedResponse } = useGetSavedByGuardianId(guardianId!, undefined, {
+    query: {
+      enabled: !!guardianId,
+    }
+  });
+  const savedQueryKey = getGetSavedByGuardianIdQueryKey(guardianId);
 
   const savedItems = savedResponse?.status === 200 ? savedResponse.data : [];
   const savedEntry = savedItems.find((s) => s.event_occurrence_id === occurrenceId);
@@ -45,7 +49,7 @@ export function BookmarkButton({ occurrenceId }: { occurrenceId: string }) {
   const createSaved = useCreateSaved(
     optimisticOptions((items) => [
       ...items,
-      { id: "optimistic", guardian_id: GUARDIAN_ID, event_occurrence_id: occurrenceId, created_at: "", updated_at: "" },
+      { id: "optimistic", guardian_id: guardianId, event_occurrence_id: occurrenceId, created_at: "", updated_at: "" },
     ])
   );
   const deleteSaved = useDeleteSaved(
@@ -56,7 +60,7 @@ export function BookmarkButton({ occurrenceId }: { occurrenceId: string }) {
     if (isBookmarked && savedEntry) {
       deleteSaved.mutate({ id: savedEntry.id });
     } else {
-      createSaved.mutate({ data: { event_occurrence_id: occurrenceId, guardian_id: GUARDIAN_ID } });
+      createSaved.mutate({ data: { event_occurrence_id: occurrenceId, guardian_id: guardianId } });
     }
   };
 
