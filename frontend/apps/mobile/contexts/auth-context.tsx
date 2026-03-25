@@ -155,6 +155,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           router.replace("/(app)/(tabs)");
         },
         onError: (err) => {
+<<<<<<< HEAD
+=======
+          console.log("helllloooo");
+>>>>>>> 0d89b02 (intial changes)
           const fail = err as unknown as { data?: { message?: string } };
           onError(fail.data?.message ?? "An unexpected error occurred");
         },
