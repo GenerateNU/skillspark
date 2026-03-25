@@ -1,19 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
-import { IconHome, IconBuilding } from "./icons";
+import { Link } from "react-router-dom";
 
-interface NavItem {
-  to: string;
-  label: string;
-  icon: React.ReactNode;
-}
 
 export function Sidebar() {
-  const location = useLocation();
-
-  const navItems: NavItem[] = [
-    { to: "/admin", label: "Home", icon: <IconHome /> },
-    { to: "/admin/organization", label: "Organizations", icon: <IconBuilding /> },
-  ];
 
   return (
     <aside className="w-56 shrink-0 bg-white border-r border-gray-200 flex flex-col h-full">
@@ -29,22 +17,7 @@ export function Sidebar() {
         </div>
       </Link>
 
-      <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2 mb-2">Navigation</p>
-        {navItems.map(function (item: NavItem) {
-          const active: boolean = location.pathname === item.to;
-          return (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={`flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm font-medium transition-colors ${active ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`}
-            >
-              <span className={active ? "text-blue-600" : "text-gray-400"}>{item.icon}</span>
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      <div className="flex-1" />
 
       <Link
         to="/admin/profile"

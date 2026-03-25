@@ -5,15 +5,40 @@ export type ManagerErrors = Partial<Record<keyof Omit<ManagerSignUpInputBody, "a
 export type OrgErrors = Partial<Record<keyof CreateOrganizationBody, string>>;
 
 const genOtp = (): string => {
-  const chars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-  const length: number = 12;
-  let result: string = "";
-  const array = new Uint32Array(length);
+  const upper: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const lower: string = "abcdefghijklmnopqrstuvwxyz";
+  const numbers: string = "0123456789";
+  const special: string = "!@#$%^&*";
+  const all: string = upper + lower + numbers + special;
+
+  const randomChar = (charset: string): string => {
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    return charset[array[0] % charset.length];
+  };
+
+  const required: string[] = [
+    randomChar(upper),
+    randomChar(lower),
+    randomChar(numbers),
+    randomChar(special),
+  ];
+
+  const remaining: string[] = [];
+  const array = new Uint32Array(8);
   crypto.getRandomValues(array);
   array.forEach(function (val: number) {
-    result += chars[val % chars.length];
+    remaining.push(all[val % all.length]);
   });
-  return result;
+
+  const combined: string[] = [...required, ...remaining];
+  const shuffled = new Uint32Array(combined.length);
+  crypto.getRandomValues(shuffled);
+  combined.sort(function (_, __) {
+    return shuffled[combined.indexOf(_)] - shuffled[combined.indexOf(__)];
+  });
+
+  return combined.join("");
 };
 
 export const isValidEmail = (v: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
@@ -53,3 +78,13 @@ export function validateMgr(m: ManagerFormInput): ManagerErrors {
   if (!m.language_preference.trim()) e.language_preference = "Required";
   return e;
 }
+
+export const isValidPassword = (v: string): boolean => {
+  return (
+    v.length >= 8 &&
+    /[A-Z]/.test(v) &&
+    /[a-z]/.test(v) &&
+    /[0-9]/.test(v) &&
+    /[!@#$%^&*]/.test(v)
+  );
+};

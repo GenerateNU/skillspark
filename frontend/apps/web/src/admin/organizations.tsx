@@ -137,7 +137,6 @@ export default function OrganizationDetailPage() {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Toolbar */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-3 shrink-0">
         <button onClick={function () { navigate("/admin"); }} className="text-sm text-gray-400 hover:text-gray-600">
           Organizations

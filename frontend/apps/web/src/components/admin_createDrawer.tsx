@@ -1,8 +1,8 @@
-import { type Organization, type ManagerSignUpInputBody, type CreateOrganizationBody, createOrganization, type Manager, signupManager, type signupManagerResponse, getManagerByOrgId } from "@skillspark/api-client";
+import { type Organization, type ManagerSignUpInputBody, type CreateOrganizationBody, type CreateLocationInputBody, createOrganization, type Manager, signupManager, type signupManagerResponse, getManagerByOrgId, postLocation } from "@skillspark/api-client";
 import { useState, useEffect } from "react";
 import { Btn, Field, Select } from "./common";
-import { IconCheck, IconPlus, IconX } from "./icons";
-import { blankMgr, isValidUUID, validateMgr } from "./validation";
+import { IconCheck, IconX } from "./icons";
+import { blankMgr, validateMgr } from "./validation";
 import ManagerFormRow from "./admin_managerFormRow";
 import ValidatedInput from "./validatedInput";
 
@@ -22,9 +22,20 @@ export interface ManagerFormInput {
 
 export function CreateModal({ onClose, onCreate }: CreateModalProps) {
   const [step, setStep] = useState<0 | 1>(0);
+
+  // org fields
   const [orgName, setOrgName] = useState<string>("");
-  const [locationId, setLocationId] = useState<string | undefined>();
   const [orgActive, setOrgActive] = useState<boolean>(true);
+
+  // location fields
+  const [addressLine1, setAddressLine1] = useState<string>("");
+  const [addressLine2, setAddressLine2] = useState<string>("");
+  const [country, setCountry] = useState<string>("");
+  const [district, setDistrict] = useState<string>("");
+  const [subdistrict, setSubdistrict] = useState<string>("");
+  const [province, setProvince] = useState<string>("");
+  const [postalCode, setPostalCode] = useState<string>("");
+
   const [managerInputs, setManagerInputs] = useState<ManagerFormInput[]>([blankMgr()]);
 
   useEffect(function () {
@@ -42,6 +53,18 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
         return Object.assign({}, m, { [k]: v });
       });
     });
+  }
+
+  function isStep0Valid(): boolean {
+    return (
+      orgName.trim().length > 0 &&
+      addressLine1.trim().length >= 5 &&
+      country.trim().length >= 2 &&
+      district.trim().length >= 2 &&
+      subdistrict.trim().length >= 2 &&
+      province.trim().length >= 2 &&
+      postalCode.trim().length >= 3
+    );
   }
 
   const stepLabels: string[] = ["Organization details", "Managers"];
@@ -88,24 +111,13 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
 
           {step === 0 && (
             <div className="flex flex-col gap-4">
+              {/* Organization */}
               <Field label="Organization name" required>
                 <ValidatedInput
                   value={orgName}
                   onChange={function (v: string) { setOrgName(v); }}
                   validate={function (v: string) { return v.trim() ? null : "Required"; }}
                   placeholder="Acme Kids Academy"
-                />
-              </Field>
-              <Field label="Location ID" required>
-                <ValidatedInput
-                  value={locationId ?? ""}
-                  onChange={function (v: string) { setLocationId(v || undefined); }}
-                  validate={function (v: string) {
-                    if (!v.trim()) return "Required";
-                    if (!isValidUUID(v)) return "Must be a valid UUID";
-                    return null;
-                  }}
-                  placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 />
               </Field>
               <Field label="Active">
@@ -117,31 +129,92 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
                   <option value="false">No</option>
                 </Select>
               </Field>
+
+              {/* Divider */}
+              <div className="relative my-1">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
+                <div className="relative flex justify-start"><span className="bg-white pr-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Location</span></div>
+              </div>
+
+              <Field label="Address line 1" required>
+                <ValidatedInput
+                  value={addressLine1}
+                  onChange={function (v: string) { setAddressLine1(v); }}
+                  validate={function (v: string) {
+                    if (!v.trim()) return "Required";
+                    if (v.trim().length < 5) return "Must be at least 5 characters";
+                    return null;
+                  }}
+                  placeholder="123 Sukhumvit Rd"
+                />
+              </Field>
+              <Field label="Address line 2">
+                <ValidatedInput
+                  value={addressLine2}
+                  onChange={function (v: string) { setAddressLine2(v); }}
+                  validate={function (v: string) {
+                    if (v && v.trim().length < 5) return "Must be at least 5 characters";
+                    return null;
+                  }}
+                  placeholder="Floor 4, Suite 401"
+                />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Subdistrict" required>
+                  <ValidatedInput
+                    value={subdistrict}
+                    onChange={function (v: string) { setSubdistrict(v); }}
+                    validate={function (v: string) { return v.trim().length >= 2 ? null : "Required"; }}
+                    placeholder="Khlong Toei"
+                  />
+                </Field>
+                <Field label="District" required>
+                  <ValidatedInput
+                    value={district}
+                    onChange={function (v: string) { setDistrict(v); }}
+                    validate={function (v: string) { return v.trim().length >= 2 ? null : "Required"; }}
+                    placeholder="Khlong Toei"
+                  />
+                </Field>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Province" required>
+                  <ValidatedInput
+                    value={province}
+                    onChange={function (v: string) { setProvince(v); }}
+                    validate={function (v: string) { return v.trim().length >= 2 ? null : "Required"; }}
+                    placeholder="Bangkok"
+                  />
+                </Field>
+                <Field label="Postal code" required>
+                  <ValidatedInput
+                    value={postalCode}
+                    onChange={function (v: string) { setPostalCode(v); }}
+                    validate={function (v: string) { return v.trim().length >= 3 ? null : "Required"; }}
+                    placeholder="10110"
+                  />
+                </Field>
+              </div>
+              <Field label="Country" required>
+                <ValidatedInput
+                  value={country}
+                  onChange={function (v: string) { setCountry(v); }}
+                  validate={function (v: string) { return v.trim().length >= 2 ? null : "Required"; }}
+                  placeholder="Thailand"
+                />
+              </Field>
             </div>
           )}
 
           {step === 1 && (
             <div className="flex flex-col gap-4">
-              {managerInputs.map(function (m: ManagerFormInput, i: number) {
-                return (
-                  <ManagerFormRow
-                    key={i} mgr={m} index={i}
-                    onChange={updMgr}
-                    onRemove={function (idx: number) {
-                      setManagerInputs(function (prev: ManagerFormInput[]) {
-                        return prev.filter(function (_: ManagerFormInput, j: number) { return j !== idx; });
-                      });
-                    }}
-                    canRemove={managerInputs.length > 1}
-                  />
-                );
-              })}
-              <button
-                onClick={function () { setManagerInputs(function (prev: ManagerFormInput[]) { return [...prev, blankMgr()]; }); }}
-                className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium py-2"
-              >
-                <IconPlus /> Add another manager
-              </button>
+              <ManagerFormRow
+                mgr={managerInputs[0]}
+                index={0}
+                onChange={updMgr}
+                onRemove={function () { }}
+                canRemove={false}
+              />
             </div>
           )}
         </div>
@@ -151,32 +224,49 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
           {step === 0 ? (
             <>
               <Btn variant="ghost" onClick={onClose}>Cancel</Btn>
-              <Btn onClick={async function () {
-                try {
-                  if (orgName.trim().length === 0) throw new Error("Organization name is required");
-                  if (!locationId || !isValidUUID(locationId)) throw new Error("A valid location ID is required");
+              <Btn
+                onClick={function () {
+                  if (!isStep0Valid()) return;
                   setStep(1);
-                } catch (e) {
-                  console.error(e);
-                }
-              }}>Continue</Btn>
+                }}
+                disabled={!isStep0Valid()}
+              >
+                Continue
+              </Btn>
             </>
           ) : (
             <>
               <Btn variant="ghost" onClick={function () { setStep(0); }}>Back</Btn>
               <Btn onClick={async function () {
                 try {
-                  const input: CreateOrganizationBody = {
+                  const locationInput: CreateLocationInputBody = {
+                    address_line1: addressLine1,
+                    ...(addressLine2.trim() ? { address_line2: addressLine2 } : {}),
+                    country,
+                    district,
+                    subdistrict,
+                    province,
+                    postal_code: postalCode,
+                  };
+                  const locationRes = await postLocation(locationInput);
+                  if (locationRes.status !== 200 && locationRes.status !== 201) {
+                    throw new Error("Failed to create location");
+                  }
+                  const locationId: string = (locationRes.data as { id: string }).id;
+                  console.log(locationId)
+
+                  const orgInput: CreateOrganizationBody = {
                     name: orgName,
                     location_id: locationId,
                     active: orgActive,
-                    profile_image: new Blob([], { type: "image/png"}),
+                    profile_image: new Blob([], { type: "image/png" }),
                   };
-                  const createdOrg = await createOrganization(input);
-                  if (createdOrg.status !== 201 && createdOrg.status !== 200) {
-                    throw new Error("There was an error creating an organization");
+                  const createdOrg = await createOrganization(orgInput);
+                  if (createdOrg.status !== 200 && createdOrg.status !== 201) {
+                    throw new Error("Failed to create organization");
                   }
                   const org: Organization = createdOrg.data as Organization;
+
                   const completeManagerInputs: ManagerSignUpInputBody[] = managerInputs.map(function (man: ManagerFormInput) {
                     const errors = validateMgr(man);
                     if (Object.keys(errors).length > 0) {
@@ -198,8 +288,11 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
                       throw new Error(`Failed to sign up manager ${mgr.name}`);
                     }
                   }
+
                   const managersRes = await getManagerByOrgId(org.id);
-                  if (managersRes.status !== 200 && managersRes.status !== 201) throw new Error("Failed to fetch managers");
+                  if (managersRes.status !== 200 && managersRes.status !== 201) {
+                    throw new Error("Failed to fetch managers");
+                  }
                   onCreate(org, managersRes.data as Manager[]);
                   onClose();
                 } catch (e) {

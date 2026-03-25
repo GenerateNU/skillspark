@@ -31,12 +31,12 @@ export interface CancelEventOccurrenceOutputBody {
 /**
  * Current status of the registration
  */
-export type RegistrationStatus =
-  (typeof RegistrationStatus)[keyof typeof RegistrationStatus];
+export type RegistrationStatus = typeof RegistrationStatus[keyof typeof RegistrationStatus];
+
 
 export const RegistrationStatus = {
-  registered: "registered",
-  cancelled: "cancelled",
+  registered: 'registered',
+  cancelled: 'cancelled',
 } as const;
 
 export interface Registration {
@@ -199,17 +199,17 @@ export interface CreateLocationInputBody {
    */
   district: string;
   /**
-   * Latitude of the location
+   * Optional latitude of the location; validated against geocoded coordinates when provided
    * @minimum -90
    * @maximum 90
    */
-  latitude: number;
+  latitude?: number;
   /**
-   * Longitude of the location
+   * Optional longitude of the location; validated against geocoded coordinates when provided
    * @minimum -180
    * @maximum 180
    */
-  longitude: number;
+  longitude?: number;
   /**
    * Postal code of the location
    * @minLength 3
@@ -262,12 +262,12 @@ export interface CreateOrgStripeAccountOutputBody {
 /**
  * Initial status of the registration
  */
-export type CreateRegistrationInputBodyStatus =
-  (typeof CreateRegistrationInputBodyStatus)[keyof typeof CreateRegistrationInputBodyStatus];
+export type CreateRegistrationInputBodyStatus = typeof CreateRegistrationInputBodyStatus[keyof typeof CreateRegistrationInputBodyStatus];
+
 
 export const CreateRegistrationInputBodyStatus = {
-  registered: "registered",
-  cancelled: "cancelled",
+  registered: 'registered',
+  cancelled: 'cancelled',
 } as const;
 
 export interface CreateRegistrationInputBody {
@@ -398,12 +398,12 @@ export interface Event {
 /**
  * Current status of the event occurrence
  */
-export type EventOccurrenceStatus =
-  (typeof EventOccurrenceStatus)[keyof typeof EventOccurrenceStatus];
+export type EventOccurrenceStatus = typeof EventOccurrenceStatus[keyof typeof EventOccurrenceStatus];
+
 
 export const EventOccurrenceStatus = {
-  scheduled: "scheduled",
-  cancelled: "cancelled",
+  scheduled: 'scheduled',
+  cancelled: 'cancelled',
 } as const;
 
 export interface Location {
@@ -443,6 +443,25 @@ export interface EventOccurrence {
   /** Current status of the event occurrence */
   status: EventOccurrenceStatus;
   updated_at: string;
+}
+
+export interface GeocodeAddressInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /**
+   * Text address to geocode
+   * @minLength 1
+   */
+  address: string;
+}
+
+export interface GeocodeAddressOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Latitude of the geocoded address */
+  latitude: number;
+  /** Longitude of the geocoded address */
+  longitude: number;
 }
 
 export interface PaymentMethodCard {
@@ -764,12 +783,12 @@ export interface UpdateGuardianInputBody {
 /**
  * Updated registration status (optional)
  */
-export type UpdateRegistrationInputBodyStatus =
-  (typeof UpdateRegistrationInputBodyStatus)[keyof typeof UpdateRegistrationInputBodyStatus];
+export type UpdateRegistrationInputBodyStatus = typeof UpdateRegistrationInputBodyStatus[keyof typeof UpdateRegistrationInputBodyStatus];
+
 
 export const UpdateRegistrationInputBodyStatus = {
-  registered: "registered",
-  cancelled: "cancelled",
+  registered: 'registered',
+  cancelled: 'cancelled',
 } as const;
 
 export interface UpdateRegistrationInputBody {
@@ -793,29 +812,30 @@ export interface UpdateRegistrationPaymentStatusInputBody {
 }
 
 export type GetAllEventOccurrencesParams = {
-  /**
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
-  search?: string;
-  lat?: string;
-  lng?: string;
-  radius_km?: number;
-  min_price?: number;
-  max_price?: number;
-  min_duration?: number;
-  max_duration?: number;
-  min_age?: number;
-  max_age?: number;
-  category?: string;
-  soldout?: boolean;
-  min_date?: string;
-  max_date?: string;
+/**
+ * @minimum 1
+ */
+page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+search?: string;
+lat?: string;
+lng?: string;
+radius_km?: number;
+min_price?: number;
+max_price?: number;
+price?: string;
+min_duration?: number;
+max_duration?: number;
+min_age?: number;
+max_age?: number;
+category?: string;
+soldout?: boolean;
+min_date?: string;
+max_date?: string;
 };
 
 export type CreateEventBody = {
@@ -855,29 +875,29 @@ export type UpdateEventBody = {
 };
 
 export type GetAllLocationsParams = {
-  /**
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
+/**
+ * @minimum 1
+ */
+page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
 };
 
 export type ListOrganizationsParams = {
-  /**
-   * Page number (starts at 1)
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * Number of items per page
-   * @minimum 1
-   * @maximum 100
-   */
-  page_size?: number;
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type CreateOrganizationBody = {
@@ -903,55 +923,56 @@ export type UpdateOrganizationBody = {
 };
 
 export type GetReviewByEventIdParams = {
-  /**
-   * Page number (starts at 1)
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * Number of items per page
-   * @minimum 1
-   * @maximum 100
-   */
-  page_size?: number;
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type GetReviewByGuardianIdParams = {
-  /**
-   * Page number (starts at 1)
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * Number of items per page
-   * @minimum 1
-   * @maximum 100
-   */
-  page_size?: number;
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type GetSavedByGuardianIdParams = {
-  /**
-   * Page number (starts at 1)
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * Number of items per page
-   * @minimum 1
-   * @maximum 100
-   */
-  page_size?: number;
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type GetAllSchoolsParams = {
-  /**
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
+/**
+ * @minimum 1
+ */
+page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
 };
+
