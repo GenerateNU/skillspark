@@ -36,12 +36,12 @@ interface AuthContextType {
   ) => void;
   logout: () => void;
   update: (
+    onError: (msg: string) => void,
     id: string,
     email: string,
     language_preference: string,
     name: string,
     username: string,
-    onError: (msg: string) => void,
     profile_picture_s3_key?: string | undefined,
     expo_push_token?: string | undefined,
   ) => void;
@@ -166,12 +166,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const update = (
+    onError: (msg: string) => void,
     id: string,
     email: string,
     language_preference: string,
     name: string,
     username: string,
-    onError: (msg: string) => void,
     profile_picture_s3_key?: string | undefined,
     expo_push_token?: string | undefined,
   ) => {
