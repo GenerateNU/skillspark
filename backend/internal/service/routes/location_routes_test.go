@@ -25,6 +25,7 @@ import (
 
 func setupTestAPI(
 	locationRepo *repomocks.MockLocationRepository,
+	geocoder *mockGeocoder,
 ) (*fiber.App, huma.API) {
 
 	app := fiber.New()
@@ -35,7 +36,7 @@ func setupTestAPI(
 		Location: locationRepo,
 	}
 
-	routes.SetupLocationsRoutes(api, repo)
+	routes.SetupLocationsRoutes(api, repo, geocoder)
 
 	return app, api
 }
@@ -44,10 +45,11 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name       string
-		payload    map[string]interface{}
-		mockSetup  func(*repomocks.MockLocationRepository)
-		statusCode int
+		name          string
+		payload       map[string]interface{}
+		geocodeSetup  func(*mockGeocoder)
+		mockSetup     func(*repomocks.MockLocationRepository)
+		statusCode    int
 	}{
 		{
 			name: "valid payload",
@@ -61,6 +63,10 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 				"province":      "NY",
 				"postal_code":   "10001",
 				"country":       "USA",
+			},
+			geocodeSetup: func(m *mockGeocoder) {
+				m.On("Geocode", mock.Anything, "123 Broadway, New York, NY, USA").
+					Return(40.7128, -74.0060, nil)
 			},
 			mockSetup: func(m *repomocks.MockLocationRepository) {
 				m.On(
@@ -95,8 +101,9 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 				"postal_code":   "10001",
 				"country":       "USA",
 			},
-			mockSetup:  func(*repomocks.MockLocationRepository) {},
-			statusCode: http.StatusUnprocessableEntity, // Huma returns 422 for validation errors
+			geocodeSetup: nil,
+			mockSetup:    func(*repomocks.MockLocationRepository) {},
+			statusCode:   http.StatusUnprocessableEntity,
 		},
 		{
 			name: "latitude out of range",
@@ -110,8 +117,9 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 				"postal_code":   "10001",
 				"country":       "USA",
 			},
-			mockSetup:  func(*repomocks.MockLocationRepository) {},
-			statusCode: http.StatusUnprocessableEntity,
+			geocodeSetup: nil,
+			mockSetup:    func(*repomocks.MockLocationRepository) {},
+			statusCode:   http.StatusUnprocessableEntity,
 		},
 	}
 
@@ -123,7 +131,12 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 			mockRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupTestAPI(mockRepo)
+			geocoder := new(mockGeocoder)
+			if tt.geocodeSetup != nil {
+				tt.geocodeSetup(geocoder)
+			}
+
+			app, _ := setupTestAPI(mockRepo, geocoder)
 
 			bodyBytes, err := json.Marshal(tt.payload)
 			assert.NoError(t, err)
@@ -147,6 +160,7 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 			}
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			geocoder.AssertExpectations(t)
 			mockRepo.AssertExpectations(t)
 		})
 	}
@@ -209,7 +223,7 @@ func TestHumaValidation_GetLocationByID(t *testing.T) {
 			mockRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupTestAPI(mockRepo)
+			app, _ := setupTestAPI(mockRepo, new(mockGeocoder))
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -292,7 +306,7 @@ func TestHumaValidation_GetAllLocations(t *testing.T) {
 			mockRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			app, _ := setupTestAPI(mockRepo)
+			app, _ := setupTestAPI(mockRepo, new(mockGeocoder))
 
 			req, err := http.NewRequest(
 				http.MethodGet,

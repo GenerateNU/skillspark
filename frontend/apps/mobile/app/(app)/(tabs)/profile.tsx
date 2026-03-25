@@ -74,7 +74,7 @@ export default function ProfileScreen() {
                 />
               ))
             ) : (
-              <ThemedText style={{ color: '#999', padding: 10 }}>{translate('common.noChildrenFound')}</ThemedText>
+              <ThemedText className = "text-[#999] p-2.5">{translate('common.noChildrenFound')}</ThemedText>
             )}
           </View>
         </View>

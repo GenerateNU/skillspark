@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { AppColors } from '@/constants/theme';
+import { AppColors, Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useGetAllSchools, School } from '@skillspark/api-client';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +14,8 @@ type SchoolPickerProps = {
 
 export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
   const [showDrop, setShowDrop] = useState(false);
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? 'light'];
   const { t: translate } = useTranslation();
 
   const { data, isLoading, isError } = useGetAllSchools();
@@ -39,11 +42,17 @@ export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
         </ThemedText>
         <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
       </TouchableOpacity>
-
       {showDrop && (
         <View
-          className="absolute left-0 right-0 rounded-[10px] border top-[52px] z-[100] bg-[#FFFFFF] dark:bg-[#1c1c1e] border-[#E5E7EB] dark:border-[#3f3f46]"
-          style={{ elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
+          className="absolute left-0 right-0 top-[52px] rounded-[10px] border z-[100] elevation-5"
+          style={{
+            backgroundColor: theme.dropdownBg,
+            borderColor: theme.borderColor,
+            shadowColor: '#000',
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 2 },
+          }}
         >
           <ScrollView nestedScrollEnabled className="max-h-[200px]">
             {schools.map(school => (

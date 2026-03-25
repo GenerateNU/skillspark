@@ -2,7 +2,8 @@ import React from 'react';
 import { View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { AppColors, TAG_COLORS } from '@/constants/theme';
+import { AppColors, TAG_COLORS, Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SchoolPicker } from '@/components/SchoolPicker';
 import { useTranslation } from 'react-i18next';
 
@@ -51,6 +52,8 @@ export function ChildProfileForm({
   showMonthDrop, setShowMonthDrop,
   showYearDrop, setShowYearDrop,
 }: ChildProfileFormProps) {
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? 'light'];
   const { t: translate } = useTranslation();
 
   const removeInterest = (tag: string) => setInterests(prev => prev.filter(i => i !== tag));
@@ -81,8 +84,9 @@ export function ChildProfileForm({
         placeholder={translate('childProfile.lastName')}
         placeholderTextColor={AppColors.placeholderText}
       />
-      <View className="flex-row gap-3 mb-6 z-[10]">
-        <View className="flex-1 z-[10]">
+      <View className="flex-row gap-3 mb-6 z-10">
+        {/* Month picker */}
+        <View className="flex-1 z-10">
           <TouchableOpacity
             className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6] dark:bg-[#27272a]"
             onPress={() => { setShowMonthDrop(!showMonthDrop); setShowYearDrop(false); }}
@@ -92,11 +96,10 @@ export function ChildProfileForm({
             </ThemedText>
             <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
           </TouchableOpacity>
-
           {showMonthDrop && (
             <View
-              className="absolute left-0 right-0 rounded-[10px] border top-[52px] z-[100] bg-[#FFFFFF] dark:bg-[#1c1c1e] border-[#E5E7EB] dark:border-[#3f3f46]"
-              style={{ elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
+              className="absolute left-0 right-0 top-[52px] rounded-[10px] border z-[100] elevation-5"
+              style={{ backgroundColor: theme.dropdownBg, borderColor: theme.borderColor, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
             >
               <ScrollView nestedScrollEnabled className="max-h-[180px]">
                 {MONTHS.map(m => (
@@ -112,7 +115,8 @@ export function ChildProfileForm({
             </View>
           )}
         </View>
-        <View className="flex-1 z-[10]">
+        {/* Year picker */}
+        <View className="flex-1 z-10">
           <TouchableOpacity
             className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6] dark:bg-[#27272a]"
             onPress={() => { setShowYearDrop(!showYearDrop); setShowMonthDrop(false); }}
@@ -122,11 +126,10 @@ export function ChildProfileForm({
             </ThemedText>
             <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
           </TouchableOpacity>
-
           {showYearDrop && (
             <View
-              className="absolute left-0 right-0 rounded-[10px] border top-[52px] z-[100] bg-[#FFFFFF] dark:bg-[#1c1c1e] border-[#E5E7EB] dark:border-[#3f3f46]"
-              style={{ elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
+              className="absolute left-0 right-0 top-[52px] rounded-[10px] border z-[100] elevation-5"
+              style={{ backgroundColor: theme.dropdownBg, borderColor: theme.borderColor, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
             >
               <ScrollView nestedScrollEnabled className="max-h-[180px]">
                 {YEARS.map(y => (
@@ -152,11 +155,12 @@ export function ChildProfileForm({
             return (
               <TouchableOpacity
                 key={tag}
-                className={`flex-row items-center px-2 py-1 rounded-full border gap-1 bg-[${color.bg}] border-[${color.border}]`}
+                className="flex-row items-center px-2 py-1 rounded-full border gap-1"
+                style={{ backgroundColor: color.bg, borderColor: color.border }}
                 onPress={() => removeInterest(tag)}
               >
                 <IconSymbol name="camera.filters" size={13} color={color.border} />
-                <ThemedText className={`text-xs font-nunito-medium text-[${color.text}]`}>{translate(`interests.${tag}`, { defaultValue: capitalize(tag) })}</ThemedText>
+                <ThemedText className="text-xs font-nunito-medium" style={{ color: color.text }}>{translate(`interests.${tag}`, { defaultValue: capitalize(tag) })}</ThemedText>
               </TouchableOpacity>
             );
           })}
@@ -184,7 +188,8 @@ export function ChildProfileForm({
               >
                 <ThemedText className="text-base font-nunito">{translate(`interests.${item}`, { defaultValue: capitalize(item) })}</ThemedText>
                 <View
-                  className={`w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center border-[${interests.includes(item) ? AppColors.checkboxSelected : AppColors.subtleText}]`}
+                  className="w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center"
+                  style={{ borderColor: interests.includes(item) ? AppColors.checkboxSelected : AppColors.subtleText }}
                 >
                   {interests.includes(item) && (
                     <IconSymbol name="checkmark" size={12} color={AppColors.checkboxSelected} />
