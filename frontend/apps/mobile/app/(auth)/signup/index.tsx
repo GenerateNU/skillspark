@@ -2,7 +2,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { router } from "expo-router";
 import { useState } from "react";
-import { View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { Controller, useForm } from "react-hook-form";
 import { ErrorMessage } from "@/components/ErrorMessage";
@@ -23,7 +23,6 @@ type SignupFormData = {
 export default function SignupScreen() {
   const [errorText, setErrorText] = useState("");
   const { signup } = useAuthContext();
-
   const { control, handleSubmit } = useForm<SignupFormData>({
     defaultValues: {
       name: "",
@@ -62,65 +61,68 @@ export default function SignupScreen() {
   };
 
   return (
-    <ThemedView
-      className="flex-1 items-center justify-center"
-    >
-      <ThemedText
-        type="title"
-        className="text-3xl font-bold mb-8"
+    <ThemedView className="flex-1">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
       >
-        Sign Up
-      </ThemedText>
-      <View
-        className="w-full px-6 gap-4 items-center"
-      >
-        <AuthFormInput
-          control={control}
-          name="name"
-          placeholder="Full Name"
-          autoCapitalize="none"
-        />
-        <AuthFormInput
-          control={control}
-          name="email"
-          placeholder="Email"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <AuthFormInput
-          control={control}
-          name="username"
-          placeholder="Username"
-          autoCapitalize="none"
-        />
-        <AuthFormInput
-          control={control}
-          name="password"
-          placeholder="Password"
-          secureTextEntry={true}
-        />
-        <Controller
-          control={control}
-          name="language_preference"
-          render={({ field: { onChange, value } }) => (
-            <Dropdown
-              value={value}
-              onChange={onChange}
-              options={[
-                { label: 'English', value: 'en' },
-                { label: 'Thai', value: 'th' },
-              ]}
-              placeholder="Select a language..."
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View className="flex-1 items-center justify-center px-6 gap-4">
+            <ThemedText type="title" className="text-3xl font-bold mb-8">
+              Sign Up
+            </ThemedText>
+            <AuthFormInput
+              control={control}
+              name="name"
+              placeholder="Full Name"
+              autoCapitalize="none"
             />
-          )}
-        />
-        <Button label="Sign Up" onPress={handleSubmit(onSubmit)} />
-        <PageRedirectButton
-          label="Already have an account? Log in"
-          onPress={handleGoToLogIn}
-        />
-        <ErrorMessage message={errorText} />
-      </View>
+            <AuthFormInput
+              control={control}
+              name="email"
+              placeholder="Email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <AuthFormInput
+              control={control}
+              name="username"
+              placeholder="Username"
+              autoCapitalize="none"
+            />
+            <AuthFormInput
+              control={control}
+              name="password"
+              placeholder="Password"
+              secureTextEntry={true}
+            />
+            <Controller
+              control={control}
+              name="language_preference"
+              render={({ field: { onChange, value } }) => (
+                <Dropdown
+                  value={value}
+                  onChange={onChange}
+                  options={[
+                    { label: "English", value: "en" },
+                    { label: "Thai", value: "th" },
+                  ]}
+                  placeholder="Select a language..."
+                />
+              )}
+            />
+            <Button label="Sign Up" onPress={handleSubmit(onSubmit)} />
+            <PageRedirectButton
+              label="Already have an account? Log in"
+              onPress={handleGoToLogIn}
+            />
+            <ErrorMessage message={errorText} />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ThemedView>
   );
 }

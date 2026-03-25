@@ -91,7 +91,6 @@ type CreateEventOccurrenceInput struct {
 	Body           struct {
 		ManagerId    *uuid.UUID `json:"manager_id,omitempty" doc:"ID of a manager in the database"`
 		EventId      uuid.UUID  `json:"event_id" doc:"ID of an event in the database"`
-		LocationId   uuid.UUID  `json:"location_id" doc:"ID of a location in the database"`
 		StartTime    time.Time  `json:"start_time" doc:"Start time of the event occurrence"`
 		EndTime      time.Time  `json:"end_time" doc:"End time of the event occurrence"`
 		MaxAttendees int        `json:"max_attendees" doc:"Maximum number of attendees" minimum:"1" maximum:"100"`
@@ -111,7 +110,6 @@ type UpdateEventOccurrenceInput struct {
 	Body           struct {
 		ManagerId    *uuid.UUID `json:"manager_id,omitempty" doc:"ID of a manager in the database"`
 		EventId      *uuid.UUID `json:"event_id,omitempty" doc:"ID of an event in the database"`
-		LocationId   *uuid.UUID `json:"location_id,omitempty" doc:"ID of a location in the database"`
 		StartTime    *time.Time `json:"start_time,omitempty" doc:"Start time of the event occurrence"`
 		EndTime      *time.Time `json:"end_time,omitempty" doc:"End time of the event occurrence"`
 		MaxAttendees *int       `json:"max_attendees,omitempty" doc:"Maximum number of attendees" minimum:"1" maximum:"100"`
