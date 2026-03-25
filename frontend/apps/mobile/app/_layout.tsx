@@ -16,6 +16,7 @@ import {
   NunitoSans_600SemiBold,
   NunitoSans_700Bold,
 } from "@expo-google-fonts/nunito-sans";
+import { MaterialIcons } from "@expo/vector-icons";
 import { AuthProvider } from '@/contexts/auth-context';
 import { LoginRedirect } from '@/components/LoginRedirect';
 SplashScreen.preventAutoHideAsync();
@@ -29,6 +30,7 @@ export default function RootLayout() {
     NunitoSans_500Medium,
     NunitoSans_600SemiBold,
     NunitoSans_700Bold,
+    ...MaterialIcons.font,
   });
 
   useEffect(() => {
