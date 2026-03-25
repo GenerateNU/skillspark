@@ -11,19 +11,17 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { AppColors } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 
-export function BookmarkButton({ occurrenceId }: { occurrenceId: string }) {
+export function BookmarkButton({ eventId }: { eventId: string }) {
   const queryClient = useQueryClient();
   const { guardianId } = useAuthContext();
 
   const { data: savedResponse } = useGetSavedByGuardianId(guardianId!, undefined, {
-    query: {
-      enabled: !!guardianId,
-    }
+    query: { enabled: !!guardianId },
   });
-  const savedQueryKey = getGetSavedByGuardianIdQueryKey(guardianId);
 
+  const savedQueryKey = getGetSavedByGuardianIdQueryKey(guardianId!);
   const savedItems = savedResponse?.status === 200 ? savedResponse.data : [];
-  const savedEntry = savedItems.find((s) => s.event_occurrence_id === occurrenceId);
+  const savedEntry = savedItems.find((s) => s.event.id === eventId);
   const isBookmarked = !!savedEntry;
 
   const optimisticOptions = (updater: (items: Saved[]) => Saved[]) => ({
@@ -49,18 +47,21 @@ export function BookmarkButton({ occurrenceId }: { occurrenceId: string }) {
   const createSaved = useCreateSaved(
     optimisticOptions((items) => [
       ...items,
-      { id: "optimistic", guardian_id: guardianId, event_occurrence_id: occurrenceId, created_at: "", updated_at: "" },
+      { id: "optimistic", guardian_id: guardianId!, event: { id: eventId }, created_at: "", updated_at: "" } as Saved,
     ])
   );
+
   const deleteSaved = useDeleteSaved(
-    optimisticOptions((items) => items.filter((s) => s.event_occurrence_id !== occurrenceId))
+    optimisticOptions((items) => items.filter((s) => s.event.id !== eventId))
   );
+
+  if (!guardianId) return null;
 
   const handlePress = () => {
     if (isBookmarked && savedEntry) {
       deleteSaved.mutate({ id: savedEntry.id });
     } else {
-      createSaved.mutate({ data: { event_occurrence_id: occurrenceId, guardian_id: guardianId } });
+      createSaved.mutate({ data: { event_id: eventId, guardian_id: guardianId } });
     }
   };
 
