@@ -9,16 +9,19 @@ import {
 import type { getSavedByGuardianIdResponse, Saved, Event } from "@skillspark/api-client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { AppColors } from "@/constants/theme";
-import { useGuardian } from "@/hooks/use-guardian";
+import { useAuthContext } from "@/hooks/use-auth-context";
 
-export function BookmarkButton({ eventId, event }: { eventId: string; event: Event }) {
-  const { guardianId } = useGuardian();
+export function BookmarkButton({ eventId }: { eventId: string }) {
   const queryClient = useQueryClient();
-  const { data: savedResponse } = useGetSavedByGuardianId(guardianId);
-  const savedQueryKey = getGetSavedByGuardianIdQueryKey(guardianId);
+  const { guardianId } = useAuthContext();
 
+  const { data: savedResponse } = useGetSavedByGuardianId(guardianId!, undefined, {
+    query: { enabled: !!guardianId },
+  });
+
+  const savedQueryKey = getGetSavedByGuardianIdQueryKey(guardianId!);
   const savedItems = savedResponse?.status === 200 ? savedResponse.data : [];
-  const savedEntry = savedItems.find((s) => s.event?.id === eventId);
+  const savedEntry = savedItems.find((s) => s.event.id === eventId);
   const isBookmarked = !!savedEntry;
 
   const optimisticOptions = (updater: (items: Saved[]) => Saved[]) => ({
@@ -41,30 +44,41 @@ export function BookmarkButton({ eventId, event }: { eventId: string; event: Eve
     },
   });
 
+  const optimisticSaved: Saved = {
+    id: "optimistic",
+    guardian_id: guardianId!,
+    event: { id: eventId } as Saved["event"],
+    created_at: "",
+    updated_at: "",
+  };
+
   const createSaved = useCreateSaved(
-    optimisticOptions((items) => [
-      ...items,
-      { id: "optimistic", guardian_id: guardianId, event, created_at: "", updated_at: "" },
-    ])
-  );
-  const deleteSaved = useDeleteSaved(
-    optimisticOptions((items) => items.filter((s) => s.event?.id !== eventId))
+    optimisticOptions((items) => [...items, optimisticSaved])
   );
 
+  const deleteSaved = useDeleteSaved(
+    optimisticOptions((items) => items.filter((s) => s.event.id !== eventId))
+  );
+
+  if (!guardianId) return null;
+
+  const isPending = createSaved.isPending || deleteSaved.isPending;
+
   const handlePress = () => {
-    if (isBookmarked && savedEntry) {
+    if (isPending) return;
+    if (isBookmarked && savedEntry.id !== "optimistic") {
       deleteSaved.mutate({ id: savedEntry.id });
-    } else {
+    } else if (!isBookmarked) {
       createSaved.mutate({ data: { event_id: eventId, guardian_id: guardianId } });
     }
   };
 
   return (
-    <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
+    <TouchableOpacity onPress={handlePress} activeOpacity={0.7} disabled={isPending}>
       <MaterialIcons
         name={isBookmarked ? "bookmark" : "bookmark-border"}
         size={40}
-        color={AppColors.primaryText}
+        color={isPending ? AppColors.placeholderText : AppColors.primaryText}
       />
     </TouchableOpacity>
   );

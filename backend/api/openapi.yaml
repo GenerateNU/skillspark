@@ -2400,9 +2400,6 @@ components:
           description: Primary language used for the event occurrence
           minLength: 2
           maxLength: 30
-        location_id:
-          type: string
-          description: ID of a location in the database
         manager_id:
           type: string
           description: ID of a manager in the database
@@ -2423,7 +2420,6 @@ components:
           format: date-time
       required:
         - event_id
-        - location_id
         - start_time
         - end_time
         - max_attendees
@@ -3741,9 +3737,6 @@ components:
           description: Primary language used for the event occurrence
           minLength: 2
           maxLength: 30
-        location_id:
-          type: string
-          description: ID of a location in the database
         manager_id:
           type: string
           description: ID of a manager in the database

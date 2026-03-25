@@ -118,7 +118,7 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
             }}
           />
           <View style={{ position: "absolute", top: -5, left: 10 }}>
-            <BookmarkButton eventId={occurrence.event.id} event={occurrence.event} />
+            <BookmarkButton eventId={occurrence.event.id} />
           </View>
           <Text
             style={{
