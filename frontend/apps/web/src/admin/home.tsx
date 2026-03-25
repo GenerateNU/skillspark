@@ -48,7 +48,6 @@ export default function HomePage() {
         </button>
       </div>
 
-      {/* rest of content unchanged */}
       <div className="flex-1 overflow-auto bg-gray-50 p-6">
         {loading && (
           <div className="flex items-center justify-center h-full">
@@ -75,7 +74,8 @@ export default function HomePage() {
               return (
                 <Link
                   key={org.id}
-                  to={`/admin/organization/${org.id}`}
+                  to={"/admin/organization/"}
+                  state={{org}}
                   className="group bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all"
                 >
                   <div className="flex items-center gap-3 mb-3">

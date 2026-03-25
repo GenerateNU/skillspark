@@ -130,6 +130,7 @@ export async function customInstance<T>(
 ): Promise<T> {
   const baseURL = getBaseURL();
   const fullUrl = `${baseURL}${url}`;
+  const isFormData = options?.body instanceof FormData;
   // Get token for auth
   const token = getStorageItem('temp_jwt') || getStorageItem('jwt');
   
@@ -137,7 +138,7 @@ export async function customInstance<T>(
     ...options,
     credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
+      ...(!isFormData && { 'Content-Type': 'application/json' }),
       'Accept-Language': 'en-US',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,

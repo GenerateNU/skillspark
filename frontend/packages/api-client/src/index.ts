@@ -12,3 +12,4 @@ export * from './generated/guardians/guardians';
 export * from './generated/managers/managers';
 export * from './generated/schools/schools';
 export * from './generated/saved/saved';
+export * from './generated/locations/locations' 

@@ -170,6 +170,7 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
                     name: orgName,
                     location_id: locationId,
                     active: orgActive,
+                    profile_image: new Blob([], { type: "image/png"}),
                   };
                   const createdOrg = await createOrganization(input);
                   if (createdOrg.status !== 201 && createdOrg.status !== 200) {

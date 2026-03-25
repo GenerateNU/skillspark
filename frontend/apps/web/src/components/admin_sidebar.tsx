@@ -47,7 +47,7 @@ export function Sidebar() {
       </nav>
 
       <Link
-        to="/profile"
+        to="/admin/profile"
         className="w-full px-4 py-3 border-t border-gray-200 flex items-center gap-2.5 hover:bg-gray-50 transition-colors"
       >
         <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0">A</div>
