@@ -62,6 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const storedJWT = await SecureStore.getItemAsync("token");
       const storedGuardianId = await SecureStore.getItemAsync("guardian_id");
       const storedLangPref = await SecureStore.getItemAsync("language_preference");
+      // DEBUG
+      console.log('[auth-context] checkAlreadyAuth SecureStore read', { storedLangPref, hasJWT: !!storedJWT, hasGuardianId: !!storedGuardianId });
       if (storedLangPref) {
         await i18n.changeLanguage(storedLangPref);
         setCurrentLanguage(storedLangPref);
@@ -72,6 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setGuardianId(storedGuardianId);
         setLangPref(storedLangPref);
       }
+      // DEBUG
+      console.log('[auth-context] checkAlreadyAuth done, setting isLoading=false');
       setIsLoading(false);
     };
     checkAlreadyAuth();
