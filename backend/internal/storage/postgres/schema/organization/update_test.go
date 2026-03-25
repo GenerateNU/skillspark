@@ -19,10 +19,13 @@ func TestUpdateOrganization(t *testing.T) {
 	t.Parallel()
 
 	active := true
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
+
 	createInput := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Original Name"
 		i.Body.Active = &active
+		i.Body.LocationID = locationID
 		return i
 	}()
 
@@ -63,10 +66,13 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	t.Parallel()
 
 	active := true
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
+
 	createInput := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Test Org"
 		i.Body.Active = &active
+		i.Body.LocationID = locationID
 		return i
 	}()
 
@@ -74,13 +80,13 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	require.Nil(t, createErr)
 	require.NotNil(t, created)
 
-	locationID := location.CreateTestLocation(t, ctx, testDB).ID
+	newLocationID := location.CreateTestLocation(t, ctx, testDB).ID
 	newName := "Test Org with Location"
 	updateInput := &models.UpdateOrganizationInput{
 		ID: created.ID,
 		Body: models.UpdateOrganizationBody{
 			Name:       &newName,
-			LocationID: &locationID,
+			LocationID: &newLocationID,
 		},
 	}
 
@@ -88,7 +94,7 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	require.Nil(t, updateErr)
 	require.NotNil(t, updated)
 	assert.Equal(t, "Test Org with Location", updated.Name)
-	assert.Equal(t, &locationID, updated.LocationID)
+	assert.Equal(t, newLocationID, updated.LocationID)
 	assert.Nil(t, updated.StripeAccountID)
 	assert.False(t, updated.StripeAccountActivated)
 }
@@ -109,7 +115,6 @@ func TestUpdateOrganization_NotFound(t *testing.T) {
 	}
 
 	updated, err := repo.UpdateOrganization(ctx, updateInput, nil)
-
 	require.NotNil(t, err)
 	assert.Nil(t, updated)
 }
@@ -121,10 +126,13 @@ func TestUpdateOrganization_DoesNotModifyStripeFields(t *testing.T) {
 	t.Parallel()
 
 	active := true
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
+
 	createInput := func() *models.CreateOrganizationInput {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Stripe Test Org"
 		i.Body.Active = &active
+		i.Body.LocationID = locationID
 		return i
 	}()
 

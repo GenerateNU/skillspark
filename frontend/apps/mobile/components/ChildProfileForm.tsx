@@ -83,8 +83,9 @@ export function ChildProfileForm({
         placeholder="Last Name"
         placeholderTextColor={AppColors.placeholderText}
       />
-      <View className="flex-row gap-3 mb-6" style={{ zIndex: 10 }}>
-        <View className="flex-1" style={{ zIndex: 10 }}>
+      <View className="flex-row gap-3 mb-6 z-10">
+        {/* Month picker */}
+        <View className="flex-1 z-10">
           <TouchableOpacity
             className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between"
             style={{ backgroundColor: theme.inputBg }}
@@ -95,13 +96,12 @@ export function ChildProfileForm({
             </ThemedText>
             <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
           </TouchableOpacity>
-
           {showMonthDrop && (
             <View
-              className="absolute left-0 right-0 rounded-[10px] border"
-              style={{ top: 52, backgroundColor: theme.dropdownBg, borderColor: theme.borderColor, zIndex: 100, elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
+              className="absolute left-0 right-0 top-[52px] rounded-[10px] border z-[100] elevation-5"
+              style={{ backgroundColor: theme.dropdownBg, borderColor: theme.borderColor, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
             >
-              <ScrollView nestedScrollEnabled style={{ maxHeight: 180 }}>
+              <ScrollView nestedScrollEnabled className="max-h-[180px]">
                 {MONTHS.map(m => (
                   <TouchableOpacity
                     key={m}
@@ -116,7 +116,8 @@ export function ChildProfileForm({
             </View>
           )}
         </View>
-        <View className="flex-1" style={{ zIndex: 10 }}>
+        {/* Year picker */}
+        <View className="flex-1 z-10">
           <TouchableOpacity
             className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between"
             style={{ backgroundColor: theme.inputBg }}
@@ -127,13 +128,12 @@ export function ChildProfileForm({
             </ThemedText>
             <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
           </TouchableOpacity>
-
           {showYearDrop && (
             <View
-              className="absolute left-0 right-0 rounded-[10px] border"
-              style={{ top: 52, backgroundColor: theme.dropdownBg, borderColor: theme.borderColor, zIndex: 100, elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
+              className="absolute left-0 right-0 top-[52px] rounded-[10px] border z-[100] elevation-5"
+              style={{ backgroundColor: theme.dropdownBg, borderColor: theme.borderColor, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }}
             >
-              <ScrollView nestedScrollEnabled style={{ maxHeight: 180 }}>
+              <ScrollView nestedScrollEnabled className="max-h-[180px]">
                 {YEARS.map(y => (
                   <TouchableOpacity
                     key={y}
@@ -183,7 +183,7 @@ export function ChildProfileForm({
         </View>
         <View className="h-px" style={{ backgroundColor: theme.borderColor }} />
         <View onStartShouldSetResponder={() => true} onMoveShouldSetResponder={() => true}>
-          <ScrollView nestedScrollEnabled showsVerticalScrollIndicator style={{ maxHeight: 150 }}>
+          <ScrollView nestedScrollEnabled showsVerticalScrollIndicator className="max-h-[150px]">
             {filteredOptions.map(item => (
               <TouchableOpacity
                 key={item}

@@ -9,9 +9,8 @@ import { useGetChildrenByGuardianId, useGetGuardianById } from '@skillspark/api-
 import { Colors, AppColors } from '@/constants/theme';
 import { ChildListItem } from '@/components/ChildListItem';
 import { SectionHeader } from '@/components/SectionHeader';
-
-// TODO: Replace with authenticated user's guardian ID
-const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
+import { useAuthContext } from '@/hooks/use-auth-context';
+import { ErrorScreen } from '@/components/ErrorScreen';
 
 export default function FamilyListScreen() {
   const router = useRouter();
@@ -19,8 +18,18 @@ export default function FamilyListScreen() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
 
-  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(GUARDIAN_ID);
-  const { data: childrenResponse, isLoading: childrenLoading } = useGetChildrenByGuardianId(GUARDIAN_ID);
+  const { guardianId } = useAuthContext();
+
+  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(guardianId!, {
+    query: {
+      enabled: !!guardianId,
+    }
+  });
+  const { data: childrenResponse, isLoading: childrenLoading } = useGetChildrenByGuardianId(guardianId!, {
+    query: {
+      enabled: !!guardianId,
+    }
+  });
 
   const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
   const children = childrenResponse?.status === 200 ? childrenResponse.data : [];
@@ -42,6 +51,10 @@ export default function FamilyListScreen() {
       },
     });
   };
+
+  if (!guardianId) {
+    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+  }
 
   if (guardianLoading || childrenLoading) {
     return (

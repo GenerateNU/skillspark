@@ -1,10 +1,10 @@
-import { ExpoConfig, ConfigContext } from 'expo/config';
+import { ExpoConfig, ConfigContext } from "expo/config";
 
 export default ({ config }: ConfigContext): ExpoConfig => {
   return {
-    ...config, 
-    name: 'SkillSpark',
-    slug: 'SkillSpark',
+    ...config,
+    name: "SkillSpark",
+    slug: "SkillSpark",
     ios: {
       ...config.ios,
       config: {

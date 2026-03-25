@@ -8,16 +8,16 @@ import (
 )
 
 type Organization struct {
-	ID                     uuid.UUID  `json:"id" db:"id"`
-	Name                   string     `json:"name" db:"name"`
-	Active                 bool       `json:"active" db:"active"`
-	PfpS3Key               *string    `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
-	PresignedURL           *string    `json:"presigned_url,omitempty"`
-	LocationID             *uuid.UUID `json:"location_id,omitempty" db:"location_id"`
-	CreatedAt              time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt              time.Time  `json:"updated_at" db:"updated_at"`
-	StripeAccountID        *string    `json:"stripe_account_id,omitempty" db:"stripe_account_id"`
-	StripeAccountActivated bool       `json:"stripe_account_activated" db:"stripe_account_activated" default:"false"`
+	ID                     uuid.UUID `json:"id" db:"id"`
+	Name                   string    `json:"name" db:"name"`
+	Active                 bool      `json:"active" db:"active"`
+	PfpS3Key               *string   `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
+	PresignedURL           *string   `json:"presigned_url"`
+	LocationID             uuid.UUID `json:"location_id" db:"location_id"`
+	CreatedAt              time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt              time.Time `json:"updated_at" db:"updated_at"`
+	StripeAccountID        *string   `json:"stripe_account_id" db:"stripe_account_id"`
+	StripeAccountActivated bool      `json:"stripe_account_activated" db:"stripe_account_activated" default:"false"`
 }
 
 // CreateOrganizationRouteInput is the multipart form input for creating an organization with an image
@@ -46,9 +46,9 @@ type UpdateOrganizationRouteInput struct {
 }
 
 type CreateOrganizationBody struct {
-	Name       string     `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
-	Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
-	LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
+	Name       string    `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
+	Active     *bool     `json:"active,omitempty" doc:"Active status (defaults to true)"`
+	LocationID uuid.UUID `json:"location_id" format:"uuid" doc:"Associated location ID"`
 }
 
 type UpdateOrganizationBody struct {

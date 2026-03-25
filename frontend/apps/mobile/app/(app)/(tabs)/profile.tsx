@@ -8,8 +8,8 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useGetGuardianById, useGetChildrenByGuardianId } from '@skillspark/api-client';
 import { FamilyCard } from '@/components/FamilyCard';
 import { ListItem } from '@/components/ListItem';
-
-const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
+import { useAuthContext } from '@/hooks/use-auth-context';
+import { ErrorScreen } from '@/components/ErrorScreen';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -19,10 +19,24 @@ export default function ProfileScreen() {
   const listBackgroundColor = colorScheme === 'dark' ? '#1c1c1e' : '#F9FAFB';
   const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
 
-  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(GUARDIAN_ID);
-  const { data: childrenResponse, isLoading: familyLoading } = useGetChildrenByGuardianId(GUARDIAN_ID);
+  const { guardianId } = useAuthContext();
+
+  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(guardianId!, {
+    query: {
+      enabled: !!guardianId,
+    }
+  });
+  const { data: childrenResponse, isLoading: familyLoading } = useGetChildrenByGuardianId(guardianId!, {
+    query: {
+      enabled: !!guardianId,
+    }
+  });
   const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
   const children = childrenResponse?.status === 200 ? childrenResponse.data : [];
+
+  if (!guardianId) {
+      return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+    }
 
   if (guardianLoading || familyLoading) {
     return (
@@ -69,7 +83,7 @@ export default function ProfileScreen() {
                 />
               ))
             ) : (
-              <ThemedText style={{ color: '#999', padding: 10 }}>No children found</ThemedText>
+              <ThemedText className = "text-[#999] p-2.5">No children found</ThemedText>
             )}
           </View>
         </View>

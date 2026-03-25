@@ -6,7 +6,6 @@ import (
 	"math"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/event"
-	"skillspark/internal/storage/postgres/schema/location"
 	"testing"
 	"time"
 
@@ -28,7 +27,6 @@ func CreateTestEventOccurrence(
 	repo := NewEventOccurrenceRepository(db)
 
 	e := event.CreateTestEvent(t, ctx, db)
-	l := location.CreateTestLocation(t, ctx, db)
 
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	start := time.Date(2026, time.February, 1, 0, 0, 0, 0, time.Local)
@@ -37,7 +35,6 @@ func CreateTestEventOccurrence(
 	input := &models.CreateEventOccurrenceInput{}
 	input.Body.ManagerId = &mid
 	input.Body.EventId = e.ID
-	input.Body.LocationId = l.ID
 	input.Body.StartTime = start
 	input.Body.EndTime = end
 	input.Body.MaxAttendees = 10

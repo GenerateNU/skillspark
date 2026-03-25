@@ -49,31 +49,26 @@ function FilterChips({
           <Pressable
             key={f}
             onPress={() => onToggle(f)}
+            className="flex-row items-center px-3.5 py-1.5 rounded-full border-[1.5px]"
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              paddingHorizontal: 14,
-              paddingVertical: 6,
-              borderRadius: 999,
-              borderWidth: 1.5,
               borderColor: isActive ? AppColors.primaryText : AppColors.borderLight,
               backgroundColor: isActive ? AppColors.primaryText : "#fff",
             }}
           >
-            <Text style={{ fontSize: 13, fontWeight: "500", color: isActive ? "#fff" : AppColors.secondaryText }}>
+            <Text
+              className="text-[13px] font-medium"
+              style={{ color: isActive ? "#fff" : AppColors.secondaryText }}
+            >
               {isActive ? `× ${f}` : f}
             </Text>
           </Pressable>
         );
       })}
       <Pressable
-        style={{
-          width: 32, height: 32, borderRadius: 999,
-          borderWidth: 1.5, borderColor: AppColors.borderLight,
-          alignItems: "center", justifyContent: "center",
-        }}
+        className="w-8 h-8 rounded-full border-[1.5px] items-center justify-center"
+        style={{ borderColor: AppColors.borderLight }}
       >
-        <Text style={{ fontSize: 18, color: AppColors.subtleText, lineHeight: 22 }}>+</Text>
+        <Text className="text-lg leading-[22px]" style={{ color: AppColors.subtleText }}>+</Text>
       </Pressable>
     </ScrollView>
   );
@@ -90,42 +85,40 @@ function DiscoverBanner({ event }: { event: EventOccurrence }) {
   return (
     <Pressable
       onPress={() => router.push(`/event/${event.id}`)}
-      style={{ marginHorizontal: 20, borderRadius: 24, overflow: "hidden", height: 180, backgroundColor: AppColors.primaryText }}
+      className="mx-5 rounded-3xl overflow-hidden h-[180px]"
+      style={{ backgroundColor: AppColors.primaryText }}
     >
       {event.event.presigned_url ? (
         <Image
           source={{ uri: event.event.presigned_url }}
-          style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: 0.5 }}
+          className="absolute inset-0 opacity-50"
           contentFit="cover"
         />
       ) : (
         <>
-          <View style={{ position: "absolute", width: 140, height: 140, borderRadius: 70, backgroundColor: "#7C3AED", top: -20, left: 20, opacity: 0.95 }} />
-          <View style={{ position: "absolute", width: 120, height: 120, borderRadius: 60, backgroundColor: AppColors.primaryBlue, top: 10, left: 90, opacity: 0.95 }} />
-          <View style={{ position: "absolute", width: 100, height: 100, borderRadius: 50, backgroundColor: "#059669", top: -5, left: 170, opacity: 0.95 }} />
+          <View className="absolute w-[140px] h-[140px] rounded-full opacity-95" style={{ backgroundColor: "#7C3AED", top: -20, left: 20 }} />
+          <View className="absolute w-[120px] h-[120px] rounded-full opacity-95" style={{ backgroundColor: AppColors.primaryBlue, top: 10, left: 90 }} />
+          <View className="absolute w-[100px] h-[100px] rounded-full opacity-95" style={{ backgroundColor: "#059669", top: -5, left: 170 }} />
           {/* White card */}
-          <View style={{
-            position: "absolute", width: 88, height: 108, backgroundColor: "#fff",
-            borderRadius: 16, top: "50%", left: "50%",
-            transform: [{ translateX: -44 }, { translateY: -54 }],
-            alignItems: "center", justifyContent: "center", gap: 6, padding: 10,
-            shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 12,
-          }}>
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "#A7F3D0" }} />
-            <View style={{ width: 52, height: 7, borderRadius: 4, backgroundColor: AppColors.divider }} />
-            <View style={{ width: 38, height: 7, borderRadius: 4, backgroundColor: "#F3F4F6" }} />
+          <View className="absolute w-[88px] h-[108px] bg-white rounded-2xl items-center justify-center gap-1.5 p-2.5"
+            style={{
+              top: "50%", left: "50%",
+              transform: [{ translateX: -44 }, { translateY: -54 }],
+              shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 12,
+            }}
+          >
+            <View className="w-9 h-9 rounded-full bg-[#A7F3D0]" />
+            <View className="w-[52px] h-[7px] rounded-sm" style={{ backgroundColor: AppColors.divider }} />
+            <View className="w-[38px] h-[7px] rounded-sm bg-[#F3F4F6]" />
           </View>
         </>
       )}
       {/* Price tag */}
-      <View style={{
-        position: "absolute", top: 18, right: 18,
-        backgroundColor: "#fff", borderRadius: 10,
-        paddingHorizontal: 11, paddingVertical: 6,
-        transform: [{ rotate: "12deg" }],
-        shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 6,
-      }}>
-        <Text style={{ fontWeight: "700", color: AppColors.primaryText, fontSize: 13 }}>
+      <View
+        className="absolute top-[18px] right-[18px] bg-white rounded-[10px] px-[11px] py-1.5"
+        style={{ transform: [{ rotate: "12deg" }], shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 6 }}
+      >
+        <Text className="font-bold text-[13px]" style={{ color: AppColors.primaryText }}>
           {ageLabel ?? event.event.title.slice(0, 6)}
         </Text>
       </View>
@@ -140,52 +133,47 @@ function EventCard({ item }: { item: EventOccurrence }) {
   const duration = formatDuration(item.start_time, item.end_time);
   const ageLabel = item.event.age_range_min != null
     ? `${item.event.age_range_min}${item.event.age_range_max != null ? `–${item.event.age_range_max}` : ""}+`
-    : null
+    : null;
 
   return (
     <Pressable
       onPress={() => router.push(`/event/${item.id}`)}
-      style={{ marginHorizontal: 20, marginBottom: 20 }}
+      className="mx-5 mb-5"
     >
       {/* Photo */}
-      <View style={{ borderRadius: 20, overflow: "hidden", height: 185 }}>
+      <View className="rounded-[20px] overflow-hidden h-[185px]">
         {item.event.presigned_url ? (
           <Image
             source={{ uri: item.event.presigned_url }}
-            style={{ width: "100%", height: "100%" }}
+            className="w-full h-full"
             contentFit="cover"
           />
         ) : (
-          <View style={{ width: "100%", height: "100%", backgroundColor: AppColors.divider }} />
+          <View className="w-full h-full" style={{ backgroundColor: AppColors.divider }} />
         )}
 
         {/* Pill overlay */}
-        <View style={{
-          position: "absolute", bottom: 12, left: 12,
-          flexDirection: "row", alignItems: "center",
-          backgroundColor: "rgba(255,255,255,0.92)",
-          borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5,
-        }}>
+        <View className="absolute bottom-3 left-3 flex-row items-center bg-white/90 rounded-full px-3 py-[5px]">
           {ageLabel && (
             <>
-              <Text style={{ fontSize: 12, color: AppColors.secondaryText, fontWeight: "500" }}>🧑 {ageLabel}</Text>
-              <View style={{ width: 1, height: 14, backgroundColor: AppColors.borderLight, marginHorizontal: 10 }} />
+              <Text className="text-xs font-medium" style={{ color: AppColors.secondaryText }}>🧑 {ageLabel}</Text>
+              <View className="w-px h-3.5 mx-2.5" style={{ backgroundColor: AppColors.borderLight }} />
             </>
           )}
-          <Text style={{ fontSize: 12, color: AppColors.secondaryText, fontWeight: "500" }}>{duration}</Text>
+          <Text className="text-xs font-medium" style={{ color: AppColors.secondaryText }}>{duration}</Text>
         </View>
       </View>
 
       {/* Below image row */}
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10, paddingHorizontal: 4 }}>
-        <View style={{ flex: 1, marginRight: 16 }}>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: AppColors.primaryText }} numberOfLines={1}>
+      <View className="flex-row items-center justify-between mt-2.5 px-1">
+        <View className="flex-1 mr-4">
+          <Text className="text-base font-semibold" style={{ color: AppColors.primaryText }} numberOfLines={1}>
             {item.event.title}
           </Text>
           <StarRating />
         </View>
-        <View style={{ backgroundColor: AppColors.primaryText, borderRadius: 999, paddingHorizontal: 20, paddingVertical: 10 }}>
-          <Text style={{ color: "#fff", fontWeight: "700", fontSize: 14 }}>
+        <View className="rounded-full px-5 py-2.5" style={{ backgroundColor: AppColors.primaryText }}>
+          <Text className="text-white font-bold text-sm">
             {item.curr_enrolled}/{item.max_attendees}
           </Text>
         </View>
@@ -208,7 +196,7 @@ function EventOccurrencesList() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 8 }}>
+      <View className="flex-1 items-center justify-center gap-2">
         <ActivityIndicator size="large" />
         <ThemedText>Loading events...</ThemedText>
       </View>
@@ -217,8 +205,8 @@ function EventOccurrencesList() {
 
   if (error) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
-        <ThemedText style={{ color: AppColors.danger, fontWeight: "600" }}>Error loading events</ThemedText>
+      <View className="flex-1 items-center justify-center p-4">
+        <ThemedText className="font-semibold" style={{ color: AppColors.danger }}>Error loading events</ThemedText>
         <ThemedText>{error.detail || "An error occurred"}</ThemedText>
       </View>
     );
@@ -226,7 +214,7 @@ function EventOccurrencesList() {
 
   if (!response || !Array.isArray(response.data)) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <View className="flex-1 items-center justify-center p-4">
         <ThemedText>No events available</ThemedText>
       </View>
     );
@@ -247,21 +235,21 @@ function EventOccurrencesList() {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 40 }}
       ListHeaderComponent={
-        <View style={{ backgroundColor: "#fff" }}>
+        <View className="bg-white">
           {/* Nav bar */}
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop: 56, paddingBottom: 20 }}>
-            <View style={{ width: 36, height: 36, alignItems: "center", justifyContent: "center" }}>
-              <Text style={{ fontSize: 22 }}>⚡</Text>
+          <View className="flex-row items-center justify-between px-5 pt-14 pb-5">
+            <View className="w-9 h-9 items-center justify-center">
+              <Text className="text-[22px]">⚡</Text>
             </View>
-            <View style={{ gap: 5, padding: 4 }}>
-              <View style={{ width: 22, height: 2, backgroundColor: AppColors.primaryText, borderRadius: 2 }} />
-              <View style={{ width: 22, height: 2, backgroundColor: AppColors.primaryText, borderRadius: 2 }} />
+            <View className="gap-[5px] p-1">
+              <View className="w-[22px] h-0.5 rounded-sm" style={{ backgroundColor: AppColors.primaryText }} />
+              <View className="w-[22px] h-0.5 rounded-sm" style={{ backgroundColor: AppColors.primaryText }} />
             </View>
           </View>
 
           {/* Title */}
-          <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
-            <Text style={{ fontSize: 28, fontWeight: "700", color: AppColors.primaryText, letterSpacing: -0.5 }}>
+          <View className="px-5 mb-4">
+            <Text className="text-[28px] font-bold tracking-tight" style={{ color: AppColors.primaryText }}>
               My Dashboard
             </Text>
           </View>
@@ -270,15 +258,14 @@ function EventOccurrencesList() {
           <FilterChips filters={allCategories} active={activeFilters} onToggle={toggleFilter} />
 
           {/* Search */}
-          <View style={{
-            marginHorizontal: 20, marginTop: 14, marginBottom: 20,
-            flexDirection: "row", alignItems: "center",
-            backgroundColor: "#F3F4F6", borderRadius: 999,
-            paddingHorizontal: 18, paddingVertical: 11,
-          }}>
-            <Text style={{ fontSize: 14, marginRight: 10, color: AppColors.subtleText }}>🔍</Text>
+          <View
+            className="mx-5 mt-3.5 mb-5 flex-row items-center rounded-full px-[18px] py-[11px]"
+            style={{ backgroundColor: "#F3F4F6" }}
+          >
+            <Text className="text-sm mr-2.5" style={{ color: AppColors.subtleText }}>🔍</Text>
             <TextInput
-              style={{ flex: 1, fontSize: 14, color: AppColors.primaryText }}
+              className="flex-1 text-sm"
+              style={{ color: AppColors.primaryText }}
               placeholder="Search for a class"
               placeholderTextColor={AppColors.placeholderText}
               value={search}
@@ -287,45 +274,40 @@ function EventOccurrencesList() {
           </View>
 
           {/* Discover Weekly */}
-          <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 20, marginBottom: 12 }}>
-            <Text style={{ color: "#7C3AED", fontSize: 13, marginRight: 6 }}>✦</Text>
-            <Text style={{ fontSize: 15, fontWeight: "600", color: AppColors.primaryText }}>Discover Weekly</Text>
+          <View className="flex-row items-center px-5 mb-3">
+            <Text className="text-[#7C3AED] text-[13px] mr-1.5">✦</Text>
+            <Text className="text-[15px] font-semibold" style={{ color: AppColors.primaryText }}>Discover Weekly</Text>
           </View>
           {featuredEvent && <DiscoverBanner event={featuredEvent} />}
 
           {/* For You */}
           {listEvents.length > 0 && (
-            <View style={{ paddingHorizontal: 20, marginTop: 24, marginBottom: 4 }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: "#3B82F6", alignItems: "center", justifyContent: "center" }}>
-                  <Text style={{ color: "#fff", fontSize: 11, fontWeight: "700" }}>A</Text>
+            <View className="px-5 mt-6 mb-1">
+              <View className="flex-row items-center gap-1.5 mb-1">
+                <View className="w-[26px] h-[26px] rounded-full bg-[#3B82F6] items-center justify-center">
+                  <Text className="text-white text-[11px] font-bold">A</Text>
                 </View>
-                <Text style={{ fontSize: 14, fontWeight: "600", color: AppColors.primaryText }}>For You</Text>
-                <View style={{ flexDirection: "row", marginLeft: 4 }}>
+                <Text className="text-sm font-semibold" style={{ color: AppColors.primaryText }}>For You</Text>
+                <View className="flex-row ml-1">
                   {["#10B981", "#6366F1"].map((c, i) => (
-                    <View key={i} style={{
-                      width: 22, height: 22, borderRadius: 11,
-                      backgroundColor: c,
-                      borderWidth: 2, borderColor: "#fff",
-                      marginLeft: i > 0 ? -8 : 0,
-                    }} />
+                    <View key={i} className="w-[22px] h-[22px] rounded-full border-2 border-white" style={{ backgroundColor: c, marginLeft: i > 0 ? -8 : 0 }} />
                   ))}
                 </View>
               </View>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <Text style={{ color: "#7C3AED", fontSize: 12 }}>✦</Text>
-                <Text style={{ fontSize: 13, color: AppColors.mutedText }}>Based on </Text>
-                <Text style={{ fontSize: 13, color: "#3B82F6" }}>upcoming events</Text>
+              <View className="flex-row items-center gap-1">
+                <Text className="text-[#7C3AED] text-xs">✦</Text>
+                <Text className="text-[13px]" style={{ color: AppColors.mutedText }}>Based on </Text>
+                <Text className="text-[13px] text-[#3B82F6]">upcoming events</Text>
               </View>
             </View>
           )}
 
-          <View style={{ height: 16 }} />
+          <View className="h-4" />
         </View>
       }
       renderItem={({ item }) => <EventCard item={item} />}
       ListEmptyComponent={
-        <View style={{ alignItems: "center", padding: 32 }}>
+        <View className="items-center p-8">
           <ThemedText style={{ color: AppColors.subtleText }}>No upcoming events</ThemedText>
         </View>
       }
@@ -337,7 +319,7 @@ function EventOccurrencesList() {
 
 export default function HomeScreen() {
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View className="flex-1 bg-white">
       <EventOccurrencesList />
     </View>
   );

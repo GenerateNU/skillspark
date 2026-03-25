@@ -1,14 +1,14 @@
-import type { PropsWithChildren, ReactElement } from 'react';
+import type { PropsWithChildren, ReactElement } from "react";
 import Animated, {
   interpolate,
   useAnimatedRef,
   useAnimatedStyle,
   useScrollOffset,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
-import { ThemedView } from '@/components/themed-view';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { ThemedView } from "@/components/themed-view";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColor } from "@/hooks/use-theme-color";
 
 const HEADER_HEIGHT = 250;
 
@@ -22,8 +22,8 @@ export default function ParallaxScrollView({
   headerImage,
   headerBackgroundColor,
 }: Props) {
-  const backgroundColor = useThemeColor({}, 'background');
-  const colorScheme = useColorScheme() ?? 'light';
+  const backgroundColor = useThemeColor({}, "background");
+  const colorScheme = useColorScheme() ?? "light";
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollOffset(scrollRef);
   const headerAnimatedStyle = useAnimatedStyle(() => {
@@ -33,11 +33,15 @@ export default function ParallaxScrollView({
           translateY: interpolate(
             scrollOffset.value,
             [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
+            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75],
           ),
         },
         {
-          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
+          scale: interpolate(
+            scrollOffset.value,
+            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
+            [2, 1, 1],
+          ),
         },
       ],
     };
@@ -48,16 +52,20 @@ export default function ParallaxScrollView({
       ref={scrollRef}
       className="flex-1"
       style={{ backgroundColor }}
-      scrollEventThrottle={16}>
+      scrollEventThrottle={16}
+    >
       <Animated.View
         style={[
-          { height: HEADER_HEIGHT, overflow: 'hidden' },
+          { height: HEADER_HEIGHT, overflow: "hidden" },
           { backgroundColor: headerBackgroundColor[colorScheme] },
           headerAnimatedStyle,
-        ]}>
+        ]}
+      >
         {headerImage}
       </Animated.View>
-      <ThemedView className="flex-1 gap-4 overflow-hidden p-8">{children}</ThemedView>
+      <ThemedView className="flex-1 gap-4 overflow-hidden p-8">
+        {children}
+      </ThemedView>
     </Animated.ScrollView>
   );
 }

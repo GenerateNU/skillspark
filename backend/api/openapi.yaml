@@ -762,6 +762,32 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/geocode:
+    post:
+      tags:
+        - Geocoding
+      summary: Geocode a text address
+      description: Validates a text address via OpenCage and returns its latitude and longitude.
+      operationId: geocode-address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeocodeAddressInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeocodeAddressOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/guardians/{guardian_id}/payment-methods:
     get:
       tags:
@@ -1782,6 +1808,33 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/review/event_aggregate/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get review aggregate by event id
+      description: Get review aggregate by event id
+      operationId: get-review-aggregate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Aggregate review data including breakdown by rating, total reviews, and average rating
+                $ref: '#/components/schemas/ReviewAggregate'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/review/guardian/{id}:
     get:
       tags:
@@ -2361,9 +2414,6 @@ components:
           description: Primary language used for the event occurrence
           minLength: 2
           maxLength: 30
-        location_id:
-          type: string
-          description: ID of a location in the database
         manager_id:
           type: string
           description: ID of a manager in the database
@@ -2384,7 +2434,6 @@ components:
           format: date-time
       required:
         - event_id
-        - location_id
         - start_time
         - end_time
         - max_attendees
@@ -2424,13 +2473,13 @@ components:
           maxLength: 100
         latitude:
           type: number
-          description: Latitude of the location
+          description: Optional latitude of the location; validated against geocoded coordinates when provided
           format: double
           minimum: -90
           maximum: 90
         longitude:
           type: number
-          description: Longitude of the location
+          description: Optional longitude of the location; validated against geocoded coordinates when provided
           format: double
           minimum: -180
           maximum: 180
@@ -2450,8 +2499,6 @@ components:
           minLength: 2
           maxLength: 100
       required:
-        - latitude
-        - longitude
         - address_line1
         - subdistrict
         - district
@@ -2551,6 +2598,10 @@ components:
         guardian_id:
           type: string
           description: ID of the guardian
+        rating:
+          type: integer
+          description: Rating left with the review, can be 1-5 inclusive
+          format: int64
         registration_id:
           type: string
           description: ID of the linked registration
@@ -2559,6 +2610,7 @@ components:
         - guardian_id
         - description
         - categories
+        - rating
     CreateSavedInputBody:
       type: object
       additionalProperties: false
@@ -2854,6 +2906,45 @@ components:
         - created_at
         - updated_at
         - status
+    GeocodeAddressInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GeocodeAddressInputBody.json
+          readOnly: true
+        address:
+          type: string
+          description: Text address to geocode
+          minLength: 1
+      required:
+        - address
+    GeocodeAddressOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GeocodeAddressOutputBody.json
+          readOnly: true
+        latitude:
+          type: number
+          description: Latitude of the geocoded address
+          format: double
+        longitude:
+          type: number
+          description: Longitude of the geocoded address
+          format: double
+      required:
+        - latitude
+        - longitude
     GetPaymentMethodsByGuardianIDOutputBody:
       type: object
       additionalProperties: false
@@ -2987,7 +3078,10 @@ components:
           readOnly: true
         guardian_id:
           type: string
+        token:
+          type: string
       required:
+        - token
         - guardian_id
     GuardianSignUpInputBody:
       type: object
@@ -3017,7 +3111,6 @@ components:
         - email
         - username
         - password
-        - profile_picture_s3_key
         - language_preference
     GuardianSignUpOutputBody:
       type: object
@@ -3194,7 +3287,10 @@ components:
           readOnly: true
         manager_id:
           type: string
+        token:
+          type: string
       required:
+        - token
         - manager_id
     ManagerSignUpInputBody:
       type: object
@@ -3495,12 +3591,19 @@ components:
         description:
           type: string
           description: The review text
+        event_id:
+          type: string
+          description: ID of the event
         guardian_id:
           type: string
           description: ID of the guardian
         id:
           type: string
           description: Unique review identifier
+        rating:
+          type: integer
+          description: Rating left with the review, can be 1-5 inclusive
+          format: int64
         registration_id:
           type: string
           description: ID of the linked registration
@@ -3512,10 +3615,53 @@ components:
         - id
         - registration_id
         - guardian_id
+        - event_id
         - description
         - categories
+        - rating
         - created_at
         - updated_at
+    ReviewAggregate:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ReviewAggregate.json
+          readOnly: true
+        average_rating:
+          type: number
+          format: double
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewRatingCount'
+        event_id:
+          type: string
+        total_reviews:
+          type: integer
+          format: int64
+      required:
+        - event_id
+        - total_reviews
+        - average_rating
+        - breakdown
+    ReviewRatingCount:
+      type: object
+      additionalProperties: false
+      properties:
+        rating:
+          type: integer
+          format: int64
+        review_count:
+          type: integer
+          format: int64
+      required:
+        - rating
+        - review_count
     Saved:
       type: object
       additionalProperties: false
@@ -3640,9 +3786,6 @@ components:
           description: Primary language used for the event occurrence
           minLength: 2
           maxLength: 30
-        location_id:
-          type: string
-          description: ID of a location in the database
         manager_id:
           type: string
           description: ID of a manager in the database

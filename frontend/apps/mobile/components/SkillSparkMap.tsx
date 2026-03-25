@@ -11,9 +11,9 @@ export interface LocationPin {
   description: string;
   latitude: number;
   longitude: number;
-  rating: number;     
-  members: number;     
-  image?: string;     
+  rating: number;
+  members: number;
+  image?: string;
 }
 
 interface SkillSparkMapProps {
@@ -25,24 +25,26 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
   const mapRef = useRef<MapView>(null);
   const [selectedPin, setSelectedPin] = useState<LocationPin | null>(null);
 
-  const initialRegion = userLocation ? {
-    latitude: userLocation.coords.latitude,
-    longitude: userLocation.coords.longitude,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  } : undefined;
+  const initialRegion = userLocation
+    ? {
+        latitude: userLocation.coords.latitude,
+        longitude: userLocation.coords.longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      }
+    : undefined;
 
   return (
     <ThemedView className="flex-1">
       <MapView
         ref={mapRef}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: "100%", height: "100%" }}
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
         showsUserLocation={true}
         showsMyLocationButton={true}
         onPress={() => setSelectedPin(null)}
-        userInterfaceStyle="dark" 
+        userInterfaceStyle="dark"
       >
         {locations.map((loc) => (
           <Marker
@@ -61,9 +63,7 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
           </Marker>
         ))}
       </MapView>
-      {selectedPin && (
-        <EventCard pin={selectedPin} />
-      )}
+      {selectedPin && <EventCard pin={selectedPin} />}
     </ThemedView>
   );
 }

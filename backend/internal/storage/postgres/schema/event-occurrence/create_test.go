@@ -30,7 +30,6 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 		input := &models.CreateEventOccurrenceInput{}
 		input.Body.ManagerId = &mid
 		input.Body.EventId = uuid.MustParse("60000000-0000-0000-0000-000000000001")
-		input.Body.LocationId = uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 		input.Body.StartTime = start
 		input.Body.EndTime = end
 		input.Body.MaxAttendees = 10
@@ -45,7 +44,6 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 	assert.NotNil(t, eventOccurrence)
 	assert.Equal(t, &mid, eventOccurrence.ManagerId)
 	assert.Equal(t, uuid.MustParse("60000000-0000-0000-0000-000000000001"), eventOccurrence.Event.ID)
-	assert.Equal(t, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"), eventOccurrence.Location.ID)
 	assert.Equal(t, start, eventOccurrence.StartTime)
 	assert.Equal(t, end, eventOccurrence.EndTime)
 	assert.Equal(t, 10, eventOccurrence.MaxAttendees)
@@ -61,7 +59,6 @@ func TestEventOccurrenceRepository_CreateEventOccurrence(t *testing.T) {
 	assert.NotNil(t, retrievedEventOccurrence)
 	assert.Equal(t, &mid, retrievedEventOccurrence.ManagerId)
 	assert.Equal(t, uuid.MustParse("60000000-0000-0000-0000-000000000001"), retrievedEventOccurrence.Event.ID)
-	assert.Equal(t, uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"), retrievedEventOccurrence.Location.ID)
 	assert.Equal(t, start, retrievedEventOccurrence.StartTime)
 	assert.Equal(t, end, retrievedEventOccurrence.EndTime)
 	assert.Equal(t, 10, retrievedEventOccurrence.MaxAttendees)

@@ -113,12 +113,36 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		Tags:        []string{"Review"},
 	}, func(ctx context.Context, input *models.CreateReviewInput) (*models.CreateReviewOutput, error) {
 
+		if input.Body.Rating != 0 && (input.Body.Rating < 1 || input.Body.Rating > 5) {
+			return nil, huma.Error400BadRequest("rating must be between 1 and 5")
+		}
+
 		reviewOutput, err := reviewHandler.CreateReview(ctx, input)
 		if err != nil {
 			return nil, err
 		}
 
 		return reviewOutput, nil
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-review-aggregate",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/review/event_aggregate/{id}",
+		Summary:     "Get review aggregate by event id",
+		Description: "Get review aggregate by event id",
+		Tags:        []string{"Review"},
+	}, func(ctx context.Context, input *models.GetReviewsAggregateInput) (*models.ReviewsAggregateOutput, error) {
+
+		aggregate, err := reviewHandler.GetAggregateReviews(ctx, input.ID)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.ReviewsAggregateOutput{
+			Body: *aggregate,
+		}, nil
 	})
 
 }

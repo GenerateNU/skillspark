@@ -11,9 +11,9 @@ export interface LocationPin {
   description: string;
   latitude: number;
   longitude: number;
-  rating: number;     
-  members: number;     
-  image?: string;     
+  rating: number;
+  members: number;
+  image?: string;
 }
 
 interface EventCardProps {
@@ -21,18 +21,20 @@ interface EventCardProps {
 }
 
 export function EventCard({ pin }: EventCardProps) {
-  const placeholderColor = useThemeColor({ light: '#D0D0D0', dark: '#333333' }, 'background');
+  const placeholderColor = useThemeColor(
+    { light: "#D0D0D0", dark: "#333333" },
+    "background",
+  );
 
   return (
     <ThemedView
-      className="absolute bottom-0 left-0 right-0 rounded-t-[25px] p-5"
+      className="absolute bottom-0 left-0 right-0 rounded-t-[25px] p-5 elevation-10"
       style={{
-        paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+        paddingBottom: Platform.OS === "ios" ? 40 : 20,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.1,
         shadowRadius: 5,
-        elevation: 10,
       }}
     >
       <View className="mb-5 flex-row">
@@ -40,12 +42,15 @@ export function EventCard({ pin }: EventCardProps) {
           className="mr-[15px] h-[90px] w-[90px] items-center justify-center rounded-[10px]"
           style={{ backgroundColor: placeholderColor }}
         >
-           <IconSymbol name="photo" size={28} color="#888" />
+          <IconSymbol name="photo" size={28} color="#888" />
         </View>
         <View className="flex-1 justify-center">
-          <ThemedText type="subtitle" className="mb-1 font-bold">{pin.title}</ThemedText>
-          <ThemedText className="mb-[6px] text-sm text-[#888]">{pin.members} members</ThemedText>
-          
+          <ThemedText type="subtitle" className="mb-1 font-bold">
+            {pin.title}
+          </ThemedText>
+          <ThemedText className="mb-[6px] text-sm text-[#888]">
+            {pin.members} members
+          </ThemedText>
           <View className="mb-2 flex-row items-center">
             {[1, 2, 3, 4, 5].map((star) => (
               <IconSymbol
@@ -56,21 +61,22 @@ export function EventCard({ pin }: EventCardProps) {
               />
             ))}
           </View>
-
           <ThemedText numberOfLines={2} className="text-sm leading-5 text-[#888]">
             {pin.description}
           </ThemedText>
         </View>
         <View className="ml-[10px] mt-[5px] items-end justify-start">
-            <IconSymbol name="record.circle" size={24} color="#888" />
+          <IconSymbol name="record.circle" size={24} color="#888" />
         </View>
       </View>
-      <TouchableOpacity 
+      <TouchableOpacity
         className="w-full items-center rounded-xl bg-[#333] py-[15px]"
-        activeOpacity={1} 
-        onPress={() => Alert.alert('Reservation', `Reserved: ${pin.title}`)} 
+        activeOpacity={1}
+        onPress={() => Alert.alert("Reservation", `Reserved: ${pin.title}`)}
       >
-        <ThemedText className="text-[18px] font-semibold text-white">Reserve</ThemedText>
+        <ThemedText className="text-[18px] font-semibold text-white">
+          Reserve
+        </ThemedText>
       </TouchableOpacity>
     </ThemedView>
   );

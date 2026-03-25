@@ -30,7 +30,7 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 		organizationBody := models.CreateOrganizationBody{
 			Name:       formData.Name,
 			Active:     &formData.Active,
-			LocationID: &formData.LocationID,
+			LocationID: formData.LocationID,
 		}
 
 		organizationModel := models.CreateOrganizationInput{
