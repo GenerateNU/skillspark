@@ -19,7 +19,6 @@ export default function OrganizationDetailPage() {
 
   const [editing, setEditing] = useState<boolean>(false);
   const [editName, setEditName] = useState<string>("");
-  const [editLocationId, setEditLocationId] = useState<string>();
   const [editActive, setEditActive] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
 
@@ -31,7 +30,6 @@ export default function OrganizationDetailPage() {
     }
     setOrg(orgFromState);
     setEditName(orgFromState.name);
-    setEditLocationId(orgFromState.location_id ?? "");
     setEditActive(orgFromState.active);
 
     async function fetchManager(): Promise<void> {
@@ -52,13 +50,13 @@ export default function OrganizationDetailPage() {
     async function fetchLocation() {
       if (!orgFromState.location_id) return;
       try {
-      const res = await getLocationById(orgFromState.location_id as string);
-      if (res.status === 200 || res.status === 201) {
-        setOrgLocation(res.data as Location);
+        const res = await getLocationById(orgFromState.location_id as string);
+        if (res.status === 200 || res.status === 201) {
+          setOrgLocation(res.data as Location);
+        }
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
-    }
     }
 
     fetchLocation();
@@ -67,7 +65,6 @@ export default function OrganizationDetailPage() {
   function startEditing(): void {
     if (!org) return;
     setEditName(org.name);
-    setEditLocationId(org.location_id ?? "");
     setEditActive(org.active);
     setEditing(true);
   }
@@ -81,12 +78,11 @@ export default function OrganizationDetailPage() {
     if (!editName.trim()) return;
     try {
       setSaving(true);
-      const input : UpdateOrganizationBody = {
+      const input: UpdateOrganizationBody = {
         name: editName,
-        location_id: editLocationId,
+        location_id: org.location_id,
         active: editActive,
-
-      }
+      };
       const res = await updateOrganization(org.id, input);
       if (res.status === 200) {
         setOrg(res.data as Organization);
@@ -104,12 +100,11 @@ export default function OrganizationDetailPage() {
     try {
       setDeleting(true);
       if (manager != undefined) {
-        const managerRes = await deleteManager(manager!.id)
+        const managerRes = await deleteManager(manager!.id);
         if (managerRes.status !== 200) {
-          throw new Error("Failed to delete manager")
+          throw new Error("Failed to delete manager");
         }
       }
-      
       const res = await deleteOrganization(org.id);
       if (res.status === 200) {
         navigate("/admin", { replace: true });
@@ -189,7 +184,6 @@ export default function OrganizationDetailPage() {
               <>
                 {[
                   { label: "ID", value: org.id, mono: true },
-                  { label: "Location", value: orgLocation? orgLocation!.address_line1 + ", " + orgLocation!.address_line2 : "—", mono: true },
                   { label: "Created", value: fmtDate(org.created_at), mono: false },
                   { label: "Updated", value: fmtDate(org.updated_at), mono: false },
                 ].map(function (row: { label: string; value: string; mono: boolean }) {
@@ -223,15 +217,6 @@ export default function OrganizationDetailPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-gray-700">Location <span className="text-red-500">*</span></label>
-                  <input
-                    value={editLocationId}
-                    onChange={function (e: React.ChangeEvent<HTMLInputElement>) { setEditLocationId(e.target.value); }}
-                    placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
                   <label className="text-sm font-medium text-gray-700">Active</label>
                   <select
                     value={editActive ? "true" : "false"}
@@ -255,6 +240,38 @@ export default function OrganizationDetailPage() {
                   </span>
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* Location card */}
+          <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+            <div className="px-5 py-4 border-b border-gray-100">
+              <h3 className="text-base font-semibold text-gray-700 uppercase tracking-wide">Location</h3>
+            </div>
+            {!orgLocation ? (
+              <p className="px-5 py-4 text-base text-gray-400">No location assigned.</p>
+            ) : (
+              <>
+                {[
+                  { label: "Address", value: orgLocation.address_line1, mono: false },
+                  { label: "Address line 2", value: orgLocation.address_line2 || "—", mono: false },
+                  { label: "Subdistrict", value: orgLocation.subdistrict, mono: false },
+                  { label: "District", value: orgLocation.district, mono: false },
+                  { label: "Province", value: orgLocation.province, mono: false },
+                  { label: "Postal code", value: orgLocation.postal_code, mono: true },
+                  { label: "Country", value: orgLocation.country, mono: false },
+                  { label: "Coordinates", value: `${orgLocation.latitude}, ${orgLocation.longitude}`, mono: true },
+                ].map(function (row) {
+                  return (
+                    <div key={row.label} className="px-5 py-3.5 grid grid-cols-3 gap-4">
+                      <span className="text-sm font-medium text-gray-500">{row.label}</span>
+                      <span className={`col-span-2 text-base text-gray-800 break-all ${row.mono ? "font-mono" : ""}`}>
+                        {row.value}
+                      </span>
+                    </div>
+                  );
+                })}
+              </>
             )}
           </div>
 
