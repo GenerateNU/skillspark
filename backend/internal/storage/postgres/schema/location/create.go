@@ -14,7 +14,7 @@ func (r *LocationRepository) CreateLocation(ctx context.Context, location *model
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, location.Body.Latitude, location.Body.Longitude, location.Body.AddressLine1, location.Body.AddressLine2, location.Body.Subdistrict, location.Body.District, location.Body.Province, location.Body.PostalCode, location.Body.Country)
+	row := r.db.QueryRow(ctx, query, *location.Body.Latitude, *location.Body.Longitude, location.Body.AddressLine1, location.Body.AddressLine2, location.Body.Subdistrict, location.Body.District, location.Body.Province, location.Body.PostalCode, location.Body.Country)
 
 	var createdLocation models.Location
 

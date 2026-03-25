@@ -19,7 +19,6 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, i
 		query,
 		input.Body.ManagerId,
 		input.Body.EventId,
-		input.Body.LocationId,
 		input.Body.StartTime,
 		input.Body.EndTime,
 		input.Body.MaxAttendees,
