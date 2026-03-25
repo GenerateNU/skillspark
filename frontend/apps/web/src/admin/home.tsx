@@ -42,7 +42,7 @@ export default function HomePage() {
         </div>
         <button
           onClick={function () { setShowCreate(true); }}
-          className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+          className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer"
         >
           <IconPlus /> Add organization
         </button>
