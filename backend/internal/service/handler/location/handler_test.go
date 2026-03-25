@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/errs"
+	"skillspark/internal/geocoding"
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"skillspark/internal/utils"
@@ -14,6 +15,22 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
+
+type mockGeocodingService struct {
+	mock.Mock
+}
+
+var _ geocoding.GeocoderServiceInterface = (*mockGeocodingService)(nil)
+
+func (m *mockGeocodingService) Geocode(ctx context.Context, address string) (*float64, *float64, *errs.HTTPError) {
+	args := m.Called(ctx, address)
+	lat := args.Get(0).(float64)
+	lng := args.Get(1).(float64)
+	if args.Get(2) == nil {
+		return &lat, &lng, nil
+	}
+	return nil, nil, args.Get(2).(*errs.HTTPError)
+}
 
 func TestHandler_GetLocationById(t *testing.T) {
 	statusCodeNotFound := http.StatusNotFound
@@ -107,7 +124,7 @@ func TestHandler_GetLocationById(t *testing.T) {
 			mockRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			handler := NewHandler(mockRepo)
+			handler := NewHandler(mockRepo, nil)
 			ctx := context.Background()
 
 			input := &models.GetLocationByIDInput{ID: uuid.MustParse(tt.id)}
@@ -129,21 +146,24 @@ func TestHandler_GetLocationById(t *testing.T) {
 	}
 }
 
+func ptr(f float64) *float64 { return &f }
+
 func TestHandler_CreateLocation(t *testing.T) {
 	tests := []struct {
-		name      string
-		input     *models.CreateLocationInput
-		mockSetup func(*repomocks.MockLocationRepository)
-		wantErr   bool
+		name         string
+		input        *models.CreateLocationInput
+		geocodeSetup func(*mockGeocodingService)
+		repoSetup    func(*repomocks.MockLocationRepository)
+		wantErr      bool
+		wantErrCode  *int
+		wantLat      float64
+		wantLng      float64
 	}{
 		{
-			name: "create New York location",
+			name: "no lat/lng provided - uses geocoded values",
 			input: func() *models.CreateLocationInput {
 				input := &models.CreateLocationInput{}
-				input.Body.Latitude = 40.7128
-				input.Body.Longitude = -74.0060
 				input.Body.AddressLine1 = "123 Broadway"
-				input.Body.AddressLine2 = nil
 				input.Body.Subdistrict = "Manhattan"
 				input.Body.District = "New York County"
 				input.Body.Province = "NY"
@@ -151,13 +171,16 @@ func TestHandler_CreateLocation(t *testing.T) {
 				input.Body.Country = "USA"
 				return input
 			}(),
-			mockSetup: func(m *repomocks.MockLocationRepository) {
+			geocodeSetup: func(m *mockGeocodingService) {
+				m.On("Geocode", mock.Anything, "123 Broadway, New York County, NY, USA").
+					Return(40.7128, -74.0060, nil)
+			},
+			repoSetup: func(m *repomocks.MockLocationRepository) {
 				m.On("CreateLocation", mock.Anything, mock.AnythingOfType("*models.CreateLocationInput")).Return(&models.Location{
 					ID:           uuid.New(),
 					Latitude:     40.7128,
 					Longitude:    -74.0060,
 					AddressLine1: "123 Broadway",
-					AddressLine2: nil,
 					Subdistrict:  "Manhattan",
 					District:     "New York County",
 					Province:     "NY",
@@ -167,47 +190,128 @@ func TestHandler_CreateLocation(t *testing.T) {
 					UpdatedAt:    time.Now(),
 				}, nil)
 			},
-			wantErr: false,
+			wantLat: 40.7128,
+			wantLng: -74.0060,
 		},
 		{
-			name: "create Boston location",
+			name: "no lat/lng provided - Chiang Mai",
 			input: func() *models.CreateLocationInput {
 				input := &models.CreateLocationInput{}
-				input.Body.Latitude = 42.3601
-				input.Body.Longitude = -71.0589
-				input.Body.AddressLine1 = "600 Boylston Street"
-				input.Body.District = "Boston"
-				input.Body.Subdistrict = "Back Bay"
-				input.Body.Province = "MA"
-				input.Body.PostalCode = "02116"
-				input.Body.Country = "USA"
+				input.Body.AddressLine1 = "Nimman Rd"
+				input.Body.Subdistrict = "Suthep"
+				input.Body.District = "Mueang Chiang Mai"
+				input.Body.Province = "Chiang Mai"
+				input.Body.PostalCode = "50200"
+				input.Body.Country = "Thailand"
 				return input
 			}(),
-			mockSetup: func(m *repomocks.MockLocationRepository) {
+			geocodeSetup: func(m *mockGeocodingService) {
+				m.On("Geocode", mock.Anything, "Nimman Rd, Mueang Chiang Mai, Chiang Mai, Thailand").
+					Return(18.7883, 98.9853, nil)
+			},
+			repoSetup: func(m *repomocks.MockLocationRepository) {
 				m.On("CreateLocation", mock.Anything, mock.AnythingOfType("*models.CreateLocationInput")).Return(&models.Location{
 					ID:           uuid.New(),
-					Latitude:     42.3601,
-					Longitude:    -71.0589,
-					AddressLine1: "600 Boylston Street",
-					District:     "Boston",
-					Subdistrict:  "Back Bay",
-					Province:     "MA",
-					PostalCode:   "02116",
-					Country:      "USA",
+					Latitude:     18.7883,
+					Longitude:    98.9853,
+					AddressLine1: "Nimman Rd",
+					Subdistrict:  "Suthep",
+					District:     "Mueang Chiang Mai",
+					Province:     "Chiang Mai",
+					PostalCode:   "50200",
+					Country:      "Thailand",
 					CreatedAt:    time.Now(),
 					UpdatedAt:    time.Now(),
 				}, nil)
 			},
-			wantErr: false,
+			wantLat: 18.7883,
+			wantLng: 98.9853,
 		},
 		{
-			name: "internal server error",
+			// Provided coords (~0.5 km from geocoded) — within 50 km threshold
+			name: "lat/lng within range - accepted, geocoded values used",
 			input: func() *models.CreateLocationInput {
 				input := &models.CreateLocationInput{}
-				input.Body.Latitude = 40.7128
-				input.Body.Longitude = -74.0060
+				input.Body.Latitude = ptr(13.7600)  // ~0.5 km from geocoded 13.7563
+				input.Body.Longitude = ptr(100.5100) // ~0.5 km from geocoded 100.5018
+				input.Body.AddressLine1 = "1 Sukhumvit Rd"
+				input.Body.Subdistrict = "Khlong Toei"
+				input.Body.District = "Khlong Toei"
+				input.Body.Province = "Bangkok"
+				input.Body.PostalCode = "10110"
+				input.Body.Country = "Thailand"
+				return input
+			}(),
+			geocodeSetup: func(m *mockGeocodingService) {
+				m.On("Geocode", mock.Anything, "1 Sukhumvit Rd, Khlong Toei, Bangkok, Thailand").
+					Return(13.7563, 100.5018, nil)
+			},
+			repoSetup: func(m *repomocks.MockLocationRepository) {
+				m.On("CreateLocation", mock.Anything, mock.AnythingOfType("*models.CreateLocationInput")).Return(&models.Location{
+					ID:           uuid.New(),
+					Latitude:     13.7563,
+					Longitude:    100.5018,
+					AddressLine1: "1 Sukhumvit Rd",
+					District:     "Khlong Toei",
+					Province:     "Bangkok",
+					PostalCode:   "10110",
+					Country:      "Thailand",
+					CreatedAt:    time.Now(),
+					UpdatedAt:    time.Now(),
+				}, nil)
+			},
+			wantLat: 13.7563,
+			wantLng: 100.5018,
+		},
+		{
+			// Bangkok coords vs Chiang Mai geocode — ~680 km apart, exceeds 50 km threshold
+			name: "lat/lng too far from geocoded address - returns bad request",
+			input: func() *models.CreateLocationInput {
+				input := &models.CreateLocationInput{}
+				input.Body.Latitude = ptr(13.7563)  // Bangkok
+				input.Body.Longitude = ptr(100.5018) // Bangkok
+				input.Body.AddressLine1 = "Nimman Rd"
+				input.Body.Subdistrict = "Suthep"
+				input.Body.District = "Mueang Chiang Mai"
+				input.Body.Province = "Chiang Mai"
+				input.Body.PostalCode = "50200"
+				input.Body.Country = "Thailand"
+				return input
+			}(),
+			geocodeSetup: func(m *mockGeocodingService) {
+				m.On("Geocode", mock.Anything, "Nimman Rd, Mueang Chiang Mai, Chiang Mai, Thailand").
+					Return(18.7883, 98.9853, nil) // Chiang Mai
+			},
+			repoSetup:   func(*repomocks.MockLocationRepository) {},
+			wantErr:     true,
+			wantErrCode: func() *int { c := http.StatusBadRequest; return &c }(),
+		},
+		{
+			name: "invalid address - geocoding returns bad request",
+			input: func() *models.CreateLocationInput {
+				input := &models.CreateLocationInput{}
+				input.Body.AddressLine1 = "zzzzz not real"
+				input.Body.Subdistrict = "Nowhere"
+				input.Body.District = "Nowhere"
+				input.Body.Province = "ZZ"
+				input.Body.PostalCode = "00000"
+				input.Body.Country = "ZZ"
+				return input
+			}(),
+			geocodeSetup: func(m *mockGeocodingService) {
+				e := errs.BadRequest("address is invalid or could not be geocoded with sufficient confidence")
+				m.On("Geocode", mock.Anything, "zzzzz not real, Nowhere, ZZ, ZZ").
+					Return(0.0, 0.0, &e)
+			},
+			repoSetup:   func(*repomocks.MockLocationRepository) {},
+			wantErr:     true,
+			wantErrCode: func() *int { c := http.StatusBadRequest; return &c }(),
+		},
+		{
+			name: "geocoding service failure - returns internal server error",
+			input: func() *models.CreateLocationInput {
+				input := &models.CreateLocationInput{}
 				input.Body.AddressLine1 = "123 Broadway"
-				input.Body.AddressLine2 = nil
 				input.Body.Subdistrict = "Manhattan"
 				input.Body.District = "New York County"
 				input.Body.Province = "NY"
@@ -215,50 +319,69 @@ func TestHandler_CreateLocation(t *testing.T) {
 				input.Body.Country = "USA"
 				return input
 			}(),
-			mockSetup: func(m *repomocks.MockLocationRepository) {
+			geocodeSetup: func(m *mockGeocodingService) {
+				e := errs.InternalServerError("geocoding failed: connection refused")
+				m.On("Geocode", mock.Anything, "123 Broadway, New York County, NY, USA").
+					Return(0.0, 0.0, &e)
+			},
+			repoSetup:   func(*repomocks.MockLocationRepository) {},
+			wantErr:     true,
+			wantErrCode: func() *int { c := http.StatusInternalServerError; return &c }(),
+		},
+		{
+			name: "repository error - returns internal server error",
+			input: func() *models.CreateLocationInput {
+				input := &models.CreateLocationInput{}
+				input.Body.AddressLine1 = "123 Broadway"
+				input.Body.Subdistrict = "Manhattan"
+				input.Body.District = "New York County"
+				input.Body.Province = "NY"
+				input.Body.PostalCode = "10001"
+				input.Body.Country = "USA"
+				return input
+			}(),
+			geocodeSetup: func(m *mockGeocodingService) {
+				m.On("Geocode", mock.Anything, "123 Broadway, New York County, NY, USA").
+					Return(40.7128, -74.0060, nil)
+			},
+			repoSetup: func(m *repomocks.MockLocationRepository) {
 				m.On("CreateLocation", mock.Anything, mock.AnythingOfType("*models.CreateLocationInput")).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Internal server error").Code,
 					Message: "Internal server error",
 				})
 			},
-			wantErr: true,
+			wantErr:     true,
+			wantErrCode: func() *int { c := http.StatusInternalServerError; return &c }(),
 		},
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := new(repomocks.MockLocationRepository)
-			tt.mockSetup(mockRepo)
+			tt.repoSetup(mockRepo)
 
-			handler := NewHandler(mockRepo)
-			ctx := context.Background()
+			mockGeocoder := new(mockGeocodingService)
+			tt.geocodeSetup(mockGeocoder)
+			handler := NewHandler(mockRepo, mockGeocoder)
 
-			location, err := handler.CreateLocation(ctx, tt.input)
+			location, err := handler.CreateLocation(context.Background(), tt.input)
 
 			if tt.wantErr {
 				assert.NotNil(t, err)
 				assert.Nil(t, location)
+				assert.Equal(t, *tt.wantErrCode, err.Code)
 			} else {
 				assert.Nil(t, err)
 				assert.NotNil(t, location)
 				assert.Equal(t, tt.input.Body.AddressLine1, location.AddressLine1)
-				if tt.input.Body.AddressLine2 != nil {
-					assert.Equal(t, *tt.input.Body.AddressLine2, *location.AddressLine2)
-				} else {
-					assert.Nil(t, location.AddressLine2)
-				}
-				assert.Equal(t, tt.input.Body.Subdistrict, location.Subdistrict)
-				assert.Equal(t, tt.input.Body.District, location.District)
-				assert.Equal(t, tt.input.Body.Province, location.Province)
-				assert.Equal(t, tt.input.Body.PostalCode, location.PostalCode)
-				assert.Equal(t, tt.input.Body.Country, location.Country)
-				assert.Equal(t, tt.input.Body.Latitude, location.Latitude)
-				assert.Equal(t, tt.input.Body.Longitude, location.Longitude)
+				assert.Equal(t, tt.wantLat, location.Latitude)
+				assert.Equal(t, tt.wantLng, location.Longitude)
 			}
 
+			mockGeocoder.AssertExpectations(t)
 			mockRepo.AssertExpectations(t)
 		})
 	}
@@ -325,7 +448,7 @@ func TestHandler_GetAllLocations(t *testing.T) {
 			mockRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockRepo)
 
-			handler := NewHandler(mockRepo)
+			handler := NewHandler(mockRepo, nil)
 			ctx := context.Background()
 
 			pagination := utils.Pagination{
