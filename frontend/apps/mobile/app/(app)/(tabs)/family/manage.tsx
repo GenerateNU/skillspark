@@ -17,9 +17,8 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCreateChild, useUpdateChild, useDeleteChild, getGetChildrenByGuardianIdQueryKey } from '@skillspark/api-client';
 import { ChildProfileForm, MONTHS } from '@/components/ChildProfileForm';
-
-// TODO: Replace with authenticated user's guardian ID
-const GUARDIAN_ID = '88888888-8888-8888-8888-888888888888';
+import { useAuthContext } from '@/hooks/use-auth-context';
+import { ErrorScreen } from '@/components/ErrorScreen';
 
 export default function ManageChildScreen() {
   const router = useRouter();
@@ -27,10 +26,10 @@ export default function ManageChildScreen() {
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
   const theme = Colors[colorScheme ?? 'light'];
+  const { guardianId } = useAuthContext();
 
   const isEditing = !!params.id;
 
-  // Initial State Setup
   const [firstName, setFirstName] = useState(
     params.name ? (params.name as string).split(' ')[0] : ''
   );
@@ -38,7 +37,6 @@ export default function ManageChildScreen() {
     params.name ? (params.name as string).split(' ').slice(1).join(' ') : ''
   );
 
-  // Convert numeric month (1-12) to String Name if editing
   const initialMonthStr = params.birth_month
     ? MONTHS[parseInt(params.birth_month as string) - 1]
     : '';
@@ -55,10 +53,8 @@ export default function ManageChildScreen() {
   const [interests, setInterests] = useState<string[]>(initialInterests);
 
   const [searchQuery, setSearchQuery] = useState('');
-
   const [showMonthDrop, setShowMonthDrop] = useState(false);
   const [showYearDrop, setShowYearDrop] = useState(false);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const queryClient = useQueryClient();
@@ -66,6 +62,10 @@ export default function ManageChildScreen() {
   const updateChildMutation = useUpdateChild();
   const deleteChildMutation = useDeleteChild();
 
+  if (!guardianId) {
+    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+  }
+  
   const handleSave = async () => {
     if (!firstName || !birthYear || !birthMonth || !schoolId) {
       Alert.alert('Error', 'Please fill in all required fields (Name, Birth Date, School ID)');
@@ -78,7 +78,7 @@ export default function ManageChildScreen() {
         name,
         birth_year: parseInt(birthYear, 10),
         birth_month: MONTHS.indexOf(birthMonth) + 1,
-        guardian_id: GUARDIAN_ID,
+        guardian_id: guardianId,
         school_id: schoolId,
         interests,
       };
@@ -87,7 +87,7 @@ export default function ManageChildScreen() {
       } else {
         await createChildMutation.mutateAsync({ data: childData });
       }
-      await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(GUARDIAN_ID) });
+      await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(guardianId) });
       router.back();
     } catch (error) {
       console.error(error);
@@ -109,14 +109,14 @@ export default function ManageChildScreen() {
             setIsSubmitting(true);
             try {
               await deleteChildMutation.mutateAsync({ id: params.id as string });
-              await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(GUARDIAN_ID) });
+              await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(guardianId) });
               router.back();
             } catch {
               Alert.alert('Error', 'Failed to delete.');
               setIsSubmitting(false);
             }
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -126,10 +126,13 @@ export default function ManageChildScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+        className="flex-1"
         keyboardVerticalOffset={0}
       >
-        <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: 10 }} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: 10 }}
+          showsVerticalScrollIndicator={false}
+        >
           <View className="flex-row items-center justify-between mb-6">
             <TouchableOpacity onPress={() => router.back()} className="w-8 h-8 justify-center items-start">
               <IconSymbol name="chevron.left" size={24} color={theme.text} />
@@ -167,8 +170,8 @@ export default function ManageChildScreen() {
             setShowYearDrop={setShowYearDrop}
           />
           <TouchableOpacity
-            className="py-4 rounded-xl items-center justify-center"
-            style={{ backgroundColor: theme.tint, opacity: isSubmitting ? 0.7 : 1 }}
+            className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? 'opacity-70' : 'opacity-100'}`}
+            style={{ backgroundColor: theme.tint }}
             onPress={handleSave}
             disabled={isSubmitting}
           >
@@ -176,7 +179,6 @@ export default function ManageChildScreen() {
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </ThemedText>
           </TouchableOpacity>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </ThemedView>

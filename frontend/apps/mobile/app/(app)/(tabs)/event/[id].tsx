@@ -10,9 +10,7 @@ import {
 import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  useGetEventOccurrencesById,
-} from "@skillspark/api-client";
+import { useGetEventOccurrencesById } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { AppColors } from "@/constants/theme";
@@ -35,267 +33,171 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
   const address = formatAddress(occurrence);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F4F6F8" }}>
+    <View className="flex-1 bg-[#F4F6F8]">
       <View
+        className="flex-1 mx-3.5 rounded-[32px] overflow-hidden bg-white elevation-8"
         style={{
-          flex: 1,
           marginTop: insets.top + 8,
-          marginHorizontal: 14,
           marginBottom: insets.bottom - 20,
-          borderRadius: 32,
-          overflow: "hidden",
-          backgroundColor: "#fff",
           shadowColor: "#000",
           shadowOpacity: 0.12,
           shadowRadius: 20,
-          elevation: 8,
         }}
       >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <View style={{ height: 250, backgroundColor: "#1a1a1a" }}>
-          {occurrence.event.presigned_url ? (
-            <Image
-              source={{ uri: occurrence.event.presigned_url }}
-              style={{ width: "100%", height: "100%" }}
-              contentFit="cover"
-            />
-          ) : (
-            <View style={{ flex: 1, backgroundColor: "#C5C5C5" }} />
-          )}
-          <TouchableOpacity
-            onPress={() => router.navigate('/')}
-            activeOpacity={0.7}
-            style={{
-              position: "absolute",
-              top: 16,
-              left: 16,
-              zIndex: 10,
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#fff",
-              borderRadius: 999,
-              paddingHorizontal: 16,
-              paddingVertical: 10,
-              shadowColor: "#000",
-              shadowOpacity: 0.15,
-              shadowRadius: 8,
-              elevation: 10,
-            }}
-          >
-            <MaterialIcons name="chevron-left" size={20} color={AppColors.primaryText} />
-            <Text style={{ fontSize: 15, color: AppColors.primaryText, fontWeight: "500" }}>Back</Text>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            backgroundColor: "#fff",
-            borderTopLeftRadius: 28,
-            borderTopRightRadius: 28,
-            marginTop: -28,
-            paddingHorizontal: 22,
-            paddingBottom: 24,
-            shadowColor: "#000",
-            shadowOpacity: 0.06,
-            shadowRadius: 12,
-            elevation: 2,
-          }}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          contentContainerStyle={{ flexGrow: 1 }}
         >
-          <View
-            style={{
-              width: 38,
-              height: 4,
-              backgroundColor: AppColors.borderLight,
-              borderRadius: 2,
-              alignSelf: "center",
-              marginTop: 12,
-              marginBottom: 14,
-            }}
-          />
-          <View style={{ position: "absolute", top: -5, left: 10 }}>
-            <BookmarkButton eventId={occurrence.event.id} />
-          </View>
-          <Text
-            style={{
-              fontSize: 28,
-              fontWeight: "700",
-              color: AppColors.primaryText,
-              letterSpacing: -0.5,
-              marginBottom: 8,
-            }}
-          >
-            {occurrence.event.title}
-          </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-              marginBottom: 14,
-            }}
-          >
-            <MaterialIcons name="location-on" size={16} color={AppColors.primaryText} />
-            <Text
-              style={{ fontSize: 13, color: AppColors.secondaryText, flex: 1 }}
-              numberOfLines={1}
-            >
-              {address}
-            </Text>
-            <StarRating size={17} />
-          </View>
-          <Text
-            numberOfLines={descriptionExpanded ? undefined : 5}
-            onTextLayout={(e) => {
-              if (!descriptionExpanded) {
-                setDescriptionTruncated(e.nativeEvent.lines.length >= 5);
-              }
-            }}
-            style={{
-              fontSize: 14,
-              color: AppColors.secondaryText,
-              lineHeight: 22,
-              marginBottom: descriptionTruncated ? 4 : 18,
-            }}
-          >
-            {occurrence.event.description}
-          </Text>
-          {descriptionTruncated && (
-            <Pressable onPress={() => setDescriptionExpanded((prev) => !prev)} style={{ marginBottom: 14 }}>
-              <Text style={{ fontSize: 13, color: AppColors.primaryText, fontWeight: "600" }}>
-                {descriptionExpanded ? "See less" : "See more"}
-              </Text>
-            </Pressable>
-          )}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <View style={{ flexDirection: "row", gap: 8, flex: 1, flexWrap: "wrap" }}>
-              {occurrence.event.category?.map((cat) => (
-                <View
-                  key={cat}
-                  style={{
-                    borderWidth: 1.5,
-                    borderColor: AppColors.borderLight,
-                    borderRadius: 999,
-                    paddingHorizontal: 16,
-                    paddingVertical: 7,
-                  }}
-                >
-                  <Text style={{ fontSize: 13, color: AppColors.secondaryText }}>{cat}</Text>
-                </View>
-              ))}
-            </View>
-            <View style={{ alignItems: "flex-end", marginLeft: 14 }}>
-              <Text style={{ fontSize: 20, fontWeight: "700", color: AppColors.primaryText }}>{occurrence.price} THB</Text>
-              <Text style={{ fontSize: 12, color: AppColors.subtleText }}>/Session</Text>
-            </View>
-          </View>
-        </View>
-        <View
-          style={{
-            marginHorizontal: 0,
-            borderBottomWidth: 1,
-            borderStyle: "dashed",
-            borderColor: AppColors.borderLight,
-          }}
-        />
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "#fff",
-            paddingHorizontal: 22,
-            paddingTop: 22,
-            paddingBottom: 28,
-            shadowColor: "#000",
-            shadowOpacity: 0.06,
-            shadowRadius: 12,
-            elevation: 2,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 22,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 30,
-                fontWeight: "700",
-                color: AppColors.primaryText,
-                letterSpacing: -0.5,
-              }}
-            >
-              {duration}
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 5,
-                backgroundColor: "#F3F4F6",
-                borderRadius: 999,
-                paddingHorizontal: 12,
-                paddingVertical: 7,
-              }}
-            >
-              <MaterialIcons name="directions-walk" size={14} color={AppColors.secondaryText} />
-              <Text style={{ fontSize: 13, color: AppColors.secondaryText }}>8 min</Text>
-              <MaterialIcons name="arrow-forward" size={12} color={AppColors.subtleText} />
-              <MaterialIcons name="directions-bus" size={16} color={AppColors.secondaryText} />
-            </View>
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-            <View style={{ gap: 0 }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                <View
-                  style={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: 8,
-                    backgroundColor: AppColors.primaryText,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#fff" }} />
-                </View>
-                <Text style={{ fontSize: 14, color: AppColors.secondaryText, fontWeight: "500" }}>Home</Text>
-              </View>
-              <View style={{ paddingLeft: 6, paddingVertical: 2 }}>
-                <Text style={{ fontSize: 14, color: AppColors.subtleText, lineHeight: 10 }}>•</Text>
-                <Text style={{ fontSize: 14, color: AppColors.subtleText, lineHeight: 10 }}>•</Text>
-                <Text style={{ fontSize: 14, color: AppColors.subtleText, lineHeight: 10 }}>•</Text>
-              </View>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                <MaterialIcons name="location-on" size={16} color={AppColors.secondaryText} />
-                <Text style={{ fontSize: 14, color: AppColors.secondaryText, fontWeight: "500" }}>Location</Text>
-              </View>
-            </View>
+          {/* Hero image */}
+          <View className="h-[250px] bg-[#1a1a1a]">
+            {occurrence.event.presigned_url ? (
+              <Image
+                source={{ uri: occurrence.event.presigned_url }}
+                className="w-full h-full"
+                contentFit="cover"
+              />
+            ) : (
+              <View className="flex-1 bg-[#C5C5C5]" />
+            )}
             <TouchableOpacity
-              onPress={() => {}}
+              onPress={() => router.navigate('/')}
               activeOpacity={0.7}
-              style={{
-                backgroundColor: AppColors.primaryText,
-                borderRadius: 16,
-                paddingHorizontal: 26,
-                paddingVertical: 14,
-              }}
+              className="absolute top-4 left-4 z-10 flex-row items-center bg-white rounded-full px-4 py-2.5 elevation-10"
+              style={{ shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 8 }}
             >
-              <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700" }}>Register</Text>
+              <MaterialIcons name="chevron-left" size={20} color={AppColors.primaryText} />
+              <Text className="text-[15px] font-medium" style={{ color: AppColors.primaryText }}>Back</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </ScrollView>
+
+          {/* Content card */}
+          <View
+            className="bg-white rounded-t-[28px] -mt-7 px-[22px] pb-6 elevation-2"
+            style={{ shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 12 }}
+          >
+            {/* Drag handle */}
+            <View
+              className="w-[38px] h-1 rounded-sm self-center mt-3 mb-3.5"
+              style={{ backgroundColor: AppColors.borderLight }}
+            />
+            <View className="absolute -top-[5px] left-2.5">
+              <BookmarkButton eventId={occurrence.event.id} />
+            </View>
+            <Text
+              className="text-[28px] font-bold tracking-tight mb-2"
+              style={{ color: AppColors.primaryText }}
+            >
+              {occurrence.event.title}
+            </Text>
+            <View className="flex-row items-center gap-1.5 mb-3.5">
+              <MaterialIcons name="location-on" size={16} color={AppColors.primaryText} />
+              <Text
+                className="text-[13px] flex-1"
+                style={{ color: AppColors.secondaryText }}
+                numberOfLines={1}
+              >
+                {address}
+              </Text>
+              <StarRating size={17} />
+            </View>
+            <Text
+              numberOfLines={descriptionExpanded ? undefined : 5}
+              onTextLayout={(e) => {
+                if (!descriptionExpanded) {
+                  setDescriptionTruncated(e.nativeEvent.lines.length >= 5);
+                }
+              }}
+              className={`text-sm leading-[22px] ${descriptionTruncated ? "mb-1" : "mb-[18px]"}`}
+              style={{ color: AppColors.secondaryText }}
+            >
+              {occurrence.event.description}
+            </Text>
+            {descriptionTruncated && (
+              <Pressable onPress={() => setDescriptionExpanded((prev) => !prev)} className="mb-3.5">
+                <Text className="text-[13px] font-semibold" style={{ color: AppColors.primaryText }}>
+                  {descriptionExpanded ? "See less" : "See more"}
+                </Text>
+              </Pressable>
+            )}
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row gap-2 flex-1 flex-wrap">
+                {occurrence.event.category?.map((cat) => (
+                  <View
+                    key={cat}
+                    className="border-[1.5px] rounded-full px-4 py-[7px]"
+                    style={{ borderColor: AppColors.borderLight }}
+                  >
+                    <Text className="text-[13px]" style={{ color: AppColors.secondaryText }}>{cat}</Text>
+                  </View>
+                ))}
+              </View>
+              <View className="items-end ml-3.5">
+                <Text className="text-xl font-bold" style={{ color: AppColors.primaryText }}>{occurrence.price} THB</Text>
+                <Text className="text-xs" style={{ color: AppColors.subtleText }}>/Session</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Divider */}
+          <View
+            className="border-b border-dashed"
+            style={{ borderColor: AppColors.borderLight }}
+          />
+
+          {/* Bottom section */}
+          <View
+            className="flex-1 bg-white px-[22px] pt-[22px] pb-7 elevation-2"
+            style={{ shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 12 }}
+          >
+            <View className="flex-row items-center justify-between mb-[22px]">
+              <Text
+                className="text-[30px] font-bold tracking-tight"
+                style={{ color: AppColors.primaryText }}
+              >
+                {duration}
+              </Text>
+              <View
+                className="flex-row items-center gap-[5px] bg-[#F3F4F6] rounded-full px-3 py-[7px]"
+              >
+                <MaterialIcons name="directions-walk" size={14} color={AppColors.secondaryText} />
+                <Text className="text-[13px]" style={{ color: AppColors.secondaryText }}>8 min</Text>
+                <MaterialIcons name="arrow-forward" size={12} color={AppColors.subtleText} />
+                <MaterialIcons name="directions-bus" size={16} color={AppColors.secondaryText} />
+              </View>
+            </View>
+            <View className="flex-row items-center justify-between">
+              <View>
+                <View className="flex-row items-center gap-3">
+                  <View
+                    className="w-4 h-4 rounded-full items-center justify-center"
+                    style={{ backgroundColor: AppColors.primaryText }}
+                  >
+                    <View className="w-1.5 h-1.5 rounded-full bg-white" />
+                  </View>
+                  <Text className="text-sm font-medium" style={{ color: AppColors.secondaryText }}>Home</Text>
+                </View>
+                <View className="pl-1.5 py-0.5">
+                  <Text className="text-sm leading-[10px]" style={{ color: AppColors.subtleText }}>•</Text>
+                  <Text className="text-sm leading-[10px]" style={{ color: AppColors.subtleText }}>•</Text>
+                  <Text className="text-sm leading-[10px]" style={{ color: AppColors.subtleText }}>•</Text>
+                </View>
+                <View className="flex-row items-center gap-2.5">
+                  <MaterialIcons name="location-on" size={16} color={AppColors.secondaryText} />
+                  <Text className="text-sm font-medium" style={{ color: AppColors.secondaryText }}>Location</Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                onPress={() => {}}
+                activeOpacity={0.7}
+                className="rounded-2xl px-[26px] py-3.5"
+                style={{ backgroundColor: AppColors.primaryText }}
+              >
+                <Text className="text-white text-[17px] font-bold">Register</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -307,7 +209,7 @@ export default function EventOccurrenceScreen() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -315,8 +217,8 @@ export default function EventOccurrenceScreen() {
 
   if (error || !response || response.status !== 200) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 24 }}>
-        <Text style={{ color: AppColors.danger, fontWeight: "600", fontSize: 16 }}>
+      <View className="flex-1 items-center justify-center p-6">
+        <Text className="text-base font-semibold" style={{ color: AppColors.danger }}>
           Event not found
         </Text>
       </View>

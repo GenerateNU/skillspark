@@ -83,7 +83,7 @@ export default function ProfileScreen() {
                 />
               ))
             ) : (
-              <ThemedText style={{ color: '#999', padding: 10 }}>No children found</ThemedText>
+              <ThemedText className = "text-[#999] p-2.5">No children found</ThemedText>
             )}
           </View>
         </View>

@@ -18,11 +18,10 @@ export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
   const { data, isLoading, isError } = useGetAllSchools();
   const schools = Array.isArray(data?.data) ? data.data : [];
   const selectedSchool = schools.find((s: School) => s.id === value);
-
   const placeholderLabel = isLoading ? 'Loading schools...' : isError ? 'Failed to load schools' : 'Select School';
 
   return (
-    <View style={{ zIndex: 20 }}>
+    <View className="z-20">
       <TouchableOpacity
         className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between mb-6"
         style={{ backgroundColor: theme.inputBg }}
@@ -37,23 +36,19 @@ export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
         </ThemedText>
         <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
       </TouchableOpacity>
-
       {showDrop && (
         <View
-          className="absolute left-0 right-0 rounded-[10px] border"
+          className="absolute left-0 right-0 top-[52px] rounded-[10px] border z-[100] elevation-5"
           style={{
-            top: 52,
             backgroundColor: theme.dropdownBg,
             borderColor: theme.borderColor,
-            zIndex: 100,
-            elevation: 5,
             shadowColor: '#000',
             shadowOpacity: 0.1,
             shadowRadius: 8,
             shadowOffset: { width: 0, height: 2 },
           }}
         >
-          <ScrollView nestedScrollEnabled style={{ maxHeight: 200 }}>
+          <ScrollView nestedScrollEnabled className="max-h-[200px]">
             {schools.map(school => (
               <TouchableOpacity
                 key={school.id}
