@@ -757,6 +757,32 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/geocode:
+    post:
+      tags:
+        - Geocoding
+      summary: Geocode a text address
+      description: Validates a text address via OpenCage and returns its latitude and longitude.
+      operationId: geocode-address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeocodeAddressInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeocodeAddressOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/guardians/{guardian_id}/payment-methods:
     get:
       tags:
@@ -2446,13 +2472,13 @@ components:
           maxLength: 100
         latitude:
           type: number
-          description: Latitude of the location
+          description: Optional latitude of the location; validated against geocoded coordinates when provided
           format: double
           minimum: -90
           maximum: 90
         longitude:
           type: number
-          description: Longitude of the location
+          description: Optional longitude of the location; validated against geocoded coordinates when provided
           format: double
           minimum: -180
           maximum: 180
@@ -2472,8 +2498,6 @@ components:
           minLength: 2
           maxLength: 100
       required:
-        - latitude
-        - longitude
         - address_line1
         - subdistrict
         - district
@@ -2881,6 +2905,45 @@ components:
         - created_at
         - updated_at
         - status
+    GeocodeAddressInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GeocodeAddressInputBody.json
+          readOnly: true
+        address:
+          type: string
+          description: Text address to geocode
+          minLength: 1
+      required:
+        - address
+    GeocodeAddressOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/GeocodeAddressOutputBody.json
+          readOnly: true
+        latitude:
+          type: number
+          description: Latitude of the geocoded address
+          format: double
+        longitude:
+          type: number
+          description: Longitude of the geocoded address
+          format: double
+      required:
+        - latitude
+        - longitude
     GetPaymentMethodsByGuardianIDOutputBody:
       type: object
       additionalProperties: false
