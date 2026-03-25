@@ -44,11 +44,16 @@ export function BookmarkButton({ eventId }: { eventId: string }) {
     },
   });
 
+  const optimisticSaved: Saved = {
+    id: "optimistic",
+    guardian_id: guardianId!,
+    event: { id: eventId } as Saved["event"],
+    created_at: "",
+    updated_at: "",
+  };
+
   const createSaved = useCreateSaved(
-    optimisticOptions((items) => [
-      ...items,
-      { id: "optimistic", guardian_id: guardianId!, event: { id: eventId }, created_at: "", updated_at: "" } as Saved,
-    ])
+    optimisticOptions((items) => [...items, optimisticSaved])
   );
 
   const deleteSaved = useDeleteSaved(

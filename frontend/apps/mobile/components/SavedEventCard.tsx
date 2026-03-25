@@ -26,65 +26,35 @@ export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) 
   return (
     <Pressable
       onPress={() => router.push(`/event/${event.id}`)} //TODO: fix event details to be either event or occurrence based on design
-      style={{
-        marginHorizontal: 20,
-        marginBottom: 12,
-        flexDirection: 'row',
-        backgroundColor: AppColors.savedBackground,
-        borderRadius: 12,
-        padding: 16,
-        height: 150,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
-      }}
+      className="mx-5 mb-3 flex-row rounded-xl p-4 h-[150px] items-center shadow-sm elevation-2"
+      style={{ backgroundColor: AppColors.savedBackground, shadowColor: '#000', shadowOpacity: 0.05, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4 }}
     >
       <View
-        style={{
-          width: 80,
-          height: 80,
-          borderRadius: 40,
-          overflow: 'hidden',
-          marginRight: 16,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: AppColors.divider,
-        }}
+        className="w-20 h-20 rounded-full overflow-hidden mr-4 items-center justify-center"
+        style={{ backgroundColor: AppColors.divider }}
       >
         {event.presigned_url && (
-          <Image
-            source={{ uri: event.presigned_url }}
-            style={{ width: '100%', height: '100%' }}
-          />
+          <Image source={{ uri: event.presigned_url }} className="w-full h-full" />
         )}
       </View>
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ fontSize: 16, fontWeight: '600', color: '#111', flexShrink: 1 }}>
+      <View className="flex-1 justify-center">
+        <View className="flex-row items-center">
+          <Text className="text-base font-semibold text-[#111] shrink">
             {event.title}
           </Text>
-          <View style={{ marginLeft: 12 }}>
+          <View className="ml-3">
             <BookmarkIcon onPress={() => onBookmarkPress?.(event)} />
           </View>
         </View>
         {event.category && event.category.length > 0 && (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 }}>
+          <View className="flex-row flex-wrap mt-1.5">
             {event.category.map((cat: string) => (
               <View
                 key={cat}
-                style={{
-                  backgroundColor: TAG_COLORS[0].bg,
-                  paddingHorizontal: 10,
-                  paddingVertical: 4,
-                  borderRadius: 999,
-                  marginRight: 6,
-                  marginBottom: 4,
-                }}
+                className="px-2.5 py-1 rounded-full mr-1.5 mb-1"
+                style={{ backgroundColor: TAG_COLORS[0].bg }}
               >
-                <Text style={{ fontSize: 12, color: TAG_COLORS[0].text, fontWeight: '500' }}>
+                <Text className="text-xs font-medium" style={{ color: TAG_COLORS[0].text }}>
                   {cat}
                 </Text>
               </View>
