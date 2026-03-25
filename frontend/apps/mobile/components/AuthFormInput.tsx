@@ -19,6 +19,8 @@ export const AuthFormInput = <T extends FieldValues>({
   return (
     <ScrollView
       keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{ flexGrow: 1 }}
+      className="w-full"
     >
       <Controller
         control={control}
