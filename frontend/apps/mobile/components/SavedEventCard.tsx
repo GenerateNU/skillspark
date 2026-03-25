@@ -1,35 +1,31 @@
 import { Event } from "@skillspark/api-client";
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
-
+import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { router } from "expo-router";
 import { AppColors, TAG_COLORS } from "@/constants/theme";
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
-
 interface BookmarkIconProps {
-  onPress?: () => void; 
+  onPress?: () => void;
 }
 
 export function BookmarkIcon({ onPress }: BookmarkIconProps) {
   return (
     <TouchableOpacity onPress={onPress}>
-      <IconSymbol
-        name="bookmark.fill"
-        size={24}
-        color="#FFC107"
-      />
+      <IconSymbol name="bookmark.fill" size={24} color="#FFC107" />
     </TouchableOpacity>
   );
 }
 
 interface SavedEventCardProps {
   event: Event;
-  onBookmarkPress?: (event: Event) => void; 
+  onBookmarkPress?: (event: Event) => void;
 }
 
-
-export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) {  return (
-    <View
+export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) {
+  return (
+    <Pressable
+      onPress={() => router.push(`/event/${event.id}`)} //TODO: fix event details to be either event or occurrence based on design
       style={{
         marginHorizontal: 20,
         marginBottom: 12,
@@ -65,18 +61,15 @@ export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) 
           />
         )}
       </View>
-
       <View style={{ flex: 1, justifyContent: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ fontSize: 16, fontWeight: '600', color: '#111', flexShrink: 1 }}>
             {event.title}
           </Text>
-
           <View style={{ marginLeft: 12 }}>
             <BookmarkIcon onPress={() => onBookmarkPress?.(event)} />
           </View>
         </View>
-
         {event.category && event.category.length > 0 && (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 }}>
             {event.category.map((cat: string) => (
@@ -98,8 +91,7 @@ export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) 
             ))}
           </View>
         )}
-
       </View>
-    </View>
+    </Pressable>
   );
 }

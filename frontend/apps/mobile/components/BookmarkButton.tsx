@@ -57,20 +57,23 @@ export function BookmarkButton({ eventId }: { eventId: string }) {
 
   if (!guardianId) return null;
 
+  const isPending = createSaved.isPending || deleteSaved.isPending;
+
   const handlePress = () => {
-    if (isBookmarked && savedEntry) {
+    if (isPending) return;
+    if (isBookmarked && savedEntry.id !== "optimistic") {
       deleteSaved.mutate({ id: savedEntry.id });
-    } else {
+    } else if (!isBookmarked) {
       createSaved.mutate({ data: { event_id: eventId, guardian_id: guardianId } });
     }
   };
 
   return (
-    <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
+    <TouchableOpacity onPress={handlePress} activeOpacity={0.7} disabled={isPending}>
       <MaterialIcons
         name={isBookmarked ? "bookmark" : "bookmark-border"}
         size={40}
-        color={AppColors.primaryText}
+        color={isPending ? AppColors.placeholderText : AppColors.primaryText}
       />
     </TouchableOpacity>
   );
