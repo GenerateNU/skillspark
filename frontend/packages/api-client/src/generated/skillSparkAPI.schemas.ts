@@ -154,8 +154,6 @@ export interface CreateEventOccurrenceInputBody {
    * @maxLength 30
    */
   language: string;
-  /** ID of a location in the database */
-  location_id: string;
   /** ID of a manager in the database */
   manager_id?: string;
   /**
@@ -729,8 +727,6 @@ export interface UpdateEventOccurrenceInputBody {
    * @maxLength 30
    */
   language?: string;
-  /** ID of a location in the database */
-  location_id?: string;
   /** ID of a manager in the database */
   manager_id?: string;
   /**
