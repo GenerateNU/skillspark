@@ -136,6 +136,7 @@ export async function customInstance<T>(
   const fullUrl = `${baseURL}${url}`;
 
   const languageHeader = i18n.language === 'th' ? 'th-TH' : 'en-US';
+  console.log(languageHeader);
 
   // Get token for auth
   const token = getStorageItem('temp_jwt') || getStorageItem('jwt');

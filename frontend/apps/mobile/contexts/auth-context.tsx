@@ -59,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const storedGuardianId = await SecureStore.getItemAsync("guardian_id");
       const storedLangPref = await SecureStore.getItemAsync("language_preference");
       if (storedJWT && storedGuardianId) {
+        
         setJWT(storedJWT);
         setGuardianId(storedGuardianId);
         setLangPref(storedLangPref);
