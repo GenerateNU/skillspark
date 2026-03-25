@@ -21,6 +21,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
+	fmt.Println(cfg)
 
 	// Initialize application with config
 	app, err := service.InitApp(*cfg)

@@ -3,11 +3,15 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import i18n from 'i18next';
+export let currentLanguage = 'en';
+export function setCurrentLanguage(lang: string) { currentLanguage = lang; }
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
+
+
+
 
 // Platform-agnostic storage helper
 const getStorageItem = (key: string): string | null => {
@@ -134,9 +138,8 @@ export async function customInstance<T>(
 ): Promise<T> {
   const baseURL = getBaseURL();
   const fullUrl = `${baseURL}${url}`;
-
-  const languageHeader = i18n.language === 'th' ? 'th-TH' : 'en-US';
-  console.log(languageHeader);
+  
+  const languageHeader = currentLanguage === 'th' ? 'th-TH' : 'en-US';
 
   // Get token for auth
   const token = getStorageItem('temp_jwt') || getStorageItem('jwt');

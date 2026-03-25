@@ -9,8 +9,9 @@ import { Colors } from '@/constants/theme';
 import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react';
 import { useGuardian } from '@/hooks/use-guardian';
-import { useUpdateGuardian, getGetGuardianByIdQueryKey } from '@skillspark/api-client';
+import { useUpdateGuardian, getGetGuardianByIdQueryKey, setCurrentLanguage } from '@skillspark/api-client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import * as SecureStore from "expo-secure-store";
 
 const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
@@ -36,7 +37,9 @@ export default function LanguageScreen() {
   const updateLanguageData = async (langCode: string) => {
     setSelected(langCode);
     await i18n.changeLanguage(langCode);
-    queryClient.invalidateQueries();
+    setCurrentLanguage(langCode);
+    await SecureStore.setItemAsync('language_preference', langCode);
+    queryClient.invalidateQueries({ refetchType: 'all' });
 
     if (guardian) {
       updateGuardianMutation.mutate({

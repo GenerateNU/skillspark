@@ -4,13 +4,8 @@ import { useEffect } from "react";
 import i18n from "@/i18n";
 
 export const LoginRedirect = () => {
-  const { isAuthenticated, isLoading, langPref } = useAuthContext();
+  const { isAuthenticated, isLoading } = useAuthContext();
 
-  useEffect(() => {
-    if (langPref) {
-      i18n.changeLanguage(langPref);
-    }
-  }, [langPref]);
 
   if (isLoading) {
     return <Stack />;

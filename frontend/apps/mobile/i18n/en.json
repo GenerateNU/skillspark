@@ -18,6 +18,7 @@
     "noEventsNearby": "No events found nearby.",
     "noEventsAvailable": "No events available",
     "noUpcomingEvents": "No upcoming events",
+    "noGuardianId": "Unable to load: no account found",
     "noChildrenFound": "No children found",
     "noChildProfilesAdded": "No child profiles added yet.",
     "error": "Error",
@@ -121,7 +122,10 @@
     "home": "Home",
     "location": "Location",
     "register": "Register",
-    "notFound": "Event not found"
+    "notFound": "Event not found",
+    "minWalk": "min",
+    "hr": "hr",
+    "min": "min"
   },
   "interests": {
     "science": "Science",

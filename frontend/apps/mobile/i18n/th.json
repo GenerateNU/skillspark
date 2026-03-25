@@ -18,6 +18,7 @@
     "noEventsNearby": "ไม่พบกิจกรรมในบริเวณใกล้เคียง",
     "noEventsAvailable": "ไม่มีกิจกรรม",
     "noUpcomingEvents": "ไม่มีกิจกรรมที่จะมาถึง",
+    "noGuardianId": "ไม่สามารถโหลดได้: ไม่พบบัญชี",
     "noChildrenFound": "ไม่พบข้อมูลเด็ก",
     "noChildProfilesAdded": "ยังไม่มีโปรไฟล์เด็ก",
     "error": "ข้อผิดพลาด",
@@ -121,7 +122,10 @@
     "home": "บ้าน",
     "location": "สถานที่",
     "register": "ลงทะเบียน",
-    "notFound": "ไม่พบกิจกรรม"
+    "notFound": "ไม่พบกิจกรรม",
+    "minWalk": "นาที",
+    "hr": "ชั่วโมง",
+    "min": "นาที"
   },
   "interests": {
     "science": "วิทยาศาสตร์",

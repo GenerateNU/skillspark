@@ -5,7 +5,8 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import * as SecureStore from "expo-secure-store";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -19,12 +20,14 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { AuthProvider } from '@/contexts/auth-context';
 import { LoginRedirect } from '@/components/LoginRedirect';
+import { setCurrentLanguage } from '@skillspark/api-client';
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const [langReady, setLangReady] = useState(false);
   const [loaded, error] = useFonts({
     NunitoSans_400Regular,
     NunitoSans_500Medium,
@@ -34,12 +37,19 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (loaded || error) {
+    SecureStore.getItemAsync('language_preference').then((lang) => {
+      if (lang) setCurrentLanguage(lang);
+      setLangReady(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if ((loaded || error) && langReady) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error]);
+  }, [loaded, error, langReady]);
 
-  if (!loaded && !error) {
+  if ((!loaded && !error) || !langReady) {
     return null;
   }
 
