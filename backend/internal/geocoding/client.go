@@ -58,7 +58,7 @@ func NewClient() (*Client, error) {
 
 // Geocode calls the OpenCage API and returns lat/lng for the given address
 // Returns ErrInvalidAddress when there are no results or confidence is too low
-func (c *Client) Geocode(ctx context.Context, address string) (lat, lng float64, err error) {
+func (c *Client) Geocode(ctx context.Context, address string) (lat, lng *float64, err error) {
 	endpoint := fmt.Sprintf(
 		"https://api.opencagedata.com/geocode/v1/json?q=%s&key=%s&limit=1",
 		url.QueryEscape(address), c.apiKey,
@@ -66,28 +66,28 @@ func (c *Client) Geocode(ctx context.Context, address string) (lat, lng float64,
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to build opencage request: %w", err)
+		return nil, nil, fmt.Errorf("failed to build opencage request: %w", err)
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return 0, 0, fmt.Errorf("opencage request failed: %w", err)
+		return nil, nil, fmt.Errorf("opencage request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return 0, 0, fmt.Errorf("opencage returned unexpected status %d", resp.StatusCode)
+		return  nil, nil, fmt.Errorf("opencage returned unexpected status %d", resp.StatusCode)
 	}
 
 	var result opencageResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return 0, 0, fmt.Errorf("failed to decode opencage response: %w", err)
+		return nil, nil, fmt.Errorf("failed to decode opencage response: %w", err)
 	}
 
 	if len(result.Results) == 0 || result.Results[0].Confidence <= c.minConfidence {
-		return 0, 0, ErrInvalidAddress
+		return nil, nil, ErrInvalidAddress
 	}
 
 	r := result.Results[0]
-	return r.Geometry.Lat, r.Geometry.Lng, nil
+	return &r.Geometry.Lat, &r.Geometry.Lng, nil
 }

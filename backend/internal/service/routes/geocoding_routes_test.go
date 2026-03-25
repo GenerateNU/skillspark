@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"skillspark/internal/errs"
-	geocodingHandler "skillspark/internal/service/handler/geocoding"
+	"skillspark/internal/geocoding"
 	"skillspark/internal/service/routes"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -18,22 +18,24 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// mockGeocoder is a testify mock implementing geocodingHandler.Geocoder.
+// mockGeocoder is a testify mock implementing geocoding.GeocoderServiceInterface.
 type mockGeocoder struct {
 	mock.Mock
 }
 
-func (m *mockGeocoder) Geocode(ctx context.Context, address string) (float64, float64, *errs.HTTPError) {
+var _ geocoding.GeocoderServiceInterface = (*mockGeocoder)(nil)
+
+func (m *mockGeocoder) Geocode(ctx context.Context, address string) (*float64, *float64, *errs.HTTPError) {
 	args := m.Called(ctx, address)
 	lat := args.Get(0).(float64)
 	lng := args.Get(1).(float64)
 	if args.Get(2) == nil {
-		return lat, lng, nil
+		return &lat, &lng, nil
 	}
-	return lat, lng, args.Get(2).(*errs.HTTPError)
+	return &lat, &lng, args.Get(2).(*errs.HTTPError)
 }
 
-func setupGeocodingTestAPI(svc geocodingHandler.Geocoder) *fiber.App {
+func setupGeocodingTestAPI(svc geocoding.GeocoderServiceInterface) *fiber.App {
 	app := fiber.New()
 	api := humafiber.New(app, huma.DefaultConfig("Test API", "1.0.0"))
 	routes.SetupGeocodingRoutesWithGeocoder(api, svc)

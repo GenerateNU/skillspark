@@ -2,12 +2,12 @@ package service
 
 import (
 	"context"
-	"log/slog"
 	"net/http"
 	"os"
 	"skillspark/internal/auth"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
+	"skillspark/internal/geocoding"
 	"skillspark/internal/notification"
 	"skillspark/internal/s3_client"
 	"skillspark/internal/service/routes"
@@ -72,7 +72,10 @@ func InitApp(config config.Config) (*App, error) {
 	jobScheduler.Start()
 	defer jobScheduler.Stop()
 
-	app, humaAPI := SetupApp(config, repo, s3Client, translateClient, newStripeClient, *notifService)
+	app, humaAPI, err := SetupApp(config, repo, s3Client, translateClient, newStripeClient, *notifService)
+	if err != nil {
+		return nil, err
+	}
 	return &App{
 		Server:      app,
 		Repo:        repo,
@@ -83,7 +86,7 @@ func InitApp(config config.Config) (*App, error) {
 }
 
 // Setup the fiber app with the specified configuration and database.
-func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, translateClient *translations.TranslateClient, newStripeClient stripeClient.StripeClientInterface, notifService notification.Service) (*fiber.App, huma.API) {
+func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, translateClient *translations.TranslateClient, newStripeClient stripeClient.StripeClientInterface, notifService notification.Service) (*fiber.App, huma.API, error) {
 	app := fiber.New(fiber.Config{
 		JSONEncoder:  go_json.Marshal,
 		JSONDecoder:  go_json.Unmarshal,
@@ -134,20 +137,28 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	})
 
 	// Register protected Huma endpoints
-	setupProtectedHumaRoutes(humaAPI, repo, config, s3Client, translateClient, newStripeClient, notifService)
+	if err := setupProtectedHumaRoutes(humaAPI, repo, config, s3Client, translateClient, newStripeClient, notifService); err != nil {
+		return nil, nil, err
+	}
 
 	routes.SetupWebhookRoutes(app, repo,
 		os.Getenv("STRIPE_WEBHOOK_SECRET"),
 		os.Getenv("STRIPE_ACCOUNT_WEBHOOK_SECRET"),
 	)
 
-	return app, humaAPI
+	return app, humaAPI, nil
 }
 
 // Setup protected Huma routes (behind auth middleware)
-func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface, notifService notification.Service) {
+func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface, notifService notification.Service) error {
+	geocodingClient, err := geocoding.NewClient()
+	if err != nil {
+		return err
+	}
+	geocodingService := geocoding.NewService(geocodingClient)
+
 	routes.SetupBaseRoutes(api)
-	routes.SetupLocationsRoutes(api, repo)
+	routes.SetupLocationsRoutes(api, repo, geocodingService)
 	routes.SetupOrganizationRoutes(api, repo, s3Client)
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
@@ -159,8 +170,6 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetUpReviewRoutes(api, repo, translateClient)
 	routes.SetupPaymentRoutes(api, repo, sc)
 	routes.SetUpSavedRoutes(api, repo)
-	// Prevents erroring for geocoding routes, mostly for if API key is not set
-	if err := routes.SetupGeocodingRoutes(api); err != nil {
-		slog.Warn("geocoding routes not registered", "reason", err.Error())
-	}
+	routes.SetupGeocodingRoutes(api, geocodingService)
+	return nil
 }

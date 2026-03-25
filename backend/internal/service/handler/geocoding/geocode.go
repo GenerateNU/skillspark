@@ -12,7 +12,7 @@ func (h *Handler) GeocodeAddress(ctx context.Context, input *models.GeocodeAddre
 	}
 
 	out := &models.GeocodeAddressOutput{}
-	out.Body.Latitude = lat
-	out.Body.Longitude = lng
+	out.Body.Latitude = *lat
+	out.Body.Longitude = *lng
 	return out, nil
 }

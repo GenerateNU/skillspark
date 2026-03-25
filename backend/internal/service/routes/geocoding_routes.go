@@ -10,20 +10,13 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupGeocodingRoutes(api huma.API) error {
-	client, err := geocoding.NewClient()
-	if err != nil {
-		return err
-	}
-
-	service := geocoding.NewService(client)
-	registerGeocodingRoutes(api, geocodingHandler.NewHandler(service))
-	return nil
+func SetupGeocodingRoutes(api huma.API, svc geocoding.GeocoderServiceInterface) {
+	registerGeocodingRoutes(api, geocodingHandler.NewHandler(svc))
 }
 
 // SetupGeocodingRoutesWithGeocoder registers geocoding routes using the provided
-// Geocoder implementation. Intended for use in tests.
-func SetupGeocodingRoutesWithGeocoder(api huma.API, svc geocodingHandler.Geocoder) {
+// GeocoderServiceInterface implementation. Intended for use in tests.
+func SetupGeocodingRoutesWithGeocoder(api huma.API, svc geocoding.GeocoderServiceInterface) {
 	registerGeocodingRoutes(api, geocodingHandler.NewHandler(svc))
 }
 

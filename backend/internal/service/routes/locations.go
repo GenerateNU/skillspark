@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"net/http"
+	"skillspark/internal/geocoding"
 	"skillspark/internal/models"
 	"skillspark/internal/service/handler/location"
 	"skillspark/internal/storage"
@@ -11,8 +12,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupLocationsRoutes(api huma.API, repo *storage.Repository) {
-	locationHandler := location.NewHandler(repo.Location)
+func SetupLocationsRoutes(api huma.API, repo *storage.Repository, geocodingService geocoding.GeocoderServiceInterface) {
+	locationHandler := location.NewHandler(repo.Location, geocodingService)
 	huma.Register(api, huma.Operation{
 		OperationID: "get-location-by-id",
 		Method:      http.MethodGet,

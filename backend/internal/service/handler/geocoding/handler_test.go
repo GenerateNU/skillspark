@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/errs"
+	"skillspark/internal/geocoding"
 	"skillspark/internal/models"
 	"testing"
 
@@ -15,14 +16,16 @@ type mockGeocoder struct {
 	mock.Mock
 }
 
-func (m *mockGeocoder) Geocode(ctx context.Context, address string) (float64, float64, *errs.HTTPError) {
+var _ geocoding.GeocoderServiceInterface = (*mockGeocoder)(nil)
+
+func (m *mockGeocoder) Geocode(ctx context.Context, address string) (*float64, *float64, *errs.HTTPError) {
 	args := m.Called(ctx, address)
 	lat := args.Get(0).(float64)
 	lng := args.Get(1).(float64)
 	if args.Get(2) == nil {
-		return lat, lng, nil
+		return &lat, &lng, nil
 	}
-	return lat, lng, args.Get(2).(*errs.HTTPError)
+	return &lat, &lng, args.Get(2).(*errs.HTTPError)
 }
 
 func TestHandler_GeocodeAddress(t *testing.T) {

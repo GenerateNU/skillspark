@@ -28,9 +28,9 @@ type GetLocationByIDInput struct {
 
 type CreateLocationInput struct {
 	Body struct {
-		Latitude float64 `json:"latitude" db:"latitude" doc:"Latitude of the location" minimum:"-90" maximum:"90"`
+		Latitude *float64 `json:"latitude,omitempty" db:"latitude" doc:"Optional latitude of the location; validated against geocoded coordinates when provided" minimum:"-90" maximum:"90"`
 
-		Longitude float64 `json:"longitude" db:"longitude" doc:"Longitude of the location" minimum:"-180" maximum:"180"`
+		Longitude *float64 `json:"longitude,omitempty" db:"longitude" doc:"Optional longitude of the location; validated against geocoded coordinates when provided" minimum:"-180" maximum:"180"`
 
 		AddressLine1 string `json:"address_line1" db:"address_line1" doc:"Primary address line of the location" minLength:"5" maxLength:"200"`
 

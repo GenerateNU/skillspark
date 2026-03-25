@@ -38,7 +38,10 @@ func main() {
 	}
 
 	// Initialize app to get Huma API
-	_, humaAPI := service.SetupApp(cfg, repo, s3Client, translateClient, newStripeClient, *notificationsService)
+	_, humaAPI, err := service.SetupApp(cfg, repo, s3Client, translateClient, newStripeClient, *notificationsService)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to setup app: %v\n", err)
+	}
 
 	// Get OpenAPI spec
 	openAPI := humaAPI.OpenAPI()
