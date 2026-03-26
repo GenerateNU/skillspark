@@ -5,9 +5,10 @@ import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useGetGuardianById, useGetChildrenByGuardianId } from '@skillspark/api-client';
 import { FamilyCard } from '@/components/FamilyCard';
 import { ListItem } from '@/components/ListItem';
+import { useTranslation } from 'react-i18next';
+import { useGuardian } from '@/hooks/use-guardian';
 import { useAuthContext } from '@/hooks/use-auth-context';
 import { ErrorScreen } from '@/components/ErrorScreen';
 
@@ -15,30 +16,19 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const router = useRouter();
+  const { t: translate } = useTranslation();
 
   const listBackgroundColor = colorScheme === 'dark' ? '#1c1c1e' : '#F9FAFB';
   const borderColor = colorScheme === 'dark' ? '#3f3f46' : '#E5E7EB';
 
+  const { guardian, children, isLoading } = useGuardian();
   const { guardianId } = useAuthContext();
-
-  const { data: guardianResponse, isLoading: guardianLoading } = useGetGuardianById(guardianId!, {
-    query: {
-      enabled: !!guardianId,
-    }
-  });
-  const { data: childrenResponse, isLoading: familyLoading } = useGetChildrenByGuardianId(guardianId!, {
-    query: {
-      enabled: !!guardianId,
-    }
-  });
-  const guardian = guardianResponse?.status === 200 ? guardianResponse.data : null;
-  const children = childrenResponse?.status === 200 ? childrenResponse.data : [];
 
   if (!guardianId) {
       return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
-    }
+  }
 
-  if (guardianLoading || familyLoading) {
+  if (isLoading) {
     return (
       <ThemedView className="flex-1 items-center justify-center" style={{ paddingTop: insets.top }}>
         <ActivityIndicator size="large" />
@@ -67,47 +57,48 @@ export default function ProfileScreen() {
             @{guardian?.username}
           </ThemedText>
           <ThemedText className="text-sm text-[#6B7280] leading-[18px] text-center font-nunito">
-            Contact
+            {translate('profile.contact')}
           </ThemedText>
         </View>
         <View className="px-5 mb-4">
-          <ThemedText className="text-base mb-2 font-nunito-semibold">Family</ThemedText>
+          <ThemedText className="text-base mb-2 font-nunito-semibold">{translate('profile.family')}</ThemedText>
           <View className="flex-row flex-wrap justify-between gap-[10px]">
             {children.length > 0 ? (
               children.map((child: any) => (
                 <FamilyCard
                   key={child.id}
-                  initials={child.name?.charAt(0)}
+                  initials={child.name?.charAt(0) ?? ''}
                   name={child.name}
-                  date={`Born ${child.birth_year}`}
+                  date={translate('profile.born', { year: child.birth_year })}
+                  
                 />
               ))
             ) : (
-              <ThemedText className = "text-[#999] p-2.5">No children found</ThemedText>
+              <ThemedText className = "text-[#999] p-2.5">{translate('common.noChildrenFound')}</ThemedText>
             )}
           </View>
         </View>
         <View className="px-5 mb-4">
-          <ThemedText className="text-base mb-2 font-nunito-semibold">My Bookings</ThemedText>
+          <ThemedText className="text-base mb-2 font-nunito-semibold">{translate('profile.myBookings')}</ThemedText>
           <View
             className="rounded-xl overflow-hidden border"
             style={{ backgroundColor: listBackgroundColor, borderColor }}
           >
-            <ListItem label="Saved" isLast onPress={() => router.push('/saved')}/>
+            <ListItem label={translate('profile.saved')} isLast onPress={() => router.push('/saved')} />
           </View>
         </View>
         <View className="px-5 mb-4">
-          <ThemedText className="text-base mb-2 font-nunito-semibold">Preferences</ThemedText>
+          <ThemedText className="text-base mb-2 font-nunito-semibold">{translate('profile.preferences')}</ThemedText>
           <View
             className="rounded-xl overflow-hidden border"
             style={{ backgroundColor: listBackgroundColor, borderColor }}
           >
-            <ListItem label="Payment" onPress={() => router.push('/payment')} />
+            <ListItem label={translate('profile.payment')} onPress={() => router.push('/payment')} />
             <ListItem
-              label="Family Information"
+              label={translate('profile.familyInformation')}
               onPress={() => router.push('/family')}
             />
-            <ListItem label="Settings" isLast onPress={() => router.push('/settings')} />
+            <ListItem label={translate('profile.settings')} isLast onPress={() => router.push('/settings')} />
           </View>
         </View>
         <View className="h-5" />

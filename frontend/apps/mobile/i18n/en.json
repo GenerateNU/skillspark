@@ -1,0 +1,140 @@
+{
+  "nav": {
+    "home": "Home",
+    "map": "Map",
+    "profile": "Profile",
+    "events": "Events",
+    "about": "About"
+  },
+  "common": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "loadingMapData": "Loading Map Data...",
+    "loadingEvents": "Loading events...",
+    "errorLoadingEvents": "Error loading events",
+    "errorOccurred": "An error occurred",
+    "errorFetchingEvents": "An error occurred while fetching events.",
+    "noEventsNearby": "No events found nearby.",
+    "noEventsAvailable": "No events available",
+    "noUpcomingEvents": "No upcoming events",
+    "noGuardianId": "Unable to load: no account found",
+    "noChildrenFound": "No children found",
+    "noChildProfilesAdded": "No child profiles added yet.",
+    "error": "Error",
+    "locationDenied": "Permission to access location was denied. Please enable it in settings.",
+    "openSettings": "Open Settings"
+  },
+  "home": {
+    "title": "Welcome",
+    "subtitle": "Find events near you"
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "searchPlaceholder": "Search for a class",
+    "discoverWeekly": "Discover Weekly",
+    "forYou": "For You",
+    "basedOn": "Based on",
+    "upcomingEvents": "upcoming events",
+    "reserve": "Reserve",
+    "reserved": "Reserved",
+    "members": "members",
+    "categories": {
+      "technology": "technology",
+      "art": "art",
+      "music": "music",
+      "math": "math",
+      "sports": "sports"
+    }
+  },
+  "profile": {
+    "contact": "Contact",
+    "family": "Family",
+    "born": "Born {{year}}",
+    "myBookings": "My Bookings",
+    "upcoming": "Upcoming",
+    "previous": "Previous",
+    "saved": "Saved",
+    "preferences": "Preferences",
+    "payment": "Payment",
+    "familyInformation": "Family Information",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languages": {
+      "en": "English",
+      "th": "Thai"
+    },
+    "termsAndConditions": "Terms and Conditions",
+    "privacyPolicy": "Privacy Policy",
+    "logOut": "Log Out",
+    "deleteAccount": "Delete Account"
+  },
+  "payment": {
+    "title": "Payment",
+    "manageBilling": "Manage Billing",
+    "creditCard": "Credit Card",
+    "name": "Name",
+    "updateBilling": "Update Billing",
+    "delete": "Delete"
+  },
+  "familyInformation": {
+    "title": "Family Information",
+    "childProfile": "Child Profile",
+    "addProfile": "add profile +",
+    "interests": "Interests",
+    "emergencyContact": "Emergency Contact",
+    "addContact": "add contact +"
+  },
+  "childProfile": {
+    "editTitle": "Edit Child Profile",
+    "createTitle": "Create Child Profile",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "month": "Month",
+    "year": "Year",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "searchInterests": "Search interests...",
+    "selectSchool": "Select School",
+    "loadingSchools": "Loading schools...",
+    "failedToLoadSchools": "Failed to load schools",
+    "noSchoolsFound": "No schools found",
+    "deleteProfile": "Delete Profile",
+    "deleteConfirm": "Are you sure you want to remove this child profile?",
+    "requiredFieldsError": "Please fill in all required fields (Name, Birth Date, School ID)",
+    "saveError": "Failed to save. Please try again.",
+    "deleteError": "Failed to delete."
+  },
+  "saved": {
+    "title": "Saved",
+    "noEvents": "You have no saved events.",
+    "deleteTitle": "Delete saved event",
+    "deleteConfirm": "Are you sure you want to remove this saved event?"
+  },
+  "event": {
+    "back": "Back",
+    "seeMore": "See more",
+    "seeLess": "See less",
+    "perSession": "/Session",
+    "home": "Home",
+    "location": "Location",
+    "register": "Register",
+    "notFound": "Event not found",
+    "minWalk": "min",
+    "hr": "hr",
+    "min": "min"
+  },
+  "interests": {
+    "science": "Science",
+    "math": "Math",
+    "music": "Music",
+    "art": "Art",
+    "sports": "Sports",
+    "technology": "Technology",
+    "language": "Language",
+    "other": "Other"
+  }
+}

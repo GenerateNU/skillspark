@@ -10,19 +10,32 @@ import type { getSavedByGuardianIdResponse, Saved } from "@skillspark/api-client
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { AppColors } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import i18n from "@/i18n";
 
-export function BookmarkButton({ eventId }: { eventId: string }) {
+interface BookmarkButtonProps {
+  eventId: string;
+  // Controlled mode: pass these to skip the internal fetch
+  isBookmarked?: boolean;
+  savedEntryId?: string;
+}
+
+export function BookmarkButton({ eventId, isBookmarked: isBookmarkedProp, savedEntryId }: BookmarkButtonProps) {
   const queryClient = useQueryClient();
   const { guardianId } = useAuthContext();
 
+  const controlled = isBookmarkedProp !== undefined;
+
   const { data: savedResponse } = useGetSavedByGuardianId(guardianId!, undefined, {
-    query: { enabled: !!guardianId },
+    query: { enabled: !!guardianId && !controlled },
   });
 
   const savedQueryKey = getGetSavedByGuardianIdQueryKey(guardianId!);
+
   const savedItems = savedResponse?.status === 200 ? savedResponse.data : [];
-  const savedEntry = savedItems.find((s) => s.event.id === eventId);
-  const isBookmarked = !!savedEntry;
+  const savedEntry = controlled
+    ? (savedEntryId ? { id: savedEntryId } : undefined)
+    : savedItems.find((s) => s.event.id === eventId);
+  const isBookmarked = controlled ? isBookmarkedProp : !!savedEntry;
 
   const optimisticOptions = (updater: (items: Saved[]) => Saved[]) => ({
     mutation: {
@@ -66,7 +79,7 @@ export function BookmarkButton({ eventId }: { eventId: string }) {
 
   const handlePress = () => {
     if (isPending) return;
-    if (isBookmarked && savedEntry.id !== "optimistic") {
+    if (isBookmarked && savedEntry && savedEntry.id !== "optimistic") {
       deleteSaved.mutate({ id: savedEntry.id });
     } else if (!isBookmarked) {
       createSaved.mutate({ data: { event_id: eventId, guardian_id: guardianId } });

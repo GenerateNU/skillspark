@@ -16,6 +16,7 @@ import { useRouter } from "expo-router";
 import { AppColors } from "@/constants/theme";
 import { StarRating } from "@/components/StarRating";
 import { formatDuration } from "@/utils/format";
+import { useTranslation } from "react-i18next";
 
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -37,6 +38,7 @@ function FilterChips({
   active: string[];
   onToggle: (f: string) => void;
 }) {
+  const { t: translate } = useTranslation();
   return (
     <ScrollView
       horizontal
@@ -59,7 +61,7 @@ function FilterChips({
               className="text-[13px] font-medium"
               style={{ color: isActive ? "#fff" : AppColors.secondaryText }}
             >
-              {isActive ? `× ${f}` : f}
+              {isActive ? `× ${translate(`interests.${f}`, { defaultValue: f })}` : translate(`interests.${f}`, { defaultValue: f })}
             </Text>
           </Pressable>
         );
@@ -130,7 +132,11 @@ function DiscoverBanner({ event }: { event: EventOccurrence }) {
 
 function EventCard({ item }: { item: EventOccurrence }) {
   const router = useRouter();
-  const duration = formatDuration(item.start_time, item.end_time);
+  const { t: translate } = useTranslation();
+  const duration = formatDuration(item.start_time, item.end_time, {
+    hr: translate('event.hr'),
+    min: translate('event.min'),
+  });
   const ageLabel = item.event.age_range_min != null
     ? `${item.event.age_range_min}${item.event.age_range_max != null ? `–${item.event.age_range_max}` : ""}+`
     : null;
@@ -188,6 +194,7 @@ function EventOccurrencesList() {
   const { data: response, isLoading, error } = useGetAllEventOccurrences();
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [search, setSearch] = useState("");
+  const { t: translate } = useTranslation();
 
   const toggleFilter = (f: string) =>
     setActiveFilters((prev) =>
@@ -198,7 +205,7 @@ function EventOccurrencesList() {
     return (
       <View className="flex-1 items-center justify-center gap-2">
         <ActivityIndicator size="large" />
-        <ThemedText>Loading events...</ThemedText>
+        <ThemedText>{translate('common.loadingEvents')}</ThemedText>
       </View>
     );
   }
@@ -206,8 +213,8 @@ function EventOccurrencesList() {
   if (error) {
     return (
       <View className="flex-1 items-center justify-center p-4">
-        <ThemedText className="font-semibold" style={{ color: AppColors.danger }}>Error loading events</ThemedText>
-        <ThemedText>{error.detail || "An error occurred"}</ThemedText>
+        <ThemedText className="font-semibold" style={{ color: AppColors.danger }}>{translate('common.errorLoadingEvents')}</ThemedText>
+        <ThemedText>{error.detail || translate('common.errorOccurred')}</ThemedText>
       </View>
     );
   }
@@ -250,7 +257,7 @@ function EventOccurrencesList() {
           {/* Title */}
           <View className="px-5 mb-4">
             <Text className="text-[28px] font-bold tracking-tight" style={{ color: AppColors.primaryText }}>
-              My Dashboard
+              {translate('dashboard.title')}
             </Text>
           </View>
 
@@ -266,7 +273,7 @@ function EventOccurrencesList() {
             <TextInput
               className="flex-1 text-sm"
               style={{ color: AppColors.primaryText }}
-              placeholder="Search for a class"
+              placeholder={translate('dashboard.searchPlaceholder')}
               placeholderTextColor={AppColors.placeholderText}
               value={search}
               onChangeText={setSearch}
@@ -276,7 +283,7 @@ function EventOccurrencesList() {
           {/* Discover Weekly */}
           <View className="flex-row items-center px-5 mb-3">
             <Text className="text-[#7C3AED] text-[13px] mr-1.5">✦</Text>
-            <Text className="text-[15px] font-semibold" style={{ color: AppColors.primaryText }}>Discover Weekly</Text>
+            <Text className="text-[15px] font-semibold" style={{ color: AppColors.primaryText }}>{translate('dashboard.discoverWeekly')}</Text>
           </View>
           {featuredEvent && <DiscoverBanner event={featuredEvent} />}
 
@@ -287,7 +294,7 @@ function EventOccurrencesList() {
                 <View className="w-[26px] h-[26px] rounded-full bg-[#3B82F6] items-center justify-center">
                   <Text className="text-white text-[11px] font-bold">A</Text>
                 </View>
-                <Text className="text-sm font-semibold" style={{ color: AppColors.primaryText }}>For You</Text>
+                <Text className="text-sm font-semibold" style={{ color: AppColors.primaryText }}>{translate('dashboard.forYou')}</Text>
                 <View className="flex-row ml-1">
                   {["#10B981", "#6366F1"].map((c, i) => (
                     <View key={i} className="w-[22px] h-[22px] rounded-full border-2 border-white" style={{ backgroundColor: c, marginLeft: i > 0 ? -8 : 0 }} />
@@ -296,8 +303,8 @@ function EventOccurrencesList() {
               </View>
               <View className="flex-row items-center gap-1">
                 <Text className="text-[#7C3AED] text-xs">✦</Text>
-                <Text className="text-[13px]" style={{ color: AppColors.mutedText }}>Based on </Text>
-                <Text className="text-[13px] text-[#3B82F6]">upcoming events</Text>
+                <Text className="text-[13px]" style={{ color: AppColors.mutedText }}>{translate('dashboard.basedOn')} </Text>
+                <Text className="text-[13px] text-[#3B82F6]">{translate('dashboard.upcomingEvents')}</Text>
               </View>
             </View>
           )}
@@ -308,7 +315,7 @@ function EventOccurrencesList() {
       renderItem={({ item }) => <EventCard item={item} />}
       ListEmptyComponent={
         <View className="items-center p-8">
-          <ThemedText style={{ color: AppColors.subtleText }}>No upcoming events</ThemedText>
+          <ThemedText style={{ color: AppColors.subtleText }}>{translate('common.noUpcomingEvents')}</ThemedText>
         </View>
       }
     />
