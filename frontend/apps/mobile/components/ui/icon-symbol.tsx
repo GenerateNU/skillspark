@@ -39,6 +39,7 @@ const MAPPING = {
   'location.fill': 'place',
   'record.circle': 'radio-button-on',
   'slider.horizontal.3': 'tune',
+  'checkmark': 'check',
 } as IconMapping;
 
 /**

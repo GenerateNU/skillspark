@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo-google-fonts/nunito-sans": "^0.4.2",
     "@expo/vector-icons": "^15.0.3",
+    "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
@@ -36,6 +37,7 @@
     "react-compiler-runtime": "^1.0.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.72.0",
+    "react-i18next": "15.5.2",
     "react-native": "0.81.5",
     "react-native-css-interop": "0.2.1",
     "react-native-gesture-handler": "~2.28.0",

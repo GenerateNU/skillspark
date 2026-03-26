@@ -36,7 +36,6 @@ func main() {
 		}
 	}()
 
-
 	port := cfg.Application.Port
 
 	// Listen for connections with a goroutine
@@ -53,7 +52,6 @@ func main() {
 	<-quit
 
 	slog.Info("Shutting down server")
-
 
 	// Shutdown server with timeout
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)

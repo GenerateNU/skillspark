@@ -27,8 +27,11 @@ import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
 import { TrendingCard } from "@/components/home/TrendingCard";
 import { RecommendedCard } from "@/components/home/RecommendedCard";
 import { CategoryCard } from "@/components/home/CategoryCard";
+import { ThemedText } from "@/components/themed-text";
+import { useTranslation } from "react-i18next";
 
 export default function HomeScreen() {
+  const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
   const [searchText, setSearchText] = useState("");
   const [_debouncedSearch] = useDebounce(searchText, 300);
@@ -113,6 +116,7 @@ export default function HomeScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" />
+        <ThemedText>{translate('common.loadingEvents')}</ThemedText>
       </View>
     );
   }
@@ -142,7 +146,7 @@ export default function HomeScreen() {
           <TextInput
             className="flex-1 text-sm font-nunito"
             style={{ color: AppColors.primaryText }}
-            placeholder="Search for a class"
+            placeholder={translate('dashboard.searchPlaceholder')}
             placeholderTextColor={AppColors.placeholderText}
             value={searchText}
             onChangeText={setSearchText}
@@ -176,7 +180,7 @@ export default function HomeScreen() {
         <View className="mb-6">
           <View className="flex-row items-center px-5 mb-3">
             <Text className="mr-1.5 font-nunito" style={{ color: AppColors.purple, fontSize: FontSizes.md }}>✦</Text>
-            <Text className="font-nunito-bold" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>Discover Weekly</Text>
+            <Text className="font-nunito-bold" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>{translate('dashboard.discoverWeekly')}</Text>
           </View>
           <DiscoverBanner event={futureOccurrences[0]} />
         </View>

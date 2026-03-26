@@ -38,7 +38,7 @@ func SetUpSavedRoutes(api huma.API, repo *storage.Repository) {
 			Limit: limit,
 		}
 
-		saveds, err := savedHandler.SavedRepository.GetByGuardianID(ctx, input.ID, pagination)
+		saveds, err := savedHandler.SavedRepository.GetByGuardianID(ctx, input.ID, pagination, input.AcceptLanguage)
 		if err != nil {
 			return nil, err
 		}
