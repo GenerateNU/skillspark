@@ -38,6 +38,7 @@ const MAPPING = {
   'bookmark.fill': 'bookmark',
   'location.fill': 'place',
   'record.circle': 'radio-button-on',
+  'slider.horizontal.3': 'tune',
 } as IconMapping;
 
 /**

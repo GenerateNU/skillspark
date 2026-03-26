@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import React from "react";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Colors } from "@/constants/theme";
+import { Colors, FontFamilies } from "@/constants/theme";
 
 export default function FamilyLayout() {
   const colorScheme = useColorScheme();
@@ -13,7 +13,7 @@ export default function FamilyLayout() {
         headerShown: false,
         headerTintColor: theme.tint,
         headerStyle: { backgroundColor: theme.background },
-        headerTitleStyle: { fontFamily: 'NunitoSans_600SemiBold', color: theme.text },
+        headerTitleStyle: { fontFamily: FontFamilies.semiBold, color: theme.text },
         headerBackTitle: "", 
       }}
     >

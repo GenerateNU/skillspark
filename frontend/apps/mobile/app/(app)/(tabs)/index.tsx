@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import {
   ActivityIndicator,
   View,
@@ -111,7 +111,7 @@ export default function HomeScreen() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: AppColors.white }}>
+      <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -124,56 +124,39 @@ export default function HomeScreen() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: AppColors.white }}
+      className="flex-1 bg-white"
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 40 }}
     >
       {/* Header */}
-      <View style={{ paddingHorizontal: 20, paddingTop: 56, paddingBottom: 16 }}>
-        <Text style={{ fontSize: FontSizes.hero, fontFamily: "NunitoSans_700Bold", color: AppColors.primaryText, letterSpacing: -0.5 }}>
+      <View className="px-5 pt-14 pb-4">
+        <Text className="font-nunito-bold" style={{ letterSpacing: -0.5, fontSize: FontSizes.hero, color: AppColors.primaryText }}>
           Hello, {firstName}
         </Text>
       </View>
 
       {/* Search row */}
-      <View style={{ paddingHorizontal: 20, marginBottom: 22 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: AppColors.surfaceGray,
-            borderRadius: 50,
-            paddingHorizontal: 16,
-            paddingVertical: 10,
-          }}
-        >
-          <Ionicons name="search" size={18} color={AppColors.subtleText} style={{ marginRight: 8 }} />
+      <View className="px-5 mb-[22px]">
+        <View className="flex-row items-center rounded-full px-4 py-[10px]" style={{ backgroundColor: AppColors.surfaceGray }}>
+          <IconSymbol name="magnifyingglass" size={18} color={AppColors.subtleText} style={{ marginRight: 8 }} />
           <TextInput
-            style={{ flex: 1, fontSize: FontSizes.base, color: AppColors.primaryText, fontFamily: "NunitoSans_400Regular" }}
+            className="flex-1 text-sm font-nunito"
+            style={{ color: AppColors.primaryText }}
             placeholder="Search for a class"
             placeholderTextColor={AppColors.placeholderText}
             value={searchText}
             onChangeText={setSearchText}
           />
-          <Pressable
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              backgroundColor: AppColors.primaryText,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Ionicons name="options" size={16} color={AppColors.white} />
+          <Pressable className="w-9 h-9 rounded-full items-center justify-center" style={{ backgroundColor: AppColors.primaryText }}>
+            <IconSymbol name="slider.horizontal.3" size={16} color={AppColors.white} />
           </Pressable>
         </View>
       </View>
 
       {/* Your Upcoming Classes — conditional */}
       {upcomingClasses.length > 0 && (
-        <View style={{ marginBottom: 24 }}>
-          <Text style={{ fontSize: FontSizes.lg, fontFamily: "NunitoSans_700Bold", color: AppColors.primaryText, paddingHorizontal: 20, marginBottom: 12 }}>
+        <View className="mb-6">
+          <Text className="font-nunito-bold px-5 mb-3" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>
             Your Upcoming Classes
           </Text>
           <ScrollView
@@ -190,10 +173,10 @@ export default function HomeScreen() {
 
       {/* Discover Weekly */}
       {futureOccurrences.length > 0 && (
-        <View style={{ marginBottom: 24 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 20, marginBottom: 12 }}>
-            <Text style={{ color: AppColors.purple, fontSize: FontSizes.md, marginRight: 6, fontFamily: "NunitoSans_400Regular" }}>✦</Text>
-            <Text style={{ fontSize: FontSizes.lg, fontFamily: "NunitoSans_700Bold", color: AppColors.primaryText }}>Discover Weekly</Text>
+        <View className="mb-6">
+          <View className="flex-row items-center px-5 mb-3">
+            <Text className="mr-1.5 font-nunito" style={{ color: AppColors.purple, fontSize: FontSizes.md }}>✦</Text>
+            <Text className="font-nunito-bold" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>Discover Weekly</Text>
           </View>
           <DiscoverBanner event={futureOccurrences[0]} />
         </View>
@@ -201,17 +184,17 @@ export default function HomeScreen() {
 
       {/* Trending In Your Area */}
       {trendingEvents.length > 0 && (
-        <View style={{ marginBottom: 24 }}>
-          <Text style={{ fontSize: FontSizes.lg, fontFamily: "NunitoSans_700Bold", color: AppColors.primaryText, paddingHorizontal: 20, marginBottom: 12 }}>
+        <View className="mb-6">
+          <Text className="font-nunito-bold px-5 mb-3" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>
             Trending in Your Area
           </Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 0 }}
+            contentContainerStyle={{ paddingHorizontal: 20 }}
           >
             {trendingEvents.map((o, i) => (
-              <TrendingCard key={o.id} occurrence={o} index={i} />
+              <TrendingCard key={o.id} occurrence={o} />
             ))}
           </ScrollView>
         </View>
@@ -219,8 +202,8 @@ export default function HomeScreen() {
 
       {/* Recommended For... */}
       {childRecommendations.length > 0 && (
-        <View style={{ marginBottom: 24 }}>
-          <Text style={{ fontSize: FontSizes.lg, fontFamily: "NunitoSans_700Bold", color: AppColors.primaryText, paddingHorizontal: 20, marginBottom: 12 }}>
+        <View className="mb-6">
+          <Text className="font-nunito-bold px-5 mb-3" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>
             Recommended for...
           </Text>
           <ScrollView
@@ -237,17 +220,17 @@ export default function HomeScreen() {
 
       {/* Explore by Category */}
       {categories.length > 0 && (
-        <View style={{ marginBottom: 24 }}>
-          <Text style={{ fontSize: FontSizes.lg, fontFamily: "NunitoSans_700Bold", color: AppColors.primaryText, paddingHorizontal: 20, marginBottom: 12 }}>
+        <View className="mb-6">
+          <Text className="font-nunito-bold px-5 mb-3" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>
             Explore by Category
           </Text>
-          <View style={{ paddingHorizontal: 15 }}>
+          <View className="px-[15px]">
             {categoryPairs.map((pair, idx) => (
-              <View key={idx} style={{ flexDirection: "row" }}>
+              <View key={idx} className="flex-row">
                 {pair.map((cat) => (
                   <CategoryCard key={cat} category={cat} occurrence={categoryEventMap[cat]} />
                 ))}
-                {pair.length === 1 && <View style={{ flex: 1, margin: 5 }} />}
+                {pair.length === 1 && <View className="flex-1 m-[5px]" />}
               </View>
             ))}
           </View>

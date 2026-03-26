@@ -2,7 +2,7 @@ import { Image } from "expo-image";
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { type EventOccurrence } from "@skillspark/api-client";
-import { AppColors, FontSizes } from "@/constants/theme";
+import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { formatEventDate, formatEventTime } from "@/utils/format";
 
 export function UpcomingClassCard({ occurrence }: { occurrence: EventOccurrence }) {
@@ -15,11 +15,9 @@ export function UpcomingClassCard({ occurrence }: { occurrence: EventOccurrence 
   return (
     <Pressable
       onPress={() => router.push(`/event/${occurrence.id}`)}
-      className="mr-4"
+      className="mr-4 w-[310px] rounded-2xl"
       style={{
-        width: 310,
         backgroundColor: AppColors.white,
-        borderRadius: 16,
         shadowColor: "#000",
         shadowOpacity: 0.07,
         shadowRadius: 10,
@@ -27,33 +25,33 @@ export function UpcomingClassCard({ occurrence }: { occurrence: EventOccurrence 
         elevation: 3,
       }}
     >
-      <View style={{ flexDirection: "row", padding: 12, gap: 12, alignItems: "center" }}>
+      <View className="flex-row p-3 gap-3 items-center">
         {/* Image */}
-        <View style={{ width: 88, height: 88, borderRadius: 12, overflow: "hidden" }}>
+        <View className="w-[88px] h-[88px] rounded-[12px] overflow-hidden">
           {occurrence.event.presigned_url ? (
             <Image
               source={{ uri: occurrence.event.presigned_url }}
-              style={{ width: 88, height: 88 }}
+              className="w-[88px] h-[88px]"
               contentFit="cover"
             />
           ) : (
-            <View style={{ width: 88, height: 88, backgroundColor: AppColors.divider }} />
+            <View className="w-[88px] h-[88px]" style={{ backgroundColor: AppColors.divider }} />
           )}
         </View>
 
         {/* Text */}
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text style={{ fontFamily: "NunitoSans_700Bold", fontSize: FontSizes.base, color: AppColors.primaryText }} numberOfLines={1}>
+        <View className="flex-1 gap-0.5">
+          <Text style={{ fontFamily: FontFamilies.bold, fontSize: FontSizes.base, color: AppColors.primaryText }} numberOfLines={1}>
             {occurrence.event.title}
           </Text>
-          <Text style={{ fontSize: FontSizes.sm, color: AppColors.mutedText, fontFamily: "NunitoSans_400Regular" }}>
+          <Text style={{ fontSize: FontSizes.sm, color: AppColors.mutedText, fontFamily: FontFamilies.regular }}>
             {formatEventDate(occurrence.start_time)}
           </Text>
-          <Text style={{ fontSize: FontSizes.sm, color: AppColors.mutedText, fontFamily: "NunitoSans_400Regular" }}>
+          <Text style={{ fontSize: FontSizes.sm, color: AppColors.mutedText, fontFamily: FontFamilies.regular }}>
             {formatEventTime(occurrence.start_time, occurrence.end_time)}
           </Text>
           {!!location && (
-            <Text style={{ fontSize: FontSizes.xs, color: AppColors.subtleText, fontFamily: "NunitoSans_400Regular" }} numberOfLines={1}>
+            <Text style={{ fontSize: FontSizes.xs, color: AppColors.subtleText, fontFamily: FontFamilies.regular }} numberOfLines={1}>
               {location}
             </Text>
           )}
@@ -61,8 +59,8 @@ export function UpcomingClassCard({ occurrence }: { occurrence: EventOccurrence 
 
         {/* Badge */}
         {!!badge && (
-          <View style={{ backgroundColor: AppColors.badgeGreenBg, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, alignSelf: "flex-start", marginTop: 2 }}>
-            <Text style={{ fontSize: FontSizes.xs, color: AppColors.badgeGreenText, fontFamily: "NunitoSans_600SemiBold" }}>{badge}</Text>
+          <View className="rounded-full px-[10px] py-1 self-start mt-0.5" style={{ backgroundColor: AppColors.badgeGreenBg }}>
+            <Text style={{ fontSize: FontSizes.xs, color: AppColors.badgeGreenText, fontFamily: FontFamilies.semiBold }}>{badge}</Text>
           </View>
         )}
       </View>

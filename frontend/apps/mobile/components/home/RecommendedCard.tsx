@@ -9,21 +9,31 @@ export function RecommendedCard({ occurrence, childName }: { occurrence: EventOc
   return (
     <Pressable
       onPress={() => router.push(`/event/${occurrence.id}`)}
-      style={{ marginRight: 20, alignItems: "center", width: 76 }}
+      className="mr-5 items-center w-[79px]"
     >
-      <View style={{ width: 88, height: 88, borderRadius: 18, overflow: "hidden" }}>
+      <View
+        className="w-[79px] h-[72px] rounded-[12px] overflow-hidden"
+        style={{
+          shadowColor: "#000",
+          shadowOpacity: 0.25,
+          shadowRadius: 4,
+          shadowOffset: { width: 0, height: 4 },
+          elevation: 3,
+        }}
+      >
         {occurrence.event.presigned_url ? (
           <Image
             source={{ uri: occurrence.event.presigned_url }}
-            style={{ width: 88, height: 88 }}
+            className="w-[79px] h-[72px]"
             contentFit="cover"
           />
         ) : (
-          <View style={{ width: 88, height: 88, backgroundColor: AppColors.divider }} />
+          <View className="w-[79px] h-[72px]" style={{ backgroundColor: AppColors.imagePlaceholder }} />
         )}
       </View>
       <Text
-        style={{ fontSize: FontSizes.xs, color: AppColors.mutedText, marginTop: 5, textAlign: "center", fontFamily: "NunitoSans_400Regular" }}
+        className="mt-[5px] text-center font-nunito"
+        style={{ fontSize: FontSizes.xs, color: AppColors.mutedText }}
         numberOfLines={1}
       >
         {childName}
