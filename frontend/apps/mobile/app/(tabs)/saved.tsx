@@ -28,7 +28,7 @@ export default function SavedScreen() {
 
     if (isLoading) {
         return (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 8 }}>
+        <View className="flex-1 items-center justify-center gap-2">
             <ActivityIndicator size="large" />
             <ThemedText>{translate('common.loadingEvents')}</ThemedText>
         </View>
@@ -38,8 +38,8 @@ export default function SavedScreen() {
     if (error) {
       console.log(error)
         return (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
-            <ThemedText style={{ color: "#EF4444", fontWeight: "600" }}>{translate('common.errorLoadingEvents')}</ThemedText>
+        <View className="flex-1 items-center justify-center p-4">
+            <ThemedText className="text-red-500 font-semibold">{translate('common.errorLoadingEvents')}</ThemedText>
             <ThemedText>{error.detail || translate('common.errorOccurred')}</ThemedText>
         </View>
         );
@@ -47,7 +47,7 @@ export default function SavedScreen() {
 
     if (!response || !Array.isArray(response.data)) {
         return (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
+        <View className="flex-1 items-center justify-center p-4">
             <ThemedText>{translate('common.noEventsAvailable')}</ThemedText>
         </View>
         );
@@ -98,7 +98,7 @@ export default function SavedScreen() {
       </View>
         <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
     {savedEvents.length === 0 ? (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+      <View className="flex-1 justify-center items-center p-5">
         <ThemedText className="text-center text-lg text-gray-500">
           {translate('saved.noEvents')}
         </ThemedText>
@@ -113,7 +113,7 @@ export default function SavedScreen() {
             onBookmarkPress={() => handleDeleteSaved(item.id)} // Saved.id
           />
         )}
-        contentContainerStyle={{ paddingTop: 10, paddingBottom: 20 }}
+        contentContainerClassName="pt-2.5 pb-5"
         showsVerticalScrollIndicator={false}
       />
     )}

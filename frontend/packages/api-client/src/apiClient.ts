@@ -42,8 +42,6 @@ const getBaseURL = () => {
     }
   }
 
-  console.warn("using default")
-  
   return 'http://localhost:8080';
 };
 
