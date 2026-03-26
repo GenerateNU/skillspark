@@ -243,7 +243,7 @@ export interface Organization {
   active: boolean;
   created_at: string;
   id: string;
-  location_id?: string;
+  location_id: string;
   name: string;
   pfp_s3_key?: string;
   presigned_url?: string;
@@ -827,7 +827,6 @@ lng?: string;
 radius_km?: number;
 min_price?: number;
 max_price?: number;
-price?: string;
 min_duration?: number;
 max_duration?: number;
 min_age?: number;

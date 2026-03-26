@@ -3,7 +3,7 @@ import { IconBuilding, IconPlus } from "../components/icons";
 import { listOrganizations } from "@skillspark/api-client";
 import type { Organization } from "@skillspark/api-client";
 import { useState, useEffect } from "react";
-import { CreateModal } from "../components/admin_createDrawer";
+import { CreateModal } from "../components/admin_createModal";
 
 export default function HomePage() {
   const [loading, setLoading] = useState<boolean>(true);

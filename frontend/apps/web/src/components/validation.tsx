@@ -1,5 +1,5 @@
 import type { ManagerSignUpInputBody, CreateOrganizationBody } from "@skillspark/api-client";
-import type { ManagerFormInput } from "./admin_createDrawer";
+import type { ManagerFormInput } from "./admin_createModal";
 
 export type ManagerErrors = Partial<Record<keyof Omit<ManagerSignUpInputBody, "auth_id" | "organization_id" | "profile_picture_s3_key">, string>>;
 export type OrgErrors = Partial<Record<keyof CreateOrganizationBody, string>>;

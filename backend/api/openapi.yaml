@@ -323,11 +323,6 @@ paths:
           schema:
             type: integer
             format: int64
-        - name: price
-          in: query
-          explode: false
-          schema:
-            type: string
         - name: min_duration
           in: query
           explode: false
@@ -3394,6 +3389,7 @@ components:
         - id
         - name
         - active
+        - location_id
         - created_at
         - updated_at
         - stripe_account_activated

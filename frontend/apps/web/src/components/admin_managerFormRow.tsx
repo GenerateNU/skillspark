@@ -3,7 +3,7 @@ import { Field, Select } from "./common";
 import { IconX } from "./icons";
 import OtpCard from "./admin_otpCard";
 import ValidatedInput from "./validatedInput";
-import type { ManagerFormInput } from "./admin_createDrawer";
+import type { ManagerFormInput } from "./admin_createModal";
 
 interface ManagerFormRowProps {
   mgr: ManagerFormInput;
