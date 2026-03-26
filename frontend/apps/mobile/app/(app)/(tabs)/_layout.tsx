@@ -42,10 +42,10 @@ export default function TabLayout() {
         options={{
           title: "Activity",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="map.fill" color={color} />
+            <IconSymbol size={28} name="bolt.fill" color={color} />
           ),
         }}
-      />
+      /> 
       <Tabs.Screen
         name="profile"
         options={{
@@ -54,7 +54,7 @@ export default function TabLayout() {
             <IconSymbol size={28} name="person.fill" color={color} />
           ),
         }}
-      />
+      /> 
       <Tabs.Screen name="event" options={{ href: null }} />
       <Tabs.Screen name="family" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
