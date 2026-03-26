@@ -25,8 +25,6 @@ export function BookmarkButton({ eventId, isBookmarked: isBookmarkedProp, savedE
 
   const controlled = isBookmarkedProp !== undefined;
 
-
-  console.log(i18n.language);
   const { data: savedResponse } = useGetSavedByGuardianId(guardianId!, undefined, {
     query: { enabled: !!guardianId && !controlled },
   });

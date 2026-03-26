@@ -44,7 +44,7 @@ const getBaseURL = () => {
 
   console.warn("using default")
   
-  return 'http://10.110.10.192:8080';
+  return 'http://localhost:8080';
 };
 
 // NOTE: This axios instance is preserved for future use or interceptor logic,
