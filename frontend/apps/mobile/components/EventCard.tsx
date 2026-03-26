@@ -4,6 +4,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { useTranslation } from 'react-i18next';
 
 export interface LocationPin {
   id: string;
@@ -25,6 +26,7 @@ export function EventCard({ pin }: EventCardProps) {
     { light: "#D0D0D0", dark: "#333333" },
     "background",
   );
+  const { t: translate } = useTranslation();
 
   return (
     <ThemedView
@@ -49,7 +51,7 @@ export function EventCard({ pin }: EventCardProps) {
             {pin.title}
           </ThemedText>
           <ThemedText className="mb-[6px] text-sm text-[#888]">
-            {pin.members} members
+            {pin.members} {translate('dashboard.members')}
           </ThemedText>
           <View className="mb-2 flex-row items-center">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -71,12 +73,10 @@ export function EventCard({ pin }: EventCardProps) {
       </View>
       <TouchableOpacity
         className="w-full items-center rounded-xl bg-[#333] py-[15px]"
-        activeOpacity={1}
-        onPress={() => Alert.alert("Reservation", `Reserved: ${pin.title}`)}
+        activeOpacity={1} 
+        onPress={() => Alert.alert(translate('dashboard.reserve'), `${translate('dashboard.reserved')}: ${pin.title}`)}
       >
-        <ThemedText className="text-[18px] font-semibold text-white">
-          Reserve
-        </ThemedText>
+        <ThemedText className="text-[18px] font-semibold text-white">{translate('dashboard.reserve')}</ThemedText>
       </TouchableOpacity>
     </ThemedView>
   );

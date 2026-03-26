@@ -3,10 +3,17 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
+export let currentLanguage = 'en';
+export function setCurrentLanguage(lang: string) {
+  currentLanguage = lang;
+}
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
+
+
+
 
 // Platform-agnostic storage helper
 const getStorageItem = (key: string): string | null => {
@@ -35,9 +42,7 @@ const getBaseURL = () => {
     }
   }
 
-  console.warn("using default")
-  
-  return 'http://10.110.10.192:8080';
+  return 'http://localhost:8080';
 };
 
 // NOTE: This axios instance is preserved for future use or interceptor logic,
@@ -51,6 +56,7 @@ const apiClient = axios.create({
   },
   withCredentials: true,
 });
+
 
 apiClient.interceptors.request.use(
   (config) => {
@@ -132,15 +138,17 @@ export async function customInstance<T>(
 ): Promise<T> {
   const baseURL = getBaseURL();
   const fullUrl = `${baseURL}${url}`;
+
+  const languageHeader = currentLanguage === 'th' ? 'th-TH' : 'en-US';
+
   // Get token for auth
   const token = getStorageItem('temp_jwt') || getStorageItem('jwt');
-  
   const response = await fetch(fullUrl, {
     ...options,
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'Accept-Language': 'en-US',
+      'Accept-Language': languageHeader,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },

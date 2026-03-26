@@ -131,7 +131,7 @@ type NotificationRepository interface {
 type SavedRepository interface {
 	CreateSaved(ctx context.Context, saved *models.CreateSavedInput) (*models.Saved, error)
 	DeleteSaved(ctx context.Context, id uuid.UUID) error
-	GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination) ([]models.Saved, error)
+	GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination, AcceptLanguage string) ([]models.Saved, error)
 }
 
 type Repository struct {
