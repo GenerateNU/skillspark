@@ -37,8 +37,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     SecureStore.getItemAsync('language_preference').then((lang) => {
-      // DEBUG
-      console.log('[_layout] SecureStore language_preference read', { lang });
       if (lang) setCurrentLanguage(lang);
       setLangReady(true);
     });

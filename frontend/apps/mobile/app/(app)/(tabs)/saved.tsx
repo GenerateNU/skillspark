@@ -60,12 +60,6 @@ export default function SavedScreen() {
   const savedEvents: Saved[] = response.status === 200 && Array.isArray(response.data)
     ? response.data
     : [];
-  // DEBUG
-  console.log('[saved] response received', {
-    status: response.status,
-    count: savedEvents.length,
-    firstTitle: savedEvents[0]?.event?.title,
-  });
 
   const handleDeleteSaved = (savedId: string) => {
     Alert.alert(

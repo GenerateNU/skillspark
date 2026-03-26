@@ -5,8 +5,6 @@ import axios, {
 } from 'axios';
 export let currentLanguage = 'en';
 export function setCurrentLanguage(lang: string) {
-  // DEBUG
-  console.log('[apiClient] setCurrentLanguage called', { prev: currentLanguage, next: lang });
   currentLanguage = lang;
 }
 
@@ -144,8 +142,6 @@ export async function customInstance<T>(
   const fullUrl = `${baseURL}${url}`;
 
   const languageHeader = currentLanguage === 'th' ? 'th-TH' : 'en-US';
-  // DEBUG
-  console.log('[apiClient] customInstance called', { url, currentLanguage, languageHeader, optionsHeaders: options?.headers });
 
   // Get token for auth
   const token = getStorageItem('temp_jwt') || getStorageItem('jwt');
@@ -176,10 +172,6 @@ export async function customInstance<T>(
   }
 
   const data = await response.json().catch(() => null);
-  // DEBUG
-  if (url.includes('/saved/')) {
-    console.log('[apiClient] saved response raw data', { acceptLanguage: languageHeader, data: JSON.stringify(data)?.slice(0, 500) });
-  }
 
   // CRITICAL FIX: Return the structure expected by Orval generated types
   // The generated types define the return type T as: { data: ..., status: number, headers: ... }
