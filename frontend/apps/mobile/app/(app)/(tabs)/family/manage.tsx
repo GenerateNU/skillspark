@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   TouchableOpacity,
@@ -7,60 +7,69 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
-import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Colors, AppColors } from '@/constants/theme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useQueryClient } from '@tanstack/react-query';
-import { useCreateChild, useUpdateChild, useDeleteChild, getGetChildrenByGuardianIdQueryKey } from '@skillspark/api-client';
-import { ChildProfileForm, MONTHS } from '@/components/ChildProfileForm';
-import { useTranslation } from 'react-i18next';
-import { useGuardian } from '@/hooks/use-guardian';
+} from "react-native";
+import { Stack, useRouter, useLocalSearchParams } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { Colors, AppColors } from "@/constants/theme";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  useCreateChild,
+  useUpdateChild,
+  useDeleteChild,
+  getGetChildrenByGuardianIdQueryKey,
+} from "@skillspark/api-client";
+import { ChildProfileForm, MONTHS } from "@/components/ChildProfileForm";
+import { useTranslation } from "react-i18next";
+import { useGuardian } from "@/hooks/use-guardian";
 
-import { useAuthContext } from '@/hooks/use-auth-context';
-import { ErrorScreen } from '@/components/ErrorScreen';
+import { useAuthContext } from "@/hooks/use-auth-context";
+import { ErrorScreen } from "@/components/ErrorScreen";
 
 export default function ManageChildScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
-  const theme = Colors[colorScheme ?? 'light'];
+  const theme = Colors[colorScheme ?? "light"];
   const { guardianId } = useAuthContext();
 
   const { t: translate } = useTranslation();
   const isEditing = !!params.id;
 
   const [firstName, setFirstName] = useState(
-    params.name ? (params.name as string).split(' ')[0] : ''
+    params.name ? (params.name as string).split(" ")[0] : "",
   );
   const [lastName, setLastName] = useState(
-    params.name ? (params.name as string).split(' ').slice(1).join(' ') : ''
+    params.name ? (params.name as string).split(" ").slice(1).join(" ") : "",
   );
 
   const initialMonthStr = params.birth_month
     ? MONTHS[parseInt(params.birth_month as string) - 1]
-    : '';
+    : "";
 
   const [birthMonth, setBirthMonth] = useState(initialMonthStr);
-  const [birthYear, setBirthYear] = useState(params.birth_year as string || '');
-  const [schoolId, setSchoolId] = useState(params.school_id as string || '');
+  const [birthYear, setBirthYear] = useState(
+    (params.birth_year as string) || "",
+  );
+  const [schoolId, setSchoolId] = useState((params.school_id as string) || "");
 
   const initialInterests = Array.isArray(params.interests)
     ? params.interests
     : params.interests
-    ? (params.interests as string).split(',').map(s => s.trim()).filter(Boolean)
-    : [];
+      ? (params.interests as string)
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
   const [interests, setInterests] = useState<string[]>(initialInterests);
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [showMonthDrop, setShowMonthDrop] = useState(false);
   const [showYearDrop, setShowYearDrop] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
 
   const queryClient = useQueryClient();
   const createChildMutation = useCreateChild();
@@ -70,13 +79,16 @@ export default function ManageChildScreen() {
   if (!guardianId) {
     return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
   }
-  
+
   const handleSave = async () => {
     if (!firstName || !birthYear || !birthMonth || !schoolId) {
-      Alert.alert(translate('common.error'), translate('childProfile.requiredFieldsError'));
+      Alert.alert(
+        translate("common.error"),
+        translate("childProfile.requiredFieldsError"),
+      );
       return;
     }
-    const name = [firstName, lastName].filter(Boolean).join(' ');
+    const name = [firstName, lastName].filter(Boolean).join(" ");
     setIsSubmitting(true);
     try {
       const childData = {
@@ -88,15 +100,23 @@ export default function ManageChildScreen() {
         interests,
       };
       if (isEditing) {
-        await updateChildMutation.mutateAsync({ id: params.id as string, data: childData });
+        await updateChildMutation.mutateAsync({
+          id: params.id as string,
+          data: childData,
+        });
       } else {
         await createChildMutation.mutateAsync({ data: childData });
       }
-      await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(guardianId) });
+      await queryClient.invalidateQueries({
+        queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
+      });
       router.back();
     } catch (error) {
       console.error(error);
-      Alert.alert(translate('common.errorOccurred'), translate('childProfile.saveError'));
+      Alert.alert(
+        translate("common.errorOccurred"),
+        translate("childProfile.saveError"),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -104,25 +124,33 @@ export default function ManageChildScreen() {
 
   const handleDelete = () => {
     Alert.alert(
-      translate('childProfile.deleteProfile'),
-      translate('childProfile.deleteConfirm'),
+      translate("childProfile.deleteProfile"),
+      translate("childProfile.deleteConfirm"),
       [
-        { text: translate('common.cancel'), style: 'cancel' },
+        { text: translate("common.cancel"), style: "cancel" },
         {
-          text: translate('payment.delete'), style: 'destructive',
+          text: translate("payment.delete"),
+          style: "destructive",
           onPress: async () => {
             setIsSubmitting(true);
             try {
-              await deleteChildMutation.mutateAsync({ id: params.id as string });
-              await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(guardianId) });
+              await deleteChildMutation.mutateAsync({
+                id: params.id as string,
+              });
+              await queryClient.invalidateQueries({
+                queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
+              });
               router.back();
             } catch {
-              Alert.alert(translate('common.errorOccurred'), translate('childProfile.deleteError'));
+              Alert.alert(
+                translate("common.errorOccurred"),
+                translate("childProfile.deleteError"),
+              );
               setIsSubmitting(false);
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -130,29 +158,45 @@ export default function ManageChildScreen() {
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
       <Stack.Screen options={{ headerShown: false }} />
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
         keyboardVerticalOffset={0}
       >
         <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: 10 }}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingBottom: 40,
+            paddingTop: 10,
+          }}
           showsVerticalScrollIndicator={false}
         >
           <View className="flex-row items-center justify-between mb-6">
-            <TouchableOpacity onPress={() => router.back()} className="w-8 h-8 justify-center items-start">
+            <TouchableOpacity
+              onPress={() => router.back()}
+              className="w-8 h-8 justify-center items-start"
+            >
               <IconSymbol name="chevron.left" size={24} color={theme.text} />
             </TouchableOpacity>
-            <ThemedText className="text-xl text-center font-nunito-bold">{translate('familyInformation.title')}</ThemedText>
+            <ThemedText className="text-xl text-center font-nunito-bold">
+              {translate("familyInformation.title")}
+            </ThemedText>
             {isEditing ? (
               <TouchableOpacity onPress={handleDelete}>
-                <ThemedText className="font-nunito-semibold" style={{ color: AppColors.danger }}>{translate('payment.delete')}</ThemedText>
+                <ThemedText
+                  className="font-nunito-semibold"
+                  style={{ color: AppColors.danger }}
+                >
+                  {translate("payment.delete")}
+                </ThemedText>
               </TouchableOpacity>
             ) : (
               <View className="w-10" />
             )}
           </View>
           <ThemedText className="text-[22px] font-nunito-semibold mb-5">
-            {isEditing ? translate('childProfile.editTitle') : translate('childProfile.createTitle')}
+            {isEditing
+              ? translate("childProfile.editTitle")
+              : translate("childProfile.createTitle")}
           </ThemedText>
           <ChildProfileForm
             firstName={firstName}
@@ -175,13 +219,15 @@ export default function ManageChildScreen() {
             setShowYearDrop={setShowYearDrop}
           />
           <TouchableOpacity
-            className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? 'opacity-70' : 'opacity-100'}`}
+            className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
             style={{ backgroundColor: theme.tint }}
             onPress={handleSave}
             disabled={isSubmitting}
           >
             <ThemedText className="text-white text-base font-nunito-semibold">
-              {isSubmitting ? translate('childProfile.saving') : translate('childProfile.saveChanges')}
+              {isSubmitting
+                ? translate("childProfile.saving")
+                : translate("childProfile.saveChanges")}
             </ThemedText>
           </TouchableOpacity>
         </ScrollView>

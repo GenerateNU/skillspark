@@ -9,13 +9,12 @@ interface ButtonProps {
 export const Button = ({ label, onPress }: ButtonProps) => {
   return (
     <TouchableOpacity
-      className="rounded-lg p-[10px] w-full items-center" style={{ backgroundColor: AppColors.primaryBlue }}
+      className="rounded-lg p-[10px] w-full items-center"
+      style={{ backgroundColor: AppColors.primaryBlue }}
       onPress={onPress}
       activeOpacity={0.5}
     >
-      <Text className="text-base font-medium text-white">
-        {label}
-      </Text>
+      <Text className="text-base font-medium text-white">{label}</Text>
     </TouchableOpacity>
   );
 };

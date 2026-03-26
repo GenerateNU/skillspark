@@ -18,9 +18,9 @@ import {
   NunitoSans_600SemiBold,
   NunitoSans_700Bold,
 } from "@expo-google-fonts/nunito-sans";
-import { AuthProvider } from '@/contexts/auth-context';
-import { LoginRedirect } from '@/components/LoginRedirect';
-import { setCurrentLanguage } from '@skillspark/api-client';
+import { AuthProvider } from "@/contexts/auth-context";
+import { LoginRedirect } from "@/components/LoginRedirect";
+import { setCurrentLanguage } from "@skillspark/api-client";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -34,7 +34,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    SecureStore.getItemAsync('language_preference').then((lang) => {
+    SecureStore.getItemAsync("language_preference").then((lang) => {
       if (lang) setCurrentLanguage(lang);
       setLangReady(true);
     });

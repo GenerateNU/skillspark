@@ -6,7 +6,10 @@ import {
   useGetSavedByGuardianId,
   getGetSavedByGuardianIdQueryKey,
 } from "@skillspark/api-client";
-import type { getSavedByGuardianIdResponse, Saved } from "@skillspark/api-client";
+import type {
+  getSavedByGuardianIdResponse,
+  Saved,
+} from "@skillspark/api-client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { AppColors } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
@@ -19,21 +22,31 @@ interface BookmarkButtonProps {
   savedEntryId?: string;
 }
 
-export function BookmarkButton({ eventId, isBookmarked: isBookmarkedProp, savedEntryId }: BookmarkButtonProps) {
+export function BookmarkButton({
+  eventId,
+  isBookmarked: isBookmarkedProp,
+  savedEntryId,
+}: BookmarkButtonProps) {
   const queryClient = useQueryClient();
   const { guardianId } = useAuthContext();
 
   const controlled = isBookmarkedProp !== undefined;
 
-  const { data: savedResponse } = useGetSavedByGuardianId(guardianId!, undefined, {
-    query: { enabled: !!guardianId && !controlled },
-  });
+  const { data: savedResponse } = useGetSavedByGuardianId(
+    guardianId!,
+    undefined,
+    {
+      query: { enabled: !!guardianId && !controlled },
+    },
+  );
 
   const savedQueryKey = getGetSavedByGuardianIdQueryKey(guardianId!);
 
   const savedItems = savedResponse?.status === 200 ? savedResponse.data : [];
   const savedEntry = controlled
-    ? (savedEntryId ? { id: savedEntryId } : undefined)
+    ? savedEntryId
+      ? { id: savedEntryId }
+      : undefined
     : savedItems.find((s) => s.event.id === eventId);
   const isBookmarked = controlled ? isBookmarkedProp : !!savedEntry;
 
@@ -41,19 +54,28 @@ export function BookmarkButton({ eventId, isBookmarked: isBookmarkedProp, savedE
     mutation: {
       onMutate: async () => {
         await queryClient.cancelQueries({ queryKey: savedQueryKey });
-        const previous = queryClient.getQueryData<getSavedByGuardianIdResponse>(savedQueryKey);
-        queryClient.setQueryData<getSavedByGuardianIdResponse>(savedQueryKey, (old) => {
-          if (!old || old.status !== 200) return old;
-          return { ...old, data: updater(old.data) };
-        });
+        const previous =
+          queryClient.getQueryData<getSavedByGuardianIdResponse>(savedQueryKey);
+        queryClient.setQueryData<getSavedByGuardianIdResponse>(
+          savedQueryKey,
+          (old) => {
+            if (!old || old.status !== 200) return old;
+            return { ...old, data: updater(old.data) };
+          },
+        );
         return { previous };
       },
-      onError: (_err: unknown, _vars: unknown, context: { previous?: getSavedByGuardianIdResponse } | undefined) => {
+      onError: (
+        _err: unknown,
+        _vars: unknown,
+        context: { previous?: getSavedByGuardianIdResponse } | undefined,
+      ) => {
         if (context?.previous) {
           queryClient.setQueryData(savedQueryKey, context.previous);
         }
       },
-      onSettled: () => queryClient.invalidateQueries({ queryKey: savedQueryKey }),
+      onSettled: () =>
+        queryClient.invalidateQueries({ queryKey: savedQueryKey }),
     },
   });
 
@@ -66,11 +88,11 @@ export function BookmarkButton({ eventId, isBookmarked: isBookmarkedProp, savedE
   };
 
   const createSaved = useCreateSaved(
-    optimisticOptions((items) => [...items, optimisticSaved])
+    optimisticOptions((items) => [...items, optimisticSaved]),
   );
 
   const deleteSaved = useDeleteSaved(
-    optimisticOptions((items) => items.filter((s) => s.event.id !== eventId))
+    optimisticOptions((items) => items.filter((s) => s.event.id !== eventId)),
   );
 
   if (!guardianId) return null;
@@ -82,12 +104,18 @@ export function BookmarkButton({ eventId, isBookmarked: isBookmarkedProp, savedE
     if (isBookmarked && savedEntry && savedEntry.id !== "optimistic") {
       deleteSaved.mutate({ id: savedEntry.id });
     } else if (!isBookmarked) {
-      createSaved.mutate({ data: { event_id: eventId, guardian_id: guardianId } });
+      createSaved.mutate({
+        data: { event_id: eventId, guardian_id: guardianId },
+      });
     }
   };
 
   return (
-    <TouchableOpacity onPress={handlePress} activeOpacity={0.7} disabled={isPending}>
+    <TouchableOpacity
+      onPress={handlePress}
+      activeOpacity={0.7}
+      disabled={isPending}
+    >
       <MaterialIcons
         name={isBookmarked ? "bookmark" : "bookmark-border"}
         size={40}

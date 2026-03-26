@@ -44,6 +44,7 @@ To use the Map features, you must configure Google Maps API keys for iOS and And
 2. Edit `.env` and fill in the required values:
 
 ## Map Integration & Managing Locations
+
 The map view (app/(tabs)/map.tsx) retrieves event occurrences dynamically from the backend API. It renders location pins for all events that have valid geographic coordinates.
 
 To populate the map:

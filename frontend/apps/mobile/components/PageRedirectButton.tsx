@@ -16,7 +16,10 @@ export const PageRedirectButton = ({
       onPress={onPress}
       activeOpacity={0.5}
     >
-      <Text className="text-base font-medium" style={{ color: AppColors.primaryBlue }}>
+      <Text
+        className="text-base font-medium"
+        style={{ color: AppColors.primaryBlue }}
+      >
         {label}
       </Text>
     </TouchableOpacity>

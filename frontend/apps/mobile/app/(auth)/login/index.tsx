@@ -39,19 +39,12 @@ export default function LoginScreen() {
   };
 
   return (
-    <ThemedView
-      className="flex-1 items-center justify-center"
-    >
-      <ThemedText
-        type="title"
-        className="text-3xl font-bold mb-8"
-      >
+    <ThemedView className="flex-1 items-center justify-center">
+      <ThemedText type="title" className="text-3xl font-bold mb-8">
         Log In
       </ThemedText>
 
-      <View
-        className="w-full px-6 gap-4 items-center"
-      >
+      <View className="w-full px-6 gap-4 items-center">
         <AuthFormInput
           control={control}
           name="email"

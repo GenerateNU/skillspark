@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Linking, Button, ActivityIndicator, View } from 'react-native';
-import * as Location from 'expo-location';
-import { useGetAllEventOccurrences } from '@skillspark/api-client';
-import type { EventOccurrence } from '@skillspark/api-client';
-import { ThemedView } from '@/components/themed-view';
-import { ThemedText } from '@/components/themed-text';
-import { SkillSparkMap } from '@/components/SkillSparkMap';
-import { useTranslation } from 'react-i18next';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect, useMemo } from "react";
+import { Linking, Button, ActivityIndicator, View } from "react-native";
+import * as Location from "expo-location";
+import { useGetAllEventOccurrences } from "@skillspark/api-client";
+import type { EventOccurrence } from "@skillspark/api-client";
+import { ThemedView } from "@/components/themed-view";
+import { ThemedText } from "@/components/themed-text";
+import { SkillSparkMap } from "@/components/SkillSparkMap";
+import { useTranslation } from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface LocationPin {
   id: string;
@@ -23,7 +23,7 @@ export interface LocationPin {
 export default function MapScreen() {
   const { t: translate } = useTranslation();
   const { data, isLoading: isApiLoading, error } = useGetAllEventOccurrences();
-  
+
   const occurrences: EventOccurrence[] = data?.status === 200 ? data.data : [];
 
   const mapLocations: LocationPin[] = useMemo(() => {
@@ -74,7 +74,9 @@ export default function MapScreen() {
     return (
       <ThemedView className="flex-1 items-center justify-center p-5">
         <ActivityIndicator size="large" />
-        <ThemedText className="mt-[10px]">{translate('common.loadingMapData')}</ThemedText>
+        <ThemedText className="mt-[10px]">
+          {translate("common.loadingMapData")}
+        </ThemedText>
       </ThemedView>
     );
   }
@@ -83,9 +85,12 @@ export default function MapScreen() {
     return (
       <ThemedView className="flex-1 items-center justify-center p-5">
         <ThemedText className="mb-5 text-center text-base">
-          {translate('common.locationDenied')}
+          {translate("common.locationDenied")}
         </ThemedText>
-        <Button title={translate('common.openSettings')} onPress={() => Linking.openSettings()} />
+        <Button
+          title={translate("common.openSettings")}
+          onPress={() => Linking.openSettings()}
+        />
       </ThemedView>
     );
   }
@@ -95,15 +100,19 @@ export default function MapScreen() {
       <SkillSparkMap locations={mapLocations} userLocation={userLocation} />
 
       {!isApiLoading && error && (
-         <View className="absolute top-[60px] self-center rounded-[20px] bg-[rgba(0,0,0,0.6)] px-5 py-[10px]">
-            <ThemedText className="text-sm font-semibold text-white">{translate('common.errorFetchingEvents')}</ThemedText>
-         </View>
+        <View className="absolute top-[60px] self-center rounded-[20px] bg-[rgba(0,0,0,0.6)] px-5 py-[10px]">
+          <ThemedText className="text-sm font-semibold text-white">
+            {translate("common.errorFetchingEvents")}
+          </ThemedText>
+        </View>
       )}
 
       {!isApiLoading && !error && mapLocations.length === 0 && (
-         <View className="absolute top-[60px] self-center rounded-[20px] bg-[rgba(0,0,0,0.6)] px-5 py-[10px]">
-            <ThemedText className="text-sm font-semibold text-white">{translate('common.noEventsNearby')}</ThemedText>
-         </View>
+        <View className="absolute top-[60px] self-center rounded-[20px] bg-[rgba(0,0,0,0.6)] px-5 py-[10px]">
+          <ThemedText className="text-sm font-semibold text-white">
+            {translate("common.noEventsNearby")}
+          </ThemedText>
+        </View>
       )}
     </ThemedView>
   );
