@@ -10,6 +10,7 @@ import type { getSavedByGuardianIdResponse, Saved } from "@skillspark/api-client
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { AppColors } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import i18n from "@/i18n";
 
 interface BookmarkButtonProps {
   eventId: string;
@@ -24,6 +25,8 @@ export function BookmarkButton({ eventId, isBookmarked: isBookmarkedProp, savedE
 
   const controlled = isBookmarkedProp !== undefined;
 
+
+  console.log(i18n.language);
   const { data: savedResponse } = useGetSavedByGuardianId(guardianId!, undefined, {
     query: { enabled: !!guardianId && !controlled },
   });

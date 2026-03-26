@@ -178,7 +178,7 @@ export async function customInstance<T>(
   const data = await response.json().catch(() => null);
   // DEBUG
   if (url.includes('/saved/')) {
-    console.log('[apiClient] saved response raw data', JSON.stringify(data)?.slice(0, 500));
+    console.log('[apiClient] saved response raw data', { acceptLanguage: languageHeader, data: JSON.stringify(data)?.slice(0, 500) });
   }
 
   // CRITICAL FIX: Return the structure expected by Orval generated types
