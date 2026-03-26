@@ -71,7 +71,7 @@ export default function OrganizationDetailPage() {
     }
 
     fetchLocation();
-  }, []);
+  }, [location.state?.org, navigate, ]);
 
   function startEditing(): void {
     if (!org) return;
