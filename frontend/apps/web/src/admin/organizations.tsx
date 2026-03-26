@@ -1,11 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import type { Organization, Manager, Location } from "@skillspark/api-client";
 import { useState, useEffect } from "react";
-import { getManagerByOrgId, deleteOrganization, getLocationById, deleteManager } from "@skillspark/api-client";
+import { deleteOrganization, deleteManager } from "@skillspark/api-client";
 import DeleteModal from "../components/admin_deleteModal";
 import OrgDetailsCard from "../components/admin_orgDetailsCard";
 import OrgLocationCard from "../components/admin_orgLocationCard";
 import OrgManagerCard from "../components/admin_orgManagerCard";
+import { loadData } from "../service/loadOrganizationData";
 
 const fmtDate = (iso: string): string =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -28,30 +29,7 @@ export default function OrganizationDetailPage() {
       return;
     }
     setOrg(orgFromState);
-
-    async function fetchManager(): Promise<void> {
-      try {
-        const res = await getManagerByOrgId(orgFromState.id);
-        if (res.status === 200) setManager(res.data as Manager);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoadingMgr(false);
-      }
-    }
-
-    async function fetchLocation(): Promise<void> {
-      if (!orgFromState.location_id) return;
-      try {
-        const res = await getLocationById(orgFromState.location_id as string);
-        if (res.status === 200 || res.status === 201) setOrgLocation(res.data as Location);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    fetchManager();
-    fetchLocation();
+    loadData(orgFromState, setManager, setOrgLocation, setLoadingMgr)
   }, [location.state?.org, navigate]);
 
   async function handleDelete(): Promise<void> {

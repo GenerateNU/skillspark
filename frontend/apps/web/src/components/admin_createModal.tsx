@@ -2,7 +2,7 @@ import { type Organization, type ManagerSignUpInputBody, type CreateOrganization
 import { useState, useEffect } from "react";
 import { Btn, Field, Select } from "./common";
 import { IconCheck, IconX } from "./icons";
-import { blankMgr, validateMgr } from "./validation";
+import { blankMgr, validateMgr } from "../utils/validation";
 import ManagerFormRow from "./admin_managerFormRow";
 import ValidatedInput from "./validatedInput";
 

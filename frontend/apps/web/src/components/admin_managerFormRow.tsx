@@ -1,4 +1,4 @@
-import { isValidEmail, type ManagerErrors } from "./validation";
+import { isValidEmail, type ManagerErrors } from "../utils/validation";
 import { Field, Select } from "./common";
 import { IconX } from "./icons";
 import OtpCard from "./admin_otpCard";
