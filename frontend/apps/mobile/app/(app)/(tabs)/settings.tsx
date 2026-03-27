@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
+import { useTranslation } from 'react-i18next';
 import { useAuthContext } from "@/hooks/use-auth-context";
 
 export default function SettingsScreen() {
@@ -13,6 +14,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
+  const { t: translate } = useTranslation();
 
   const cardBg = colorScheme === 'dark' ? '#1c1c1e' : '#EFEFEF';
   const dividerColor = colorScheme === 'dark' ? '#3a3a3c' : '#D1D5DB';
@@ -35,32 +37,32 @@ export default function SettingsScreen() {
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText className="text-xl text-center font-nunito-bold">Settings</ThemedText>
+        <ThemedText className="text-xl text-center font-nunito-bold">{translate('settings.title')}</ThemedText>
         <View className="w-10" />
       </View>
       <View className="px-4 pt-5">
         <View className="rounded-2xl overflow-hidden" style={{ backgroundColor: cardBg }}>
           <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6} onPress={() => router.push('/language')}>
-            <ThemedText className="text-[17px] font-nunito">Language</ThemedText>
+            <ThemedText className="text-[17px] font-nunito">{translate('settings.language')}</ThemedText>
             <IconSymbol name="chevron.right" size={16} color="#9CA3AF" />
           </TouchableOpacity>
           <View className="h-px" style={{ backgroundColor: dividerColor }} />
           <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6}>
-            <ThemedText className="text-[17px] font-nunito">Terms and Conditions</ThemedText>
+            <ThemedText className="text-[17px] font-nunito">{translate('settings.termsAndConditions')}</ThemedText>
             <IconSymbol name="chevron.right" size={16} color="#9CA3AF" />
           </TouchableOpacity>
           <View className="h-px" style={{ backgroundColor: dividerColor }} />
           <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6}>
-            <ThemedText className="text-[17px] font-nunito">Privacy Policy</ThemedText>
+            <ThemedText className="text-[17px] font-nunito">{translate('settings.privacyPolicy')}</ThemedText>
             <IconSymbol name="chevron.right" size={16} color="#9CA3AF" />
           </TouchableOpacity>
           <View className="h-px" style={{ backgroundColor: dividerColor }} />
           <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6} onPress={handleLogOut}>
-            <ThemedText className="text-[17px] font-nunito">Log Out</ThemedText>
+            <ThemedText className="text-[17px] font-nunito">{translate('settings.logOut')}</ThemedText>
           </TouchableOpacity>
           <View className="h-px" style={{ backgroundColor: dividerColor }} />
           <TouchableOpacity className="flex-row items-center justify-between px-4 py-[18px]" activeOpacity={0.6} onPress={handleDeleteAccount}>
-            <ThemedText className="text-[17px] font-nunito">Delete Account</ThemedText>
+            <ThemedText className="text-[17px] font-nunito">{translate('settings.deleteAccount')}</ThemedText>
           </TouchableOpacity>
         </View>
       </View>

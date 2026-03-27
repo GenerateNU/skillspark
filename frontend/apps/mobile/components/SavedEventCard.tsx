@@ -4,6 +4,7 @@ import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { router } from "expo-router";
 import { AppColors, TAG_COLORS } from "@/constants/theme";
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useTranslation } from 'react-i18next';
 
 interface BookmarkIconProps {
   onPress?: () => void;
@@ -23,6 +24,7 @@ interface SavedEventCardProps {
 }
 
 export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) {
+  const { t: translate } = useTranslation();
   return (
     <Pressable
       onPress={() => router.push(`/event/${event.id}`)} //TODO: fix event details to be either event or occurrence based on design
@@ -55,7 +57,7 @@ export function SavedEventCard({ event, onBookmarkPress }: SavedEventCardProps) 
                 style={{ backgroundColor: TAG_COLORS[0].bg }}
               >
                 <Text className="text-xs font-medium" style={{ color: TAG_COLORS[0].text }}>
-                  {cat}
+                  {translate(`interests.${cat}`, { defaultValue: cat })}
                 </Text>
               </View>
             ))}
