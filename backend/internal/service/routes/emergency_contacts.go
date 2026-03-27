@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/models"
-	"skillspark/internal/service/handler/child"
+	emergencycontact "skillspark/internal/service/handler/emergency-contact"
 	"skillspark/internal/storage"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -12,78 +12,59 @@ import (
 
 func SetupEmergencyContactRoutes(api huma.API, repo *storage.Repository) {
 
-	// childHandler is a very suspicious name...
-	EmergencyContactHandler := child.NewHandler(repo.EmergencyContact)
+	emergencyContactHandler := emergencycontact.NewHandler(repo.EmergencyContact)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-emergency-contacts-by-guardian-id",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/child/{id}",
-		Summary:     "Get emergency contacts by id",
-		Description: "Returns emergency contacts by id",
+		Path:        "/api/v1/emergency-contact/{id}",
+		Summary:     "Get emergency contacts by guardian id",
+		Description: "Returns emergency contacts by guardian id",
 		Tags:        []string{"EmergencyContact"},
-	}, func(ctx context.Context, input *models.ChildIDInput) (*models.ChildOutput, error) {
-		emergencyContact, err := EmergencyContactHandler.GetEmergencyContactsByID(ctx, input)
+	}, func(ctx context.Context, input *models.GetEmergencyContactByGuardianIDInput) (*models.GetEmergencyContactByGuardianIDOutput, error) {
+		emergencyContact, err := emergencyContactHandler.GetEmergencyContactByGuardianID(ctx, input.GuardianID)
 		if err != nil {
 			return nil, err
 		}
 
-		return &models.EmergencyContactOutput{
-			Body: emergencyContact,
-		}, nil
-	})
-
-	huma.Register(api, huma.Operation{
-		OperationID: "get-children-by-guardian-id",
-		Method:      http.MethodGet,
-		Path:        "/api/v1/children/{id}",
-		Summary:     "Get all children for a guardian",
-		Description: "Returns the list of children associated with a given guardian ID",
-		Tags:        []string{"Child"},
-	}, func(ctx context.Context, input *models.GuardianIDInput) (*models.ChildrenOutput, error) {
-		children, err := childHandler.GetChildrenByParentID(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-
-		return &models.ChildrenOutput{
-			Body: children,
+		return &models.GetEmergencyContactByGuardianIDOutput{
+			Body: emergencyContact.Body,
 		}, nil
 	})
 
 	huma.Register(api, huma.Operation{
 		OperationID: "delete-emergency-contact",
 		Method:      http.MethodDelete,
-		Path:        "/api/v1/child/{id}",
-		Summary:     "Delete a child",
-		Description: "Deletes a child by ID",
-		Tags:        []string{"Child"},
-	}, func(ctx context.Context, input *models.ChildIDInput) (*models.ChildOutput, error) {
-		child, err := childHandler.DeleteChildByID(ctx, input)
+		Path:        "/api/v1/emergency-contact/{id}",
+		Summary:     "Delete an emergency contact",
+		Description: "Deletes an emergency contact",
+		Tags:        []string{"Emergency Contact"},
+	}, func(ctx context.Context, input *models.DeleteEmergencyContactInput) (*models.DeleteEmergencyContactOutput, error) {
+		deletedEmergencyContact, err := emergencyContactHandler.DeleteEmergencyContact(ctx, input.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		return &models.ChildOutput{
-			Body: child,
+		return &models.DeleteEmergencyContactOutput{
+			Body: deletedEmergencyContact.Body,
 		}, nil
 	})
 
 	huma.Register(api, huma.Operation{
-		OperationID: "update-child",
+		OperationID: "update-emergency-contact",
 		Method:      http.MethodPatch,
-		Path:        "/api/v1/child/{id}",
-		Summary:     "Updates a child",
-		Description: "Updates a child by ID",
-		Tags:        []string{"Child"},
-	}, func(ctx context.Context, input *models.UpdateChildInput) (*models.ChildOutput, error) {
-		child, err := childHandler.UpdateChildByID(ctx, input.ID, input)
+		Path:        "/api/v1/emergency-contact/{id}",
+		Summary:     "Updates an emergency contact",
+		Description: "Update an emergency contact",
+		Tags:        []string{"Emergency Contact"},
+	}, func(ctx context.Context, input *models.UpdateEmergencyContactInput) (*models.UpdateEmergencyContactOutput, error) {
+		UpdateEmergencyContact, err := emergencyContactHandler.UpdateEmergencyContact(ctx, input)
 		if err != nil {
 			return nil, err
 		}
 
-		return &models.ChildOutput{
-			Body: child,
+		return &models.UpdateEmergencyContactOutput{
+			Body: UpdateEmergencyContact.Body,
 		}, nil
 	})
 
@@ -94,14 +75,14 @@ func SetupEmergencyContactRoutes(api huma.API, repo *storage.Repository) {
 		Summary:     "Creates a child",
 		Description: "Creates a child",
 		Tags:        []string{"Child"},
-	}, func(ctx context.Context, input *models.CreateChildInput) (*models.ChildOutput, error) {
-		child, err := childHandler.CreateChild(ctx, input)
+	}, func(ctx context.Context, input *models.CreateEmergencyContactInput) (*models.CreateEmergencyContactOutput, error) {
+		emergencyContact, err := emergencyContactHandler.CreateEmergencyContact(ctx, input)
 		if err != nil {
 			return nil, err
 		}
 
-		return &models.ChildOutput{
-			Body: child,
+		return &models.CreateEmergencyContactOutput{
+			Body: emergencyContact.Body,
 		}, nil
 	})
 }
