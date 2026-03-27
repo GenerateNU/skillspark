@@ -37,6 +37,7 @@ func TestHandler_GetByGuardianID(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse("11111111-1111-1111-1111-111111111111"),
 					mock.AnythingOfType("utils.Pagination"),
+					mock.AnythingOfType("string"),
 				).Return([]models.Saved{
 					{
 						ID:         uuid.MustParse("20000000-0000-0000-0000-000000000001"),
@@ -81,6 +82,7 @@ func TestHandler_GetByGuardianID(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse("22222222-2222-2222-2222-222222222222"),
 					mock.AnythingOfType("utils.Pagination"),
+					mock.AnythingOfType("string"),
 				).Return(nil, errs.BadRequest("cannot fetch saved"))
 			},
 			wantSaved: nil,
@@ -105,7 +107,7 @@ func TestHandler_GetByGuardianID(t *testing.T) {
 
 			pagination := utils.Pagination{Page: 1, Limit: 10}
 
-			saved, err := handler.GetByGuardianID(context.Background(), tt.guardianID, pagination)
+			saved, err := handler.GetByGuardianID(context.Background(), tt.guardianID, pagination, "en-US")
 
 			if tt.wantErr {
 				assert.Error(t, err)

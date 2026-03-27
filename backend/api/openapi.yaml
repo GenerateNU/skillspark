@@ -1895,6 +1895,15 @@ paths:
       summary: Creates a saved event
       description: Creates a saved event
       operationId: create-saved
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
       requestBody:
         content:
           application/json:
@@ -1948,6 +1957,14 @@ paths:
             default: 10
             minimum: 1
             maximum: 100
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
       responses:
         "200":
           description: OK

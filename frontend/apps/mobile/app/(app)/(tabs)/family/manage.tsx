@@ -17,6 +17,9 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCreateChild, useUpdateChild, useDeleteChild, getGetChildrenByGuardianIdQueryKey } from '@skillspark/api-client';
 import { ChildProfileForm, MONTHS } from '@/components/ChildProfileForm';
+import { useTranslation } from 'react-i18next';
+import { useGuardian } from '@/hooks/use-guardian';
+
 import { useAuthContext } from '@/hooks/use-auth-context';
 import { ErrorScreen } from '@/components/ErrorScreen';
 
@@ -28,6 +31,7 @@ export default function ManageChildScreen() {
   const theme = Colors[colorScheme ?? 'light'];
   const { guardianId } = useAuthContext();
 
+  const { t: translate } = useTranslation();
   const isEditing = !!params.id;
 
   const [firstName, setFirstName] = useState(
@@ -57,6 +61,7 @@ export default function ManageChildScreen() {
   const [showYearDrop, setShowYearDrop] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+
   const queryClient = useQueryClient();
   const createChildMutation = useCreateChild();
   const updateChildMutation = useUpdateChild();
@@ -68,7 +73,7 @@ export default function ManageChildScreen() {
   
   const handleSave = async () => {
     if (!firstName || !birthYear || !birthMonth || !schoolId) {
-      Alert.alert('Error', 'Please fill in all required fields (Name, Birth Date, School ID)');
+      Alert.alert(translate('common.error'), translate('childProfile.requiredFieldsError'));
       return;
     }
     const name = [firstName, lastName].filter(Boolean).join(' ');
@@ -91,7 +96,7 @@ export default function ManageChildScreen() {
       router.back();
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to save. Please try again.');
+      Alert.alert(translate('common.errorOccurred'), translate('childProfile.saveError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -99,12 +104,12 @@ export default function ManageChildScreen() {
 
   const handleDelete = () => {
     Alert.alert(
-      'Delete Profile',
-      'Are you sure you want to remove this child profile?',
+      translate('childProfile.deleteProfile'),
+      translate('childProfile.deleteConfirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: translate('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete', style: 'destructive',
+          text: translate('payment.delete'), style: 'destructive',
           onPress: async () => {
             setIsSubmitting(true);
             try {
@@ -112,7 +117,7 @@ export default function ManageChildScreen() {
               await queryClient.invalidateQueries({ queryKey: getGetChildrenByGuardianIdQueryKey(guardianId) });
               router.back();
             } catch {
-              Alert.alert('Error', 'Failed to delete.');
+              Alert.alert(translate('common.errorOccurred'), translate('childProfile.deleteError'));
               setIsSubmitting(false);
             }
           },
@@ -137,17 +142,17 @@ export default function ManageChildScreen() {
             <TouchableOpacity onPress={() => router.back()} className="w-8 h-8 justify-center items-start">
               <IconSymbol name="chevron.left" size={24} color={theme.text} />
             </TouchableOpacity>
-            <ThemedText className="text-xl text-center font-nunito-bold">Family Information</ThemedText>
+            <ThemedText className="text-xl text-center font-nunito-bold">{translate('familyInformation.title')}</ThemedText>
             {isEditing ? (
               <TouchableOpacity onPress={handleDelete}>
-                <ThemedText className="font-nunito-semibold" style={{ color: AppColors.danger }}>Delete</ThemedText>
+                <ThemedText className="font-nunito-semibold" style={{ color: AppColors.danger }}>{translate('payment.delete')}</ThemedText>
               </TouchableOpacity>
             ) : (
               <View className="w-10" />
             )}
           </View>
           <ThemedText className="text-[22px] font-nunito-semibold mb-5">
-            {isEditing ? 'Edit Child Profile' : 'Create Child Profile'}
+            {isEditing ? translate('childProfile.editTitle') : translate('childProfile.createTitle')}
           </ThemedText>
           <ChildProfileForm
             firstName={firstName}
@@ -176,7 +181,7 @@ export default function ManageChildScreen() {
             disabled={isSubmitting}
           >
             <ThemedText className="text-white text-base font-nunito-semibold">
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
+              {isSubmitting ? translate('childProfile.saving') : translate('childProfile.saveChanges')}
             </ThemedText>
           </TouchableOpacity>
         </ScrollView>
