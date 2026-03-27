@@ -1,7 +1,7 @@
 import axios, {
-  AxiosRequestConfig,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
+  // AxiosRequestConfig,
+  // AxiosResponse,
+  type InternalAxiosRequestConfig,
 } from 'axios';
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {

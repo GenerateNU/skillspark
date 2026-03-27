@@ -3390,6 +3390,7 @@ components:
         - name
         - active
         - presigned_url
+        - location_id
         - created_at
         - updated_at
         - stripe_account_id
