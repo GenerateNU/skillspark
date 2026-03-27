@@ -16,9 +16,15 @@ interface DropdownProps {
   style?: ViewStyle;
 }
 
-export const Dropdown = ({ value, onChange, options, placeholder, style }: DropdownProps) => {
+export const Dropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  style,
+}: DropdownProps) => {
   const [isOpen, setOpen] = useState(false);
-  const selected = options.find(o => o.value === value);
+  const selected = options.find((o) => o.value === value);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
@@ -29,7 +35,10 @@ export const Dropdown = ({ value, onChange, options, placeholder, style }: Dropd
         className="w-full flex-row justify-between items-center rounded-lg p-[10px] border"
         style={[{ borderColor: colors.borderColor }, style]}
       >
-        <Text className="text-base" style={{ color: AppColors.placeholderText }}>
+        <Text
+          className="text-base"
+          style={{ color: AppColors.placeholderText }}
+        >
           {selected ? selected.label : placeholder}
         </Text>
         <Text style={{ color: AppColors.placeholderText }}>▼</Text>
@@ -40,11 +49,11 @@ export const Dropdown = ({ value, onChange, options, placeholder, style }: Dropd
           className="flex-1 justify-center p-6 bg-black/10"
           onPress={() => setOpen(false)}
         >
-          <View 
+          <View
             className="rounded-lg overflow-hidden"
             style={{ backgroundColor: colors.dropdownBg }}
           >
-            {options.map(option => (
+            {options.map((option) => (
               <TouchableOpacity
                 key={option.value}
                 onPress={() => {

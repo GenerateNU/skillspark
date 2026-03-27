@@ -12,7 +12,13 @@ const CATEGORY_COLORS: Record<string, string> = {
   Tutoring: AppColors.danger,
 };
 
-export function CategoryCard({ category, occurrence }: { category: string; occurrence?: EventOccurrence }) {
+export function CategoryCard({
+  category,
+  occurrence,
+}: {
+  category: string;
+  occurrence?: EventOccurrence;
+}) {
   return (
     <Pressable
       className="flex-1 m-[5px]"
@@ -34,14 +40,25 @@ export function CategoryCard({ category, occurrence }: { category: string; occur
         ) : (
           <View
             className="absolute inset-0"
-            style={{ backgroundColor: CATEGORY_COLORS[category] ?? AppColors.categoryFallback }}
+            style={{
+              backgroundColor:
+                CATEGORY_COLORS[category] ?? AppColors.categoryFallback,
+            }}
           />
         )}
         <View
           className="absolute bottom-0 left-0 right-0 h-[55%] justify-end px-3 pb-[10px]"
           style={{ backgroundColor: AppColors.cardOverlay }}
         >
-          <Text style={{ color: AppColors.white, fontFamily: FontFamilies.bold, fontSize: FontSizes.base }}>{category}</Text>
+          <Text
+            style={{
+              color: AppColors.white,
+              fontFamily: FontFamilies.bold,
+              fontSize: FontSizes.base,
+            }}
+          >
+            {category}
+          </Text>
         </View>
       </View>
     </Pressable>

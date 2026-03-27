@@ -24,7 +24,6 @@ import { useDebounce } from "use-debounce";
 import { isWithinNext7Days } from "@/utils/format";
 import { DiscoverBanner } from "@/components/home/DiscoverBanner";
 import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
-import { TrendingCard } from "@/components/home/TrendingCard";
 import { RecommendedCard } from "@/components/home/RecommendedCard";
 import { CategoryCard } from "@/components/home/CategoryCard";
 import { ThemedText } from "@/components/themed-text";
@@ -39,17 +38,23 @@ export default function HomeScreen() {
   const { data: guardianResp } = useGetGuardianById(guardianId!, {
     query: { enabled: !!guardianId },
   });
-  const guardian = (guardianResp as unknown as { data: Guardian } | undefined)?.data;
+  const guardian = (guardianResp as unknown as { data: Guardian } | undefined)
+    ?.data;
 
   const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences();
   const allOccurrences: EventOccurrence[] = useMemo(() => {
-    const d = occurrencesResp as unknown as { data: EventOccurrence[] } | undefined;
+    const d = occurrencesResp as unknown as
+      | { data: EventOccurrence[] }
+      | undefined;
     return Array.isArray(d?.data) ? d.data : [];
   }, [occurrencesResp]);
 
-  const { data: registrationsResp } = useGetRegistrationsByGuardianId(guardianId!, {
-    query: { enabled: !!guardianId },
-  });
+  const { data: registrationsResp } = useGetRegistrationsByGuardianId(
+    guardianId!,
+    {
+      query: { enabled: !!guardianId },
+    },
+  );
   const registrations: Registration[] = useMemo(() => {
     const d = registrationsResp as unknown as
       | { data: { registrations: Registration[] } }
@@ -68,33 +73,41 @@ export default function HomeScreen() {
   const upcomingClasses = useMemo(() => {
     const upcomingIds = new Set(
       registrations
-        .filter((r) => r.status === "registered" && isWithinNext7Days(r.occurrence_start_time))
-        .map((r) => r.event_occurrence_id)
+        .filter(
+          (r) =>
+            r.status === "registered" &&
+            isWithinNext7Days(r.occurrence_start_time),
+        )
+        .map((r) => r.event_occurrence_id),
     );
     return allOccurrences.filter((o) => upcomingIds.has(o.id));
   }, [registrations, allOccurrences]);
 
   const futureOccurrences = useMemo(
     () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
-    [allOccurrences]
+    [allOccurrences],
   );
 
   const trendingEvents = useMemo(
     () => [...futureOccurrences].sort(() => Math.random() - 0.5).slice(0, 5),
-    [futureOccurrences]
+    [futureOccurrences],
   );
 
   const childRecommendations = useMemo(() => {
     const shuffled = [...futureOccurrences].sort(() => Math.random() - 0.5);
-    return children.map((child, i) => ({
-      child,
-      occurrence: shuffled[i % shuffled.length],
-    })).filter((r) => r.occurrence != null);
+    return children
+      .map((child, i) => ({
+        child,
+        occurrence: shuffled[i % shuffled.length],
+      }))
+      .filter((r) => r.occurrence != null);
   }, [children, futureOccurrences]);
 
   const categories = useMemo(() => {
     const cats = new Set<string>();
-    allOccurrences.forEach((o) => o.event.category?.forEach((c) => cats.add(c)));
+    allOccurrences.forEach((o) =>
+      o.event.category?.forEach((c) => cats.add(c)),
+    );
     return cats.size > 0
       ? Array.from(cats)
       : ["Sport", "Arts", "Music", "Tech", "Activity", "Tutoring"];
@@ -116,7 +129,7 @@ export default function HomeScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" />
-        <ThemedText>{translate('common.loadingEvents')}</ThemedText>
+        <ThemedText>{translate("common.loadingEvents")}</ThemedText>
       </View>
     );
   }
@@ -134,25 +147,47 @@ export default function HomeScreen() {
     >
       {/* Header */}
       <View className="px-5 pt-14 pb-4">
-        <Text className="font-nunito-bold" style={{ letterSpacing: -0.5, fontSize: FontSizes.hero, color: AppColors.primaryText }}>
+        <Text
+          className="font-nunito-bold"
+          style={{
+            letterSpacing: -0.5,
+            fontSize: FontSizes.hero,
+            color: AppColors.primaryText,
+          }}
+        >
           Hello, {firstName}
         </Text>
       </View>
 
       {/* Search row */}
       <View className="px-5 mb-[22px]">
-        <View className="flex-row items-center rounded-full px-4 py-[10px]" style={{ backgroundColor: AppColors.surfaceGray }}>
-          <IconSymbol name="magnifyingglass" size={18} color={AppColors.subtleText} style={{ marginRight: 8 }} />
+        <View
+          className="flex-row items-center rounded-full px-4 py-[10px]"
+          style={{ backgroundColor: AppColors.surfaceGray }}
+        >
+          <IconSymbol
+            name="magnifyingglass"
+            size={18}
+            color={AppColors.subtleText}
+            style={{ marginRight: 8 }}
+          />
           <TextInput
             className="flex-1 text-sm font-nunito"
             style={{ color: AppColors.primaryText }}
-            placeholder={translate('dashboard.searchPlaceholder')}
+            placeholder={translate("dashboard.searchPlaceholder")}
             placeholderTextColor={AppColors.placeholderText}
             value={searchText}
             onChangeText={setSearchText}
           />
-          <Pressable className="w-9 h-9 rounded-full items-center justify-center" style={{ backgroundColor: AppColors.primaryText }}>
-            <IconSymbol name="slider.horizontal.3" size={16} color={AppColors.white} />
+          <Pressable
+            className="w-9 h-9 rounded-full items-center justify-center"
+            style={{ backgroundColor: AppColors.primaryText }}
+          >
+            <IconSymbol
+              name="slider.horizontal.3"
+              size={16}
+              color={AppColors.white}
+            />
           </Pressable>
         </View>
       </View>
@@ -160,7 +195,10 @@ export default function HomeScreen() {
       {/* Your Upcoming Classes — conditional */}
       {upcomingClasses.length > 0 && (
         <View className="mb-6">
-          <Text className="font-nunito-bold px-5 mb-3" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>
+          <Text
+            className="font-nunito-bold px-5 mb-3"
+            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+          >
             Your Upcoming Classes
           </Text>
           <ScrollView
@@ -179,8 +217,18 @@ export default function HomeScreen() {
       {futureOccurrences.length > 0 && (
         <View className="mb-6">
           <View className="flex-row items-center px-5 mb-3">
-            <Text className="mr-1.5 font-nunito" style={{ color: AppColors.purple, fontSize: FontSizes.md }}>✦</Text>
-            <Text className="font-nunito-bold" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>{translate('dashboard.discoverWeekly')}</Text>
+            <Text
+              className="mr-1.5 font-nunito"
+              style={{ color: AppColors.purple, fontSize: FontSizes.md }}
+            >
+              ✦
+            </Text>
+            <Text
+              className="font-nunito-bold"
+              style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+            >
+              {translate("dashboard.discoverWeekly")}
+            </Text>
           </View>
           <DiscoverBanner event={futureOccurrences[0]} />
         </View>
@@ -189,7 +237,10 @@ export default function HomeScreen() {
       {/* Trending In Your Area */}
       {trendingEvents.length > 0 && (
         <View className="mb-6">
-          <Text className="font-nunito-bold px-5 mb-3" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>
+          <Text
+            className="font-nunito-bold px-5 mb-3"
+            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+          >
             Trending in Your Area
           </Text>
           <ScrollView
@@ -207,7 +258,10 @@ export default function HomeScreen() {
       {/* Recommended For... */}
       {childRecommendations.length > 0 && (
         <View className="mb-6">
-          <Text className="font-nunito-bold px-5 mb-3" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>
+          <Text
+            className="font-nunito-bold px-5 mb-3"
+            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+          >
             Recommended for...
           </Text>
           <ScrollView
@@ -216,7 +270,11 @@ export default function HomeScreen() {
             contentContainerStyle={{ paddingHorizontal: 20 }}
           >
             {childRecommendations.map(({ child, occurrence }) => (
-              <RecommendedCard key={child.id} occurrence={occurrence} childName={child.name.split(" ")[0]} />
+              <RecommendedCard
+                key={child.id}
+                occurrence={occurrence}
+                childName={child.name.split(" ")[0]}
+              />
             ))}
           </ScrollView>
         </View>
@@ -225,14 +283,21 @@ export default function HomeScreen() {
       {/* Explore by Category */}
       {categories.length > 0 && (
         <View className="mb-6">
-          <Text className="font-nunito-bold px-5 mb-3" style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}>
+          <Text
+            className="font-nunito-bold px-5 mb-3"
+            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+          >
             Explore by Category
           </Text>
           <View className="px-[15px]">
             {categoryPairs.map((pair, idx) => (
               <View key={idx} className="flex-row">
                 {pair.map((cat) => (
-                  <CategoryCard key={cat} category={cat} occurrence={categoryEventMap[cat]} />
+                  <CategoryCard
+                    key={cat}
+                    category={cat}
+                    occurrence={categoryEventMap[cat]}
+                  />
                 ))}
                 {pair.length === 1 && <View className="flex-1 m-[5px]" />}
               </View>

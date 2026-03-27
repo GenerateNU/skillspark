@@ -4,7 +4,13 @@ import { useRouter } from "expo-router";
 import { type EventOccurrence } from "@skillspark/api-client";
 import { AppColors, FontSizes } from "@/constants/theme";
 
-export function RecommendedCard({ occurrence, childName }: { occurrence: EventOccurrence; childName: string }) {
+export function RecommendedCard({
+  occurrence,
+  childName,
+}: {
+  occurrence: EventOccurrence;
+  childName: string;
+}) {
   const router = useRouter();
   return (
     <Pressable
@@ -28,7 +34,10 @@ export function RecommendedCard({ occurrence, childName }: { occurrence: EventOc
             contentFit="cover"
           />
         ) : (
-          <View className="w-[79px] h-[72px]" style={{ backgroundColor: AppColors.imagePlaceholder }} />
+          <View
+            className="w-[79px] h-[72px]"
+            style={{ backgroundColor: AppColors.imagePlaceholder }}
+          />
         )}
       </View>
       <Text

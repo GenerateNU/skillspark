@@ -6,11 +6,11 @@ import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { StarRating } from "@/components/StarRating";
 
 const AVATAR_COLORS = [
-  AppColors.purple, 
-  AppColors.emerald, 
-  AppColors.blue, 
-  AppColors.amber, 
-  AppColors.pink
+  AppColors.purple,
+  AppColors.emerald,
+  AppColors.blue,
+  AppColors.amber,
+  AppColors.pink,
 ];
 
 function hashColor(initials: string): string {
@@ -26,7 +26,9 @@ export function TrendingCard({ occurrence }: { occurrence: EventOccurrence }) {
   const ageLabel =
     occurrence.event.age_range_min != null
       ? `Ages ${occurrence.event.age_range_min}${
-          occurrence.event.age_range_max != null ? ` - ${occurrence.event.age_range_max}` : "+"
+          occurrence.event.age_range_max != null
+            ? ` - ${occurrence.event.age_range_max}`
+            : "+"
         }`
       : null;
   // Placeholder initials — not real user data
@@ -43,13 +45,29 @@ export function TrendingCard({ occurrence }: { occurrence: EventOccurrence }) {
           className="w-9 h-9 rounded-full border-[2.5px] items-center justify-center"
           style={{ backgroundColor: color1, borderColor: AppColors.white }}
         >
-          <Text style={{ color: AppColors.white, fontSize: FontSizes.md, fontFamily: FontFamilies.bold }}>{letter1}</Text>
+          <Text
+            style={{
+              color: AppColors.white,
+              fontSize: FontSizes.md,
+              fontFamily: FontFamilies.bold,
+            }}
+          >
+            {letter1}
+          </Text>
         </View>
         <View
           className="w-9 h-9 rounded-full border-[2.5px] items-center justify-center -ml-[10px]"
           style={{ backgroundColor: color2, borderColor: AppColors.white }}
         >
-          <Text style={{ color: AppColors.white, fontSize: FontSizes.md, fontFamily: FontFamilies.bold }}>{letter2}</Text>
+          <Text
+            style={{
+              color: AppColors.white,
+              fontSize: FontSizes.md,
+              fontFamily: FontFamilies.bold,
+            }}
+          >
+            {letter2}
+          </Text>
         </View>
       </View>
 
@@ -76,18 +94,36 @@ export function TrendingCard({ occurrence }: { occurrence: EventOccurrence }) {
               contentFit="cover"
             />
           ) : (
-            <View className="w-[88px] h-[88px]" style={{ backgroundColor: AppColors.divider }} />
+            <View
+              className="w-[88px] h-[88px]"
+              style={{ backgroundColor: AppColors.divider }}
+            />
           )}
         </View>
 
         {/* Text */}
         <View className="flex-1 gap-1">
-          <Text style={{ fontFamily: FontFamilies.bold, fontSize: FontSizes.base, color: AppColors.primaryText }} numberOfLines={2}>
+          <Text
+            style={{
+              fontFamily: FontFamilies.bold,
+              fontSize: FontSizes.base,
+              color: AppColors.primaryText,
+            }}
+            numberOfLines={2}
+          >
             {occurrence.event.title}
           </Text>
           <StarRating size={12} rating={0} />
           {ageLabel && (
-            <Text style={{ fontSize: FontSizes.sm, color: AppColors.mutedText, fontFamily: FontFamilies.regular }}>{ageLabel}</Text>
+            <Text
+              style={{
+                fontSize: FontSizes.sm,
+                color: AppColors.mutedText,
+                fontFamily: FontFamilies.regular,
+              }}
+            >
+              {ageLabel}
+            </Text>
           )}
         </View>
       </Pressable>
