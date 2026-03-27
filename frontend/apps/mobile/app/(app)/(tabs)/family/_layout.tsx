@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import React from "react";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Colors } from "@/constants/theme";
+import { Colors, FontFamilies } from "@/constants/theme";
 
 export default function FamilyLayout() {
   const colorScheme = useColorScheme();
