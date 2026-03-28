@@ -28,7 +28,7 @@ func SetupEmergencyContactRoutes(api huma.API, repo *storage.Repository) {
 		}
 
 		return &models.GetEmergencyContactByGuardianIDOutput{
-			Body: emergencyContact.Body,
+			Body: emergencyContact,
 		}, nil
 	})
 

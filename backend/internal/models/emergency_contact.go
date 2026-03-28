@@ -29,8 +29,6 @@ type CreateEmergencyContactInput struct {
 		Name        string    `json:"name" db:"name"`
 		GuardianID  uuid.UUID `json:"guardian_id" db:"guardian_id"`
 		PhoneNumber string    `json:"phone_number" db:"phone_number"`
-		CreatedAt   time.Time `json:"created_at" db:"created_at"`
-		UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 	} `json:"body" doc:"New emergency contact to add"`
 }
 
@@ -41,8 +39,9 @@ type CreateEmergencyContactOutput struct {
 type UpdateEmergencyContactInput struct {
 	ID   uuid.UUID `json:"id" db:"id"`
 	Body struct {
-		PhoneNumber string `json:"phone_number" db:"phone_number"`
-		Name        string `json:"name" db:"name"`
+		GuardianID  uuid.UUID `json:"guardian_id" db:"guardian_id"`
+		PhoneNumber string    `json:"phone_number" db:"phone_number"`
+		Name        string    `json:"name" db:"name"`
 	} `json:"body" doc:"Emergency contact to update"`
 }
 
@@ -55,5 +54,5 @@ type DeleteEmergencyContactInput struct {
 }
 
 type DeleteEmergencyContactOutput struct {
-	Body *EmergencyContact `json:"body" doc:"Updated Emergency Contact"`
+	Body *EmergencyContact `json:"body" doc:"Deleted Emergency Contact"`
 }

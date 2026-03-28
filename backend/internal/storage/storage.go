@@ -138,7 +138,7 @@ type SavedRepository interface {
 type EmergencyContactRepository interface {
 	CreateEmergencyContact(ctx context.Context, emergencyContact *models.CreateEmergencyContactInput) (*models.CreateEmergencyContactOutput, error)
 	UpdateEmergencyContact(ctx context.Context, emergencyContact *models.UpdateEmergencyContactInput) (*models.UpdateEmergencyContactOutput, error)
-	GetEmergencyContactByGuardianID(ctx context.Context, guardian_id uuid.UUID) ([]*models.GetEmergencyContactByGuardianIDOutput, error)
+	GetEmergencyContactByGuardianID(ctx context.Context, guardian_id uuid.UUID) ([]*models.EmergencyContact, error)
 	DeleteEmergencyContact(ctx context.Context, guardian_id uuid.UUID) (*models.DeleteEmergencyContactOutput, error)
 }
 
