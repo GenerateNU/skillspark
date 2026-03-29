@@ -7,10 +7,16 @@ import (
 	"github.com/google/uuid"
 )
 
+type OrgLink struct {
+	Href  string `json:"href" doc:"URL to the organization resource"`
+	Label string `json:"label" doc:"Human-readable label for the organization link"`
+}
+
 type Organization struct {
 	ID                     uuid.UUID  `json:"id" db:"id"`
 	Name                   string     `json:"name" db:"name"`
 	Active                 bool       `json:"active" db:"active"`
+	Links                  []OrgLink  `json:"links" db:"links"`
 	PfpS3Key               *string    `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
 	PresignedURL           *string    `json:"presigned_url"`
 	LocationID             *uuid.UUID `json:"location_id,omitempty" db:"location_id"`
@@ -31,12 +37,14 @@ type UpdateOrganizationFormData struct {
 	Active       bool          `form:"active"`
 	LocationID   uuid.UUID     `form:"location_id"`
 	ProfileImage huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
+	Links        string        `form:"links"`
 }
 
 type CreateOrganizationFormData struct {
 	Name         string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
 	Active       bool          `form:"active"`
 	LocationID   uuid.UUID     `form:"location_id"`
+	Links        string        `form:"links"`
 	ProfileImage huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
 }
 
@@ -49,12 +57,14 @@ type CreateOrganizationBody struct {
 	Name       string     `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
 	Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
 	LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
+	Links      []OrgLink  `json:"links,omitempty" doc:"List of links associated with the organization"`
 }
 
 type UpdateOrganizationBody struct {
 	Name       *string    `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
 	Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
 	LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
+	Links      *[]OrgLink `json:"links,omitempty" doc:"List of links associated with the organization"`
 }
 
 type CreateOrganizationInput struct {

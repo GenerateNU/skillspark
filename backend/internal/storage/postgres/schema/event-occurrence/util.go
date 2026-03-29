@@ -3,6 +3,7 @@ package eventoccurrence
 import (
 	"context"
 	"embed"
+	"encoding/json"
 	"math"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/event"
@@ -69,4 +70,12 @@ func DistanceKm(lat1, lng1, lat2, lng2 float64) float64 {
 
 func degreesToRadians(deg float64) float64 {
 	return deg * (math.Pi / 180)
+}
+
+func scanLinks(raw []byte) ([]models.OrgLink, error) {
+	var links []models.OrgLink
+	if raw == nil {
+		return []models.OrgLink{}, nil
+	}
+	return links, json.Unmarshal(raw, &links)
 }

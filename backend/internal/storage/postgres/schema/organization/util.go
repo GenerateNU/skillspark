@@ -3,6 +3,7 @@ package organization
 import (
 	"context"
 	"embed"
+	"encoding/json"
 	"skillspark/internal/models"
 	"testing"
 
@@ -34,4 +35,22 @@ func CreateTestOrganization(
 	// require.NotNil(t, organization)
 
 	return organization
+}
+
+func scanLinks(raw []byte) ([]models.OrgLink, error) {
+	var links []models.OrgLink
+	if raw == nil {
+		return []models.OrgLink{}, nil
+	}
+	if err := json.Unmarshal(raw, &links); err != nil {
+		return nil, err
+	}
+	return links, nil
+}
+
+func byteSliceLinks(links []models.OrgLink) ([]byte, error) {
+	if links == nil {
+		return []byte("[]"), nil
+	}
+	return json.Marshal(links)
 }

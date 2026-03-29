@@ -239,12 +239,20 @@ export interface CreateOrgLoginLinkOutputBody {
   login_url: string;
 }
 
+export interface OrgLink {
+  /** URL to the organization resource */
+  href: string;
+  /** Human-readable label for the organization link */
+  label: string;
+}
+
 export interface Organization {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   active: boolean;
   created_at: string;
   id: string;
+  links: OrgLink[];
   location_id?: string;
   name: string;
   pfp_s3_key?: string;
@@ -437,6 +445,7 @@ export interface EventOccurrence {
   location: Location;
   manager_id: string;
   max_attendees: number;
+  org_links: OrgLink[];
   /** Price in cents (e.g., 10000 = $100) */
   price: number;
   start_time: string;
@@ -864,6 +873,7 @@ page_size?: number;
 
 export type CreateOrganizationBody = {
   active?: boolean;
+  links?: OrgLink[];
   location_id?: Blob | string;
   /**
    * @minLength 1
@@ -875,6 +885,7 @@ export type CreateOrganizationBody = {
 
 export type UpdateOrganizationBody = {
   active?: boolean;
+  links?: OrgLink[];
   location_id?: Blob | string;
   /**
    * @minLength 1

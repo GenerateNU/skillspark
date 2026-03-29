@@ -31,23 +31,35 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 	if input.Body.LocationID != nil {
 		existing.LocationID = input.Body.LocationID
 	}
+	if input.Body.Links != nil {
+		existing.Links = *input.Body.Links
+	}
+
+	jsonLinks, err := byteSliceLinks(existing.Links)
+	if err != nil {
+		errr := errs.InternalServerError("Failed to serialize links: ", err.Error())
+		return nil, &errr
+	}
 
 	row := r.db.QueryRow(ctx, query,
 		existing.Name,
 		existing.Active,
 		existing.PfpS3Key,
 		existing.LocationID,
+		jsonLinks,
 		input.ID,
 	)
 
 	var updatedOrganization models.Organization
 
+	var rawLinks []byte
 	err = row.Scan(
 		&updatedOrganization.ID,
 		&updatedOrganization.Name,
 		&updatedOrganization.Active,
 		&updatedOrganization.PfpS3Key,
 		&updatedOrganization.LocationID,
+		&rawLinks,
 		&updatedOrganization.StripeAccountID,
 		&updatedOrganization.StripeAccountActivated,
 		&updatedOrganization.CreatedAt,
@@ -59,6 +71,12 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 			return nil, &errr
 		}
 		errr := errs.InternalServerError("Failed to update organization: ", err.Error())
+		return nil, &errr
+	}
+
+	updatedOrganization.Links, err = scanLinks(rawLinks)
+	if err != nil {
+		errr := errs.InternalServerError("Failed to deserialize links: ", err.Error())
 		return nil, &errr
 	}
 

@@ -1167,6 +1167,10 @@ paths:
               properties:
                 active:
                   type: boolean
+                links:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/OrgLink'
                 location_id:
                   type: string
                 name:
@@ -1181,6 +1185,8 @@ paths:
                 - name
             encoding:
               active:
+                contentType: text/plain
+              links:
                 contentType: text/plain
               location_id:
                 contentType: text/plain
@@ -1279,6 +1285,10 @@ paths:
               properties:
                 active:
                   type: boolean
+                links:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/OrgLink'
                 location_id:
                   type: string
                 name:
@@ -1293,6 +1303,8 @@ paths:
                 - name
             encoding:
               active:
+                contentType: text/plain
+              links:
                 contentType: text/plain
               location_id:
                 contentType: text/plain
@@ -2818,6 +2830,10 @@ components:
         max_attendees:
           type: integer
           format: int64
+        org_links:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgLink'
         price:
           type: integer
           description: Price in cents (e.g., 10000 = $100)
@@ -2839,6 +2855,7 @@ components:
         - manager_id
         - event
         - location
+        - org_links
         - start_time
         - end_time
         - max_attendees
@@ -3255,6 +3272,19 @@ components:
       required:
         - token
         - manager_id
+    OrgLink:
+      type: object
+      additionalProperties: false
+      properties:
+        href:
+          type: string
+          description: URL to the organization resource
+        label:
+          type: string
+          description: Human-readable label for the organization link
+      required:
+        - href
+        - label
     Organization:
       type: object
       additionalProperties: false
@@ -3273,6 +3303,10 @@ components:
           format: date-time
         id:
           type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgLink'
         location_id:
           type: string
         name:
@@ -3293,6 +3327,7 @@ components:
         - id
         - name
         - active
+        - links
         - presigned_url
         - created_at
         - updated_at

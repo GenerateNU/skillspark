@@ -15,21 +15,29 @@ func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *
 		return nil, &errr
 	}
 
+	jsonLinks, err := byteSliceLinks(input.Body.Links)
+	if err != nil {
+		errr := errs.InternalServerError("Failed to serialize links: ", err.Error())
+		return nil, &errr
+	}
+
 	row := r.db.QueryRow(ctx, query,
 		input.Body.Name,
 		input.Body.Active,
 		PfpS3Key,
 		input.Body.LocationID,
+		jsonLinks,
 	)
 
 	var createdOrganization models.Organization
-
+	var rawLinks []byte
 	err = row.Scan(
 		&createdOrganization.ID,
 		&createdOrganization.Name,
 		&createdOrganization.Active,
 		&createdOrganization.PfpS3Key,
 		&createdOrganization.LocationID,
+		&rawLinks,
 		&createdOrganization.StripeAccountID,
 		&createdOrganization.StripeAccountActivated,
 		&createdOrganization.CreatedAt,
@@ -37,6 +45,12 @@ func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *
 	)
 	if err != nil {
 		return nil, err
+	}
+
+	createdOrganization.Links, err = scanLinks(rawLinks)
+	if err != nil {
+		errr := errs.InternalServerError("Failed to deserialize links: ", err.Error())
+		return nil, &errr
 	}
 
 	return &createdOrganization, nil

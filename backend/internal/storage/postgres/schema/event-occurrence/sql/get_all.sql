@@ -36,10 +36,13 @@ SELECT
     l.postal_code,
     l.country,
     l.created_at,
-    l.updated_at
+    l.updated_at,
+
+    o.links
 FROM event_occurrence eo
 JOIN event e ON e.id = eo.event_id
 JOIN location l ON l.id = eo.location_id
+JOIN organization o ON o.id = e.organization_id
 
 WHERE 1=1
 AND ($3::text IS NULL OR e.title_en ILIKE '%' || $3 || '%' OR e.description_en ILIKE '%' || $3 || '%' OR e.title_th ILIKE '%' || $3 || '%' OR e.description_th ILIKE '%' || $3 || '%')

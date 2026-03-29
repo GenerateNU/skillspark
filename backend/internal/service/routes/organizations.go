@@ -10,6 +10,8 @@ import (
 	"skillspark/internal/storage"
 	"skillspark/internal/utils"
 
+	"encoding/json"
+
 	"github.com/danielgtaylor/huma/v2"
 )
 
@@ -27,10 +29,19 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 
 		formData := input.RawBody.Data()
 
+		var links []models.OrgLink
+
+		if formData.Links != "" {
+			if err := json.Unmarshal([]byte(formData.Links), &links); err != nil {
+				return nil, err
+			}
+		}
+
 		organizationBody := models.CreateOrganizationBody{
 			Name:       formData.Name,
 			Active:     &formData.Active,
 			LocationID: &formData.LocationID,
+			Links:      links,
 		}
 
 		organizationModel := models.CreateOrganizationInput{
@@ -122,10 +133,19 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 	}, func(ctx context.Context, input *models.UpdateOrganizationRouteInput) (*models.UpdateOrganizationOutput, error) {
 		formData := input.RawBody.Data()
 
+		var links []models.OrgLink
+
+		if formData.Links != "" {
+			if err := json.Unmarshal([]byte(formData.Links), &links); err != nil {
+				return nil, err
+			}
+		}
+
 		organizationBody := models.UpdateOrganizationBody{
 			Name:       &formData.Name,
 			Active:     &formData.Active,
 			LocationID: &formData.LocationID,
+			Links:      &links,
 		}
 
 		organizationModel := models.UpdateOrganizationInput{
