@@ -1,4 +1,4 @@
-import { type CreateLocationInputBody, postLocation, type CreateOrganizationBody, createOrganization, type Organization, type ManagerSignUpInputBody, type signupManagerResponse, signupManager, getManagerByOrgId } from "@skillspark/api-client";
+import { type CreateLocationInputBody, postLocation, type CreateOrganizationBody, createOrganization, type Organization, type ManagerSignUpInputBody, type signupManagerResponse, signupManager, getManagerByOrgId, type Manager } from "@skillspark/api-client";
 import type { ManagerFormInput } from "../components/admin_createModal";
 import { validateMgr } from "../utils/validation";
 
@@ -26,7 +26,8 @@ export async function createOrganziationLocationAndManager (
     province,
     postalCode,
     managerInputs
-} : CreateOrganziationLocationAndManagerInput) {
+} : CreateOrganziationLocationAndManagerInput) : 
+Promise<{ org: Organization; manager: Manager }>{
     const locationInput: CreateLocationInputBody = {
             address_line1: addressLine1,
             ...(addressLine2.trim() ? { address_line2: addressLine2 } : {}),
@@ -70,4 +71,6 @@ export async function createOrganziationLocationAndManager (
     
           const managersRes = await getManagerByOrgId(org.id);
           if (managersRes.status !== 200 && managersRes.status !== 201) throw new Error("Failed to fetch managers");
+
+          return { org, manager: managersRes.data as Manager };
 }

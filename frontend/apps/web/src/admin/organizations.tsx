@@ -1,105 +1,116 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import type { Organization, Manager, Location } from "@skillspark/api-client";
+import { Link } from "react-router-dom";
+import { IconBuilding, IconPlus } from "../components/icons";
+import { listOrganizations } from "@skillspark/api-client";
+import type { Organization } from "@skillspark/api-client";
 import { useState, useEffect } from "react";
-import { deleteOrganization, deleteManager } from "@skillspark/api-client";
-import DeleteModal from "../components/admin_deleteModal";
-import OrgDetailsCard from "../components/admin_orgDetailsCard";
-import OrgLocationCard from "../components/admin_orgLocationCard";
-import OrgManagerCard from "../components/admin_orgManagerCard";
-import { loadData } from "../service/loadOrganizationData";
+import { CreateModal } from "../components/admin_createModal";
+import ErrorModal from "../common/error";
 
-const fmtDate = (iso: string): string =>
-  new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+export default function HomePage() {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [showCreate, setShowCreate] = useState<boolean>(false);
 
-export default function OrganizationDetailPage() {
-  const [org, setOrg] = useState<Organization>();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const [manager, setManager] = useState<Manager>();
-  const [orgLocation, setOrgLocation] = useState<Location>();
-  const [loadingMgr, setLoadingMgr] = useState<boolean>(true);
-  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const [deleting, setDeleting] = useState<boolean>(false);
+  const fmtDate = (iso: string): string =>
+    new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   useEffect(function () {
-    const orgFromState = location.state?.org as Organization;
-    if (!orgFromState) {
-      navigate("/admin", { replace: true });
-      return;
-    }
-    setOrg(orgFromState);
-    loadData(orgFromState, setManager, setOrgLocation, setLoadingMgr)
-  }, [location.state?.org, navigate]);
-
-  async function handleDelete(): Promise<void> {
-    if (!org) return;
-    try {
-      setDeleting(true);
-      if (manager != undefined) {
-        const managerRes = await deleteManager(manager!.id);
-        if (managerRes.status !== 200) throw new Error("Failed to delete manager");
+    async function getOrgs(): Promise<void> {
+      try {
+        const orgResponse = await listOrganizations();
+        if (orgResponse.status !== 200) throw new Error("Failed to load organizations");
+        setOrganizations(orgResponse.data);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "An unexpected error occurred");
+      } finally {
+        setLoading(false);
       }
-      const res = await deleteOrganization(org.id);
-      if (res.status === 200) navigate("/admin", { replace: true });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setDeleting(false);
-      setShowDeleteModal(false);
     }
-  }
+    getOrgs();
+  }, []);
 
-  if (!org) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-base font-semibold text-gray-700">No organization selected</p>
-          <button onClick={function () { navigate("/admin"); }} className="mt-3 text-sm text-blue-600 hover:underline cursor-pointer">
-            Back to organizations
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const showBody = !loading && !error;
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-3 shrink-0">
-        <button onClick={function () { navigate("/admin"); }} className="text-sm text-gray-400 hover:text-gray-600 cursor-pointer">
-          Organizations
+      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
+        <div>
+          <h1 className="text-base font-semibold text-gray-900">Organizations</h1>
+          <p className="text-xs text-gray-500">{organizations.length} {organizations.length === 1 ? "organization" : "organizations"} registered</p>
+        </div>
+        <button
+          onClick={function () { setShowCreate(true); }}
+          className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer"
+        >
+          <IconPlus /> Add organization
         </button>
-        <span className="text-gray-300">›</span>
-        <h1 className="text-base font-semibold text-gray-900">{org.name}</h1>
-        <div className="ml-auto flex items-center gap-3">
-          <span className={`inline-flex items-center text-sm font-medium px-2.5 py-1 rounded ring-1 ${org.active ? "bg-green-50 text-green-700 ring-green-200" : "bg-gray-100 text-gray-500 ring-gray-200"}`}>
-            {org.active ? "Active" : "Inactive"}
-          </span>
-          <button
-            onClick={function () { setShowDeleteModal(true); }}
-            className="px-3.5 py-2 text-sm font-medium rounded-md bg-white border border-red-300 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-          >
-            Delete
-          </button>
-        </div>
       </div>
 
-      <div className="flex-1 overflow-auto bg-gray-50 p-6 flex justify-center">
-        <div className="w-full max-w-lg flex flex-col gap-6">
-          <h2 className="text-2xl font-bold text-gray-900 text-center">{org.name}</h2>
-          <OrgDetailsCard org={org} onOrgUpdate={setOrg} fmtDate={fmtDate} />
-          <OrgLocationCard org={org} orgLocation={orgLocation} onOrgUpdate={setOrg} onLocationUpdate={setOrgLocation} />
-          <OrgManagerCard manager={manager} loadingMgr={loadingMgr} />
-        </div>
+      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+        {loading && (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-sm text-gray-400">Loading organizations…</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="flex items-center justify-center h-full">
+            <div className="w-full max-w-lg">
+              <ErrorModal error={error} setError={setError} />
+            </div>
+          </div>
+        )}
+
+        {showBody && organizations.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+              <IconBuilding />
+            </div>
+            <p className="text-sm font-semibold text-gray-700">No organizations yet</p>
+            <p className="text-sm text-gray-400 mt-1">Click "Add organization" to register the first one.</p>
+          </div>
+        )}
+
+        {showBody && organizations.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {organizations.map(function (org: Organization) {
+              return (
+                <Link
+                  key={org.id}
+                  to={"/admin/organization/"}
+                  state={{ org }}
+                  className="group bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-9 h-9 rounded-md bg-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                      {org.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 truncate">{org.name}</p>
+                      <p className="text-xs text-gray-400">{org.active ? "Active" : "Inactive"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded ring-1 ${org.stripe_account_activated ? "bg-green-50 text-green-700 ring-green-200" : "bg-yellow-50 text-yellow-700 ring-yellow-200"}`}>
+                      {org.stripe_account_activated ? "Stripe connected" : "Stripe pending"}
+                    </span>
+                    <span className="text-xs text-gray-400">{fmtDate(org.created_at)}</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {showDeleteModal && (
-        <DeleteModal
-          title="Delete organization"
-          description={<>Are you sure you want to delete <span className="font-semibold text-gray-900">{org.name}</span>? This action cannot be undone.</>}
-          deleting={deleting}
-          onConfirm={handleDelete}
-          onClose={function () { setShowDeleteModal(false); }}
+      {showCreate && (
+        <CreateModal
+          onClose={function () { setShowCreate(false); }}
+          onCreate={function (org: Organization) {
+            setOrganizations(function (prev: Organization[]) { return [org, ...prev]; });
+            setShowCreate(false);
+          }}
         />
       )}
     </div>

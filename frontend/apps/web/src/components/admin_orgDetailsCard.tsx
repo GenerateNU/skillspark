@@ -6,23 +6,25 @@ interface OrgDetailsCardProps {
   org: Organization;
   onOrgUpdate: (org: Organization) => void;
   fmtDate: (iso: string) => string;
+  setError: (e: string | null) => void;
 }
 
-export default function OrgDetailsCard({ org, onOrgUpdate, fmtDate }: OrgDetailsCardProps) {
+export default function OrgDetailsCard({ org, onOrgUpdate, fmtDate, setError }: OrgDetailsCardProps) {
   const [editing, setEditing] = useState<boolean>(false);
   const [editName, setEditName] = useState<string>("");
   const [editActive, setEditActive] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
 
   const orgFields = [
-            { label: "ID", value: org.id, mono: true },
-            { label: "Created", value: fmtDate(org.created_at), mono: false },
-            { label: "Updated", value: fmtDate(org.updated_at), mono: false },
-          ]
+    { label: "ID", value: org.id, mono: true },
+    { label: "Created", value: fmtDate(org.created_at), mono: false },
+    { label: "Updated", value: fmtDate(org.updated_at), mono: false },
+  ];
 
   function startEditing(): void {
     setEditName(org.name);
     setEditActive(org.active);
+    setError(null);
     setEditing(true);
   }
 
@@ -33,6 +35,7 @@ export default function OrgDetailsCard({ org, onOrgUpdate, fmtDate }: OrgDetails
   async function handleSave(): Promise<void> {
     if (!editName.trim()) return;
     try {
+      setError(null);
       setSaving(true);
       const input: UpdateOrganizationBody = {
         name: editName,
@@ -45,7 +48,7 @@ export default function OrgDetailsCard({ org, onOrgUpdate, fmtDate }: OrgDetails
         setEditing(false);
       }
     } catch (e) {
-      console.error(e);
+      setError(e instanceof Error ? e.message : "An unexpected error occurred");
     } finally {
       setSaving(false);
     }

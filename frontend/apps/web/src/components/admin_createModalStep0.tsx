@@ -1,6 +1,6 @@
 import Field from "../common/field";
 import Select from "../common/select";
-import ValidatedInput from "./validatedInput";
+import ValidatedInput from "../common/validatedInput";
 
 interface OrgLocationStepProps {
   orgName: string;

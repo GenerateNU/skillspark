@@ -1,9 +1,10 @@
 import { isValidEmail, type ManagerErrors } from "../utils/validation";
-import { Field, Select } from "../common/common";
 import { IconX } from "./icons";
 import OtpCard from "./admin_otpCard";
-import ValidatedInput from "./validatedInput";
+import ValidatedInput from "../common/validatedInput";
 import type { ManagerFormInput } from "./admin_createModal";
+import Field from "../common/field";
+import Select from "../common/select";
 
 interface ManagerFormRowProps {
   mgr: ManagerFormInput;

@@ -1,15 +1,15 @@
 import { useState } from "react";
 import type { Organization, Location, CreateLocationInputBody } from "@skillspark/api-client";
 import { postLocation, updateOrganization } from "@skillspark/api-client";
-
 interface OrgLocationCardProps {
   org: Organization;
   orgLocation: Location | undefined;
   onOrgUpdate: (org: Organization) => void;
   onLocationUpdate: (location: Location) => void;
+  setError: (e: string | null) => void;
 }
 
-export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocationUpdate }: OrgLocationCardProps) {
+export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocationUpdate, setError }: OrgLocationCardProps) {
   const [changingLocation, setChangingLocation] = useState<boolean>(false);
   const [locAddressLine1, setLocAddressLine1] = useState<string>("");
   const [locAddressLine2, setLocAddressLine2] = useState<string>("");
@@ -28,19 +28,20 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
     setLocProvince("");
     setLocPostalCode("");
     setLocCountry("");
+    setError(null);
     setChangingLocation(true);
   }
 
   const addressFields = orgLocation ? [
-              { label: "Address", value: orgLocation.address_line1, mono: false },
-              { label: "Address line 2", value: orgLocation.address_line2 || "—", mono: false },
-              { label: "Subdistrict", value: orgLocation.subdistrict, mono: false },
-              { label: "District", value: orgLocation.district, mono: false },
-              { label: "Province", value: orgLocation.province, mono: false },
-              { label: "Postal code", value: orgLocation.postal_code, mono: true },
-              { label: "Country", value: orgLocation.country, mono: false },
-              { label: "Coordinates", value: `${orgLocation.latitude}, ${orgLocation.longitude}`, mono: true },
-            ] : [];
+    { label: "Address", value: orgLocation.address_line1, mono: false },
+    { label: "Address line 2", value: orgLocation.address_line2 || "—", mono: false },
+    { label: "Subdistrict", value: orgLocation.subdistrict, mono: false },
+    { label: "District", value: orgLocation.district, mono: false },
+    { label: "Province", value: orgLocation.province, mono: false },
+    { label: "Postal code", value: orgLocation.postal_code, mono: true },
+    { label: "Country", value: orgLocation.country, mono: false },
+    { label: "Coordinates", value: `${orgLocation.latitude}, ${orgLocation.longitude}`, mono: true },
+  ] : [];
 
   function isLocationFormValid(): boolean {
     return (
@@ -56,6 +57,7 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
   async function handleSaveLocation(): Promise<void> {
     if (!isLocationFormValid()) return;
     try {
+      setError(null);
       setSavingLocation(true);
       const locationInput: CreateLocationInputBody = {
         address_line1: locAddressLine1,
@@ -80,7 +82,7 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
       onLocationUpdate(locationRes.data as Location);
       setChangingLocation(false);
     } catch (e) {
-      console.error(e);
+      setError(e instanceof Error ? e.message : "An unexpected error occurred");
     } finally {
       setSavingLocation(false);
     }

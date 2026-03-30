@@ -1,11 +1,12 @@
-import { type Organization, type ManagerSignUpInputBody, type CreateOrganizationBody, type CreateLocationInputBody, createOrganization, type Manager, signupManager, type signupManagerResponse, getManagerByOrgId, postLocation } from "@skillspark/api-client";
 import { useState, useEffect } from "react";
 import { IconCheck, IconX } from "./icons";
-import { validateMgr } from "../utils/validation";
-import { blankMgr } from "../utils/validation";
 import OrgLocationStep from "./admin_createModalStep0";
 import ManagerStep from "./admin_createModalStep1";
 import Btn from "../common/button";
+import { createOrganziationLocationAndManager } from "../service/createOrganization";
+import type { Organization, Manager, ManagerSignUpInputBody } from "@skillspark/api-client";
+import { blankMgr } from "../utils/validation";
+import ErrorModal from "../common/error";
 
 export interface ManagerFormInput {
   name: string;
@@ -18,11 +19,13 @@ export interface ManagerFormInput {
 
 interface CreateModalProps {
   onClose: () => void;
-  onCreate: (org: Organization, managers: Manager[]) => void;
+  onCreate: (org: Organization, manager: Manager) => void;
 }
 
 export function CreateModal({ onClose, onCreate }: CreateModalProps) {
   const [step, setStep] = useState<0 | 1>(0);
+  const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState<boolean>(false);
 
   const [orgName, setOrgName] = useState<string>("");
   const [orgActive, setOrgActive] = useState<boolean>(true);
@@ -65,55 +68,42 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
     );
   }
 
+  const goToStep1 = (): void =>  {
+    if (!isStep0Valid()) return;
+    setError(null);
+    setStep(1);
+  }
+
+  const goToStep0 = (): void =>  {
+    setError(null);
+    setStep(0);
+  }
+
   async function handleCreate(): Promise<void> {
     try {
-      const locationInput: CreateLocationInputBody = {
-        address_line1: addressLine1,
-        ...(addressLine2.trim() ? { address_line2: addressLine2 } : {}),
-        country,
-        district,
-        subdistrict,
-        province,
-        postal_code: postalCode,
-      };
-      const locationRes = await postLocation(locationInput);
-      if (locationRes.status !== 200 && locationRes.status !== 201) throw new Error("Failed to create location");
-      const locationId: string = (locationRes.data as { id: string }).id;
+      setError(null);
+      setCreating(true);
 
-      const orgInput: CreateOrganizationBody = {
-        name: orgName,
-        location_id: locationId,
-        active: orgActive,
-        profile_image: new Blob([], { type: "image/png" }),
-      };
-      const createdOrg = await createOrganization(orgInput);
-      if (createdOrg.status !== 200 && createdOrg.status !== 201) throw new Error("Failed to create organization");
-      const org: Organization = createdOrg.data as Organization;
-
-      const completeManagerInputs: ManagerSignUpInputBody[] = managerInputs.map(function (man: ManagerFormInput) {
-        const errors = validateMgr(man);
-        if (Object.keys(errors).length > 0) throw new Error(`Manager ${man.name || "unknown"} has incomplete or invalid inputs`);
-        return {
-          name: man.name,
-          email: man.email,
-          username: man.username,
-          password: man.password,
-          role: man.role,
-          language_preference: man.language_preference,
-          organization_id: org.id,
-        };
-      });
-      for (const mgr of completeManagerInputs) {
-        const res: signupManagerResponse = await signupManager(mgr);
-        if (res.status !== 200 && res.status !== 201) throw new Error(`Failed to sign up manager ${mgr.name}`);
-      }
-
-      const managersRes = await getManagerByOrgId(org.id);
-      if (managersRes.status !== 200 && managersRes.status !== 201) throw new Error("Failed to fetch managers");
-      onCreate(org, managersRes.data as Manager[]);
+      const data : {org: Organization, manager: Manager }= await createOrganziationLocationAndManager(
+        {
+          orgName,
+          orgActive,
+          addressLine1,
+          addressLine2,
+          country,
+          district,
+          subdistrict,
+          province,
+          postalCode,
+          managerInputs
+        }
+      )
+      onCreate(data.org, data.manager);
       onClose();
     } catch (e) {
-      console.error(e);
+      setError(e instanceof Error ? e.message : "An unexpected error occurred");
+    } finally {
+      setCreating(false);
     }
   }
 
@@ -159,6 +149,10 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
             })}
           </div>
 
+          {error && 
+            <ErrorModal error={error} setError={setError} />
+          }
+
           {step === 0 && (
             <OrgLocationStep
               orgName={orgName} setOrgName={setOrgName}
@@ -185,18 +179,21 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
         <div className="shrink-0 px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-3 rounded-b-xl">
           {step === 0 ? (
             <>
-              <Btn variant="ghost" onClick={onClose}>Cancel</Btn>
-              <Btn onClick={function () { if (!isStep0Valid()) return; setStep(1); }} disabled={!isStep0Valid()}>
+              <Btn variant="ghost" onClick={onClose} disabled={creating}>Cancel</Btn>
+              <Btn onClick={goToStep1} disabled={!isStep0Valid()}>
                 Continue
               </Btn>
             </>
           ) : (
             <>
-              <Btn variant="ghost" onClick={function () { setStep(0); }}>Back</Btn>
-              <Btn onClick={handleCreate} icon={<IconCheck />}>Create organization</Btn>
+              <Btn variant="ghost" onClick={goToStep0} disabled={creating}>Back</Btn>
+              <Btn onClick={handleCreate} icon={<IconCheck />} disabled={creating}>
+                {creating ? "Creating…" : "Create organization"}
+              </Btn>
             </>
           )}
         </div>
+
       </div>
     </div>
   );
