@@ -4,7 +4,8 @@
         up-backend up-frontend logs-backend logs-frontend \
         build-backend build-frontend shell-backend shell-frontend setup-hooks generate-api \
         clean-node-modules \
-        up-localstack up-backend-localstack logs-localstack 
+        format-frontend \
+        up-localstack up-backend-localstack logs-localstack
 
 # Default target - show help
 .DEFAULT_GOAL := help
@@ -52,6 +53,7 @@ help:
 	@echo "  make logs-frontend     - View frontend logs"
 	@echo "  make build-backend     - Build only backend"
 	@echo "  make build-frontend    - Build only frontend"
+	@echo "  make format-frontend   - Format all frontend files with Prettier"
 	@echo ""
 	@echo "$(BLUE)Container Management:$(NC)"
 	@echo "  make stop              - Stop all services (without removing)"
@@ -186,6 +188,11 @@ restart-frontend:
 	@echo "$(BOLD)Restarting frontend...$(NC)"
 	@$(DOCKER_COMPOSE) restart frontend
 	@echo "$(GREEN)Frontend restarted$(NC)"
+
+format-frontend:
+	@echo "$(BOLD)Formatting all frontend files with Prettier...$(NC)"
+	@cd frontend && bun x prettier --write "**/*.{ts,tsx,js,jsx,json,css,scss,md}"
+	@echo "$(GREEN)Frontend formatting complete$(NC)"
 
 # ------------------------
 # Cleanup Commands

@@ -7,11 +7,11 @@ interface ErrorScreenProps {
 }
 
 export const ErrorScreen = ({ message }: ErrorScreenProps) => {
-    return (
-        <View className="flex-1 items-center justify-center p-4">
-            <ThemedText className="font-semibold" style={{ color: AppColors.danger }}>
-            ERROR: {message}
-            </ThemedText>
-        </View>
-    )
+  return (
+    <View className="flex-1 items-center justify-center p-4">
+      <ThemedText className="font-semibold" style={{ color: AppColors.danger }}>
+        ERROR: {message}
+      </ThemedText>
+    </View>
+  );
 };

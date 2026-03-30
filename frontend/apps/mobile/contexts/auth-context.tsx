@@ -56,18 +56,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: guardianData } = useGetGuardianById(guardianId!, {
     query: {
       enabled: !!guardianId,
-    }
+    },
   });
 
   useEffect(() => {
     const checkAlreadyAuth = async () => {
       const storedJWT = await SecureStore.getItemAsync("token");
       const storedGuardianId = await SecureStore.getItemAsync("guardian_id");
-      const storedLangPref = await SecureStore.getItemAsync("language_preference");
+      const storedLangPref = await SecureStore.getItemAsync(
+        "language_preference",
+      );
       if (storedLangPref) {
         await i18n.changeLanguage(storedLangPref);
         setCurrentLanguage(storedLangPref);
-        queryClient.invalidateQueries({ refetchType: 'all' });
+        queryClient.invalidateQueries({ refetchType: "all" });
       }
       if (storedJWT && storedGuardianId) {
         setJWT(storedJWT);
@@ -78,7 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     checkAlreadyAuth();
   }, []);
-
 
   useEffect(() => {
     const getUpdatedLangPref = async () => {
@@ -117,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           router.replace("/(app)/(tabs)");
         },
         onError: (err) => {
-          const fail = err as unknown as { data?: { message?: string }};
+          const fail = err as unknown as { data?: { message?: string } };
           onError(fail.data?.message ?? "An unexpected error occurred");
         },
       },
@@ -155,11 +156,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           router.replace("/(app)/(tabs)");
         },
         onError: (err) => {
-          console.log('failure');
-          const fail = err as unknown as { data?: { message?: string }};
-          onError(
-            fail.data?.message ?? "An unexpected error occurred",
-          );
+          const fail = err as unknown as { data?: { message?: string } };
+          onError(fail.data?.message ?? "An unexpected error occurred");
         },
       },
     );
