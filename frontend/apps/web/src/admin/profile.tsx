@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Btn, Field, Input, Select } from "../components/common";
-
+import Btn from "../common/button";
+import Field from "../common/field";
+import Input from "../common/input";
+import Select from "../common/select";
 export function ProfilePage() {
   const [editing, setEditing] = useState<boolean>(false);
   const [form, setForm] = useState({

@@ -4,7 +4,7 @@ import type { ManagerFormInput } from "../components/admin_createModal";
 export type ManagerErrors = Partial<Record<keyof Omit<ManagerSignUpInputBody, "auth_id" | "organization_id" | "profile_picture_s3_key">, string>>;
 export type OrgErrors = Partial<Record<keyof CreateOrganizationBody, string>>;
 
-const genOtp = (): string => {
+const generateOnetimePassword = (): string => {
   const upper: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const lower: string = "abcdefghijklmnopqrstuvwxyz";
   const numbers: string = "0123456789";
@@ -17,6 +17,7 @@ const genOtp = (): string => {
     return charset[array[0] % charset.length];
   };
 
+  // ensures that there is at least one uppercase, lowercase, number, and special character in the password
   const required: string[] = [
     randomChar(upper),
     randomChar(lower),
@@ -34,8 +35,8 @@ const genOtp = (): string => {
   const combined: string[] = [...required, ...remaining];
   const shuffled = new Uint32Array(combined.length);
   crypto.getRandomValues(shuffled);
-  combined.sort(function (_, __) {
-    return shuffled[combined.indexOf(_)] - shuffled[combined.indexOf(__)];
+  combined.sort(function (a, b) {
+    return shuffled[combined.indexOf(a)] - shuffled[combined.indexOf(b)];
   });
 
   return combined.join("");
@@ -50,7 +51,7 @@ export const blankMgr = (): ManagerSignUpInputBody => ({
   name: "",
   email: "",
   username: "",
-  password: genOtp(),
+  password: generateOnetimePassword(),
   language_preference: "en",
   organization_id: "",
   role: "",

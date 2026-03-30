@@ -23,7 +23,9 @@ export default function ValidatedInput({
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
     onChange(e.target.value);
-    if (touched) setError(validate(e.target.value)); // re-validate on change once touched
+    if (touched) {
+      setError(validate(e.target.value));
+    }
   }
 
   return (

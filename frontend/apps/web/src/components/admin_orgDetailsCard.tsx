@@ -14,6 +14,12 @@ export default function OrgDetailsCard({ org, onOrgUpdate, fmtDate }: OrgDetails
   const [editActive, setEditActive] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
 
+  const orgFields = [
+            { label: "ID", value: org.id, mono: true },
+            { label: "Created", value: fmtDate(org.created_at), mono: false },
+            { label: "Updated", value: fmtDate(org.updated_at), mono: false },
+          ]
+
   function startEditing(): void {
     setEditName(org.name);
     setEditActive(org.active);
@@ -69,11 +75,7 @@ export default function OrgDetailsCard({ org, onOrgUpdate, fmtDate }: OrgDetails
 
       {!editing ? (
         <>
-          {[
-            { label: "ID", value: org.id, mono: true },
-            { label: "Created", value: fmtDate(org.created_at), mono: false },
-            { label: "Updated", value: fmtDate(org.updated_at), mono: false },
-          ].map(function (row: { label: string; value: string; mono: boolean }) {
+          {orgFields.map(function (row: { label: string; value: string; mono: boolean }) {
             return (
               <div key={row.label} className="px-5 py-3.5 grid grid-cols-3 gap-4">
                 <span className="text-sm font-medium text-gray-500">{row.label}</span>

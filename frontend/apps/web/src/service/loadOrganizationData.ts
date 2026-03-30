@@ -22,7 +22,6 @@ export function loadData(orgFromState : Organization, setManager : (man : Manage
         console.error(e);
       }
     }
-
     fetchManager();
     fetchLocation();
 }

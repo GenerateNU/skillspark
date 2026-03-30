@@ -8,7 +8,7 @@ interface DeleteModalProps {
 
 export default function DeleteModal({ title, description, deleting, onConfirm, onClose }: DeleteModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.45)" }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm">
         <div className="px-6 py-5 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">{title}</h2>

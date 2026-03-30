@@ -31,6 +31,17 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
     setChangingLocation(true);
   }
 
+  const addressFields = orgLocation ? [
+              { label: "Address", value: orgLocation.address_line1, mono: false },
+              { label: "Address line 2", value: orgLocation.address_line2 || "—", mono: false },
+              { label: "Subdistrict", value: orgLocation.subdistrict, mono: false },
+              { label: "District", value: orgLocation.district, mono: false },
+              { label: "Province", value: orgLocation.province, mono: false },
+              { label: "Postal code", value: orgLocation.postal_code, mono: true },
+              { label: "Country", value: orgLocation.country, mono: false },
+              { label: "Coordinates", value: `${orgLocation.latitude}, ${orgLocation.longitude}`, mono: true },
+            ] : [];
+
   function isLocationFormValid(): boolean {
     return (
       locAddressLine1.trim().length >= 5 &&
@@ -102,16 +113,7 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
           <p className="px-5 py-4 text-base text-gray-400">No location assigned.</p>
         ) : (
           <>
-            {[
-              { label: "Address", value: orgLocation.address_line1, mono: false },
-              { label: "Address line 2", value: orgLocation.address_line2 || "—", mono: false },
-              { label: "Subdistrict", value: orgLocation.subdistrict, mono: false },
-              { label: "District", value: orgLocation.district, mono: false },
-              { label: "Province", value: orgLocation.province, mono: false },
-              { label: "Postal code", value: orgLocation.postal_code, mono: true },
-              { label: "Country", value: orgLocation.country, mono: false },
-              { label: "Coordinates", value: `${orgLocation.latitude}, ${orgLocation.longitude}`, mono: true },
-            ].map(function (row) {
+            {addressFields.map(function (row) {
               return (
                 <div key={row.label} className="px-5 py-3.5 grid grid-cols-3 gap-4">
                   <span className="text-sm font-medium text-gray-500">{row.label}</span>
