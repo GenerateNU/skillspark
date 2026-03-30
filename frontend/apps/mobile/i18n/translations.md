@@ -5,6 +5,7 @@
 The app uses [react-i18next](https://react.i18next.com/) for internationalization. Translation files live in `frontend/apps/mobile/i18n/`.
 
 Currently supported languages:
+
 - `en` — English (default)
 - `th` — Thai
 
@@ -51,9 +52,9 @@ Add an entry to the `LANGUAGES` array:
 
 ```ts
 const LANGUAGES = [
-  { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'th', label: 'Thai',    flag: '🇹🇭' },
-  { code: 'ja', label: 'Japanese', flag: '🇯🇵' },  // add this
+  { code: "en", label: "English", flag: "🇺🇸" },
+  { code: "th", label: "Thai", flag: "🇹🇭" },
+  { code: "ja", label: "Japanese", flag: "🇯🇵" }, // add this
 ];
 ```
 
@@ -77,11 +78,11 @@ In `frontend/packages/api-client/src/apiClient.ts`, update the `languageHeader` 
 
 ```ts
 const langMap: Record<string, string> = {
-  en: 'en-US',
-  th: 'th-TH',
-  ja: 'ja-JP',
+  en: "en-US",
+  th: "th-TH",
+  ja: "ja-JP",
 };
-const languageHeader = langMap[i18n.language] ?? 'en-US';
+const languageHeader = langMap[i18n.language] ?? "en-US";
 ```
 
 ---
