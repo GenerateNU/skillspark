@@ -1,4 +1,5 @@
 export function ProfilePage() {
+  
   const profile = {
     name: import.meta.env.VITE_ADMIN_NAME ?? "—",
     email: import.meta.env.VITE_ADMIN_EMAIL ?? "—",
@@ -8,6 +9,14 @@ export function ProfilePage() {
   };
 
   const languageLabels: Record<string, string> = { en: "English", th: "Thai" };
+
+  const profileFields = [
+              { label: "Name", value: profile.name },
+              { label: "Email", value: profile.email },
+              { label: "Username", value: profile.username },
+              { label: "Language", value: languageLabels[profile.language_preference] ?? profile.language_preference },
+              { label: "Role", value: profile.role },
+            ]
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -35,13 +44,7 @@ export function ProfilePage() {
             <div className="px-5 py-4">
               <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Account details</h2>
             </div>
-            {[
-              { label: "Name", value: profile.name },
-              { label: "Email", value: profile.email },
-              { label: "Username", value: profile.username },
-              { label: "Language", value: languageLabels[profile.language_preference] ?? profile.language_preference },
-              { label: "Role", value: profile.role },
-            ].map(function (row: { label: string; value: string }) {
+            {profileFields.map(function (row: { label: string; value: string }) {
               return (
                 <div key={row.label} className="px-5 py-3 grid grid-cols-3 gap-4">
                   <span className="text-xs font-medium text-gray-500">{row.label}</span>
