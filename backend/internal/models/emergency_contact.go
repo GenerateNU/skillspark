@@ -16,7 +16,7 @@ type EmergencyContact struct {
 }
 
 type GetEmergencyContactByGuardianIDInput struct {
-	GuardianID uuid.UUID `path:"guardian_id"`
+	GuardianID uuid.UUID `path:"guardian_id" required:"true"`
 }
 
 type GetEmergencyContactByGuardianIDOutput struct {
@@ -25,7 +25,6 @@ type GetEmergencyContactByGuardianIDOutput struct {
 
 type CreateEmergencyContactInput struct {
 	Body struct {
-		ID          uuid.UUID `json:"id" db:"id"`
 		Name        string    `json:"name" db:"name"`
 		GuardianID  uuid.UUID `json:"guardian_id" db:"guardian_id"`
 		PhoneNumber string    `json:"phone_number" db:"phone_number"`
@@ -37,7 +36,7 @@ type CreateEmergencyContactOutput struct {
 }
 
 type UpdateEmergencyContactInput struct {
-	ID   uuid.UUID `json:"id" db:"id"`
+	ID   uuid.UUID `path:"id" format:"uuid" doc:"Emergency Contact ID to update" required:"true"`
 	Body struct {
 		GuardianID  uuid.UUID `json:"guardian_id" db:"guardian_id"`
 		PhoneNumber string    `json:"phone_number" db:"phone_number"`

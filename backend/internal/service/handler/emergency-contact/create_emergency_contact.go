@@ -6,7 +6,7 @@ import (
 )
 
 func (h *Handler) CreateEmergencyContact(ctx context.Context, input *models.CreateEmergencyContactInput) (*models.CreateEmergencyContactOutput, error) {
-	createdEmergencyContact, err := h.CreateEmergencyContact(ctx, input)
+	createdEmergencyContact, err := h.EmergencyContactRepository.CreateEmergencyContact(ctx, input)
 	if err != nil {
 		return nil, err
 	}

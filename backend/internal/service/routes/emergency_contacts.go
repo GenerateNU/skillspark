@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"skillspark/internal/models"
 	emergencycontact "skillspark/internal/service/handler/emergency-contact"
@@ -17,10 +18,10 @@ func SetupEmergencyContactRoutes(api huma.API, repo *storage.Repository) {
 	huma.Register(api, huma.Operation{
 		OperationID: "get-emergency-contacts-by-guardian-id",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/emergency-contact/{id}",
+		Path:        "/api/v1/emergency-contact/{guardian_id}",
 		Summary:     "Get emergency contacts by guardian id",
 		Description: "Returns emergency contacts by guardian id",
-		Tags:        []string{"EmergencyContact"},
+		Tags:        []string{"Emergency Contacts"},
 	}, func(ctx context.Context, input *models.GetEmergencyContactByGuardianIDInput) (*models.GetEmergencyContactByGuardianIDOutput, error) {
 		emergencyContact, err := emergencyContactHandler.GetEmergencyContactByGuardianID(ctx, input.GuardianID)
 		if err != nil {
@@ -38,10 +39,11 @@ func SetupEmergencyContactRoutes(api huma.API, repo *storage.Repository) {
 		Path:        "/api/v1/emergency-contact/{id}",
 		Summary:     "Delete an emergency contact",
 		Description: "Deletes an emergency contact",
-		Tags:        []string{"Emergency Contact"},
+		Tags:        []string{"Emergency Contacts"},
 	}, func(ctx context.Context, input *models.DeleteEmergencyContactInput) (*models.DeleteEmergencyContactOutput, error) {
 		deletedEmergencyContact, err := emergencyContactHandler.DeleteEmergencyContact(ctx, input.ID)
 		if err != nil {
+			fmt.Println(err.Error())
 			return nil, err
 		}
 
@@ -56,7 +58,7 @@ func SetupEmergencyContactRoutes(api huma.API, repo *storage.Repository) {
 		Path:        "/api/v1/emergency-contact/{id}",
 		Summary:     "Updates an emergency contact",
 		Description: "Update an emergency contact",
-		Tags:        []string{"Emergency Contact"},
+		Tags:        []string{"Emergency Contacts"},
 	}, func(ctx context.Context, input *models.UpdateEmergencyContactInput) (*models.UpdateEmergencyContactOutput, error) {
 		UpdateEmergencyContact, err := emergencyContactHandler.UpdateEmergencyContact(ctx, input)
 		if err != nil {
@@ -69,15 +71,16 @@ func SetupEmergencyContactRoutes(api huma.API, repo *storage.Repository) {
 	})
 
 	huma.Register(api, huma.Operation{
-		OperationID: "create-child",
+		OperationID: "create-emergency-contact",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/child",
-		Summary:     "Creates a child",
-		Description: "Creates a child",
-		Tags:        []string{"Child"},
+		Path:        "/api/v1/emergency-contact",
+		Summary:     "Creates an emergency contact",
+		Description: "Creates an emergency contact",
+		Tags:        []string{"Emergency Contacts"},
 	}, func(ctx context.Context, input *models.CreateEmergencyContactInput) (*models.CreateEmergencyContactOutput, error) {
 		emergencyContact, err := emergencyContactHandler.CreateEmergencyContact(ctx, input)
 		if err != nil {
+
 			return nil, err
 		}
 

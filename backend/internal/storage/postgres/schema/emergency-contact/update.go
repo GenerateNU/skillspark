@@ -14,7 +14,7 @@ func (r *EmergencyContactRepository) UpdateEmergencyContact(ctx context.Context,
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, input.Body.Name, input.Body.GuardianID, input.Body.PhoneNumber)
+	row := r.db.QueryRow(ctx, query, input.ID, input.Body.Name, input.Body.GuardianID, input.Body.PhoneNumber)
 
 	var updatedEmergencyContact models.EmergencyContact
 
@@ -28,7 +28,7 @@ func (r *EmergencyContactRepository) UpdateEmergencyContact(ctx context.Context,
 	)
 
 	if err != nil {
-		err := errs.InternalServerError("Failed to create emergency contact: ", err.Error())
+		err := errs.InternalServerError("Failed to update emergency contact: ", err.Error())
 		return nil, &err
 	}
 
