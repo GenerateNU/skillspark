@@ -30,6 +30,7 @@ export const AuthFormInput = <T extends FieldValues>({
               lineHeight: 20,
             }}
             placeholderTextColor={AppColors.placeholderText}
+            autoCorrect={false}
             onChangeText={onChange}
             value={value}
             {...props}
