@@ -8,13 +8,19 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   // Global ignores
   {
-    ignores: ["dist/**", "node_modules/**", ".vite/**", "coverage/**", "*.config.js"],
+    ignores: [
+      "dist/**",
+      "node_modules/**",
+      ".vite/**",
+      "coverage/**",
+      "*.config.js",
+    ],
   },
-  
+
   // Base configs
   js.configs.recommended,
   ...tseslint.configs.recommended,
-  
+
   // React and TypeScript specific config
   {
     files: ["**/*.{ts,tsx}"],
@@ -47,5 +53,5 @@ export default tseslint.config(
         version: "detect", // Automatically detect React version
       },
     },
-  }
+  },
 );

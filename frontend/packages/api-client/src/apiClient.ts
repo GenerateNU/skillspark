@@ -12,25 +12,22 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
-
-
-
 // Platform-agnostic storage helper
 const getStorageItem = (key: string): string | null => {
-  if (typeof window !== 'undefined' && window.localStorage) {
+  if (typeof window !== "undefined" && window.localStorage) {
     return localStorage.getItem(key);
   }
   return null;
 };
 
 const removeStorageItem = (key: string): void => {
-  if (typeof window !== 'undefined' && window.localStorage) {
+  if (typeof window !== "undefined" && window.localStorage) {
     localStorage.removeItem(key);
   }
 };
 
 const getBaseURL = () => {
-  if (typeof process !== 'undefined' && process.env) {
+  if (typeof process !== "undefined" && process.env) {
     if (process.env.EXPO_PUBLIC_API_BASE_URL) {
       return process.env.EXPO_PUBLIC_API_BASE_URL;
     }
@@ -42,7 +39,7 @@ const getBaseURL = () => {
     }
   }
 
-  return 'http://localhost:8080';
+  return "http://localhost:8080";
 };
 
 // NOTE: This axios instance is preserved for future use or interceptor logic,
@@ -52,15 +49,14 @@ const apiClient = axios.create({
   baseURL: getBaseURL(),
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   withCredentials: true,
 });
 
-
 apiClient.interceptors.request.use(
   (config) => {
-    const token = getStorageItem('temp_jwt') || getStorageItem('jwt');
+    const token = getStorageItem("temp_jwt") || getStorageItem("jwt");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -68,25 +64,26 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 let isRetrying = false;
 
 const handleLogout = () => {
-  removeStorageItem('jwt');
-  removeStorageItem('userId');
-  removeStorageItem('recentlyViewedStudents');
-  
-  if (typeof document !== 'undefined') {
-    document.cookie.split(';').forEach((cookie) => {
-      const eqPos = cookie.indexOf('=');
-      const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+  removeStorageItem("jwt");
+  removeStorageItem("userId");
+  removeStorageItem("recentlyViewedStudents");
+
+  if (typeof document !== "undefined") {
+    document.cookie.split(";").forEach((cookie) => {
+      const eqPos = cookie.indexOf("=");
+      const name =
+        eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
     });
-    
-    if (typeof window !== 'undefined') {
-      window.location.href = '/login';
+
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
     }
   }
 };
@@ -110,26 +107,26 @@ apiClient.interceptors.response.use(
           return result;
         } catch (retryError) {
           isRetrying = false;
-          console.error('Unauthorized access');
+          console.error("Unauthorized access");
           handleLogout();
           return Promise.reject(retryError);
         }
       } else {
-        console.error('Unauthorized access');
+        console.error("Unauthorized access");
         handleLogout();
       }
     } else if (status === 403) {
-      console.error('Forbidden access');
+      console.error("Forbidden access");
     } else if (status === 404) {
-      console.error('Resource not found');
+      console.error("Resource not found");
     } else if (status >= 500) {
-      console.error('Server error occurred');
+      console.error("Server error occurred");
     } else {
-      console.error('An error occurred:', error.message);
+      console.error("An error occurred:", error.message);
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export async function customInstance<T>(
@@ -139,16 +136,16 @@ export async function customInstance<T>(
   const baseURL = getBaseURL();
   const fullUrl = `${baseURL}${url}`;
 
-  const languageHeader = currentLanguage === 'th' ? 'th-TH' : 'en-US';
+  const languageHeader = currentLanguage === "th" ? "th-TH" : "en-US";
 
   // Get token for auth
-  const token = getStorageItem('temp_jwt') || getStorageItem('jwt');
+  const token = getStorageItem("temp_jwt") || getStorageItem("jwt");
   const response = await fetch(fullUrl, {
     ...options,
-    credentials: 'include',
+    credentials: "include",
     headers: {
-      'Content-Type': 'application/json',
-      'Accept-Language': languageHeader,
+      "Content-Type": "application/json",
+      "Accept-Language": languageHeader,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
@@ -159,13 +156,13 @@ export async function customInstance<T>(
       handleLogout();
     }
     const errorBody = await response.json().catch(() => null);
-    
+
     // Throw an error object that preserves the status so react-query can handle it
-    throw { 
-      message: 'An error occurred',
+    throw {
+      message: "An error occurred",
       detail: `HTTP ${response.status}`,
       status: response.status,
-      data: errorBody
+      data: errorBody,
     };
   }
 
@@ -176,7 +173,7 @@ export async function customInstance<T>(
   return {
     data,
     status: response.status,
-    headers: response.headers
+    headers: response.headers,
   } as T;
 }
 

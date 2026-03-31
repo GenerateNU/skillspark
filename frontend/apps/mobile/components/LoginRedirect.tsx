@@ -6,11 +6,9 @@ import i18n from "@/i18n";
 export const LoginRedirect = () => {
   const { isAuthenticated, isLoading } = useAuthContext();
 
-
   if (isLoading) {
     return <Stack />;
   }
-
 
   return (
     <>

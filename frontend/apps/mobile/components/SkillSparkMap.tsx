@@ -1,9 +1,9 @@
-import React, { useRef, useState } from 'react';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import * as Location from 'expo-location';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { ThemedView } from '@/components/themed-view';
-import { EventCard } from '@/components/EventCard'; 
+import React, { useRef, useState } from "react";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import * as Location from "expo-location";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { ThemedView } from "@/components/themed-view";
+import { EventCard } from "@/components/EventCard";
 
 export interface LocationPin {
   id: string;
