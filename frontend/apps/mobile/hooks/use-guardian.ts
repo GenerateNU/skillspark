@@ -2,15 +2,14 @@ import {
   useGetGuardianById,
   useGetChildrenByGuardianId,
 } from "@skillspark/api-client";
-
-// TODO: Replace with authenticated user's guardian ID
-const GUARDIAN_ID = "88888888-8888-8888-8888-888888888888";
+import { useAuthContext } from "@/hooks/use-auth-context";
 
 export function useGuardian() {
+  const { guardianId } = useAuthContext();
   const { data: guardianResponse, isLoading: guardianLoading } =
-    useGetGuardianById(GUARDIAN_ID);
+    useGetGuardianById(guardianId || "");
   const { data: childrenResponse, isLoading: childrenLoading } =
-    useGetChildrenByGuardianId(GUARDIAN_ID);
+    useGetChildrenByGuardianId(guardianId || "");
 
   const guardian =
     guardianResponse?.status === 200 ? guardianResponse.data : null;
@@ -19,7 +18,7 @@ export function useGuardian() {
   return {
     guardian,
     children,
-    guardianId: GUARDIAN_ID,
+    guardianId: guardianId,
     isLoading: guardianLoading || childrenLoading,
   };
 }
