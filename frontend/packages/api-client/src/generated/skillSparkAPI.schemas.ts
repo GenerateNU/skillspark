@@ -199,17 +199,17 @@ export interface CreateLocationInputBody {
    */
   district: string;
   /**
-   * Latitude of the location
+   * Optional latitude of the location; validated against geocoded coordinates when provided
    * @minimum -90
    * @maximum 90
    */
-  latitude: number;
+  latitude?: number;
   /**
-   * Longitude of the location
+   * Optional longitude of the location; validated against geocoded coordinates when provided
    * @minimum -180
    * @maximum 180
    */
-  longitude: number;
+  longitude?: number;
   /**
    * Postal code of the location
    * @minLength 3
@@ -243,7 +243,7 @@ export interface Organization {
   active: boolean;
   created_at: string;
   id: string;
-  location_id?: string;
+  location_id: string;
   name: string;
   pfp_s3_key?: string;
   presigned_url: string;
@@ -443,6 +443,25 @@ export interface EventOccurrence {
   /** Current status of the event occurrence */
   status: EventOccurrenceStatus;
   updated_at: string;
+}
+
+export interface GeocodeAddressInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /**
+   * Text address to geocode
+   * @minLength 1
+   */
+  address: string;
+}
+
+export interface GeocodeAddressOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Latitude of the geocoded address */
+  latitude: number;
+  /** Longitude of the geocoded address */
+  longitude: number;
 }
 
 export interface PaymentMethodCard {

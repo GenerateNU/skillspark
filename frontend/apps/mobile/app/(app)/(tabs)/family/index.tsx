@@ -5,20 +5,17 @@ import {
 	TouchableOpacity,
 	ActivityIndicator,
 	useColorScheme,
-	Image,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import {
-	useGetChildrenByGuardianId,
-	useGetGuardianById,
-} from "@skillspark/api-client";
 import { Colors, AppColors } from "@/constants/theme";
 import { ChildListItem } from "@/components/ChildListItem";
 import { SectionHeader } from "@/components/SectionHeader";
+import { useTranslation } from "react-i18next";
+import { useGuardian } from "@/hooks/use-guardian";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 
@@ -27,27 +24,10 @@ export default function FamilyListScreen() {
 	const insets = useSafeAreaInsets();
 	const colorScheme = useColorScheme();
 	const theme = Colors[colorScheme ?? "light"];
+	const { t: translate } = useTranslation();
 
+	const { guardian, children, isLoading } = useGuardian();
 	const { guardianId } = useAuthContext();
-
-	const { data: guardianResponse, isLoading: guardianLoading } =
-		useGetGuardianById(guardianId!, {
-			query: {
-				enabled: !!guardianId,
-			},
-		});
-	const { data: childrenResponse, isLoading: childrenLoading } =
-		useGetChildrenByGuardianId(guardianId!, {
-			query: {
-				enabled: !!guardianId,
-			},
-		});
-
-	const guardian =
-		guardianResponse?.status === 200 ? guardianResponse.data : null;
-	const children =
-		childrenResponse?.status === 200 ? childrenResponse.data : [];
-	const profilePic = guardian?.profile_picture_s3_key; // add guard
 
 	const handleAddChild = () => {
 		router.push("/family/manage");
@@ -71,7 +51,7 @@ export default function FamilyListScreen() {
 		return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
 	}
 
-	if (guardianLoading || childrenLoading) {
+	if (isLoading) {
 		return (
 			<ThemedView className="flex-1 items-center justify-center">
 				<ActivityIndicator size="large" />
@@ -90,7 +70,7 @@ export default function FamilyListScreen() {
 					<IconSymbol name="chevron.left" size={24} color={theme.text} />
 				</TouchableOpacity>
 				<ThemedText className="text-xl text-center font-nunito-bold">
-					Family Information
+					{translate("familyInformation.title")}
 				</ThemedText>
 				<View className="w-10" />
 			</View>
@@ -102,19 +82,9 @@ export default function FamilyListScreen() {
 				<TouchableOpacity
 					className="flex-row items-start py-4 gap-3"
 					activeOpacity={0.7}
-					onPress={() => router.navigate("/family/edit-profile")}
 				>
-					<View className="w-11 h-11 items-center justify-center overflow-hidden rounded-full">
-						{profilePic && (
-							<Image
-								source={{ uri: profilePic }}
-								className="w-full h-full"
-								resizeMode="cover"
-							/>
-						)}
-						{!profilePic && (
-							<IconSymbol name="person.circle" size={40} color={theme.text} />
-						)}
+					<View className="w-11 h-11 items-center justify-center">
+						<IconSymbol name="person.circle" size={40} color={theme.text} />
 					</View>
 					<View className="flex-1 gap-1">
 						<ThemedText className="text-base font-nunito-semibold">
@@ -133,19 +103,14 @@ export default function FamilyListScreen() {
 							{guardian?.email}
 						</ThemedText>
 					</View>
-					<IconSymbol
-						name="chevron.right"
-						size={18}
-						color={AppColors.subtleText}
-					/>
 				</TouchableOpacity>
 				<View
 					className="h-px my-3"
 					style={{ backgroundColor: AppColors.divider }}
 				/>
 				<SectionHeader
-					title="Child Profile"
-					actionLabel="add profile +"
+					title={translate("familyInformation.childProfile")}
+					actionLabel={translate("familyInformation.addProfile")}
 					onAction={handleAddChild}
 				/>
 				{children.length === 0 && (
@@ -153,7 +118,7 @@ export default function FamilyListScreen() {
 						className="text-sm pb-4 font-nunito"
 						style={{ color: AppColors.subtleText }}
 					>
-						No child profiles added yet.
+						{translate("common.noChildProfilesAdded")}
 					</ThemedText>
 				)}
 				{children.map((child: any, idx: number) => (
@@ -175,8 +140,8 @@ export default function FamilyListScreen() {
 					style={{ backgroundColor: AppColors.divider }}
 				/>
 				<SectionHeader
-					title="Emergency Contact"
-					actionLabel="add contact +"
+					title={translate("familyInformation.emergencyContact")}
+					actionLabel={translate("familyInformation.addContact")}
 					onAction={() => {}}
 				/>
 				{/* TODO: Replace with real emergency contact data from API */}

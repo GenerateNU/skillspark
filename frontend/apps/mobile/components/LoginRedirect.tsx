@@ -1,5 +1,7 @@
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { Redirect, Stack } from "expo-router";
+import { useEffect } from "react";
+import i18n from "@/i18n";
 
 export const LoginRedirect = () => {
   const { isAuthenticated, isLoading } = useAuthContext();

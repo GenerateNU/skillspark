@@ -1,39 +1,57 @@
-import { SavedEventCard } from '@/components/SavedEventCard';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { getGetSavedByGuardianIdQueryKey, Saved, useDeleteSaved, useGetSavedByGuardianId } from '@skillspark/api-client';
-import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
-import React from 'react';
-import { ActivityIndicator, Alert, FlatList, TouchableOpacity, useColorScheme, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuthContext } from '@/hooks/use-auth-context';
-import { ErrorScreen } from '@/components/ErrorScreen';
+import { SavedEventCard } from "@/components/SavedEventCard";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors } from "@/constants/theme";
+import {
+  getGetSavedByGuardianIdQueryKey,
+  Saved,
+  useDeleteSaved,
+  useGetSavedByGuardianId,
+} from "@skillspark/api-client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
+import React from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuthContext } from "@/hooks/use-auth-context";
+import { ErrorScreen } from "@/components/ErrorScreen";
+import { useTranslation } from "react-i18next";
 
 export default function SavedScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const theme = Colors[colorScheme ?? 'light'];
+  const theme = Colors[colorScheme ?? "light"];
   const queryClient = useQueryClient();
   const { guardianId } = useAuthContext();
+  const { t: translate } = useTranslation();
 
-  const { data: response, isLoading, error } = useGetSavedByGuardianId(guardianId!, undefined, {
+  const {
+    data: response,
+    isLoading,
+    error,
+  } = useGetSavedByGuardianId(guardianId!, undefined, {
     query: { enabled: !!guardianId },
   });
   const deleteSavedMutation = useDeleteSaved();
 
   if (!guardianId) {
-    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+    return <ErrorScreen message={translate("common.noGuardianId")} />;
   }
 
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center gap-2">
         <ActivityIndicator size="large" />
-        <ThemedText>Loading events...</ThemedText>
+        <ThemedText>{translate("common.loadingEvents")}</ThemedText>
       </View>
     );
   }
@@ -41,8 +59,12 @@ export default function SavedScreen() {
   if (error) {
     return (
       <View className="flex-1 items-center justify-center p-4">
-        <ThemedText className="text-red-500 font-semibold">Error loading events</ThemedText>
-        <ThemedText>{error.detail || "An error occurred"}</ThemedText>
+        <ThemedText className="text-red-500 font-semibold">
+          {translate("common.errorLoadingEvents")}
+        </ThemedText>
+        <ThemedText>
+          {error.detail || translate("common.errorOccurred")}
+        </ThemedText>
       </View>
     );
   }
@@ -50,23 +72,25 @@ export default function SavedScreen() {
   if (!response || !Array.isArray(response.data)) {
     return (
       <View className="flex-1 items-center justify-center p-4">
-        <ThemedText>No events available</ThemedText>
+        <ThemedText>{translate("common.noEventsAvailable")}</ThemedText>
       </View>
     );
   }
 
-  const savedEvents: Saved[] = response.status === 200 && Array.isArray(response.data)
-    ? response.data
-    : [];
+  const savedEvents: Saved[] =
+    response.status === 200 && Array.isArray(response.data)
+      ? response.data
+      : [];
 
   const handleDeleteSaved = (savedId: string) => {
     Alert.alert(
-      'Delete saved event',
-      'Are you sure you want remove this saved event?',
+      translate("saved.deleteTitle"),
+      translate("saved.deleteConfirm"),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: translate("common.cancel"), style: "cancel" },
         {
-          text: 'Delete', style: 'destructive',
+          text: translate("payment.delete"),
+          style: "destructive",
           onPress: async () => {
             deleteSavedMutation.mutate(
               { id: savedId },
@@ -76,12 +100,13 @@ export default function SavedScreen() {
                     queryKey: getGetSavedByGuardianIdQueryKey(guardianId),
                   });
                 },
-                onError: (err) => console.error('Failed to delete saved event', err),
-              }
+                onError: (err) =>
+                  console.error("Failed to delete saved event", err),
+              },
             );
           },
         },
-      ]
+      ],
     );
   };
 
@@ -89,20 +114,22 @@ export default function SavedScreen() {
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
       <View className="flex-row items-center justify-between px-5 py-[14px]">
         <TouchableOpacity
-          onPress={() => router.navigate('/profile')}
+          onPress={() => router.navigate("/profile")}
           className="w-10 justify-center items-start"
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText className="text-xl text-center font-nunito-bold">Saved</ThemedText>
+        <ThemedText className="text-xl text-center font-nunito-bold">
+          {translate("saved.title")}
+        </ThemedText>
         <View className="w-10" />
       </View>
       <ThemedView className="flex-1">
         {savedEvents.length === 0 ? (
           <View className="flex-1 justify-center items-center p-5">
             <ThemedText className="text-center text-lg text-gray-500">
-              You have no saved events.
+              {translate("saved.noEvents")}
             </ThemedText>
           </View>
         ) : (

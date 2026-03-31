@@ -7,13 +7,10 @@ import {
 	useSignupGuardian,
 	useGetGuardianById,
 	Guardian,
-	useUpdateGuardian,
-	updateGuardianResponse,
 } from "@skillspark/api-client";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 import { createContext, useState, useEffect, ReactNode } from "react";
-import { queryClient } from "@/constants/query-client";
 
 interface AuthContextType {
 	guardianId: string | null;
@@ -58,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [jwt, setJWT] = useState<string | null>(null);
 	const [langPref, setLangPref] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
+	const queryClient = useQueryClient();
 	const { mutate: loginFunc } = useLoginGuardian();
 	const { mutate: signupFunc } = useSignupGuardian();
 	const { mutate: updateFunc } = useUpdateGuardian();
@@ -76,6 +74,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			const storedLangPref = await SecureStore.getItemAsync(
 				"language_preference",
 			);
+			if (storedLangPref) {
+				await i18n.changeLanguage(storedLangPref);
+				setCurrentLanguage(storedLangPref);
+				queryClient.invalidateQueries({ refetchType: "all" });
+			}
 			if (storedJWT && storedGuardianId) {
 				setJWT(storedJWT);
 				setGuardianId(storedGuardianId);
@@ -88,13 +91,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	useEffect(() => {
 		const getUpdatedLangPref = async () => {
-			if (!guardian) return;
-			const pref = guardian?.language_preference ?? "en"; // default to english
+			if (!guardianData) return;
+			// SecureStore is the source of truth — only fall back to server value
+			// if there is no locally stored preference (e.g. first login on a new device).
+			const stored = await SecureStore.getItemAsync("language_preference");
+			if (stored) {
+				setLangPref(stored);
+				return;
+			}
+			const guardian = (guardianData as unknown as { data: Guardian })?.data;
+			const pref = guardian?.language_preference ?? "en";
+			await i18n.changeLanguage(pref);
+			setCurrentLanguage(pref);
 			await SecureStore.setItemAsync("language_preference", pref);
 			setLangPref(pref);
 		};
 		getUpdatedLangPref();
-	}, [guardian]);
+	}, [guardianData]);
 
 	const login = (
 		email: string,

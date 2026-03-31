@@ -5,9 +5,11 @@ import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTranslation } from "react-i18next";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { t: translate } = useTranslation();
 
   return (
     <Tabs
@@ -20,7 +22,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: translate("nav.home"),
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="house.fill" color={color} />
           ),
@@ -29,7 +31,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="map"
         options={{
-          title: "Map",
+          title: translate("nav.map"),
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="map.fill" color={color} />
           ),
@@ -38,8 +40,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          title: translate("nav.profile"),
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="person.fill" color={color} />
+          ),
         }}
       />
       <Tabs.Screen name="event" options={{ href: null }} />
