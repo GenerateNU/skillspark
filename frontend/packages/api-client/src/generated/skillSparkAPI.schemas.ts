@@ -5,11 +5,94 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
+export interface AttachPaymentMethodInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe payment method ID to attach (e.g. pm_card_visa) */
+  payment_method_id: string;
+}
+
+export interface AttachPaymentMethodOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Attached payment method ID */
+  PaymentMethodID: string;
+  /** Stripe customer ID the payment method was attached to */
+  customer_id: string;
+}
+
 export interface CancelEventOccurrenceOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   /** Success message */
   message: string;
+}
+
+/**
+ * Current status of the registration
+ */
+export type RegistrationStatus =
+  (typeof RegistrationStatus)[keyof typeof RegistrationStatus];
+
+export const RegistrationStatus = {
+  registered: "registered",
+  cancelled: "cancelled",
+} as const;
+
+export interface Registration {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Timestamp when registration was cancelled */
+  cancelled_at?: string;
+  /** ID of the registered child */
+  child_id: string;
+  /** Timestamp when registration was created */
+  created_at: string;
+  /** Currency code (e.g., thb, usd) */
+  currency: string;
+  /** Name of the event */
+  event_name: string;
+  /** ID of the event occurrence */
+  event_occurrence_id: string;
+  /** ID of the child's guardian */
+  guardian_id: string;
+  /** Unique registration identifier */
+  id: string;
+  /** Start time of the event occurrence */
+  occurrence_start_time: string;
+  /** Organization's Stripe account ID */
+  org_stripe_account_id: string;
+  /** Timestamp when payment was completed */
+  paid_at?: string;
+  /** Stripe payment intent status */
+  payment_intent_status: string;
+  /** Platform fee amount in cents */
+  platform_fee_amount: number;
+  /** Amount provider receives in cents */
+  provider_amount: number;
+  /** Current status of the registration */
+  status: RegistrationStatus;
+  /** Stripe customer ID */
+  stripe_customer_id: string;
+  /** Stripe payment intent ID */
+  stripe_payment_intent_id: string;
+  /** Stripe payment method ID */
+  stripe_payment_method_id: string;
+  /** Total amount in cents */
+  total_amount: number;
+  /** Timestamp when registration was last updated */
+  updated_at: string;
+}
+
+export interface CancelRegistrationOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Success message */
+  message: string;
+  /** Refund status if applicable */
+  refund_status?: string;
+  /** Updated registration */
+  registration: Registration;
 }
 
 export interface Child {
@@ -59,6 +142,8 @@ export interface CreateChildInputBody {
 export interface CreateEventOccurrenceInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
+  /** Currency code (e.g., thb, usd) */
+  currency: string;
   /** End time of the event occurrence */
   end_time: string;
   /** ID of an event in the database */
@@ -69,8 +154,6 @@ export interface CreateEventOccurrenceInputBody {
    * @maxLength 30
    */
   language: string;
-  /** ID of a location in the database */
-  location_id: string;
   /** ID of a manager in the database */
   manager_id?: string;
   /**
@@ -79,6 +162,11 @@ export interface CreateEventOccurrenceInputBody {
    * @maximum 100
    */
   max_attendees: number;
+  /**
+   * Price in cents (e.g., 10000 = ฿100)
+   * @minimum 0
+   */
+  price: number;
   /** Start time of the event occurrence */
   start_time: string;
 }
@@ -111,17 +199,17 @@ export interface CreateLocationInputBody {
    */
   district: string;
   /**
-   * Latitude of the location
+   * Optional latitude of the location; validated against geocoded coordinates when provided
    * @minimum -90
    * @maximum 90
    */
-  latitude: number;
+  latitude?: number;
   /**
-   * Longitude of the location
+   * Optional longitude of the location; validated against geocoded coordinates when provided
    * @minimum -180
    * @maximum 180
    */
-  longitude: number;
+  longitude?: number;
   /**
    * Postal code of the location
    * @minLength 3
@@ -142,15 +230,44 @@ export interface CreateLocationInputBody {
   subdistrict: string;
 }
 
+export interface CreateOrgLoginLinkOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe Express dashboard login URL */
+  login_url: string;
+}
+
+export interface Organization {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  active: boolean;
+  created_at: string;
+  id: string;
+  location_id: string;
+  name: string;
+  pfp_s3_key?: string;
+  presigned_url: string;
+  stripe_account_activated: boolean;
+  stripe_account_id: string;
+  updated_at: string;
+}
+
+export interface CreateOrgStripeAccountOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe account details */
+  account: Organization;
+}
+
 /**
  * Initial status of the registration
  */
-export type CreateRegistrationInputBodyStatus = typeof CreateRegistrationInputBodyStatus[keyof typeof CreateRegistrationInputBodyStatus];
-
+export type CreateRegistrationInputBodyStatus =
+  (typeof CreateRegistrationInputBodyStatus)[keyof typeof CreateRegistrationInputBodyStatus];
 
 export const CreateRegistrationInputBodyStatus = {
-  registered: 'registered',
-  cancelled: 'cancelled',
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface CreateRegistrationInputBody {
@@ -162,6 +279,8 @@ export interface CreateRegistrationInputBody {
   event_occurrence_id: string;
   /** ID of the guardian registering the child */
   guardian_id: string;
+  /** Stripe payment method ID to use */
+  payment_method_id: string;
   /** Initial status of the registration */
   status: CreateRegistrationInputBodyStatus;
 }
@@ -175,23 +294,42 @@ export interface CreateReviewInputBody {
   description: string;
   /** ID of the guardian */
   guardian_id: string;
+  /** Rating left with the review, can be 1-5 inclusive */
+  rating: number;
   /** ID of the linked registration */
   registration_id: string;
 }
 
-export interface CreateUserInputBody {
+export interface CreateSavedInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** User email address */
-  email: string;
-  /** Full name (optional) */
-  full_name?: string;
-  /**
-   * Username
-   * @minLength 3
-   * @maxLength 50
-   */
-  username: string;
+  /** ID of this saved event. */
+  event_id: string;
+  /** ID of the guardian that saved this. */
+  guardian_id: string;
+}
+
+export interface CreateSetupIntentOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe SetupIntent client_secret for frontend */
+  client_secret: string;
+}
+
+export interface CreateStripeOnboardingLinkInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** URL to redirect if onboarding is exited early */
+  refresh_url: string;
+  /** URL to redirect after successful onboarding */
+  return_url: string;
+}
+
+export interface CreateStripeOnboardingLinkOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe-hosted onboarding page URL */
+  onboarding_url: string;
 }
 
 export interface DeleteEventOutputBody {
@@ -202,6 +340,13 @@ export interface DeleteEventOutputBody {
 }
 
 export interface DeleteReviewOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Success message */
+  message: string;
+}
+
+export interface DeleteSavedOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   /** Success message */
@@ -253,12 +398,12 @@ export interface Event {
 /**
  * Current status of the event occurrence
  */
-export type EventOccurrenceStatus = typeof EventOccurrenceStatus[keyof typeof EventOccurrenceStatus];
-
+export type EventOccurrenceStatus =
+  (typeof EventOccurrenceStatus)[keyof typeof EventOccurrenceStatus];
 
 export const EventOccurrenceStatus = {
-  scheduled: 'scheduled',
-  cancelled: 'cancelled',
+  scheduled: "scheduled",
+  cancelled: "cancelled",
 } as const;
 
 export interface Location {
@@ -283,6 +428,8 @@ export interface EventOccurrence {
   readonly $schema?: string;
   created_at: string;
   curr_enrolled: number;
+  /** Currency code (e.g., thb, usd) */
+  currency: string;
   end_time: string;
   event: Event;
   id: string;
@@ -290,53 +437,50 @@ export interface EventOccurrence {
   location: Location;
   manager_id: string;
   max_attendees: number;
+  /** Price in cents (e.g., 10000 = $100) */
+  price: number;
   start_time: string;
   /** Current status of the event occurrence */
   status: EventOccurrenceStatus;
   updated_at: string;
 }
 
-export interface GetGreetingOutputBody {
+export interface GeocodeAddressInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** Greeting message */
-  message: string;
-  /** Server timestamp */
-  timestamp: string;
+  /**
+   * Text address to geocode
+   * @minLength 1
+   */
+  address: string;
 }
 
-/**
- * Current status of the registration
- */
-export type RegistrationStatus = typeof RegistrationStatus[keyof typeof RegistrationStatus];
-
-
-export const RegistrationStatus = {
-  registered: 'registered',
-  cancelled: 'cancelled',
-} as const;
-
-export interface Registration {
+export interface GeocodeAddressOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** ID of the registered child */
-  child_id: string;
-  /** Timestamp when registration was created */
-  created_at: string;
-  /** Name of the event (joined from events table) */
-  event_name: string;
-  /** ID of the event occurrence */
-  event_occurrence_id: string;
-  /** ID of the child's guardian */
-  guardian_id: string;
-  /** Unique registration identifier */
+  /** Latitude of the geocoded address */
+  latitude: number;
+  /** Longitude of the geocoded address */
+  longitude: number;
+}
+
+export interface PaymentMethodCard {
+  brand: string;
+  exp_month: number;
+  exp_year: number;
+  last4: string;
+}
+
+export interface PaymentMethod {
+  card: PaymentMethodCard;
   id: string;
-  /** Start time of the event occurrence */
-  occurrence_start_time: string;
-  /** Current status of the registration */
-  status: RegistrationStatus;
-  /** Timestamp when registration was last updated */
-  updated_at: string;
+  type: string;
+}
+
+export interface GetPaymentMethodsByGuardianIDOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  payment_methods: PaymentMethod[];
 }
 
 export interface GetRegistrationsByChildIDOutputBody {
@@ -366,10 +510,12 @@ export interface Guardian {
   auth_id: string;
   created_at: string;
   email: string;
+  expo_push_token: string;
   id: string;
   language_preference: string;
   name: string;
   profile_picture_s3_key: string;
+  stripe_customer_id?: string;
   updated_at: string;
   user_id: string;
   username: string;
@@ -379,6 +525,7 @@ export interface GuardianLoginOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   guardian_id: string;
+  token: string;
 }
 
 export interface GuardianSignUpInputBody {
@@ -388,7 +535,7 @@ export interface GuardianSignUpInputBody {
   language_preference: string;
   name: string;
   password: string;
-  profile_picture_s3_key: string;
+  profile_picture_s3_key?: string;
   username: string;
 }
 
@@ -406,19 +553,6 @@ export interface HealthOutputBody {
   status: string;
   /** API version */
   version: string;
-}
-
-export interface Item {
-  email: string;
-  id: string;
-  username: string;
-}
-
-export interface ListUsersOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  total: number;
-  users: Item[];
 }
 
 export interface LoginInputBody {
@@ -449,6 +583,7 @@ export interface ManagerLoginOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   manager_id: string;
+  token: string;
 }
 
 export interface ManagerSignUpInputBody {
@@ -481,19 +616,6 @@ export interface ManagerSignUpOutputBody {
   token: string;
 }
 
-export interface Organization {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  active: boolean;
-  created_at: string;
-  id: string;
-  location_id?: string;
-  name: string;
-  pfp_s3_key?: string;
-  presigned_url: string;
-  updated_at: string;
-}
-
 export interface PatchManagerInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -524,13 +646,41 @@ export interface Review {
   created_at: string;
   /** The review text */
   description: string;
+  /** ID of the event */
+  event_id: string;
   /** ID of the guardian */
   guardian_id: string;
   /** Unique review identifier */
   id: string;
+  /** Rating left with the review, can be 1-5 inclusive */
+  rating: number;
   /** ID of the linked registration */
   registration_id: string;
   /** Timestamp when registration was last updated */
+  updated_at: string;
+}
+
+export interface ReviewRatingCount {
+  rating: number;
+  review_count: number;
+}
+
+export interface ReviewAggregate {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  average_rating: number;
+  breakdown: ReviewRatingCount[];
+  event_id: string;
+  total_reviews: number;
+}
+
+export interface Saved {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  created_at: string;
+  event: Event;
+  guardian_id: string;
+  id: string;
   updated_at: string;
 }
 
@@ -580,6 +730,12 @@ export interface UpdateEventOccurrenceInputBody {
    * @maximum 100
    */
   curr_enrolled?: number;
+  /**
+   * Currency code
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency?: string;
   /** End time of the event occurrence */
   end_time?: string;
   /** ID of an event in the database */
@@ -590,8 +746,6 @@ export interface UpdateEventOccurrenceInputBody {
    * @maxLength 30
    */
   language?: string;
-  /** ID of a location in the database */
-  location_id?: string;
   /** ID of a manager in the database */
   manager_id?: string;
   /**
@@ -600,6 +754,11 @@ export interface UpdateEventOccurrenceInputBody {
    * @maximum 100
    */
   max_attendees?: number;
+  /**
+   * Price in lowest denomination of currency
+   * @minimum 0
+   */
+  price?: number;
   /** Start time of the event occurrence */
   start_time?: string;
 }
@@ -609,6 +768,8 @@ export interface UpdateGuardianInputBody {
   readonly $schema?: string;
   /** Email of the guardian */
   email: string;
+  /** Expo push notification token */
+  expo_push_token?: string;
   /** Language preference */
   language_preference: string;
   /** Name of the guardian */
@@ -622,12 +783,12 @@ export interface UpdateGuardianInputBody {
 /**
  * Updated registration status (optional)
  */
-export type UpdateRegistrationInputBodyStatus = typeof UpdateRegistrationInputBodyStatus[keyof typeof UpdateRegistrationInputBodyStatus];
-
+export type UpdateRegistrationInputBodyStatus =
+  (typeof UpdateRegistrationInputBodyStatus)[keyof typeof UpdateRegistrationInputBodyStatus];
 
 export const UpdateRegistrationInputBodyStatus = {
-  registered: 'registered',
-  cancelled: 'cancelled',
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface UpdateRegistrationInputBody {
@@ -643,36 +804,37 @@ export interface UpdateRegistrationInputBody {
   status?: UpdateRegistrationInputBodyStatus;
 }
 
-export interface UserOutputBody {
+export interface UpdateRegistrationPaymentStatusInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
-  /** User email */
-  email: string;
-  /** Full name */
-  full_name?: string;
-  /** User ID */
-  id: string;
-  /** Username */
-  username: string;
+  /** New payment intent status from Stripe */
+  payment_intent_status: string;
 }
 
 export type GetAllEventOccurrencesParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
-search?: string;
-lat?: number;
-lng?: number;
-radius_km?: number;
-price?: string;
-min_duration?: number;
-max_duration?: number;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  search?: string;
+  lat?: string;
+  lng?: string;
+  radius_km?: number;
+  min_price?: number;
+  max_price?: number;
+  min_duration?: number;
+  max_duration?: number;
+  min_age?: number;
+  max_age?: number;
+  category?: string;
+  soldout?: boolean;
+  min_date?: string;
+  max_date?: string;
 };
 
 export type CreateEventBody = {
@@ -712,29 +874,29 @@ export type UpdateEventBody = {
 };
 
 export type GetAllLocationsParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
 };
 
 export type ListOrganizationsParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type CreateOrganizationBody = {
@@ -760,42 +922,55 @@ export type UpdateOrganizationBody = {
 };
 
 export type GetReviewByEventIdParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type GetReviewByGuardianIdParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+};
+
+export type GetSavedByGuardianIdParams = {
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type GetAllSchoolsParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
 };
-

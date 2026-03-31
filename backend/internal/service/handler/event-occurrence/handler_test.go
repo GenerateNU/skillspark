@@ -112,7 +112,6 @@ func TestHandler_CreateEventOccurrence(t *testing.T) {
 				input.AcceptLanguage = "en-US"
 				input.Body.ManagerId = &testMid
 				input.Body.EventId = event.ID
-				input.Body.LocationId = location.ID
 				input.Body.StartTime = start
 				input.Body.EndTime = end
 				input.Body.MaxAttendees = 15
@@ -201,7 +200,6 @@ func TestHandler_CreateEventOccurrence(t *testing.T) {
 					assert.Equal(t, *tt.input.Body.ManagerId, *eventOccurrence.ManagerId)
 				}
 				assert.Equal(t, tt.input.Body.EventId, eventOccurrence.Event.ID)
-				assert.Equal(t, tt.input.Body.LocationId, eventOccurrence.Location.ID)
 				assert.Equal(t, tt.input.Body.StartTime, eventOccurrence.StartTime)
 				assert.Equal(t, tt.input.Body.EndTime, eventOccurrence.EndTime)
 				assert.Equal(t, tt.input.Body.MaxAttendees, eventOccurrence.MaxAttendees)
@@ -380,7 +378,6 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 				input.ID = testEOID
 				input.Body.ManagerId = nil
 				input.Body.EventId = nil
-				input.Body.LocationId = nil
 				input.Body.StartTime = nil
 				input.Body.EndTime = nil
 				input.Body.MaxAttendees = &max
@@ -401,7 +398,6 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 				input.ID = testEOID
 				input.Body.ManagerId = nil
 				input.Body.EventId = nil
-				input.Body.LocationId = nil
 				input.Body.StartTime = nil
 				input.Body.EndTime = nil
 				input.Body.MaxAttendees = nil
@@ -439,7 +435,6 @@ func TestHandler_UpdateEventOccurrence(t *testing.T) {
 				input.ID = testEOID
 				input.Body.ManagerId = &midNew
 				input.Body.EventId = &eid
-				input.Body.LocationId = &lid
 				input.Body.StartTime = &startNew
 				input.Body.EndTime = &endNew
 				input.Body.MaxAttendees = &max

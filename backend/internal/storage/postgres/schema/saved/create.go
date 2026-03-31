@@ -7,7 +7,10 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
+var language string
+
 func (r *SavedRepository) CreateSaved(ctx context.Context, saved *models.CreateSavedInput) (*models.Saved, error) {
+	language = saved.AcceptLanguage
 
 	query, err := schema.ReadSQLBaseScript("create.sql", SqlSavedFiles)
 	if err != nil {
@@ -15,15 +18,47 @@ func (r *SavedRepository) CreateSaved(ctx context.Context, saved *models.CreateS
 		return nil, &err
 	}
 
-	row := r.db.QueryRow(ctx, query, saved.Body.GuardianID, saved.Body.EventOccurrenceID)
+	row := r.db.QueryRow(ctx, query, saved.Body.GuardianID, saved.Body.EventID)
 
 	var createdSaved models.Saved
+	var titleEN, descriptionEN string
+	var titleTH, descriptionTH *string
 
-	err = row.Scan(&createdSaved.ID, &createdSaved.GuardianID, &createdSaved.EventOccurrenceID, &createdSaved.CreatedAt, &createdSaved.UpdatedAt)
+	err = row.Scan(
+		&createdSaved.ID,
+		&createdSaved.GuardianID,
+		&createdSaved.CreatedAt,
+		&createdSaved.UpdatedAt,
+		&createdSaved.Event.ID,
+		&titleEN,
+		&titleTH,
+		&descriptionEN,
+		&descriptionTH,
+		&createdSaved.Event.OrganizationID,
+		&createdSaved.Event.AgeRangeMin,
+		&createdSaved.Event.AgeRangeMax,
+		&createdSaved.Event.Category,
+		&createdSaved.Event.HeaderImageS3Key,
+		&createdSaved.Event.CreatedAt,
+		&createdSaved.Event.UpdatedAt,
+	)
 
 	if err != nil {
 		err := errs.InternalServerError("Failed to create saved event: ", err.Error())
 		return nil, &err
+	}
+
+	switch language {
+	case "th-TH":
+		if titleTH != nil {
+			createdSaved.Event.Title = *titleTH
+		}
+		if descriptionTH != nil {
+			createdSaved.Event.Description = *descriptionTH
+		}
+	case "en-US":
+		createdSaved.Event.Title = titleEN
+		createdSaved.Event.Description = descriptionEN
 	}
 
 	return &createdSaved, nil

@@ -112,6 +112,7 @@ type ReviewRepository interface {
 	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	DeleteReview(ctx context.Context, id uuid.UUID) error
+	GetAggregateReviews(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
 }
 
 type UserRepository interface {
@@ -130,7 +131,7 @@ type NotificationRepository interface {
 type SavedRepository interface {
 	CreateSaved(ctx context.Context, saved *models.CreateSavedInput) (*models.Saved, error)
 	DeleteSaved(ctx context.Context, id uuid.UUID) error
-	GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination) ([]models.Saved, error)
+	GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination, AcceptLanguage string) ([]models.Saved, error)
 }
 
 type Repository struct {

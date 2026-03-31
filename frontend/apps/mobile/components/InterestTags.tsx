@@ -1,17 +1,22 @@
-import React from 'react';
-import { View } from 'react-native';
-import { ThemedText } from '@/components/themed-text';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { AppColors, TAG_COLORS } from '@/constants/theme';
+import React from "react";
+import { View } from "react-native";
+import { ThemedText } from "@/components/themed-text";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { AppColors, TAG_COLORS } from "@/constants/theme";
+import { useTranslation } from "react-i18next";
 
 const MAX_VISIBLE_TAGS = 3;
 
 export function InterestTags({ interests }: { interests?: string[] | string }) {
+  const { t: translate } = useTranslation();
   const tags: string[] = Array.isArray(interests)
     ? interests
-    : typeof interests === 'string' && interests
-    ? interests.split(',').map((s) => s.trim()).filter(Boolean)
-    : [];
+    : typeof interests === "string" && interests
+      ? interests
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
 
   if (!tags.length) return null;
 
@@ -29,14 +34,22 @@ export function InterestTags({ interests }: { interests?: string[] | string }) {
             style={{ backgroundColor: c.bg, borderColor: c.border }}
           >
             <IconSymbol name="camera.filters" size={13} color={c.border} />
-            <ThemedText className="text-xs font-nunito-medium" style={{ color: c.text }}>
-              {tag}
+            <ThemedText
+              className="text-xs font-nunito-medium"
+              style={{ color: c.text }}
+            >
+              {translate(`interests.${tag}`, { defaultValue: tag })}
             </ThemedText>
           </View>
         );
       })}
       {overflow > 0 && (
-        <ThemedText className="text-[13px] font-nunito-medium self-center" style={{ color: AppColors.mutedText }}>+{overflow}</ThemedText>
+        <ThemedText
+          className="text-[13px] font-nunito-medium self-center"
+          style={{ color: AppColors.mutedText }}
+        >
+          +{overflow}
+        </ThemedText>
       )}
     </View>
   );

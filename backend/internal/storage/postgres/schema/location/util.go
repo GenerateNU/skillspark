@@ -22,9 +22,10 @@ func CreateTestLocation(
 
 	repo := NewLocationRepository(db)
 
+	lat, lng := 40.7128, -74.0060
 	input := &models.CreateLocationInput{}
-	input.Body.Latitude = 40.7128
-	input.Body.Longitude = -74.0060
+	input.Body.Latitude = &lat
+	input.Body.Longitude = &lng
 	input.Body.AddressLine1 = "123 Broadway"
 	input.Body.AddressLine2 = nil
 	input.Body.Subdistrict = "Manhattan"
