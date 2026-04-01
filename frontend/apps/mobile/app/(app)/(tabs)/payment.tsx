@@ -17,6 +17,7 @@ import {
 import { useGuardian } from "@/hooks/use-guardian";
 import PaymentMethodRow from "@/components/PaymentMethodRow";
 import CardForm from "@/components/CardForm";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -27,22 +28,10 @@ export default function PaymentScreen() {
   const [editingCard, setEditingCard] = useState<boolean>(false);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const { guardian } = useGuardian();
 
-  async function refetchPaymentMethods(): Promise<void> {
-    if (!guardian) return;
-    try {
-      const res = await getGuardianPaymentMethods(guardian.id);
-      if (res.status !== 200 && res.status !== 201) throw res.data;
-      const methods = (res.data as GetPaymentMethodsByGuardianIDOutputBody).payment_methods;
-      setPaymentMethods(methods ? methods : []);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  useEffect(() => {
-    async function fetchPaymentMethods(): Promise<void> {
+      async function fetchPaymentMethods(): Promise<void> {
       if (!guardian) return;
       try {
         const res = await getGuardianPaymentMethods(guardian.id);
@@ -50,11 +39,13 @@ export default function PaymentScreen() {
         const methods = (res.data as GetPaymentMethodsByGuardianIDOutputBody).payment_methods;
         setPaymentMethods(methods ? methods : []);
       } catch (e) {
-        console.error(e);
+        setError("Failed to fetch payment methods");
       } finally {
         setLoading(false);
       }
     }
+
+  useEffect(() => {
     fetchPaymentMethods();
   }, [guardian]);
 
@@ -103,14 +94,16 @@ export default function PaymentScreen() {
           ) : editingCard ? (
             <CardForm
               onSave={async () => {
-                await refetchPaymentMethods();
+                await fetchPaymentMethods();
                 setEditingCard(false);
               }}
               onCancel={() => setEditingCard(false)}
             />
           ) : paymentMethods.length > 0 ? (
             paymentMethods.map((method, i) => <PaymentMethodRow method={method} onDelete={deletePaymentMethod} key={i} />)
-          ) : (
+          ) : 
+          error ? <></> :
+          (
             <ThemedText className="text-base font-nunito mb-8" style={{ color: theme.icon }}>
               {translate("payment.noCard")}
             </ThemedText>
@@ -131,6 +124,7 @@ export default function PaymentScreen() {
             </View>
           )}
         </View>
+        {error && <ErrorMessage message={error} />}
       </ThemedView>
     </StripeProvider>
   );

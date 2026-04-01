@@ -1,16 +1,17 @@
 import { Colors, AppColors } from "@/constants/theme";
 import { useGuardian } from "@/hooks/use-guardian";
-import { createGuardianSetupIntent, CreateSetupIntentOutputBody } from "@skillspark/api-client";
+import { createGuardianSetupIntent, type CreateSetupIntentOutputBody } from "@skillspark/api-client";
 import { useStripe, CardField } from "@stripe/stripe-react-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useColorScheme, View, TouchableOpacity } from "react-native";
 import { ThemedText } from "./themed-text";
-
+import { ErrorMessage } from "./ErrorMessage";
 
 export default function CardForm({ onSave, onCancel }: { onSave: () => void; onCancel: () => void }) {
   const [cardComplete, setCardComplete] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { confirmSetupIntent } = useStripe();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "light"];
@@ -19,21 +20,20 @@ export default function CardForm({ onSave, onCancel }: { onSave: () => void; onC
 
   async function handleSave(): Promise<void> {
     try {
+      setError(null);
       if (!guardian) throw new Error("No user is authenticated");
       setSaving(true);
 
       const res = await createGuardianSetupIntent(guardian.id);
-      if (res.status !== 200 && res.status !== 201) throw res.data;
+      if (res.status !== 200 && res.status !== 201) throw new Error("Failed to create setup intent");
 
       const clientSecret = (res.data as CreateSetupIntentOutputBody).client_secret;
-      const { error } = await confirmSetupIntent(clientSecret, { paymentMethodType: "Card" });
-      if (error) throw new Error(error.message);
-
-
+      const { error: stripeError } = await confirmSetupIntent(clientSecret, { paymentMethodType: "Card" });
+      if (stripeError) throw new Error("Failed to confirm payment method, please try again.");
 
       onSave();
     } catch (e) {
-      console.error(e);
+      setError(e instanceof Error ? e.message : "An unexpected error occurred");
     } finally {
       setSaving(false);
     }
@@ -77,6 +77,7 @@ export default function CardForm({ onSave, onCancel }: { onSave: () => void; onC
           </ThemedText>
         </TouchableOpacity>
       </View>
+      {error && <ErrorMessage message={error} />}
     </View>
   );
 }
