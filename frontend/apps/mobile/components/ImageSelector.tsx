@@ -8,16 +8,20 @@ import * as ImagePicker from "expo-image-picker";
 import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { AppColors, Colors } from "@/constants/theme";
 import { ThemedText } from "./themed-text";
-import { IconSymbol } from "./ui/icon-symbol";
+import { NoProfilePic } from "./NoProfilePic";
 
 interface ImageSelectorProps extends TouchableOpacityProps {
 	setImage: React.Dispatch<React.SetStateAction<string | undefined>>;
 	image: string | undefined;
+	width: number;
+	height: number;
 }
 
 export const ImageSelector = ({
 	setImage,
 	image,
+	width,
+	height,
 	...props
 }: ImageSelectorProps) => {
 	const colorScheme = useColorScheme();
@@ -38,8 +42,8 @@ export const ImageSelector = ({
 	return (
 		<TouchableOpacity onPress={pickImage} {...props}>
 			<View
-				className="w-40 h-40 rounded-full border items-center justify-center overflow-hidden"
-				style={{ borderColor: theme.borderColor }}
+				className="rounded-full border items-center justify-center overflow-hidden"
+				style={{ borderColor: theme.borderColor, width: width, height: height }}
 			>
 				{image && (
 					<Image
@@ -48,9 +52,7 @@ export const ImageSelector = ({
 						resizeMode="cover"
 					/>
 				)}
-				{!image && (
-					<IconSymbol name="person" size={60} color={AppColors.mutedText} />
-				)}
+				{!image && <NoProfilePic width={width} height={height} />}
 			</View>
 			<ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
 				Change Image

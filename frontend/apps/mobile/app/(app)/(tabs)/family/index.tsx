@@ -5,6 +5,7 @@ import {
 	TouchableOpacity,
 	ActivityIndicator,
 	useColorScheme,
+	Image,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
+import { NoProfilePic } from "@/components/NoProfilePic";
 
 export default function FamilyListScreen() {
 	const router = useRouter();
@@ -26,8 +28,9 @@ export default function FamilyListScreen() {
 	const theme = Colors[colorScheme ?? "light"];
 	const { t: translate } = useTranslation();
 
-	const { guardian, children, isLoading } = useGuardian();
 	const { guardianId } = useAuthContext();
+	const { guardian, children, isLoading } = useGuardian(guardianId);
+	const profilePic = guardian?.profile_picture_s3_key ?? null;
 
 	const handleAddChild = () => {
 		router.push("/family/manage");
@@ -48,6 +51,7 @@ export default function FamilyListScreen() {
 	};
 
 	if (!guardianId) {
+		// change to reroute to login
 		return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
 	}
 
@@ -82,9 +86,20 @@ export default function FamilyListScreen() {
 				<TouchableOpacity
 					className="flex-row items-start py-4 gap-3"
 					activeOpacity={0.7}
+					onPress={() => router.navigate("/family/edit-profile")}
 				>
-					<View className="w-11 h-11 items-center justify-center">
-						<IconSymbol name="person.circle" size={40} color={theme.text} />
+					<View
+						className="w-14 h-14 items-center border justify-center rounded-full overflow-hidden"
+						style={{ borderColor: theme.borderColor }}
+					>
+						{profilePic && (
+							<Image
+								source={{ uri: profilePic }}
+								className="w-full h-full"
+								resizeMode="cover"
+							/>
+						)}
+						{!profilePic && <NoProfilePic width={56} height={56} />}
 					</View>
 					<View className="flex-1 gap-1">
 						<ThemedText className="text-base font-nunito-semibold">
@@ -103,6 +118,11 @@ export default function FamilyListScreen() {
 							{guardian?.email}
 						</ThemedText>
 					</View>
+					<IconSymbol
+						name="chevron.right"
+						size={18}
+						color={AppColors.subtleText}
+					/>
 				</TouchableOpacity>
 				<View
 					className="h-px my-3"
@@ -149,8 +169,8 @@ export default function FamilyListScreen() {
 					className="flex-row items-start py-4 gap-3"
 					activeOpacity={0.7}
 				>
-					<View className="w-11 h-11 items-center justify-center">
-						<IconSymbol name="person.circle" size={40} color={theme.text} />
+					<View className="w-14 h-14 items-center justify-center">
+						<NoProfilePic width={56} height={56} />
 					</View>
 					<View className="flex-1 gap-1">
 						<ThemedText className="text-base font-nunito-semibold">

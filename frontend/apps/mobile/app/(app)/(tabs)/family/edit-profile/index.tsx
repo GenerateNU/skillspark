@@ -7,18 +7,18 @@ import {
 	View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Colors, AppColors } from "@/constants/theme";
+import { AppColors, Colors } from "@/constants/theme";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ErrorScreen } from "@/components/ErrorScreen";
-import { useGetGuardianById, Guardian } from "@skillspark/api-client";
 import { AuthFormInput } from "@/components/AuthFormInput";
 import { Button } from "@/components/Button";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { ImageSelector } from "@/components/ImageSelector";
+import { useGuardian } from "@/hooks/use-guardian";
 
 type EditFormData = {
 	name: string;
@@ -32,14 +32,12 @@ export default function EditProfileScreen() {
 	const theme = Colors[colorScheme ?? "light"];
 
 	const [errorText, setErrorText] = useState("");
-	const [image, setImage] = useState<string | undefined>(undefined);
 	const { update, guardianId, langPref } = useAuthContext();
-
-	const { data: guardianData } = useGetGuardianById(guardianId!, {
-		query: {
-			enabled: !!guardianId,
-		},
-	});
+	const { guardian } = useGuardian(guardianId);
+	const [image, setImage] = useState<string | undefined>(undefined);
+	const [pfp, setPfp] = useState<string | undefined>(
+		guardian?.profile_picture_s3_key,
+	);
 
 	const { control, handleSubmit } = useForm<EditFormData>({
 		defaultValues: {
@@ -53,9 +51,9 @@ export default function EditProfileScreen() {
 	}
 
 	const onSubmit = (formData: EditFormData) => {
-		const guardian = guardianData?.data as unknown as Guardian;
-		if (!("email" in guardian)) {
+		if (!guardian) {
 			setErrorText("No guardian ID found");
+			return;
 		}
 
 		const id = guardian.id;
@@ -65,22 +63,27 @@ export default function EditProfileScreen() {
 		const username =
 			formData.username === "" ? guardian.username : formData.username;
 		update(
-			() => router.navigate("/profile"),
+			() => router.back(),
 			setErrorText,
 			id,
 			email,
 			language_preference,
 			name,
 			username,
-			image,
+			image ?? pfp,
 		);
+	};
+
+	const clearImage = () => {
+		setImage(undefined);
+		setPfp(undefined);
 	};
 
 	return (
 		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
 			<View className="flex-row items-center justify-between px-5 py-3">
 				<TouchableOpacity
-					onPress={() => router.navigate("/profile")}
+					onPress={() => router.back()}
 					className="w-10 justify-center items-start"
 					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 				>
@@ -102,11 +105,24 @@ export default function EditProfileScreen() {
 				</ThemedText>
 
 				<View className="items-center mb-8">
-					<ImageSelector
-						setImage={setImage}
-						image={image}
-						className="items-center gap-2"
-					/>
+					<View className="relative w-40">
+						<ImageSelector
+							setImage={setImage}
+							image={image ?? pfp}
+							width={160}
+							height={160}
+							className="items-center gap-2"
+						/>
+						{(image || pfp) && (
+							<TouchableOpacity
+								onPress={clearImage}
+								className="absolute top-1 right-1 w-7 h-7 rounded-full items-center justify-center"
+								style={{ backgroundColor: AppColors.danger }}
+							>
+								<IconSymbol name="xmark" size={14} color="white" />
+							</TouchableOpacity>
+						)}
+					</View>
 				</View>
 
 				<View className="gap-5">
