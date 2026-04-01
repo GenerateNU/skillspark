@@ -2110,6 +2110,28 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/stripe/detach:
+    delete:
+      tags:
+        - Payments
+      summary: Detach a payment method from a guardian
+      description: Detaches a Stripe payment method from a guardian's customer account
+      operationId: detach-guardian-payment-method
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DetachPaymentMethodInputBody'
+        required: true
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/stripe/login/{organization_id}:
     post:
       tags:
@@ -2743,6 +2765,22 @@ components:
           description: Success message
       required:
         - message
+    DetachPaymentMethodInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DetachPaymentMethodInputBody.json
+          readOnly: true
+        payment_method_id:
+          type: string
+          description: Payment Method ID
+      required:
+        - payment_method_id
     ErrorDetail:
       type: object
       additionalProperties: false

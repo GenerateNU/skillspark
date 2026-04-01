@@ -10,6 +10,7 @@
     "submit": "Submit",
     "cancel": "Cancel",
     "loading": "Loading...",
+    "saving": "Saving...",
     "loadingMapData": "Loading Map Data...",
     "loadingEvents": "Loading events...",
     "errorLoadingEvents": "Error loading events",
@@ -76,7 +77,10 @@
     "title": "Payment",
     "manageBilling": "Manage Billing",
     "creditCard": "Credit Card",
+    "expires": "Expires",
     "name": "Name",
+    "save": "Save",
+    "noCard": "No Card Registered",
     "updateBilling": "Update Billing",
     "delete": "Delete"
   },
