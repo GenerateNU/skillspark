@@ -2,8 +2,8 @@ import axios, {
   // AxiosRequestConfig,
   // AxiosResponse,
   type InternalAxiosRequestConfig,
-} from 'axios';
-export let currentLanguage = 'en';
+} from "axios";
+export let currentLanguage = "en";
 export function setCurrentLanguage(lang: string) {
   currentLanguage = lang;
 }

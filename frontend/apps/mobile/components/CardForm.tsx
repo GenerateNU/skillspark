@@ -1,6 +1,9 @@
 import { Colors, AppColors } from "@/constants/theme";
 import { useGuardian } from "@/hooks/use-guardian";
-import { createGuardianSetupIntent, type CreateSetupIntentOutputBody } from "@skillspark/api-client";
+import {
+  createGuardianSetupIntent,
+  type CreateSetupIntentOutputBody,
+} from "@skillspark/api-client";
 import { useStripe, CardField } from "@stripe/stripe-react-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,7 +11,13 @@ import { useColorScheme, View, TouchableOpacity } from "react-native";
 import { ThemedText } from "./themed-text";
 import { ErrorMessage } from "./ErrorMessage";
 
-export default function CardForm({ onSave, onCancel }: { onSave: () => void; onCancel: () => void }) {
+export default function CardForm({
+  onSave,
+  onCancel,
+}: {
+  onSave: () => void;
+  onCancel: () => void;
+}) {
   const [cardComplete, setCardComplete] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,11 +34,16 @@ export default function CardForm({ onSave, onCancel }: { onSave: () => void; onC
       setSaving(true);
 
       const res = await createGuardianSetupIntent(guardian.id);
-      if (res.status !== 200 && res.status !== 201) throw new Error("Failed to create setup intent");
+      if (res.status !== 200 && res.status !== 201)
+        throw new Error("Failed to create setup intent");
 
-      const clientSecret = (res.data as CreateSetupIntentOutputBody).client_secret;
-      const { error: stripeError } = await confirmSetupIntent(clientSecret, { paymentMethodType: "Card" });
-      if (stripeError) throw new Error("Failed to confirm payment method, please try again.");
+      const clientSecret = (res.data as CreateSetupIntentOutputBody)
+        .client_secret;
+      const { error: stripeError } = await confirmSetupIntent(clientSecret, {
+        paymentMethodType: "Card",
+      });
+      if (stripeError)
+        throw new Error("Failed to confirm payment method, please try again.");
 
       onSave();
     } catch (e) {
@@ -61,13 +75,19 @@ export default function CardForm({ onSave, onCancel }: { onSave: () => void; onC
           disabled={saving}
           activeOpacity={0.8}
         >
-          <ThemedText className="text-[15px] font-nunito" style={{ color: theme.text }}>
+          <ThemedText
+            className="text-[15px] font-nunito"
+            style={{ color: theme.text }}
+          >
             {translate("common.cancel")}
           </ThemedText>
         </TouchableOpacity>
         <TouchableOpacity
           className="flex-1 py-[14px] rounded-lg items-center justify-center"
-          style={{ backgroundColor: AppColors.primaryBlue, opacity: cardComplete && !saving ? 1 : 0.5 }}
+          style={{
+            backgroundColor: AppColors.primaryBlue,
+            opacity: cardComplete && !saving ? 1 : 0.5,
+          }}
           onPress={handleSave}
           disabled={!cardComplete || saving}
           activeOpacity={0.8}

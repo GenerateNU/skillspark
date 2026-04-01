@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, useColorScheme, ActivityIndicator } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  useColorScheme,
+  ActivityIndicator,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
@@ -31,19 +36,20 @@ export default function PaymentScreen() {
   const [error, setError] = useState<string | null>(null);
   const { guardian } = useGuardian();
 
-      async function fetchPaymentMethods(): Promise<void> {
-      if (!guardian) return;
-      try {
-        const res = await getGuardianPaymentMethods(guardian.id);
-        if (res.status !== 200 && res.status !== 201) throw res.data;
-        const methods = (res.data as GetPaymentMethodsByGuardianIDOutputBody).payment_methods;
-        setPaymentMethods(methods ? methods : []);
-      } catch (e) {
-        setError("Failed to fetch payment methods");
-      } finally {
-        setLoading(false);
-      }
+  async function fetchPaymentMethods(): Promise<void> {
+    if (!guardian) return;
+    try {
+      const res = await getGuardianPaymentMethods(guardian.id);
+      if (res.status !== 200 && res.status !== 201) throw res.data;
+      const methods = (res.data as GetPaymentMethodsByGuardianIDOutputBody)
+        .payment_methods;
+      setPaymentMethods(methods ? methods : []);
+    } catch (e) {
+      setError("Failed to fetch payment methods");
+    } finally {
+      setLoading(false);
     }
+  }
 
   useEffect(() => {
     fetchPaymentMethods();
@@ -52,20 +58,29 @@ export default function PaymentScreen() {
   const deletePaymentMethod = (id: string) => {
     async function detachMethod() {
       try {
-      const res = await detachGuardianPaymentMethod({payment_method_id: id});
-      if (res.status !== 204) {
-        throw res.data
-      }
-      setPaymentMethods(paymentMethods.filter((pm : PaymentMethod) => pm.id != id));
+        const res = await detachGuardianPaymentMethod({
+          payment_method_id: id,
+        });
+        if (res.status !== 204) {
+          throw res.data;
+        }
+        setPaymentMethods(
+          paymentMethods.filter((pm: PaymentMethod) => pm.id != id),
+        );
       } catch (e) {
-        console.error(e)
+        console.error(e);
       }
     }
     detachMethod();
-  }
+  };
 
   return (
-    <StripeProvider publishableKey={process.env.STRIPE_PUBLIC_TEST_KEY ?? "pk_test_51Sv0A4FrpRQNhznd1iPvH4KiYp9NuqJjqrKSiuDr3Ut2BcWgOf82rOx0SDiWuS7BMAd3hErQQmAIg12fhib2ZanZ00yBhzIAJR"}>
+    <StripeProvider
+      publishableKey={
+        process.env.STRIPE_PUBLIC_TEST_KEY ??
+        "pk_test_51Sv0A4FrpRQNhznd1iPvH4KiYp9NuqJjqrKSiuDr3Ut2BcWgOf82rOx0SDiWuS7BMAd3hErQQmAIg12fhib2ZanZ00yBhzIAJR"
+      }
+    >
       <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
         <View className="flex-row items-center justify-between px-5 py-[14px]">
           <TouchableOpacity
@@ -90,7 +105,11 @@ export default function PaymentScreen() {
           </ThemedText>
 
           {loading ? (
-            <ActivityIndicator size="small" color={AppColors.primaryBlue} style={{ marginBottom: 32 }} />
+            <ActivityIndicator
+              size="small"
+              color={AppColors.primaryBlue}
+              style={{ marginBottom: 32 }}
+            />
           ) : editingCard ? (
             <CardForm
               onSave={async () => {
@@ -100,11 +119,20 @@ export default function PaymentScreen() {
               onCancel={() => setEditingCard(false)}
             />
           ) : paymentMethods.length > 0 ? (
-            paymentMethods.map((method, i) => <PaymentMethodRow method={method} onDelete={deletePaymentMethod} key={i} />)
-          ) : 
-          error ? <></> :
-          (
-            <ThemedText className="text-base font-nunito mb-8" style={{ color: theme.icon }}>
+            paymentMethods.map((method, i) => (
+              <PaymentMethodRow
+                method={method}
+                onDelete={deletePaymentMethod}
+                key={i}
+              />
+            ))
+          ) : error ? (
+            <></>
+          ) : (
+            <ThemedText
+              className="text-base font-nunito mb-8"
+              style={{ color: theme.icon }}
+            >
               {translate("payment.noCard")}
             </ThemedText>
           )}
