@@ -47,7 +47,7 @@ export default function LanguageScreen() {
 				guardian.username,
 				guardian.profile_picture_s3_key,
 			);
-			console.log(errorText);
+			if (errorText !== "") console.log(errorText); // how should we display error to user?
 		}
 	};
 

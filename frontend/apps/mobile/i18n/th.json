@@ -1,140 +1,148 @@
 {
-  "nav": {
-    "home": "หน้าหลัก",
-    "map": "แผนที่",
-    "profile": "โปรไฟล์",
-    "events": "กิจกรรม",
-    "about": "เกี่ยวกับ"
-  },
-  "common": {
-    "submit": "ส่ง",
-    "cancel": "ยกเลิก",
-    "loading": "กำลังโหลด...",
-    "loadingMapData": "กำลังโหลดข้อมูลแผนที่...",
-    "loadingEvents": "กำลังโหลดกิจกรรม...",
-    "errorLoadingEvents": "เกิดข้อผิดพลาดในการโหลดกิจกรรม",
-    "errorOccurred": "เกิดข้อผิดพลาด",
-    "errorFetchingEvents": "เกิดข้อผิดพลาดขณะดึงข้อมูลกิจกรรม",
-    "noEventsNearby": "ไม่พบกิจกรรมในบริเวณใกล้เคียง",
-    "noEventsAvailable": "ไม่มีกิจกรรม",
-    "noUpcomingEvents": "ไม่มีกิจกรรมที่จะมาถึง",
-    "noGuardianId": "ไม่สามารถโหลดได้: ไม่พบบัญชี",
-    "noChildrenFound": "ไม่พบข้อมูลเด็ก",
-    "noChildProfilesAdded": "ยังไม่มีโปรไฟล์เด็ก",
-    "error": "ข้อผิดพลาด",
-    "locationDenied": "การเข้าถึงตำแหน่งที่ตั้งถูกปฏิเสธ กรุณาเปิดใช้งานในการตั้งค่า",
-    "openSettings": "เปิดการตั้งค่า"
-  },
-  "home": {
-    "title": "ยินดีต้อนรับ",
-    "subtitle": "ค้นหากิจกรรมใกล้คุณ"
-  },
-  "dashboard": {
-    "title": "แดชบอร์ดของฉัน",
-    "searchPlaceholder": "ค้นหาคลาส",
-    "discoverWeekly": "ค้นพบประจำสัปดาห์",
-    "forYou": "สำหรับคุณ",
-    "basedOn": "ตามจาก",
-    "upcomingEvents": "กิจกรรมที่จะมาถึง",
-    "reserve": "จอง",
-    "reserved": "จองแล้ว",
-    "members": "สมาชิก",
-    "categories": {
-      "technology": "เทคโนโลยี",
-      "art": "ศิลปะ",
-      "music": "ดนตรี",
-      "math": "คณิตศาสตร์",
-      "sports": "กีฬา"
-    }
-  },
-  "profile": {
-    "contact": "ติดต่อ",
-    "family": "ครอบครัว",
-    "born": "เกิด {{year}}",
-    "myBookings": "การจองของฉัน",
-    "upcoming": "ที่จะมาถึง",
-    "previous": "ก่อนหน้า",
-    "saved": "ที่บันทึกไว้",
-    "preferences": "การตั้งค่า",
-    "payment": "การชำระเงิน",
-    "familyInformation": "ข้อมูลครอบครัว",
-    "settings": "ตั้งค่า"
-  },
-  "settings": {
-    "title": "ตั้งค่า",
-    "language": "ภาษา",
-    "languages": {
-      "en": "อังกฤษ",
-      "th": "ไทย"
-    },
-    "termsAndConditions": "ข้อกำหนดและเงื่อนไข",
-    "privacyPolicy": "นโยบายความเป็นส่วนตัว",
-    "logOut": "ออกจากระบบ",
-    "deleteAccount": "ลบบัญชี"
-  },
-  "payment": {
-    "title": "การชำระเงิน",
-    "manageBilling": "จัดการการเรียกเก็บเงิน",
-    "creditCard": "บัตรเครดิต",
-    "name": "ชื่อ",
-    "updateBilling": "อัปเดตการเรียกเก็บเงิน",
-    "delete": "ลบ"
-  },
-  "familyInformation": {
-    "title": "ข้อมูลครอบครัว",
-    "childProfile": "โปรไฟล์เด็ก",
-    "addProfile": "เพิ่มโปรไฟล์ +",
-    "interests": "ความสนใจ",
-    "emergencyContact": "ผู้ติดต่อฉุกเฉิน",
-    "addContact": "เพิ่มผู้ติดต่อ +"
-  },
-  "childProfile": {
-    "editTitle": "แก้ไขโปรไฟล์เด็ก",
-    "createTitle": "สร้างโปรไฟล์เด็ก",
-    "firstName": "ชื่อ",
-    "lastName": "นามสกุล",
-    "month": "เดือน",
-    "year": "ปี",
-    "saving": "กำลังบันทึก...",
-    "saveChanges": "บันทึกการเปลี่ยนแปลง",
-    "searchInterests": "ค้นหาความสนใจ...",
-    "selectSchool": "เลือกโรงเรียน",
-    "loadingSchools": "กำลังโหลดโรงเรียน...",
-    "failedToLoadSchools": "โหลดโรงเรียนไม่สำเร็จ",
-    "noSchoolsFound": "ไม่พบโรงเรียน",
-    "deleteProfile": "ลบโปรไฟล์",
-    "deleteConfirm": "คุณต้องการลบโปรไฟล์เด็กนี้ใช่ไหม?",
-    "requiredFieldsError": "กรุณากรอกข้อมูลที่จำเป็นทั้งหมด (ชื่อ วันเกิด รหัสโรงเรียน)",
-    "saveError": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
-    "deleteError": "ลบไม่สำเร็จ"
-  },
-  "saved": {
-    "title": "ที่บันทึกไว้",
-    "noEvents": "คุณไม่มีกิจกรรมที่บันทึกไว้",
-    "deleteTitle": "ลบกิจกรรมที่บันทึก",
-    "deleteConfirm": "คุณต้องการลบกิจกรรมที่บันทึกนี้ใช่ไหม?"
-  },
-  "event": {
-    "back": "กลับ",
-    "seeMore": "ดูเพิ่มเติม",
-    "seeLess": "ดูน้อยลง",
-    "perSession": "/เซสชัน",
-    "home": "บ้าน",
-    "location": "สถานที่",
-    "register": "ลงทะเบียน",
-    "notFound": "ไม่พบกิจกรรม",
-    "minWalk": "นาที",
-    "hr": "ชั่วโมง",
-    "min": "นาที"
-  },
-  "interests": {
-    "science": "วิทยาศาสตร์",
-    "math": "คณิตศาสตร์",
-    "music": "ดนตรี",
-    "art": "ศิลปะ",
-    "sports": "กีฬา",
-    "technology": "เทคโนโลยี",
-    "language": "ภาษา",
-    "other": "อื่นๆ"
-  }
+	"nav": {
+		"home": "หน้าหลัก",
+		"map": "แผนที่",
+		"profile": "โปรไฟล์",
+		"events": "กิจกรรม",
+		"about": "เกี่ยวกับ"
+	},
+	"common": {
+		"submit": "ส่ง",
+		"cancel": "ยกเลิก",
+		"loading": "กำลังโหลด...",
+		"loadingMapData": "กำลังโหลดข้อมูลแผนที่...",
+		"loadingEvents": "กำลังโหลดกิจกรรม...",
+		"errorLoadingEvents": "เกิดข้อผิดพลาดในการโหลดกิจกรรม",
+		"errorOccurred": "เกิดข้อผิดพลาด",
+		"errorFetchingEvents": "เกิดข้อผิดพลาดขณะดึงข้อมูลกิจกรรม",
+		"noEventsNearby": "ไม่พบกิจกรรมในบริเวณใกล้เคียง",
+		"noEventsAvailable": "ไม่มีกิจกรรม",
+		"noUpcomingEvents": "ไม่มีกิจกรรมที่จะมาถึง",
+		"noGuardianId": "ไม่สามารถโหลดได้: ไม่พบบัญชี",
+		"noChildrenFound": "ไม่พบข้อมูลเด็ก",
+		"noChildProfilesAdded": "ยังไม่มีโปรไฟล์เด็ก",
+		"error": "ข้อผิดพลาด",
+		"locationDenied": "การเข้าถึงตำแหน่งที่ตั้งถูกปฏิเสธ กรุณาเปิดใช้งานในการตั้งค่า",
+		"openSettings": "เปิดการตั้งค่า"
+	},
+	"home": {
+		"title": "ยินดีต้อนรับ",
+		"subtitle": "ค้นหากิจกรรมใกล้คุณ"
+	},
+	"dashboard": {
+		"title": "แดชบอร์ดของฉัน",
+		"searchPlaceholder": "ค้นหาคลาส",
+		"discoverWeekly": "ค้นพบประจำสัปดาห์",
+		"forYou": "สำหรับคุณ",
+		"basedOn": "ตามจาก",
+		"upcomingEvents": "กิจกรรมที่จะมาถึง",
+		"reserve": "จอง",
+		"reserved": "จองแล้ว",
+		"members": "สมาชิก",
+		"categories": {
+			"technology": "เทคโนโลยี",
+			"art": "ศิลปะ",
+			"music": "ดนตรี",
+			"math": "คณิตศาสตร์",
+			"sports": "กีฬา"
+		}
+	},
+	"profile": {
+		"contact": "ติดต่อ",
+		"family": "ครอบครัว",
+		"born": "เกิด {{year}}",
+		"myBookings": "การจองของฉัน",
+		"upcoming": "ที่จะมาถึง",
+		"previous": "ก่อนหน้า",
+		"saved": "ที่บันทึกไว้",
+		"preferences": "การตั้งค่า",
+		"payment": "การชำระเงิน",
+		"familyInformation": "ข้อมูลครอบครัว",
+		"settings": "ตั้งค่า"
+	},
+	"settings": {
+		"title": "ตั้งค่า",
+		"language": "ภาษา",
+		"languages": {
+			"en": "อังกฤษ",
+			"th": "ไทย"
+		},
+		"termsAndConditions": "ข้อกำหนดและเงื่อนไข",
+		"privacyPolicy": "นโยบายความเป็นส่วนตัว",
+		"logOut": "ออกจากระบบ",
+		"deleteAccount": "ลบบัญชี"
+	},
+	"payment": {
+		"title": "การชำระเงิน",
+		"manageBilling": "จัดการการเรียกเก็บเงิน",
+		"creditCard": "บัตรเครดิต",
+		"name": "ชื่อ",
+		"updateBilling": "อัปเดตการเรียกเก็บเงิน",
+		"delete": "ลบ"
+	},
+	"familyInformation": {
+		"title": "ข้อมูลครอบครัว",
+		"childProfile": "โปรไฟล์เด็ก",
+		"addProfile": "เพิ่มโปรไฟล์ +",
+		"interests": "ความสนใจ",
+		"emergencyContact": "ผู้ติดต่อฉุกเฉิน",
+		"addContact": "เพิ่มผู้ติดต่อ +"
+	},
+	"childProfile": {
+		"editTitle": "แก้ไขโปรไฟล์เด็ก",
+		"createTitle": "สร้างโปรไฟล์เด็ก",
+		"firstName": "ชื่อ",
+		"lastName": "นามสกุล",
+		"month": "เดือน",
+		"year": "ปี",
+		"saving": "กำลังบันทึก...",
+		"saveChanges": "บันทึกการเปลี่ยนแปลง",
+		"searchInterests": "ค้นหาความสนใจ...",
+		"selectSchool": "เลือกโรงเรียน",
+		"loadingSchools": "กำลังโหลดโรงเรียน...",
+		"failedToLoadSchools": "โหลดโรงเรียนไม่สำเร็จ",
+		"noSchoolsFound": "ไม่พบโรงเรียน",
+		"deleteProfile": "ลบโปรไฟล์",
+		"deleteConfirm": "คุณต้องการลบโปรไฟล์เด็กนี้ใช่ไหม?",
+		"requiredFieldsError": "กรุณากรอกข้อมูลที่จำเป็นทั้งหมด (ชื่อ วันเกิด รหัสโรงเรียน)",
+		"saveError": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
+		"deleteError": "ลบไม่สำเร็จ"
+	},
+	"saved": {
+		"title": "ที่บันทึกไว้",
+		"noEvents": "คุณไม่มีกิจกรรมที่บันทึกไว้",
+		"deleteTitle": "ลบกิจกรรมที่บันทึก",
+		"deleteConfirm": "คุณต้องการลบกิจกรรมที่บันทึกนี้ใช่ไหม?"
+	},
+	"event": {
+		"back": "กลับ",
+		"seeMore": "ดูเพิ่มเติม",
+		"seeLess": "ดูน้อยลง",
+		"perSession": "/เซสชัน",
+		"home": "บ้าน",
+		"location": "สถานที่",
+		"register": "ลงทะเบียน",
+		"notFound": "ไม่พบกิจกรรม",
+		"minWalk": "นาที",
+		"hr": "ชั่วโมง",
+		"min": "นาที"
+	},
+	"interests": {
+		"science": "วิทยาศาสตร์",
+		"math": "คณิตศาสตร์",
+		"music": "ดนตรี",
+		"art": "ศิลปะ",
+		"sports": "กีฬา",
+		"technology": "เทคโนโลยี",
+		"language": "ภาษา",
+		"other": "อื่นๆ"
+	},
+	"editProfile": {
+		"title": "ข้อมูลครอบครัว",
+		"subtitle": "แก้ไขโปรไฟล์",
+		"name": "ชื่อ",
+		"username": "ชื่อผู้ใช้",
+		"changeImage": "เปลี่ยนรูปภาพ",
+		"saveChanges": "บันทึกการเปลี่ยนแปลง"
+	}
 }

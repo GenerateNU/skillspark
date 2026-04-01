@@ -10,20 +10,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { FamilyCard } from "@/components/FamilyCard";
 import { ListItem } from "@/components/ListItem";
 import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
-import { AppColors, Colors } from "@/constants/theme";
 import { NoProfilePic } from "@/components/NoProfilePic";
 
 export default function ProfileScreen() {
 	const insets = useSafeAreaInsets();
 	const colorScheme = useColorScheme();
-	const theme = Colors[colorScheme ?? "light"];
 	const router = useRouter();
 	const { t: translate } = useTranslation();
 

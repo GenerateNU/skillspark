@@ -19,6 +19,7 @@ import { Button } from "@/components/Button";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { ImageSelector } from "@/components/ImageSelector";
 import { useGuardian } from "@/hooks/use-guardian";
+import { useTranslation } from "react-i18next";
 
 type EditFormData = {
 	name: string;
@@ -38,6 +39,7 @@ export default function EditProfileScreen() {
 	const [pfp, setPfp] = useState<string | undefined>(
 		guardian?.profile_picture_s3_key,
 	);
+	const { t: translate } = useTranslation();
 
 	const { control, handleSubmit } = useForm<EditFormData>({
 		defaultValues: {
@@ -90,7 +92,7 @@ export default function EditProfileScreen() {
 					<IconSymbol name="chevron.left" size={24} color={theme.text} />
 				</TouchableOpacity>
 				<ThemedText className="text-xl text-center font-nunito-bold">
-					Family Information
+					{translate("editProfile.title")}
 				</ThemedText>
 				<View className="w-10" />
 			</View>
@@ -101,7 +103,7 @@ export default function EditProfileScreen() {
 				keyboardShouldPersistTaps="handled"
 			>
 				<ThemedText className="text-lg font-nunito-bold mt-4 mb-6">
-					Edit Profile
+					{translate("editProfile.subtitle")}
 				</ThemedText>
 
 				<View className="items-center mb-8">
@@ -127,23 +129,25 @@ export default function EditProfileScreen() {
 
 				<View className="gap-5">
 					<View className="gap-1">
-						<ThemedText className="text-sm font-nunito-bold">Name</ThemedText>
+						<ThemedText className="text-sm font-nunito-bold">
+							{translate("editProfile.name")}
+						</ThemedText>
 						<AuthFormInput
 							control={control}
 							name="name"
-							placeholder="Name"
+							placeholder={translate("editProfile.name")}
 							autoCapitalize="none"
 						/>
 					</View>
 
 					<View className="gap-1">
 						<ThemedText className="text-sm font-nunito-bold">
-							Username
+							{translate("editProfile.username")}
 						</ThemedText>
 						<AuthFormInput
 							control={control}
 							name="username"
-							placeholder="Username"
+							placeholder={translate("editProfile.username")}
 							autoCapitalize="none"
 						/>
 					</View>
@@ -152,7 +156,10 @@ export default function EditProfileScreen() {
 				<ErrorMessage message={errorText} />
 
 				<View className="mt-8">
-					<Button label="Save Changes" onPress={handleSubmit(onSubmit)} />
+					<Button
+						label={translate("editProfile.saveChanges")}
+						onPress={handleSubmit(onSubmit)}
+					/>
 				</View>
 			</ScrollView>
 		</ThemedView>
