@@ -1,5 +1,6 @@
 import React from "react";
-import { Alert, View, TouchableOpacity, Platform } from "react-native";
+import { View, TouchableOpacity, Platform } from "react-native";
+import { useRouter } from "expo-router";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -22,6 +23,7 @@ interface EventCardProps {
 }
 
 export function EventCard({ pin }: EventCardProps) {
+  const router = useRouter();
   const placeholderColor = useThemeColor(
     { light: "#D0D0D0", dark: "#333333" },
     "background",
@@ -75,17 +77,12 @@ export function EventCard({ pin }: EventCardProps) {
         </View>
       </View>
       <TouchableOpacity
-        className="w-full items-center rounded-xl bg-[#333] py-[15px]"
-        activeOpacity={1}
-        onPress={() =>
-          Alert.alert(
-            translate("dashboard.reserve"),
-            `${translate("dashboard.reserved")}: ${pin.title}`,
-          )
-        }
+        className="w-full items-center rounded-xl bg-black py-[15px]"
+        activeOpacity={0.8}
+        onPress={() => router.push(`/event/${pin.id}`)}
       >
-        <ThemedText className="text-[18px] font-semibold text-white">
-          {translate("dashboard.reserve")}
+        <ThemedText lightColor="#fff" darkColor="#fff" className="text-[18px] font-semibold">
+          {translate("dashboard.learnMore")}
         </ThemedText>
       </TouchableOpacity>
     </ThemedView>
