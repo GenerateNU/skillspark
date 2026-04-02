@@ -31,6 +31,9 @@ export default function RootLayout() {
     NunitoSans_500Medium,
     NunitoSans_600SemiBold,
     NunitoSans_700Bold,
+    MuseoModerno_700Bold: {
+      uri: "https://fonts.gstatic.com/s/museomoderno/v21/zrf30VXsoJQLfl-LiGQLaGoBRhuRKNR8m3k.woff2",
+    },
   });
 
   useEffect(() => {
