@@ -38,6 +38,7 @@
     "upcomingEvents": "กิจกรรมที่จะมาถึง",
     "reserve": "จอง",
     "reserved": "จองแล้ว",
+    "learnMore": "ดูเพิ่มเติม",
     "members": "สมาชิก",
     "categories": {
       "technology": "เทคโนโลยี",
@@ -125,7 +126,14 @@
     "notFound": "ไม่พบกิจกรรม",
     "minWalk": "นาที",
     "hr": "ชั่วโมง",
-    "min": "นาที"
+    "min": "นาที",
+    "bookingsThisWeek": "การจองสัปดาห์นี้",
+    "about": "เกี่ยวกับ",
+    "reviews": "รีวิว",
+    "more": "เพิ่มเติม",
+    "noReviews": "ยังไม่มีรีวิว",
+    "seeMoreReviews": "ดูรีวิวเพิ่มเติม",
+    "seeSchedule": "ดูตารางเรียน"
   },
   "interests": {
     "science": "วิทยาศาสตร์",

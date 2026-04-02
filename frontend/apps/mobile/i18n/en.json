@@ -38,6 +38,7 @@
     "upcomingEvents": "upcoming events",
     "reserve": "Reserve",
     "reserved": "Reserved",
+    "learnMore": "Learn More",
     "members": "members",
     "categories": {
       "technology": "technology",
@@ -125,7 +126,14 @@
     "notFound": "Event not found",
     "minWalk": "min",
     "hr": "hr",
-    "min": "min"
+    "min": "min",
+    "bookingsThisWeek": "Bookings this week",
+    "about": "About",
+    "reviews": "Reviews",
+    "more": "more",
+    "noReviews": "No reviews yet.",
+    "seeMoreReviews": "See more reviews",
+    "seeSchedule": "See Schedule"
   },
   "interests": {
     "science": "Science",
