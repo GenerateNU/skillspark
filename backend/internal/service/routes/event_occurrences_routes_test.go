@@ -229,7 +229,6 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			payload: map[string]interface{}{
 				"manager_id":    nil,
 				"event_id":      uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-				"location_id":   uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 				"start_time":    start,
 				"end_time":      end,
 				"max_attendees": 10,
@@ -265,7 +264,6 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			payload: map[string]interface{}{
 				"manager_id":    nil,
 				"event_id":      uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-				"location_id":   uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 				"start_time":    start,
 				"end_time":      end,
 				"max_attendees": 10,
@@ -280,7 +278,6 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			payload: map[string]interface{}{
 				"manager_id":    nil,
 				"event_id":      uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-				"location_id":   uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 				"start_time":    start,
 				"end_time":      end,
 				"max_attendees": 10,
@@ -295,7 +292,6 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			payload: map[string]interface{}{
 				"manager_id":    nil,
 				"event_id":      uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-				"location_id":   uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 				"start_time":    start,
 				"end_time":      end,
 				"max_attendees": 0,
@@ -311,7 +307,6 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 			payload: map[string]interface{}{
 				"manager_id":    nil,
 				"event_id":      uuid.MustParse("60000000-0000-0000-0000-000000000001"),
-				"location_id":   uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 				"start_time":    start,
 				"end_time":      end,
 				"max_attendees": 10,
@@ -360,7 +355,6 @@ func TestHumaValidation_CreateEventOccurrence(t *testing.T) {
 					Role:           "Director",
 				}, nil)
 				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything, mock.Anything).Return(&event, nil)
-				mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything).Return(&location, nil)
 			}
 
 			resp, err := app.Test(req)
@@ -384,7 +378,6 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
 	midNew := uuid.MustParse("50000000-0000-0000-0000-000000000005")
 	eid := uuid.MustParse("60000000-0000-0000-0000-00000000000e")
-	lid := uuid.MustParse("10000000-0000-0000-0000-000000000008")
 	start, _ := time.Parse(time.RFC3339, "2026-02-22T09:00:00+07:00")
 	end, _ := time.Parse(time.RFC3339, "2026-02-22T11:00:00+07:00")
 	startNew, _ := time.Parse(time.RFC3339, "2026-02-15T10:00:00+07:00")
@@ -439,7 +432,7 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 	}
 
 	locationNew := models.Location{
-		ID:           lid,
+		ID:           uuid.MustParse("10000000-0000-0000-0000-000000000008"),
 		Latitude:     13.7400000,
 		Longitude:    100.5450000,
 		AddressLine1: "369 Wireless Road",
@@ -466,7 +459,6 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 			payload: map[string]interface{}{
 				"manager_id":    midNew,
 				"event_id":      eid,
-				"location_id":   lid,
 				"start_time":    startNew,
 				"end_time":      endNew,
 				"max_attendees": 10,
@@ -567,7 +559,6 @@ func TestHumaValidation_UpdateEventOccurrence(t *testing.T) {
 					Role:           "Director",
 				}, nil)
 				mockEventRepo.On("GetEventByID", mock.Anything, mock.Anything, mock.Anything).Return(&event, nil)
-				mockLocationRepo.On("GetLocationByID", mock.Anything, mock.Anything).Return(&location, nil)
 			}
 
 			resp, err := app.Test(req)
@@ -755,8 +746,7 @@ func TestHumaValidation_EventOccurrence_InvalidAcceptLanguage(t *testing.T) {
 			t.Parallel()
 
 			body, _ := json.Marshal(map[string]interface{}{
-				"event_id":    "60000000-0000-0000-0000-000000000001",
-				"location_id": "10000000-0000-0000-0000-000000000004",
+				"event_id": "60000000-0000-0000-0000-000000000001",
 			})
 
 			app, _ := setupEventOccurrencesTestAPI(

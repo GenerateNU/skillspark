@@ -7,18 +7,19 @@ import (
 )
 
 type Saved struct {
-	ID                uuid.UUID `json:"id" db:"id"`
-	GuardianID        uuid.UUID `json:"guardian_id" db:"guardian_id"`
-	EventOccurrenceID uuid.UUID `json:"event_occurrence_id" db:"event_occurrence_id"`
-	CreatedAt         time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt         time.Time `json:"updated_at" db:"updated_at"`
+	ID         uuid.UUID `json:"id" db:"id"`
+	GuardianID uuid.UUID `json:"guardian_id" db:"guardian_id"`
+	Event      Event     `json:"event" db:"-"`
+	CreatedAt  time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type CreateSavedInput struct {
 	Body struct {
-		GuardianID        uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian that saved this."`
-		EventOccurrenceID uuid.UUID `json:"event_occurrence_id" db:"event_occurrence_id" doc:"ID of the event occurrence of this saved event."`
+		GuardianID uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian that saved this."`
+		EventID    uuid.UUID `json:"event_id" db:"event_id" doc:"ID of this saved event."`
 	}
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 }
 
 type CreateSavedOutput struct {
@@ -36,9 +37,10 @@ type DeleteSavedOutput struct {
 }
 
 type GetSavedInput struct {
-	ID       uuid.UUID `path:"id"`
-	Page     int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
-	PageSize int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+	ID             uuid.UUID `path:"id"`
+	Page           int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
+	PageSize       int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 }
 
 type GetSavedOutput struct {

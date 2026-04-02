@@ -40,12 +40,29 @@ func TestGetSavedByGuardianID_Success(t *testing.T) {
 	guardianID := uuid.New()
 	now := time.Now()
 
+	eight := 8
+	twelve := 12
+	jpg := "events/robotics_workshop.jpg"
+
+	event := models.Event{
+		ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+		Title:            "Junior Robotics Workshop",
+		Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+		AgeRangeMin:      &eight,
+		AgeRangeMax:      &twelve,
+		Category:         []string{"science", "technology"},
+		HeaderImageS3Key: &jpg,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
+	}
+
 	expectedSaved := []models.Saved{
 		{
-			ID:                uuid.New(),
-			GuardianID:        guardianID,
-			EventOccurrenceID: uuid.New(),
-			CreatedAt:         now,
+			ID:         uuid.New(),
+			GuardianID: guardianID,
+			Event:      event,
+			CreatedAt:  now,
 		},
 	}
 
@@ -54,6 +71,7 @@ func TestGetSavedByGuardianID_Success(t *testing.T) {
 		mock.Anything,
 		guardianID,
 		utils.Pagination{Page: 1, Limit: 10},
+		mock.AnythingOfType("string"),
 	).Return(expectedSaved, nil)
 
 	app, _ := setupSavedTestAPI(mockRepo)
@@ -77,6 +95,7 @@ func TestGetSavedByGuardianID_Success(t *testing.T) {
 
 	assert.Len(t, decoded, 1)
 	assert.Equal(t, expectedSaved[0].GuardianID, decoded[0].GuardianID)
+	assert.Equal(t, expectedSaved[0].Event.ID, decoded[0].Event.ID)
 
 	mockRepo.AssertExpectations(t)
 }
@@ -88,16 +107,33 @@ func TestGetSavedByGuardianID_WithPagination(t *testing.T) {
 
 	guardianID := uuid.New()
 
+	eight := 8
+	twelve := 12
+	jpg := "events/robotics_workshop.jpg"
+
+	event := models.Event{
+		ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+		Title:            "Junior Robotics Workshop",
+		Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+		AgeRangeMin:      &eight,
+		AgeRangeMax:      &twelve,
+		Category:         []string{"science", "technology"},
+		HeaderImageS3Key: &jpg,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
+	}
+
 	expectedSaved := []models.Saved{
 		{
-			ID:                uuid.New(),
-			GuardianID:        guardianID,
-			EventOccurrenceID: uuid.New(),
+			ID:         uuid.New(),
+			GuardianID: guardianID,
+			Event:      event,
 		},
 		{
-			ID:                uuid.New(),
-			GuardianID:        guardianID,
-			EventOccurrenceID: uuid.New(),
+			ID:         uuid.New(),
+			GuardianID: guardianID,
+			Event:      event,
 		},
 	}
 
@@ -106,6 +142,7 @@ func TestGetSavedByGuardianID_WithPagination(t *testing.T) {
 		mock.Anything,
 		guardianID,
 		utils.Pagination{Page: 2, Limit: 10},
+		mock.AnythingOfType("string"),
 	).Return(expectedSaved, nil)
 
 	app, _ := setupSavedTestAPI(mockRepo)
@@ -178,22 +215,38 @@ func TestCreateSaved_Success(t *testing.T) {
 	mockRepo := new(repomocks.MockSavedRepository)
 
 	guardianID := uuid.New()
-	eventOccurrenceID := uuid.New()
+	eventID := uuid.New()
+
+	eight := 8
+	twelve := 12
+	jpg := "events/robotics_workshop.jpg"
+	event := models.Event{
+		ID:               eventID,
+		Title:            "Junior Robotics Workshop",
+		Description:      "Learn the basics of robotics with hands-on LEGO Mindstorms projects. Build and program your own robots!",
+		OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+		AgeRangeMin:      &eight,
+		AgeRangeMax:      &twelve,
+		Category:         []string{"science", "technology"},
+		HeaderImageS3Key: &jpg,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
+	}
 
 	input := models.CreateSavedInput{
 		Body: struct {
-			GuardianID        uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian that saved this."`
-			EventOccurrenceID uuid.UUID `json:"event_occurrence_id" db:"event_occurrence_id" doc:"ID of the event occurrence of this saved event."`
+			GuardianID uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian that saved this."`
+			EventID    uuid.UUID `json:"event_id" db:"event_id" doc:"ID of this saved event."`
 		}{
-			GuardianID:        guardianID,
-			EventOccurrenceID: eventOccurrenceID,
+			GuardianID: guardianID,
+			EventID:    eventID,
 		},
 	}
 
 	expectedSaved := &models.Saved{
-		ID:                uuid.New(),
-		GuardianID:        guardianID,
-		EventOccurrenceID: eventOccurrenceID,
+		ID:         uuid.New(),
+		GuardianID: guardianID,
+		Event:      event,
 	}
 
 	mockRepo.On(
@@ -226,7 +279,7 @@ func TestCreateSaved_Success(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, expectedSaved.GuardianID, decoded.GuardianID)
-	assert.Equal(t, expectedSaved.EventOccurrenceID, decoded.EventOccurrenceID)
+	assert.Equal(t, expectedSaved.Event.ID, decoded.Event.ID)
 
 	mockRepo.AssertExpectations(t)
 }

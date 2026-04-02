@@ -1,0 +1,14 @@
+# Copy to terraform.tfvars and fill in. Do not commit terraform.tfvars.
+
+aws_region   = "us-east-2"
+project_name = "skillspark"
+environment  = "dev"
+
+resend_api_key    = "re_xxxxxxxxxxxx"
+expo_access_token = "" # Optional
+
+# Optional overrides (defaults are in variables.tf)
+# lambda_timeout             = 30
+# lambda_reserved_concurrency = 2
+# sqs_batch_size             = 10
+# sqs_batch_window           = 5

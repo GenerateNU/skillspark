@@ -5,734 +5,1019 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
-  MutationFunction,
-  QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+	DataTag,
+	DefinedInitialDataOptions,
+	DefinedUseQueryResult,
+	MutationFunction,
+	QueryClient,
+	QueryFunction,
+	QueryKey,
+	UndefinedInitialDataOptions,
+	UseMutationOptions,
+	UseMutationResult,
+	UseQueryOptions,
+	UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
-  AttachPaymentMethodInputBody,
-  AttachPaymentMethodOutputBody,
-  CreateOrgLoginLinkOutputBody,
-  CreateOrgStripeAccountOutputBody,
-  CreateSetupIntentOutputBody,
-  CreateStripeOnboardingLinkInputBody,
-  CreateStripeOnboardingLinkOutputBody,
-  ErrorModel,
-  GetPaymentMethodsByGuardianIDOutputBody,
-  Guardian
-} from '../skillSparkAPI.schemas';
+	AttachPaymentMethodInputBody,
+	AttachPaymentMethodOutputBody,
+	CreateOrgLoginLinkOutputBody,
+	CreateOrgStripeAccountOutputBody,
+	CreateSetupIntentOutputBody,
+	CreateStripeOnboardingLinkInputBody,
+	CreateStripeOnboardingLinkOutputBody,
+	ErrorModel,
+	GetPaymentMethodsByGuardianIDOutputBody,
+	Guardian,
+} from "../skillSparkAPI.schemas";
 
-import { customInstance } from '../../apiClient';
+import { customInstance } from "../../apiClient";
 
 // https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
-type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
-T,
->() => T extends Y ? 1 : 2
-? A
-: B;
+type IfEquals<X, Y, A = X, B = never> =
+	(<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
 
 type WritableKeys<T> = {
-[P in keyof T]-?: IfEquals<
-  { [Q in P]: T[P] },
-  { -readonly [Q in P]: T[P] },
-  P
->;
+	[P in keyof T]-?: IfEquals<
+		{ [Q in P]: T[P] },
+		{ -readonly [Q in P]: T[P] },
+		P
+	>;
 }[keyof T];
 
-type UnionToIntersection<U> =
-  (U extends any ? (k: U)=>void : never) extends ((k: infer I)=>void) ? I : never;
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+	k: infer I,
+) => void
+	? I
+	: never;
 type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
 
 type Writable<T> = Pick<T, WritableKeys<T>>;
-type NonReadonly<T> = [T] extends [UnionToIntersection<T>] ? {
-  [P in keyof Writable<T>]: T[P] extends object
-    ? NonReadonly<NonNullable<T[P]>>
-    : T[P];
-} : DistributeReadOnlyOverUnions<T>;
-
-
+type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
+	? {
+			[P in keyof Writable<T>]: T[P] extends object
+				? NonReadonly<NonNullable<T[P]>>
+				: T[P];
+		}
+	: DistributeReadOnlyOverUnions<T>;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
 export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
-export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 419 | 420 | 421 | 422 | 423 | 424 | 426 | 428 | 429 | 431 | 451;
+export type HTTPStatusCode4xx =
+	| 400
+	| 401
+	| 402
+	| 403
+	| 404
+	| 405
+	| 406
+	| 407
+	| 408
+	| 409
+	| 410
+	| 411
+	| 412
+	| 413
+	| 414
+	| 415
+	| 416
+	| 417
+	| 418
+	| 419
+	| 420
+	| 421
+	| 422
+	| 423
+	| 424
+	| 426
+	| 428
+	| 429
+	| 431
+	| 451;
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
-export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
-
+export type HTTPStatusCodes =
+	| HTTPStatusCode1xx
+	| HTTPStatusCode2xx
+	| HTTPStatusCode3xx
+	| HTTPStatusCode4xx
+	| HTTPStatusCode5xx;
 
 /**
  * Retrieves all saved payment methods for a specific guardian
  * @summary Get all payment methods for a guardian
  */
 export type getGuardianPaymentMethodsResponse200 = {
-  data: GetPaymentMethodsByGuardianIDOutputBody
-  status: 200
-}
+	data: GetPaymentMethodsByGuardianIDOutputBody;
+	status: 200;
+};
 
 export type getGuardianPaymentMethodsResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type getGuardianPaymentMethodsResponseSuccess = (getGuardianPaymentMethodsResponse200) & {
-  headers: Headers;
-};
-export type getGuardianPaymentMethodsResponseError = (getGuardianPaymentMethodsResponseDefault) & {
-  headers: Headers;
+	data: ErrorModel;
+	status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type getGuardianPaymentMethodsResponse = (getGuardianPaymentMethodsResponseSuccess | getGuardianPaymentMethodsResponseError)
+export type getGuardianPaymentMethodsResponseSuccess =
+	getGuardianPaymentMethodsResponse200 & {
+		headers: Headers;
+	};
+export type getGuardianPaymentMethodsResponseError =
+	getGuardianPaymentMethodsResponseDefault & {
+		headers: Headers;
+	};
 
-export const getGetGuardianPaymentMethodsUrl = (guardianId: string,) => {
+export type getGuardianPaymentMethodsResponse =
+	| getGuardianPaymentMethodsResponseSuccess
+	| getGuardianPaymentMethodsResponseError;
 
+export const getGetGuardianPaymentMethodsUrl = (guardianId: string) => {
+	return `/api/v1/guardians/${guardianId}/payment-methods`;
+};
 
-  
+export const getGuardianPaymentMethods = async (
+	guardianId: string,
+	options?: RequestInit,
+): Promise<getGuardianPaymentMethodsResponse> => {
+	return customInstance<getGuardianPaymentMethodsResponse>(
+		getGetGuardianPaymentMethodsUrl(guardianId),
+		{
+			...options,
+			method: "GET",
+		},
+	);
+};
 
-  return `/api/v1/guardians/${guardianId}/payment-methods`
-}
+export const getGetGuardianPaymentMethodsQueryKey = (guardianId: string) => {
+	return [`/api/v1/guardians/${guardianId}/payment-methods`] as const;
+};
 
-export const getGuardianPaymentMethods = async (guardianId: string, options?: RequestInit): Promise<getGuardianPaymentMethodsResponse> => {
-  
-  return customInstance<getGuardianPaymentMethodsResponse>(getGetGuardianPaymentMethodsUrl(guardianId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getGetGuardianPaymentMethodsQueryKey = (guardianId: string,) => {
-    return [
-    `/api/v1/guardians/${guardianId}/payment-methods`
-    ] as const;
-    }
-
-    
-export const getGetGuardianPaymentMethodsQueryOptions = <TData = Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError = ErrorModel>(guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetGuardianPaymentMethodsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+	TError = ErrorModel,
+>(
+	guardianId: string,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
 ) => {
+	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+	const queryKey =
+		queryOptions?.queryKey ?? getGetGuardianPaymentMethodsQueryKey(guardianId);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetGuardianPaymentMethodsQueryKey(guardianId);
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof getGuardianPaymentMethods>>
+	> = ({ signal }) =>
+		getGuardianPaymentMethods(guardianId, { signal, ...requestOptions });
 
-  
+	return {
+		queryKey,
+		queryFn,
+		enabled: !!guardianId,
+		...queryOptions,
+	} as UseQueryOptions<
+		Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getGuardianPaymentMethods>>> = ({ signal }) => getGuardianPaymentMethods(guardianId, { signal, ...requestOptions });
+export type GetGuardianPaymentMethodsQueryResult = NonNullable<
+	Awaited<ReturnType<typeof getGuardianPaymentMethods>>
+>;
+export type GetGuardianPaymentMethodsQueryError = ErrorModel;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(guardianId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetGuardianPaymentMethodsQueryResult = NonNullable<Awaited<ReturnType<typeof getGuardianPaymentMethods>>>
-export type GetGuardianPaymentMethodsQueryError = ErrorModel
-
-
-export function useGetGuardianPaymentMethods<TData = Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError = ErrorModel>(
- guardianId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
-          TError,
-          Awaited<ReturnType<typeof getGuardianPaymentMethods>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetGuardianPaymentMethods<TData = Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError = ErrorModel>(
- guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
-          TError,
-          Awaited<ReturnType<typeof getGuardianPaymentMethods>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetGuardianPaymentMethods<TData = Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError = ErrorModel>(
- guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetGuardianPaymentMethods<
+	TData = Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+	TError = ErrorModel,
+>(
+	guardianId: string,
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+					TError,
+					Awaited<ReturnType<typeof getGuardianPaymentMethods>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetGuardianPaymentMethods<
+	TData = Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+	TError = ErrorModel,
+>(
+	guardianId: string,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+					TError,
+					Awaited<ReturnType<typeof getGuardianPaymentMethods>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetGuardianPaymentMethods<
+	TData = Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+	TError = ErrorModel,
+>(
+	guardianId: string,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get all payment methods for a guardian
  */
 
-export function useGetGuardianPaymentMethods<TData = Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError = ErrorModel>(
- guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGuardianPaymentMethods>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetGuardianPaymentMethods<
+	TData = Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+	TError = ErrorModel,
+>(
+	guardianId: string,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getGuardianPaymentMethods>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+} {
+	const queryOptions = getGetGuardianPaymentMethodsQueryOptions(
+		guardianId,
+		options,
+	);
 
-  const queryOptions = getGetGuardianPaymentMethodsQueryOptions(guardianId,options)
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
+	return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
 
 /**
  * Directly attaches a Stripe payment method to a guardian's customer account. For development/testing only.
  * @summary Attach a payment method to a guardian (testing only)
  */
 export type attachPaymentMethodResponse200 = {
-  data: AttachPaymentMethodOutputBody
-  status: 200
-}
+	data: AttachPaymentMethodOutputBody;
+	status: 200;
+};
 
 export type attachPaymentMethodResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type attachPaymentMethodResponseSuccess = (attachPaymentMethodResponse200) & {
-  headers: Headers;
-};
-export type attachPaymentMethodResponseError = (attachPaymentMethodResponseDefault) & {
-  headers: Headers;
+	data: ErrorModel;
+	status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type attachPaymentMethodResponse = (attachPaymentMethodResponseSuccess | attachPaymentMethodResponseError)
+export type attachPaymentMethodResponseSuccess =
+	attachPaymentMethodResponse200 & {
+		headers: Headers;
+	};
+export type attachPaymentMethodResponseError =
+	attachPaymentMethodResponseDefault & {
+		headers: Headers;
+	};
 
-export const getAttachPaymentMethodUrl = (guardianId: string,) => {
+export type attachPaymentMethodResponse =
+	| attachPaymentMethodResponseSuccess
+	| attachPaymentMethodResponseError;
 
+export const getAttachPaymentMethodUrl = (guardianId: string) => {
+	return `/api/v1/stripe/attach-pm/${guardianId}`;
+};
 
-  
+export const attachPaymentMethod = async (
+	guardianId: string,
+	attachPaymentMethodInputBody: NonReadonly<AttachPaymentMethodInputBody>,
+	options?: RequestInit,
+): Promise<attachPaymentMethodResponse> => {
+	return customInstance<attachPaymentMethodResponse>(
+		getAttachPaymentMethodUrl(guardianId),
+		{
+			...options,
+			method: "POST",
+			headers: { "Content-Type": "application/json", ...options?.headers },
+			body: JSON.stringify(attachPaymentMethodInputBody),
+		},
+	);
+};
 
-  return `/api/v1/stripe/attach-pm/${guardianId}`
-}
+export const getAttachPaymentMethodMutationOptions = <
+	TError = ErrorModel,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof attachPaymentMethod>>,
+		TError,
+		{ guardianId: string; data: NonReadonly<AttachPaymentMethodInputBody> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof attachPaymentMethod>>,
+	TError,
+	{ guardianId: string; data: NonReadonly<AttachPaymentMethodInputBody> },
+	TContext
+> => {
+	const mutationKey = ["attachPaymentMethod"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-export const attachPaymentMethod = async (guardianId: string,
-    attachPaymentMethodInputBody: NonReadonly<AttachPaymentMethodInputBody>, options?: RequestInit): Promise<attachPaymentMethodResponse> => {
-  
-  return customInstance<attachPaymentMethodResponse>(getAttachPaymentMethodUrl(guardianId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      attachPaymentMethodInputBody,)
-  }
-);}
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof attachPaymentMethod>>,
+		{ guardianId: string; data: NonReadonly<AttachPaymentMethodInputBody> }
+	> = (props) => {
+		const { guardianId, data } = props ?? {};
 
+		return attachPaymentMethod(guardianId, data, requestOptions);
+	};
 
+	return { mutationFn, ...mutationOptions };
+};
 
+export type AttachPaymentMethodMutationResult = NonNullable<
+	Awaited<ReturnType<typeof attachPaymentMethod>>
+>;
+export type AttachPaymentMethodMutationBody =
+	NonReadonly<AttachPaymentMethodInputBody>;
+export type AttachPaymentMethodMutationError = ErrorModel;
 
-export const getAttachPaymentMethodMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attachPaymentMethod>>, TError,{guardianId: string;data: NonReadonly<AttachPaymentMethodInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof attachPaymentMethod>>, TError,{guardianId: string;data: NonReadonly<AttachPaymentMethodInputBody>}, TContext> => {
-
-const mutationKey = ['attachPaymentMethod'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof attachPaymentMethod>>, {guardianId: string;data: NonReadonly<AttachPaymentMethodInputBody>}> = (props) => {
-          const {guardianId,data} = props ?? {};
-
-          return  attachPaymentMethod(guardianId,data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AttachPaymentMethodMutationResult = NonNullable<Awaited<ReturnType<typeof attachPaymentMethod>>>
-    export type AttachPaymentMethodMutationBody = NonReadonly<AttachPaymentMethodInputBody>
-    export type AttachPaymentMethodMutationError = ErrorModel
-
-    /**
+/**
  * @summary Attach a payment method to a guardian (testing only)
  */
-export const useAttachPaymentMethod = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attachPaymentMethod>>, TError,{guardianId: string;data: NonReadonly<AttachPaymentMethodInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof attachPaymentMethod>>,
-        TError,
-        {guardianId: string;data: NonReadonly<AttachPaymentMethodInputBody>},
-        TContext
-      > => {
-      return useMutation(getAttachPaymentMethodMutationOptions(options), queryClient);
-    }
-    /**
+export const useAttachPaymentMethod = <TError = ErrorModel, TContext = unknown>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof attachPaymentMethod>>,
+			TError,
+			{ guardianId: string; data: NonReadonly<AttachPaymentMethodInputBody> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof attachPaymentMethod>>,
+	TError,
+	{ guardianId: string; data: NonReadonly<AttachPaymentMethodInputBody> },
+	TContext
+> => {
+	return useMutation(
+		getAttachPaymentMethodMutationOptions(options),
+		queryClient,
+	);
+};
+/**
  * Create a new Stripe Customer
  * @summary Create a new Stripe Customer
  */
 export type createStripeCustomerResponse200 = {
-  data: Guardian
-  status: 200
-}
+	data: Guardian;
+	status: 200;
+};
 
 export type createStripeCustomerResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type createStripeCustomerResponseSuccess = (createStripeCustomerResponse200) & {
-  headers: Headers;
-};
-export type createStripeCustomerResponseError = (createStripeCustomerResponseDefault) & {
-  headers: Headers;
+	data: ErrorModel;
+	status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type createStripeCustomerResponse = (createStripeCustomerResponseSuccess | createStripeCustomerResponseError)
+export type createStripeCustomerResponseSuccess =
+	createStripeCustomerResponse200 & {
+		headers: Headers;
+	};
+export type createStripeCustomerResponseError =
+	createStripeCustomerResponseDefault & {
+		headers: Headers;
+	};
 
-export const getCreateStripeCustomerUrl = (guardianId: string,) => {
+export type createStripeCustomerResponse =
+	| createStripeCustomerResponseSuccess
+	| createStripeCustomerResponseError;
 
+export const getCreateStripeCustomerUrl = (guardianId: string) => {
+	return `/api/v1/stripe/customer/${guardianId}`;
+};
 
-  
+export const createStripeCustomer = async (
+	guardianId: string,
+	options?: RequestInit,
+): Promise<createStripeCustomerResponse> => {
+	return customInstance<createStripeCustomerResponse>(
+		getCreateStripeCustomerUrl(guardianId),
+		{
+			...options,
+			method: "POST",
+		},
+	);
+};
 
-  return `/api/v1/stripe/customer/${guardianId}`
-}
+export const getCreateStripeCustomerMutationOptions = <
+	TError = ErrorModel,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof createStripeCustomer>>,
+		TError,
+		{ guardianId: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof createStripeCustomer>>,
+	TError,
+	{ guardianId: string },
+	TContext
+> => {
+	const mutationKey = ["createStripeCustomer"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-export const createStripeCustomer = async (guardianId: string, options?: RequestInit): Promise<createStripeCustomerResponse> => {
-  
-  return customInstance<createStripeCustomerResponse>(getCreateStripeCustomerUrl(guardianId),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof createStripeCustomer>>,
+		{ guardianId: string }
+	> = (props) => {
+		const { guardianId } = props ?? {};
 
+		return createStripeCustomer(guardianId, requestOptions);
+	};
 
+	return { mutationFn, ...mutationOptions };
+};
 
+export type CreateStripeCustomerMutationResult = NonNullable<
+	Awaited<ReturnType<typeof createStripeCustomer>>
+>;
 
-export const getCreateStripeCustomerMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createStripeCustomer>>, TError,{guardianId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createStripeCustomer>>, TError,{guardianId: string}, TContext> => {
+export type CreateStripeCustomerMutationError = ErrorModel;
 
-const mutationKey = ['createStripeCustomer'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createStripeCustomer>>, {guardianId: string}> = (props) => {
-          const {guardianId} = props ?? {};
-
-          return  createStripeCustomer(guardianId,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateStripeCustomerMutationResult = NonNullable<Awaited<ReturnType<typeof createStripeCustomer>>>
-    
-    export type CreateStripeCustomerMutationError = ErrorModel
-
-    /**
+/**
  * @summary Create a new Stripe Customer
  */
-export const useCreateStripeCustomer = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createStripeCustomer>>, TError,{guardianId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createStripeCustomer>>,
-        TError,
-        {guardianId: string},
-        TContext
-      > => {
-      return useMutation(getCreateStripeCustomerMutationOptions(options), queryClient);
-    }
-    /**
+export const useCreateStripeCustomer = <
+	TError = ErrorModel,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof createStripeCustomer>>,
+			TError,
+			{ guardianId: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof createStripeCustomer>>,
+	TError,
+	{ guardianId: string },
+	TContext
+> => {
+	return useMutation(
+		getCreateStripeCustomerMutationOptions(options),
+		queryClient,
+	);
+};
+/**
  * Generates a login link for organization to access their Stripe Express dashboard
  * @summary Create Stripe dashboard login link for organization
  */
 export type createOrgLoginLinkResponse200 = {
-  data: CreateOrgLoginLinkOutputBody
-  status: 200
-}
+	data: CreateOrgLoginLinkOutputBody;
+	status: 200;
+};
 
 export type createOrgLoginLinkResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type createOrgLoginLinkResponseSuccess = (createOrgLoginLinkResponse200) & {
-  headers: Headers;
-};
-export type createOrgLoginLinkResponseError = (createOrgLoginLinkResponseDefault) & {
-  headers: Headers;
+	data: ErrorModel;
+	status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type createOrgLoginLinkResponse = (createOrgLoginLinkResponseSuccess | createOrgLoginLinkResponseError)
+export type createOrgLoginLinkResponseSuccess =
+	createOrgLoginLinkResponse200 & {
+		headers: Headers;
+	};
+export type createOrgLoginLinkResponseError =
+	createOrgLoginLinkResponseDefault & {
+		headers: Headers;
+	};
 
-export const getCreateOrgLoginLinkUrl = (organizationId: string,) => {
+export type createOrgLoginLinkResponse =
+	| createOrgLoginLinkResponseSuccess
+	| createOrgLoginLinkResponseError;
 
+export const getCreateOrgLoginLinkUrl = (organizationId: string) => {
+	return `/api/v1/stripe/login/${organizationId}`;
+};
 
-  
+export const createOrgLoginLink = async (
+	organizationId: string,
+	options?: RequestInit,
+): Promise<createOrgLoginLinkResponse> => {
+	return customInstance<createOrgLoginLinkResponse>(
+		getCreateOrgLoginLinkUrl(organizationId),
+		{
+			...options,
+			method: "POST",
+		},
+	);
+};
 
-  return `/api/v1/stripe/login/${organizationId}`
-}
+export const getCreateOrgLoginLinkMutationOptions = <
+	TError = ErrorModel,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof createOrgLoginLink>>,
+		TError,
+		{ organizationId: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof createOrgLoginLink>>,
+	TError,
+	{ organizationId: string },
+	TContext
+> => {
+	const mutationKey = ["createOrgLoginLink"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-export const createOrgLoginLink = async (organizationId: string, options?: RequestInit): Promise<createOrgLoginLinkResponse> => {
-  
-  return customInstance<createOrgLoginLinkResponse>(getCreateOrgLoginLinkUrl(organizationId),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof createOrgLoginLink>>,
+		{ organizationId: string }
+	> = (props) => {
+		const { organizationId } = props ?? {};
 
+		return createOrgLoginLink(organizationId, requestOptions);
+	};
 
+	return { mutationFn, ...mutationOptions };
+};
 
+export type CreateOrgLoginLinkMutationResult = NonNullable<
+	Awaited<ReturnType<typeof createOrgLoginLink>>
+>;
 
-export const getCreateOrgLoginLinkMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createOrgLoginLink>>, TError,{organizationId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createOrgLoginLink>>, TError,{organizationId: string}, TContext> => {
+export type CreateOrgLoginLinkMutationError = ErrorModel;
 
-const mutationKey = ['createOrgLoginLink'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createOrgLoginLink>>, {organizationId: string}> = (props) => {
-          const {organizationId} = props ?? {};
-
-          return  createOrgLoginLink(organizationId,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateOrgLoginLinkMutationResult = NonNullable<Awaited<ReturnType<typeof createOrgLoginLink>>>
-    
-    export type CreateOrgLoginLinkMutationError = ErrorModel
-
-    /**
+/**
  * @summary Create Stripe dashboard login link for organization
  */
-export const useCreateOrgLoginLink = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createOrgLoginLink>>, TError,{organizationId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createOrgLoginLink>>,
-        TError,
-        {organizationId: string},
-        TContext
-      > => {
-      return useMutation(getCreateOrgLoginLinkMutationOptions(options), queryClient);
-    }
-    /**
+export const useCreateOrgLoginLink = <TError = ErrorModel, TContext = unknown>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof createOrgLoginLink>>,
+			TError,
+			{ organizationId: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof createOrgLoginLink>>,
+	TError,
+	{ organizationId: string },
+	TContext
+> => {
+	return useMutation(
+		getCreateOrgLoginLinkMutationOptions(options),
+		queryClient,
+	);
+};
+/**
  * Creates an onboarding link for a Stripe account
  * @summary Creates an onboarding link for a Stripe account
  */
 export type createOrgStripeOnboardingLinkResponse200 = {
-  data: CreateStripeOnboardingLinkOutputBody
-  status: 200
-}
+	data: CreateStripeOnboardingLinkOutputBody;
+	status: 200;
+};
 
 export type createOrgStripeOnboardingLinkResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type createOrgStripeOnboardingLinkResponseSuccess = (createOrgStripeOnboardingLinkResponse200) & {
-  headers: Headers;
-};
-export type createOrgStripeOnboardingLinkResponseError = (createOrgStripeOnboardingLinkResponseDefault) & {
-  headers: Headers;
+	data: ErrorModel;
+	status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type createOrgStripeOnboardingLinkResponse = (createOrgStripeOnboardingLinkResponseSuccess | createOrgStripeOnboardingLinkResponseError)
+export type createOrgStripeOnboardingLinkResponseSuccess =
+	createOrgStripeOnboardingLinkResponse200 & {
+		headers: Headers;
+	};
+export type createOrgStripeOnboardingLinkResponseError =
+	createOrgStripeOnboardingLinkResponseDefault & {
+		headers: Headers;
+	};
 
-export const getCreateOrgStripeOnboardingLinkUrl = (organizationId: string,) => {
+export type createOrgStripeOnboardingLinkResponse =
+	| createOrgStripeOnboardingLinkResponseSuccess
+	| createOrgStripeOnboardingLinkResponseError;
 
+export const getCreateOrgStripeOnboardingLinkUrl = (organizationId: string) => {
+	return `/api/v1/stripe/onboarding/${organizationId}`;
+};
 
-  
+export const createOrgStripeOnboardingLink = async (
+	organizationId: string,
+	createStripeOnboardingLinkInputBody: NonReadonly<CreateStripeOnboardingLinkInputBody>,
+	options?: RequestInit,
+): Promise<createOrgStripeOnboardingLinkResponse> => {
+	return customInstance<createOrgStripeOnboardingLinkResponse>(
+		getCreateOrgStripeOnboardingLinkUrl(organizationId),
+		{
+			...options,
+			method: "POST",
+			headers: { "Content-Type": "application/json", ...options?.headers },
+			body: JSON.stringify(createStripeOnboardingLinkInputBody),
+		},
+	);
+};
 
-  return `/api/v1/stripe/onboarding/${organizationId}`
-}
+export const getCreateOrgStripeOnboardingLinkMutationOptions = <
+	TError = ErrorModel,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>,
+		TError,
+		{
+			organizationId: string;
+			data: NonReadonly<CreateStripeOnboardingLinkInputBody>;
+		},
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>,
+	TError,
+	{
+		organizationId: string;
+		data: NonReadonly<CreateStripeOnboardingLinkInputBody>;
+	},
+	TContext
+> => {
+	const mutationKey = ["createOrgStripeOnboardingLink"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-export const createOrgStripeOnboardingLink = async (organizationId: string,
-    createStripeOnboardingLinkInputBody: NonReadonly<CreateStripeOnboardingLinkInputBody>, options?: RequestInit): Promise<createOrgStripeOnboardingLinkResponse> => {
-  
-  return customInstance<createOrgStripeOnboardingLinkResponse>(getCreateOrgStripeOnboardingLinkUrl(organizationId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createStripeOnboardingLinkInputBody,)
-  }
-);}
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>,
+		{
+			organizationId: string;
+			data: NonReadonly<CreateStripeOnboardingLinkInputBody>;
+		}
+	> = (props) => {
+		const { organizationId, data } = props ?? {};
 
+		return createOrgStripeOnboardingLink(organizationId, data, requestOptions);
+	};
 
+	return { mutationFn, ...mutationOptions };
+};
 
+export type CreateOrgStripeOnboardingLinkMutationResult = NonNullable<
+	Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>
+>;
+export type CreateOrgStripeOnboardingLinkMutationBody =
+	NonReadonly<CreateStripeOnboardingLinkInputBody>;
+export type CreateOrgStripeOnboardingLinkMutationError = ErrorModel;
 
-export const getCreateOrgStripeOnboardingLinkMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>, TError,{organizationId: string;data: NonReadonly<CreateStripeOnboardingLinkInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>, TError,{organizationId: string;data: NonReadonly<CreateStripeOnboardingLinkInputBody>}, TContext> => {
-
-const mutationKey = ['createOrgStripeOnboardingLink'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>, {organizationId: string;data: NonReadonly<CreateStripeOnboardingLinkInputBody>}> = (props) => {
-          const {organizationId,data} = props ?? {};
-
-          return  createOrgStripeOnboardingLink(organizationId,data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateOrgStripeOnboardingLinkMutationResult = NonNullable<Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>>
-    export type CreateOrgStripeOnboardingLinkMutationBody = NonReadonly<CreateStripeOnboardingLinkInputBody>
-    export type CreateOrgStripeOnboardingLinkMutationError = ErrorModel
-
-    /**
+/**
  * @summary Creates an onboarding link for a Stripe account
  */
-export const useCreateOrgStripeOnboardingLink = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>, TError,{organizationId: string;data: NonReadonly<CreateStripeOnboardingLinkInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>,
-        TError,
-        {organizationId: string;data: NonReadonly<CreateStripeOnboardingLinkInputBody>},
-        TContext
-      > => {
-      return useMutation(getCreateOrgStripeOnboardingLinkMutationOptions(options), queryClient);
-    }
-    /**
+export const useCreateOrgStripeOnboardingLink = <
+	TError = ErrorModel,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>,
+			TError,
+			{
+				organizationId: string;
+				data: NonReadonly<CreateStripeOnboardingLinkInputBody>;
+			},
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof createOrgStripeOnboardingLink>>,
+	TError,
+	{
+		organizationId: string;
+		data: NonReadonly<CreateStripeOnboardingLinkInputBody>;
+	},
+	TContext
+> => {
+	return useMutation(
+		getCreateOrgStripeOnboardingLinkMutationOptions(options),
+		queryClient,
+	);
+};
+/**
  * Create a new Stripe account for an organization
  * @summary Create a new Stripe account for an organization
  */
 export type createOrgStripeAccountResponse200 = {
-  data: CreateOrgStripeAccountOutputBody
-  status: 200
-}
+	data: CreateOrgStripeAccountOutputBody;
+	status: 200;
+};
 
 export type createOrgStripeAccountResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type createOrgStripeAccountResponseSuccess = (createOrgStripeAccountResponse200) & {
-  headers: Headers;
-};
-export type createOrgStripeAccountResponseError = (createOrgStripeAccountResponseDefault) & {
-  headers: Headers;
+	data: ErrorModel;
+	status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type createOrgStripeAccountResponse = (createOrgStripeAccountResponseSuccess | createOrgStripeAccountResponseError)
+export type createOrgStripeAccountResponseSuccess =
+	createOrgStripeAccountResponse200 & {
+		headers: Headers;
+	};
+export type createOrgStripeAccountResponseError =
+	createOrgStripeAccountResponseDefault & {
+		headers: Headers;
+	};
 
-export const getCreateOrgStripeAccountUrl = (organizationId: string,) => {
+export type createOrgStripeAccountResponse =
+	| createOrgStripeAccountResponseSuccess
+	| createOrgStripeAccountResponseError;
 
+export const getCreateOrgStripeAccountUrl = (organizationId: string) => {
+	return `/api/v1/stripe/orgaccount/${organizationId}`;
+};
 
-  
+export const createOrgStripeAccount = async (
+	organizationId: string,
+	options?: RequestInit,
+): Promise<createOrgStripeAccountResponse> => {
+	return customInstance<createOrgStripeAccountResponse>(
+		getCreateOrgStripeAccountUrl(organizationId),
+		{
+			...options,
+			method: "POST",
+		},
+	);
+};
 
-  return `/api/v1/stripe/orgaccount/${organizationId}`
-}
+export const getCreateOrgStripeAccountMutationOptions = <
+	TError = ErrorModel,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof createOrgStripeAccount>>,
+		TError,
+		{ organizationId: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof createOrgStripeAccount>>,
+	TError,
+	{ organizationId: string },
+	TContext
+> => {
+	const mutationKey = ["createOrgStripeAccount"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-export const createOrgStripeAccount = async (organizationId: string, options?: RequestInit): Promise<createOrgStripeAccountResponse> => {
-  
-  return customInstance<createOrgStripeAccountResponse>(getCreateOrgStripeAccountUrl(organizationId),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof createOrgStripeAccount>>,
+		{ organizationId: string }
+	> = (props) => {
+		const { organizationId } = props ?? {};
 
+		return createOrgStripeAccount(organizationId, requestOptions);
+	};
 
+	return { mutationFn, ...mutationOptions };
+};
 
+export type CreateOrgStripeAccountMutationResult = NonNullable<
+	Awaited<ReturnType<typeof createOrgStripeAccount>>
+>;
 
-export const getCreateOrgStripeAccountMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createOrgStripeAccount>>, TError,{organizationId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createOrgStripeAccount>>, TError,{organizationId: string}, TContext> => {
+export type CreateOrgStripeAccountMutationError = ErrorModel;
 
-const mutationKey = ['createOrgStripeAccount'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createOrgStripeAccount>>, {organizationId: string}> = (props) => {
-          const {organizationId} = props ?? {};
-
-          return  createOrgStripeAccount(organizationId,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateOrgStripeAccountMutationResult = NonNullable<Awaited<ReturnType<typeof createOrgStripeAccount>>>
-    
-    export type CreateOrgStripeAccountMutationError = ErrorModel
-
-    /**
+/**
  * @summary Create a new Stripe account for an organization
  */
-export const useCreateOrgStripeAccount = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createOrgStripeAccount>>, TError,{organizationId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createOrgStripeAccount>>,
-        TError,
-        {organizationId: string},
-        TContext
-      > => {
-      return useMutation(getCreateOrgStripeAccountMutationOptions(options), queryClient);
-    }
-    /**
+export const useCreateOrgStripeAccount = <
+	TError = ErrorModel,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof createOrgStripeAccount>>,
+			TError,
+			{ organizationId: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof createOrgStripeAccount>>,
+	TError,
+	{ organizationId: string },
+	TContext
+> => {
+	return useMutation(
+		getCreateOrgStripeAccountMutationOptions(options),
+		queryClient,
+	);
+};
+/**
  * Creates a Stripe SetupIntent and returns client_secret for frontend to collect card details
  * @summary Create a SetupIntent for guardian to add payment method
  */
 export type createGuardianSetupIntentResponse200 = {
-  data: CreateSetupIntentOutputBody
-  status: 200
-}
+	data: CreateSetupIntentOutputBody;
+	status: 200;
+};
 
 export type createGuardianSetupIntentResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type createGuardianSetupIntentResponseSuccess = (createGuardianSetupIntentResponse200) & {
-  headers: Headers;
-};
-export type createGuardianSetupIntentResponseError = (createGuardianSetupIntentResponseDefault) & {
-  headers: Headers;
+	data: ErrorModel;
+	status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type createGuardianSetupIntentResponse = (createGuardianSetupIntentResponseSuccess | createGuardianSetupIntentResponseError)
+export type createGuardianSetupIntentResponseSuccess =
+	createGuardianSetupIntentResponse200 & {
+		headers: Headers;
+	};
+export type createGuardianSetupIntentResponseError =
+	createGuardianSetupIntentResponseDefault & {
+		headers: Headers;
+	};
 
-export const getCreateGuardianSetupIntentUrl = (guardianId: string,) => {
+export type createGuardianSetupIntentResponse =
+	| createGuardianSetupIntentResponseSuccess
+	| createGuardianSetupIntentResponseError;
 
+export const getCreateGuardianSetupIntentUrl = (guardianId: string) => {
+	return `/api/v1/stripe/setup-intent/${guardianId}`;
+};
 
-  
+export const createGuardianSetupIntent = async (
+	guardianId: string,
+	options?: RequestInit,
+): Promise<createGuardianSetupIntentResponse> => {
+	return customInstance<createGuardianSetupIntentResponse>(
+		getCreateGuardianSetupIntentUrl(guardianId),
+		{
+			...options,
+			method: "POST",
+		},
+	);
+};
 
-  return `/api/v1/stripe/setup-intent/${guardianId}`
-}
+export const getCreateGuardianSetupIntentMutationOptions = <
+	TError = ErrorModel,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof createGuardianSetupIntent>>,
+		TError,
+		{ guardianId: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof createGuardianSetupIntent>>,
+	TError,
+	{ guardianId: string },
+	TContext
+> => {
+	const mutationKey = ["createGuardianSetupIntent"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-export const createGuardianSetupIntent = async (guardianId: string, options?: RequestInit): Promise<createGuardianSetupIntentResponse> => {
-  
-  return customInstance<createGuardianSetupIntentResponse>(getCreateGuardianSetupIntentUrl(guardianId),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof createGuardianSetupIntent>>,
+		{ guardianId: string }
+	> = (props) => {
+		const { guardianId } = props ?? {};
 
+		return createGuardianSetupIntent(guardianId, requestOptions);
+	};
 
+	return { mutationFn, ...mutationOptions };
+};
 
+export type CreateGuardianSetupIntentMutationResult = NonNullable<
+	Awaited<ReturnType<typeof createGuardianSetupIntent>>
+>;
 
-export const getCreateGuardianSetupIntentMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGuardianSetupIntent>>, TError,{guardianId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createGuardianSetupIntent>>, TError,{guardianId: string}, TContext> => {
+export type CreateGuardianSetupIntentMutationError = ErrorModel;
 
-const mutationKey = ['createGuardianSetupIntent'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createGuardianSetupIntent>>, {guardianId: string}> = (props) => {
-          const {guardianId} = props ?? {};
-
-          return  createGuardianSetupIntent(guardianId,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateGuardianSetupIntentMutationResult = NonNullable<Awaited<ReturnType<typeof createGuardianSetupIntent>>>
-    
-    export type CreateGuardianSetupIntentMutationError = ErrorModel
-
-    /**
+/**
  * @summary Create a SetupIntent for guardian to add payment method
  */
-export const useCreateGuardianSetupIntent = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGuardianSetupIntent>>, TError,{guardianId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createGuardianSetupIntent>>,
-        TError,
-        {guardianId: string},
-        TContext
-      > => {
-      return useMutation(getCreateGuardianSetupIntentMutationOptions(options), queryClient);
-    }
-    
+export const useCreateGuardianSetupIntent = <
+	TError = ErrorModel,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof createGuardianSetupIntent>>,
+			TError,
+			{ guardianId: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
+): UseMutationResult<
+	Awaited<ReturnType<typeof createGuardianSetupIntent>>,
+	TError,
+	{ guardianId: string },
+	TContext
+> => {
+	return useMutation(
+		getCreateGuardianSetupIntentMutationOptions(options),
+		queryClient,
+	);
+};

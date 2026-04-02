@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/models"
+	"skillspark/internal/notification"
 	"skillspark/internal/service/handler/registration"
 	"skillspark/internal/storage"
 	"skillspark/internal/stripeClient"
@@ -11,8 +12,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupRegistrationRoutes(api huma.API, repo *storage.Repository, sc stripeClient.StripeClientInterface) {
-	registrationHandler := registration.NewHandler(repo.Registration, repo.Child, repo.Guardian, repo.EventOccurrence, repo.Organization, sc)
+func SetupRegistrationRoutes(api huma.API, repo *storage.Repository, sc stripeClient.StripeClientInterface, notifService *notification.Service) {
+	registrationHandler := registration.NewHandler(repo.Registration, repo.Child, repo.Guardian, repo.EventOccurrence, repo.Organization, sc, notifService)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "create-registration",

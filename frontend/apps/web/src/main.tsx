@@ -7,13 +7,11 @@ import SignUp from "./signup/signup.tsx";
 import { AuthProvider } from "../contexts/auth-context.tsx";
 
 createRoot(document.getElementById("root")!).render(
-  <AuthProvider>
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-    </Routes>
-  </BrowserRouter>
-  </AuthProvider>,
+	<BrowserRouter>
+		<Routes>
+			<Route path="/" element={<App />} />
+			<Route path="/login" element={<Login />} />
+			<Route path="/signup" element={<SignUp />} />
+		</Routes>
+	</BrowserRouter>,
 );

@@ -1,0 +1,2 @@
+ALTER TABLE review
+ADD COLUMN rating int NOT NULL;

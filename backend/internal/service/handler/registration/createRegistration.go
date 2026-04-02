@@ -3,6 +3,9 @@ package registration
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log/slog"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"time"
 )
@@ -24,7 +27,7 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 
 	guardian, err := h.GuardianRepository.GetGuardianByID(ctx, input.Body.GuardianID)
 	if err != nil {
-		return nil, err
+		return nil, errs.BadRequest("Invalid guardian_id: guardian does not exist")
 	}
 
 	if guardian.StripeCustomerID == nil {
@@ -78,6 +81,23 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 	registration, err := h.RegistrationRepository.CreateRegistration(ctx, completeRegistration)
 	if err != nil {
 		return nil, err
+	}
+
+	if h.NotificationService != nil {
+		subject := "Registration Confirmed"
+		body := fmt.Sprintf(
+			"Your child has been successfully registered for %s on %s.",
+			registration.Body.EventName,
+			registration.Body.OccurrenceStartTime.Format("January 2, 2006 at 3:04 PM"),
+		)
+		if notifErr := h.NotificationService.SendNotification(ctx, &models.SendNotificationInput{
+			NotificationType: models.NotificationTypeEmail,
+			RecipientEmail:   &guardian.Email, // this is where you hardcode email to test
+			Subject:          &subject,
+			Body:             body,
+		}); notifErr != nil {
+			slog.Error("failed to send registration confirmation notification", "error", notifErr)
+		}
 	}
 
 	return registration, nil

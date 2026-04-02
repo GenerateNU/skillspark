@@ -10,7 +10,7 @@ import (
 )
 
 func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput, tx *pgx.Tx) (*models.EventOccurrence, error) {
-	language = input.AcceptLanguage
+	language := input.AcceptLanguage
 	query, err := schema.ReadSQLBaseScript("update.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -24,7 +24,6 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 			input.ID,
 			input.Body.ManagerId,
 			input.Body.EventId,
-			input.Body.LocationId,
 			input.Body.StartTime,
 			input.Body.EndTime,
 			input.Body.MaxAttendees,
@@ -39,7 +38,6 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 			input.ID,
 			input.Body.ManagerId,
 			input.Body.EventId,
-			input.Body.LocationId,
 			input.Body.StartTime,
 			input.Body.EndTime,
 			input.Body.MaxAttendees,

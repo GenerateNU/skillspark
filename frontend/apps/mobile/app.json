@@ -11,7 +11,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "SkillSpark needs your location to show events and activities near you."
+        "NSLocationWhenInUseUsageDescription": "SkillSpark needs your location to show events and activities near you.",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "config": {},
       "bundleIdentifier": "com.skillspark.app"
@@ -46,6 +47,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "457b5274-1ec8-481d-ad0c-fe24ae374428"
+      }
+    },
+    "owner": "skillspark-generate"
   }
 }

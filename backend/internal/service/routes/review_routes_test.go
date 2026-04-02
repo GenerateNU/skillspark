@@ -89,6 +89,7 @@ func TestCreateReview_Success(t *testing.T) {
 	payload := map[string]interface{}{
 		"registration_id": regID.String(),
 		"guardian_id":     guardianID.String(),
+		"rating":          4,
 		"description":     "Great event",
 		"categories":      []string{"fun"},
 	}

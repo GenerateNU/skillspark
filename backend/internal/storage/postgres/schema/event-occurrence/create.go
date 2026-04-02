@@ -8,7 +8,7 @@ import (
 )
 
 func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error) {
-	language = input.AcceptLanguage
+	language := input.AcceptLanguage
 	query, err := schema.ReadSQLBaseScript("create.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -19,7 +19,6 @@ func (r *EventOccurrenceRepository) CreateEventOccurrence(ctx context.Context, i
 		query,
 		input.Body.ManagerId,
 		input.Body.EventId,
-		input.Body.LocationId,
 		input.Body.StartTime,
 		input.Body.EndTime,
 		input.Body.MaxAttendees,
