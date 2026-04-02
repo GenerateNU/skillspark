@@ -1,5 +1,8 @@
 import axios from "axios";
 import type { InternalAxiosRequestConfig } from "axios";
+
+// process is available in Node/Expo but not in browser environments — declare it as optional
+declare const process: { env: Record<string, string | undefined> } | undefined;
 export let currentLanguage = "en";
 export function setCurrentLanguage(lang: string) {
 	currentLanguage = lang;
