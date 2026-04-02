@@ -11,6 +11,10 @@ import (
 
 func (r *EmergencyContactRepository) DeleteEmergencyContact(ctx context.Context, id uuid.UUID) (*models.DeleteEmergencyContactOutput, error) {
 	query, err := schema.ReadSQLBaseScript("delete.sql", SqlSavedFiles)
+	if err != nil {
+		e := errs.InternalServerError("Failed to read base query: ", err.Error())
+		return nil, &e
+	}
 
 	emergencyContact, err := r.GetEmergencyContactByID(ctx, id)
 	if err != nil {
