@@ -2,10 +2,12 @@ import { Stack } from "expo-router";
 import React from "react";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Colors } from "@/constants/theme";
+import { useTranslation } from "react-i18next";
 
-export default function FamilyLayout() {
+export default function EmergencyContactLayout() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
+  const { t: translate } = useTranslation();
 
   return (
     <Stack
@@ -17,16 +19,10 @@ export default function FamilyLayout() {
         headerBackTitle: "", 
       }}
     >
-      <Stack.Screen
-        name="index" 
-        options={{ 
-          headerShown: false 
-        }} 
-      />
       <Stack.Screen 
         name="manage" 
         options={{ 
-          title: "Manage Child",
+          title: translate('emergencyContact.manageTitle'),
           headerShown: false
         }} 
       />

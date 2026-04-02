@@ -127,6 +127,22 @@
     "hr": "hr",
     "min": "min"
   },
+  "emergencyContact": {
+    "manageTitle": "Manage Emergency Contact",
+    "addTitle": "Add Emergency Contact",
+    "editTitle": "Edit Emergency Contact",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phoneNumber": "Phone Number",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "addContact": "Add Contact",
+    "deleteContact": "Delete",
+    "deleteConfirm": "Are you sure you want to remove this emergency contact?",
+    "requiredFieldsError": "Please fill in all required fields (Name, Phone Number)",
+    "saveError": "Failed to save. Please try again.",
+    "deleteError": "Failed to delete."
+  },
   "interests": {
     "science": "Science",
     "math": "Math",
