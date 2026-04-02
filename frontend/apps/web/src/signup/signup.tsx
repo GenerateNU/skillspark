@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useAuthContext } from "../../contexts/use-auth-context";
+import { useAuthContext } from "../contexts/use-auth-context";
 import { useNavigate } from "react-router-dom";
 
 type SignupFormData = {
