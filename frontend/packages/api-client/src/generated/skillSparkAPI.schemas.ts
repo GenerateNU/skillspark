@@ -963,20 +963,6 @@ export type GetSavedByGuardianIdParams = {
 	page_size?: number;
 };
 
-export type GetSavedByGuardianIdParams = {
-	/**
-	 * Page number (starts at 1)
-	 * @minimum 1
-	 */
-	page?: number;
-	/**
-	 * Number of items per page
-	 * @minimum 1
-	 * @maximum 100
-	 */
-	page_size?: number;
-};
-
 export type GetAllSchoolsParams = {
 	/**
 	 * @minimum 1
