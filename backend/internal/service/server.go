@@ -46,20 +46,19 @@ func InitApp(config config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Initialize SQS client
 	sqsClient, err := sqs_client.NewClient(config.SQS)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Initialize notification service and scheduler
 	var notifService *notification.Service
-	
-	if config.TestMode { 
+
+	if config.TestMode {
 		notifService = notification.NewService(repo, sqsClient)
 	}
-	
 
 	c := &http.Client{}
 	translateClient := translations.NewClient(c)
@@ -77,9 +76,9 @@ func InitApp(config config.Config) (*App, error) {
 		return nil, err
 	}
 	return &App{
-		Server:      app,
-		Repo:        repo,
-		API:         humaAPI,
+		Server:       app,
+		Repo:         repo,
+		API:          humaAPI,
 		NotifService: notifService,
 		StripeClient: newStripeClient,
 	}, nil
@@ -171,5 +170,6 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetupPaymentRoutes(api, repo, sc)
 	routes.SetUpSavedRoutes(api, repo)
 	routes.SetupGeocodingRoutes(api, geocodingService)
+	routes.SetupUserRoutes(api, repo)
 	return nil
 }

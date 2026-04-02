@@ -2229,6 +2229,32 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/user/{username}:
+    get:
+      tags:
+        - User
+      summary: Get a user by username
+      description: Returns a user by username
+      operationId: get-user-by-username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
     AttachPaymentMethodInputBody:
@@ -3898,3 +3924,44 @@ components:
           description: New payment intent status from Stripe
       required:
         - payment_intent_status
+    User:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/User.json
+          readOnly: true
+        auth_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        email:
+          type: string
+        id:
+          type: string
+        language_preference:
+          type: string
+        name:
+          type: string
+        profile_picture_s3_key:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        username:
+          type: string
+      required:
+        - id
+        - name
+        - email
+        - username
+        - profile_picture_s3_key
+        - language_preference
+        - auth_id
+        - created_at
+        - updated_at
