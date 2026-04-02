@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, ScrollView, TouchableOpacity, ActivityIndicator, useColorScheme } from 'react-native';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  useColorScheme,
+} from "react-native";
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
@@ -18,7 +24,7 @@ export default function FamilyListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? 'light'];
+  const theme = Colors[colorScheme ?? "light"];
   const { t: translate } = useTranslation();
 
   const { guardian, children, emergencyContacts, isLoading } = useGuardian();
@@ -26,7 +32,7 @@ export default function FamilyListScreen() {
 
 
   const handleAddChild = () => {
-    router.push('/family/manage');
+    router.push("/family/manage");
   };
 
   const handleAddEmergencyContact = () => {
@@ -47,20 +53,20 @@ export default function FamilyListScreen() {
 
   const handleEditChild = (child: any) => {
     router.push({
-      pathname: '/family/manage',
+      pathname: "/family/manage",
       params: {
         id: child.id,
         name: child.name,
         birth_month: child.birth_month,
         birth_year: child.birth_year,
-        school_id: child.school_id ?? '',
+        school_id: child.school_id ?? "",
         interests: child.interests ?? [],
       },
     });
   };
 
-   if (!guardianId) {
-        return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+  if (!guardianId) {
+    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
   }
 
   if (isLoading) {
@@ -75,35 +81,63 @@ export default function FamilyListScreen() {
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
       <View className="flex-row items-center justify-between px-5 py-3">
         <TouchableOpacity
-          onPress={() => router.navigate('/profile')}
+          onPress={() => router.navigate("/profile")}
           className="w-10 justify-center items-start"
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText className="text-xl text-center font-nunito-bold">{translate('familyInformation.title')}</ThemedText>
+        <ThemedText className="text-xl text-center font-nunito-bold">
+          {translate("familyInformation.title")}
+        </ThemedText>
         <View className="w-10" />
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12 }} showsVerticalScrollIndicator={false}>
-        <TouchableOpacity className="flex-row items-start py-4 gap-3" activeOpacity={0.7}>
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <TouchableOpacity
+          className="flex-row items-start py-4 gap-3"
+          activeOpacity={0.7}
+        >
           <View className="w-11 h-11 items-center justify-center">
             <IconSymbol name="person.circle" size={40} color={theme.text} />
           </View>
           <View className="flex-1 gap-1">
-            <ThemedText className="text-base font-nunito-semibold">{guardian?.name}</ThemedText>
-            <ThemedText className="text-[13px] font-nunito" style={{ color: AppColors.mutedText }}>@{guardian?.username}</ThemedText>
-            <ThemedText className="text-[13px] font-nunito" style={{ color: AppColors.mutedText }}>{guardian?.email}</ThemedText>
+            <ThemedText className="text-base font-nunito-semibold">
+              {guardian?.name}
+            </ThemedText>
+            <ThemedText
+              className="text-[13px] font-nunito"
+              style={{ color: AppColors.mutedText }}
+            >
+              @{guardian?.username}
+            </ThemedText>
+            <ThemedText
+              className="text-[13px] font-nunito"
+              style={{ color: AppColors.mutedText }}
+            >
+              {guardian?.email}
+            </ThemedText>
           </View>
         </TouchableOpacity>
-        <View className="h-px my-3" style={{ backgroundColor: AppColors.divider }} />
+        <View
+          className="h-px my-3"
+          style={{ backgroundColor: AppColors.divider }}
+        />
         <SectionHeader
-          title={translate('familyInformation.childProfile')}
-          actionLabel={translate('familyInformation.addProfile')}
+          title={translate("familyInformation.childProfile")}
+          actionLabel={translate("familyInformation.addProfile")}
           onAction={handleAddChild}
         />
         {children.length === 0 && (
-          <ThemedText className="text-sm pb-4 font-nunito" style={{ color: AppColors.subtleText }}>{translate('common.noChildProfilesAdded')}</ThemedText>
+          <ThemedText
+            className="text-sm pb-4 font-nunito"
+            style={{ color: AppColors.subtleText }}
+          >
+            {translate("common.noChildProfilesAdded")}
+          </ThemedText>
         )}
         {children.map((child: any, idx: number) => (
           <React.Fragment key={child.id}>
@@ -111,10 +145,18 @@ export default function FamilyListScreen() {
               child={child}
               onPress={() => handleEditChild(child)}
             />
-            {idx < children.length - 1 && <View className="h-px my-3" style={{ backgroundColor: AppColors.divider }} />}
+            {idx < children.length - 1 && (
+              <View
+                className="h-px my-3"
+                style={{ backgroundColor: AppColors.divider }}
+              />
+            )}
           </React.Fragment>
         ))}
-        <View className="h-px my-3" style={{ backgroundColor: AppColors.divider }} />
+        <View
+          className="h-px my-3"
+          style={{ backgroundColor: AppColors.divider }}
+        />
         <SectionHeader
           title={translate('familyInformation.emergencyContact')}
           actionLabel={translate('familyInformation.addContact')}

@@ -80,7 +80,6 @@ export default function ManageChildScreen() {
     return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
   }
 
-
   const handleSave = async () => {
     if (!firstName || !birthYear || !birthMonth || !schoolId) {
       Alert.alert(

@@ -25,15 +25,19 @@ function formatAddress(occurrence: EventOccurrence) {
   return parts.join(", ") || "Location";
 }
 
-function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) {
+function EventOccurrenceDetail({
+  occurrence,
+}: {
+  occurrence: EventOccurrence;
+}) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [descriptionTruncated, setDescriptionTruncated] = useState(false);
   const { t: translate } = useTranslation();
   const duration = formatDuration(occurrence.start_time, occurrence.end_time, {
-    hr: translate('event.hr'),
-    min: translate('event.min'),
+    hr: translate("event.hr"),
+    min: translate("event.min"),
   });
   const address = formatAddress(occurrence);
 
@@ -66,20 +70,37 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
               <View className="flex-1 bg-[#C5C5C5]" />
             )}
             <TouchableOpacity
-              onPress={() => router.navigate('/')}
+              onPress={() => router.navigate("/")}
               activeOpacity={0.7}
               className="absolute top-4 left-4 z-10 flex-row items-center bg-white rounded-full px-4 py-2.5 elevation-10"
-              style={{ shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 8 }}
+              style={{
+                shadowColor: "#000",
+                shadowOpacity: 0.15,
+                shadowRadius: 8,
+              }}
             >
-              <MaterialIcons name="chevron-left" size={20} color={AppColors.primaryText} />
-              <Text className="text-[15px] font-medium" style={{ color: AppColors.primaryText }}>{translate('event.back')}</Text>
+              <MaterialIcons
+                name="chevron-left"
+                size={20}
+                color={AppColors.primaryText}
+              />
+              <Text
+                className="text-[15px] font-medium"
+                style={{ color: AppColors.primaryText }}
+              >
+                {translate("event.back")}
+              </Text>
             </TouchableOpacity>
           </View>
 
           {/* Content card */}
           <View
             className="bg-white rounded-t-[28px] -mt-7 px-[22px] pb-6 elevation-2"
-            style={{ shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 12 }}
+            style={{
+              shadowColor: "#000",
+              shadowOpacity: 0.06,
+              shadowRadius: 12,
+            }}
           >
             {/* Drag handle */}
             <View
@@ -96,7 +117,11 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
               {occurrence.event.title}
             </Text>
             <View className="flex-row items-center gap-1.5 mb-3.5">
-              <MaterialIcons name="location-on" size={16} color={AppColors.primaryText} />
+              <MaterialIcons
+                name="location-on"
+                size={16}
+                color={AppColors.primaryText}
+              />
               <Text
                 className="text-[13px] flex-1"
                 style={{ color: AppColors.secondaryText }}
@@ -119,9 +144,17 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
               {occurrence.event.description}
             </Text>
             {descriptionTruncated && (
-              <Pressable onPress={() => setDescriptionExpanded((prev) => !prev)} className="mb-3.5">
-                <Text className="text-[13px] font-semibold" style={{ color: AppColors.primaryText }}>
-                  {descriptionExpanded ? translate('event.seeLess') : translate('event.seeMore')}
+              <Pressable
+                onPress={() => setDescriptionExpanded((prev) => !prev)}
+                className="mb-3.5"
+              >
+                <Text
+                  className="text-[13px] font-semibold"
+                  style={{ color: AppColors.primaryText }}
+                >
+                  {descriptionExpanded
+                    ? translate("event.seeLess")
+                    : translate("event.seeMore")}
                 </Text>
               </Pressable>
             )}
@@ -133,13 +166,28 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
                     className="border-[1.5px] rounded-full px-4 py-[7px]"
                     style={{ borderColor: AppColors.borderLight }}
                   >
-                    <Text className="text-[13px]" style={{ color: AppColors.secondaryText }}>{translate(`interests.${cat}`, { defaultValue: cat })}</Text>
+                    <Text
+                      className="text-[13px]"
+                      style={{ color: AppColors.secondaryText }}
+                    >
+                      {translate(`interests.${cat}`, { defaultValue: cat })}
+                    </Text>
                   </View>
                 ))}
               </View>
               <View className="items-end ml-3.5">
-                <Text className="text-xl font-bold" style={{ color: AppColors.primaryText }}>{occurrence.price} THB</Text>
-                <Text className="text-xs" style={{ color: AppColors.subtleText }}>{translate('event.perSession')}</Text>
+                <Text
+                  className="text-xl font-bold"
+                  style={{ color: AppColors.primaryText }}
+                >
+                  {occurrence.price} THB
+                </Text>
+                <Text
+                  className="text-xs"
+                  style={{ color: AppColors.subtleText }}
+                >
+                  {translate("event.perSession")}
+                </Text>
               </View>
             </View>
           </View>
@@ -153,7 +201,11 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
           {/* Bottom section */}
           <View
             className="flex-1 bg-white px-[22px] pt-[22px] pb-7 elevation-2"
-            style={{ shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 12 }}
+            style={{
+              shadowColor: "#000",
+              shadowOpacity: 0.06,
+              shadowRadius: 12,
+            }}
           >
             <View className="flex-row items-center justify-between mb-[22px]">
               <Text
@@ -162,13 +214,28 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
               >
                 {duration}
               </Text>
-              <View
-                className="flex-row items-center gap-[5px] bg-[#F3F4F6] rounded-full px-3 py-[7px]"
-              >
-                <MaterialIcons name="directions-walk" size={14} color={AppColors.secondaryText} />
-                <Text className="text-[13px]" style={{ color: AppColors.secondaryText }}>8 {translate('event.minWalk')}</Text>
-                <MaterialIcons name="arrow-forward" size={12} color={AppColors.subtleText} />
-                <MaterialIcons name="directions-bus" size={16} color={AppColors.secondaryText} />
+              <View className="flex-row items-center gap-[5px] bg-[#F3F4F6] rounded-full px-3 py-[7px]">
+                <MaterialIcons
+                  name="directions-walk"
+                  size={14}
+                  color={AppColors.secondaryText}
+                />
+                <Text
+                  className="text-[13px]"
+                  style={{ color: AppColors.secondaryText }}
+                >
+                  8 {translate("event.minWalk")}
+                </Text>
+                <MaterialIcons
+                  name="arrow-forward"
+                  size={12}
+                  color={AppColors.subtleText}
+                />
+                <MaterialIcons
+                  name="directions-bus"
+                  size={16}
+                  color={AppColors.secondaryText}
+                />
               </View>
             </View>
             <View className="flex-row items-center justify-between">
@@ -180,16 +247,45 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
                   >
                     <View className="w-1.5 h-1.5 rounded-full bg-white" />
                   </View>
-                  <Text className="text-sm font-medium" style={{ color: AppColors.secondaryText }}>{translate('event.home')}</Text>
+                  <Text
+                    className="text-sm font-medium"
+                    style={{ color: AppColors.secondaryText }}
+                  >
+                    {translate("event.home")}
+                  </Text>
                 </View>
                 <View className="pl-1.5 py-0.5">
-                  <Text className="text-sm leading-[10px]" style={{ color: AppColors.subtleText }}>•</Text>
-                  <Text className="text-sm leading-[10px]" style={{ color: AppColors.subtleText }}>•</Text>
-                  <Text className="text-sm leading-[10px]" style={{ color: AppColors.subtleText }}>•</Text>
+                  <Text
+                    className="text-sm leading-[10px]"
+                    style={{ color: AppColors.subtleText }}
+                  >
+                    •
+                  </Text>
+                  <Text
+                    className="text-sm leading-[10px]"
+                    style={{ color: AppColors.subtleText }}
+                  >
+                    •
+                  </Text>
+                  <Text
+                    className="text-sm leading-[10px]"
+                    style={{ color: AppColors.subtleText }}
+                  >
+                    •
+                  </Text>
                 </View>
                 <View className="flex-row items-center gap-2.5">
-                  <MaterialIcons name="location-on" size={16} color={AppColors.secondaryText} />
-                  <Text className="text-sm font-medium" style={{ color: AppColors.secondaryText }}>{translate('event.location')}</Text>
+                  <MaterialIcons
+                    name="location-on"
+                    size={16}
+                    color={AppColors.secondaryText}
+                  />
+                  <Text
+                    className="text-sm font-medium"
+                    style={{ color: AppColors.secondaryText }}
+                  >
+                    {translate("event.location")}
+                  </Text>
                 </View>
               </View>
               <TouchableOpacity
@@ -198,7 +294,9 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
                 className="rounded-2xl px-[26px] py-3.5"
                 style={{ backgroundColor: AppColors.primaryText }}
               >
-                <Text className="text-white text-[17px] font-bold">{translate('event.register')}</Text>
+                <Text className="text-white text-[17px] font-bold">
+                  {translate("event.register")}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -224,8 +322,11 @@ export default function EventOccurrenceScreen() {
   if (error || !response || response.status !== 200) {
     return (
       <View className="flex-1 items-center justify-center p-6">
-        <Text className="text-base font-semibold" style={{ color: AppColors.danger }}>
-          {translate('event.notFound')}
+        <Text
+          className="text-base font-semibold"
+          style={{ color: AppColors.danger }}
+        >
+          {translate("event.notFound")}
         </Text>
       </View>
     );
