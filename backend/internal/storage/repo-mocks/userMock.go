@@ -47,3 +47,12 @@ func (m *MockUserRepository) DeleteUser(ctx context.Context, id uuid.UUID) (*mod
 	}
 	return u, args.Error(1)
 }
+
+func (m *MockUserRepository) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+	args := m.Called(ctx, username)
+	var u *models.User
+	if v := args.Get(0); v != nil {
+		u = v.(*models.User)
+	}
+	return u, args.Error(1)
+}
