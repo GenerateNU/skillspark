@@ -107,13 +107,7 @@ function EventOccurrenceDetail({
               contentFit="cover"
             />
           ) : (
-            <View className="flex-1 items-center justify-center">
-              <MaterialIcons
-                name="image"
-                size={48}
-                color={AppColors.borderLight}
-              />
-            </View>
+            <View className="flex-1 bg-[#C5C5C5]" />
           )}
         </View>
         <View className="px-4 pt-4 pb-2">
