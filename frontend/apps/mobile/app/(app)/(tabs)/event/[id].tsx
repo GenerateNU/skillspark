@@ -1,25 +1,34 @@
 import { Image } from "expo-image";
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useGetEventOccurrencesById } from "@skillspark/api-client";
+import {
+  useGetEventOccurrencesById,
+  useGetReviewByEventId,
+  useGetReviewAggregate,
+} from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { AppColors } from "@/constants/theme";
+import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { StarRating } from "@/components/StarRating";
-import { BookmarkButton } from "@/components/BookmarkButton";
-import { formatDuration } from "@/utils/format";
 import { useTranslation } from "react-i18next";
 
-function formatAddress(occurrence: EventOccurrence) {
+function formatRelativeTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days < 1) return "today";
+  if (days < 7) return `${days}d`;
+  if (days < 30) return `${Math.floor(days / 7)}w`;
+  return `${Math.floor(days / 30)}mo`;
+}
+
+function formatLocation(occurrence: EventOccurrence) {
   const loc = occurrence.location;
   const parts = [loc.address_line1, loc.district].filter(Boolean);
   return parts.join(", ") || "Location";
@@ -32,276 +41,327 @@ function EventOccurrenceDetail({
 }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
-  const [descriptionTruncated, setDescriptionTruncated] = useState(false);
   const { t: translate } = useTranslation();
-  const duration = formatDuration(occurrence.start_time, occurrence.end_time, {
-    hr: translate("event.hr"),
-    min: translate("event.min"),
+  const location = formatLocation(occurrence);
+  const categories = occurrence.event.category?.join(" / ") ?? "";
+
+  const { data: aggregateResp } = useGetReviewAggregate(occurrence.event.id);
+  const aggregate =
+    aggregateResp?.status === 200 ? aggregateResp.data : null;
+
+  const { data: reviewsResp } = useGetReviewByEventId(occurrence.event.id, {
+    page: 1,
+    page_size: 1,
   });
-  const address = formatAddress(occurrence);
+  const firstReview =
+    reviewsResp?.status === 200 ? reviewsResp.data[0] ?? null : null;
 
   return (
-    <View className="flex-1 bg-[#F4F6F8]">
+    <View className="flex-1 bg-white">
       <View
-        className="flex-1 mx-3.5 rounded-[32px] overflow-hidden bg-white elevation-8"
+        className="flex-row items-center bg-white px-4 border-b"
         style={{
-          marginTop: insets.top + 8,
-          marginBottom: insets.bottom - 20,
-          shadowColor: "#000",
-          shadowOpacity: 0.12,
-          shadowRadius: 20,
+          paddingTop: insets.top + 6,
+          paddingBottom: 10,
+          borderBottomColor: AppColors.divider,
         }}
       >
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          contentContainerStyle={{ flexGrow: 1 }}
+        <TouchableOpacity
+          onPress={() => router.back()}
+          activeOpacity={0.7}
+          className="w-8 h-8 items-center justify-center"
         >
-          {/* Hero image */}
-          <View className="h-[250px] bg-[#1a1a1a]">
-            {occurrence.event.presigned_url ? (
-              <Image
-                source={{ uri: occurrence.event.presigned_url }}
-                className="w-full h-full"
-                contentFit="cover"
-              />
-            ) : (
-              <View className="flex-1 bg-[#C5C5C5]" />
-            )}
-            <TouchableOpacity
-              onPress={() => router.navigate("/")}
-              activeOpacity={0.7}
-              className="absolute top-4 left-4 z-10 flex-row items-center bg-white rounded-full px-4 py-2.5 elevation-10"
-              style={{
-                shadowColor: "#000",
-                shadowOpacity: 0.15,
-                shadowRadius: 8,
-              }}
-            >
-              <MaterialIcons
-                name="chevron-left"
-                size={20}
-                color={AppColors.primaryText}
-              />
-              <Text
-                className="text-[15px] font-medium"
-                style={{ color: AppColors.primaryText }}
-              >
-                {translate("event.back")}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Content card */}
-          <View
-            className="bg-white rounded-t-[28px] -mt-7 px-[22px] pb-6 elevation-2"
-            style={{
-              shadowColor: "#000",
-              shadowOpacity: 0.06,
-              shadowRadius: 12,
-            }}
-          >
-            {/* Drag handle */}
-            <View
-              className="w-[38px] h-1 rounded-sm self-center mt-3 mb-3.5"
-              style={{ backgroundColor: AppColors.borderLight }}
-            />
-            <View className="absolute -top-[5px] left-2.5">
-              <BookmarkButton eventId={occurrence.event.id} />
-            </View>
-            <Text
-              className="text-[28px] font-bold tracking-tight mb-2"
-              style={{ color: AppColors.primaryText }}
-            >
-              {occurrence.event.title}
-            </Text>
-            <View className="flex-row items-center gap-1.5 mb-3.5">
-              <MaterialIcons
-                name="location-on"
-                size={16}
-                color={AppColors.primaryText}
-              />
-              <Text
-                className="text-[13px] flex-1"
-                style={{ color: AppColors.secondaryText }}
-                numberOfLines={1}
-              >
-                {address}
-              </Text>
-              <StarRating size={17} />
-            </View>
-            <Text
-              numberOfLines={descriptionExpanded ? undefined : 5}
-              onTextLayout={(e) => {
-                if (!descriptionExpanded) {
-                  setDescriptionTruncated(e.nativeEvent.lines.length >= 5);
-                }
-              }}
-              className={`text-sm leading-[22px] ${descriptionTruncated ? "mb-1" : "mb-[18px]"}`}
-              style={{ color: AppColors.secondaryText }}
-            >
-              {occurrence.event.description}
-            </Text>
-            {descriptionTruncated && (
-              <Pressable
-                onPress={() => setDescriptionExpanded((prev) => !prev)}
-                className="mb-3.5"
-              >
-                <Text
-                  className="text-[13px] font-semibold"
-                  style={{ color: AppColors.primaryText }}
-                >
-                  {descriptionExpanded
-                    ? translate("event.seeLess")
-                    : translate("event.seeMore")}
-                </Text>
-              </Pressable>
-            )}
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row gap-2 flex-1 flex-wrap">
-                {occurrence.event.category?.map((cat) => (
-                  <View
-                    key={cat}
-                    className="border-[1.5px] rounded-full px-4 py-[7px]"
-                    style={{ borderColor: AppColors.borderLight }}
-                  >
-                    <Text
-                      className="text-[13px]"
-                      style={{ color: AppColors.secondaryText }}
-                    >
-                      {translate(`interests.${cat}`, { defaultValue: cat })}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-              <View className="items-end ml-3.5">
-                <Text
-                  className="text-xl font-bold"
-                  style={{ color: AppColors.primaryText }}
-                >
-                  {occurrence.price} THB
-                </Text>
-                <Text
-                  className="text-xs"
-                  style={{ color: AppColors.subtleText }}
-                >
-                  {translate("event.perSession")}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Divider */}
-          <View
-            className="border-b border-dashed"
-            style={{ borderColor: AppColors.borderLight }}
+          <MaterialIcons
+            name="chevron-left"
+            size={28}
+            color={AppColors.primaryText}
           />
-
-          {/* Bottom section */}
-          <View
-            className="flex-1 bg-white px-[22px] pt-[22px] pb-7 elevation-2"
-            style={{
-              shadowColor: "#000",
-              shadowOpacity: 0.06,
-              shadowRadius: 12,
-            }}
-          >
-            <View className="flex-row items-center justify-between mb-[22px]">
+        </TouchableOpacity>
+        <Text
+          className="flex-1 text-center"
+          style={{
+            fontSize: 17,
+            fontFamily: FontFamilies.bold,
+            color: AppColors.primaryText,
+          }}
+          numberOfLines={1}
+        >
+          {occurrence.event.title}
+        </Text>
+        <View style={{ width: 32 }} />
+      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 24 }}
+      >
+        <View
+          style={{
+            height: 220,
+            backgroundColor: AppColors.imagePlaceholder,
+          }}
+        >
+          {occurrence.event.presigned_url ? (
+            <Image
+              source={{ uri: occurrence.event.presigned_url }}
+              className="w-full h-full"
+              contentFit="cover"
+            />
+          ) : (
+            <View className="flex-1 items-center justify-center">
+              <MaterialIcons
+                name="image"
+                size={48}
+                color={AppColors.borderLight}
+              />
+            </View>
+          )}
+        </View>
+        <View className="px-4 pt-4 pb-2">
+          <View className="flex-row items-start justify-between">
+            <View className="flex-1 mr-3">
               <Text
-                className="text-[30px] font-bold tracking-tight"
-                style={{ color: AppColors.primaryText }}
+                style={{
+                  fontSize: 26,
+                  fontFamily: FontFamilies.museoModerno,
+                  color: AppColors.primaryText,
+                  marginBottom: 2,
+                }}
               >
-                {duration}
+                {occurrence.event.title}
               </Text>
-              <View className="flex-row items-center gap-[5px] bg-[#F3F4F6] rounded-full px-3 py-[7px]">
-                <MaterialIcons
-                  name="directions-walk"
-                  size={14}
-                  color={AppColors.secondaryText}
-                />
+              <Text
+                style={{
+                  fontSize: FontSizes.base,
+                  color: AppColors.secondaryText,
+                  fontFamily: FontFamilies.regular,
+                  marginBottom: 5,
+                }}
+              >
+                {location}
+              </Text>
+              {!!categories && (
+                <View className="flex-row items-center gap-1.5 mb-1.5">
+                  <Text style={{ fontSize: FontSizes.base }}>⚽</Text>
+                  <Text
+                    style={{
+                      fontSize: FontSizes.base,
+                      color: AppColors.secondaryText,
+                      fontFamily: FontFamilies.regular,
+                    }}
+                  >
+                    {categories}
+                  </Text>
+                </View>
+              )}
+              <View className="flex-row items-center gap-1.5">
+                <Text style={{ fontSize: FontSizes.base }}>🔥</Text>
                 <Text
-                  className="text-[13px]"
-                  style={{ color: AppColors.secondaryText }}
+                  style={{
+                    fontSize: FontSizes.base,
+                    color: AppColors.primaryBlue,
+                    fontFamily: FontFamilies.semiBold,
+                  }}
                 >
-                  8 {translate("event.minWalk")}
+                  {occurrence.curr_enrolled}+{" "}
+                  {translate("event.bookingsThisWeek")}
                 </Text>
-                <MaterialIcons
-                  name="arrow-forward"
-                  size={12}
-                  color={AppColors.subtleText}
-                />
-                <MaterialIcons
-                  name="directions-bus"
-                  size={16}
-                  color={AppColors.secondaryText}
-                />
               </View>
             </View>
-            <View className="flex-row items-center justify-between">
-              <View>
-                <View className="flex-row items-center gap-3">
-                  <View
-                    className="w-4 h-4 rounded-full items-center justify-center"
-                    style={{ backgroundColor: AppColors.primaryText }}
-                  >
-                    <View className="w-1.5 h-1.5 rounded-full bg-white" />
-                  </View>
-                  <Text
-                    className="text-sm font-medium"
-                    style={{ color: AppColors.secondaryText }}
-                  >
-                    {translate("event.home")}
-                  </Text>
-                </View>
-                <View className="pl-1.5 py-0.5">
-                  <Text
-                    className="text-sm leading-[10px]"
-                    style={{ color: AppColors.subtleText }}
-                  >
-                    •
-                  </Text>
-                  <Text
-                    className="text-sm leading-[10px]"
-                    style={{ color: AppColors.subtleText }}
-                  >
-                    •
-                  </Text>
-                  <Text
-                    className="text-sm leading-[10px]"
-                    style={{ color: AppColors.subtleText }}
-                  >
-                    •
-                  </Text>
-                </View>
-                <View className="flex-row items-center gap-2.5">
-                  <MaterialIcons
-                    name="location-on"
-                    size={16}
-                    color={AppColors.secondaryText}
-                  />
-                  <Text
-                    className="text-sm font-medium"
-                    style={{ color: AppColors.secondaryText }}
-                  >
-                    {translate("event.location")}
-                  </Text>
-                </View>
-              </View>
+            <View className="flex-col items-center gap-2 mt-1">
               <TouchableOpacity
-                onPress={() => {}}
                 activeOpacity={0.7}
-                className="rounded-2xl px-[26px] py-3.5"
-                style={{ backgroundColor: AppColors.primaryText }}
+                className="w-9 h-9 rounded-full border-2 items-center justify-center"
+                style={{ borderColor: AppColors.borderLight }}
               >
-                <Text className="text-white text-[17px] font-bold">
-                  {translate("event.register")}
-                </Text>
+                <MaterialIcons
+                  name="bookmark-border"
+                  size={18}
+                  color={AppColors.secondaryText}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                className="w-9 h-9 rounded-full border-2 items-center justify-center"
+                style={{ borderColor: AppColors.borderLight }}
+              >
+                <MaterialIcons
+                  name="ios-share"
+                  size={18}
+                  color={AppColors.secondaryText}
+                />
               </TouchableOpacity>
             </View>
           </View>
-        </ScrollView>
-      </View>
+        </View>
+        <View
+          className="mt-2 mb-3 p-5"
+          style={{
+            marginHorizontal: 15,
+            backgroundColor: AppColors.white,
+            borderRadius: 32,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 3,
+          }}
+        >
+          {(() => {
+            const hasReviews = !!aggregate && aggregate.total_reviews > 0;
+            if (!aggregate) return null;
+            return (
+              <>
+                <View className="flex-row gap-3">
+                  <View style={{ width: 90, alignItems: "center" }}>
+                    <Text
+                      style={{
+                        fontSize: 22,
+                        fontFamily: FontFamilies.bold,
+                        color: AppColors.primaryText,
+                        marginBottom: 2,
+                        textAlign: "center",
+                      }}
+                    >
+                      {translate("event.reviews")}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 42,
+                        fontFamily: FontFamilies.bold,
+                        color: AppColors.primaryText,
+                        lineHeight: 46,
+                        textAlign: "center",
+                      }}
+                    >
+                      {aggregate.average_rating.toFixed(1)}
+                    </Text>
+                    <StarRating
+                      rating={Math.round(aggregate.average_rating)}
+                      size={13}
+                      filledColor={AppColors.primaryText}
+                    />
+                    <Text
+                      style={{
+                        fontSize: FontSizes.sm,
+                        color: AppColors.mutedText,
+                        fontFamily: FontFamilies.regular,
+                        marginTop: 4,
+                        textAlign: "center",
+                      }}
+                    >
+                      ({aggregate.total_reviews})
+                    </Text>
+                  </View>
+                  {hasReviews && firstReview && (
+                    <View style={{ justifyContent: "flex-start", paddingHorizontal: 2, paddingTop: 4 }}>
+                      <Image
+                        source={require("@/assets/images/faces.png")}
+                        style={{ width: 38, height: 38, borderRadius: 19 }}
+                        contentFit="cover"
+                      />
+                    </View>
+                  )}
+                  {hasReviews && firstReview && (
+                    <View className="flex-1">
+                      <Text
+                        style={{
+                          fontSize: FontSizes.lg,
+                          color: AppColors.primaryText,
+                          fontFamily: FontFamilies.regular,
+                          lineHeight: 24,
+                          marginBottom: 12,
+                        }}
+                      >
+                        {firstReview.description}
+                      </Text>
+                      {firstReview.categories?.length > 0 && (
+                        <View className="flex-row gap-2 flex-wrap mb-3">
+                          {firstReview.categories.map((cat) => (
+                            <View
+                              key={cat}
+                              className="rounded-xl px-4 py-1.5"
+                              style={{ backgroundColor: "#BFCFEA" }}
+                            >
+                              <Text
+                                style={{
+                                  fontSize: FontSizes.base,
+                                  color: AppColors.secondaryText,
+                                  fontFamily: FontFamilies.regular,
+                                }}
+                              >
+                                {cat}
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
+                      )}
+                      <View className="flex-row items-center justify-between">
+                        <Text
+                          style={{
+                            fontSize: FontSizes.base,
+                            color: AppColors.primaryText,
+                            fontFamily: FontFamilies.regular,
+                            fontStyle: "italic",
+                          }}
+                        >
+                          Anonymous
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: FontSizes.base,
+                            color: AppColors.primaryText,
+                            fontFamily: FontFamilies.regular,
+                          }}
+                        >
+                          {formatRelativeTime(firstReview.created_at)}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                </View>
+                {hasReviews && (
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    className="items-center mt-5"
+                    onPress={() => {}}
+                  >
+                    <Text
+                      style={{
+                        fontSize: FontSizes.base,
+                        color: AppColors.primaryText,
+                        fontFamily: FontFamilies.regular,
+                      }}
+                    >
+                      {translate("event.seeMoreReviews")}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            );
+          })()}
+        </View>
+        <View
+          className="px-4"
+          style={{ paddingTop: 4, paddingBottom: insets.bottom + 10 }}
+        >
+          <TouchableOpacity
+            activeOpacity={0.85}
+            className="w-full items-center rounded-full py-4"
+            style={{ backgroundColor: AppColors.primaryText }}
+            onPress={() => {}}
+          >
+            <Text
+              style={{
+                color: AppColors.white,
+                fontSize: 17,
+                fontFamily: FontFamilies.bold,
+              }}
+            >
+              {translate("event.seeSchedule")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }

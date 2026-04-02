@@ -46,12 +46,12 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen name="event" options={{ href: null }} />
       <Tabs.Screen name="family" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
       <Tabs.Screen name="language" options={{ href: null }} />
       <Tabs.Screen name="payment" options={{ href: null }} />
       <Tabs.Screen name="saved" options={{ href: null }} />
+      <Tabs.Screen name="event/[id]" options={{ href: null }} />
     </Tabs>
   );
 }
