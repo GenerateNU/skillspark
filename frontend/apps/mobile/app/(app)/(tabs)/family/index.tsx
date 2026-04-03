@@ -86,7 +86,7 @@ export default function FamilyListScreen() {
 				<TouchableOpacity
 					className="flex-row items-start py-4 gap-3"
 					activeOpacity={0.7}
-					onPress={() => router.navigate("/family/edit-profile")}
+					onPress={() => router.navigate("./family/edit-profile")}
 				>
 					<View
 						className="w-14 h-14 items-center border justify-center rounded-full overflow-hidden"

@@ -121,7 +121,7 @@ export default function EditProfileScreen() {
 								className="absolute top-1 right-1 w-7 h-7 rounded-full items-center justify-center"
 								style={{ backgroundColor: AppColors.danger }}
 							>
-								<IconSymbol name="xmark" size={14} color="white" />
+								<IconSymbol name="xmark" size={20} color="white" />
 							</TouchableOpacity>
 						)}
 					</View>
@@ -130,7 +130,7 @@ export default function EditProfileScreen() {
 				<View className="gap-5">
 					<View className="gap-1">
 						<ThemedText className="text-sm font-nunito-bold">
-							{translate("editProfile.name")}
+							{control._defaultValues.name ?? translate("editProfile.name")}
 						</ThemedText>
 						<AuthFormInput
 							control={control}
@@ -142,7 +142,8 @@ export default function EditProfileScreen() {
 
 					<View className="gap-1">
 						<ThemedText className="text-sm font-nunito-bold">
-							{translate("editProfile.username")}
+							{control._defaultValues.username ??
+								translate("editProfile.username")}
 						</ThemedText>
 						<AuthFormInput
 							control={control}
