@@ -36,7 +36,7 @@ export default function EditProfileScreen() {
 	const { update, guardianId, langPref } = useAuthContext();
 	const { guardian } = useGuardian(guardianId);
 	const [image, setImage] = useState<string | undefined>(undefined);
-	const ogPfp = guardian?.profile_picture_s3_key;
+	const ogPfp = guardian?.profile_picture_s3_key ?? undefined;
 	const [imgCleared, setImgCleared] = useState(false);
 	const { t: translate } = useTranslation();
 
@@ -52,13 +52,18 @@ export default function EditProfileScreen() {
 
 	useEffect(() => {
 		const hasTextChanges = formValues.name !== "" || formValues.username !== "";
-		const currentImage = imgCleared ? undefined : (image ?? ogPfp);
+		const currentImage = imgCleared ? undefined : image || ogPfp;
 		const hasImgChanges = currentImage !== ogPfp;
-		if (image !== undefined) {
-			setImgCleared(false);
-		}
 		setCanUpdate(hasTextChanges || hasImgChanges);
-	}, [formValues, image, ogPfp, imgCleared]);
+		console.log({
+			image,
+			imgCleared,
+			ogPfp,
+			currentImage,
+			hasImgChanges,
+			hasTextChanges,
+		});
+	}, [formValues.name, formValues.username, image, ogPfp, imgCleared]);
 
 	if (!guardianId || !guardian) {
 		// change to reroute to login
@@ -117,7 +122,10 @@ export default function EditProfileScreen() {
 				<View className="items-center mb-8">
 					<View className="relative w-40">
 						<ImageSelector
-							setImage={setImage}
+							setImage={(e) => {
+								setImage(e);
+								setImgCleared(false);
+							}}
 							image={imgCleared ? undefined : (image ?? ogPfp)}
 							width={160}
 							height={160}
