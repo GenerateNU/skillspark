@@ -12,7 +12,11 @@ COPY scripts ./scripts
 RUN bun install
 # Build the web app
 WORKDIR /app/apps/web
+<<<<<<< HEAD
 #RUN bun run build
+=======
+# RUN bun run build
+>>>>>>> c18248eb13dc30aef2033d2c0f99f8ab05893c4b
 RUN bun x tsc -b && bun x vite build
 # Production stage
 FROM nginx:alpine
