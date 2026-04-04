@@ -21,7 +21,17 @@ import {
 import { AuthProvider } from "@/contexts/auth-context";
 import { LoginRedirect } from "@/components/LoginRedirect";
 import { setCurrentLanguage } from "@skillspark/api-client";
-import { StripeProvider } from "@stripe/stripe-react-native";
+
+let StripeProvider: React.ComponentType<{
+  publishableKey: string;
+  children: React.ReactNode;
+}> | null = null;
+try {
+  StripeProvider = require("@stripe/stripe-react-native").StripeProvider;
+} catch {
+  // Native module unavailable (e.g. Expo Go). Skip Stripe
+}
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -51,10 +61,7 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <StripeProvider
-          publishableKey={process.env.EXPO_PUBLIC_STRIPE_KEY ?? ""}
-        >
+  const content = (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <AuthProvider>
@@ -62,6 +69,15 @@ export default function RootLayout() {
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
-    </StripeProvider>
   );
+
+  if (StripeProvider) {
+    return (
+      <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_KEY ?? ""}>
+        {content}
+      </StripeProvider>
+    );
+  }
+
+  return content;
 }
