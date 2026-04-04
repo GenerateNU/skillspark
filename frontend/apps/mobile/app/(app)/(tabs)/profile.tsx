@@ -51,8 +51,8 @@ export default function ProfileScreen() {
 		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
 			<ScrollView
 				showsVerticalScrollIndicator={false}
-				contentContainerStyle={{ paddingTop: 10, paddingBottom: 20 }}
 				bounces={false}
+				className="pt-[10px] pb-5"
 			>
 				<View className="items-center mb-5 mt-[5px]">
 					<View

@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 import { setCurrentLanguage } from "@skillspark/api-client";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 const LANGUAGES = [
 	{ code: "en", label: "English", flag: "🇺🇸" },
@@ -47,7 +48,7 @@ export default function LanguageScreen() {
 				guardian.username,
 				guardian.profile_picture_s3_key,
 			);
-			if (errorText !== "") console.log(errorText); // how should we display error to user?
+			if (errorText !== "") console.log(errorText);
 		}
 	};
 
@@ -102,6 +103,7 @@ export default function LanguageScreen() {
 					</React.Fragment>
 				))}
 			</View>
+			<ErrorMessage message={errorText} />
 		</ThemedView>
 	);
 }

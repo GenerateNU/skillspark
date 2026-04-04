@@ -50,11 +50,6 @@ export default function FamilyListScreen() {
 		});
 	};
 
-	if (!guardianId) {
-		// change to reroute to login
-		return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
-	}
-
 	if (isLoading) {
 		return (
 			<ThemedView className="flex-1 items-center justify-center">

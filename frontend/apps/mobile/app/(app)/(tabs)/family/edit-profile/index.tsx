@@ -35,7 +35,7 @@ export default function EditProfileScreen() {
 	const [errorText, setErrorText] = useState("");
 	const { update, guardianId, langPref } = useAuthContext();
 	const { guardian } = useGuardian(guardianId);
-	const [image, setImage] = useState<string | null>(null);
+	const [image, setImage] = useState<string | undefined>(undefined);
 	const ogPfp = guardian?.profile_picture_s3_key;
 	const [imgCleared, setImgCleared] = useState(false);
 	const { t: translate } = useTranslation();
@@ -52,15 +52,16 @@ export default function EditProfileScreen() {
 
 	useEffect(() => {
 		const hasTextChanges = formValues.name !== "" || formValues.username !== "";
-		const currentImage = imgCleared ? null : (image ?? ogPfp);
+		const currentImage = imgCleared ? undefined : (image ?? ogPfp);
 		const hasImgChanges = currentImage !== ogPfp;
-		if (image !== null) {
+		if (image !== undefined) {
 			setImgCleared(false);
 		}
 		setCanUpdate(hasTextChanges || hasImgChanges);
 	}, [formValues, image, ogPfp, imgCleared]);
 
-	if (!guardianId && !guardian) {
+	if (!guardianId || !guardian) {
+		// change to reroute to login
 		return <ErrorScreen message="Illegal state: no guardian ID found" />;
 	}
 
@@ -79,12 +80,12 @@ export default function EditProfileScreen() {
 			language_preference,
 			name,
 			username,
-			imgCleared ? null : (image ?? ogPfp),
+			imgCleared ? undefined : (image ?? ogPfp),
 		);
 	};
 
 	const clearImage = () => {
-		setImage(null);
+		setImage(undefined);
 		setImgCleared(true);
 	};
 
@@ -117,12 +118,12 @@ export default function EditProfileScreen() {
 					<View className="relative w-40">
 						<ImageSelector
 							setImage={setImage}
-							image={imgCleared ? null : (image ?? ogPfp)}
+							image={imgCleared ? undefined : (image ?? ogPfp)}
 							width={160}
 							height={160}
 							className="items-center gap-2"
 						/>
-						{(imgCleared ? null : (image ?? ogPfp)) && (
+						{(imgCleared ? undefined : (image ?? ogPfp)) && (
 							<TouchableOpacity
 								onPress={clearImage}
 								className="absolute top-0 right-0 w-10 h-10 rounded-full items-center justify-center"
