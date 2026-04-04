@@ -12,7 +12,8 @@ COPY scripts ./scripts
 RUN bun install
 # Build the web app
 WORKDIR /app/apps/web
-RUN bun run build
+#RUN bun run build
+RUN bun x tsc -b && bun x vite build
 # Production stage
 FROM nginx:alpine
 COPY --from=build /app/apps/web/dist /usr/share/nginx/html

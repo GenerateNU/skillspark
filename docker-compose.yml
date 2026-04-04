@@ -31,7 +31,6 @@ services:
           target: /app
     networks:
       - app-network
-      - supabase_network_skillspark
     container_name: backend
     labels:
       - "description=Backend available at http://localhost:8080"
@@ -67,5 +66,3 @@ services:
 networks:
   app-network:
     driver: bridge
-  supabase_network_skillspark:
-    external: true
