@@ -21,6 +21,7 @@ import {
 import { AuthProvider } from "@/contexts/auth-context";
 import { LoginRedirect } from "@/components/LoginRedirect";
 import { setCurrentLanguage } from "@skillspark/api-client";
+import { StripeProvider } from "@stripe/stripe-react-native";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -51,6 +52,9 @@ export default function RootLayout() {
   }
 
   return (
+    <StripeProvider
+          publishableKey={process.env.EXPO_PUBLIC_STRIPE_KEY ?? ""}
+        >
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <AuthProvider>
@@ -58,5 +62,6 @@ export default function RootLayout() {
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
+    </StripeProvider>
   );
 }

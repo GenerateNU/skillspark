@@ -12,7 +12,6 @@ import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors, AppColors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
-import { StripeProvider } from "@stripe/stripe-react-native";
 import {
   detachGuardianPaymentMethod,
   getGuardianPaymentMethods,
@@ -75,12 +74,6 @@ export default function PaymentScreen() {
   };
 
   return (
-    <StripeProvider
-      publishableKey={
-        process.env.STRIPE_PUBLIC_TEST_KEY ??
-        "pk_test_51Sv0A4FrpRQNhznd1iPvH4KiYp9NuqJjqrKSiuDr3Ut2BcWgOf82rOx0SDiWuS7BMAd3hErQQmAIg12fhib2ZanZ00yBhzIAJR"
-      }
-    >
       <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
         <View className="flex-row items-center justify-between px-5 py-[14px]">
           <TouchableOpacity
@@ -154,6 +147,5 @@ export default function PaymentScreen() {
         </View>
         {error && <ErrorMessage message={error} />}
       </ThemedView>
-    </StripeProvider>
   );
 }
