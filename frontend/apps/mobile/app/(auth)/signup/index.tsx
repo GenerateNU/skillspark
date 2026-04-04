@@ -3,6 +3,7 @@ import { ThemedView } from "@/components/themed-view";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
+	BlurEvent,
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
@@ -28,11 +29,14 @@ type SignupFormData = {
 
 export default function SignupScreen() {
 	const [errorText, setErrorText] = useState("");
-	const { signup, checkUsername } = useAuthContext();
+	const { signup, usernameExists } = useAuthContext();
 	const {
 		control,
 		handleSubmit,
 		formState: { errors },
+		getValues,
+		setError,
+		clearErrors,
 	} = useForm<SignupFormData>({
 		defaultValues: {
 			name: "",
@@ -66,8 +70,19 @@ export default function SignupScreen() {
 		}
 	};
 
-	const onClickOut = (e: TextInputChangeEvent) => {
-		checkUsername(control._defaultValues.username ?? "");
+	const onClickOut = async () => {
+		const result = await usernameExists(
+			getValues("username") ?? "",
+			setErrorText,
+		);
+		if (!result) {
+			setError("username", {
+				type: "manual",
+				message: "Username is taken.",
+			});
+		} else {
+			clearErrors("username");
+		}
 	};
 
 	const handleGoToLogIn = () => {
@@ -109,7 +124,7 @@ export default function SignupScreen() {
 							error={errors.username}
 							placeholder="Username"
 							autoCapitalize="none"
-							onChange={onClickOut}
+							onBlur={(e) => onClickOut()}
 						/>
 						<AuthFormInput
 							control={control}
