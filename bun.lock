@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "skillspark",
+      "dependencies": {
+        "expo-image-picker": "^55.0.16",
+      },
       "devDependencies": {
         "husky": "^9.1.7",
         "supabase": "^2.72.7",

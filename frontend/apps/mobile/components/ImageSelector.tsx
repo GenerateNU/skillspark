@@ -12,8 +12,8 @@ import { NoProfilePic } from "./NoProfilePic";
 import { useTranslation } from "react-i18next";
 
 interface ImageSelectorProps extends TouchableOpacityProps {
-	setImage: React.Dispatch<React.SetStateAction<string | undefined>>;
-	image: string | undefined;
+	setImage: React.Dispatch<React.SetStateAction<string | null>>;
+	image: string | null;
 	width: number;
 	height: number;
 }

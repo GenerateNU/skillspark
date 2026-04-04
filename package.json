@@ -17,5 +17,8 @@
   "workspaces": [
     "frontend/apps/*",
     "frontend/packages/*"
-  ]
+  ],
+  "dependencies": {
+    "expo-image-picker": "^55.0.16"
+  }
 }

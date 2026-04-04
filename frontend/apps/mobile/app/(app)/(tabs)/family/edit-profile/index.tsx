@@ -11,7 +11,7 @@ import { AppColors, Colors } from "@/constants/theme";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { AuthFormInput } from "@/components/AuthFormInput";
@@ -35,29 +35,36 @@ export default function EditProfileScreen() {
 	const [errorText, setErrorText] = useState("");
 	const { update, guardianId, langPref } = useAuthContext();
 	const { guardian } = useGuardian(guardianId);
-	const [image, setImage] = useState<string | undefined>(undefined);
-	const [pfp, setPfp] = useState<string | undefined>(
-		guardian?.profile_picture_s3_key,
-	);
+	const [image, setImage] = useState<string | null>(null);
+	const ogPfp = guardian?.profile_picture_s3_key;
+	const [imgCleared, setImgCleared] = useState(false);
 	const { t: translate } = useTranslation();
 
-	const { control, handleSubmit } = useForm<EditFormData>({
+	const { control, handleSubmit, watch } = useForm<EditFormData>({
 		defaultValues: {
 			name: "",
 			username: "",
 		},
 	});
 
-	if (!guardianId) {
+	const [canUpdate, setCanUpdate] = useState(false);
+	const formValues = watch();
+
+	useEffect(() => {
+		const hasTextChanges = formValues.name !== "" || formValues.username !== "";
+		const currentImage = imgCleared ? null : (image ?? ogPfp);
+		const hasImgChanges = currentImage !== ogPfp;
+		if (image !== null) {
+			setImgCleared(false);
+		}
+		setCanUpdate(hasTextChanges || hasImgChanges);
+	}, [formValues, image, ogPfp, imgCleared]);
+
+	if (!guardianId && !guardian) {
 		return <ErrorScreen message="Illegal state: no guardian ID found" />;
 	}
 
 	const onSubmit = (formData: EditFormData) => {
-		if (!guardian) {
-			setErrorText("No guardian ID found");
-			return;
-		}
-
 		const id = guardian.id;
 		const email = guardian.email;
 		const language_preference = langPref!;
@@ -72,13 +79,13 @@ export default function EditProfileScreen() {
 			language_preference,
 			name,
 			username,
-			image ?? pfp,
+			imgCleared ? null : (image ?? ogPfp),
 		);
 	};
 
 	const clearImage = () => {
-		setImage(undefined);
-		setPfp(undefined);
+		setImage(null);
+		setImgCleared(true);
 	};
 
 	return (
@@ -110,18 +117,18 @@ export default function EditProfileScreen() {
 					<View className="relative w-40">
 						<ImageSelector
 							setImage={setImage}
-							image={image ?? pfp}
+							image={imgCleared ? null : (image ?? ogPfp)}
 							width={160}
 							height={160}
 							className="items-center gap-2"
 						/>
-						{(image || pfp) && (
+						{(imgCleared ? null : (image ?? ogPfp)) && (
 							<TouchableOpacity
 								onPress={clearImage}
-								className="absolute top-1 right-1 w-7 h-7 rounded-full items-center justify-center"
+								className="absolute top-0 right-0 w-10 h-10 rounded-full items-center justify-center"
 								style={{ backgroundColor: AppColors.danger }}
 							>
-								<IconSymbol name="xmark" size={20} color="white" />
+								<IconSymbol name="xmark" size={18} color="white" />
 							</TouchableOpacity>
 						)}
 					</View>
@@ -130,25 +137,26 @@ export default function EditProfileScreen() {
 				<View className="gap-5">
 					<View className="gap-1">
 						<ThemedText className="text-sm font-nunito-bold">
-							{control._defaultValues.name ?? translate("editProfile.name")}
+							{translate("editProfile.name")}
 						</ThemedText>
 						<AuthFormInput
 							control={control}
 							name="name"
-							placeholder={translate("editProfile.name")}
+							placeholder={guardian.name || translate("editProfile.name")}
 							autoCapitalize="none"
 						/>
 					</View>
 
 					<View className="gap-1">
 						<ThemedText className="text-sm font-nunito-bold">
-							{control._defaultValues.username ??
-								translate("editProfile.username")}
+							{translate("editProfile.username")}
 						</ThemedText>
 						<AuthFormInput
 							control={control}
 							name="username"
-							placeholder={translate("editProfile.username")}
+							placeholder={
+								guardian.username || translate("editProfile.username")
+							}
 							autoCapitalize="none"
 						/>
 					</View>
@@ -160,6 +168,7 @@ export default function EditProfileScreen() {
 					<Button
 						label={translate("editProfile.saveChanges")}
 						onPress={handleSubmit(onSubmit)}
+						disabled={!canUpdate}
 					/>
 				</View>
 			</ScrollView>
