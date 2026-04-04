@@ -92,7 +92,7 @@ export default function FamilyListScreen() {
 			</View>
 
 			<ScrollView
-				contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12 }}
+				className="px-[20px] pt-[12px]"
 				showsVerticalScrollIndicator={false}
 			>
 				<TouchableOpacity

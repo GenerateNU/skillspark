@@ -51,18 +51,12 @@ export default function EditProfileScreen() {
 	const formValues = watch();
 
 	useEffect(() => {
+		// true if name or username text boxes are empty
 		const hasTextChanges = formValues.name !== "" || formValues.username !== "";
+		// true if selected image has changed at all from user's current profile pic
 		const currentImage = imgCleared ? undefined : image || ogPfp;
 		const hasImgChanges = currentImage !== ogPfp;
 		setCanUpdate(hasTextChanges || hasImgChanges);
-		console.log({
-			image,
-			imgCleared,
-			ogPfp,
-			currentImage,
-			hasImgChanges,
-			hasTextChanges,
-		});
 	}, [formValues.name, formValues.username, image, ogPfp, imgCleared]);
 
 	if (!guardianId || !guardian) {

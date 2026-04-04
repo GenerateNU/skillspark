@@ -1,19 +1,19 @@
 {
-	"name": "frontend",
-	"private": true,
-	"workspaces": [
-		"apps/*",
-		"packages/*"
-	],
-	"scripts": {
-		"dev:web": "bun --filter apps/web dev",
-		"dev:mobile": "cd apps/mobile && bun run start",
-		"generate:api": "cd packages/api-client && bun run generate"
-	},
-	"dependencies": {
-		"@tanstack/react-query": "^5.0.0",
-		"axios": "^1.0.0",
-		"react": "19.1.0",
-		"react-dom": "19.1.0"
-	}
+  "name": "frontend",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "bun --filter apps/web dev",
+    "dev:mobile": "cd apps/mobile && bun run start",
+    "generate:api": "cd packages/api-client && bun run generate"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "axios": "^1.0.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  }
 }

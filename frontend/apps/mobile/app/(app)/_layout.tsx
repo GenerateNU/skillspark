@@ -1,7 +1,7 @@
 import {
-	DarkTheme,
-	DefaultTheme,
-	ThemeProvider,
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -13,32 +13,32 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useAuthContext } from "@/hooks/use-auth-context";
 
 export const unstable_settings = {
-	anchor: "(tabs)",
+  anchor: "(tabs)",
 };
 
 export default function RootLayout() {
-	const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme();
 
-	const { isAuthenticated, isLoading } = useAuthContext();
+  const { isAuthenticated, isLoading } = useAuthContext();
 
-	if (isLoading) return null;
+  if (isLoading) return null;
 
-	if (!isAuthenticated) {
-		return;
-	}
+  if (!isAuthenticated) {
+    return;
+  }
 
-	return (
-		<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-			<QueryClientProvider client={queryClient}>
-				<Stack>
-					<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-					<Stack.Screen
-						name="modal"
-						options={{ presentation: "modal", title: "Modal" }}
-					/>
-				</Stack>
-				<StatusBar style="auto" />
-			</QueryClientProvider>
-		</ThemeProvider>
-	);
+  return (
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <QueryClientProvider client={queryClient}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="modal"
+            options={{ presentation: "modal", title: "Modal" }}
+          />
+        </Stack>
+        <StatusBar style="auto" />
+      </QueryClientProvider>
+    </ThemeProvider>
+  );
 }

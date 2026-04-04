@@ -4,29 +4,29 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Colors } from "@/constants/theme";
 
 export default function EditLayout() {
-	const colorScheme = useColorScheme();
-	const theme = Colors[colorScheme ?? "light"];
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? "light"];
 
-	return (
-		<Stack
-			screenOptions={{
-				headerShown: false,
-				headerTintColor: theme.tint,
-				headerStyle: { backgroundColor: theme.background },
-				headerTitleStyle: {
-					fontFamily: "NunitoSans_600SemiBold",
-					color: theme.text,
-				},
-				headerBackTitle: "",
-			}}
-		>
-			<Stack.Screen
-				name="index"
-				options={{
-					headerShown: false,
-					animation: "slide_from_bottom",
-				}}
-			/>
-		</Stack>
-	);
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        headerTintColor: theme.tint,
+        headerStyle: { backgroundColor: theme.background },
+        headerTitleStyle: {
+          fontFamily: "NunitoSans_600SemiBold",
+          color: theme.text,
+        },
+        headerBackTitle: "",
+      }}
+    >
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: false,
+          animation: "slide_from_bottom",
+        }}
+      />
+    </Stack>
+  );
 }
