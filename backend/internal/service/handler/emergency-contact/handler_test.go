@@ -217,7 +217,7 @@ func TestHandler_DeleteEmergencyContact(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 				).Return(&models.DeleteEmergencyContactOutput{
-					SuccessMessage: "success",
+					Body: &models.DeleteEmergencyContactBody{SuccessMessage: "success"},
 				}, nil)
 			},
 			wantErr: false,
