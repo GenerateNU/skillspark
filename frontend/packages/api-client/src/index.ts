@@ -23,3 +23,4 @@ export * from "./generated/locations/locations";
 export * from "./generated/auth/auth";
 export * from "./generated/registrations/registrations";
 export * from "./generated/payments/payments";
+export * from './generated/emergency-contacts/emergency-contacts';
