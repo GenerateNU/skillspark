@@ -10,7 +10,7 @@ import type { LocationObject } from "expo-location";
 import { haversineDistance } from "@/utils/distance";
 import { OrgCard } from "@/components/OrgCard";
 
-const SNAP_POINTS = [30, "78%"];
+const SNAP_POINTS = [30, "65%"];
 
 interface OrgListSheetProps {
   locations: LocationPin[];
@@ -26,11 +26,12 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
     <BottomSheet
       index={0}
       snapPoints={SNAP_POINTS}
+      enableDynamicSizing={false}
       backgroundStyle={{ backgroundColor: bgColor }}
       handleIndicatorStyle={{ backgroundColor: AppColors.borderLight }}
     >
       <View
-        className="flex-row items-center gap-2 border-b px-4 pb-5"
+        className="flex-row items-center gap-2 border-b px-4 pb-5 pt-3"
         style={{ borderBottomColor: borderColor }}
       >
         <FilterPill label={`${translate("map.filterTime")} ▾`} />
