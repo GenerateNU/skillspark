@@ -226,6 +226,14 @@
     "miles": "mi",
     "stars": "Stars"
   },
+  "org": {
+    "about": "About",
+    "noDescription": "No description available.",
+    "seeSchedule": "See Schedule",
+    "notFound": "Organization not found.",
+    "bookingsThisWeek": "Bookings this week",
+    "reviews": "Reviews"
+  },
   "interests": {
     "science": "Science",
     "math": "Math",
