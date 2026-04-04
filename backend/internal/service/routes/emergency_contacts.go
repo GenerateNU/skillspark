@@ -48,7 +48,7 @@ func SetupEmergencyContactRoutes(api huma.API, repo *storage.Repository) {
 		}
 
 		return &models.DeleteEmergencyContactOutput{
-			SuccessMessage: "nice",
+			Body: &models.DeleteEmergencyContactBody{SuccessMessage: "nice"},
 		}, nil
 	})
 

@@ -198,7 +198,7 @@ func TestDeleteEmergencyContact_Success(t *testing.T) {
 		"DeleteEmergencyContact",
 		mock.Anything,
 		contactID,
-	).Return(&models.DeleteEmergencyContactOutput{SuccessMessage: "nice"}, nil)
+	).Return(&models.DeleteEmergencyContactOutput{Body: &models.DeleteEmergencyContactBody{SuccessMessage: "nice"}}, nil)
 
 	app, _ := setupEmergencyContactTestAPI(mockRepo)
 

@@ -52,6 +52,10 @@ type DeleteEmergencyContactInput struct {
 	ID uuid.UUID `path:"id"`
 }
 
-type DeleteEmergencyContactOutput struct {
+type DeleteEmergencyContactBody struct {
 	SuccessMessage string `json:"success_message"`
+}
+
+type DeleteEmergencyContactOutput struct {
+	Body *DeleteEmergencyContactBody
 }

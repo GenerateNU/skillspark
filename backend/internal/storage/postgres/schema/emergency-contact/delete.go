@@ -28,7 +28,7 @@ func (r *EmergencyContactRepository) DeleteEmergencyContact(ctx context.Context,
 	}
 
 	output := &models.DeleteEmergencyContactOutput{}
-	output.SuccessMessage = "success"
+	output.Body = &models.DeleteEmergencyContactBody{SuccessMessage: "success"}
 
 	return output, nil
 }
