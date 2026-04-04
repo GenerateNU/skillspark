@@ -174,7 +174,17 @@
     "noReviews": "ไม่มีความคิดเห็น",
     "mostRecent": "ล่าสุด",
     "highest": "สูงสุด",
-    "lowest": "ต่ำสุด"
+    "lowest": "ต่ำสุด",
+    "reviews": "รีวิว"
+  },
+  "time": {
+    "today": "วันนี้",
+    "oneDayAgo": "1 วันที่แล้ว",
+    "daysAgo": "หลายวันก่อน",
+    "oneMonthAgo": "1 เดือนที่แล้ว",
+    "monthsAgo": "หลายเดือนก่อน",
+    "oneYearAgo": "1 ปีที่แล้ว",
+    "yearsAgo": "หลายปีที่แล้ว"
   },
   "event": {
     "back": "กลับ",

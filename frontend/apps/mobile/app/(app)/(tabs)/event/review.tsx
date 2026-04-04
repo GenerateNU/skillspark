@@ -143,14 +143,14 @@ return (
 
       <View className="gap-0 px-5 mt-4">
         {reviews.map((review, index) => (
-          <View key={review.id}>
+          <View key={review.id} >
             <ReviewCard review={review} />
             {index < reviews.length - 1 && (
-              <View style={{ height: 0.5, backgroundColor: AppColors.borderLight }} className="my-3" />
+              <View style={{ backgroundColor: AppColors.borderLight }} className="my-3 h-px" />
             )}
           </View>
         ))}
-      </View>
+      </View> 
 
     </ScrollView>
   </ThemedView>

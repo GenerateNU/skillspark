@@ -4,17 +4,17 @@ import { Review } from "@skillspark/api-client";
 import { useTranslation } from "react-i18next";
 import { Image, Text, View } from "react-native";
 
-function timeAgo(dateStr: string) {
+function timeAgo(dateStr: string, translate: (key: string) => string) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days === 0) return "Today";
-  if (days === 1) return "1 day ago";
-  if (days < 30) return `${days} days ago`;
+  if (days === 0) return translate("time.today");
+  if (days === 1) return translate("time.oneDayAgo");
+  if (days < 30) return `${days} ${translate("time.daysAgo")}`;
   const months = Math.floor(days / 30);
-  if (months === 1) return "1 month ago";
-  if (months < 12) return `${months} months ago`;
+  if (months === 1) return translate("time.oneMonthAgo");
+  if (months < 12) return `${months} ${translate("time.monthsAgo")}`;
   const years = Math.floor(months / 12);
-  return years === 1 ? "1 year ago" : `${years} years ago`;
+  return years === 1 ? translate("time.oneYearAgo") : `${years} ${translate("time.yearsAgo")}`;
 }
 
 export function ReviewCard({ review }: { review: Review }) {
@@ -27,7 +27,7 @@ export function ReviewCard({ review }: { review: Review }) {
       className="flex-row gap-3 p-4 rounded-2xl"
     >
       <View className="items-center pt-1">
-        {match && <Image source={match.image} style={{ width: 36, height: 36 }} />}
+        {match && <Image source={match.image} className="w-9 h-9" />}
       </View>
 
       <View className="flex-1 gap-2">
@@ -56,7 +56,7 @@ export function ReviewCard({ review }: { review: Review }) {
             Anonymous
           </Text> 
           <Text className="text-xs" style={{ color: AppColors.subtleText }}>
-            {timeAgo(review.created_at)}
+            {timeAgo(review.created_at, translate)}
           </Text>
         </View>
       </View>

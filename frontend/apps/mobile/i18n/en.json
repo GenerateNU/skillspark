@@ -177,7 +177,17 @@
     "firstReview": "Be the first to review!",
     "mostRecent": "Most recent",
     "highest": "Highest",
-    "lowest": "Lowest"
+    "lowest": "Lowest",
+    "reviews": "reviews"
+  },
+  "time": {
+    "today": "Today",
+    "oneDayAgo": "1 day ago",
+    "daysAgo": "days ago",
+    "oneMonthAgo": "1 month ago",
+    "monthsAgo": "months ago",
+    "oneYearAgo": "1 year ago",
+    "yearsAgo": "years ago"
   },
   "event": {
     "back": "Back",

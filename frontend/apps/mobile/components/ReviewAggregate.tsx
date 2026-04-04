@@ -18,7 +18,7 @@ export function RatingAggregateCard({ aggregate }: { aggregate: ReviewAggregate 
       <View>
         {total === 0 ? (
             <View className="flex-row items-center gap-3 mb-1">
-                <Image source={NO_REVIEWS_IMAGE} style={{ width: 40, height: 40 }} />
+                <Image source={NO_REVIEWS_IMAGE} className="w-10 h-10" />
                 <Text className="text-4xl font-bold mb-1" style={{ color: AppColors.primaryText }}>
                     {translate("review.noReviews")}
                 </Text>
@@ -27,7 +27,7 @@ export function RatingAggregateCard({ aggregate }: { aggregate: ReviewAggregate 
             const match = RATING_OPTIONS.find(r => r.rating === Math.round(avg));
             return (
                 <View className="flex-row items-center gap-3 mb-1">
-                <Image source={match?.image} style={{ width: 40, height: 40 }} />
+                <Image source={match?.image} className="w-10 h-10" />
                 <Text className="text-4xl font-bold" style={{ color: AppColors.primaryText }}>
                     {translate(match?.labelKey ?? "")}
                 </Text>
@@ -38,20 +38,20 @@ export function RatingAggregateCard({ aggregate }: { aggregate: ReviewAggregate 
             className="text-sm mb-5"
             style={{ color: AppColors.subtleText }}
         >
-            {total} reviews
+            {total} {translate("review.reviews")}
         </Text>
       </View>
 
     <View className="mb-3" style={{ height: 0.5, backgroundColor: AppColors.borderLight }} />
 
       <View className="gap-3">
-  {total > 0 && RATING_OPTIONS.slice().reverse().map(({ rating, image, labelKey }) => {
+  {total > 0 && RATING_OPTIONS.slice().map(({ rating, image, labelKey }) => {
     const count = aggregate.breakdown.find(b => b.rating === rating)?.review_count ?? 0;
     const pct = total > 0 ? (count / total) * 100 : 0;
     return (
       <View key={rating} className="gap-1">
         <View className="flex-row items-center gap-2">
-          <Image source={image} style={{ width: 18, height: 18 }} />
+          <Image source={image} className="w-4 h-4" />
           <Text className="text-xs" style={{ color: AppColors.secondaryText }}>
             {translate(labelKey)}
           </Text>
