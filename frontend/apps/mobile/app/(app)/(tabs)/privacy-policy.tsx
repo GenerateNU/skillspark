@@ -32,84 +32,84 @@ export default function PrivacyPolicyScreen() {
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 40 }}
+        className="px-5 pt-2 pb-10"
       >
         <ThemedText className="text-[15px] font-nunito italic mb-4" style={{ color: theme.icon }}>
-          Last Updated: April 4, 2026
+          {translate("privacyPolicy.lastUpdated")}
         </ThemedText>
 
-        <ThemedText className="text-[15px] font-nunito mb-4" style={{ lineHeight: 22 }}>
-          This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.
+        <ThemedText className="text-[15px] font-nunito mb-4 leading-[22px]">
+          {translate("privacyPolicy.intro1")}
         </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-4" style={{ lineHeight: 22 }}>
-          We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.
-        </ThemedText>
-
-        <ThemedText className="text-[15px] font-nunito-bold mb-2">
-          Collecting and Using Your Personal Data
-        </ThemedText>
-        <ThemedText className="text-[15px] font-nunito-bold mb-2">
-          Types of Data Collected
-        </ThemedText>
-        <ThemedText className="text-[15px] font-nunito-bold mb-2">
-          Personal Data
-        </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-3" style={{ lineHeight: 22 }}>
-          While using Our Service, We may ask You to provide Us with certain personally identifiable information that can be used to contact or identify You. Personally identifiable information may include, but is not limited to:
-        </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-1 ml-4" style={{ lineHeight: 22 }}>
-          • Email address
-        </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-1 ml-4" style={{ lineHeight: 22 }}>
-          • Name
-        </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-1 ml-4" style={{ lineHeight: 22 }}>
-          • Phone number
-        </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-4 ml-4" style={{ lineHeight: 22 }}>
-          • Usage Data
+        <ThemedText className="text-[15px] font-nunito mb-4 leading-[22px]">
+          {translate("privacyPolicy.intro2")}
         </ThemedText>
 
         <ThemedText className="text-[15px] font-nunito-bold mb-2">
-          Usage Data
+          {translate("privacyPolicy.collectingDataTitle")}
         </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-4" style={{ lineHeight: 22 }}>
-          Usage Data is collected automatically when using the Service. Usage Data may include information such as Your Device's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that You visit, the time and date of Your visit, the time spent on those pages, unique device identifiers and other diagnostic data.
+        <ThemedText className="text-[15px] font-nunito-bold mb-2">
+          {translate("privacyPolicy.typesOfDataTitle")}
+        </ThemedText>
+        <ThemedText className="text-[15px] font-nunito-bold mb-2">
+          {translate("privacyPolicy.personalDataTitle")}
+        </ThemedText>
+        <ThemedText className="text-[15px] font-nunito mb-3 leading-[22px]">
+          {translate("privacyPolicy.personalDataDesc")}
+        </ThemedText>
+        <ThemedText className="text-[15px] font-nunito mb-1 ml-4 leading-[22px]">
+          {`\u2022 ${translate("privacyPolicy.emailAddress")}`}
+        </ThemedText>
+        <ThemedText className="text-[15px] font-nunito mb-1 ml-4 leading-[22px]">
+          {`\u2022 ${translate("privacyPolicy.name")}`}
+        </ThemedText>
+        <ThemedText className="text-[15px] font-nunito mb-1 ml-4 leading-[22px]">
+          {`\u2022 ${translate("privacyPolicy.phoneNumber")}`}
+        </ThemedText>
+        <ThemedText className="text-[15px] font-nunito mb-4 ml-4 leading-[22px]">
+          {`\u2022 ${translate("privacyPolicy.usageDataItem")}`}
         </ThemedText>
 
         <ThemedText className="text-[15px] font-nunito-bold mb-2">
-          Use of Your Personal Data
+          {translate("privacyPolicy.usageDataTitle")}
         </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-4" style={{ lineHeight: 22 }}>
-          The Company may use Personal Data for the following purposes: to provide and maintain our Service, to manage Your Account, to contact You, to provide You with news and special offers, and for other purposes such as data analysis and improving our Service.
-        </ThemedText>
-
-        <ThemedText className="text-[15px] font-nunito-bold mb-2">
-          Security of Your Personal Data
-        </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-4" style={{ lineHeight: 22 }}>
-          The security of Your Personal Data is important to Us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While We strive to use commercially acceptable means to protect Your Personal Data, We cannot guarantee its absolute security.
+        <ThemedText className="text-[15px] font-nunito mb-4 leading-[22px]">
+          {translate("privacyPolicy.usageDataDesc")}
         </ThemedText>
 
         <ThemedText className="text-[15px] font-nunito-bold mb-2">
-          Children's Privacy
+          {translate("privacyPolicy.useOfDataTitle")}
         </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-4" style={{ lineHeight: 22 }}>
-          Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If You are a parent or guardian and You are aware that Your child has provided Us with Personal Data, please contact Us.
-        </ThemedText>
-
-        <ThemedText className="text-[15px] font-nunito-bold mb-2">
-          Changes to This Privacy Policy
-        </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-4" style={{ lineHeight: 22 }}>
-          We may update Our Privacy Policy from time to time. We will notify You of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.
+        <ThemedText className="text-[15px] font-nunito mb-4 leading-[22px]">
+          {translate("privacyPolicy.useOfDataDesc")}
         </ThemedText>
 
         <ThemedText className="text-[15px] font-nunito-bold mb-2">
-          Contact Us
+          {translate("privacyPolicy.securityTitle")}
         </ThemedText>
-        <ThemedText className="text-[15px] font-nunito mb-4" style={{ lineHeight: 22 }}>
-          If you have any questions about this Privacy Policy, You can contact us by email.
+        <ThemedText className="text-[15px] font-nunito mb-4 leading-[22px]">
+          {translate("privacyPolicy.securityDesc")}
+        </ThemedText>
+
+        <ThemedText className="text-[15px] font-nunito-bold mb-2">
+          {translate("privacyPolicy.childrenTitle")}
+        </ThemedText>
+        <ThemedText className="text-[15px] font-nunito mb-4 leading-[22px]">
+          {translate("privacyPolicy.childrenDesc")}
+        </ThemedText>
+
+        <ThemedText className="text-[15px] font-nunito-bold mb-2">
+          {translate("privacyPolicy.changesTitle")}
+        </ThemedText>
+        <ThemedText className="text-[15px] font-nunito mb-4 leading-[22px]">
+          {translate("privacyPolicy.changesDesc")}
+        </ThemedText>
+
+        <ThemedText className="text-[15px] font-nunito-bold mb-2">
+          {translate("privacyPolicy.contactTitle")}
+        </ThemedText>
+        <ThemedText className="text-[15px] font-nunito mb-4 leading-[22px]">
+          {translate("privacyPolicy.contactDesc")}
         </ThemedText>
       </ScrollView>
     </ThemedView>
