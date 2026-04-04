@@ -8,15 +8,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useGetOrganization } from "@skillspark/api-client";
-import type { Organization } from "@skillspark/api-client";
+import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
+import type { Location, Organization } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { AppColors } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
 
-function OrgDetail({ org }: { org: Organization }) {
+function OrgDetail({ org, location }: { org: Organization; location?: Location }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
@@ -60,14 +60,12 @@ function OrgDetail({ org }: { org: Organization }) {
                 {org.name}
               </Text>
               <Text className="mb-[5px] text-[14px] font-nunito" style={{ color: AppColors.mutedText }}>
-                Dorchester, Massachusetts
+                {location && (
+                  <Text className="mb-[5px] text-[14px] font-nunito" style={{ color: AppColors.mutedText }}>
+                    {location.district}, {location.province}
+                  </Text>
+                )}
               </Text>
-              <View className="mb-1.5 flex-row items-center gap-1.5">
-                <Text className="text-[14px]">⚽</Text>
-                <Text className="text-[14px] font-nunito" style={{ color: AppColors.mutedText }}>
-                  Athletics / Recreational Sports
-                </Text>
-              </View>
               <View className="flex-row items-center gap-1.5">
                 <Text className="text-[14px]">🔥</Text>
                 <Text className="text-[14px] font-nunito" style={{ color: AppColors.mutedText }}>
@@ -95,7 +93,7 @@ function OrgDetail({ org }: { org: Organization }) {
               4.5
             </Text>
             <Image
-              source={require("@/assets/images/faces.svg")}
+              source={require("@/assets/images/faces.png")}
               className="my-3 h-10 w-[140px]"
             />
             <Text className="mt-1.5 text-[14px] font-nunito" style={{ color: AppColors.subtleText }}>
@@ -124,6 +122,14 @@ export default function OrgScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: response, isLoading, error } = useGetOrganization(id);
   const { t: translate } = useTranslation();
+  const { data: locationResponse } = useGetLocationById(
+    response?.status === 200 ? response.data.location_id ?? "" : "",
+    {
+      query: {
+        enabled: response?.status === 200 && !!response.data.location_id,
+      },
+    }
+  );
 
   if (isLoading) {
     return (
@@ -143,5 +149,5 @@ export default function OrgScreen() {
     );
   }
 
-  return <OrgDetail org={response.data} />;
+  return <OrgDetail org={response.data} location={locationResponse?.status === 200 ? locationResponse.data : undefined} />;
 }

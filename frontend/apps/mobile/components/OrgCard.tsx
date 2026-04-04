@@ -24,19 +24,19 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
       style={{ borderBottomColor: borderColor }}
     >
       <View className="flex-row items-center justify-between">
-        <View className="flex-1 items-center pr-4">
-          <ThemedText className="font-nunito-bold mb-2 text-center text-[22px] leading-[26px]">
+        <View className="flex-1 pr-4">
+          <ThemedText className="font-nunito-bold mb-2 text-[23px] leading-[26px]">
             {pin.title}
           </ThemedText>
-          <ThemedText className="font-nunito text-center text-[15px] leading-[22px]">
+          <ThemedText className="font-nunito text-[15px] leading-[22px]">
             {pin.members} {translate("dashboard.members")}
           </ThemedText>
           {distance !== null && (
-            <ThemedText className="font-nunito text-center text-[15px] leading-[22px]">
+            <ThemedText className="font-nunito text-[15px] leading-[22px]">
               {distance.toFixed(1)} {translate("map.miles")}
             </ThemedText>
           )}
-          <ThemedText className="font-nunito text-center text-[15px] leading-[22px]">
+          <ThemedText className="font-nunito text-[15px] leading-[22px]">
             {pin.rating.toFixed(1)} {translate("map.stars")}
           </ThemedText>
           <TouchableOpacity
