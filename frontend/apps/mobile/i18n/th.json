@@ -199,6 +199,14 @@
     "miles": "ไมล์",
     "stars": "ดาว"
   },
+  "org": {
+    "about": "เกี่ยวกับ",
+    "noDescription": "ไม่มีคำอธิบาย",
+    "seeSchedule": "ดูตารางเวลา",
+    "notFound": "ไม่พบองค์กร",
+    "bookingsThisWeek": "การจองสัปดาห์นี้",
+    "reviews": "รีวิว"
+  },
   "interests": {
     "science": "วิทยาศาสตร์",
     "math": "คณิตศาสตร์",

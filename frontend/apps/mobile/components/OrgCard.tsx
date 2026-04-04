@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "expo-router";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -14,6 +15,7 @@ interface OrgCardProps {
 
 export function OrgCard({ pin, distance }: OrgCardProps) {
   const { t: translate } = useTranslation();
+  const router = useRouter();
   const borderColor = useThemeColor({}, "borderColor");
 
   return (
@@ -40,6 +42,7 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
           <TouchableOpacity
             className="mt-4 w-full items-center rounded-full py-[10px]"
             style={{ backgroundColor: AppColors.checkboxSelected }}
+            onPress={() => router.push(`/(app)/(tabs)/org/${pin.id}`)}
           >
             <Text className="font-nunito-semibold text-sm text-white">
               {translate("dashboard.learnMore")}
