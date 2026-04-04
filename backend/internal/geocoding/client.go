@@ -73,10 +73,10 @@ func (c *Client) Geocode(ctx context.Context, address string) (lat, lng *float64
 	if err != nil {
 		return nil, nil, fmt.Errorf("opencage request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		return  nil, nil, fmt.Errorf("opencage returned unexpected status %d", resp.StatusCode)
+		return nil, nil, fmt.Errorf("opencage returned unexpected status %d", resp.StatusCode)
 	}
 
 	var result opencageResponse

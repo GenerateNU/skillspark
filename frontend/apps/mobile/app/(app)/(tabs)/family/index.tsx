@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
-import { NoProfilePic } from "@/components/NoProfilePic";
+import { EmergencyContactListItem } from "@/components/EmergencyContactListItem";
 
 export default function FamilyListScreen() {
 	const router = useRouter();
@@ -34,6 +34,22 @@ export default function FamilyListScreen() {
 
 	const handleAddChild = () => {
 		router.push("/family/manage");
+	};
+
+	const handleAddEmergencyContact = () => {
+		router.push("/family/emergency-contact/manage");
+	};
+
+	const handleEditEmergencyContact = (emergencyContact: any) => {
+		router.push({
+			pathname: "/family/emergency-contact/manage",
+			params: {
+				id: emergencyContact.id,
+				guardian_id: emergencyContact.guardian_id,
+				name: emergencyContact.name,
+				phone_number: emergencyContact.phone_number,
+			},
+		});
 	};
 
 	const handleEditChild = (child: any) => {
