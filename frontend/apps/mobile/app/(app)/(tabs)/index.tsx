@@ -40,8 +40,8 @@ export default function HomeScreen() {
   const [_debouncedSearch] = useDebounce(searchText, 300);
   const { width, height } = useWindowDimensions();
 
-  const [geoLocationLat, setGeoLocationLat] = useState<string | undefined>(undefined);
-  const [geoLocationLong, setGeoLocationLong] = useState<string | undefined>(undefined);
+  const [geoLocationLat, setGeoLocationLat] = useState<string | undefined>("13.7563");
+  const [geoLocationLong, setGeoLocationLong] = useState<string | undefined>("100.5018");
 
   useEffect(() => {
     (async () => {
@@ -53,7 +53,7 @@ export default function HomeScreen() {
     })();
   }, []);
 
-  const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({ lat: geoLocationLat, lng: geoLocationLong, limit: 5 });
+  const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({ lat: "13.7563", lng: "100.5018", radius_km: 50, limit: 5 });
   const allLocalizedOccurrences: EventOccurrence[] = useMemo(() => {
     const d = localizedOccurrencesResp as unknown as { data: EventOccurrence[] } | undefined;
     return Array.isArray(d?.data) ? d.data : [];
@@ -254,7 +254,7 @@ export default function HomeScreen() {
               {translate("dashboard.discoverWeekly")}
             </Text>
           </View>
-          <CarouselCard events={allLocalizedOccurrences} width={width} />
+          <CarouselCard events={allLocalizedOccurrences} width={width} height={height} />
         </View>
       )}
 
