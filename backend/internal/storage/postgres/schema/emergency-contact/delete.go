@@ -16,12 +16,6 @@ func (r *EmergencyContactRepository) DeleteEmergencyContact(ctx context.Context,
 		return nil, &e
 	}
 
-	emergencyContact, err := r.GetEmergencyContactByID(ctx, id)
-	if err != nil {
-		err := errs.InternalServerError("Failed to read base query: ", err.Error())
-		return nil, &err
-	}
-
 	commandTag, err := r.db.Exec(ctx, query, id)
 	if err != nil {
 		err := errs.InternalServerError("Failed to delete saved: ", err.Error())
@@ -34,7 +28,7 @@ func (r *EmergencyContactRepository) DeleteEmergencyContact(ctx context.Context,
 	}
 
 	output := &models.DeleteEmergencyContactOutput{}
-	output.Body = emergencyContact
+	output.SuccessMessage = "success"
 
 	return output, nil
 }

@@ -41,14 +41,14 @@ func SetupEmergencyContactRoutes(api huma.API, repo *storage.Repository) {
 		Description: "Deletes an emergency contact",
 		Tags:        []string{"Emergency Contacts"},
 	}, func(ctx context.Context, input *models.DeleteEmergencyContactInput) (*models.DeleteEmergencyContactOutput, error) {
-		deletedEmergencyContact, err := emergencyContactHandler.DeleteEmergencyContact(ctx, input.ID)
+		_, err := emergencyContactHandler.DeleteEmergencyContact(ctx, input.ID)
 		if err != nil {
 			fmt.Println(err.Error())
 			return nil, err
 		}
 
 		return &models.DeleteEmergencyContactOutput{
-			Body: deletedEmergencyContact.Body,
+			SuccessMessage: "nice",
 		}, nil
 	})
 

@@ -31,6 +31,7 @@ export default function ManageEmergencyContactScreen() {
   const insets = useSafeAreaInsets();
   const theme = Colors[colorScheme ?? 'light'];
 
+
   //const { guardianId } = useAuthContext();
   const { guardianId } = useGuardian();
  
@@ -41,14 +42,8 @@ export default function ManageEmergencyContactScreen() {
 
   const { t: translate } = useTranslation();
   const isEditing = !!params.id;
-
-  const [firstName, setFirstName] = useState(
-    params.name ? (params.name as string).split(' ')[0] : ''
-  );
-  const [lastName, setLastName] = useState(
-    params.name ? (params.name as string).split(' ').slice(1).join(' ') : ''
-  );
   const [phoneNumber, setPhoneNumber] = useState(params.phone_number as string || '');
+  const [name, setName] = useState(params.name as string || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!guardianId) {
@@ -62,7 +57,6 @@ export default function ManageEmergencyContactScreen() {
     return isValid(phoneNumber);
   }
 
-  const name = [firstName, lastName].filter(Boolean).join(" ");
   const emergencyContactData = {
     guardian_id: guardianId,
     name: name,
@@ -70,7 +64,7 @@ export default function ManageEmergencyContactScreen() {
   };
 
   const handleSave = async () => {
-    if (!firstName || !lastName || !phoneNumber) {
+    if (!name || !phoneNumber) {
         Alert.alert(
           translate("common.error"),
           translate("childProfile.requiredFieldsError"),
@@ -81,7 +75,7 @@ export default function ManageEmergencyContactScreen() {
     if (!isValidPhoneNumber(phoneNumber)) {
       Alert.alert(
           translate("common.error"),
-          "Please enter a valid phone number"
+          translate("emergencyContact.invalidPhoneNumber")
         );
       return;
     }
@@ -171,20 +165,18 @@ export default function ManageEmergencyContactScreen() {
             {isEditing ? translate('emergencyContact.editTitle') : translate('emergencyContact.addTitle')}
           </ThemedText>
           <EmergencyContactForm
-            firstName={firstName}
-            setFirstName={setFirstName}
-            lastName={lastName}
-            setLastName={setLastName}
+            name={name}
+            setName={setName}
             phoneNumber={phoneNumber}
             setPhoneNumber={setPhoneNumber}
           />
           <TouchableOpacity
             className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? 'opacity-70' : 'opacity-100'}`}
-            style={{ backgroundColor: theme.tint }}
+            style={{ backgroundColor: Colors.dark.dropdownBg }}
             onPress={handleSave}
             disabled={isSubmitting}
           >
-            <ThemedText className="text-white text-base font-nunito-semibold">
+            <ThemedText className="text-base font-nunito-semibold" style={{ color: Colors.light.dropdownBg }}>
               {isSubmitting ? translate('emergencyContact.saving') : isEditing ? translate('emergencyContact.saveChanges') : translate('emergencyContact.addContact')}
             </ThemedText>
           </TouchableOpacity>

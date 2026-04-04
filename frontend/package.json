@@ -18,6 +18,7 @@
     "expo-secure-store": "^55.0.9",
     "i18next": "^25.8.18",
     "react-i18next": "^16.5.8",
-    "react-native-maps": "^1.27.1"
+    "react-native-maps": "^1.27.1",
+    "use-debounce": "^10.1.1"
   }
 }

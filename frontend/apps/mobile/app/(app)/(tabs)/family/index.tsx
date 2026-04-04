@@ -164,7 +164,7 @@ export default function FamilyListScreen() {
         />
 
         {emergencyContacts.length === 0 && (
-        <ThemedText className="text-sm pb-4 font-nunito" style={{ color: AppColors.subtleText }}>No emergency contacts added</ThemedText>
+        <ThemedText className="text-sm pb-4 font-nunito" style={{ color: AppColors.subtleText }}>{translate('common.noEmergencyContactsAdded')}</ThemedText>
         )}
         {emergencyContacts.map((emergencyContact: any, idx: number) => (
           <React.Fragment key={emergencyContact.id}>

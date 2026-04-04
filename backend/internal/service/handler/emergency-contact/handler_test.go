@@ -86,7 +86,7 @@ func TestHandler_CreateEmergencyContact(t *testing.T) {
 		wantErr   bool
 	}{
 		{
-			name: "successful creation",
+			name:  "successful creation",
 			input: &models.CreateEmergencyContactInput{},
 			mockSetup: func(repo *repomocks.MockEmergencyContactRepository) {
 				repo.On("CreateEmergencyContact",
@@ -217,9 +217,7 @@ func TestHandler_DeleteEmergencyContact(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 				).Return(&models.DeleteEmergencyContactOutput{
-					Body: &models.EmergencyContact{
-						ID: uuid.MustParse("20000000-0000-0000-0000-000000000001"),
-					},
+					SuccessMessage: "success",
 				}, nil)
 			},
 			wantErr: false,

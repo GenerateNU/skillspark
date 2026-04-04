@@ -193,23 +193,12 @@ func TestDeleteEmergencyContact_Success(t *testing.T) {
 	mockRepo := new(repomocks.MockEmergencyContactRepository)
 
 	contactID := uuid.New()
-	guardianID := uuid.New()
-	now := time.Now()
-
-	deletedContact := &models.EmergencyContact{
-		ID:          contactID,
-		Name:        "Jane Doe",
-		GuardianID:  guardianID,
-		PhoneNumber: "+16462996961",
-		CreatedAt:   now,
-		UpdatedAt:   now,
-	}
 
 	mockRepo.On(
 		"DeleteEmergencyContact",
 		mock.Anything,
 		contactID,
-	).Return(&models.DeleteEmergencyContactOutput{Body: deletedContact}, nil)
+	).Return(&models.DeleteEmergencyContactOutput{SuccessMessage: "nice"}, nil)
 
 	app, _ := setupEmergencyContactTestAPI(mockRepo)
 

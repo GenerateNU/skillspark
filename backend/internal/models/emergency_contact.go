@@ -53,5 +53,5 @@ type DeleteEmergencyContactInput struct {
 }
 
 type DeleteEmergencyContactOutput struct {
-	Body *EmergencyContact `json:"body" doc:"Deleted Emergency Contact"`
+	SuccessMessage string `json:"success_message"`
 }

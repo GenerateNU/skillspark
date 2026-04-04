@@ -22,9 +22,6 @@ func TestDeleteEmergencyContact(t *testing.T) {
 
 	require.Nil(t, err)
 	require.NotNil(t, deleted)
-
-	assert.Equal(t, ec.ID, deleted.Body.ID)
-	assert.Equal(t, ec.GuardianID, deleted.Body.GuardianID)
 }
 
 func TestDeleteEmergencyContact_NotFound(t *testing.T) {

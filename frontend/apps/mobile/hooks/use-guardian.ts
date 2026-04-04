@@ -26,6 +26,6 @@ export function useGuardian() {
     children,
     emergencyContacts,
     guardianId: guardianId,
-    isLoading: guardianLoading || childrenLoading, || emergencycontactLoading,
+    isLoading: guardianLoading || childrenLoading || emergencycontactLoading,
   };
 }

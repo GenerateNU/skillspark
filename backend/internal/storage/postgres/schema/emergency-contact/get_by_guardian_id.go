@@ -7,6 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 func (r *EmergencyContactRepository) GetEmergencyContactByGuardianID(ctx context.Context, guardian_id uuid.UUID) ([]*models.EmergencyContact, error) {
@@ -28,25 +29,25 @@ func (r *EmergencyContactRepository) GetEmergencyContactByGuardianID(ctx context
 	}
 	defer rows.Close()
 
-	emergencyContactList := []*models.EmergencyContact{}
+	emergencyContacts, err := pgx.CollectRows(
+		rows,
+		func(row pgx.CollectableRow) (*models.EmergencyContact, error) {
+			var emergencyContact models.EmergencyContact
+			err := row.Scan(
+				&emergencyContact.ID,
+				&emergencyContact.Name,
+				&emergencyContact.GuardianID,
+				&emergencyContact.PhoneNumber,
+				&emergencyContact.CreatedAt,
+				&emergencyContact.UpdatedAt,
+			)
+			return &emergencyContact, err
+		},
+	)
 
-	for rows.Next() {
-		var s models.EmergencyContact
-
-		err := rows.Scan(
-			&s.ID,
-			&s.Name,
-			&s.GuardianID,
-			&s.PhoneNumber,
-			&s.CreatedAt,
-			&s.UpdatedAt,
-		)
-		if err != nil {
-			err := errs.InternalServerError("Failed to scan emergency contact: ", err.Error())
-			return nil, &err
-		}
-
-		emergencyContactList = append(emergencyContactList, &s)
+	if err != nil {
+		err := errs.InternalServerError("Failed to scan emergency contact: ", err.Error())
+		return nil, &err
 	}
 
 	if err := rows.Err(); err != nil {
@@ -54,5 +55,5 @@ func (r *EmergencyContactRepository) GetEmergencyContactByGuardianID(ctx context
 		return nil, &err
 	}
 
-	return emergencyContactList, nil
+	return emergencyContacts, nil
 }
