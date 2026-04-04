@@ -5,7 +5,10 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,666 +21,469 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   ErrorModel,
   Manager,
-  PatchManagerInputBody,
-} from "../skillSparkAPI.schemas";
+  PatchManagerInputBody
+} from '../skillSparkAPI.schemas';
 
-import { customInstance } from "../../apiClient";
+import { customInstance } from '../../apiClient';
 
 // https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
-type IfEquals<X, Y, A = X, B = never> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
+type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
+T,
+>() => T extends Y ? 1 : 2
+? A
+: B;
 
 type WritableKeys<T> = {
-  [P in keyof T]-?: IfEquals<
-    { [Q in P]: T[P] },
-    { -readonly [Q in P]: T[P] },
-    P
-  >;
+[P in keyof T]-?: IfEquals<
+  { [Q in P]: T[P] },
+  { -readonly [Q in P]: T[P] },
+  P
+>;
 }[keyof T];
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I,
-) => void
-  ? I
-  : never;
+type UnionToIntersection<U> =
+  (U extends any ? (k: U)=>void : never) extends ((k: infer I)=>void) ? I : never;
 type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
 
 type Writable<T> = Pick<T, WritableKeys<T>>;
-type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
-  ? {
-      [P in keyof Writable<T>]: T[P] extends object
-        ? NonReadonly<NonNullable<T[P]>>
-        : T[P];
-    }
-  : DistributeReadOnlyOverUnions<T>;
+type NonReadonly<T> = [T] extends [UnionToIntersection<T>] ? {
+  [P in keyof Writable<T>]: T[P] extends object
+    ? NonReadonly<NonNullable<T[P]>>
+    : T[P];
+} : DistributeReadOnlyOverUnions<T>;
+
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
 export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
-export type HTTPStatusCode4xx =
-  | 400
-  | 401
-  | 402
-  | 403
-  | 404
-  | 405
-  | 406
-  | 407
-  | 408
-  | 409
-  | 410
-  | 411
-  | 412
-  | 413
-  | 414
-  | 415
-  | 416
-  | 417
-  | 418
-  | 419
-  | 420
-  | 421
-  | 422
-  | 423
-  | 424
-  | 426
-  | 428
-  | 429
-  | 431
-  | 451;
+export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 419 | 420 | 421 | 422 | 423 | 424 | 426 | 428 | 429 | 431 | 451;
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
-export type HTTPStatusCodes =
-  | HTTPStatusCode1xx
-  | HTTPStatusCode2xx
-  | HTTPStatusCode3xx
-  | HTTPStatusCode4xx
-  | HTTPStatusCode5xx;
+export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
+
 
 /**
  * Returns a manager by id
  * @summary Updates a manager by id
  */
 export type patchManagerResponse200 = {
-  data: Manager;
-  status: 200;
-};
+  data: Manager
+  status: 200
+}
 
 export type patchManagerResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
 
-export type patchManagerResponseSuccess = patchManagerResponse200 & {
+export type patchManagerResponseSuccess = (patchManagerResponse200) & {
   headers: Headers;
 };
-export type patchManagerResponseError = patchManagerResponseDefault & {
+export type patchManagerResponseError = (patchManagerResponseDefault) & {
   headers: Headers;
 };
 
-export type patchManagerResponse =
-  | patchManagerResponseSuccess
-  | patchManagerResponseError;
+export type patchManagerResponse = (patchManagerResponseSuccess | patchManagerResponseError)
 
 export const getPatchManagerUrl = () => {
-  return `/api/v1/manager`;
-};
 
-export const patchManager = async (
-  patchManagerInputBody: NonReadonly<PatchManagerInputBody>,
-  options?: RequestInit,
-): Promise<patchManagerResponse> => {
-  return customInstance<patchManagerResponse>(getPatchManagerUrl(), {
+
+  
+
+  return `/api/v1/manager`
+}
+
+export const patchManager = async (patchManagerInputBody: NonReadonly<PatchManagerInputBody>, options?: RequestInit): Promise<patchManagerResponse> => {
+  
+  return customInstance<patchManagerResponse>(getPatchManagerUrl(),
+  {      
     ...options,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(patchManagerInputBody),
-  });
-};
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      patchManagerInputBody,)
+  }
+);}
 
-export const getPatchManagerMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof patchManager>>,
-    TError,
-    { data: NonReadonly<PatchManagerInputBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof patchManager>>,
-  TError,
-  { data: NonReadonly<PatchManagerInputBody> },
-  TContext
-> => {
-  const mutationKey = ["patchManager"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof patchManager>>,
-    { data: NonReadonly<PatchManagerInputBody> }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return patchManager(data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getPatchManagerMutationOptions = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchManager>>, TError,{data: NonReadonly<PatchManagerInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchManager>>, TError,{data: NonReadonly<PatchManagerInputBody>}, TContext> => {
 
-export type PatchManagerMutationResult = NonNullable<
-  Awaited<ReturnType<typeof patchManager>>
->;
-export type PatchManagerMutationBody = NonReadonly<PatchManagerInputBody>;
-export type PatchManagerMutationError = ErrorModel;
+const mutationKey = ['patchManager'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchManager>>, {data: NonReadonly<PatchManagerInputBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  patchManager(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchManagerMutationResult = NonNullable<Awaited<ReturnType<typeof patchManager>>>
+    export type PatchManagerMutationBody = NonReadonly<PatchManagerInputBody>
+    export type PatchManagerMutationError = ErrorModel
+
+    /**
  * @summary Updates a manager by id
  */
-export const usePatchManager = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof patchManager>>,
-      TError,
-      { data: NonReadonly<PatchManagerInputBody> },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof patchManager>>,
-  TError,
-  { data: NonReadonly<PatchManagerInputBody> },
-  TContext
-> => {
-  return useMutation(getPatchManagerMutationOptions(options), queryClient);
-};
-/**
+export const usePatchManager = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchManager>>, TError,{data: NonReadonly<PatchManagerInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof patchManager>>,
+        TError,
+        {data: NonReadonly<PatchManagerInputBody>},
+        TContext
+      > => {
+      return useMutation(getPatchManagerMutationOptions(options), queryClient);
+    }
+    /**
  * Returns a manager by id
  * @summary Get a manager by id
  */
 export type getManagerByIdResponse200 = {
-  data: Manager;
-  status: 200;
-};
+  data: Manager
+  status: 200
+}
 
 export type getManagerByIdResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
 
-export type getManagerByIdResponseSuccess = getManagerByIdResponse200 & {
+export type getManagerByIdResponseSuccess = (getManagerByIdResponse200) & {
   headers: Headers;
 };
-export type getManagerByIdResponseError = getManagerByIdResponseDefault & {
+export type getManagerByIdResponseError = (getManagerByIdResponseDefault) & {
   headers: Headers;
 };
 
-export type getManagerByIdResponse =
-  | getManagerByIdResponseSuccess
-  | getManagerByIdResponseError;
+export type getManagerByIdResponse = (getManagerByIdResponseSuccess | getManagerByIdResponseError)
 
-export const getGetManagerByIdUrl = (id: string) => {
-  return `/api/v1/manager/${id}`;
-};
+export const getGetManagerByIdUrl = (id: string,) => {
 
-export const getManagerById = async (
-  id: string,
-  options?: RequestInit,
-): Promise<getManagerByIdResponse> => {
-  return customInstance<getManagerByIdResponse>(getGetManagerByIdUrl(id), {
+
+  
+
+  return `/api/v1/manager/${id}`
+}
+
+export const getManagerById = async (id: string, options?: RequestInit): Promise<getManagerByIdResponse> => {
+  
+  return customInstance<getManagerByIdResponse>(getGetManagerByIdUrl(id),
+  {      
     ...options,
-    method: "GET",
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getGetManagerByIdQueryKey = (id: string) => {
-  return [`/api/v1/manager/${id}`] as const;
-};
 
-export const getGetManagerByIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getManagerById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
+
+
+
+export const getGetManagerByIdQueryKey = (id: string,) => {
+    return [
+    `/api/v1/manager/${id}`
+    ] as const;
+    }
+
+    
+export const getGetManagerByIdQueryOptions = <TData = Awaited<ReturnType<typeof getManagerById>>, TError = ErrorModel>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetManagerByIdQueryKey(id);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getManagerById>>> = ({
-    signal,
-  }) => getManagerById(id, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetManagerByIdQueryKey(id);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!id,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getManagerById>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetManagerByIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getManagerById>>
->;
-export type GetManagerByIdQueryError = ErrorModel;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getManagerById>>> = ({ signal }) => getManagerById(id, { signal, ...requestOptions });
 
-export function useGetManagerById<
-  TData = Awaited<ReturnType<typeof getManagerById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData>
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetManagerByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getManagerById>>>
+export type GetManagerByIdQueryError = ErrorModel
+
+
+export function useGetManagerById<TData = Awaited<ReturnType<typeof getManagerById>>, TError = ErrorModel>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getManagerById>>,
           TError,
           Awaited<ReturnType<typeof getManagerById>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetManagerById<
-  TData = Awaited<ReturnType<typeof getManagerById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetManagerById<TData = Awaited<ReturnType<typeof getManagerById>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getManagerById>>,
           TError,
           Awaited<ReturnType<typeof getManagerById>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetManagerById<
-  TData = Awaited<ReturnType<typeof getManagerById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetManagerById<TData = Awaited<ReturnType<typeof getManagerById>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get a manager by id
  */
 
-export function useGetManagerById<
-  TData = Awaited<ReturnType<typeof getManagerById>>,
-  TError = ErrorModel,
->(
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetManagerByIdQueryOptions(id, options);
+export function useGetManagerById<TData = Awaited<ReturnType<typeof getManagerById>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagerById>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetManagerByIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Returns a manager by id
  * @summary Deletes a manager by id
  */
 export type deleteManagerResponse200 = {
-  data: Manager;
-  status: 200;
-};
+  data: Manager
+  status: 200
+}
 
 export type deleteManagerResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
 
-export type deleteManagerResponseSuccess = deleteManagerResponse200 & {
+export type deleteManagerResponseSuccess = (deleteManagerResponse200) & {
   headers: Headers;
 };
-export type deleteManagerResponseError = deleteManagerResponseDefault & {
+export type deleteManagerResponseError = (deleteManagerResponseDefault) & {
   headers: Headers;
 };
 
-export type deleteManagerResponse =
-  | deleteManagerResponseSuccess
-  | deleteManagerResponseError;
+export type deleteManagerResponse = (deleteManagerResponseSuccess | deleteManagerResponseError)
 
-export const getDeleteManagerUrl = (id: string) => {
-  return `/api/v1/manager/${id}`;
-};
+export const getDeleteManagerUrl = (id: string,) => {
 
-export const deleteManager = async (
-  id: string,
-  options?: RequestInit,
-): Promise<deleteManagerResponse> => {
-  return customInstance<deleteManagerResponse>(getDeleteManagerUrl(id), {
+
+  
+
+  return `/api/v1/manager/${id}`
+}
+
+export const deleteManager = async (id: string, options?: RequestInit): Promise<deleteManagerResponse> => {
+  
+  return customInstance<deleteManagerResponse>(getDeleteManagerUrl(id),
+  {      
     ...options,
-    method: "DELETE",
-  });
-};
+    method: 'DELETE'
+    
+    
+  }
+);}
 
-export const getDeleteManagerMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteManager>>,
-    TError,
-    { id: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteManager>>,
-  TError,
-  { id: string },
-  TContext
-> => {
-  const mutationKey = ["deleteManager"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteManager>>,
-    { id: string }
-  > = (props) => {
-    const { id } = props ?? {};
 
-    return deleteManager(id, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getDeleteManagerMutationOptions = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteManager>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteManager>>, TError,{id: string}, TContext> => {
 
-export type DeleteManagerMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteManager>>
->;
+const mutationKey = ['deleteManager'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-export type DeleteManagerMutationError = ErrorModel;
+      
 
-/**
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteManager>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteManager(id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteManagerMutationResult = NonNullable<Awaited<ReturnType<typeof deleteManager>>>
+    
+    export type DeleteManagerMutationError = ErrorModel
+
+    /**
  * @summary Deletes a manager by id
  */
-export const useDeleteManager = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteManager>>,
-      TError,
-      { id: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteManager>>,
-  TError,
-  { id: string },
-  TContext
-> => {
-  return useMutation(getDeleteManagerMutationOptions(options), queryClient);
-};
-/**
+export const useDeleteManager = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteManager>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteManager>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getDeleteManagerMutationOptions(options), queryClient);
+    }
+    /**
  * Returns a manager by organization id
  * @summary Get a manager by organization id
  */
 export type getManagerByOrgIdResponse200 = {
-  data: Manager;
-  status: 200;
-};
+  data: Manager
+  status: 200
+}
 
 export type getManagerByOrgIdResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
 
-export type getManagerByOrgIdResponseSuccess = getManagerByOrgIdResponse200 & {
+export type getManagerByOrgIdResponseSuccess = (getManagerByOrgIdResponse200) & {
   headers: Headers;
 };
-export type getManagerByOrgIdResponseError =
-  getManagerByOrgIdResponseDefault & {
-    headers: Headers;
-  };
-
-export type getManagerByOrgIdResponse =
-  | getManagerByOrgIdResponseSuccess
-  | getManagerByOrgIdResponseError;
-
-export const getGetManagerByOrgIdUrl = (organizationId: string) => {
-  return `/api/v1/manager/org/${organizationId}`;
+export type getManagerByOrgIdResponseError = (getManagerByOrgIdResponseDefault) & {
+  headers: Headers;
 };
 
-export const getManagerByOrgId = async (
-  organizationId: string,
-  options?: RequestInit,
-): Promise<getManagerByOrgIdResponse> => {
-  return customInstance<getManagerByOrgIdResponse>(
-    getGetManagerByOrgIdUrl(organizationId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+export type getManagerByOrgIdResponse = (getManagerByOrgIdResponseSuccess | getManagerByOrgIdResponseError)
 
-export const getGetManagerByOrgIdQueryKey = (organizationId: string) => {
-  return [`/api/v1/manager/org/${organizationId}`] as const;
-};
+export const getGetManagerByOrgIdUrl = (organizationId: string,) => {
 
-export const getGetManagerByOrgIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getManagerByOrgId>>,
-  TError = ErrorModel,
->(
-  organizationId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getManagerByOrgId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
+
+  
+
+  return `/api/v1/manager/org/${organizationId}`
+}
+
+export const getManagerByOrgId = async (organizationId: string, options?: RequestInit): Promise<getManagerByOrgIdResponse> => {
+  
+  return customInstance<getManagerByOrgIdResponse>(getGetManagerByOrgIdUrl(organizationId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetManagerByOrgIdQueryKey = (organizationId: string,) => {
+    return [
+    `/api/v1/manager/org/${organizationId}`
+    ] as const;
+    }
+
+    
+export const getGetManagerByOrgIdQueryOptions = <TData = Awaited<ReturnType<typeof getManagerByOrgId>>, TError = ErrorModel>(organizationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagerByOrgId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetManagerByOrgIdQueryKey(organizationId);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getManagerByOrgId>>
-  > = ({ signal }) =>
-    getManagerByOrgId(organizationId, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetManagerByOrgIdQueryKey(organizationId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!organizationId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getManagerByOrgId>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetManagerByOrgIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getManagerByOrgId>>
->;
-export type GetManagerByOrgIdQueryError = ErrorModel;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getManagerByOrgId>>> = ({ signal }) => getManagerByOrgId(organizationId, { signal, ...requestOptions });
 
-export function useGetManagerByOrgId<
-  TData = Awaited<ReturnType<typeof getManagerByOrgId>>,
-  TError = ErrorModel,
->(
-  organizationId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getManagerByOrgId>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(organizationId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getManagerByOrgId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetManagerByOrgIdQueryResult = NonNullable<Awaited<ReturnType<typeof getManagerByOrgId>>>
+export type GetManagerByOrgIdQueryError = ErrorModel
+
+
+export function useGetManagerByOrgId<TData = Awaited<ReturnType<typeof getManagerByOrgId>>, TError = ErrorModel>(
+ organizationId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagerByOrgId>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getManagerByOrgId>>,
           TError,
           Awaited<ReturnType<typeof getManagerByOrgId>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetManagerByOrgId<
-  TData = Awaited<ReturnType<typeof getManagerByOrgId>>,
-  TError = ErrorModel,
->(
-  organizationId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getManagerByOrgId>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetManagerByOrgId<TData = Awaited<ReturnType<typeof getManagerByOrgId>>, TError = ErrorModel>(
+ organizationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagerByOrgId>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getManagerByOrgId>>,
           TError,
           Awaited<ReturnType<typeof getManagerByOrgId>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetManagerByOrgId<
-  TData = Awaited<ReturnType<typeof getManagerByOrgId>>,
-  TError = ErrorModel,
->(
-  organizationId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getManagerByOrgId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetManagerByOrgId<TData = Awaited<ReturnType<typeof getManagerByOrgId>>, TError = ErrorModel>(
+ organizationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagerByOrgId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get a manager by organization id
  */
 
-export function useGetManagerByOrgId<
-  TData = Awaited<ReturnType<typeof getManagerByOrgId>>,
-  TError = ErrorModel,
->(
-  organizationId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getManagerByOrgId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetManagerByOrgIdQueryOptions(
-    organizationId,
-    options,
-  );
+export function useGetManagerByOrgId<TData = Awaited<ReturnType<typeof getManagerByOrgId>>, TError = ErrorModel>(
+ organizationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagerByOrgId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetManagerByOrgIdQueryOptions(organizationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+
