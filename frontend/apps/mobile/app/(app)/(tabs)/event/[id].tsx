@@ -14,7 +14,7 @@ import {
   useGetReviewAggregate,
 } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { StarRating } from "@/components/StarRating";
 import { useTranslation } from "react-i18next";
@@ -71,8 +71,8 @@ function EventOccurrenceDetail({
           activeOpacity={0.7}
           className="w-8 h-8 items-center justify-center"
         >
-          <MaterialIcons
-            name="chevron-left"
+          <IconSymbol
+            name="chevron.left"
             size={28}
             color={AppColors.primaryText}
           />
@@ -167,8 +167,8 @@ function EventOccurrenceDetail({
                 className="w-9 h-9 rounded-full border-2 items-center justify-center"
                 style={{ borderColor: AppColors.borderLight }}
               >
-                <MaterialIcons
-                  name="bookmark-border"
+                <IconSymbol
+                  name="bookmark"
                   size={18}
                   color={AppColors.secondaryText}
                 />
@@ -178,8 +178,8 @@ function EventOccurrenceDetail({
                 className="w-9 h-9 rounded-full border-2 items-center justify-center"
                 style={{ borderColor: AppColors.borderLight }}
               >
-                <MaterialIcons
-                  name="ios-share"
+                <IconSymbol
+                  name="square.and.arrow.up"
                   size={18}
                   color={AppColors.secondaryText}
                 />

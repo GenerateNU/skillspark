@@ -9,3 +9,4 @@ export * from "./generated/schools/schools";
 export * from "./generated/auth/auth";
 export * from "./generated/saved/saved";
 export * from "./generated/registrations/registrations";
+export * from "./generated/review/review";
