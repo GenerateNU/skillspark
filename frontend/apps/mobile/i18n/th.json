@@ -19,6 +19,8 @@
     "noEventsAvailable": "ไม่มีกิจกรรม",
     "noUpcomingEvents": "ไม่มีกิจกรรมที่จะมาถึง",
     "noGuardianId": "ไม่สามารถโหลดได้: ไม่พบบัญชี",
+    "noEventId": "โหลดไม่ได้: ไม่พบรหัสเหตุการณ์",
+    "noReviewsAvailable": "ไม่มีบทวิจารณ์", 
     "noChildrenFound": "ไม่พบข้อมูลเด็ก",
     "noChildProfilesAdded": "ยังไม่มีโปรไฟล์เด็ก",
     "noEmergencyContactsAdded": "ยังไม่มีผู้ติดต่อฉุกเฉิน",
@@ -37,7 +39,7 @@
     "forYou": "สำหรับคุณ",
     "basedOn": "ตามจาก",
     "upcomingEvents": "กิจกรรมที่จะมาถึง",
-    "reserve": "จอง",
+    "learnMore": "Learn More",
     "reserved": "จองแล้ว",
     "members": "สมาชิก",
     "categories": {
@@ -162,6 +164,28 @@
     "deleteTitle": "ลบกิจกรรมที่บันทึก",
     "deleteConfirm": "คุณต้องการลบกิจกรรมที่บันทึกนี้ใช่ไหม?"
   },
+  "review": {
+    "title": "บทวิจารณ์",
+    "bad": "ไม่ดี",
+    "okay": "โอเค",
+    "good": "น่าพึงพอใจ",
+    "terrible": "แย่มาก",
+    "excellent": "ดีเยี่ยม",
+    "noReviews": "ไม่มีความคิดเห็น",
+    "mostRecent": "ล่าสุด",
+    "highest": "สูงสุด",
+    "lowest": "ต่ำสุด",
+    "reviews": "รีวิว"
+  },
+  "time": {
+    "today": "วันนี้",
+    "oneDayAgo": "1 วันที่แล้ว",
+    "daysAgo": "หลายวันก่อน",
+    "oneMonthAgo": "1 เดือนที่แล้ว",
+    "monthsAgo": "หลายเดือนก่อน",
+    "oneYearAgo": "1 ปีที่แล้ว",
+    "yearsAgo": "หลายปีที่แล้ว"
+  },
   "event": {
     "back": "กลับ",
     "seeMore": "ดูเพิ่มเติม",
@@ -190,6 +214,14 @@
     "requiredFieldsError": "กรุณากรอกข้อมูลที่จำเป็นทั้งหมด (ชื่อ หมายเลขโทรศัพท์)",
     "saveError": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
     "deleteError": "ลบไม่สำเร็จ"
+  },
+  "map": {
+    "filterTime": "เวลา",
+    "filterDistance": "ระยะทาง",
+    "sortBy": "เรียงตาม",
+    "filter": "กรอง",
+    "miles": "ไมล์",
+    "stars": "ดาว"
   },
   "interests": {
     "science": "วิทยาศาสตร์",

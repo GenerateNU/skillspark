@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   Text,
+  useWindowDimensions,
 } from "react-native";
 import {
   useGetAllEventOccurrences,
@@ -17,7 +18,7 @@ import {
   type Registration,
   type Child,
 } from "@skillspark/api-client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useDebounce } from "use-debounce";
@@ -29,12 +30,34 @@ import { CategoryCard } from "@/components/home/CategoryCard";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { TrendingCard } from "@/components/home/TrendingCard";
+import * as Location from "expo-location";
+import CarouselCard from "@/components/home/CarouselCard";
 
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
   const [searchText, setSearchText] = useState("");
   const [_debouncedSearch] = useDebounce(searchText, 300);
+  const { width, height } = useWindowDimensions();
+
+  const [geoLocationLat, setGeoLocationLat] = useState<string | undefined>("13.7563");
+  const [geoLocationLong, setGeoLocationLong] = useState<string | undefined>("100.5018");
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
+      const loc = await Location.getCurrentPositionAsync({});
+      setGeoLocationLat(String(loc.coords.latitude));
+      setGeoLocationLong(String(loc.coords.longitude));
+    })();
+  }, []);
+
+  const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({ lat: "13.7563", lng: "100.5018", radius_km: 50, limit: 5 });
+  const allLocalizedOccurrences: EventOccurrence[] = useMemo(() => {
+    const d = localizedOccurrencesResp as unknown as { data: EventOccurrence[] } | undefined;
+    return Array.isArray(d?.data) ? d.data : [];
+  }, [localizedOccurrencesResp]);
 
   const { data: guardianResp } = useGetGuardianById(guardianId!, {
     query: { enabled: !!guardianId },
@@ -231,7 +254,7 @@ export default function HomeScreen() {
               {translate("dashboard.discoverWeekly")}
             </Text>
           </View>
-          <DiscoverBanner event={futureOccurrences[0]} />
+          <CarouselCard events={allLocalizedOccurrences} width={width} height={height} />
         </View>
       )}
 
@@ -249,7 +272,7 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 20 }}
           >
-            {trendingEvents.map((o, i) => (
+            {trendingEvents.map((o) => (
               <TrendingCard key={o.id} occurrence={o} />
             ))}
           </ScrollView>
