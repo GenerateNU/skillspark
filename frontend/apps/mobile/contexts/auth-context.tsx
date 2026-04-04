@@ -39,7 +39,10 @@ interface AuthContextType {
 		onError: (msg: string) => void,
 	) => void;
 	logout: () => void;
-	checkUsername: (username: string) => Promise<boolean>;
+	usernameExists: (
+		username: string,
+		onError: (msg: string) => void,
+	) => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -176,13 +179,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	// add update const for changing the guardian
 
-	const checkUsername = async (username: string) => {
+	const usernameExists = async (
+		username: string,
+		onError: (msg: string) => void,
+	) => {
 		try {
 			const resp = await getUserByUsername(username);
-			console.log("Promise resolved with value: " + resp);
-			return true;
-		} catch (error) {
-			console.error("Promise rejected with error: " + error);
+			if (resp.status === 404) {
+				return true;
+			} else if (resp.status === 200) {
+				return false;
+			} else {
+				onError(resp.data.detail ?? "An unexpected error occurred.");
+				return false;
+			}
+		} catch (err) {
+			if (err instanceof Error) {
+				onError(err.message);
+			} else {
+				onError("An unexpected error occurred:" + err);
+			}
 			return false;
 		}
 	};
@@ -198,7 +214,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				login,
 				signup,
 				logout,
-				checkUsername,
+				usernameExists,
 			}}
 		>
 			{children}
