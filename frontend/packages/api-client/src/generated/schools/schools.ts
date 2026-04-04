@@ -5,7 +5,9 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-import { useQuery } from "@tanstack/react-query";
+import {
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -15,234 +17,152 @@ import type {
   QueryKey,
   UndefinedInitialDataOptions,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   ErrorModel,
   GetAllSchoolsParams,
-  School,
-} from "../skillSparkAPI.schemas";
+  School
+} from '../skillSparkAPI.schemas';
 
-import { customInstance } from "../../apiClient";
+import { customInstance } from '../../apiClient';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
 export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
-export type HTTPStatusCode4xx =
-  | 400
-  | 401
-  | 402
-  | 403
-  | 404
-  | 405
-  | 406
-  | 407
-  | 408
-  | 409
-  | 410
-  | 411
-  | 412
-  | 413
-  | 414
-  | 415
-  | 416
-  | 417
-  | 418
-  | 419
-  | 420
-  | 421
-  | 422
-  | 423
-  | 424
-  | 426
-  | 428
-  | 429
-  | 431
-  | 451;
+export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 419 | 420 | 421 | 422 | 423 | 424 | 426 | 428 | 429 | 431 | 451;
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
-export type HTTPStatusCodes =
-  | HTTPStatusCode1xx
-  | HTTPStatusCode2xx
-  | HTTPStatusCode3xx
-  | HTTPStatusCode4xx
-  | HTTPStatusCode5xx;
+export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
+
 
 /**
  * Returns all schools
  * @summary Get all schools
  */
 export type getAllSchoolsResponse200 = {
-  data: School[];
-  status: 200;
-};
+  data: School[]
+  status: 200
+}
 
 export type getAllSchoolsResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
 
-export type getAllSchoolsResponseSuccess = getAllSchoolsResponse200 & {
+export type getAllSchoolsResponseSuccess = (getAllSchoolsResponse200) & {
   headers: Headers;
 };
-export type getAllSchoolsResponseError = getAllSchoolsResponseDefault & {
+export type getAllSchoolsResponseError = (getAllSchoolsResponseDefault) & {
   headers: Headers;
 };
 
-export type getAllSchoolsResponse =
-  | getAllSchoolsResponseSuccess
-  | getAllSchoolsResponseError;
+export type getAllSchoolsResponse = (getAllSchoolsResponseSuccess | getAllSchoolsResponseError)
 
-export const getGetAllSchoolsUrl = (params?: GetAllSchoolsParams) => {
+export const getGetAllSchoolsUrl = (params?: GetAllSchoolsParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/api/v1/schools?${stringifiedParams}`
-    : `/api/v1/schools`;
-};
+  return stringifiedParams.length > 0 ? `/api/v1/schools?${stringifiedParams}` : `/api/v1/schools`
+}
 
-export const getAllSchools = async (
-  params?: GetAllSchoolsParams,
-  options?: RequestInit,
-): Promise<getAllSchoolsResponse> => {
-  return customInstance<getAllSchoolsResponse>(getGetAllSchoolsUrl(params), {
+export const getAllSchools = async (params?: GetAllSchoolsParams, options?: RequestInit): Promise<getAllSchoolsResponse> => {
+  
+  return customInstance<getAllSchoolsResponse>(getGetAllSchoolsUrl(params),
+  {      
     ...options,
-    method: "GET",
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getGetAllSchoolsQueryKey = (params?: GetAllSchoolsParams) => {
-  return [`/api/v1/schools`, ...(params ? [params] : [])] as const;
-};
 
-export const getGetAllSchoolsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getAllSchools>>,
-  TError = ErrorModel,
->(
-  params?: GetAllSchoolsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
+
+
+
+export const getGetAllSchoolsQueryKey = (params?: GetAllSchoolsParams,) => {
+    return [
+    `/api/v1/schools`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getGetAllSchoolsQueryOptions = <TData = Awaited<ReturnType<typeof getAllSchools>>, TError = ErrorModel>(params?: GetAllSchoolsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetAllSchoolsQueryKey(params);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllSchools>>> = ({
-    signal,
-  }) => getAllSchools(params, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetAllSchoolsQueryKey(params);
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getAllSchools>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetAllSchoolsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getAllSchools>>
->;
-export type GetAllSchoolsQueryError = ErrorModel;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllSchools>>> = ({ signal }) => getAllSchools(params, { signal, ...requestOptions });
 
-export function useGetAllSchools<
-  TData = Awaited<ReturnType<typeof getAllSchools>>,
-  TError = ErrorModel,
->(
-  params: undefined | GetAllSchoolsParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData>
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAllSchoolsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllSchools>>>
+export type GetAllSchoolsQueryError = ErrorModel
+
+
+export function useGetAllSchools<TData = Awaited<ReturnType<typeof getAllSchools>>, TError = ErrorModel>(
+ params: undefined |  GetAllSchoolsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllSchools>>,
           TError,
           Awaited<ReturnType<typeof getAllSchools>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetAllSchools<
-  TData = Awaited<ReturnType<typeof getAllSchools>>,
-  TError = ErrorModel,
->(
-  params?: GetAllSchoolsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllSchools<TData = Awaited<ReturnType<typeof getAllSchools>>, TError = ErrorModel>(
+ params?: GetAllSchoolsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllSchools>>,
           TError,
           Awaited<ReturnType<typeof getAllSchools>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetAllSchools<
-  TData = Awaited<ReturnType<typeof getAllSchools>>,
-  TError = ErrorModel,
->(
-  params?: GetAllSchoolsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllSchools<TData = Awaited<ReturnType<typeof getAllSchools>>, TError = ErrorModel>(
+ params?: GetAllSchoolsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get all schools
  */
 
-export function useGetAllSchools<
-  TData = Awaited<ReturnType<typeof getAllSchools>>,
-  TError = ErrorModel,
->(
-  params?: GetAllSchoolsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetAllSchoolsQueryOptions(params, options);
+export function useGetAllSchools<TData = Awaited<ReturnType<typeof getAllSchools>>, TError = ErrorModel>(
+ params?: GetAllSchoolsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllSchools>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetAllSchoolsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+

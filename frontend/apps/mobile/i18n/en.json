@@ -235,5 +235,13 @@
     "technology": "Technology",
     "language": "Language",
     "other": "Other"
+  },
+  "editProfile": {
+    "title": "Family Information",
+    "subtitle": "Edit Profile",
+    "name": "Name",
+    "username": "Username",
+    "changeImage": "Change Image",
+    "saveChanges": "Save Changes"
   }
 }

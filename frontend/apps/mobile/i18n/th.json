@@ -232,5 +232,13 @@
     "technology": "เทคโนโลยี",
     "language": "ภาษา",
     "other": "อื่นๆ"
+  },
+  "editProfile": {
+    "title": "ข้อมูลครอบครัว",
+    "subtitle": "แก้ไขโปรไฟล์",
+    "name": "ชื่อ",
+    "username": "ชื่อผู้ใช้",
+    "changeImage": "เปลี่ยนรูปภาพ",
+    "saveChanges": "บันทึกการเปลี่ยนแปลง"
   }
 }

@@ -2,12 +2,10 @@ import { Stack } from "expo-router";
 import React from "react";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Colors } from "@/constants/theme";
-import { useTranslation } from "react-i18next";
 
-export default function EmergencyContactLayout() {
+export default function EditLayout() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "light"];
-  const { t: translate } = useTranslation();
 
   return (
     <Stack
@@ -23,10 +21,10 @@ export default function EmergencyContactLayout() {
       }}
     >
       <Stack.Screen
-        name="manage"
+        name="index"
         options={{
-          title: translate("emergencyContact.manageTitle"),
           headerShown: false,
+          animation: "slide_from_bottom",
         }}
       />
     </Stack>
