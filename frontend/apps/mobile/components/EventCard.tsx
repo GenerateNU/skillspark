@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, View, TouchableOpacity, Platform } from "react-native";
+import { Alert, View, TouchableOpacity, Platform, Text } from "react-native";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -70,23 +70,15 @@ export function EventCard({ pin }: EventCardProps) {
             {pin.description}
           </ThemedText>
         </View>
-        <View className="ml-[10px] mt-[5px] items-end justify-start">
-          <IconSymbol name="record.circle" size={24} color="#888" />
-        </View>
       </View>
       <TouchableOpacity
         className="w-full items-center rounded-xl bg-[#333] py-[15px]"
         activeOpacity={1}
-        onPress={() =>
-          Alert.alert(
-            translate("dashboard.reserve"),
-            `${translate("dashboard.reserved")}: ${pin.title}`,
-          )
-        }
+        onPress={() => {}}
       >
-        <ThemedText className="text-[18px] font-semibold text-white">
-          {translate("dashboard.reserve")}
-        </ThemedText>
+        <Text className="font-nunito-semibold text-[18px] text-white">
+          {translate("dashboard.learnMore")}
+        </Text>
       </TouchableOpacity>
     </ThemedView>
   );
