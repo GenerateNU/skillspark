@@ -219,13 +219,7 @@ function EventOccurrenceDetail({
                       {translate("event.reviews")}
                     </Text>
                     <Text
-                      style={{
-                        fontSize: 42,
-                        fontFamily: FontFamilies.bold,
-                        color: AppColors.primaryText,
-                        lineHeight: 46,
-                        textAlign: "center",
-                      }}
+                      className="text-[42px] font-nunito-bold text-[#111] leading-[46px] text-center"
                     >
                       {aggregate.average_rating.toFixed(1)}
                     </Text>
@@ -247,10 +241,10 @@ function EventOccurrenceDetail({
                     </Text>
                   </View>
                   {hasReviews && firstReview && (
-                    <View style={{ justifyContent: "flex-start", paddingHorizontal: 2, paddingTop: 4 }}>
+                    <View className="justify-start px-0.5 pt-1">
                       <Image
                         source={require("@/assets/images/faces.png")}
-                        style={{ width: 38, height: 38, borderRadius: 19 }}
+                        className="w-[38px] h-[38px] rounded-full"
                         contentFit="cover"
                       />
                     </View>
