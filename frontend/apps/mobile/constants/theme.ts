@@ -61,6 +61,7 @@ export const AppColors = {
   badgeGreenText: "#065F46",
   categoryFallback: "#6B8888",
   imagePlaceholder: "#D9D9D9",
+  ratingPill: "#E69BF040",
   cardOverlay: "rgba(0,0,0,0.42)",
 };
 
