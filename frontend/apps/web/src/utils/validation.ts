@@ -1,7 +1,18 @@
-import type { ManagerSignUpInputBody, CreateOrganizationBody } from "@skillspark/api-client";
+import type {
+  ManagerSignUpInputBody,
+  CreateOrganizationBody,
+} from "@skillspark/api-client";
 import type { ManagerFormInput } from "../components/admin_createModal";
 
-export type ManagerErrors = Partial<Record<keyof Omit<ManagerSignUpInputBody, "auth_id" | "organization_id" | "profile_picture_s3_key">, string>>;
+export type ManagerErrors = Partial<
+  Record<
+    keyof Omit<
+      ManagerSignUpInputBody,
+      "auth_id" | "organization_id" | "profile_picture_s3_key"
+    >,
+    string
+  >
+>;
 export type OrgErrors = Partial<Record<keyof CreateOrganizationBody, string>>;
 
 const generateOnetimePassword = (): string => {
@@ -42,10 +53,13 @@ const generateOnetimePassword = (): string => {
   return combined.join("");
 };
 
-export const isValidEmail = (v: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+export const isValidEmail = (v: string): boolean =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
 export const isValidUUID = (v: string): boolean =>
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v.trim());
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    v.trim(),
+  );
 
 export const blankMgr = (): ManagerSignUpInputBody => ({
   name: "",
@@ -71,11 +85,11 @@ export function validateOrg(o: CreateOrganizationBody): OrgErrors {
 
 export function validateMgr(m: ManagerFormInput): ManagerErrors {
   const e: ManagerErrors = {};
-  if (!m.name.trim())     e.name = "Required";
-  if (!m.email.trim())    e.email = "Required";
+  if (!m.name.trim()) e.name = "Required";
+  if (!m.email.trim()) e.email = "Required";
   else if (!isValidEmail(m.email)) e.email = "Invalid email address";
   if (!m.username.trim()) e.username = "Required";
-  if (!m.role.trim())     e.role = "Required";
+  if (!m.role.trim()) e.role = "Required";
   if (!m.language_preference.trim()) e.language_preference = "Required";
   return e;
 }

@@ -6,7 +6,13 @@ interface DeleteModalProps {
   onClose: () => void;
 }
 
-export default function DeleteModal({ title, description, deleting, onConfirm, onClose }: DeleteModalProps) {
+export default function DeleteModal({
+  title,
+  description,
+  deleting,
+  onConfirm,
+  onClose,
+}: DeleteModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm">

@@ -24,30 +24,45 @@ interface OrgLocationStepProps {
 }
 
 export default function OrgLocationStep({
-  orgName, setOrgName,
-  orgActive, setOrgActive,
-  addressLine1, setAddressLine1,
-  addressLine2, setAddressLine2,
-  subdistrict, setSubdistrict,
-  district, setDistrict,
-  province, setProvince,
-  postalCode, setPostalCode,
-  country, setCountry,
+  orgName,
+  setOrgName,
+  orgActive,
+  setOrgActive,
+  addressLine1,
+  setAddressLine1,
+  addressLine2,
+  setAddressLine2,
+  subdistrict,
+  setSubdistrict,
+  district,
+  setDistrict,
+  province,
+  setProvince,
+  postalCode,
+  setPostalCode,
+  country,
+  setCountry,
 }: OrgLocationStepProps) {
   return (
     <div className="flex flex-col gap-4">
       <Field label="Organization name" required>
         <ValidatedInput
           value={orgName}
-          onChange={function (v: string) { setOrgName(v); }}
-          validate={function (v: string) { return v.trim() ? null : "Required"; }}
+          onChange={function (v: string) {
+            setOrgName(v);
+          }}
+          validate={function (v: string) {
+            return v.trim() ? null : "Required";
+          }}
           placeholder="Acme Kids Academy"
         />
       </Field>
       <Field label="Active">
         <Select
           value={orgActive ? "true" : "false"}
-          onChange={function (e: React.ChangeEvent<HTMLSelectElement>) { setOrgActive(e.target.value === "true"); }}
+          onChange={function (e: React.ChangeEvent<HTMLSelectElement>) {
+            setOrgActive(e.target.value === "true");
+          }}
         >
           <option value="true">Yes</option>
           <option value="false">No</option>
@@ -55,14 +70,22 @@ export default function OrgLocationStep({
       </Field>
 
       <div className="relative my-1">
-        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
-        <div className="relative flex justify-start"><span className="bg-white pr-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Location</span></div>
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-start">
+          <span className="bg-white pr-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            Location
+          </span>
+        </div>
       </div>
 
       <Field label="Address line 1" required>
         <ValidatedInput
           value={addressLine1}
-          onChange={function (v: string) { setAddressLine1(v); }}
+          onChange={function (v: string) {
+            setAddressLine1(v);
+          }}
           validate={function (v: string) {
             if (!v.trim()) return "Required";
             if (v.trim().length < 5) return "Must be at least 5 characters";
@@ -74,9 +97,12 @@ export default function OrgLocationStep({
       <Field label="Address line 2">
         <ValidatedInput
           value={addressLine2}
-          onChange={function (v: string) { setAddressLine2(v); }}
+          onChange={function (v: string) {
+            setAddressLine2(v);
+          }}
           validate={function (v: string) {
-            if (v && v.trim().length < 5) return "Must be at least 5 characters";
+            if (v && v.trim().length < 5)
+              return "Must be at least 5 characters";
             return null;
           }}
           placeholder="Floor 4, Suite 401"
@@ -86,16 +112,24 @@ export default function OrgLocationStep({
         <Field label="Subdistrict" required>
           <ValidatedInput
             value={subdistrict}
-            onChange={function (v: string) { setSubdistrict(v); }}
-            validate={function (v: string) { return v.trim().length >= 2 ? null : "Required"; }}
+            onChange={function (v: string) {
+              setSubdistrict(v);
+            }}
+            validate={function (v: string) {
+              return v.trim().length >= 2 ? null : "Required";
+            }}
             placeholder="Khlong Toei"
           />
         </Field>
         <Field label="District" required>
           <ValidatedInput
             value={district}
-            onChange={function (v: string) { setDistrict(v); }}
-            validate={function (v: string) { return v.trim().length >= 2 ? null : "Required"; }}
+            onChange={function (v: string) {
+              setDistrict(v);
+            }}
+            validate={function (v: string) {
+              return v.trim().length >= 2 ? null : "Required";
+            }}
             placeholder="Khlong Toei"
           />
         </Field>
@@ -104,16 +138,24 @@ export default function OrgLocationStep({
         <Field label="Province" required>
           <ValidatedInput
             value={province}
-            onChange={function (v: string) { setProvince(v); }}
-            validate={function (v: string) { return v.trim().length >= 2 ? null : "Required"; }}
+            onChange={function (v: string) {
+              setProvince(v);
+            }}
+            validate={function (v: string) {
+              return v.trim().length >= 2 ? null : "Required";
+            }}
             placeholder="Bangkok"
           />
         </Field>
         <Field label="Postal code" required>
           <ValidatedInput
             value={postalCode}
-            onChange={function (v: string) { setPostalCode(v); }}
-            validate={function (v: string) { return v.trim().length >= 3 ? null : "Required"; }}
+            onChange={function (v: string) {
+              setPostalCode(v);
+            }}
+            validate={function (v: string) {
+              return v.trim().length >= 3 ? null : "Required";
+            }}
             placeholder="10110"
           />
         </Field>
@@ -121,8 +163,12 @@ export default function OrgLocationStep({
       <Field label="Country" required>
         <ValidatedInput
           value={country}
-          onChange={function (v: string) { setCountry(v); }}
-          validate={function (v: string) { return v.trim().length >= 2 ? null : "Required"; }}
+          onChange={function (v: string) {
+            setCountry(v);
+          }}
+          validate={function (v: string) {
+            return v.trim().length >= 2 ? null : "Required";
+          }}
           placeholder="Thailand"
         />
       </Field>

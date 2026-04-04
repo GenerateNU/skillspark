@@ -15,17 +15,32 @@ interface ManagerFormRowProps {
   errors?: ManagerErrors;
 }
 
-export default function ManagerFormRow({ mgr, index, onChange, onRemove, canRemove }: ManagerFormRowProps) {
+export default function ManagerFormRow({
+  mgr,
+  index,
+  onChange,
+  onRemove,
+  canRemove,
+}: ManagerFormRowProps) {
   function upd(key: keyof ManagerFormInput): (v: string) => void {
-    return function (v: string) { onChange(index, key, v); };
+    return function (v: string) {
+      onChange(index, key, v);
+    };
   }
 
   return (
     <div className="rounded-md border border-gray-200 bg-gray-50/60 p-4">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Manager {index + 1}</span>
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+          Manager {index + 1}
+        </span>
         {canRemove && (
-          <button onClick={function () { onRemove(index); }} className="text-xs text-red-500 hover:text-red-700 font-medium flex items-center gap-1">
+          <button
+            onClick={function () {
+              onRemove(index);
+            }}
+            className="text-xs text-red-500 hover:text-red-700 font-medium flex items-center gap-1"
+          >
             <IconX /> Remove
           </button>
         )}
@@ -36,7 +51,9 @@ export default function ManagerFormRow({ mgr, index, onChange, onRemove, canRemo
           <ValidatedInput
             value={mgr.name}
             onChange={upd("name")}
-            validate={function (v: string) { return v.trim() ? null : "Required"; }}
+            validate={function (v: string) {
+              return v.trim() ? null : "Required";
+            }}
             placeholder="Jane Doe"
           />
         </Field>
@@ -60,7 +77,9 @@ export default function ManagerFormRow({ mgr, index, onChange, onRemove, canRemo
           <ValidatedInput
             value={mgr.username}
             onChange={upd("username")}
-            validate={function (v: string) { return v.trim() ? null : "Required"; }}
+            validate={function (v: string) {
+              return v.trim() ? null : "Required";
+            }}
             placeholder="janedoe"
           />
         </Field>
@@ -68,7 +87,9 @@ export default function ManagerFormRow({ mgr, index, onChange, onRemove, canRemo
           <ValidatedInput
             value={mgr.role}
             onChange={upd("role")}
-            validate={function (v: string) { return v.trim() ? null : "Required"; }}
+            validate={function (v: string) {
+              return v.trim() ? null : "Required";
+            }}
             placeholder="Manager"
           />
         </Field>
@@ -77,7 +98,9 @@ export default function ManagerFormRow({ mgr, index, onChange, onRemove, canRemo
       <Field label="Language preference">
         <Select
           value={mgr.language_preference}
-          onChange={function (e: React.ChangeEvent<HTMLSelectElement>) { onChange(index, "language_preference", e.target.value); }}
+          onChange={function (e: React.ChangeEvent<HTMLSelectElement>) {
+            onChange(index, "language_preference", e.target.value);
+          }}
         >
           <option value="en">English</option>
           <option value="th">Thai</option>

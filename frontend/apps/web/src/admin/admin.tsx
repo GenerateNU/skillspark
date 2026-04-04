@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Sidebar } from "../components/admin_sidebar";
-import OrganizationDetailPage  from "./organizations";
+import OrganizationDetailPage from "./organizations";
 import HomePage from "./home";
 import { ProfilePage } from "./profile";
 
