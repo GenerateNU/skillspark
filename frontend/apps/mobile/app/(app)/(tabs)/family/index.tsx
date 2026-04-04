@@ -174,7 +174,7 @@ export default function FamilyListScreen() {
 				<SectionHeader
 					title={translate("familyInformation.emergencyContact")}
 					actionLabel={translate("familyInformation.addContact")}
-					onAction={() => {}}
+					onAction={() => handleAddEmergencyContact()}
 				/>
 				{emergencyContacts.length === 0 && (
 					<ThemedText
