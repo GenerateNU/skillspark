@@ -34,7 +34,7 @@ func (h *Handler) CancelEventOccurrence(ctx context.Context, id uuid.UUID) (stri
 				return "", err
 			}
 		default:
-			return "", errors.New("Payment intent must be requires_capture or succeeded")
+			return "", errors.New("payment intent must be requires_capture or succeeded")
 		}
 	}
 
