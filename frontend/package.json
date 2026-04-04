@@ -11,14 +11,9 @@
     "generate:api": "cd packages/api-client && bun run generate"
   },
   "dependencies": {
-    "@expo-google-fonts/archivo": "^0.4.2",
-    "@expo-google-fonts/nunito-sans": "^0.4.2",
-    "@react-native-async-storage/async-storage": "^3.0.1",
-    "expo-font": "^14.0.11",
-    "expo-secure-store": "^55.0.9",
-    "i18next": "^25.8.18",
-    "react-i18next": "^16.5.8",
-    "react-native-maps": "^1.27.1",
-    "use-debounce": "^10.1.1"
+    "@tanstack/react-query": "^5.0.0",
+    "axios": "^1.0.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   }
 }
