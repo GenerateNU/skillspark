@@ -162,6 +162,9 @@
     "deleteTitle": "Delete saved event",
     "deleteConfirm": "Are you sure you want to remove this saved event?"
   },
+  "review": {
+    "title": "Reviews"
+  },
   "event": {
     "back": "Back",
     "seeMore": "See more",
