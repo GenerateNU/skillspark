@@ -345,7 +345,7 @@ function EventOccurrenceDetail({
                 fontFamily: FontFamilies.bold,
               }}
             >
-              {translate("event.seeSchedule")}
+              {translate("event.reserve")}
             </Text>
           </TouchableOpacity>
         </View>
