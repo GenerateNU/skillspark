@@ -37,7 +37,7 @@
     "forYou": "For You",
     "basedOn": "Based on",
     "upcomingEvents": "upcoming events",
-    "reserve": "Reserve",
+    "learnMore": "Learn More",
     "reserved": "Reserved",
     "members": "members",
     "categories": {
@@ -190,6 +190,14 @@
     "requiredFieldsError": "Please fill in all required fields (Name, Phone Number)",
     "saveError": "Failed to save. Please try again.",
     "deleteError": "Failed to delete."
+  },
+  "map": {
+    "filterTime": "Time",
+    "filterDistance": "Distance",
+    "sortBy": "Sort by",
+    "filter": "Filter",
+    "miles": "mi",
+    "stars": "Stars"
   },
   "interests": {
     "science": "Science",
