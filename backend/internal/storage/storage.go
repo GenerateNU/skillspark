@@ -5,6 +5,7 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
 	emergencycontact "skillspark/internal/storage/postgres/schema/emergency-contact"
+	"skillspark/internal/storage/postgres/schema/recommendation"
 	"skillspark/internal/storage/postgres/schema/event"
 	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
@@ -142,6 +143,10 @@ type EmergencyContactRepository interface {
 	DeleteEmergencyContact(ctx context.Context, guardian_id uuid.UUID) (*models.DeleteEmergencyContactOutput, error)
 }
 
+type RecommendationRepository interface {
+	GetRecommendationsByChildID(ctx context.Context, childID uuid.UUID, acceptLanguage string, k int) ([]models.EventOccurrence, error)
+}
+
 type Repository struct {
 	db               *pgxpool.Pool
 	Location         LocationRepository
@@ -158,6 +163,7 @@ type Repository struct {
 	Notification     NotificationRepository
 	Saved            SavedRepository
 	EmergencyContact EmergencyContactRepository
+	Recommendation   RecommendationRepository
 }
 
 // Close closes the database connection pool
@@ -189,5 +195,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Notification:     notification.NewNotificationRepository(db),
 		Saved:            saved.NewSavedRepository(db),
 		EmergencyContact: emergencycontact.NewEmergencyContactRepository(db),
+		Recommendation:   recommendation.NewRecommendationRepository(db),
 	}
 }
