@@ -22,7 +22,17 @@ import {
 import { AuthProvider } from "@/contexts/auth-context";
 import { LoginRedirect } from "@/components/LoginRedirect";
 import { setCurrentLanguage } from "@skillspark/api-client";
-import { StripeProvider } from "@stripe/stripe-react-native";
+
+let StripeProvider: React.ComponentType<{
+  publishableKey: string;
+  children: React.ReactNode;
+}> | null = null;
+try {
+  StripeProvider = require("@stripe/stripe-react-native").StripeProvider;
+} catch {
+  // Native module unavailable (e.g. Expo Go). Skip Stripe
+}
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -51,21 +61,26 @@ export default function RootLayout() {
   if ((!loaded && !error) || !langReady) {
     return null;
   }
-
-  return (
     
+  const content = (
     <GestureHandlerRootView>
-      <StripeProvider
-          publishableKey={process.env.EXPO_PUBLIC_STRIPE_KEY ?? ""}
-        >
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-          <AuthProvider>
-            <LoginRedirect />
-          </AuthProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-      </StripeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <AuthProvider>
+          <LoginRedirect />
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
     </GestureHandlerRootView>
   );
+
+  if (StripeProvider) {
+    return (
+      <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_KEY ?? ""}>
+        {content}
+      </StripeProvider>
+    );
+  }
+
+  return content;
 }
