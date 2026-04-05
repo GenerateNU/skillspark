@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Organization, Location, CreateLocationInputBody } from "@skillspark/api-client";
 import { postLocation, updateOrganization } from "@skillspark/api-client";
+
 interface OrgLocationCardProps {
   org: Organization;
   orgLocation: Location | undefined;
@@ -88,46 +89,57 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
     }
   }
 
+  const renderHeaderActions = () => {
+    if (!changingLocation) {
+      return (
+        <button onClick={startChangingLocation} className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
+          Change
+        </button>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2">
+        <button onClick={function () { setChangingLocation(false); }} disabled={savingLocation}
+          className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer">
+          Cancel
+        </button>
+        <button onClick={handleSaveLocation} disabled={savingLocation || !isLocationFormValid()}
+          className="px-3.5 py-1.5 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50 cursor-pointer">
+          {savingLocation ? "Saving…" : "Save location"}
+        </button>
+      </div>
+    );
+  }
+
+  const renderLocation = () => {
+    if (!orgLocation) {
+      return <p className="px-5 py-4 text-base text-gray-400">No location assigned.</p>;
+    }
+
+    return (
+      <>
+        {addressFields.map(function (row) {
+          return (
+            <div key={row.label} className="px-5 py-3.5 grid grid-cols-3 gap-4">
+              <span className="text-sm font-medium text-gray-500">{row.label}</span>
+              <span className={`col-span-2 text-base text-gray-800 break-all ${row.mono ? "font-mono" : ""}`}>
+                {row.value}
+              </span>
+            </div>
+          );
+        })}
+      </>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
       <div className="px-5 py-4 flex items-center justify-between">
         <h3 className="text-base font-semibold text-gray-700 uppercase tracking-wide">Location</h3>
-        {!changingLocation ? (
-          <button onClick={startChangingLocation} className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
-            Change
-          </button>
-        ) : (
-          <div className="flex items-center gap-2">
-            <button onClick={function () { setChangingLocation(false); }} disabled={savingLocation}
-              className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer">
-              Cancel
-            </button>
-            <button onClick={handleSaveLocation} disabled={savingLocation || !isLocationFormValid()}
-              className="px-3.5 py-1.5 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50 cursor-pointer">
-              {savingLocation ? "Saving…" : "Save location"}
-            </button>
-          </div>
-        )}
+        {renderHeaderActions()}
       </div>
-
-      {!changingLocation ? (
-        !orgLocation ? (
-          <p className="px-5 py-4 text-base text-gray-400">No location assigned.</p>
-        ) : (
-          <>
-            {addressFields.map(function (row) {
-              return (
-                <div key={row.label} className="px-5 py-3.5 grid grid-cols-3 gap-4">
-                  <span className="text-sm font-medium text-gray-500">{row.label}</span>
-                  <span className={`col-span-2 text-base text-gray-800 break-all ${row.mono ? "font-mono" : ""}`}>
-                    {row.value}
-                  </span>
-                </div>
-              );
-            })}
-          </>
-        )
-      ) : (
+      {changingLocation ? (
         <div className="px-5 py-4 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">Address line 1 <span className="text-red-500">*</span></label>
@@ -176,7 +188,7 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
         </div>
-      )}
+      ) : renderLocation()}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { isValidEmail, type ManagerErrors } from "../utils/validation";
 import { IconX } from "./icons";
-import OtpCard from "./admin_otpCard";
+import OneTimePasswordCard from "./admin_oneTimePasswordCard";
 import ValidatedInput from "../common/validatedInput";
 import type { ManagerFormInput } from "./admin_createModal";
 import Field from "../common/field";
@@ -84,7 +84,7 @@ export default function ManagerFormRow({ mgr, index, onChange, onRemove, canRemo
         </Select>
       </Field>
 
-      <OtpCard password={mgr.password} name={mgr.name} />
+      <OneTimePasswordCard password={mgr.password} name={mgr.name} />
     </div>
   );
 }
