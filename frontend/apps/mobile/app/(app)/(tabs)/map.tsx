@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Linking, Button, ActivityIndicator, View } from "react-native";
 import * as Location from "expo-location";
-import { useListOrganizations, useGetAllLocations } from "@skillspark/api-client";
-import type { Organization, Location as OrgLocation } from "@skillspark/api-client";
+import {
+  useListOrganizations,
+  useGetAllLocations,
+} from "@skillspark/api-client";
+import type {
+  Organization,
+  Location as OrgLocation,
+} from "@skillspark/api-client";
 import { ThemedView } from "@/components/themed-view";
 import { ThemedText } from "@/components/themed-text";
 import { SkillSparkMap } from "@/components/SkillSparkMap";
@@ -21,11 +27,17 @@ export interface LocationPin {
 
 export default function MapScreen() {
   const { t: translate } = useTranslation();
-  const { data: orgsData, isLoading: isOrgsLoading, error } = useListOrganizations();
+  const {
+    data: orgsData,
+    isLoading: isOrgsLoading,
+    error,
+  } = useListOrganizations();
   const { data: locsData, isLoading: isLocsLoading } = useGetAllLocations();
 
-  const organizations: Organization[] = orgsData?.status === 200 ? orgsData.data : [];
-  const locations: OrgLocation[] = locsData?.status === 200 ? locsData.data : [];
+  const organizations: Organization[] =
+    orgsData?.status === 200 ? orgsData.data : [];
+  const locations: OrgLocation[] =
+    locsData?.status === 200 ? locsData.data : [];
 
   const isApiLoading = isOrgsLoading || isLocsLoading;
 

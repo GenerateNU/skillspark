@@ -22,6 +22,7 @@ import { useGuardian } from "@/hooks/use-guardian";
 import PaymentMethodRow from "@/components/PaymentMethodRow";
 import CardForm from "@/components/CardForm";
 import { ErrorMessage } from "@/components/ErrorMessage";
+import DeletePaymentMethodModal from "@/components/DeletePaymentMethodModal";
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -33,6 +34,8 @@ export default function PaymentScreen() {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<boolean>(false);
   const { guardian } = useGuardian();
 
   async function fetchPaymentMethods(): Promise<void> {
@@ -54,98 +57,108 @@ export default function PaymentScreen() {
     fetchPaymentMethods();
   }, [guardian]);
 
-  const deletePaymentMethod = (id: string) => {
-    async function detachMethod() {
-      try {
-        const res = await detachGuardianPaymentMethod({
-          payment_method_id: id,
+  async function confirmDelete(): Promise<void> {
+    if (!pendingDeleteId) return;
+    try {
+      setDeleting(true);
+      const res = await detachGuardianPaymentMethod({
+        payment_method_id: pendingDeleteId,
+      });
+      if (res.status !== 204) throw res.data;
+      setPaymentMethods(function (prev) {
+        return prev.filter(function (pm) {
+          return pm.id !== pendingDeleteId;
         });
-        if (res.status !== 204) {
-          throw res.data;
-        }
-        setPaymentMethods(
-          paymentMethods.filter((pm: PaymentMethod) => pm.id != id),
-        );
-      } catch (e) {
-        console.error(e);
-      }
+      });
+    } catch (e) {
+      setError("Failed to delete payment method");
+    } finally {
+      setDeleting(false);
+      setPendingDeleteId(null);
     }
-    detachMethod();
-  };
+  }
 
   return (
-      <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
-        <View className="flex-row items-center justify-between px-5 py-[14px]">
-          <TouchableOpacity
-            onPress={() => {
+    <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+      <View className="flex-row items-center justify-between px-5 py-[14px]">
+        <TouchableOpacity
+          onPress={() => {
+            setEditingCard(false);
+            router.navigate("/profile");
+          }}
+          className="w-10 justify-center items-start"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <IconSymbol name="chevron.left" size={24} color={theme.text} />
+        </TouchableOpacity>
+        <ThemedText className="text-xl text-center font-nunito-bold">
+          {translate("payment.title")}
+        </ThemedText>
+        <View className="w-10" />
+      </View>
+
+      <View className="px-5 pt-5">
+        <ThemedText className="text-[22px] font-nunito-bold mb-5">
+          {translate("payment.manageBilling")}
+        </ThemedText>
+
+        {loading ? (
+          <ActivityIndicator
+            size="small"
+            color={AppColors.primaryBlue}
+            style={{ marginBottom: 32 }}
+          />
+        ) : editingCard ? (
+          <CardForm
+            onSave={async () => {
+              await fetchPaymentMethods();
               setEditingCard(false);
-              router.navigate("/profile");
             }}
-            className="w-10 justify-center items-start"
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            onCancel={() => setEditingCard(false)}
+          />
+        ) : paymentMethods.length > 0 ? (
+          paymentMethods.map((method, i) => (
+            <PaymentMethodRow
+              method={method}
+              onDelete={(id) => setPendingDeleteId(id)}
+              key={i}
+            />
+          ))
+        ) : error ? (
+          <></>
+        ) : (
+          <ThemedText
+            className="text-base font-nunito mb-8"
+            style={{ color: theme.icon }}
           >
-            <IconSymbol name="chevron.left" size={24} color={theme.text} />
-          </TouchableOpacity>
-          <ThemedText className="text-xl text-center font-nunito-bold">
-            {translate("payment.title")}
+            {translate("payment.noCard")}
           </ThemedText>
-          <View className="w-10" />
-        </View>
+        )}
 
-        <View className="px-5 pt-5">
-          <ThemedText className="text-[22px] font-nunito-bold mb-5">
-            {translate("payment.manageBilling")}
-          </ThemedText>
-
-          {loading ? (
-            <ActivityIndicator
-              size="small"
-              color={AppColors.primaryBlue}
-              style={{ marginBottom: 32 }}
-            />
-          ) : editingCard ? (
-            <CardForm
-              onSave={async () => {
-                await fetchPaymentMethods();
-                setEditingCard(false);
-              }}
-              onCancel={() => setEditingCard(false)}
-            />
-          ) : paymentMethods.length > 0 ? (
-            paymentMethods.map((method, i) => (
-              <PaymentMethodRow
-                method={method}
-                onDelete={deletePaymentMethod}
-                key={i}
-              />
-            ))
-          ) : error ? (
-            <></>
-          ) : (
-            <ThemedText
-              className="text-base font-nunito mb-8"
-              style={{ color: theme.icon }}
+        {!editingCard && (
+          <View className="flex-row gap-4">
+            <TouchableOpacity
+              className="flex-1 py-[14px] rounded-lg items-center justify-center"
+              style={{ backgroundColor: AppColors.primaryBlue }}
+              onPress={() => setEditingCard(true)}
+              activeOpacity={0.8}
             >
-              {translate("payment.noCard")}
-            </ThemedText>
-          )}
+              <ThemedText className="text-white text-[15px] font-nunito-semibold">
+                {translate("payment.updateBilling")}
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
 
-          {!editingCard && (
-            <View className="flex-row gap-4">
-              <TouchableOpacity
-                className="flex-1 py-[14px] rounded-lg items-center justify-center"
-                style={{ backgroundColor: AppColors.primaryBlue }}
-                onPress={() => setEditingCard(true)}
-                activeOpacity={0.8}
-              >
-                <ThemedText className="text-white text-[15px] font-nunito-semibold">
-                  {translate("payment.updateBilling")}
-                </ThemedText>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-        {error && <ErrorMessage message={error} />}
-      </ThemedView>
+      {error && <ErrorMessage message={error} />}
+
+      <DeletePaymentMethodModal
+        visible={pendingDeleteId !== null}
+        deleting={deleting}
+        onConfirm={confirmDelete}
+        onClose={() => setPendingDeleteId(null)}
+      />
+    </ThemedView>
   );
 }

@@ -61,16 +61,18 @@ export default function RootLayout() {
   if ((!loaded && !error) || !langReady) {
     return null;
   }
-    
+
   const content = (
     <GestureHandlerRootView>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <AuthProvider>
-          <LoginRedirect />
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <AuthProvider>
+            <LoginRedirect />
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </GestureHandlerRootView>
   );
 

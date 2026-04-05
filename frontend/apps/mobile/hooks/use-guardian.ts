@@ -11,16 +11,18 @@ export function useGuardian() {
     useGetGuardianById(guardianId || "");
   const { data: childrenResponse, isLoading: childrenLoading } =
     useGetChildrenByGuardianId(guardianId || "");
-  const { data: emergencycontactResponse, isLoading: emergencycontactLoading } = 
+  const { data: emergencycontactResponse, isLoading: emergencycontactLoading } =
     useGetEmergencyContactsByGuardianId(guardianId || "");
 
   const guardian =
     guardianResponse?.status === 200 ? guardianResponse.data : null;
   const children =
     childrenResponse?.status === 200 ? childrenResponse.data : [];
-  const emergencyContacts = 
-    emergencycontactResponse?.status === 200 ? emergencycontactResponse.data : [];
-  
+  const emergencyContacts =
+    emergencycontactResponse?.status === 200
+      ? emergencycontactResponse.data
+      : [];
+
   return {
     guardian,
     children,

@@ -130,7 +130,13 @@
     "save": "Save",
     "noCard": "No Card Registered",
     "updateBilling": "Update Billing",
-    "delete": "Delete"
+    "delete": "Delete",
+    "deleteModal": {
+      "title": "Delete?",
+      "description": "Are you sure you want to delete this payment method?",
+      "confirm": "Confirm",
+      "deleting": "Deleting..."
+    }
   },
   "familyInformation": {
     "title": "Family Information",

@@ -46,9 +46,10 @@ export default function PaymentMethodRow({
           backgroundColor: pressed ? AppColors.danger : "transparent",
         }}
         onPress={() => {
-          setPressed(true);
           handleDelete();
         }}
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
         activeOpacity={1}
       >
         <ThemedText
