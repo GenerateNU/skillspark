@@ -124,8 +124,6 @@ export default function PaymentScreen() {
               key={i}
             />
           ))
-        ) : error ? (
-          <></>
         ) : (
           <ThemedText
             className="text-base font-nunito mb-8"
