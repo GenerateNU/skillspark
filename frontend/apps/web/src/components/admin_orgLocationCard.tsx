@@ -114,7 +114,10 @@ export default function OrgLocationCard({
   const renderHeaderActions = () => {
     if (!changingLocation) {
       return (
-        <button onClick={startChangingLocation} className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
+        <button
+          onClick={startChangingLocation}
+          className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+        >
           Change
         </button>
       );
@@ -122,21 +125,33 @@ export default function OrgLocationCard({
 
     return (
       <div className="flex items-center gap-2">
-        <button onClick={function () { setChangingLocation(false); }} disabled={savingLocation}
-          className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer">
+        <button
+          onClick={function () {
+            setChangingLocation(false);
+          }}
+          disabled={savingLocation}
+          className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer"
+        >
           Cancel
         </button>
-        <button onClick={handleSaveLocation} disabled={savingLocation || !isLocationFormValid()}
-          className="px-3.5 py-1.5 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50 cursor-pointer">
+        <button
+          onClick={handleSaveLocation}
+          disabled={savingLocation || !isLocationFormValid()}
+          className="px-3.5 py-1.5 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50 cursor-pointer"
+        >
           {savingLocation ? "Saving…" : "Save location"}
         </button>
       </div>
     );
-  }
+  };
 
   const renderLocation = () => {
     if (!orgLocation) {
-      return <p className="px-5 py-4 text-base text-gray-400">No location assigned.</p>;
+      return (
+        <p className="px-5 py-4 text-base text-gray-400">
+          No location assigned.
+        </p>
+      );
     }
 
     return (
@@ -144,8 +159,12 @@ export default function OrgLocationCard({
         {addressFields.map(function (row) {
           return (
             <div key={row.label} className="px-5 py-3.5 grid grid-cols-3 gap-4">
-              <span className="text-sm font-medium text-gray-500">{row.label}</span>
-              <span className={`col-span-2 text-base text-gray-800 break-all ${row.mono ? "font-mono" : ""}`}>
+              <span className="text-sm font-medium text-gray-500">
+                {row.label}
+              </span>
+              <span
+                className={`col-span-2 text-base text-gray-800 break-all ${row.mono ? "font-mono" : ""}`}
+              >
                 {row.value}
               </span>
             </div>
@@ -153,12 +172,14 @@ export default function OrgLocationCard({
         })}
       </>
     );
-  }
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
       <div className="px-5 py-4 flex items-center justify-between">
-        <h3 className="text-base font-semibold text-gray-700 uppercase tracking-wide">Location</h3>
+        <h3 className="text-base font-semibold text-gray-700 uppercase tracking-wide">
+          Location
+        </h3>
         {renderHeaderActions()}
       </div>
       {changingLocation ? (
@@ -259,7 +280,9 @@ export default function OrgLocationCard({
             />
           </div>
         </div>
-      ) : renderLocation()}
+      ) : (
+        renderLocation()
+      )}
     </div>
   );
 }

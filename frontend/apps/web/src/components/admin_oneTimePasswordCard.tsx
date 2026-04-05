@@ -1,7 +1,13 @@
 import { useState } from "react";
 import ErrorModal from "../common/error";
 
-export default function OneTimePasswordCard({ password, name }: { password: string; name: string }) {
+export default function OneTimePasswordCard({
+  password,
+  name,
+}: {
+  password: string;
+  name: string;
+}) {
   const [copied, setCopied] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 

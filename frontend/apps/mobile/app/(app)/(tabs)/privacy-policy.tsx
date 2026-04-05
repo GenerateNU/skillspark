@@ -1,5 +1,10 @@
 import React from "react";
-import { View, TouchableOpacity, ScrollView, useColorScheme } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  ScrollView,
+  useColorScheme,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
@@ -34,7 +39,10 @@ export default function PrivacyPolicyScreen() {
         showsVerticalScrollIndicator={false}
         className="px-5 pt-2 pb-10"
       >
-        <ThemedText className="text-[15px] font-nunito italic mb-4" style={{ color: theme.icon }}>
+        <ThemedText
+          className="text-[15px] font-nunito italic mb-4"
+          style={{ color: theme.icon }}
+        >
           {translate("privacyPolicy.lastUpdated")}
         </ThemedText>
 
