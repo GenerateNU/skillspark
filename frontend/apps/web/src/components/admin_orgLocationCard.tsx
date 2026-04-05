@@ -1,5 +1,9 @@
 import { useState } from "react";
-import type { Organization, Location, CreateLocationInputBody } from "@skillspark/api-client";
+import type {
+  Organization,
+  Location,
+  CreateLocationInputBody,
+} from "@skillspark/api-client";
 import { postLocation, updateOrganization } from "@skillspark/api-client";
 
 interface OrgLocationCardProps {
@@ -10,7 +14,13 @@ interface OrgLocationCardProps {
   setError: (e: string | null) => void;
 }
 
-export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocationUpdate, setError }: OrgLocationCardProps) {
+export default function OrgLocationCard({
+  org,
+  orgLocation,
+  onOrgUpdate,
+  onLocationUpdate,
+  setError,
+}: OrgLocationCardProps) {
   const [changingLocation, setChangingLocation] = useState<boolean>(false);
   const [locAddressLine1, setLocAddressLine1] = useState<string>("");
   const [locAddressLine2, setLocAddressLine2] = useState<string>("");
@@ -33,16 +43,26 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
     setChangingLocation(true);
   }
 
-  const addressFields = orgLocation ? [
-    { label: "Address", value: orgLocation.address_line1, mono: false },
-    { label: "Address line 2", value: orgLocation.address_line2 || "—", mono: false },
-    { label: "Subdistrict", value: orgLocation.subdistrict, mono: false },
-    { label: "District", value: orgLocation.district, mono: false },
-    { label: "Province", value: orgLocation.province, mono: false },
-    { label: "Postal code", value: orgLocation.postal_code, mono: true },
-    { label: "Country", value: orgLocation.country, mono: false },
-    { label: "Coordinates", value: `${orgLocation.latitude}, ${orgLocation.longitude}`, mono: true },
-  ] : [];
+  const addressFields = orgLocation
+    ? [
+        { label: "Address", value: orgLocation.address_line1, mono: false },
+        {
+          label: "Address line 2",
+          value: orgLocation.address_line2 || "—",
+          mono: false,
+        },
+        { label: "Subdistrict", value: orgLocation.subdistrict, mono: false },
+        { label: "District", value: orgLocation.district, mono: false },
+        { label: "Province", value: orgLocation.province, mono: false },
+        { label: "Postal code", value: orgLocation.postal_code, mono: true },
+        { label: "Country", value: orgLocation.country, mono: false },
+        {
+          label: "Coordinates",
+          value: `${orgLocation.latitude}, ${orgLocation.longitude}`,
+          mono: true,
+        },
+      ]
+    : [];
 
   function isLocationFormValid(): boolean {
     return (
@@ -70,7 +90,8 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
         postal_code: locPostalCode,
       };
       const locationRes = await postLocation(locationInput);
-      if (locationRes.status !== 200 && locationRes.status !== 201) throw new Error("Failed to create location");
+      if (locationRes.status !== 200 && locationRes.status !== 201)
+        throw new Error("Failed to create location");
       const newLocationId: string = (locationRes.data as { id: string }).id;
 
       const updateRes = await updateOrganization(org.id, {
@@ -78,7 +99,8 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
         location_id: newLocationId,
         active: org.active,
       });
-      if (updateRes.status !== 200) throw new Error("Failed to update organization");
+      if (updateRes.status !== 200)
+        throw new Error("Failed to update organization");
       onOrgUpdate(updateRes.data as Organization);
       onLocationUpdate(locationRes.data as Location);
       setChangingLocation(false);
@@ -142,50 +164,99 @@ export default function OrgLocationCard({ org, orgLocation, onOrgUpdate, onLocat
       {changingLocation ? (
         <div className="px-5 py-4 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">Address line 1 <span className="text-red-500">*</span></label>
-            <input value={locAddressLine1} onChange={function (e: React.ChangeEvent<HTMLInputElement>) { setLocAddressLine1(e.target.value); }}
+            <label className="text-sm font-medium text-gray-700">
+              Address line 1 <span className="text-red-500">*</span>
+            </label>
+            <input
+              value={locAddressLine1}
+              onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+                setLocAddressLine1(e.target.value);
+              }}
               placeholder="123 Sukhumvit Rd"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">Address line 2</label>
-            <input value={locAddressLine2} onChange={function (e: React.ChangeEvent<HTMLInputElement>) { setLocAddressLine2(e.target.value); }}
+            <label className="text-sm font-medium text-gray-700">
+              Address line 2
+            </label>
+            <input
+              value={locAddressLine2}
+              onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+                setLocAddressLine2(e.target.value);
+              }}
               placeholder="Floor 4, Suite 401"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">Subdistrict <span className="text-red-500">*</span></label>
-              <input value={locSubdistrict} onChange={function (e: React.ChangeEvent<HTMLInputElement>) { setLocSubdistrict(e.target.value); }}
+              <label className="text-sm font-medium text-gray-700">
+                Subdistrict <span className="text-red-500">*</span>
+              </label>
+              <input
+                value={locSubdistrict}
+                onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+                  setLocSubdistrict(e.target.value);
+                }}
                 placeholder="Khlong Toei"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">District <span className="text-red-500">*</span></label>
-              <input value={locDistrict} onChange={function (e: React.ChangeEvent<HTMLInputElement>) { setLocDistrict(e.target.value); }}
+              <label className="text-sm font-medium text-gray-700">
+                District <span className="text-red-500">*</span>
+              </label>
+              <input
+                value={locDistrict}
+                onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+                  setLocDistrict(e.target.value);
+                }}
                 placeholder="Khlong Toei"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">Province <span className="text-red-500">*</span></label>
-              <input value={locProvince} onChange={function (e: React.ChangeEvent<HTMLInputElement>) { setLocProvince(e.target.value); }}
+              <label className="text-sm font-medium text-gray-700">
+                Province <span className="text-red-500">*</span>
+              </label>
+              <input
+                value={locProvince}
+                onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+                  setLocProvince(e.target.value);
+                }}
                 placeholder="Bangkok"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">Postal code <span className="text-red-500">*</span></label>
-              <input value={locPostalCode} onChange={function (e: React.ChangeEvent<HTMLInputElement>) { setLocPostalCode(e.target.value); }}
+              <label className="text-sm font-medium text-gray-700">
+                Postal code <span className="text-red-500">*</span>
+              </label>
+              <input
+                value={locPostalCode}
+                onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+                  setLocPostalCode(e.target.value);
+                }}
                 placeholder="10110"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">Country <span className="text-red-500">*</span></label>
-            <input value={locCountry} onChange={function (e: React.ChangeEvent<HTMLInputElement>) { setLocCountry(e.target.value); }}
+            <label className="text-sm font-medium text-gray-700">
+              Country <span className="text-red-500">*</span>
+            </label>
+            <input
+              value={locCountry}
+              onChange={function (e: React.ChangeEvent<HTMLInputElement>) {
+                setLocCountry(e.target.value);
+              }}
               placeholder="Thailand"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-base bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
         </div>
       ) : renderLocation()}

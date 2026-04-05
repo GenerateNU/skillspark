@@ -12,7 +12,11 @@ export default function HomePage() {
   const [showCreate, setShowCreate] = useState<boolean>(false);
 
   const fmtDate = (iso: string): string =>
-    new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    new Date(iso).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
 
   useEffect(function () {
     async function getOrgs(): Promise<void> {
@@ -37,11 +41,19 @@ export default function HomePage() {
     <div className="flex-1 flex flex-col overflow-hidden">
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
         <div>
-          <h1 className="text-base font-semibold text-gray-900">Organizations</h1>
-          <p className="text-xs text-gray-500">{organizations.length} {organizations.length === 1 ? "organization" : "organizations"} registered</p>
+          <h1 className="text-base font-semibold text-gray-900">
+            Organizations
+          </h1>
+          <p className="text-xs text-gray-500">
+            {organizations.length}{" "}
+            {organizations.length === 1 ? "organization" : "organizations"}{" "}
+            registered
+          </p>
         </div>
         <button
-          onClick={function () { setShowCreate(true); }}
+          onClick={function () {
+            setShowCreate(true);
+          }}
           className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer"
         >
           <IconPlus /> Add organization
@@ -56,7 +68,9 @@ export default function HomePage() {
         )}
         {isError && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-red-500">Failed to load organizations.</p>
+            <p className="text-sm text-red-500">
+              Failed to load organizations.
+            </p>
           </div>
         )}
         {!loading && !isError && organizations.length === 0 && (
@@ -64,8 +78,12 @@ export default function HomePage() {
             <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
               <IconBuilding />
             </div>
-            <p className="text-sm font-semibold text-gray-700">No organizations yet</p>
-            <p className="text-sm text-gray-400 mt-1">Click "Add organization" to register the first one.</p>
+            <p className="text-sm font-semibold text-gray-700">
+              No organizations yet
+            </p>
+            <p className="text-sm text-gray-400 mt-1">
+              Click "Add organization" to register the first one.
+            </p>
           </div>
         )}
         {!loading && organizations.length > 0 && (
@@ -75,7 +93,7 @@ export default function HomePage() {
                 <Link
                   key={org.id}
                   to={"/admin/organization/"}
-                  state={{org}}
+                  state={{ org }}
                   className="group bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all"
                 >
                   <div className="flex items-center gap-3 mb-3">
@@ -83,15 +101,25 @@ export default function HomePage() {
                       {org.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 truncate">{org.name}</p>
-                      <p className="text-xs text-gray-400">{org.active ? "Active" : "Inactive"}</p>
+                      <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 truncate">
+                        {org.name}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {org.active ? "Active" : "Inactive"}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-2">
-                    <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded ring-1 ${org.stripe_account_activated ? "bg-green-50 text-green-700 ring-green-200" : "bg-yellow-50 text-yellow-700 ring-yellow-200"}`}>
-                      {org.stripe_account_activated ? "Stripe connected" : "Stripe pending"}
+                    <span
+                      className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded ring-1 ${org.stripe_account_activated ? "bg-green-50 text-green-700 ring-green-200" : "bg-yellow-50 text-yellow-700 ring-yellow-200"}`}
+                    >
+                      {org.stripe_account_activated
+                        ? "Stripe connected"
+                        : "Stripe pending"}
                     </span>
-                    <span className="text-xs text-gray-400">{fmtDate(org.created_at)}</span>
+                    <span className="text-xs text-gray-400">
+                      {fmtDate(org.created_at)}
+                    </span>
                   </div>
                 </Link>
               );
@@ -102,9 +130,13 @@ export default function HomePage() {
 
       {showCreate && (
         <CreateModal
-          onClose={function () { setShowCreate(false); }}
+          onClose={function () {
+            setShowCreate(false);
+          }}
           onCreate={function (org: Organization) {
-            setOrganizations(function (prev: Organization[]) { return [org, ...prev]; });
+            setOrganizations(function (prev: Organization[]) {
+              return [org, ...prev];
+            });
             setShowCreate(false);
           }}
         />

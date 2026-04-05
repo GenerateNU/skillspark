@@ -4,7 +4,11 @@ import OrgLocationStep from "./admin_createModalStep0";
 import ManagerStep from "./admin_createModalStep1";
 import Btn from "../common/button";
 import { createOrganziationLocationAndManager } from "../service/createOrganization";
-import type { Organization, Manager, ManagerSignUpInputBody } from "@skillspark/api-client";
+import type {
+  Organization,
+  Manager,
+  ManagerSignUpInputBody,
+} from "@skillspark/api-client";
 import { blankMgr } from "../utils/validation";
 import ErrorModal from "../common/error";
 
@@ -37,17 +41,28 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
   const [province, setProvince] = useState<string>("");
   const [postalCode, setPostalCode] = useState<string>("");
 
-  const [managerInputs, setManagerInputs] = useState<ManagerFormInput[]>([blankMgr()]);
+  const [managerInputs, setManagerInputs] = useState<ManagerFormInput[]>([
+    blankMgr(),
+  ]);
 
-  useEffect(function () {
-    function handler(e: KeyboardEvent): void {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", handler);
-    return function () { window.removeEventListener("keydown", handler); };
-  }, [onClose]);
+  useEffect(
+    function () {
+      function handler(e: KeyboardEvent): void {
+        if (e.key === "Escape") onClose();
+      }
+      window.addEventListener("keydown", handler);
+      return function () {
+        window.removeEventListener("keydown", handler);
+      };
+    },
+    [onClose],
+  );
 
-  function updMgr(index: number, k: keyof ManagerSignUpInputBody, v: string): void {
+  function updMgr(
+    index: number,
+    k: keyof ManagerSignUpInputBody,
+    v: string,
+  ): void {
     setManagerInputs(function (prev: ManagerFormInput[]) {
       return prev.map(function (m: ManagerFormInput, i: number) {
         if (i !== index) return m;
@@ -68,24 +83,24 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
     );
   }
 
-  const goToStep1 = (): void =>  {
+  const goToStep1 = (): void => {
     if (!isStep0Valid()) return;
     setError(null);
     setStep(1);
-  }
+  };
 
-  const goToStep0 = (): void =>  {
+  const goToStep0 = (): void => {
     setError(null);
     setStep(0);
-  }
+  };
 
   async function handleCreate(): Promise<void> {
     try {
       setError(null);
       setCreating(true);
 
-      const data : {org: Organization, manager: Manager }= await createOrganziationLocationAndManager(
-        {
+      const data: { org: Organization; manager: Manager } =
+        await createOrganziationLocationAndManager({
           orgName,
           orgActive,
           addressLine1,
@@ -95,9 +110,8 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
           subdistrict,
           province,
           postalCode,
-          managerInputs
-        }
-      )
+          managerInputs,
+        });
       onCreate(data.org, data.manager);
       onClose();
     } catch (e) {
@@ -112,7 +126,6 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45">
       <div className="bg-white rounded-xl shadow-2xl flex flex-col w-full max-w-lg max-h-[90vh]">
-
         {/* Header */}
         <div className="flex items-start justify-between px-6 py-5 border-b border-gray-200 shrink-0">
           <div>
@@ -120,10 +133,15 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
               {step === 0 ? "Register new organization" : "Add managers"}
             </h2>
             <p className="text-sm text-gray-500 mt-0.5">
-              {step === 0 ? "Step 1 of 2 — Enter organization information" : "Step 2 of 2 — At least one manager required"}
+              {step === 0
+                ? "Step 1 of 2 — Enter organization information"
+                : "Step 2 of 2 — At least one manager required"}
             </p>
           </div>
-          <button onClick={onClose} className="ml-4 p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
+          <button
+            onClick={onClose}
+            className="ml-4 p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+          >
             <IconX />
           </button>
         </div>
@@ -138,40 +156,52 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
               return (
                 <div key={i} className="flex items-center">
                   <div className="flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${active || done ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-500"}`}>
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${active || done ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-500"}`}
+                    >
                       {done ? <IconCheck /> : i + 1}
                     </div>
-                    <span className={`text-sm ${active ? "font-semibold text-gray-900" : done ? "text-gray-500" : "text-gray-400"}`}>{label}</span>
+                    <span
+                      className={`text-sm ${active ? "font-semibold text-gray-900" : done ? "text-gray-500" : "text-gray-400"}`}
+                    >
+                      {label}
+                    </span>
                   </div>
-                  {i < stepLabels.length - 1 && <div className="w-8 h-px bg-gray-300 mx-3" />}
+                  {i < stepLabels.length - 1 && (
+                    <div className="w-8 h-px bg-gray-300 mx-3" />
+                  )}
                 </div>
               );
             })}
           </div>
 
-          {error && 
-            <ErrorModal error={error} setError={setError} />
-          }
+          {error && <ErrorModal error={error} setError={setError} />}
 
           {step === 0 && (
             <OrgLocationStep
-              orgName={orgName} setOrgName={setOrgName}
-              orgActive={orgActive} setOrgActive={setOrgActive}
-              addressLine1={addressLine1} setAddressLine1={setAddressLine1}
-              addressLine2={addressLine2} setAddressLine2={setAddressLine2}
-              subdistrict={subdistrict} setSubdistrict={setSubdistrict}
-              district={district} setDistrict={setDistrict}
-              province={province} setProvince={setProvince}
-              postalCode={postalCode} setPostalCode={setPostalCode}
-              country={country} setCountry={setCountry}
+              orgName={orgName}
+              setOrgName={setOrgName}
+              orgActive={orgActive}
+              setOrgActive={setOrgActive}
+              addressLine1={addressLine1}
+              setAddressLine1={setAddressLine1}
+              addressLine2={addressLine2}
+              setAddressLine2={setAddressLine2}
+              subdistrict={subdistrict}
+              setSubdistrict={setSubdistrict}
+              district={district}
+              setDistrict={setDistrict}
+              province={province}
+              setProvince={setProvince}
+              postalCode={postalCode}
+              setPostalCode={setPostalCode}
+              country={country}
+              setCountry={setCountry}
             />
           )}
 
           {step === 1 && (
-            <ManagerStep
-              managerInputs={managerInputs}
-              updMgr={updMgr}
-            />
+            <ManagerStep managerInputs={managerInputs} updMgr={updMgr} />
           )}
         </div>
 
@@ -179,21 +209,28 @@ export function CreateModal({ onClose, onCreate }: CreateModalProps) {
         <div className="shrink-0 px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-3 rounded-b-xl">
           {step === 0 ? (
             <>
-              <Btn variant="ghost" onClick={onClose} disabled={creating}>Cancel</Btn>
+              <Btn variant="ghost" onClick={onClose} disabled={creating}>
+                Cancel
+              </Btn>
               <Btn onClick={goToStep1} disabled={!isStep0Valid()}>
                 Continue
               </Btn>
             </>
           ) : (
             <>
-              <Btn variant="ghost" onClick={goToStep0} disabled={creating}>Back</Btn>
-              <Btn onClick={handleCreate} icon={<IconCheck />} disabled={creating}>
+              <Btn variant="ghost" onClick={goToStep0} disabled={creating}>
+                Back
+              </Btn>
+              <Btn
+                onClick={handleCreate}
+                icon={<IconCheck />}
+                disabled={creating}
+              >
                 {creating ? "Creating…" : "Create organization"}
               </Btn>
             </>
           )}
         </div>
-
       </div>
     </div>
   );
