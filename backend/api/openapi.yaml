@@ -257,6 +257,126 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/emergency-contact:
+    post:
+      tags:
+        - Emergency Contacts
+      summary: Creates an emergency contact
+      description: Creates an emergency contact
+      operationId: create-emergency-contact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: New emergency contact to add
+              $ref: '#/components/schemas/CreateEmergencyContactInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Created Emergency Contact
+                $ref: '#/components/schemas/EmergencyContact'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/emergency-contact/{guardian_id}:
+    get:
+      tags:
+        - Emergency Contacts
+      summary: Get emergency contacts by guardian id
+      description: Returns emergency contacts by guardian id
+      operationId: get-emergency-contacts-by-guardian-id
+      parameters:
+        - name: guardian_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of all emergency contacts related to the given guardian in the database
+                items:
+                  $ref: '#/components/schemas/EmergencyContact'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/emergency-contact/{id}:
+    delete:
+      tags:
+        - Emergency Contacts
+      summary: Delete an emergency contact
+      description: Deletes an emergency contact
+      operationId: delete-emergency-contact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Deleted Emergency Contact
+                $ref: '#/components/schemas/EmergencyContact'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    patch:
+      tags:
+        - Emergency Contacts
+      summary: Updates an emergency contact
+      description: Update an emergency contact
+      operationId: update-emergency-contact
+      parameters:
+        - name: id
+          in: path
+          description: Emergency Contact ID to update
+          required: true
+          schema:
+            type: string
+            description: Emergency Contact ID to update
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Emergency contact to update
+              $ref: '#/components/schemas/UpdateEmergencyContactInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Updated Emergency Contact
+                $ref: '#/components/schemas/EmergencyContact'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/event-occurrences:
     get:
       tags:
@@ -2400,6 +2520,27 @@ components:
         - birth_year
         - interests
         - guardian_id
+    CreateEmergencyContactInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateEmergencyContactInputBody.json
+          readOnly: true
+        guardian_id:
+          type: string
+        name:
+          type: string
+        phone_number:
+          type: string
+      required:
+        - name
+        - guardian_id
+        - phone_number
     CreateEventOccurrenceInputBody:
       type: object
       additionalProperties: false
@@ -2743,6 +2884,38 @@ components:
           description: Success message
       required:
         - message
+    EmergencyContact:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/EmergencyContact.json
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        guardian_id:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        phone_number:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - guardian_id
+        - phone_number
+        - created_at
+        - updated_at
     ErrorDetail:
       type: object
       additionalProperties: false
@@ -3765,6 +3938,27 @@ components:
         school_id:
           type: string
           description: ID of the school the child goes to
+    UpdateEmergencyContactInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateEmergencyContactInputBody.json
+          readOnly: true
+        guardian_id:
+          type: string
+        name:
+          type: string
+        phone_number:
+          type: string
+      required:
+        - guardian_id
+        - phone_number
+        - name
     UpdateEventOccurrenceInputBody:
       type: object
       additionalProperties: false

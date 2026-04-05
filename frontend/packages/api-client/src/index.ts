@@ -18,3 +18,6 @@ export * from './generated/locations/locations'
 export * from './generated/auth/auth';
 export * from './generated/saved/saved';
 export * from "./generated/registrations/registrations";
+export * from './generated/emergency-contacts/emergency-contacts';
+export * from './generated/organizations/organizations';
+export * from './generated/locations/locations';
