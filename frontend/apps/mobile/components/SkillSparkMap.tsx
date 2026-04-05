@@ -4,6 +4,7 @@ import * as Location from "expo-location";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedView } from "@/components/themed-view";
 import { EventCard } from "@/components/EventCard";
+import { OrgListSheet } from "@/components/OrgListSheet";
 
 export interface LocationPin {
   id: string;
@@ -63,7 +64,11 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
           </Marker>
         ))}
       </MapView>
-      {selectedPin && <EventCard pin={selectedPin} />}
+      {selectedPin ? (
+        <EventCard pin={selectedPin} />
+      ) : (
+        <OrgListSheet locations={locations} userLocation={userLocation} />
+      )}
     </ThemedView>
   );
 }

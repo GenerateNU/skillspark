@@ -8,6 +8,7 @@ import * as SplashScreen from "expo-splash-screen";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/constants/query-client";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -52,16 +53,19 @@ export default function RootLayout() {
   }
 
   return (
-    <StripeProvider
+    
+    <GestureHandlerRootView>
+      <StripeProvider
           publishableKey={process.env.EXPO_PUBLIC_STRIPE_KEY ?? ""}
         >
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <AuthProvider>
-          <LoginRedirect />
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
-    </StripeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+          <AuthProvider>
+            <LoginRedirect />
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+      </StripeProvider>
+    </GestureHandlerRootView>
   );
 }

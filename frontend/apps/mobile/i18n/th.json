@@ -38,7 +38,7 @@
     "forYou": "สำหรับคุณ",
     "basedOn": "ตามจาก",
     "upcomingEvents": "กิจกรรมที่จะมาถึง",
-    "reserve": "จอง",
+    "learnMore": "Learn More",
     "reserved": "จองแล้ว",
     "members": "สมาชิก",
     "categories": {
@@ -194,6 +194,14 @@
     "requiredFieldsError": "กรุณากรอกข้อมูลที่จำเป็นทั้งหมด (ชื่อ หมายเลขโทรศัพท์)",
     "saveError": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
     "deleteError": "ลบไม่สำเร็จ"
+  },
+  "map": {
+    "filterTime": "เวลา",
+    "filterDistance": "ระยะทาง",
+    "sortBy": "เรียงตาม",
+    "filter": "กรอง",
+    "miles": "ไมล์",
+    "stars": "ดาว"
   },
   "interests": {
     "science": "วิทยาศาสตร์",
