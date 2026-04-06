@@ -40,7 +40,10 @@ func main() {
 	// genapi only registers routes to produce the OpenAPI spec — no real API calls
 	// are ever made, so a placeholder key is sufficient.
 	if os.Getenv("OPENCAGE_API_KEY") == "" {
-		os.Setenv("OPENCAGE_API_KEY", "genapi-placeholder")
+		err = os.Setenv("OPENCAGE_API_KEY", "genapi-placeholder")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to set env value %v\n", err)
+		}
 	}
 
 	// Initialize app to get Huma API
