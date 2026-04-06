@@ -1,148 +1,151 @@
 import type {
-  GuardianLoginOutputBody,
-  GuardianSignUpOutputBody,
-  loginGuardianResponse,
-  signupGuardianResponse,
+	ManagerLoginOutputBody,
+	ManagerSignUpOutputBody,
+	loginManagerResponse,
+	signupManagerResponse,
 } from "@skillspark/api-client";
-import {
-  useLoginGuardian,
-  useSignupGuardian,
-} from "@skillspark/api-client";
+import { useLoginManager, useSignupManager } from "@skillspark/api-client";
 import { useNavigate } from "react-router-dom";
 import { createContext, useEffect, useState } from "react";
 
 interface AuthContextType {
-  guardianId: string | null;
-  jwt: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (
-    email: string,
-    password: string,
-    onError: (msg: string) => void,
-  ) => void;
-  signup: (
-    name: string,
-    email: string,
-    username: string,
-    password: string,
-    language_preference: string,
-    profile_picture_s3_key: string | undefined,
-    onError: (msg: string) => void,
-  ) => void;
-  logout: () => void;
+	managerId: string | null;
+	jwt: string | null;
+	isAuthenticated: boolean;
+	isLoading: boolean;
+	login: (
+		email: string,
+		password: string,
+		onError: (msg: string) => void,
+	) => void;
+	signup: (
+		name: string,
+		email: string,
+		username: string,
+		password: string,
+		language_preference: string,
+		organization_id: string,
+		role: string,
+		profile_picture_s3_key: string | undefined,
+		onError: (msg: string) => void,
+	) => void;
+	logout: () => void;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+	undefined,
+);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [guardianId, setGuardianId] = useState<string | null>(null);
-  const [jwt, setJWT] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { mutate: loginFunc } = useLoginGuardian();
-  const { mutate: signupFunc } = useSignupGuardian();
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    const checkAlreadyAuth = () => {
-      const storedGuardianId = localStorage.getItem("guardian_id");
-      const storedJwt = localStorage.getItem("jwt");
+	const [managerId, setManagerId] = useState<string | null>(null);
+	const [jwt, setJWT] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const { mutate: loginFunc } = useLoginManager();
+	const { mutate: signupFunc } = useSignupManager();
+	const navigate = useNavigate();
 
-      if (storedJwt && storedGuardianId) {
-        setJWT(storedJwt);
-        setGuardianId(storedGuardianId);
-      }
+	useEffect(() => {
+		const checkAlreadyAuth = () => {
+			const storedManagerId = localStorage.getItem("manager_id");
+			const storedJwt = localStorage.getItem("jwt");
 
-      setIsLoading(false);
-    };
-    checkAlreadyAuth();
-  }, []);
+			if (storedJwt && storedManagerId) {
+				setJWT(storedJwt);
+				setManagerId(storedManagerId);
+			}
 
-  const login = (
-    email: string,
-    password: string,
-    onError: (msg: string) => void,
-  ) => {
-    loginFunc(
-      { data: { email, password } },
-      {
-        onSuccess: (resp: loginGuardianResponse) => {
-          const success = resp.data as GuardianLoginOutputBody;
-          localStorage.setItem("token", success.token);
-          setJWT(success.token);
-          localStorage.setItem("guardian_id", success.guardian_id);
-          setGuardianId(success.guardian_id);
-          navigate("/");
-        },
-        onError: (err) => {
-          const fail = err as unknown as { data?: { message?: string }};
-          onError(fail.data?.message ?? "An unexpected error occurred");
-        },
-      },
-    );
-  };
+			setIsLoading(false);
+		};
+		checkAlreadyAuth();
+	}, []);
 
-  const signup = (
-    name: string,
-    email: string,
-    username: string,
-    password: string,
-    language_preference: string,
-    profile_picture_s3_key: string | undefined,
-    onError: (msg: string) => void,
-  ) => {
-    signupFunc(
-      {
-        data: {
-          name,
-          email,
-          username,
-          password,
-          language_preference,
-          profile_picture_s3_key,
-        },
-      },
-      {
-        onSuccess: (resp: signupGuardianResponse) => {
-          const success = resp.data as GuardianSignUpOutputBody;
-          console.log(JSON.stringify(resp));
-          localStorage.setItem("token", success.token);
-          setJWT(success.token);
-          localStorage.setItem("guardian_id", success.guardian_id);
-          setGuardianId(success.guardian_id);
-          navigate("/")
-        },
-        onError: (err) => {
-          const fail = err as unknown as { data?: { message?: string }};
-          onError(
-            fail.data?.message ?? "An unexpected error occurred",
-          );
-        },
-      },
-    );
-  };
+	const login = (
+		email: string,
+		password: string,
+		onError: (msg: string) => void,
+	) => {
+		loginFunc(
+			{ data: { email, password } },
+			{
+				onSuccess: (resp: loginManagerResponse) => {
+					const success = resp.data as ManagerLoginOutputBody;
+					localStorage.setItem("jwt", success.token);
+					setJWT(success.token);
+					localStorage.setItem("manager_id", success.manager_id);
+					setManagerId(success.manager_id);
+					navigate("/");
+				},
+				onError: (err) => {
+					const fail = err as unknown as { data?: { message?: string } };
+					onError(fail.data?.message ?? "An unexpected error occurred");
+				},
+			},
+		);
+	};
 
-  const logout = () => {
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("userId");
-    setJWT(null);
-    setGuardianId(null);
-    navigate("/login");
-  };
+	const signup = (
+		name: string,
+		email: string,
+		username: string,
+		password: string,
+		language_preference: string,
+		organization_id: string,
+		role: string,
+		profile_picture_s3_key: string | undefined,
+		onError: (msg: string) => void,
+	) => {
+		signupFunc(
+			{
+				data: {
+					email,
+					password,
+					language_preference,
+					name,
+					organization_id,
+					profile_picture_s3_key,
+					role,
+					username,
+				},
+			},
+			{
+				onSuccess: (resp: signupManagerResponse) => {
+					const success = resp.data as ManagerSignUpOutputBody;
+					console.log(JSON.stringify(resp));
+					localStorage.setItem("jwt", success.token);
+					setJWT(success.token);
+					localStorage.setItem("guardian_id", success.manager_id);
+					setManagerId(success.manager_id);
+					navigate("/");
+				},
+				onError: (err) => {
+					const fail = err as unknown as { data?: { message?: string } };
+					onError(fail.data?.message ?? "An unexpected error occurred");
+				},
+			},
+		);
+	};
 
-  return (
-    <AuthContext.Provider
-      value={{
-        guardianId,
-        jwt,
-        isAuthenticated: !!(jwt && guardianId),
-        isLoading,
-        login,
-        signup,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+	const logout = () => {
+		localStorage.removeItem("jwt");
+		localStorage.removeItem("manager_id");
+		setJWT(null);
+		setManagerId(null);
+		navigate("/login");
+	};
+
+	return (
+		<AuthContext.Provider
+			value={{
+				managerId: managerId,
+				jwt,
+				isAuthenticated: !!(jwt && managerId),
+				isLoading,
+				login,
+				signup,
+				logout,
+			}}
+		>
+			{children}
+		</AuthContext.Provider>
+	);
 }
