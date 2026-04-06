@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuthContext } from "../contexts/use-auth-context";
 import { useNavigate } from "react-router-dom";
@@ -14,9 +14,9 @@ type SignupFormData = {
 	profile_picture_s3_key: string | undefined;
 };
 
-function SignUp() {
+export default function SignUp() {
 	const [errorText, setErrorText] = useState("");
-	const { signup } = useAuthContext();
+	const { signup, isAuthenticated } = useAuthContext();
 	const navigate = useNavigate();
 
 	const { register, handleSubmit } = useForm<SignupFormData>({
@@ -57,6 +57,12 @@ function SignUp() {
 			);
 		}
 	};
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigate("/");
+		}
+	}, [navigate, isAuthenticated]);
 
 	return (
 		<div className="flex flex-col items-center justify-center h-screen">
@@ -107,5 +113,3 @@ function SignUp() {
 		</div>
 	);
 }
-
-export default SignUp;

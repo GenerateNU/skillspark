@@ -53,11 +53,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				setJWT(storedJwt);
 				setManagerId(storedManagerId);
 			}
-
 			setIsLoading(false);
 		};
 		checkAlreadyAuth();
-	}, []);
+	}, [navigate]);
 
 	const login = (
 		email: string,
@@ -110,7 +109,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			{
 				onSuccess: (resp: signupManagerResponse) => {
 					const success = resp.data as ManagerSignUpOutputBody;
-					console.log(JSON.stringify(resp));
 					localStorage.setItem("jwt", success.token);
 					setJWT(success.token);
 					localStorage.setItem("guardian_id", success.manager_id);

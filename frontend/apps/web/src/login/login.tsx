@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuthContext } from "../contexts/use-auth-context";
 import { useNavigate } from "react-router-dom";
 import { AuthProvider } from "../contexts/auth-context";
@@ -11,7 +11,7 @@ type LoginFormData = {
 
 export default function Login() {
 	const [errorText, setErrorText] = useState("");
-	const { login } = useAuthContext();
+	const { login, isAuthenticated } = useAuthContext();
 	const navigate = useNavigate();
 
 	const { register, handleSubmit } = useForm<LoginFormData>({
@@ -28,6 +28,12 @@ export default function Login() {
 			login(formData.email, formData.password, setErrorText);
 		}
 	};
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigate("/");
+		}
+	}, [navigate, isAuthenticated]);
 
 	return (
 		<AuthProvider>
