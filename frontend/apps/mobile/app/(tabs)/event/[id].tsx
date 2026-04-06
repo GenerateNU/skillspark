@@ -1,19 +1,16 @@
 import { Image } from "expo-image";
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetEventOccurrencesById } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { AppColors } from "@/constants/theme";
 import { AboutPage } from "@/components/AboutPage";
 import { formatDuration } from "@/utils/format";
 
@@ -30,12 +27,13 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
   const address = formatAddress(occurrence);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F4F6F8" }}>
+    <View className="flex-1 bg-gray-100">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <View style={{ height: 250, backgroundColor: "#1a1a1a" }}>
+        {/* Header image */}
+        <View className="h-64 bg-gray-900">
           {occurrence.event.presigned_url ? (
             <Image
               source={{ uri: occurrence.event.presigned_url }}
@@ -43,54 +41,45 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
               contentFit="cover"
             />
           ) : (
-            <View style={{ flex: 1, backgroundColor: "#C5C5C5" }} />
+            <View className="flex-1 bg-gray-300" />
           )}
           <TouchableOpacity
             onPress={() => router.back()}
             activeOpacity={0.7}
-            style={{
-              position: "absolute",
-              top: insets.top + 8,
-              left: 16,
-              zIndex: 10,
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#fff",
-              borderRadius: 999,
-              paddingHorizontal: 16,
-              paddingVertical: 10,
-              shadowColor: "#000",
-              shadowOpacity: 0.15,
-              shadowRadius: 8,
-              elevation: 10,
-            }}
+            style={{ top: insets.top + 8 }}
+            className="absolute left-4 z-10 flex-row items-center bg-white rounded-full px-4 py-2.5 shadow-md"
           >
-            <MaterialIcons name="chevron-left" size={20} color={AppColors.primaryText} />
-            <Text style={{ fontSize: 15, color: AppColors.primaryText, fontWeight: "500" }}>Back</Text>
+            <MaterialIcons name="chevron-left" size={20} color="#1a1a1a" />
+            <Text className="text-base text-gray-900 font-medium">Back</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={{ backgroundColor: "#fff", borderTopLeftRadius: 28, borderTopRightRadius: 28, marginTop: -28, padding: 22 }}>
+        {/* Content card */}
+        <View className="bg-white rounded-t-3xl -mt-7 px-6 pt-6 pb-6">
           {/* Title */}
-          <Text style={{ fontSize: 26, fontWeight: "700", color: AppColors.primaryText, letterSpacing: -0.5, marginBottom: 6 }}>
+          <Text className="text-2xl font-bold text-gray-900 tracking-tight mb-1.5">
             {occurrence.event.title}
           </Text>
 
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 20 }}>
-            <MaterialIcons name="location-on" size={16} color={AppColors.secondaryText} />
-            <Text style={{ fontSize: 13, color: AppColors.secondaryText }}>{address}</Text>
+          {/* Location */}
+          <View className="flex-row items-center gap-1.5 mb-5">
+            <MaterialIcons name="location-on" size={16} color="#6b7280" />
+            <Text className="text-sm text-gray-500">{address}</Text>
           </View>
 
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <Text style={{ fontSize: 22, fontWeight: "700", color: AppColors.primaryText }}>{duration}</Text>
-            <View style={{ alignItems: "flex-end" }}>
-              <Text style={{ fontSize: 20, fontWeight: "700", color: AppColors.primaryText }}>{occurrence.price} THB</Text>
-              <Text style={{ fontSize: 12, color: AppColors.subtleText }}>/Session</Text>
+          {/* Duration + price */}
+          <View className="flex-row justify-between items-center mb-5">
+            <Text className="text-2xl font-bold text-gray-900">{duration}</Text>
+            <View className="items-end">
+              <Text className="text-xl font-bold text-gray-900">{occurrence.price} THB</Text>
+              <Text className="text-xs text-gray-400">/Session</Text>
             </View>
           </View>
 
-          <View style={{ borderBottomWidth: 1, borderStyle: "dashed", borderColor: AppColors.borderLight, marginBottom: 20 }} />
+          {/* Divider */}
+          <View className="border-b border-dashed border-gray-200 mb-5" />
 
+          {/* About section */}
           <AboutPage
             description={occurrence.event.description}
             links={occurrence.org_links ?? []}
@@ -98,29 +87,17 @@ function EventOccurrenceDetail({ occurrence }: { occurrence: EventOccurrence }) 
         </View>
       </ScrollView>
 
-      <View style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "#fff",
-        paddingHorizontal: 22,
-        paddingTop: 12,
-        paddingBottom: insets.bottom + 12,
-        borderTopWidth: 1,
-        borderColor: AppColors.borderLight,
-      }}>
+      {/* Register button pinned at bottom */}
+      <View
+        className="absolute bottom-0 left-0 right-0 bg-white px-6 pt-3 border-t border-gray-100"
+        style={{ paddingBottom: insets.bottom + 12 }}
+      >
         <TouchableOpacity
           onPress={() => {}}
           activeOpacity={0.7}
-          style={{
-            backgroundColor: AppColors.primaryText,
-            borderRadius: 16,
-            paddingVertical: 16,
-            alignItems: "center",
-          }}
+          className="bg-gray-900 rounded-2xl py-4 items-center"
         >
-          <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700" }}>Register</Text>
+          <Text className="text-white text-lg font-bold">Register</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -133,7 +110,7 @@ export default function EventOccurrenceScreen() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -141,8 +118,8 @@ export default function EventOccurrenceScreen() {
 
   if (error || !response || response.status !== 200) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 24 }}>
-        <Text style={{ color: AppColors.danger, fontWeight: "600", fontSize: 16 }}>
+      <View className="flex-1 items-center justify-center p-6">
+        <Text className="text-red-500 font-semibold text-base">
           Event not found
         </Text>
       </View>

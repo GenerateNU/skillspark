@@ -1,16 +1,7 @@
 import { Pressable, Text, View } from "react-native";
-import { useCallback, useState } from "react";
-import * as WebBrowser from "expo-web-browser";
+import { useState } from "react";
 import type { OrgLink } from "@skillspark/api-client";
-import { AppColors } from "@/constants/theme";
-
-function useOrgLinks(links: OrgLink[]) {
-  const openLink = useCallback(async (href: string) => {
-    await WebBrowser.openBrowserAsync(href);
-  }, []);
-
-  return { openLink, hasLinks: links.length > 0 };
-}
+import { useOrgLinks } from "@/hooks/useOrgLinks";
 
 interface AboutPageProps {
   description: string;
@@ -24,56 +15,50 @@ export function AboutPage({ description, links }: AboutPageProps) {
 
   return (
     <View>
-      <Text style={{ fontSize: 18, fontWeight: "700", color: AppColors.primaryText, marginBottom: 10 }}>
-        About
-      </Text>
+      <Text className="text-lg font-bold text-gray-900 mb-2.5">About</Text>
 
       <Text
         numberOfLines={expanded ? undefined : 4}
         onTextLayout={(e) => {
           if (!expanded) setTruncated(e.nativeEvent.lines.length >= 4);
         }}
-        style={{ fontSize: 14, color: AppColors.secondaryText, lineHeight: 22, marginBottom: 4 }}
+        className="text-sm text-gray-500 leading-relaxed mb-1"
       >
         {description}
       </Text>
 
       {truncated && (
-        <Pressable onPress={() => setExpanded((p) => !p)} style={{ marginBottom: 16 }}>
-          <Text style={{ fontSize: 13, color: AppColors.primaryText, fontWeight: "600" }}>
+        <Pressable onPress={() => setExpanded((p) => !p)} className="mb-4">
+          <Text className="text-sm text-gray-900 font-semibold">
             {expanded ? "See less" : "See more"}
           </Text>
         </Pressable>
       )}
 
-      {!truncated && <View style={{ marginBottom: 16 }} />}
+      {!truncated && <View className="mb-4" />}
 
       {hasLinks && (
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-        {links.map((link, index) => (
-          <Pressable
-            key={index}
-            onPress={() => openLink(link.href)}
-            style={({ pressed }) => ({
-              borderRadius: 999,
-              paddingHorizontal: 20,
-              paddingVertical: 10,
-              backgroundColor: pressed ? "#F3F4F6" : "#fff",
-              alignItems: "center",
-              shadowColor: "#000",
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              shadowOffset: { width: 0, height: 2 },
-              elevation: 4,
-            })}
-          >
-            <Text style={{ fontSize: 14, color: AppColors.primaryText, fontWeight: "600" }}>
-              {link.label}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-    )}
+        <View className="flex-row flex-wrap gap-2.5">
+          {links.map((link, index) => (
+            <Pressable
+              key={index}
+              onPress={() => openLink(link.href)}
+              className="rounded-full px-5 py-2.5 bg-white items-center shadow"
+              style={{
+                shadowColor: "#000",
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                shadowOffset: { width: 0, height: 2 },
+                elevation: 4,
+              }}
+            >
+              <Text className="text-sm text-gray-900 font-semibold">
+                {link.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
