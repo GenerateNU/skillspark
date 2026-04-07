@@ -22,8 +22,8 @@ WHERE EXISTS (
     WHERE eo.event_id = e.id
       AND eo.status = 'scheduled'
       AND eo.start_time > NOW()
-      AND ($5::timestamp IS NULL OR eo.start_time >= $5)
-      AND ($6::timestamp IS NULL OR eo.start_time <= $6)
+      AND ($5::timestamptz IS NULL OR eo.start_time >= $5)
+      AND ($6::timestamptz IS NULL OR eo.start_time <= $6)
 )
 AND (
     $2::int IS NULL OR e.age_range_min IS NULL OR (EXTRACT(YEAR FROM NOW()) - $2) >= e.age_range_min
