@@ -37,8 +37,14 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 			}
 		}
 
+		var about *string
+		if formData.About != "" {
+			about = &formData.About
+		}
+
 		organizationBody := models.CreateOrganizationBody{
 			Name:       formData.Name,
+			About:      about,
 			Active:     &formData.Active,
 			LocationID: &formData.LocationID,
 			Links:      links,
@@ -50,6 +56,7 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 
 		updateBody := models.UpdateOrganizationBody{
 			Name:       &formData.Name,
+			About:      about,
 			Active:     &formData.Active,
 			LocationID: &formData.LocationID,
 		}
@@ -141,8 +148,14 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 			}
 		}
 
+		var about *string
+		if formData.About != "" {
+			about = &formData.About
+		}
+
 		organizationBody := models.UpdateOrganizationBody{
 			Name:       &formData.Name,
+			About:      about,
 			Active:     &formData.Active,
 			LocationID: &formData.LocationID,
 			Links:      &links,

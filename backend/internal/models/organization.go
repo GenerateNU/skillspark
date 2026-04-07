@@ -15,6 +15,7 @@ type OrgLink struct {
 type Organization struct {
 	ID                     uuid.UUID  `json:"id" db:"id"`
 	Name                   string     `json:"name" db:"name"`
+	About                  *string    `json:"about,omitempty" db:"about"`
 	Active                 bool       `json:"active" db:"active"`
 	Links                  []OrgLink  `json:"links" db:"links"`
 	PfpS3Key               *string    `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
@@ -34,6 +35,7 @@ type CreateOrganizationRouteInput struct {
 // CreateOrganizationFormData holds the parsed form data for creating an organization
 type UpdateOrganizationFormData struct {
 	Name         string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
+	About        string        `form:"about"`
 	Active       bool          `form:"active"`
 	LocationID   uuid.UUID     `form:"location_id"`
 	ProfileImage huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
@@ -42,6 +44,7 @@ type UpdateOrganizationFormData struct {
 
 type CreateOrganizationFormData struct {
 	Name         string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
+	About        string        `form:"about"`
 	Active       bool          `form:"active"`
 	LocationID   uuid.UUID     `form:"location_id"`
 	Links        string        `form:"links"`
@@ -55,6 +58,7 @@ type UpdateOrganizationRouteInput struct {
 
 type CreateOrganizationBody struct {
 	Name       string     `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
+	About      *string    `json:"about,omitempty" doc:"Short description of the organization"`
 	Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
 	LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
 	Links      []OrgLink  `json:"links,omitempty" doc:"List of links associated with the organization"`
@@ -62,6 +66,7 @@ type CreateOrganizationBody struct {
 
 type UpdateOrganizationBody struct {
 	Name       *string    `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
+	About      *string    `json:"about,omitempty" doc:"Short description of the organization"`
 	Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
 	LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
 	Links      *[]OrgLink `json:"links,omitempty" doc:"List of links associated with the organization"`

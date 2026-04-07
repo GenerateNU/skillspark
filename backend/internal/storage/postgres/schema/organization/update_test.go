@@ -94,7 +94,8 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	require.Nil(t, updateErr)
 	require.NotNil(t, updated)
 	assert.Equal(t, "Test Org with Location", updated.Name)
-	assert.Equal(t, newLocationID, updated.LocationID)
+	require.NotNil(t, updated.LocationID)
+	assert.Equal(t, newLocationID, *updated.LocationID)
 	assert.Nil(t, updated.StripeAccountID)
 	assert.False(t, updated.StripeAccountActivated)
 }
