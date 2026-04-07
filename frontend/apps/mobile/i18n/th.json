@@ -19,6 +19,8 @@
     "noEventsAvailable": "ไม่มีกิจกรรม",
     "noUpcomingEvents": "ไม่มีกิจกรรมที่จะมาถึง",
     "noGuardianId": "ไม่สามารถโหลดได้: ไม่พบบัญชี",
+    "noEventId": "โหลดไม่ได้: ไม่พบรหัสเหตุการณ์",
+    "noReviewsAvailable": "ไม่มีบทวิจารณ์", 
     "noChildrenFound": "ไม่พบข้อมูลเด็ก",
     "noChildProfilesAdded": "ยังไม่มีโปรไฟล์เด็ก",
     "noEmergencyContactsAdded": "ยังไม่มีผู้ติดต่อฉุกเฉิน",
@@ -162,6 +164,28 @@
     "deleteTitle": "ลบกิจกรรมที่บันทึก",
     "deleteConfirm": "คุณต้องการลบกิจกรรมที่บันทึกนี้ใช่ไหม?"
   },
+  "review": {
+    "title": "บทวิจารณ์",
+    "bad": "ไม่ดี",
+    "okay": "โอเค",
+    "good": "น่าพึงพอใจ",
+    "terrible": "แย่มาก",
+    "excellent": "ดีเยี่ยม",
+    "noReviews": "ไม่มีความคิดเห็น",
+    "mostRecent": "ล่าสุด",
+    "highest": "สูงสุด",
+    "lowest": "ต่ำสุด",
+    "reviews": "รีวิว"
+  },
+  "time": {
+    "today": "วันนี้",
+    "oneDayAgo": "1 วันที่แล้ว",
+    "daysAgo": "หลายวันก่อน",
+    "oneMonthAgo": "1 เดือนที่แล้ว",
+    "monthsAgo": "หลายเดือนก่อน",
+    "oneYearAgo": "1 ปีที่แล้ว",
+    "yearsAgo": "หลายปีที่แล้ว"
+  },
   "event": {
     "back": "กลับ",
     "seeMore": "ดูเพิ่มเติม",
@@ -199,6 +223,14 @@
     "miles": "ไมล์",
     "stars": "ดาว"
   },
+  "org": {
+    "about": "เกี่ยวกับ",
+    "noDescription": "ไม่มีคำอธิบาย",
+    "seeSchedule": "ดูตารางเวลา",
+    "notFound": "ไม่พบองค์กร",
+    "bookingsThisWeek": "การจองสัปดาห์นี้",
+    "reviews": "รีวิว"
+  },
   "interests": {
     "science": "วิทยาศาสตร์",
     "math": "คณิตศาสตร์",
@@ -208,5 +240,13 @@
     "technology": "เทคโนโลยี",
     "language": "ภาษา",
     "other": "อื่นๆ"
+  },
+  "editProfile": {
+    "title": "ข้อมูลครอบครัว",
+    "subtitle": "แก้ไขโปรไฟล์",
+    "name": "ชื่อ",
+    "username": "ชื่อผู้ใช้",
+    "changeImage": "เปลี่ยนรูปภาพ",
+    "saveChanges": "บันทึกการเปลี่ยนแปลง"
   }
 }
