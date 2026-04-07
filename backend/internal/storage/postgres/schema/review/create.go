@@ -18,6 +18,7 @@ func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.Creat
 	row := r.db.QueryRow(ctx, query,
 		input.Body.RegistrationID,
 		input.Body.GuardianID,
+		input.Body.Rating,
 		input.Body.Description_EN,
 		input.Body.Description_TH,
 		input.Body.Categories,
@@ -26,7 +27,7 @@ func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.Creat
 	var createdReview models.Review
 	var descEN, descTH string
 
-	err = row.Scan(&createdReview.ID, &createdReview.RegistrationID, &createdReview.GuardianID, &descEN, &descTH, &createdReview.Categories, &createdReview.CreatedAt, &createdReview.UpdatedAt)
+	err = row.Scan(&createdReview.ID, &createdReview.RegistrationID, &createdReview.GuardianID, &createdReview.EventID, &createdReview.Rating, &descEN, &descTH, &createdReview.Categories, &createdReview.CreatedAt, &createdReview.UpdatedAt)
 
 	if err != nil {
 		err := errs.InternalServerError("Failed to create child: ", err.Error())

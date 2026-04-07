@@ -11,7 +11,6 @@ func (h *Handler) CreateEventOccurrence(ctx context.Context, input *models.Creat
 	// check that foreign keys exist in the database
 	managerId := input.Body.ManagerId
 	eventId := input.Body.EventId
-	locationId := input.Body.LocationId
 
 	var managerErr error
 	if managerId != nil {
@@ -19,10 +18,9 @@ func (h *Handler) CreateEventOccurrence(ctx context.Context, input *models.Creat
 	}
 
 	_, eventErr := h.EventRepository.GetEventByID(ctx, eventId, input.AcceptLanguage)
-	_, locationErr := h.LocationRepository.GetLocationByID(ctx, locationId)
 
-	if managerErr != nil || eventErr != nil || locationErr != nil {
-		return nil, cmp.Or(managerErr, eventErr, locationErr)
+	if managerErr != nil || eventErr != nil {
+		return nil, cmp.Or(managerErr, eventErr)
 	}
 
 	eventOccurrence, err := h.EventOccurrenceRepository.CreateEventOccurrence(ctx, input)

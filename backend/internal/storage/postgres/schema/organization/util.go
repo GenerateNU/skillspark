@@ -5,6 +5,7 @@ import (
 	"embed"
 	"encoding/json"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/location"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -26,6 +27,8 @@ func CreateTestOrganization(
 	i := &models.CreateOrganizationInput{}
 	i.Body.Name = "Test Corp"
 	i.Body.Active = &active
+	locationID := location.CreateTestLocation(t, ctx, db).ID
+	i.Body.LocationID = &locationID
 
 	organization, _ := repo.CreateOrganization(ctx, i, nil)
 

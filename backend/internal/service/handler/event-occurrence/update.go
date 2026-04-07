@@ -30,11 +30,6 @@ func (h *Handler) UpdateEventOccurrence(ctx context.Context, input *models.Updat
 		_, eventErr = h.EventRepository.GetEventByID(ctx, *eventId, input.AcceptLanguage)
 	}
 
-	locationId := input.Body.LocationId
-	if locationId != nil {
-		_, locationErr = h.LocationRepository.GetLocationByID(ctx, *locationId)
-	}
-
 	if managerErr != nil || eventErr != nil || locationErr != nil {
 		return nil, cmp.Or(managerErr, eventErr, locationErr)
 	}

@@ -41,6 +41,6 @@ SELECT
     o.links
 FROM event_occurrence eo
 JOIN event e ON e.id = eo.event_id
-JOIN location l ON l.id = eo.location_id
 JOIN organization o ON o.id = e.organization_id
+LEFT JOIN location l ON l.id = o.location_id
 WHERE eo.id = $1;

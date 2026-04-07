@@ -516,3 +516,101 @@ func TestHandler_GetReviewsByGuardianID(t *testing.T) {
 		})
 	}
 }
+
+func TestHandler_GetAggregateReviews(t *testing.T) {
+	tests := []struct {
+		name      string
+		eventID   uuid.UUID
+		mockSetup func(*repomocks.MockEventRepository, *repomocks.MockReviewRepository)
+		wantAgg   *models.ReviewAggregate
+		wantErr   bool
+	}{
+		{
+			name:    "successful aggregate",
+			eventID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+			mockSetup: func(eventRepo *repomocks.MockEventRepository, reviewRepo *repomocks.MockReviewRepository) {
+				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111111"), "en-US").
+					Return(&models.Event{
+						ID: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+					}, nil)
+				reviewRepo.On("GetAggregateReviews", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111111")).
+					Return(&models.ReviewAggregate{
+						EventID:       uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						TotalReviews:  5,
+						AverageRating: 4.2,
+						Breakdown: []models.ReviewRatingCount{
+							{Rating: 1, ReviewCount: 0},
+							{Rating: 2, ReviewCount: 0},
+							{Rating: 3, ReviewCount: 1},
+							{Rating: 4, ReviewCount: 2},
+							{Rating: 5, ReviewCount: 2},
+						},
+					}, nil)
+			},
+			wantAgg: &models.ReviewAggregate{
+				EventID:       uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+				TotalReviews:  5,
+				AverageRating: 4.2,
+				Breakdown: []models.ReviewRatingCount{
+					{Rating: 1, ReviewCount: 0},
+					{Rating: 2, ReviewCount: 0},
+					{Rating: 3, ReviewCount: 1},
+					{Rating: 4, ReviewCount: 2},
+					{Rating: 5, ReviewCount: 2},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "event not found",
+			eventID: uuid.MustParse("11111111-1111-1111-1111-111111111112"),
+			mockSetup: func(eventRepo *repomocks.MockEventRepository, reviewRepo *repomocks.MockReviewRepository) {
+				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111112"), "en-US").
+					Return(nil, errs.BadRequest("event not found"))
+			},
+			wantAgg: nil,
+			wantErr: true,
+		},
+		{
+			name:    "review repository error",
+			eventID: uuid.MustParse("11111111-1111-1111-1111-111111111113"),
+			mockSetup: func(eventRepo *repomocks.MockEventRepository, reviewRepo *repomocks.MockReviewRepository) {
+				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111113"), "en-US").
+					Return(&models.Event{
+						ID: uuid.MustParse("11111111-1111-1111-1111-111111111113"),
+					}, nil)
+				reviewRepo.On("GetAggregateReviews", mock.Anything, uuid.MustParse("11111111-1111-1111-1111-111111111113")).
+					Return(nil, errs.BadRequest("cannot fetch aggregate reviews"))
+			},
+			wantAgg: nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			mockEventRepo := new(repomocks.MockEventRepository)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
+			tt.mockSetup(mockEventRepo, mockReviewRepo)
+			handler := &Handler{
+				EventRepository:  mockEventRepo,
+				ReviewRepository: mockReviewRepo,
+			}
+			aggregate, err := handler.GetAggregateReviews(context.Background(), tt.eventID)
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, aggregate)
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, aggregate)
+				assert.Equal(t, tt.wantAgg.EventID, aggregate.EventID)
+				assert.Equal(t, tt.wantAgg.TotalReviews, aggregate.TotalReviews)
+				assert.InDelta(t, tt.wantAgg.AverageRating, aggregate.AverageRating, 0.01)
+				assert.Equal(t, tt.wantAgg.Breakdown, aggregate.Breakdown)
+			}
+			mockEventRepo.AssertExpectations(t)
+			mockReviewRepo.AssertExpectations(t)
+		})
+	}
+}

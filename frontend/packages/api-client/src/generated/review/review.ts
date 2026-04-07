@@ -30,7 +30,8 @@ import type {
   ErrorModel,
   GetReviewByEventIdParams,
   GetReviewByGuardianIdParams,
-  Review
+  Review,
+  ReviewAggregate
 } from '../skillSparkAPI.schemas';
 
 import { customInstance } from '../../apiClient';
@@ -378,6 +379,124 @@ export function useGetReviewByEventId<TData = Awaited<ReturnType<typeof getRevie
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetReviewByEventIdQueryOptions(id,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+/**
+ * Get review aggregate by event id
+ * @summary Get review aggregate by event id
+ */
+export type getReviewAggregateResponse200 = {
+  data: ReviewAggregate
+  status: 200
+}
+
+export type getReviewAggregateResponseDefault = {
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type getReviewAggregateResponseSuccess = (getReviewAggregateResponse200) & {
+  headers: Headers;
+};
+export type getReviewAggregateResponseError = (getReviewAggregateResponseDefault) & {
+  headers: Headers;
+};
+
+export type getReviewAggregateResponse = (getReviewAggregateResponseSuccess | getReviewAggregateResponseError)
+
+export const getGetReviewAggregateUrl = (id: string,) => {
+
+
+  
+
+  return `/api/v1/review/event_aggregate/${id}`
+}
+
+export const getReviewAggregate = async (id: string, options?: RequestInit): Promise<getReviewAggregateResponse> => {
+  
+  return customInstance<getReviewAggregateResponse>(getGetReviewAggregateUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetReviewAggregateQueryKey = (id: string,) => {
+    return [
+    `/api/v1/review/event_aggregate/${id}`
+    ] as const;
+    }
+
+    
+export const getGetReviewAggregateQueryOptions = <TData = Awaited<ReturnType<typeof getReviewAggregate>>, TError = ErrorModel>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReviewAggregate>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetReviewAggregateQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getReviewAggregate>>> = ({ signal }) => getReviewAggregate(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getReviewAggregate>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetReviewAggregateQueryResult = NonNullable<Awaited<ReturnType<typeof getReviewAggregate>>>
+export type GetReviewAggregateQueryError = ErrorModel
+
+
+export function useGetReviewAggregate<TData = Awaited<ReturnType<typeof getReviewAggregate>>, TError = ErrorModel>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReviewAggregate>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReviewAggregate>>,
+          TError,
+          Awaited<ReturnType<typeof getReviewAggregate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetReviewAggregate<TData = Awaited<ReturnType<typeof getReviewAggregate>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReviewAggregate>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReviewAggregate>>,
+          TError,
+          Awaited<ReturnType<typeof getReviewAggregate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetReviewAggregate<TData = Awaited<ReturnType<typeof getReviewAggregate>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReviewAggregate>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get review aggregate by event id
+ */
+
+export function useGetReviewAggregate<TData = Awaited<ReturnType<typeof getReviewAggregate>>, TError = ErrorModel>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReviewAggregate>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetReviewAggregateQueryOptions(id,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

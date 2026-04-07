@@ -5,11 +5,11 @@ import (
 	"os"
 	"path/filepath"
 	"skillspark/internal/config"
+	notifications "skillspark/internal/notification"
 	"skillspark/internal/s3_client"
 	"skillspark/internal/service"
 	"skillspark/internal/storage"
 	"skillspark/internal/stripeClient"
-	notifications "skillspark/internal/notification"
 	translations "skillspark/internal/translation"
 
 	"gopkg.in/yaml.v3"
@@ -37,8 +37,21 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to create Stripe Client: %v\n", err)
 	}
 
+	// genapi only registers routes to produce the OpenAPI spec — no real API calls
+	// are ever made, so a placeholder key is sufficient.
+	if os.Getenv("OPENCAGE_API_KEY") == "" {
+		err = os.Setenv("OPENCAGE_API_KEY", "genapi-placeholder")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to set env value %v\n", err)
+		}
+	}
+
 	// Initialize app to get Huma API
-	_, humaAPI := service.SetupApp(cfg, repo, s3Client, translateClient, newStripeClient, *notificationsService)
+	_, humaAPI, err := service.SetupApp(cfg, repo, s3Client, translateClient, newStripeClient, *notificationsService)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to setup app: %v\n", err)
+		os.Exit(1)
+	}
 
 	// Get OpenAPI spec
 	openAPI := humaAPI.OpenAPI()

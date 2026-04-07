@@ -139,6 +139,14 @@ export interface CreateChildInputBody {
   school_id: string;
 }
 
+export interface CreateEmergencyContactInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  guardian_id: string;
+  name: string;
+  phone_number: string;
+}
+
 export interface CreateEventOccurrenceInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -154,8 +162,6 @@ export interface CreateEventOccurrenceInputBody {
    * @maxLength 30
    */
   language: string;
-  /** ID of a location in the database */
-  location_id: string;
   /** ID of a manager in the database */
   manager_id?: string;
   /**
@@ -201,17 +207,17 @@ export interface CreateLocationInputBody {
    */
   district: string;
   /**
-   * Latitude of the location
+   * Optional latitude of the location; validated against geocoded coordinates when provided
    * @minimum -90
    * @maximum 90
    */
-  latitude: number;
+  latitude?: number;
   /**
-   * Longitude of the location
+   * Optional longitude of the location; validated against geocoded coordinates when provided
    * @minimum -180
    * @maximum 180
    */
-  longitude: number;
+  longitude?: number;
   /**
    * Postal code of the location
    * @minLength 3
@@ -253,7 +259,7 @@ export interface Organization {
   created_at: string;
   id: string;
   links: OrgLink[];
-  location_id?: string;
+  location_id: string;
   name: string;
   pfp_s3_key?: string;
   presigned_url: string;
@@ -304,6 +310,8 @@ export interface CreateReviewInputBody {
   description: string;
   /** ID of the guardian */
   guardian_id: string;
+  /** Rating left with the review, can be 1-5 inclusive */
+  rating: number;
   /** ID of the linked registration */
   registration_id: string;
 }
@@ -359,6 +367,17 @@ export interface DeleteSavedOutputBody {
   readonly $schema?: string;
   /** Success message */
   message: string;
+}
+
+export interface EmergencyContact {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  created_at: string;
+  guardian_id: string;
+  id: string;
+  name: string;
+  phone_number: string;
+  updated_at: string;
 }
 
 export interface ErrorDetail {
@@ -454,6 +473,25 @@ export interface EventOccurrence {
   updated_at: string;
 }
 
+export interface GeocodeAddressInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /**
+   * Text address to geocode
+   * @minLength 1
+   */
+  address: string;
+}
+
+export interface GeocodeAddressOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Latitude of the geocoded address */
+  latitude: number;
+  /** Longitude of the geocoded address */
+  longitude: number;
+}
+
 export interface PaymentMethodCard {
   brand: string;
   exp_month: number;
@@ -515,6 +553,7 @@ export interface GuardianLoginOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   guardian_id: string;
+  token: string;
 }
 
 export interface GuardianSignUpInputBody {
@@ -524,7 +563,7 @@ export interface GuardianSignUpInputBody {
   language_preference: string;
   name: string;
   password: string;
-  profile_picture_s3_key: string;
+  profile_picture_s3_key?: string;
   username: string;
 }
 
@@ -572,6 +611,7 @@ export interface ManagerLoginOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
   manager_id: string;
+  token: string;
 }
 
 export interface ManagerSignUpInputBody {
@@ -634,14 +674,32 @@ export interface Review {
   created_at: string;
   /** The review text */
   description: string;
+  /** ID of the event */
+  event_id: string;
   /** ID of the guardian */
   guardian_id: string;
   /** Unique review identifier */
   id: string;
+  /** Rating left with the review, can be 1-5 inclusive */
+  rating: number;
   /** ID of the linked registration */
   registration_id: string;
   /** Timestamp when registration was last updated */
   updated_at: string;
+}
+
+export interface ReviewRatingCount {
+  rating: number;
+  review_count: number;
+}
+
+export interface ReviewAggregate {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  average_rating: number;
+  breakdown: ReviewRatingCount[];
+  event_id: string;
+  total_reviews: number;
 }
 
 export interface Saved {
@@ -691,6 +749,14 @@ export interface UpdateChildInputBody {
   school_id?: string;
 }
 
+export interface UpdateEmergencyContactInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  guardian_id: string;
+  name: string;
+  phone_number: string;
+}
+
 export interface UpdateEventOccurrenceInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -716,8 +782,6 @@ export interface UpdateEventOccurrenceInputBody {
    * @maxLength 30
    */
   language?: string;
-  /** ID of a location in the database */
-  location_id?: string;
   /** ID of a manager in the database */
   manager_id?: string;
   /**
