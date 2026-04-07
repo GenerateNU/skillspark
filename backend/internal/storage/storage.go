@@ -144,7 +144,7 @@ type EmergencyContactRepository interface {
 }
 
 type RecommendationRepository interface {
-	GetRecommendationsByChildID(ctx context.Context, childInterests []string, childBirthYear int, acceptLanguage string, pagination utils.Pagination, minDate *time.Time, maxDate *time.Time) ([]models.Event, error)
+	GetRecommendationsForChildProfile(ctx context.Context, childInterests []string, childBirthYear int, acceptLanguage string, pagination utils.Pagination, minDate *time.Time, maxDate *time.Time) ([]models.Event, error)
 }
 
 type Repository struct {
