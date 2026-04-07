@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func Test_CreateTestManager(t *testing.T) {
+func Test_CreateTestEvent(t *testing.T) {
 	testDB := testutil.SetupTestDB(t)
 	ctx := context.Background()
 	t.Parallel()

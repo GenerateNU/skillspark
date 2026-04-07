@@ -111,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 					const success = resp.data as ManagerSignUpOutputBody;
 					localStorage.setItem("jwt", success.token);
 					setJWT(success.token);
-					localStorage.setItem("guardian_id", success.manager_id);
+					localStorage.setItem("manager_id", success.manager_id);
 					setManagerId(success.manager_id);
 					navigate("/");
 				},
