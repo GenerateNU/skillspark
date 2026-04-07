@@ -223,6 +223,14 @@
     "miles": "ไมล์",
     "stars": "ดาว"
   },
+  "org": {
+    "about": "เกี่ยวกับ",
+    "noDescription": "ไม่มีคำอธิบาย",
+    "seeSchedule": "ดูตารางเวลา",
+    "notFound": "ไม่พบองค์กร",
+    "bookingsThisWeek": "การจองสัปดาห์นี้",
+    "reviews": "รีวิว"
+  },
   "interests": {
     "science": "วิทยาศาสตร์",
     "math": "คณิตศาสตร์",
@@ -232,5 +240,13 @@
     "technology": "เทคโนโลยี",
     "language": "ภาษา",
     "other": "อื่นๆ"
+  },
+  "editProfile": {
+    "title": "ข้อมูลครอบครัว",
+    "subtitle": "แก้ไขโปรไฟล์",
+    "name": "ชื่อ",
+    "username": "ชื่อผู้ใช้",
+    "changeImage": "เปลี่ยนรูปภาพ",
+    "saveChanges": "บันทึกการเปลี่ยนแปลง"
   }
 }

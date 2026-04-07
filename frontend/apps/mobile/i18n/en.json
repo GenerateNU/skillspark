@@ -226,6 +226,14 @@
     "miles": "mi",
     "stars": "Stars"
   },
+  "org": {
+    "about": "About",
+    "noDescription": "No description available.",
+    "seeSchedule": "See Schedule",
+    "notFound": "Organization not found.",
+    "bookingsThisWeek": "Bookings this week",
+    "reviews": "Reviews"
+  },
   "interests": {
     "science": "Science",
     "math": "Math",
@@ -235,5 +243,13 @@
     "technology": "Technology",
     "language": "Language",
     "other": "Other"
+  },
+  "editProfile": {
+    "title": "Family Information",
+    "subtitle": "Edit Profile",
+    "name": "Name",
+    "username": "Username",
+    "changeImage": "Change Image",
+    "saveChanges": "Save Changes"
   }
 }
