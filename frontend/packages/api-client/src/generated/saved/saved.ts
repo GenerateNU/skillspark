@@ -7,57 +7,57 @@
  */
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
-	DataTag,
-	DefinedInitialDataOptions,
-	DefinedUseQueryResult,
-	MutationFunction,
-	QueryClient,
-	QueryFunction,
-	QueryKey,
-	UndefinedInitialDataOptions,
-	UseMutationOptions,
-	UseMutationResult,
-	UseQueryOptions,
-	UseQueryResult,
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
+  MutationFunction,
+  QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult,
 } from "@tanstack/react-query";
 
 import type {
-	CreateSavedInputBody,
-	DeleteSavedOutputBody,
-	ErrorModel,
-	GetSavedByGuardianIdParams,
-	Saved,
+  CreateSavedInputBody,
+  DeleteSavedOutputBody,
+  ErrorModel,
+  GetSavedByGuardianIdParams,
+  Saved,
 } from "../skillSparkAPI.schemas";
 
 import { customInstance } from "../../apiClient";
 
 // https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
 type IfEquals<X, Y, A = X, B = never> =
-	(<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
 
 type WritableKeys<T> = {
-	[P in keyof T]-?: IfEquals<
-		{ [Q in P]: T[P] },
-		{ -readonly [Q in P]: T[P] },
-		P
-	>;
+  [P in keyof T]-?: IfEquals<
+    { [Q in P]: T[P] },
+    { -readonly [Q in P]: T[P] },
+    P
+  >;
 }[keyof T];
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-	k: infer I,
+  k: infer I,
 ) => void
-	? I
-	: never;
+  ? I
+  : never;
 type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
 
 type Writable<T> = Pick<T, WritableKeys<T>>;
 type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
-	? {
-			[P in keyof Writable<T>]: T[P] extends object
-				? NonReadonly<NonNullable<T[P]>>
-				: T[P];
-		}
-	: DistributeReadOnlyOverUnions<T>;
+  ? {
+      [P in keyof Writable<T>]: T[P] extends object
+        ? NonReadonly<NonNullable<T[P]>>
+        : T[P];
+    }
+  : DistributeReadOnlyOverUnions<T>;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -65,125 +65,125 @@ export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
 export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
 export type HTTPStatusCode4xx =
-	| 400
-	| 401
-	| 402
-	| 403
-	| 404
-	| 405
-	| 406
-	| 407
-	| 408
-	| 409
-	| 410
-	| 411
-	| 412
-	| 413
-	| 414
-	| 415
-	| 416
-	| 417
-	| 418
-	| 419
-	| 420
-	| 421
-	| 422
-	| 423
-	| 424
-	| 426
-	| 428
-	| 429
-	| 431
-	| 451;
+  | 400
+  | 401
+  | 402
+  | 403
+  | 404
+  | 405
+  | 406
+  | 407
+  | 408
+  | 409
+  | 410
+  | 411
+  | 412
+  | 413
+  | 414
+  | 415
+  | 416
+  | 417
+  | 418
+  | 419
+  | 420
+  | 421
+  | 422
+  | 423
+  | 424
+  | 426
+  | 428
+  | 429
+  | 431
+  | 451;
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
 export type HTTPStatusCodes =
-	| HTTPStatusCode1xx
-	| HTTPStatusCode2xx
-	| HTTPStatusCode3xx
-	| HTTPStatusCode4xx
-	| HTTPStatusCode5xx;
+  | HTTPStatusCode1xx
+  | HTTPStatusCode2xx
+  | HTTPStatusCode3xx
+  | HTTPStatusCode4xx
+  | HTTPStatusCode5xx;
 
 /**
  * Creates a saved event
  * @summary Creates a saved event
  */
 export type createSavedResponse200 = {
-	data: Saved;
-	status: 200;
+  data: Saved;
+  status: 200;
 };
 
 export type createSavedResponseDefault = {
-	data: ErrorModel;
-	status: Exclude<HTTPStatusCodes, 200>;
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
 };
 
 export type createSavedResponseSuccess = createSavedResponse200 & {
-	headers: Headers;
+  headers: Headers;
 };
 export type createSavedResponseError = createSavedResponseDefault & {
-	headers: Headers;
+  headers: Headers;
 };
 
 export type createSavedResponse =
-	| createSavedResponseSuccess
-	| createSavedResponseError;
+  | createSavedResponseSuccess
+  | createSavedResponseError;
 
 export const getCreateSavedUrl = () => {
-	return `/api/v1/saved`;
+  return `/api/v1/saved`;
 };
 
 export const createSaved = async (
-	createSavedInputBody: NonReadonly<CreateSavedInputBody>,
-	options?: RequestInit,
+  createSavedInputBody: NonReadonly<CreateSavedInputBody>,
+  options?: RequestInit,
 ): Promise<createSavedResponse> => {
-	return customInstance<createSavedResponse>(getCreateSavedUrl(), {
-		...options,
-		method: "POST",
-		headers: { "Content-Type": "application/json", ...options?.headers },
-		body: JSON.stringify(createSavedInputBody),
-	});
+  return customInstance<createSavedResponse>(getCreateSavedUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createSavedInputBody),
+  });
 };
 
 export const getCreateSavedMutationOptions = <
-	TError = ErrorModel,
-	TContext = unknown,
+  TError = ErrorModel,
+  TContext = unknown,
 >(options?: {
-	mutation?: UseMutationOptions<
-		Awaited<ReturnType<typeof createSaved>>,
-		TError,
-		{ data: NonReadonly<CreateSavedInputBody> },
-		TContext
-	>;
-	request?: SecondParameter<typeof customInstance>;
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSaved>>,
+    TError,
+    { data: NonReadonly<CreateSavedInputBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-	Awaited<ReturnType<typeof createSaved>>,
-	TError,
-	{ data: NonReadonly<CreateSavedInputBody> },
-	TContext
+  Awaited<ReturnType<typeof createSaved>>,
+  TError,
+  { data: NonReadonly<CreateSavedInputBody> },
+  TContext
 > => {
-	const mutationKey = ["createSaved"];
-	const { mutation: mutationOptions, request: requestOptions } = options
-		? options.mutation &&
-			"mutationKey" in options.mutation &&
-			options.mutation.mutationKey
-			? options
-			: { ...options, mutation: { ...options.mutation, mutationKey } }
-		: { mutation: { mutationKey }, request: undefined };
+  const mutationKey = ["createSaved"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-	const mutationFn: MutationFunction<
-		Awaited<ReturnType<typeof createSaved>>,
-		{ data: NonReadonly<CreateSavedInputBody> }
-	> = (props) => {
-		const { data } = props ?? {};
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createSaved>>,
+    { data: NonReadonly<CreateSavedInputBody> }
+  > = (props) => {
+    const { data } = props ?? {};
 
-		return createSaved(data, requestOptions);
-	};
+    return createSaved(data, requestOptions);
+  };
 
-	return { mutationFn, ...mutationOptions };
+  return { mutationFn, ...mutationOptions };
 };
 
 export type CreateSavedMutationResult = NonNullable<
-	Awaited<ReturnType<typeof createSaved>>
+  Awaited<ReturnType<typeof createSaved>>
 >;
 export type CreateSavedMutationBody = NonReadonly<CreateSavedInputBody>;
 export type CreateSavedMutationError = ErrorModel;
@@ -192,243 +192,243 @@ export type CreateSavedMutationError = ErrorModel;
  * @summary Creates a saved event
  */
 export const useCreateSaved = <TError = ErrorModel, TContext = unknown>(
-	options?: {
-		mutation?: UseMutationOptions<
-			Awaited<ReturnType<typeof createSaved>>,
-			TError,
-			{ data: NonReadonly<CreateSavedInputBody> },
-			TContext
-		>;
-		request?: SecondParameter<typeof customInstance>;
-	},
-	queryClient?: QueryClient,
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createSaved>>,
+      TError,
+      { data: NonReadonly<CreateSavedInputBody> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
 ): UseMutationResult<
-	Awaited<ReturnType<typeof createSaved>>,
-	TError,
-	{ data: NonReadonly<CreateSavedInputBody> },
-	TContext
+  Awaited<ReturnType<typeof createSaved>>,
+  TError,
+  { data: NonReadonly<CreateSavedInputBody> },
+  TContext
 > => {
-	return useMutation(getCreateSavedMutationOptions(options), queryClient);
+  return useMutation(getCreateSavedMutationOptions(options), queryClient);
 };
 /**
  * Returns all saved events with the given guardian ID
  * @summary Get saved by guardian ID
  */
 export type getSavedByGuardianIdResponse200 = {
-	data: Saved[];
-	status: 200;
+  data: Saved[];
+  status: 200;
 };
 
 export type getSavedByGuardianIdResponseDefault = {
-	data: ErrorModel;
-	status: Exclude<HTTPStatusCodes, 200>;
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
 };
 
 export type getSavedByGuardianIdResponseSuccess =
-	getSavedByGuardianIdResponse200 & {
-		headers: Headers;
-	};
+  getSavedByGuardianIdResponse200 & {
+    headers: Headers;
+  };
 export type getSavedByGuardianIdResponseError =
-	getSavedByGuardianIdResponseDefault & {
-		headers: Headers;
-	};
+  getSavedByGuardianIdResponseDefault & {
+    headers: Headers;
+  };
 
 export type getSavedByGuardianIdResponse =
-	| getSavedByGuardianIdResponseSuccess
-	| getSavedByGuardianIdResponseError;
+  | getSavedByGuardianIdResponseSuccess
+  | getSavedByGuardianIdResponseError;
 
 export const getGetSavedByGuardianIdUrl = (
-	id: string,
-	params?: GetSavedByGuardianIdParams,
+  id: string,
+  params?: GetSavedByGuardianIdParams,
 ) => {
-	const normalizedParams = new URLSearchParams();
+  const normalizedParams = new URLSearchParams();
 
-	Object.entries(params || {}).forEach(([key, value]) => {
-		if (value !== undefined) {
-			normalizedParams.append(key, value === null ? "null" : value.toString());
-		}
-	});
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
 
-	const stringifiedParams = normalizedParams.toString();
+  const stringifiedParams = normalizedParams.toString();
 
-	return stringifiedParams.length > 0
-		? `/api/v1/saved/${id}?${stringifiedParams}`
-		: `/api/v1/saved/${id}`;
+  return stringifiedParams.length > 0
+    ? `/api/v1/saved/${id}?${stringifiedParams}`
+    : `/api/v1/saved/${id}`;
 };
 
 export const getSavedByGuardianId = async (
-	id: string,
-	params?: GetSavedByGuardianIdParams,
-	options?: RequestInit,
+  id: string,
+  params?: GetSavedByGuardianIdParams,
+  options?: RequestInit,
 ): Promise<getSavedByGuardianIdResponse> => {
-	return customInstance<getSavedByGuardianIdResponse>(
-		getGetSavedByGuardianIdUrl(id, params),
-		{
-			...options,
-			method: "GET",
-		},
-	);
+  return customInstance<getSavedByGuardianIdResponse>(
+    getGetSavedByGuardianIdUrl(id, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
 };
 
 export const getGetSavedByGuardianIdQueryKey = (
-	id: string,
-	params?: GetSavedByGuardianIdParams,
+  id: string,
+  params?: GetSavedByGuardianIdParams,
 ) => {
-	return [`/api/v1/saved/${id}`, ...(params ? [params] : [])] as const;
+  return [`/api/v1/saved/${id}`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetSavedByGuardianIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getSavedByGuardianId>>,
-	TError = ErrorModel,
+  TData = Awaited<ReturnType<typeof getSavedByGuardianId>>,
+  TError = ErrorModel,
 >(
-	id: string,
-	params?: GetSavedByGuardianIdParams,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof getSavedByGuardianId>>,
-				TError,
-				TData
-			>
-		>;
-		request?: SecondParameter<typeof customInstance>;
-	},
+  id: string,
+  params?: GetSavedByGuardianIdParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getSavedByGuardianId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
 ) => {
-	const { query: queryOptions, request: requestOptions } = options ?? {};
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-	const queryKey =
-		queryOptions?.queryKey ?? getGetSavedByGuardianIdQueryKey(id, params);
+  const queryKey =
+    queryOptions?.queryKey ?? getGetSavedByGuardianIdQueryKey(id, params);
 
-	const queryFn: QueryFunction<
-		Awaited<ReturnType<typeof getSavedByGuardianId>>
-	> = ({ signal }) =>
-		getSavedByGuardianId(id, params, { signal, ...requestOptions });
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getSavedByGuardianId>>
+  > = ({ signal }) =>
+    getSavedByGuardianId(id, params, { signal, ...requestOptions });
 
-	return {
-		queryKey,
-		queryFn,
-		enabled: !!id,
-		...queryOptions,
-	} as UseQueryOptions<
-		Awaited<ReturnType<typeof getSavedByGuardianId>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData, TError> };
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSavedByGuardianId>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetSavedByGuardianIdQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getSavedByGuardianId>>
+  Awaited<ReturnType<typeof getSavedByGuardianId>>
 >;
 export type GetSavedByGuardianIdQueryError = ErrorModel;
 
 export function useGetSavedByGuardianId<
-	TData = Awaited<ReturnType<typeof getSavedByGuardianId>>,
-	TError = ErrorModel,
+  TData = Awaited<ReturnType<typeof getSavedByGuardianId>>,
+  TError = ErrorModel,
 >(
-	id: string,
-	params: undefined | GetSavedByGuardianIdParams,
-	options: {
-		query: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof getSavedByGuardianId>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getSavedByGuardianId>>,
-					TError,
-					Awaited<ReturnType<typeof getSavedByGuardianId>>
-				>,
-				"initialData"
-			>;
-		request?: SecondParameter<typeof customInstance>;
-	},
-	queryClient?: QueryClient,
+  id: string,
+  params: undefined | GetSavedByGuardianIdParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getSavedByGuardianId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSavedByGuardianId>>,
+          TError,
+          Awaited<ReturnType<typeof getSavedByGuardianId>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
+  queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetSavedByGuardianId<
-	TData = Awaited<ReturnType<typeof getSavedByGuardianId>>,
-	TError = ErrorModel,
+  TData = Awaited<ReturnType<typeof getSavedByGuardianId>>,
+  TError = ErrorModel,
 >(
-	id: string,
-	params?: GetSavedByGuardianIdParams,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof getSavedByGuardianId>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getSavedByGuardianId>>,
-					TError,
-					Awaited<ReturnType<typeof getSavedByGuardianId>>
-				>,
-				"initialData"
-			>;
-		request?: SecondParameter<typeof customInstance>;
-	},
-	queryClient?: QueryClient,
+  id: string,
+  params?: GetSavedByGuardianIdParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getSavedByGuardianId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSavedByGuardianId>>,
+          TError,
+          Awaited<ReturnType<typeof getSavedByGuardianId>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
+  queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetSavedByGuardianId<
-	TData = Awaited<ReturnType<typeof getSavedByGuardianId>>,
-	TError = ErrorModel,
+  TData = Awaited<ReturnType<typeof getSavedByGuardianId>>,
+  TError = ErrorModel,
 >(
-	id: string,
-	params?: GetSavedByGuardianIdParams,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof getSavedByGuardianId>>,
-				TError,
-				TData
-			>
-		>;
-		request?: SecondParameter<typeof customInstance>;
-	},
-	queryClient?: QueryClient,
+  id: string,
+  params?: GetSavedByGuardianIdParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getSavedByGuardianId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
+  queryKey: DataTag<QueryKey, TData, TError>;
 };
 /**
  * @summary Get saved by guardian ID
  */
 
 export function useGetSavedByGuardianId<
-	TData = Awaited<ReturnType<typeof getSavedByGuardianId>>,
-	TError = ErrorModel,
+  TData = Awaited<ReturnType<typeof getSavedByGuardianId>>,
+  TError = ErrorModel,
 >(
-	id: string,
-	params?: GetSavedByGuardianIdParams,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof getSavedByGuardianId>>,
-				TError,
-				TData
-			>
-		>;
-		request?: SecondParameter<typeof customInstance>;
-	},
-	queryClient?: QueryClient,
+  id: string,
+  params?: GetSavedByGuardianIdParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getSavedByGuardianId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
+  queryKey: DataTag<QueryKey, TData, TError>;
 } {
-	const queryOptions = getGetSavedByGuardianIdQueryOptions(id, params, options);
+  const queryOptions = getGetSavedByGuardianIdQueryOptions(id, params, options);
 
-	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-		TData,
-		TError
-	> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-	return { ...query, queryKey: queryOptions.queryKey };
+  return { ...query, queryKey: queryOptions.queryKey };
 }
 
 /**
@@ -436,80 +436,80 @@ export function useGetSavedByGuardianId<
  * @summary Delete an existing saved by id
  */
 export type deleteSavedResponse200 = {
-	data: DeleteSavedOutputBody;
-	status: 200;
+  data: DeleteSavedOutputBody;
+  status: 200;
 };
 
 export type deleteSavedResponseDefault = {
-	data: ErrorModel;
-	status: Exclude<HTTPStatusCodes, 200>;
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
 };
 
 export type deleteSavedResponseSuccess = deleteSavedResponse200 & {
-	headers: Headers;
+  headers: Headers;
 };
 export type deleteSavedResponseError = deleteSavedResponseDefault & {
-	headers: Headers;
+  headers: Headers;
 };
 
 export type deleteSavedResponse =
-	| deleteSavedResponseSuccess
-	| deleteSavedResponseError;
+  | deleteSavedResponseSuccess
+  | deleteSavedResponseError;
 
 export const getDeleteSavedUrl = (id: string) => {
-	return `/api/v1/saved/${id}`;
+  return `/api/v1/saved/${id}`;
 };
 
 export const deleteSaved = async (
-	id: string,
-	options?: RequestInit,
+  id: string,
+  options?: RequestInit,
 ): Promise<deleteSavedResponse> => {
-	return customInstance<deleteSavedResponse>(getDeleteSavedUrl(id), {
-		...options,
-		method: "DELETE",
-	});
+  return customInstance<deleteSavedResponse>(getDeleteSavedUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
 };
 
 export const getDeleteSavedMutationOptions = <
-	TError = ErrorModel,
-	TContext = unknown,
+  TError = ErrorModel,
+  TContext = unknown,
 >(options?: {
-	mutation?: UseMutationOptions<
-		Awaited<ReturnType<typeof deleteSaved>>,
-		TError,
-		{ id: string },
-		TContext
-	>;
-	request?: SecondParameter<typeof customInstance>;
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteSaved>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-	Awaited<ReturnType<typeof deleteSaved>>,
-	TError,
-	{ id: string },
-	TContext
+  Awaited<ReturnType<typeof deleteSaved>>,
+  TError,
+  { id: string },
+  TContext
 > => {
-	const mutationKey = ["deleteSaved"];
-	const { mutation: mutationOptions, request: requestOptions } = options
-		? options.mutation &&
-			"mutationKey" in options.mutation &&
-			options.mutation.mutationKey
-			? options
-			: { ...options, mutation: { ...options.mutation, mutationKey } }
-		: { mutation: { mutationKey }, request: undefined };
+  const mutationKey = ["deleteSaved"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-	const mutationFn: MutationFunction<
-		Awaited<ReturnType<typeof deleteSaved>>,
-		{ id: string }
-	> = (props) => {
-		const { id } = props ?? {};
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteSaved>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
-		return deleteSaved(id, requestOptions);
-	};
+    return deleteSaved(id, requestOptions);
+  };
 
-	return { mutationFn, ...mutationOptions };
+  return { mutationFn, ...mutationOptions };
 };
 
 export type DeleteSavedMutationResult = NonNullable<
-	Awaited<ReturnType<typeof deleteSaved>>
+  Awaited<ReturnType<typeof deleteSaved>>
 >;
 
 export type DeleteSavedMutationError = ErrorModel;
@@ -518,21 +518,21 @@ export type DeleteSavedMutationError = ErrorModel;
  * @summary Delete an existing saved by id
  */
 export const useDeleteSaved = <TError = ErrorModel, TContext = unknown>(
-	options?: {
-		mutation?: UseMutationOptions<
-			Awaited<ReturnType<typeof deleteSaved>>,
-			TError,
-			{ id: string },
-			TContext
-		>;
-		request?: SecondParameter<typeof customInstance>;
-	},
-	queryClient?: QueryClient,
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteSaved>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
 ): UseMutationResult<
-	Awaited<ReturnType<typeof deleteSaved>>,
-	TError,
-	{ id: string },
-	TContext
+  Awaited<ReturnType<typeof deleteSaved>>,
+  TError,
+  { id: string },
+  TContext
 > => {
-	return useMutation(getDeleteSavedMutationOptions(options), queryClient);
+  return useMutation(getDeleteSavedMutationOptions(options), queryClient);
 };

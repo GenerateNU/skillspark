@@ -6,998 +6,998 @@
  * OpenAPI spec version: 1.0.0
  */
 export interface AttachPaymentMethodInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Stripe payment method ID to attach (e.g. pm_card_visa) */
-	payment_method_id: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe payment method ID to attach (e.g. pm_card_visa) */
+  payment_method_id: string;
 }
 
 export interface AttachPaymentMethodOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Attached payment method ID */
-	PaymentMethodID: string;
-	/** Stripe customer ID the payment method was attached to */
-	customer_id: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Attached payment method ID */
+  PaymentMethodID: string;
+  /** Stripe customer ID the payment method was attached to */
+  customer_id: string;
 }
 
 export interface CancelEventOccurrenceOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Success message */
-	message: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Success message */
+  message: string;
 }
 
 /**
  * Current status of the registration
  */
 export type RegistrationStatus =
-	(typeof RegistrationStatus)[keyof typeof RegistrationStatus];
+  (typeof RegistrationStatus)[keyof typeof RegistrationStatus];
 
 export const RegistrationStatus = {
-	registered: "registered",
-	cancelled: "cancelled",
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface Registration {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Timestamp when registration was cancelled */
-	cancelled_at?: string;
-	/** ID of the registered child */
-	child_id: string;
-	/** Timestamp when registration was created */
-	created_at: string;
-	/** Currency code (e.g., thb, usd) */
-	currency: string;
-	/** Name of the event */
-	event_name: string;
-	/** ID of the event occurrence */
-	event_occurrence_id: string;
-	/** ID of the child's guardian */
-	guardian_id: string;
-	/** Unique registration identifier */
-	id: string;
-	/** Start time of the event occurrence */
-	occurrence_start_time: string;
-	/** Organization's Stripe account ID */
-	org_stripe_account_id: string;
-	/** Timestamp when payment was completed */
-	paid_at?: string;
-	/** Stripe payment intent status */
-	payment_intent_status: string;
-	/** Platform fee amount in cents */
-	platform_fee_amount: number;
-	/** Amount provider receives in cents */
-	provider_amount: number;
-	/** Current status of the registration */
-	status: RegistrationStatus;
-	/** Stripe customer ID */
-	stripe_customer_id: string;
-	/** Stripe payment intent ID */
-	stripe_payment_intent_id: string;
-	/** Stripe payment method ID */
-	stripe_payment_method_id: string;
-	/** Total amount in cents */
-	total_amount: number;
-	/** Timestamp when registration was last updated */
-	updated_at: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Timestamp when registration was cancelled */
+  cancelled_at?: string;
+  /** ID of the registered child */
+  child_id: string;
+  /** Timestamp when registration was created */
+  created_at: string;
+  /** Currency code (e.g., thb, usd) */
+  currency: string;
+  /** Name of the event */
+  event_name: string;
+  /** ID of the event occurrence */
+  event_occurrence_id: string;
+  /** ID of the child's guardian */
+  guardian_id: string;
+  /** Unique registration identifier */
+  id: string;
+  /** Start time of the event occurrence */
+  occurrence_start_time: string;
+  /** Organization's Stripe account ID */
+  org_stripe_account_id: string;
+  /** Timestamp when payment was completed */
+  paid_at?: string;
+  /** Stripe payment intent status */
+  payment_intent_status: string;
+  /** Platform fee amount in cents */
+  platform_fee_amount: number;
+  /** Amount provider receives in cents */
+  provider_amount: number;
+  /** Current status of the registration */
+  status: RegistrationStatus;
+  /** Stripe customer ID */
+  stripe_customer_id: string;
+  /** Stripe payment intent ID */
+  stripe_payment_intent_id: string;
+  /** Stripe payment method ID */
+  stripe_payment_method_id: string;
+  /** Total amount in cents */
+  total_amount: number;
+  /** Timestamp when registration was last updated */
+  updated_at: string;
 }
 
 export interface CancelRegistrationOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Success message */
-	message: string;
-	/** Refund status if applicable */
-	refund_status?: string;
-	/** Updated registration */
-	registration: Registration;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Success message */
+  message: string;
+  /** Refund status if applicable */
+  refund_status?: string;
+  /** Updated registration */
+  registration: Registration;
 }
 
 export interface Child {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	birth_month: number;
-	birth_year: number;
-	created_at: string;
-	guardian_id: string;
-	id: string;
-	interests: string[];
-	name: string;
-	school_id: string;
-	school_name: string;
-	updated_at: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  birth_month: number;
+  birth_year: number;
+  created_at: string;
+  guardian_id: string;
+  id: string;
+  interests: string[];
+  name: string;
+  school_id: string;
+  school_name: string;
+  updated_at: string;
 }
 
 export interface CreateChildInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/**
-	 * Birth month of the child
-	 * @minimum 1
-	 * @maximum 12
-	 */
-	birth_month: number;
-	/**
-	 * Birth year of the child
-	 * @minimum 2000
-	 * @maximum 2026
-	 */
-	birth_year: number;
-	/** ID of the child's guardian */
-	guardian_id: string;
-	/** Interests of the child */
-	interests: string[];
-	/**
-	 * Name of the child
-	 * @minLength 1
-	 * @maxLength 200
-	 */
-	name: string;
-	/** ID of the school the child goes to */
-	school_id: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /**
+   * Birth month of the child
+   * @minimum 1
+   * @maximum 12
+   */
+  birth_month: number;
+  /**
+   * Birth year of the child
+   * @minimum 2000
+   * @maximum 2026
+   */
+  birth_year: number;
+  /** ID of the child's guardian */
+  guardian_id: string;
+  /** Interests of the child */
+  interests: string[];
+  /**
+   * Name of the child
+   * @minLength 1
+   * @maxLength 200
+   */
+  name: string;
+  /** ID of the school the child goes to */
+  school_id: string;
 }
 
 export interface CreateEmergencyContactInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	guardian_id: string;
-	name: string;
-	phone_number: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  guardian_id: string;
+  name: string;
+  phone_number: string;
 }
 
 export interface CreateEventOccurrenceInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Currency code (e.g., thb, usd) */
-	currency: string;
-	/** End time of the event occurrence */
-	end_time: string;
-	/** ID of an event in the database */
-	event_id: string;
-	/**
-	 * Primary language used for the event occurrence
-	 * @minLength 2
-	 * @maxLength 30
-	 */
-	language: string;
-	/** ID of a manager in the database */
-	manager_id?: string;
-	/**
-	 * Maximum number of attendees
-	 * @minimum 1
-	 * @maximum 100
-	 */
-	max_attendees: number;
-	/**
-	 * Price in cents (e.g., 10000 = ฿100)
-	 * @minimum 0
-	 */
-	price: number;
-	/** Start time of the event occurrence */
-	start_time: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Currency code (e.g., thb, usd) */
+  currency: string;
+  /** End time of the event occurrence */
+  end_time: string;
+  /** ID of an event in the database */
+  event_id: string;
+  /**
+   * Primary language used for the event occurrence
+   * @minLength 2
+   * @maxLength 30
+   */
+  language: string;
+  /** ID of a manager in the database */
+  manager_id?: string;
+  /**
+   * Maximum number of attendees
+   * @minimum 1
+   * @maximum 100
+   */
+  max_attendees: number;
+  /**
+   * Price in cents (e.g., 10000 = ฿100)
+   * @minimum 0
+   */
+  price: number;
+  /** Start time of the event occurrence */
+  start_time: string;
 }
 
 export interface CreateLocationInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/**
-	 * Primary address line of the location
-	 * @minLength 5
-	 * @maxLength 200
-	 */
-	address_line1: string;
-	/**
-	 * Secondary address line of the location
-	 * @minLength 5
-	 * @maxLength 200
-	 */
-	address_line2?: string;
-	/**
-	 * Country of the location
-	 * @minLength 2
-	 * @maxLength 100
-	 */
-	country: string;
-	/**
-	 * District of the location
-	 * @minLength 2
-	 * @maxLength 100
-	 */
-	district: string;
-	/**
-	 * Optional latitude of the location; validated against geocoded coordinates when provided
-	 * @minimum -90
-	 * @maximum 90
-	 */
-	latitude?: number;
-	/**
-	 * Optional longitude of the location; validated against geocoded coordinates when provided
-	 * @minimum -180
-	 * @maximum 180
-	 */
-	longitude?: number;
-	/**
-	 * Postal code of the location
-	 * @minLength 3
-	 * @maxLength 20
-	 */
-	postal_code: string;
-	/**
-	 * Province/State of the location
-	 * @minLength 2
-	 * @maxLength 100
-	 */
-	province: string;
-	/**
-	 * Subdistrict of the location
-	 * @minLength 2
-	 * @maxLength 100
-	 */
-	subdistrict: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /**
+   * Primary address line of the location
+   * @minLength 5
+   * @maxLength 200
+   */
+  address_line1: string;
+  /**
+   * Secondary address line of the location
+   * @minLength 5
+   * @maxLength 200
+   */
+  address_line2?: string;
+  /**
+   * Country of the location
+   * @minLength 2
+   * @maxLength 100
+   */
+  country: string;
+  /**
+   * District of the location
+   * @minLength 2
+   * @maxLength 100
+   */
+  district: string;
+  /**
+   * Optional latitude of the location; validated against geocoded coordinates when provided
+   * @minimum -90
+   * @maximum 90
+   */
+  latitude?: number;
+  /**
+   * Optional longitude of the location; validated against geocoded coordinates when provided
+   * @minimum -180
+   * @maximum 180
+   */
+  longitude?: number;
+  /**
+   * Postal code of the location
+   * @minLength 3
+   * @maxLength 20
+   */
+  postal_code: string;
+  /**
+   * Province/State of the location
+   * @minLength 2
+   * @maxLength 100
+   */
+  province: string;
+  /**
+   * Subdistrict of the location
+   * @minLength 2
+   * @maxLength 100
+   */
+  subdistrict: string;
 }
 
 export interface CreateOrgLoginLinkOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Stripe Express dashboard login URL */
-	login_url: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe Express dashboard login URL */
+  login_url: string;
 }
 
 export interface Organization {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	active: boolean;
-	created_at: string;
-	id: string;
-	location_id: string;
-	name: string;
-	pfp_s3_key?: string;
-	presigned_url: string;
-	stripe_account_activated: boolean;
-	stripe_account_id: string;
-	updated_at: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  active: boolean;
+  created_at: string;
+  id: string;
+  location_id: string;
+  name: string;
+  pfp_s3_key?: string;
+  presigned_url: string;
+  stripe_account_activated: boolean;
+  stripe_account_id: string;
+  updated_at: string;
 }
 
 export interface CreateOrgStripeAccountOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Stripe account details */
-	account: Organization;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe account details */
+  account: Organization;
 }
 
 /**
  * Initial status of the registration
  */
 export type CreateRegistrationInputBodyStatus =
-	(typeof CreateRegistrationInputBodyStatus)[keyof typeof CreateRegistrationInputBodyStatus];
+  (typeof CreateRegistrationInputBodyStatus)[keyof typeof CreateRegistrationInputBodyStatus];
 
 export const CreateRegistrationInputBodyStatus = {
-	registered: "registered",
-	cancelled: "cancelled",
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface CreateRegistrationInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** ID of the child to register */
-	child_id: string;
-	/** ID of the event occurrence to register for */
-	event_occurrence_id: string;
-	/** ID of the guardian registering the child */
-	guardian_id: string;
-	/** Stripe payment method ID to use */
-	payment_method_id: string;
-	/** Initial status of the registration */
-	status: CreateRegistrationInputBodyStatus;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** ID of the child to register */
+  child_id: string;
+  /** ID of the event occurrence to register for */
+  event_occurrence_id: string;
+  /** ID of the guardian registering the child */
+  guardian_id: string;
+  /** Stripe payment method ID to use */
+  payment_method_id: string;
+  /** Initial status of the registration */
+  status: CreateRegistrationInputBodyStatus;
 }
 
 export interface CreateReviewInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Review categories for this review, can be one of fun, engaging, interesting or informative. */
-	categories: string[];
-	/** The review text */
-	description: string;
-	/** ID of the guardian */
-	guardian_id: string;
-	/** Rating left with the review, can be 1-5 inclusive */
-	rating: number;
-	/** ID of the linked registration */
-	registration_id: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Review categories for this review, can be one of fun, engaging, interesting or informative. */
+  categories: string[];
+  /** The review text */
+  description: string;
+  /** ID of the guardian */
+  guardian_id: string;
+  /** Rating left with the review, can be 1-5 inclusive */
+  rating: number;
+  /** ID of the linked registration */
+  registration_id: string;
 }
 
 export interface CreateSavedInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** ID of this saved event. */
-	event_id: string;
-	/** ID of the guardian that saved this. */
-	guardian_id: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** ID of this saved event. */
+  event_id: string;
+  /** ID of the guardian that saved this. */
+  guardian_id: string;
 }
 
 export interface CreateSetupIntentOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Stripe SetupIntent client_secret for frontend */
-	client_secret: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe SetupIntent client_secret for frontend */
+  client_secret: string;
 }
 
 export interface CreateStripeOnboardingLinkInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** URL to redirect if onboarding is exited early */
-	refresh_url: string;
-	/** URL to redirect after successful onboarding */
-	return_url: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** URL to redirect if onboarding is exited early */
+  refresh_url: string;
+  /** URL to redirect after successful onboarding */
+  return_url: string;
 }
 
 export interface CreateStripeOnboardingLinkOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Stripe-hosted onboarding page URL */
-	onboarding_url: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe-hosted onboarding page URL */
+  onboarding_url: string;
 }
 
 export interface DeleteEventOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Success message */
-	message: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Success message */
+  message: string;
 }
 
 export interface DeleteReviewOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Success message */
-	message: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Success message */
+  message: string;
 }
 
 export interface DeleteSavedOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Success message */
-	message: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Success message */
+  message: string;
 }
 
 export interface EmergencyContact {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	created_at: string;
-	guardian_id: string;
-	id: string;
-	name: string;
-	phone_number: string;
-	updated_at: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  created_at: string;
+  guardian_id: string;
+  id: string;
+  name: string;
+  phone_number: string;
+  updated_at: string;
 }
 
 export interface ErrorDetail {
-	/** Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id' */
-	location?: string;
-	/** Error message text */
-	message?: string;
-	/** The value at the given location */
-	value?: unknown;
+  /** Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id' */
+  location?: string;
+  /** Error message text */
+  message?: string;
+  /** The value at the given location */
+  value?: unknown;
 }
 
 export interface ErrorModel {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** A human-readable explanation specific to this occurrence of the problem. */
-	detail?: string;
-	/** Optional list of individual error details */
-	errors?: ErrorDetail[];
-	/** A URI reference that identifies the specific occurrence of the problem. */
-	instance?: string;
-	/** HTTP status code */
-	status?: number;
-	/** A short, human-readable summary of the problem type. This value should not change between occurrences of the error. */
-	title?: string;
-	/** A URI reference to human-readable documentation for the error. */
-	type?: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** A human-readable explanation specific to this occurrence of the problem. */
+  detail?: string;
+  /** Optional list of individual error details */
+  errors?: ErrorDetail[];
+  /** A URI reference that identifies the specific occurrence of the problem. */
+  instance?: string;
+  /** HTTP status code */
+  status?: number;
+  /** A short, human-readable summary of the problem type. This value should not change between occurrences of the error. */
+  title?: string;
+  /** A URI reference to human-readable documentation for the error. */
+  type?: string;
 }
 
 export interface Event {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	age_range_max: number;
-	age_range_min: number;
-	category: string[];
-	created_at: string;
-	description: string;
-	header_image_s3_key: string;
-	id: string;
-	organization_id: string;
-	presigned_url: string;
-	title: string;
-	updated_at: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  age_range_max: number;
+  age_range_min: number;
+  category: string[];
+  created_at: string;
+  description: string;
+  header_image_s3_key: string;
+  id: string;
+  organization_id: string;
+  presigned_url: string;
+  title: string;
+  updated_at: string;
 }
 
 /**
  * Current status of the event occurrence
  */
 export type EventOccurrenceStatus =
-	(typeof EventOccurrenceStatus)[keyof typeof EventOccurrenceStatus];
+  (typeof EventOccurrenceStatus)[keyof typeof EventOccurrenceStatus];
 
 export const EventOccurrenceStatus = {
-	scheduled: "scheduled",
-	cancelled: "cancelled",
+  scheduled: "scheduled",
+  cancelled: "cancelled",
 } as const;
 
 export interface Location {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	address_line1: string;
-	address_line2: string;
-	country: string;
-	created_at: string;
-	district: string;
-	id: string;
-	latitude: number;
-	longitude: number;
-	postal_code: string;
-	province: string;
-	subdistrict: string;
-	updated_at: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  address_line1: string;
+  address_line2: string;
+  country: string;
+  created_at: string;
+  district: string;
+  id: string;
+  latitude: number;
+  longitude: number;
+  postal_code: string;
+  province: string;
+  subdistrict: string;
+  updated_at: string;
 }
 
 export interface EventOccurrence {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	created_at: string;
-	curr_enrolled: number;
-	/** Currency code (e.g., thb, usd) */
-	currency: string;
-	end_time: string;
-	event: Event;
-	id: string;
-	language: string;
-	location: Location;
-	manager_id: string;
-	max_attendees: number;
-	/** Price in cents (e.g., 10000 = $100) */
-	price: number;
-	start_time: string;
-	/** Current status of the event occurrence */
-	status: EventOccurrenceStatus;
-	updated_at: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  created_at: string;
+  curr_enrolled: number;
+  /** Currency code (e.g., thb, usd) */
+  currency: string;
+  end_time: string;
+  event: Event;
+  id: string;
+  language: string;
+  location: Location;
+  manager_id: string;
+  max_attendees: number;
+  /** Price in cents (e.g., 10000 = $100) */
+  price: number;
+  start_time: string;
+  /** Current status of the event occurrence */
+  status: EventOccurrenceStatus;
+  updated_at: string;
 }
 
 export interface GeocodeAddressInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/**
-	 * Text address to geocode
-	 * @minLength 1
-	 */
-	address: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /**
+   * Text address to geocode
+   * @minLength 1
+   */
+  address: string;
 }
 
 export interface GeocodeAddressOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Latitude of the geocoded address */
-	latitude: number;
-	/** Longitude of the geocoded address */
-	longitude: number;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Latitude of the geocoded address */
+  latitude: number;
+  /** Longitude of the geocoded address */
+  longitude: number;
 }
 
 export interface PaymentMethodCard {
-	brand: string;
-	exp_month: number;
-	exp_year: number;
-	last4: string;
+  brand: string;
+  exp_month: number;
+  exp_year: number;
+  last4: string;
 }
 
 export interface PaymentMethod {
-	card: PaymentMethodCard;
-	id: string;
-	type: string;
+  card: PaymentMethodCard;
+  id: string;
+  type: string;
 }
 
 export interface GetPaymentMethodsByGuardianIDOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	payment_methods: PaymentMethod[];
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  payment_methods: PaymentMethod[];
 }
 
 export interface GetRegistrationsByChildIDOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** List of registrations for the child */
-	registrations: Registration[];
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** List of registrations for the child */
+  registrations: Registration[];
 }
 
 export interface GetRegistrationsByEventOccurrenceIDOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** List of registrations for the event occurrence */
-	registrations: Registration[];
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** List of registrations for the event occurrence */
+  registrations: Registration[];
 }
 
 export interface GetRegistrationsByGuardianIDOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** List of registrations for the guardian */
-	registrations: Registration[];
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** List of registrations for the guardian */
+  registrations: Registration[];
 }
 
 export interface Guardian {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	auth_id: string;
-	created_at: string;
-	email: string;
-	expo_push_token: string;
-	id: string;
-	language_preference: string;
-	name: string;
-	profile_picture_s3_key: string;
-	stripe_customer_id?: string;
-	updated_at: string;
-	user_id: string;
-	username: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  auth_id: string;
+  created_at: string;
+  email: string;
+  expo_push_token: string;
+  id: string;
+  language_preference: string;
+  name: string;
+  profile_picture_s3_key: string;
+  stripe_customer_id?: string;
+  updated_at: string;
+  user_id: string;
+  username: string;
 }
 
 export interface GuardianLoginOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	guardian_id: string;
-	token: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  guardian_id: string;
+  token: string;
 }
 
 export interface GuardianSignUpInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	email: string;
-	language_preference: string;
-	name: string;
-	password: string;
-	profile_picture_s3_key?: string;
-	username: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  email: string;
+  language_preference: string;
+  name: string;
+  password: string;
+  profile_picture_s3_key?: string;
+  username: string;
 }
 
 export interface GuardianSignUpOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	guardian_id: string;
-	token: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  guardian_id: string;
+  token: string;
 }
 
 export interface HealthOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Health status */
-	status: string;
-	/** API version */
-	version: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Health status */
+  status: string;
+  /** API version */
+  version: string;
 }
 
 export interface LoginInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	email: string;
-	password: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  email: string;
+  password: string;
 }
 
 export interface Manager {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	auth_id: string;
-	created_at: string;
-	email: string;
-	id: string;
-	language_preference: string;
-	name: string;
-	organization_id: string;
-	profile_picture_s3_key: string;
-	role: string;
-	updated_at: string;
-	user_id: string;
-	username: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  auth_id: string;
+  created_at: string;
+  email: string;
+  id: string;
+  language_preference: string;
+  name: string;
+  organization_id: string;
+  profile_picture_s3_key: string;
+  role: string;
+  updated_at: string;
+  user_id: string;
+  username: string;
 }
 
 export interface ManagerLoginOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	manager_id: string;
-	token: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  manager_id: string;
+  token: string;
 }
 
 export interface ManagerSignUpInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** auth id of the manager being created */
-	auth_id?: string;
-	/** email of the manager */
-	email: string;
-	/** language preference of the manager */
-	language_preference: string;
-	/** name of the manager */
-	name: string;
-	/** organization id of the organization the manager is associated with */
-	organization_id: string;
-	/** password of the manager */
-	password: string;
-	/** profile picture s3 key of the manager */
-	profile_picture_s3_key?: string;
-	/** role of the manager being created */
-	role: string;
-	/** username of the manager */
-	username: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** auth id of the manager being created */
+  auth_id?: string;
+  /** email of the manager */
+  email: string;
+  /** language preference of the manager */
+  language_preference: string;
+  /** name of the manager */
+  name: string;
+  /** organization id of the organization the manager is associated with */
+  organization_id: string;
+  /** password of the manager */
+  password: string;
+  /** profile picture s3 key of the manager */
+  profile_picture_s3_key?: string;
+  /** role of the manager being created */
+  role: string;
+  /** username of the manager */
+  username: string;
 }
 
 export interface ManagerSignUpOutputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	manager_id: string;
-	token: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  manager_id: string;
+  token: string;
 }
 
 export interface PatchManagerInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Email of the guardian */
-	email?: string;
-	/** id of the manager */
-	id: string;
-	/** Language preference */
-	language_preference?: string;
-	/** Name of the guardian */
-	name?: string;
-	/** organization id */
-	organization_id?: string;
-	/** S3 key for profile picture */
-	profile_picture_s3_key?: string;
-	/** role of the manager */
-	role?: string;
-	/** Username of the guardian */
-	username?: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Email of the guardian */
+  email?: string;
+  /** id of the manager */
+  id: string;
+  /** Language preference */
+  language_preference?: string;
+  /** Name of the guardian */
+  name?: string;
+  /** organization id */
+  organization_id?: string;
+  /** S3 key for profile picture */
+  profile_picture_s3_key?: string;
+  /** role of the manager */
+  role?: string;
+  /** Username of the guardian */
+  username?: string;
 }
 
 export interface Review {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Review categories for this review, can be one of fun, engaging, interesting or informative. */
-	categories: string[];
-	/** Timestamp when registration was created */
-	created_at: string;
-	/** The review text */
-	description: string;
-	/** ID of the event */
-	event_id: string;
-	/** ID of the guardian */
-	guardian_id: string;
-	/** Unique review identifier */
-	id: string;
-	/** Rating left with the review, can be 1-5 inclusive */
-	rating: number;
-	/** ID of the linked registration */
-	registration_id: string;
-	/** Timestamp when registration was last updated */
-	updated_at: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Review categories for this review, can be one of fun, engaging, interesting or informative. */
+  categories: string[];
+  /** Timestamp when registration was created */
+  created_at: string;
+  /** The review text */
+  description: string;
+  /** ID of the event */
+  event_id: string;
+  /** ID of the guardian */
+  guardian_id: string;
+  /** Unique review identifier */
+  id: string;
+  /** Rating left with the review, can be 1-5 inclusive */
+  rating: number;
+  /** ID of the linked registration */
+  registration_id: string;
+  /** Timestamp when registration was last updated */
+  updated_at: string;
 }
 
 export interface ReviewRatingCount {
-	rating: number;
-	review_count: number;
+  rating: number;
+  review_count: number;
 }
 
 export interface ReviewAggregate {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	average_rating: number;
-	breakdown: ReviewRatingCount[];
-	event_id: string;
-	total_reviews: number;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  average_rating: number;
+  breakdown: ReviewRatingCount[];
+  event_id: string;
+  total_reviews: number;
 }
 
 export interface Saved {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	created_at: string;
-	event: Event;
-	guardian_id: string;
-	id: string;
-	updated_at: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  created_at: string;
+  event: Event;
+  guardian_id: string;
+  id: string;
+  updated_at: string;
 }
 
 export interface School {
-	created_at: string;
-	id: string;
-	location_id: string;
-	name: string;
-	updated_at: string;
+  created_at: string;
+  id: string;
+  location_id: string;
+  name: string;
+  updated_at: string;
 }
 
 export interface UpdateChildInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/**
-	 * Birth month of the child
-	 * @minimum 1
-	 * @maximum 12
-	 */
-	birth_month?: number;
-	/**
-	 * Birth year of the child
-	 * @minimum 2000
-	 * @maximum 2026
-	 */
-	birth_year?: number;
-	/** ID of the child's guardian */
-	guardian_id?: string;
-	/** Interests of the child */
-	interests?: string[];
-	/**
-	 * Name of the child
-	 * @minLength 1
-	 * @maxLength 200
-	 */
-	name?: string;
-	/** ID of the school the child goes to */
-	school_id?: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /**
+   * Birth month of the child
+   * @minimum 1
+   * @maximum 12
+   */
+  birth_month?: number;
+  /**
+   * Birth year of the child
+   * @minimum 2000
+   * @maximum 2026
+   */
+  birth_year?: number;
+  /** ID of the child's guardian */
+  guardian_id?: string;
+  /** Interests of the child */
+  interests?: string[];
+  /**
+   * Name of the child
+   * @minLength 1
+   * @maxLength 200
+   */
+  name?: string;
+  /** ID of the school the child goes to */
+  school_id?: string;
 }
 
 export interface UpdateEmergencyContactInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	guardian_id: string;
-	name: string;
-	phone_number: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  guardian_id: string;
+  name: string;
+  phone_number: string;
 }
 
 export interface UpdateEventOccurrenceInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/**
-	 * Number of students currently enrolled in the event occurrence
-	 * @minimum 0
-	 * @maximum 100
-	 */
-	curr_enrolled?: number;
-	/**
-	 * Currency code
-	 * @minLength 3
-	 * @maxLength 3
-	 */
-	currency?: string;
-	/** End time of the event occurrence */
-	end_time?: string;
-	/** ID of an event in the database */
-	event_id?: string;
-	/**
-	 * Primary language used for the event occurrence
-	 * @minLength 2
-	 * @maxLength 30
-	 */
-	language?: string;
-	/** ID of a manager in the database */
-	manager_id?: string;
-	/**
-	 * Maximum number of attendees
-	 * @minimum 1
-	 * @maximum 100
-	 */
-	max_attendees?: number;
-	/**
-	 * Price in lowest denomination of currency
-	 * @minimum 0
-	 */
-	price?: number;
-	/** Start time of the event occurrence */
-	start_time?: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /**
+   * Number of students currently enrolled in the event occurrence
+   * @minimum 0
+   * @maximum 100
+   */
+  curr_enrolled?: number;
+  /**
+   * Currency code
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency?: string;
+  /** End time of the event occurrence */
+  end_time?: string;
+  /** ID of an event in the database */
+  event_id?: string;
+  /**
+   * Primary language used for the event occurrence
+   * @minLength 2
+   * @maxLength 30
+   */
+  language?: string;
+  /** ID of a manager in the database */
+  manager_id?: string;
+  /**
+   * Maximum number of attendees
+   * @minimum 1
+   * @maximum 100
+   */
+  max_attendees?: number;
+  /**
+   * Price in lowest denomination of currency
+   * @minimum 0
+   */
+  price?: number;
+  /** Start time of the event occurrence */
+  start_time?: string;
 }
 
 export interface UpdateGuardianInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Email of the guardian */
-	email: string;
-	/** Expo push notification token */
-	expo_push_token?: string;
-	/** Language preference */
-	language_preference: string;
-	/** Name of the guardian */
-	name: string;
-	/** S3 key for profile picture */
-	profile_picture_s3_key?: string;
-	/** Username of the guardian */
-	username: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Email of the guardian */
+  email: string;
+  /** Expo push notification token */
+  expo_push_token?: string;
+  /** Language preference */
+  language_preference: string;
+  /** Name of the guardian */
+  name: string;
+  /** S3 key for profile picture */
+  profile_picture_s3_key?: string;
+  /** Username of the guardian */
+  username: string;
 }
 
 /**
  * Updated registration status (optional)
  */
 export type UpdateRegistrationInputBodyStatus =
-	(typeof UpdateRegistrationInputBodyStatus)[keyof typeof UpdateRegistrationInputBodyStatus];
+  (typeof UpdateRegistrationInputBodyStatus)[keyof typeof UpdateRegistrationInputBodyStatus];
 
 export const UpdateRegistrationInputBodyStatus = {
-	registered: "registered",
-	cancelled: "cancelled",
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface UpdateRegistrationInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** Updated child ID (optional) */
-	child_id?: string;
-	/** Updated event occurrence ID (optional) */
-	event_occurrence_id?: string;
-	/** Updated guardian ID (optional) */
-	guardian_id?: string;
-	/** Updated registration status (optional) */
-	status?: UpdateRegistrationInputBodyStatus;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Updated child ID (optional) */
+  child_id?: string;
+  /** Updated event occurrence ID (optional) */
+  event_occurrence_id?: string;
+  /** Updated guardian ID (optional) */
+  guardian_id?: string;
+  /** Updated registration status (optional) */
+  status?: UpdateRegistrationInputBodyStatus;
 }
 
 export interface UpdateRegistrationPaymentStatusInputBody {
-	/** A URL to the JSON Schema for this object. */
-	readonly $schema?: string;
-	/** New payment intent status from Stripe */
-	payment_intent_status: string;
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** New payment intent status from Stripe */
+  payment_intent_status: string;
 }
 
 export type GetAllEventOccurrencesParams = {
-	/**
-	 * @minimum 1
-	 */
-	page?: number;
-	/**
-	 * @minimum 1
-	 * @maximum 100
-	 */
-	limit?: number;
-	search?: string;
-	lat?: string;
-	lng?: string;
-	radius_km?: number;
-	min_price?: number;
-	max_price?: number;
-	min_duration?: number;
-	max_duration?: number;
-	min_age?: number;
-	max_age?: number;
-	category?: string;
-	soldout?: boolean;
-	min_date?: string;
-	max_date?: string;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  search?: string;
+  lat?: string;
+  lng?: string;
+  radius_km?: number;
+  min_price?: number;
+  max_price?: number;
+  min_duration?: number;
+  max_duration?: number;
+  min_age?: number;
+  max_age?: number;
+  category?: string;
+  soldout?: boolean;
+  min_date?: string;
+  max_date?: string;
 };
 
 export type CreateEventBody = {
-	age_range_max?: number;
-	age_range_min?: number;
-	category?: (Blob | string)[];
-	/**
-	 * @minLength 2
-	 * @maxLength 200
-	 */
-	description: Blob | string;
-	header_image?: Blob;
-	organization_id: Blob | string;
-	/**
-	 * @minLength 2
-	 * @maxLength 100
-	 */
-	title: Blob | string;
+  age_range_max?: number;
+  age_range_min?: number;
+  category?: (Blob | string)[];
+  /**
+   * @minLength 2
+   * @maxLength 200
+   */
+  description: Blob | string;
+  header_image?: Blob;
+  organization_id: Blob | string;
+  /**
+   * @minLength 2
+   * @maxLength 100
+   */
+  title: Blob | string;
 };
 
 export type UpdateEventBody = {
-	age_range_max?: number;
-	age_range_min?: number;
-	category?: (Blob | string)[];
-	/**
-	 * @minLength 2
-	 * @maxLength 200
-	 */
-	description?: Blob | string;
-	header_image?: Blob;
-	organization_id?: Blob | string;
-	/**
-	 * @minLength 2
-	 * @maxLength 100
-	 */
-	title?: Blob | string;
+  age_range_max?: number;
+  age_range_min?: number;
+  category?: (Blob | string)[];
+  /**
+   * @minLength 2
+   * @maxLength 200
+   */
+  description?: Blob | string;
+  header_image?: Blob;
+  organization_id?: Blob | string;
+  /**
+   * @minLength 2
+   * @maxLength 100
+   */
+  title?: Blob | string;
 };
 
 export type GetAllLocationsParams = {
-	/**
-	 * @minimum 1
-	 */
-	page?: number;
-	/**
-	 * @minimum 1
-	 * @maximum 100
-	 */
-	limit?: number;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
 };
 
 export type ListOrganizationsParams = {
-	/**
-	 * Page number (starts at 1)
-	 * @minimum 1
-	 */
-	page?: number;
-	/**
-	 * Number of items per page
-	 * @minimum 1
-	 * @maximum 100
-	 */
-	page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type CreateOrganizationBody = {
-	active?: boolean;
-	location_id?: Blob | string;
-	/**
-	 * @minLength 1
-	 * @maxLength 255
-	 */
-	name: Blob | string;
-	profile_image?: Blob;
+  active?: boolean;
+  location_id?: Blob | string;
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name: Blob | string;
+  profile_image?: Blob;
 };
 
 export type UpdateOrganizationBody = {
-	active?: boolean;
-	location_id?: Blob | string;
-	/**
-	 * @minLength 1
-	 * @maxLength 255
-	 */
-	name: Blob | string;
-	profile_image?: Blob;
+  active?: boolean;
+  location_id?: Blob | string;
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name: Blob | string;
+  profile_image?: Blob;
 };
 
 export type GetReviewByEventIdParams = {
-	/**
-	 * Page number (starts at 1)
-	 * @minimum 1
-	 */
-	page?: number;
-	/**
-	 * Number of items per page
-	 * @minimum 1
-	 * @maximum 100
-	 */
-	page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type GetReviewByGuardianIdParams = {
-	/**
-	 * Page number (starts at 1)
-	 * @minimum 1
-	 */
-	page?: number;
-	/**
-	 * Number of items per page
-	 * @minimum 1
-	 * @maximum 100
-	 */
-	page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type GetSavedByGuardianIdParams = {
-	/**
-	 * Page number (starts at 1)
-	 * @minimum 1
-	 */
-	page?: number;
-	/**
-	 * Number of items per page
-	 * @minimum 1
-	 * @maximum 100
-	 */
-	page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type GetAllSchoolsParams = {
-	/**
-	 * @minimum 1
-	 */
-	page?: number;
-	/**
-	 * @minimum 1
-	 * @maximum 100
-	 */
-	limit?: number;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
 };
