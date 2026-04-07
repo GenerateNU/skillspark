@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../contexts/use-auth-context";
 import { useNavigate } from "react-router-dom";
-import { AuthProvider } from "../contexts/auth-context";
+import { AuthProvider } from "../contexts/auth-context.tsx";
 
 type LoginFormData = {
   email: string;
