@@ -4,6 +4,9 @@
 	"workspaces": {
 		"": {
 			"name": "skillspark",
+			"dependencies": {
+				"@types/node": "^25.5.0",
+			},
 			"devDependencies": {
 				"husky": "^9.1.7",
 				"supabase": "^2.72.7",
@@ -3842,10 +3845,10 @@
 		],
 
 		"@types/node": [
-			"@types/node@24.10.13",
+			"@types/node@24.12.0",
 			"",
 			{ "dependencies": { "undici-types": "~7.16.0" } },
-			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
+			"sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ==",
 		],
 
 		"@types/react": [
@@ -9303,6 +9306,31 @@
 			"sha512-r4F0Sec0BLxWicc7HEyo2x3/2icUTrRmDjaaRyzzn+7aDyFZliszMDOgLVwSnQnYENOlL1o569Ze2HZefk8clA==",
 		],
 
+		"react-hook-form": [
+			"react-hook-form@7.72.0",
+			"",
+			{ "peerDependencies": { "react": "^16.8.0 || ^17 || ^18 || ^19" } },
+			"sha512-V4v6jubaf6JAurEaVnT9aUPKFbNtDgohj5CIgVGyPHvT9wRx5OZHVjz31GsxnPNI278XMu+ruFz+wGOscHaLKw==",
+		],
+
+		"react-i18next": [
+			"react-i18next@15.5.2",
+			"",
+			{
+				"dependencies": {
+					"@babel/runtime": "^7.25.0",
+					"html-parse-stringify": "^3.0.1",
+				},
+				"peerDependencies": {
+					"i18next": ">= 23.2.3",
+					"react": ">= 16.8.0",
+					"typescript": "^5",
+				},
+				"optionalPeers": ["typescript"],
+			},
+			"sha512-ePODyXgmZQAOYTbZXQn5rRsSBu3Gszo69jxW6aKmlSgxKAI1fOhDwSu6bT4EKHciWPKQ7v7lPrjeiadR6Gi+1A==",
+		],
+
 		"react-is": [
 			"react-is@19.2.4",
 			"",
@@ -11722,6 +11750,20 @@
 			"sha512-PMSmkqxr106Xa156c2M265Z+FTrPl+oxd/rgOQy2tijQeK5TxQ43psO1ZCwhVOSdnn+RzkzlRz/eY4BgJBYVpg==",
 		],
 
+		"@jest/environment/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
+		],
+
+		"@jest/fake-timers/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
+		],
+
 		"@jest/transform/chalk": [
 			"chalk@4.1.2",
 			"",
@@ -11736,6 +11778,13 @@
 			"",
 			{ "dependencies": { "imurmurhash": "^0.1.4", "signal-exit": "^3.0.7" } },
 			"sha512-7KxauUdBmSdWnmpaGFg+ppNjKF8uNLry8LyzjauQDOVONfFLNKrKvQOxZ/VuTIcS/gge/YNahf5RIIQWTSarlg==",
+		],
+
+		"@jest/types/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
 		],
 
 		"@jest/types/chalk": [
@@ -11941,10 +11990,31 @@
 		],
 
 		"@tailwindcss/vite/tailwindcss": [
-			"tailwindcss@4.2.0",
+			"tailwindcss@4.2.1",
 			"",
 			{},
-			"sha512-yYzTZ4++b7fNYxFfpnberEEKu43w44aqDMNM9MHMmcKuCH7lL8jJ4yJ7LGHv7rSwiqM0nkiobF9I6cLlpS2P7Q==",
+			"sha512-/tBrSQ36vCleJkAOsy9kbNTgaxvGbyOamC30PRePTQe/o1MFwEKHQk4Cn7BNGaPtjp+PuUrByJehM1hgxfq4sw==",
+		],
+
+		"@types/cacheable-request/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
+		],
+
+		"@types/graceful-fs/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
+		],
+
+		"@types/keyv/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
 		],
 
 		"@types/react-dom/@types/react": [
@@ -12300,6 +12370,20 @@
 			"sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
 		],
 
+		"jest-environment-node/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
+		],
+
+		"jest-haste-map/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
+		],
+
 		"jest-message-util/chalk": [
 			"chalk@4.1.2",
 			"",
@@ -12307,6 +12391,20 @@
 				"dependencies": { "ansi-styles": "^4.1.0", "supports-color": "^7.1.0" },
 			},
 			"sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==",
+		],
+
+		"jest-mock/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
+		],
+
+		"jest-util/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
 		],
 
 		"jest-util/chalk": [
@@ -12806,6 +12904,13 @@
 			"",
 			{ "bin": { "yaml": "bin.mjs" } },
 			"sha512-mplynKqc1C2hTVYxd0PU2xQAc22TI1vShAYGksCCfxbn/dFwnHTNi1bvYsBTkhdUNtGIf5xNOg938rrSSYvS9A==",
+		],
+
+		"web/@types/node": [
+			"@types/node@24.10.13",
+			"",
+			{ "dependencies": { "undici-types": "~7.16.0" } },
+			"sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
 		],
 
 		"web/@types/react": [
@@ -13415,6 +13520,20 @@
 			"",
 			{ "dependencies": { "balanced-match": "^1.0.0" } },
 			"sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==",
+		],
+
+		"web/@types/node/undici-types": [
+			"undici-types@7.16.0",
+			"",
+			{},
+			"sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==",
+		],
+
+		"web/react-dom/scheduler": [
+			"scheduler@0.27.0",
+			"",
+			{},
+			"sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==",
 		],
 
 		"@babel/highlight/chalk/ansi-styles/color-convert": [

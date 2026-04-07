@@ -35,5 +35,3 @@ func (r *GuardianRepository) GetGuardianByChildID(ctx context.Context, childID u
 
 	return &guardian, nil
 }
-
-// TODO: do repo testing and then move onto actual endpoints. Verify types in

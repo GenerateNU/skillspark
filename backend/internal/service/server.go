@@ -121,6 +121,8 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	// Register public routes BEFORE auth middleware
 	routes.SetupAuthRoutes(humaAPI, repo, config)
+	routes.SetupOrganizationRoutes(humaAPI, repo, s3Client)
+	routes.SetupManagerRoutes(humaAPI, repo, config)
 
 	// Apply auth middleware — only affects routes registered after this point
 	if !config.TestMode {

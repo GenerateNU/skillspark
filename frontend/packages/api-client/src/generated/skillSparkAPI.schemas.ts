@@ -254,9 +254,9 @@ export interface Organization {
   location_id: string;
   name: string;
   pfp_s3_key?: string;
-  presigned_url: string;
+  presigned_url?: string;
   stripe_account_activated: boolean;
-  stripe_account_id: string;
+  stripe_account_id?: string;
   updated_at: string;
 }
 
