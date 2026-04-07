@@ -16,8 +16,7 @@ func ListComparison(listOne []string, listTwo []string) int {
 		counterTwo[element] = true
 	}
 
-	for idx := range listOne {
-		element := listOne[idx]
+	for element := range counterOne {
 		if _, ok := counterTwo[element]; ok {
 			commonElements += 1
 		}
