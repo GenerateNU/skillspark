@@ -20,7 +20,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginInputBody'
+              $ref: "#/components/schemas/LoginInputBody"
         required: true
       responses:
         "200":
@@ -32,13 +32,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GuardianLoginOutputBody'
+                $ref: "#/components/schemas/GuardianLoginOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/auth/login/manager:
     post:
       tags:
@@ -50,7 +50,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginInputBody'
+              $ref: "#/components/schemas/LoginInputBody"
         required: true
       responses:
         "200":
@@ -62,13 +62,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ManagerLoginOutputBody'
+                $ref: "#/components/schemas/ManagerLoginOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/auth/signup/guardian:
     post:
       tags:
@@ -80,7 +80,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GuardianSignUpInputBody'
+              $ref: "#/components/schemas/GuardianSignUpInputBody"
         required: true
       responses:
         "200":
@@ -88,13 +88,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GuardianSignUpOutputBody'
+                $ref: "#/components/schemas/GuardianSignUpOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/auth/signup/manager:
     post:
       tags:
@@ -106,7 +106,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ManagerSignUpInputBody'
+              $ref: "#/components/schemas/ManagerSignUpInputBody"
         required: true
       responses:
         "200":
@@ -114,13 +114,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ManagerSignUpOutputBody'
+                $ref: "#/components/schemas/ManagerSignUpOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/child:
     post:
       tags:
@@ -132,7 +132,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateChildInputBody'
+              $ref: "#/components/schemas/CreateChildInputBody"
         required: true
       responses:
         "200":
@@ -140,13 +140,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Child'
+                $ref: "#/components/schemas/Child"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/child/{id}:
     get:
       tags:
@@ -166,13 +166,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Child'
+                $ref: "#/components/schemas/Child"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     delete:
       tags:
         - Child
@@ -191,13 +191,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Child'
+                $ref: "#/components/schemas/Child"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     patch:
       tags:
         - Child
@@ -214,7 +214,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateChildInputBody'
+              $ref: "#/components/schemas/UpdateChildInputBody"
         required: true
       responses:
         "200":
@@ -222,13 +222,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Child'
+                $ref: "#/components/schemas/Child"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/children/{id}:
     get:
       tags:
@@ -250,13 +250,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Child'
+                  $ref: "#/components/schemas/Child"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/emergency-contact:
     post:
       tags:
@@ -269,7 +269,7 @@ paths:
           application/json:
             schema:
               description: New emergency contact to add
-              $ref: '#/components/schemas/CreateEmergencyContactInputBody'
+              $ref: "#/components/schemas/CreateEmergencyContactInputBody"
         required: true
       responses:
         "200":
@@ -278,13 +278,13 @@ paths:
             application/json:
               schema:
                 description: Created Emergency Contact
-                $ref: '#/components/schemas/EmergencyContact'
+                $ref: "#/components/schemas/EmergencyContact"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/emergency-contact/{guardian_id}:
     get:
       tags:
@@ -307,13 +307,13 @@ paths:
                 type: array
                 description: List of all emergency contacts related to the given guardian in the database
                 items:
-                  $ref: '#/components/schemas/EmergencyContact'
+                  $ref: "#/components/schemas/EmergencyContact"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/emergency-contact/{id}:
     delete:
       tags:
@@ -334,13 +334,13 @@ paths:
             application/json:
               schema:
                 description: Deleted Emergency Contact
-                $ref: '#/components/schemas/EmergencyContact'
+                $ref: "#/components/schemas/EmergencyContact"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     patch:
       tags:
         - Emergency Contacts
@@ -361,7 +361,7 @@ paths:
           application/json:
             schema:
               description: Emergency contact to update
-              $ref: '#/components/schemas/UpdateEmergencyContactInputBody'
+              $ref: "#/components/schemas/UpdateEmergencyContactInputBody"
         required: true
       responses:
         "200":
@@ -370,13 +370,13 @@ paths:
             application/json:
               schema:
                 description: Updated Emergency Contact
-                $ref: '#/components/schemas/EmergencyContact'
+                $ref: "#/components/schemas/EmergencyContact"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/event-occurrences:
     get:
       tags:
@@ -498,13 +498,13 @@ paths:
                 type: array
                 description: List of all event occurrences in the database
                 items:
-                  $ref: '#/components/schemas/EventOccurrence'
+                  $ref: "#/components/schemas/EventOccurrence"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     post:
       tags:
         - Event Occurrences
@@ -525,7 +525,7 @@ paths:
           application/json:
             schema:
               description: New event occurrence to add
-              $ref: '#/components/schemas/CreateEventOccurrenceInputBody'
+              $ref: "#/components/schemas/CreateEventOccurrenceInputBody"
         required: true
       responses:
         "200":
@@ -534,13 +534,13 @@ paths:
             application/json:
               schema:
                 description: Created event occurrence
-                $ref: '#/components/schemas/EventOccurrence'
+                $ref: "#/components/schemas/EventOccurrence"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/event-occurrences/{id}:
     get:
       tags:
@@ -571,13 +571,13 @@ paths:
             application/json:
               schema:
                 description: Event occurrence in the database that matches the ID
-                $ref: '#/components/schemas/EventOccurrence'
+                $ref: "#/components/schemas/EventOccurrence"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     delete:
       tags:
         - Event Occurrences
@@ -598,13 +598,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CancelEventOccurrenceOutputBody'
+                $ref: "#/components/schemas/CancelEventOccurrenceOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     patch:
       tags:
         - Event Occurrences
@@ -632,7 +632,7 @@ paths:
           application/json:
             schema:
               description: Event occurrence fields to update
-              $ref: '#/components/schemas/UpdateEventOccurrenceInputBody'
+              $ref: "#/components/schemas/UpdateEventOccurrenceInputBody"
         required: true
       responses:
         "200":
@@ -641,13 +641,13 @@ paths:
             application/json:
               schema:
                 description: Updated event occurrence
-                $ref: '#/components/schemas/EventOccurrence'
+                $ref: "#/components/schemas/EventOccurrence"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/events:
     post:
       tags:
@@ -719,13 +719,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: "#/components/schemas/Event"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/events/{event_id}/event-occurrences/:
     get:
       tags:
@@ -766,13 +766,13 @@ paths:
                 type: array
                 description: List of event occurrences in the database that match the event ID
                 items:
-                  $ref: '#/components/schemas/EventOccurrence'
+                  $ref: "#/components/schemas/EventOccurrence"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/events/{id}:
     delete:
       tags:
@@ -792,13 +792,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeleteEventOutputBody'
+                $ref: "#/components/schemas/DeleteEventOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     patch:
       tags:
         - Events
@@ -870,13 +870,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: "#/components/schemas/Event"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/geocode:
     post:
       tags:
@@ -888,7 +888,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GeocodeAddressInputBody'
+              $ref: "#/components/schemas/GeocodeAddressInputBody"
         required: true
       responses:
         "200":
@@ -896,13 +896,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GeocodeAddressOutputBody'
+                $ref: "#/components/schemas/GeocodeAddressOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/guardians/{guardian_id}/payment-methods:
     get:
       tags:
@@ -924,13 +924,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetPaymentMethodsByGuardianIDOutputBody'
+                $ref: "#/components/schemas/GetPaymentMethodsByGuardianIDOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/guardians/{id}:
     get:
       tags:
@@ -950,13 +950,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Guardian'
+                $ref: "#/components/schemas/Guardian"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     put:
       tags:
         - Guardians
@@ -973,7 +973,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateGuardianInputBody'
+              $ref: "#/components/schemas/UpdateGuardianInputBody"
         required: true
       responses:
         "200":
@@ -981,13 +981,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Guardian'
+                $ref: "#/components/schemas/Guardian"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     delete:
       tags:
         - Guardians
@@ -1006,13 +1006,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Guardian'
+                $ref: "#/components/schemas/Guardian"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/guardians/child/{child_id}:
     get:
       tags:
@@ -1032,13 +1032,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Guardian'
+                $ref: "#/components/schemas/Guardian"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/health:
     get:
       tags:
@@ -1052,13 +1052,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthOutputBody'
+                $ref: "#/components/schemas/HealthOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/locations:
     get:
       tags:
@@ -1093,13 +1093,13 @@ paths:
                 type: array
                 description: List of all locations in the database
                 items:
-                  $ref: '#/components/schemas/Location'
+                  $ref: "#/components/schemas/Location"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     post:
       tags:
         - Locations
@@ -1110,7 +1110,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateLocationInputBody'
+              $ref: "#/components/schemas/CreateLocationInputBody"
         required: true
       responses:
         "200":
@@ -1118,13 +1118,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Location'
+                $ref: "#/components/schemas/Location"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/locations/{id}:
     get:
       tags:
@@ -1144,13 +1144,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Location'
+                $ref: "#/components/schemas/Location"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/manager:
     patch:
       tags:
@@ -1162,7 +1162,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchManagerInputBody'
+              $ref: "#/components/schemas/PatchManagerInputBody"
         required: true
       responses:
         "200":
@@ -1170,13 +1170,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Manager'
+                $ref: "#/components/schemas/Manager"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/manager/{id}:
     get:
       tags:
@@ -1196,13 +1196,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Manager'
+                $ref: "#/components/schemas/Manager"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     delete:
       tags:
         - Managers
@@ -1221,13 +1221,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Manager'
+                $ref: "#/components/schemas/Manager"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/manager/org/{organization_id}:
     get:
       tags:
@@ -1247,13 +1247,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Manager'
+                $ref: "#/components/schemas/Manager"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/organizations:
     get:
       tags:
@@ -1292,13 +1292,13 @@ paths:
                 type: array
                 description: List of organizations
                 items:
-                  $ref: '#/components/schemas/Organization'
+                  $ref: "#/components/schemas/Organization"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     post:
       tags:
         - Organizations
@@ -1340,13 +1340,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Organization'
+                $ref: "#/components/schemas/Organization"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/organizations/{id}:
     get:
       tags:
@@ -1369,13 +1369,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Organization'
+                $ref: "#/components/schemas/Organization"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     delete:
       tags:
         - Organizations
@@ -1398,13 +1398,13 @@ paths:
             application/json:
               schema:
                 description: The deleted organization
-                $ref: '#/components/schemas/Organization'
+                $ref: "#/components/schemas/Organization"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     patch:
       tags:
         - Organizations
@@ -1452,13 +1452,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Organization'
+                $ref: "#/components/schemas/Organization"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/organizations/{organization_id}/event-occurrences/:
     get:
       tags:
@@ -1491,13 +1491,13 @@ paths:
                 type: array
                 description: List of event occurrences in the database that match the organization ID
                 items:
-                  $ref: '#/components/schemas/EventOccurrence'
+                  $ref: "#/components/schemas/EventOccurrence"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/registrations:
     post:
       tags:
@@ -1518,7 +1518,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateRegistrationInputBody'
+              $ref: "#/components/schemas/CreateRegistrationInputBody"
         required: true
       responses:
         "200":
@@ -1527,13 +1527,13 @@ paths:
             application/json:
               schema:
                 description: The newly created registration with full details
-                $ref: '#/components/schemas/Registration'
+                $ref: "#/components/schemas/Registration"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/registrations/{id}:
     get:
       tags:
@@ -1565,13 +1565,13 @@ paths:
             application/json:
               schema:
                 description: The requested registration with full details
-                $ref: '#/components/schemas/Registration'
+                $ref: "#/components/schemas/Registration"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     patch:
       tags:
         - Registrations
@@ -1599,7 +1599,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateRegistrationInputBody'
+              $ref: "#/components/schemas/UpdateRegistrationInputBody"
         required: true
       responses:
         "200":
@@ -1608,13 +1608,13 @@ paths:
             application/json:
               schema:
                 description: The updated registration with full details
-                $ref: '#/components/schemas/Registration'
+                $ref: "#/components/schemas/Registration"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/registrations/{id}/cancel:
     post:
       tags:
@@ -1642,13 +1642,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CancelRegistrationOutputBody'
+                $ref: "#/components/schemas/CancelRegistrationOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/registrations/{id}/payment-status:
     patch:
       tags:
@@ -1677,7 +1677,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateRegistrationPaymentStatusInputBody'
+              $ref: "#/components/schemas/UpdateRegistrationPaymentStatusInputBody"
         required: true
       responses:
         "200":
@@ -1686,13 +1686,13 @@ paths:
             application/json:
               schema:
                 description: The updated registration with full details
-                $ref: '#/components/schemas/Registration'
+                $ref: "#/components/schemas/Registration"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/registrations/child/{child_id}:
     get:
       tags:
@@ -1723,13 +1723,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetRegistrationsByChildIDOutputBody'
+                $ref: "#/components/schemas/GetRegistrationsByChildIDOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/registrations/event_occurrence/{event_occurrence_id}:
     get:
       tags:
@@ -1760,13 +1760,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetRegistrationsByEventOccurrenceIDOutputBody'
+                $ref: "#/components/schemas/GetRegistrationsByEventOccurrenceIDOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/registrations/guardian/{guardian_id}:
     get:
       tags:
@@ -1797,13 +1797,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetRegistrationsByGuardianIDOutputBody'
+                $ref: "#/components/schemas/GetRegistrationsByGuardianIDOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/review:
     post:
       tags:
@@ -1824,7 +1824,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateReviewInputBody'
+              $ref: "#/components/schemas/CreateReviewInputBody"
         required: true
       responses:
         "200":
@@ -1832,13 +1832,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Review'
+                $ref: "#/components/schemas/Review"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/review/{id}:
     delete:
       tags:
@@ -1858,13 +1858,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeleteReviewOutputBody'
+                $ref: "#/components/schemas/DeleteReviewOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/review/event/{id}:
     get:
       tags:
@@ -1916,13 +1916,13 @@ paths:
                 type: array
                 description: List of reviews
                 items:
-                  $ref: '#/components/schemas/Review'
+                  $ref: "#/components/schemas/Review"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/review/event_aggregate/{id}:
     get:
       tags:
@@ -1943,13 +1943,13 @@ paths:
             application/json:
               schema:
                 description: Aggregate review data including breakdown by rating, total reviews, and average rating
-                $ref: '#/components/schemas/ReviewAggregate'
+                $ref: "#/components/schemas/ReviewAggregate"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/review/guardian/{id}:
     get:
       tags:
@@ -2001,13 +2001,13 @@ paths:
                 type: array
                 description: List of reviews
                 items:
-                  $ref: '#/components/schemas/Review'
+                  $ref: "#/components/schemas/Review"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/saved:
     post:
       tags:
@@ -2028,7 +2028,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateSavedInputBody'
+              $ref: "#/components/schemas/CreateSavedInputBody"
         required: true
       responses:
         "200":
@@ -2036,13 +2036,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Saved'
+                $ref: "#/components/schemas/Saved"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/saved/{id}:
     get:
       tags:
@@ -2094,13 +2094,13 @@ paths:
                 type: array
                 description: List of saved event occurrences
                 items:
-                  $ref: '#/components/schemas/Saved'
+                  $ref: "#/components/schemas/Saved"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
     delete:
       tags:
         - Saved
@@ -2119,13 +2119,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeleteSavedOutputBody'
+                $ref: "#/components/schemas/DeleteSavedOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/schools:
     get:
       tags:
@@ -2160,13 +2160,13 @@ paths:
                 type: array
                 description: List of all schools in the database
                 items:
-                  $ref: '#/components/schemas/School'
+                  $ref: "#/components/schemas/School"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/stripe/attach-pm/{guardian_id}:
     post:
       tags:
@@ -2186,7 +2186,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AttachPaymentMethodInputBody'
+              $ref: "#/components/schemas/AttachPaymentMethodInputBody"
         required: true
       responses:
         "200":
@@ -2194,13 +2194,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AttachPaymentMethodOutputBody'
+                $ref: "#/components/schemas/AttachPaymentMethodOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/stripe/customer/{guardian_id}:
     post:
       tags:
@@ -2223,13 +2223,13 @@ paths:
             application/json:
               schema:
                 description: Updated guardian with Stripe customer ID
-                $ref: '#/components/schemas/Guardian'
+                $ref: "#/components/schemas/Guardian"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/stripe/login/{organization_id}:
     post:
       tags:
@@ -2251,13 +2251,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateOrgLoginLinkOutputBody'
+                $ref: "#/components/schemas/CreateOrgLoginLinkOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/stripe/onboarding/{organization_id}:
     post:
       tags:
@@ -2277,7 +2277,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateStripeOnboardingLinkInputBody'
+              $ref: "#/components/schemas/CreateStripeOnboardingLinkInputBody"
         required: true
       responses:
         "200":
@@ -2285,13 +2285,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateStripeOnboardingLinkOutputBody'
+                $ref: "#/components/schemas/CreateStripeOnboardingLinkOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/stripe/orgaccount/{organization_id}:
     post:
       tags:
@@ -2314,13 +2314,13 @@ paths:
             application/json:
               schema:
                 description: Updated organization with Stripe account ID
-                $ref: '#/components/schemas/CreateOrgStripeAccountOutputBody'
+                $ref: "#/components/schemas/CreateOrgStripeAccountOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
   /api/v1/stripe/setup-intent/{guardian_id}:
     post:
       tags:
@@ -2342,13 +2342,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateSetupIntentOutputBody'
+                $ref: "#/components/schemas/CreateSetupIntentOutputBody"
         default:
           description: Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorModel'
+                $ref: "#/components/schemas/ErrorModel"
 components:
   schemas:
     AttachPaymentMethodInputBody:
@@ -2422,7 +2422,7 @@ components:
           description: Refund status if applicable
         registration:
           description: Updated registration
-          $ref: '#/components/schemas/Registration'
+          $ref: "#/components/schemas/Registration"
       required:
         - message
         - registration
@@ -2687,7 +2687,7 @@ components:
           readOnly: true
         account:
           description: Stripe account details
-          $ref: '#/components/schemas/Organization'
+          $ref: "#/components/schemas/Organization"
       required:
         - account
     CreateRegistrationInputBody:
@@ -2948,7 +2948,7 @@ components:
           type: array
           description: Optional list of individual error details
           items:
-            $ref: '#/components/schemas/ErrorDetail'
+            $ref: "#/components/schemas/ErrorDetail"
         instance:
           type: string
           description: A URI reference that identifies the specific occurrence of the problem.
@@ -3048,13 +3048,13 @@ components:
           type: string
           format: date-time
         event:
-          $ref: '#/components/schemas/Event'
+          $ref: "#/components/schemas/Event"
         id:
           type: string
         language:
           type: string
         location:
-          $ref: '#/components/schemas/Location'
+          $ref: "#/components/schemas/Location"
         manager_id:
           type: string
         max_attendees:
@@ -3144,7 +3144,7 @@ components:
         payment_methods:
           type: array
           items:
-            $ref: '#/components/schemas/PaymentMethod'
+            $ref: "#/components/schemas/PaymentMethod"
       required:
         - payment_methods
     GetRegistrationsByChildIDOutputBody:
@@ -3162,7 +3162,7 @@ components:
           type: array
           description: List of registrations for the child
           items:
-            $ref: '#/components/schemas/Registration'
+            $ref: "#/components/schemas/Registration"
       required:
         - registrations
     GetRegistrationsByEventOccurrenceIDOutputBody:
@@ -3180,7 +3180,7 @@ components:
           type: array
           description: List of registrations for the event occurrence
           items:
-            $ref: '#/components/schemas/Registration'
+            $ref: "#/components/schemas/Registration"
       required:
         - registrations
     GetRegistrationsByGuardianIDOutputBody:
@@ -3198,7 +3198,7 @@ components:
           type: array
           description: List of registrations for the guardian
           items:
-            $ref: '#/components/schemas/Registration'
+            $ref: "#/components/schemas/Registration"
       required:
         - registrations
     Guardian:
@@ -3625,7 +3625,7 @@ components:
       additionalProperties: false
       properties:
         card:
-          $ref: '#/components/schemas/PaymentMethodCard'
+          $ref: "#/components/schemas/PaymentMethodCard"
         id:
           type: string
         type:
@@ -3824,7 +3824,7 @@ components:
         breakdown:
           type: array
           items:
-            $ref: '#/components/schemas/ReviewRatingCount'
+            $ref: "#/components/schemas/ReviewRatingCount"
         event_id:
           type: string
         total_reviews:
@@ -3863,7 +3863,7 @@ components:
           type: string
           format: date-time
         event:
-          $ref: '#/components/schemas/Event'
+          $ref: "#/components/schemas/Event"
         guardian_id:
           type: string
         id:

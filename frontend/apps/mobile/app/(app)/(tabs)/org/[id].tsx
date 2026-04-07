@@ -16,14 +16,24 @@ import { AppColors } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
 
-function OrgDetail({ org, location }: { org: Organization; location?: Location }) {
+function OrgDetail({
+  org,
+  location,
+}: {
+  org: Organization;
+  location?: Location;
+}) {
   const router = useRouter();
   const { t: translate } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
   const borderColor = useThemeColor({}, "borderColor");
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }} edges={["top", "bottom"]}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor }}
+      edges={["top", "bottom"]}
+    >
       <View
         className="flex-row items-center border-b px-4 pb-2.5 pt-3"
         style={{ backgroundColor, borderBottomColor: borderColor }}
@@ -33,7 +43,11 @@ function OrgDetail({ org, location }: { org: Organization; location?: Location }
           activeOpacity={0.7}
           className="h-8 w-8 items-center justify-center"
         >
-          <IconSymbol name="chevron.left" size={28} color={AppColors.primaryText} />
+          <IconSymbol
+            name="chevron.left"
+            size={28}
+            color={AppColors.primaryText}
+          />
         </TouchableOpacity>
         <ThemedText
           className="flex-1 text-center text-[16px] font-nunito-bold"
@@ -44,9 +58,16 @@ function OrgDetail({ org, location }: { org: Organization; location?: Location }
         <View className="w-8" />
       </View>
       <ScrollView showsVerticalScrollIndicator={false} className="pb-6">
-        <View className="h-[160px]" style={{ backgroundColor: AppColors.imagePlaceholder }}>
+        <View
+          className="h-[160px]"
+          style={{ backgroundColor: AppColors.imagePlaceholder }}
+        >
           {org.presigned_url ? (
-            <Image source={{ uri: org.presigned_url }} className="h-full w-full" contentFit="cover" />
+            <Image
+              source={{ uri: org.presigned_url }}
+              className="h-full w-full"
+              contentFit="cover"
+            />
           ) : (
             <View className="flex-1 items-center justify-center">
               <IconSymbol name="photo" size={48} color={AppColors.mutedText} />
@@ -59,16 +80,25 @@ function OrgDetail({ org, location }: { org: Organization; location?: Location }
               <Text className="mb-0.5 text-[24px] font-nunito-bold">
                 {org.name}
               </Text>
-              <Text className="mb-[5px] text-[14px] font-nunito" style={{ color: AppColors.mutedText }}>
+              <Text
+                className="mb-[5px] text-[14px] font-nunito"
+                style={{ color: AppColors.mutedText }}
+              >
                 {location && (
-                  <Text className="mb-[5px] text-[14px] font-nunito" style={{ color: AppColors.mutedText }}>
+                  <Text
+                    className="mb-[5px] text-[14px] font-nunito"
+                    style={{ color: AppColors.mutedText }}
+                  >
                     {location.district}, {location.province}
                   </Text>
                 )}
               </Text>
               <View className="flex-row items-center gap-1.5">
                 <Text className="text-[14px]">🔥</Text>
-                <Text className="text-[14px] font-nunito" style={{ color: AppColors.mutedText }}>
+                <Text
+                  className="text-[14px] font-nunito"
+                  style={{ color: AppColors.mutedText }}
+                >
                   100+ {translate("org.bookingsThisWeek")}
                 </Text>
               </View>
@@ -79,7 +109,11 @@ function OrgDetail({ org, location }: { org: Organization; location?: Location }
                 className="h-9 w-9 items-center justify-center rounded-full border-2"
                 style={{ borderColor: AppColors.borderLight }}
               >
-                <IconSymbol name="square.and.arrow.up" size={18} color={AppColors.secondaryText} />
+                <IconSymbol
+                  name="square.and.arrow.up"
+                  size={18}
+                  color={AppColors.secondaryText}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -96,7 +130,10 @@ function OrgDetail({ org, location }: { org: Organization; location?: Location }
               source={require("@/assets/images/faces.png")}
               className="my-3 h-10 w-[140px]"
             />
-            <Text className="mt-1.5 text-[14px] font-nunito" style={{ color: AppColors.subtleText }}>
+            <Text
+              className="mt-1.5 text-[14px] font-nunito"
+              style={{ color: AppColors.subtleText }}
+            >
               (140)
             </Text>
           </View>
@@ -123,12 +160,12 @@ export default function OrgScreen() {
   const { data: response, isLoading, error } = useGetOrganization(id);
   const { t: translate } = useTranslation();
   const { data: locationResponse } = useGetLocationById(
-    response?.status === 200 ? response.data.location_id ?? "" : "",
+    response?.status === 200 ? (response.data.location_id ?? "") : "",
     {
       query: {
         enabled: response?.status === 200 && !!response.data.location_id,
       },
-    }
+    },
   );
 
   if (isLoading) {
@@ -149,5 +186,12 @@ export default function OrgScreen() {
     );
   }
 
-  return <OrgDetail org={response.data} location={locationResponse?.status === 200 ? locationResponse.data : undefined} />;
+  return (
+    <OrgDetail
+      org={response.data}
+      location={
+        locationResponse?.status === 200 ? locationResponse.data : undefined
+      }
+    />
+  );
 }
