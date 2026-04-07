@@ -35,6 +35,8 @@ func CreateTestLocation(
 	input.Body.Country = "USA"
 
 	location, err := repo.CreateLocation(ctx, input)
+	t.Logf("CreateLocation error: %v", err)
+	t.Logf("CreateLocation result: %v", location)
 
 	require.NoError(t, err)
 	require.NotNil(t, location)

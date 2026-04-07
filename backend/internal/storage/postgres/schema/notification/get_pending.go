@@ -15,7 +15,6 @@ func (r *NotificationRepository) GetPendingNotifications(ctx context.Context) ([
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
 	}
-	
 
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
@@ -32,4 +31,3 @@ func (r *NotificationRepository) GetPendingNotifications(ctx context.Context) ([
 
 	return notifications, nil
 }
-

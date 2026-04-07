@@ -1,21 +1,21 @@
 {
-	"name": "skillspark",
-	"version": "1.0.0",
-	"private": true,
-	"scripts": {
-		"prepare": "husky",
-		"dev:backend": "cd backend && go run .",
-		"install:all": "cd frontend && bun install",
-		"dev:web": "npm run dev -w frontend/apps/web",
-		"dev:mobile": "npm run start -w frontend/apps/mobile",
-		"generate:api": "npm run generate -w frontend/packages/api-client"
-	},
-	"devDependencies": {
-		"husky": "^9.1.7",
-		"supabase": "^2.72.7"
-	},
-	"workspaces": [
-		"frontend/apps/*",
-		"frontend/packages/*"
-	]
+  "name": "skillspark",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "dev:backend": "cd backend && go run .",
+    "install:all": "cd frontend && bun install",
+    "dev:web": "npm run dev -w frontend/apps/web",
+    "dev:mobile": "npm run start -w frontend/apps/mobile",
+    "generate:api": "npm run generate -w frontend/packages/api-client"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "supabase": "^2.72.7"
+  },
+  "workspaces": [
+    "frontend/apps/*",
+    "frontend/packages/*"
+  ]
 }

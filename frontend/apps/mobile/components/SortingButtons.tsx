@@ -21,12 +21,12 @@ export function FilterTabs<T>({ options, onChange }: FilterTabsProps<T>) {
   }
 
   return (
-    <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        className="px-5 flex-grow-0 py-3"
-        contentContainerStyle={{ gap: 12, paddingHorizontal: 4 }}
-        >
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      className="px-5 flex-grow-0 py-3"
+      contentContainerStyle={{ gap: 12, paddingHorizontal: 4 }}
+    >
       {options.map((opt) => {
         const active = selected === opt.value;
         return (
@@ -36,7 +36,9 @@ export function FilterTabs<T>({ options, onChange }: FilterTabsProps<T>) {
             className="px-4 py-2 rounded-full border"
             style={{
               backgroundColor: active ? AppColors.primaryText : "transparent",
-              borderColor: active ? AppColors.primaryText : AppColors.borderLight,
+              borderColor: active
+                ? AppColors.primaryText
+                : AppColors.borderLight,
             }}
           >
             <Text

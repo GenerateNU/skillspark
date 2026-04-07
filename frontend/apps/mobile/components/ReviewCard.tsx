@@ -14,24 +14,26 @@ function timeAgo(dateStr: string, translate: (key: string) => string) {
   if (months === 1) return translate("time.oneMonthAgo");
   if (months < 12) return `${months} ${translate("time.monthsAgo")}`;
   const years = Math.floor(months / 12);
-  return years === 1 ? translate("time.oneYearAgo") : `${years} ${translate("time.yearsAgo")}`;
+  return years === 1
+    ? translate("time.oneYearAgo")
+    : `${years} ${translate("time.yearsAgo")}`;
 }
 
 export function ReviewCard({ review }: { review: Review }) {
-
   const { t: translate } = useTranslation();
-  const match = RATING_OPTIONS.find(r => r.rating === review.rating);
+  const match = RATING_OPTIONS.find((r) => r.rating === review.rating);
 
   return (
-    <View
-      className="flex-row gap-3 p-4 rounded-2xl"
-    >
+    <View className="flex-row gap-3 p-4 rounded-2xl">
       <View className="items-center pt-1">
         {match && <Image source={match.image} className="w-9 h-9" />}
       </View>
 
       <View className="flex-1 gap-2">
-        <Text className="text-sm leading-5" style={{ color: AppColors.primaryText }}>
+        <Text
+          className="text-sm leading-5"
+          style={{ color: AppColors.primaryText }}
+        >
           {review.description}
         </Text>
 
@@ -42,8 +44,11 @@ export function ReviewCard({ review }: { review: Review }) {
                 key={cat}
                 className="px-3 py-1 rounded-full"
                 style={{ backgroundColor: AppColors.ratingPill }}
+              >
+                <Text
+                  className="text-xs"
+                  style={{ color: AppColors.secondaryText }}
                 >
-                <Text className="text-xs" style={{ color: AppColors.secondaryText }}>
                   {cat}
                 </Text>
               </View>
@@ -54,7 +59,7 @@ export function ReviewCard({ review }: { review: Review }) {
         <View className="flex-row justify-between items-center">
           <Text className="text-xs" style={{ color: AppColors.subtleText }}>
             Anonymous
-          </Text> 
+          </Text>
           <Text className="text-xs" style={{ color: AppColors.subtleText }}>
             {timeAgo(review.created_at, translate)}
           </Text>
