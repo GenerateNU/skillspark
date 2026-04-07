@@ -30,6 +30,8 @@ func CreateTestGuardian(
 	input.Body.Email = RandomString(10)
 	input.Body.Username = RandomString(10)
 	input.Body.AuthID = uuid.New()
+	input.Body.Name = RandomString(10)
+	input.Body.LanguagePreference = "en"
 
 	guardian, err := repo.CreateGuardian(ctx, input)
 
