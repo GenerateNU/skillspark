@@ -140,11 +140,11 @@ export interface CreateChildInputBody {
 }
 
 export interface CreateEmergencyContactInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  guardian_id: string;
-  name: string;
-  phone_number: string;
+	/** A URL to the JSON Schema for this object. */
+	readonly $schema?: string;
+	guardian_id: string;
+	name: string;
+	phone_number: string;
 }
 
 export interface CreateEventOccurrenceInputBody {
@@ -362,14 +362,14 @@ export interface DeleteSavedOutputBody {
 }
 
 export interface EmergencyContact {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  created_at: string;
-  guardian_id: string;
-  id: string;
-  name: string;
-  phone_number: string;
-  updated_at: string;
+	/** A URL to the JSON Schema for this object. */
+	readonly $schema?: string;
+	created_at: string;
+	guardian_id: string;
+	id: string;
+	name: string;
+	phone_number: string;
+	updated_at: string;
 }
 
 export interface ErrorDetail {
@@ -741,11 +741,11 @@ export interface UpdateChildInputBody {
 }
 
 export interface UpdateEmergencyContactInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  guardian_id: string;
-  name: string;
-  phone_number: string;
+	/** A URL to the JSON Schema for this object. */
+	readonly $schema?: string;
+	guardian_id: string;
+	name: string;
+	phone_number: string;
 }
 
 export interface UpdateEventOccurrenceInputBody {

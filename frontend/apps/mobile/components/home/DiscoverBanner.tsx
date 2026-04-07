@@ -12,9 +12,10 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
       : null;
 
   return (
+    <View className="borderRadius: 24, overflow: 'hidden'">
     <Pressable
       onPress={() => router.push(`/event/${event.id}`)}
-      className="mx-5 rounded-3xl overflow-hidden h-[188px]"
+      className="mx-1 rounded-3xl overflow-hidden h-[188px]"
       style={{ backgroundColor: AppColors.primaryText }}
     >
       {event.event.presigned_url ? (
@@ -81,5 +82,6 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
         </Text>
       </View>
     </Pressable>
+    </View>
   );
 }

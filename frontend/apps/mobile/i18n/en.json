@@ -19,6 +19,8 @@
     "noEventsAvailable": "No events available",
     "noUpcomingEvents": "No upcoming events",
     "noGuardianId": "Unable to load: no account found",
+    "noEventId": "Unable to load: no event ID found",
+    "noReviewsAvailable": "No reviews available", 
     "noChildrenFound": "No children found",
     "noChildProfilesAdded": "No child profiles added yet.",
     "noEmergencyContactsAdded": "No emergency contacts added",
@@ -162,6 +164,31 @@
     "deleteTitle": "Delete saved event",
     "deleteConfirm": "Are you sure you want to remove this saved event?"
   },
+  "review": {
+    "title": "Reviews",
+    "bad": "Bad",
+    "okay": "Okay",
+    "good": "Good",
+    "terrible": "Terrible",
+    "excellent": "Excellent",
+    "noReviews": "No reviews",
+    "tapToReview": "Tap to review",
+    "writeReview": "Write a review",
+    "firstReview": "Be the first to review!",
+    "mostRecent": "Most recent",
+    "highest": "Highest",
+    "lowest": "Lowest",
+    "reviews": "reviews"
+  },
+  "time": {
+    "today": "Today",
+    "oneDayAgo": "1 day ago",
+    "daysAgo": "days ago",
+    "oneMonthAgo": "1 month ago",
+    "monthsAgo": "months ago",
+    "oneYearAgo": "1 year ago",
+    "yearsAgo": "years ago"
+  },
   "event": {
     "back": "Back",
     "seeMore": "See more",
@@ -199,6 +226,14 @@
     "miles": "mi",
     "stars": "Stars"
   },
+  "org": {
+    "about": "About",
+    "noDescription": "No description available.",
+    "seeSchedule": "See Schedule",
+    "notFound": "Organization not found.",
+    "bookingsThisWeek": "Bookings this week",
+    "reviews": "Reviews"
+  },
   "interests": {
     "science": "Science",
     "math": "Math",
@@ -208,5 +243,13 @@
     "technology": "Technology",
     "language": "Language",
     "other": "Other"
+  },
+  "editProfile": {
+    "title": "Family Information",
+    "subtitle": "Edit Profile",
+    "name": "Name",
+    "username": "Username",
+    "changeImage": "Change Image",
+    "saveChanges": "Save Changes"
   }
 }
