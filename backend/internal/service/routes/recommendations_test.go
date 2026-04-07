@@ -76,7 +76,7 @@ func TestGetRecommendationsByChildID(t *testing.T) {
 			childID: childID.String(),
 			mockSetup: func(c *repomocks.MockChildRepository, r *repomocks.MockRecommendationRepository) {
 				c.On("GetChildByID", mock.Anything, childID).Return(child, nil)
-				r.On("GetRecommendationsByChildID", mock.Anything, child.Interests, child.BirthYear, "en-US", defaultPagination).Return(events, nil)
+				r.On("GetRecommendationsByChildID", mock.Anything, child.Interests, child.BirthYear, "en-US", defaultPagination, (*time.Time)(nil), (*time.Time)(nil)).Return(events, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -102,7 +102,7 @@ func TestGetRecommendationsByChildID(t *testing.T) {
 			mockSetup: func(c *repomocks.MockChildRepository, r *repomocks.MockRecommendationRepository) {
 				c.On("GetChildByID", mock.Anything, childID).Return(child, nil)
 				repoErr := errs.InternalServerError("db error", "")
-				r.On("GetRecommendationsByChildID", mock.Anything, child.Interests, child.BirthYear, "en-US", defaultPagination).Return(nil, &repoErr)
+				r.On("GetRecommendationsByChildID", mock.Anything, child.Interests, child.BirthYear, "en-US", defaultPagination, (*time.Time)(nil), (*time.Time)(nil)).Return(nil, &repoErr)
 			},
 			statusCode: http.StatusInternalServerError,
 		},
