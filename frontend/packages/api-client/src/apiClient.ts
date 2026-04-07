@@ -1,8 +1,4 @@
-import axios, {
-  AxiosRequestConfig,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from "axios";
+import axios, { type InternalAxiosRequestConfig } from "axios";
 export let currentLanguage = "en";
 export function setCurrentLanguage(lang: string) {
   currentLanguage = lang;
@@ -135,6 +131,7 @@ export async function customInstance<T>(
 ): Promise<T> {
   const baseURL = getBaseURL();
   const fullUrl = `${baseURL}${url}`;
+  const isFormData = options?.body instanceof FormData;
 
   const languageHeader = currentLanguage === "th" ? "th-TH" : "en-US";
 
@@ -144,7 +141,7 @@ export async function customInstance<T>(
     ...options,
     credentials: "include",
     headers: {
-      "Content-Type": "application/json",
+      ...(!isFormData && { "Content-Type": "application/json" }),
       "Accept-Language": languageHeader,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,

@@ -1,9 +1,9 @@
 package registration
 
 import (
+	"skillspark/internal/notification"
 	"skillspark/internal/storage"
 	"skillspark/internal/stripeClient"
-	"skillspark/internal/notification"
 )
 
 type Handler struct {
@@ -12,7 +12,7 @@ type Handler struct {
 	GuardianRepository        storage.GuardianRepository
 	ChildRepository           storage.ChildRepository
 	OrganizationRepository    storage.OrganizationRepository
-	StripeClient 			  stripeClient.StripeClientInterface
+	StripeClient              stripeClient.StripeClientInterface
 	NotificationService       notification.NotificationServiceInterface
 }
 

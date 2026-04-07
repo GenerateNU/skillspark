@@ -3579,11 +3579,9 @@ components:
         - id
         - name
         - active
-        - presigned_url
         - location_id
         - created_at
         - updated_at
-        - stripe_account_id
         - stripe_account_activated
     PatchManagerInputBody:
       type: object
