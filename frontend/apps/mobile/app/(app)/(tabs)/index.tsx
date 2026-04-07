@@ -29,6 +29,8 @@ import { CategoryCard } from "@/components/home/CategoryCard";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { TrendingCard } from "@/components/home/TrendingCard";
+import { getCurrentPositionAsync } from "expo-location";
+
 
 export default function HomeScreen() {
   const { t: translate } = useTranslation();

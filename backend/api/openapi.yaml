@@ -333,8 +333,7 @@ paths:
           content:
             application/json:
               schema:
-                description: Deleted Emergency Contact
-                $ref: '#/components/schemas/EmergencyContact'
+                $ref: '#/components/schemas/DeleteEmergencyContactBody'
         default:
           description: Error
           content:
@@ -642,6 +641,56 @@ paths:
               schema:
                 description: Updated event occurrence
                 $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/event-occurrences/trending:
+    get:
+      tags:
+        - Event Occurrences
+      summary: Get the top 5 trending event occurrences
+      description: Returns a list of trending event occurrences in the user's location
+      operationId: get-trending-event-occurrences
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: lat
+          in: query
+          description: The user's latitude
+          required: true
+          explode: false
+          schema:
+            type: number
+            description: The user's latitude
+            format: double
+        - name: lng
+          in: query
+          description: The user's longitude
+          required: true
+          explode: false
+          schema:
+            type: number
+            description: The user's longitude
+            format: double
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of trending in the user's area
+                items:
+                  $ref: '#/components/schemas/EventOccurrence'
         default:
           description: Error
           content:
@@ -2836,6 +2885,21 @@ components:
           description: Stripe-hosted onboarding page URL
       required:
         - onboarding_url
+    DeleteEmergencyContactBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DeleteEmergencyContactBody.json
+          readOnly: true
+        success_message:
+          type: string
+      required:
+        - success_message
     DeleteEventOutputBody:
       type: object
       additionalProperties: false

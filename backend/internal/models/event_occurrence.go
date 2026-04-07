@@ -72,6 +72,10 @@ type GetAllEventOccurrencesOutput struct {
 	Body []EventOccurrence `json:"body" doc:"List of all event occurrences in the database"`
 }
 
+type GetTrendingEventOccurrencesOutput struct {
+	Body []EventOccurrence `json:"body" doc:"List of trending in the user's area"`
+}
+
 type GetEventOccurrenceByIDInput struct {
 	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	ID             uuid.UUID `path:"id" doc:"ID of an event occurrence"`
@@ -84,6 +88,12 @@ type OptionalFloat64 struct {
 
 type GetEventOccurrenceByIDOutput struct {
 	Body *EventOccurrence `json:"body" doc:"Event occurrence in the database that matches the ID"`
+}
+
+type GetTrendingEventOccurrencesInput struct {
+	AcceptLanguage string  `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	Latitude       float64 `query:"lat" required:"true" doc:"The user's latitude"`
+	Longitude      float64 `query:"lng" required:"true" doc:"The user's longitude"`
 }
 
 type CreateEventOccurrenceInput struct {
