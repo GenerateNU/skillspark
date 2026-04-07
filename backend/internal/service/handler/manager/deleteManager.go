@@ -3,8 +3,8 @@ package manager
 import (
 	"context"
 	"log/slog"
-	"skillspark/internal/models"
 	"skillspark/internal/auth"
+	"skillspark/internal/models"
 )
 
 // DeleteManager handles DELETE /manager
@@ -16,13 +16,6 @@ func (h *Handler) DeleteManager(ctx context.Context, input *models.DeleteManager
 		slog.Error("Failed to start transaction: " + txErr.Error())
 		return nil, txErr
 	}
-
-	defer func() {
-		closeErr := tx.Conn().Close(ctx)
-		if closeErr != nil {
-			slog.Error("Failed to close transaction: " + closeErr.Error())
-		}
-	}()
 
 	manager, err := h.ManagerRepository.DeleteManager(ctx, input.ID, tx)
 	if err != nil {

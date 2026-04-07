@@ -26,18 +26,18 @@ const (
 
 // Notification represents a scheduled notification in the database
 type Notification struct {
-	ID                 uuid.UUID        `json:"id" db:"id"`
-	NotificationType   NotificationType  `json:"notification_type" db:"notification_type"`
-	RecipientEmail     *string          `json:"recipient_email,omitempty" db:"recipient_email"`
-	RecipientPushToken *string          `json:"recipient_push_token,omitempty" db:"recipient_push_token"`
-	Subject            *string          `json:"subject,omitempty" db:"subject"`
-	Body               string           `json:"body" db:"body"`
-	Metadata           json.RawMessage  `json:"metadata,omitempty" db:"metadata"`
-	ScheduledFor       time.Time        `json:"scheduled_for" db:"scheduled_for"`
-	SentAt             *time.Time       `json:"sent_at,omitempty" db:"sent_at"`
+	ID                 uuid.UUID          `json:"id" db:"id"`
+	NotificationType   NotificationType   `json:"notification_type" db:"notification_type"`
+	RecipientEmail     *string            `json:"recipient_email,omitempty" db:"recipient_email"`
+	RecipientPushToken *string            `json:"recipient_push_token,omitempty" db:"recipient_push_token"`
+	Subject            *string            `json:"subject,omitempty" db:"subject"`
+	Body               string             `json:"body" db:"body"`
+	Metadata           json.RawMessage    `json:"metadata,omitempty" db:"metadata"`
+	ScheduledFor       time.Time          `json:"scheduled_for" db:"scheduled_for"`
+	SentAt             *time.Time         `json:"sent_at,omitempty" db:"sent_at"`
 	Status             NotificationStatus `json:"status" db:"status"`
-	CreatedAt          time.Time        `json:"created_at" db:"created_at"`
-	UpdatedAt          time.Time        `json:"updated_at" db:"updated_at"`
+	CreatedAt          time.Time          `json:"created_at" db:"created_at"`
+	UpdatedAt          time.Time          `json:"updated_at" db:"updated_at"`
 }
 
 // NotificationMessage represents the payload structure sent to SQS
@@ -48,7 +48,7 @@ type NotificationMessage struct {
 	RecipientPushToken *string          `json:"recipient_push_token,omitempty"`
 	Subject            *string          `json:"subject,omitempty"`
 	Body               string           `json:"body"`
-	Metadata           json.RawMessage `json:"metadata,omitempty"`
+	Metadata           json.RawMessage  `json:"metadata,omitempty"`
 }
 
 // CreateScheduledNotificationInput is used internally to create a scheduled notification
@@ -71,4 +71,3 @@ type SendNotificationInput struct {
 	Body               string
 	Metadata           json.RawMessage
 }
-

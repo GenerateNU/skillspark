@@ -1,11 +1,18 @@
-import Carousel from 'react-native-reanimated-carousel';
-import { View } from 'react-native';
+import Carousel from "react-native-reanimated-carousel";
+import { View } from "react-native";
 import { AppColors } from "@/constants/theme";
-import { type EventOccurrence } from '@skillspark/api-client';
-import { DiscoverBanner } from './DiscoverBanner';
+import { type EventOccurrence } from "@skillspark/api-client";
+import { DiscoverBanner } from "./DiscoverBanner";
 
-export default function CarouselCard({ events, width, height}: { events: EventOccurrence[], width: number, height: number }) {
-    
+export default function CarouselCard({
+  events,
+  width,
+  height,
+}: {
+  events: EventOccurrence[];
+  width: number;
+  height: number;
+}) {
   return (
     <Carousel
       width={width / 1.1}
@@ -16,16 +23,15 @@ export default function CarouselCard({ events, width, height}: { events: EventOc
       autoPlayInterval={3000}
       mode="vertical-stack"
       modeConfig={{
-        snapDirection: 'left',
+        snapDirection: "left",
         stackInterval: 0,
       }}
-
       renderItem={({ item }) => (
         <View className="borderRadius: 24, overflow: 'hidden', flex: 1">
           <DiscoverBanner event={item} />
         </View>
       )}
-      style={{ alignSelf: 'center' }}
+      style={{ alignSelf: "center" }}
     />
   );
 }

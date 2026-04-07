@@ -35,4 +35,3 @@ func (r *GuardianRepository) GetGuardianByChildID(ctx context.Context, childID u
 
 	return &guardian, nil
 }
-
