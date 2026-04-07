@@ -17,6 +17,8 @@ SELECT
         WHERE cat = ANY($1::text[])
     ) AS score
 FROM event e
+JOIN organization o ON o.id = e.organization_id
+JOIN location l ON l.id = o.location_id
 WHERE EXISTS (
     SELECT 1 FROM event_occurrence eo
     WHERE eo.event_id = e.id
@@ -32,7 +34,10 @@ AND (
     $2::int IS NULL OR e.age_range_max IS NULL OR (EXTRACT(YEAR FROM NOW()) - $2) <= e.age_range_max
 )
 AND (
-    earth_distance(
+    $7::float IS NULL
+    OR $8::float IS NULL
+    OR $9::float IS NULL
+    OR earth_distance(
         ll_to_earth(l.latitude, l.longitude),
         ll_to_earth($7, $8)
     )/1000 <= $9

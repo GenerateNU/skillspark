@@ -6,6 +6,7 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
 	"skillspark/internal/utils"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -17,7 +18,23 @@ func (r *RecommendationRepository) GetRecommendationsByChildID(ctx context.Conte
 		return nil, &e
 	}
 
-	rows, err := r.db.Query(ctx, query, childInterests, childBirthYear, pagination.Limit, pagination.GetOffset(), filters.MinDate, filters.MaxDate, filters.Latitude, filters.Longitude, filters.RadiusKm)
+	var lat, lng *float64
+	if filters.Latitude.Set {
+		lat = &filters.Latitude.Value
+	}
+	if filters.Longitude.Set {
+		lng = &filters.Longitude.Value
+	}
+
+	var minDate, maxDate *time.Time
+	if !filters.MinDate.IsZero() {
+		minDate = &filters.MinDate
+	}
+	if !filters.MaxDate.IsZero() {
+		maxDate = &filters.MaxDate
+	}
+
+	rows, err := r.db.Query(ctx, query, childInterests, childBirthYear, pagination.Limit, pagination.GetOffset(), minDate, maxDate, lat, lng, filters.RadiusKm)
 	if err != nil {
 		e := errs.InternalServerError("Failed to fetch recommendations: ", err.Error())
 		return nil, &e

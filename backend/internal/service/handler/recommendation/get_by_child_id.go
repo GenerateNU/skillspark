@@ -23,13 +23,9 @@ func (h *Handler) GetRecommendationsByChildID(ctx context.Context, childID uuid.
 	}
 
 	for idx := range output {
-
-		event := output[idx]
-		err := AssignURL(ctx, &event, h.S3Client)
-		if err != nil {
+		if err := AssignURL(ctx, &output[idx], h.S3Client); err != nil {
 			return nil, err
 		}
-
 	}
 
 	return output, nil
