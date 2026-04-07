@@ -136,7 +136,9 @@ function EventOccurrenceDetail({
               <ListItem
                 label={translate("review.title")}
                 isLast
-                onPress={() => router.push(`/event/review?id=${occurrence.event.id}`)}
+                onPress={() =>
+                  router.push(`/event/review?id=${occurrence.event.id}`)
+                }
               />
             </View>
             <Text
