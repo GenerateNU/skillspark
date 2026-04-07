@@ -32,6 +32,9 @@ func SetupRecommendationRoutes(api huma.API, repo *storage.Repository) {
 		if !input.MaxDate.IsZero() {
 			maxDate = &input.MaxDate
 		}
+		if minDate != nil && maxDate != nil && minDate.After(*maxDate) {
+			return nil, huma.Error400("min_date must be less than or equal to max_date")
+		}
 
 		recommendations, err := recommendationHandler.GetRecommendationsByChildID(ctx, input.ChildID, input.AcceptLanguage, pagination, minDate, maxDate)
 		if err != nil {
