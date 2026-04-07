@@ -12,8 +12,7 @@ export {
 } from "./generated/event-occurrences/event-occurrences";
 export { createOrganization, updateOrganization } from "./organizations";
 export * from "./generated/event-occurrences/event-occurrences";
-export * from "./generated/organizations/organizations";
-export * from "./generated/auth/auth";
+export * from "./generated/review/review";
 export * from "./generated/events/events";
 export * from "./generated/skillSparkAPI.schemas";
 export * from "./generated/child/child";

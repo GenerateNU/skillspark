@@ -1,10 +1,9 @@
 import { Stack } from "expo-router";
 
-export default function EventLayout() {
+export default function OrgLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="[id]" />
-      <Stack.Screen name="review" />
     </Stack>
   );
 }

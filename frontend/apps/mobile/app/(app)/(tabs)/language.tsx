@@ -7,15 +7,10 @@ import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
 import { useGuardian } from "@/hooks/use-guardian";
-import {
-  useUpdateGuardian,
-  getGetGuardianByIdQueryKey,
-  setCurrentLanguage,
-} from "@skillspark/api-client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import * as SecureStore from "expo-secure-store";
+import { setCurrentLanguage } from "@skillspark/api-client";
+import { useAuthContext } from "@/hooks/use-auth-context";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 const LANGUAGES = [
   { code: "en", label: "English", flag: "🇺🇸" },
@@ -33,27 +28,27 @@ export default function LanguageScreen() {
   const dividerColor = colorScheme === "dark" ? "#3a3a3c" : "#E5E7EB";
 
   const [selected, setSelected] = useState(i18n.language ?? "en");
-  const { guardian, guardianId } = useGuardian();
-  const updateGuardianMutation = useUpdateGuardian();
-  const queryClient = useQueryClient();
+  const [errorText, setErrorText] = useState("");
+  const { guardianId, update } = useAuthContext();
+  const { guardian } = useGuardian(guardianId);
 
   const updateLanguageData = async (langCode: string) => {
     setSelected(langCode);
     await i18n.changeLanguage(langCode);
     setCurrentLanguage(langCode);
-    await SecureStore.setItemAsync("language_preference", langCode);
-    queryClient.invalidateQueries({ refetchType: "all" });
 
-    if (guardian) {
-      updateGuardianMutation.mutate({
-        id: guardianId,
-        data: {
-          name: guardian.name,
-          email: guardian.email,
-          username: guardian.username,
-          language_preference: langCode,
-        },
-      });
+    if (guardianId && guardian) {
+      update(
+        () => {},
+        setErrorText,
+        guardianId,
+        guardian.email,
+        langCode,
+        guardian.name,
+        guardian.username,
+        guardian.profile_picture_s3_key,
+      );
+      if (errorText !== "") console.log(errorText);
     }
   };
 
@@ -108,6 +103,7 @@ export default function LanguageScreen() {
           </React.Fragment>
         ))}
       </View>
+      <ErrorMessage message={errorText} />
     </ThemedView>
   );
 }
