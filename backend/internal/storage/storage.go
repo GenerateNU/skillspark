@@ -5,7 +5,6 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
 	emergencycontact "skillspark/internal/storage/postgres/schema/emergency-contact"
-	"skillspark/internal/storage/postgres/schema/recommendation"
 	"skillspark/internal/storage/postgres/schema/event"
 	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
@@ -14,6 +13,7 @@ import (
 	notification "skillspark/internal/storage/postgres/schema/notification"
 	"skillspark/internal/storage/postgres/schema/organization"
 	"skillspark/internal/storage/postgres/schema/registration"
+	"skillspark/internal/storage/postgres/schema/recommendation"
 	"skillspark/internal/storage/postgres/schema/review"
 	"skillspark/internal/storage/postgres/schema/saved"
 	"skillspark/internal/storage/postgres/schema/school"
@@ -144,7 +144,7 @@ type EmergencyContactRepository interface {
 }
 
 type RecommendationRepository interface {
-	GetRecommendationsByChildID(ctx context.Context, childID uuid.UUID, acceptLanguage string, k int) ([]models.EventOccurrence, error)
+	GetRecommendationsByChildID(ctx context.Context, childInterests []string, childBirthYear int, acceptLanguage string, pagination utils.Pagination, minDate *time.Time, maxDate *time.Time) ([]models.Event, error)
 }
 
 type Repository struct {

@@ -333,8 +333,7 @@ paths:
           content:
             application/json:
               schema:
-                description: Deleted Emergency Contact
-                $ref: '#/components/schemas/EmergencyContact'
+                $ref: '#/components/schemas/DeleteEmergencyContactBody'
         default:
           description: Error
           content:
@@ -1492,6 +1491,88 @@ paths:
                 description: List of event occurrences in the database that match the organization ID
                 items:
                   $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/recommendations/{child_id}:
+    get:
+      tags:
+        - Recommendations
+      summary: Get recommendations by child ID
+      description: Returns a list of recommended events for a child
+      operationId: get-recommendations-by-child-id
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: child_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: lat
+          in: query
+          explode: false
+          schema:
+            type: string
+        - name: lng
+          in: query
+          explode: false
+          schema:
+            type: string
+        - name: radius_km
+          in: query
+          explode: false
+          schema:
+            type: number
+            format: double
+        - name: min_date
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: date-time
+        - name: max_date
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of recommended events for the child
+                items:
+                  $ref: '#/components/schemas/Event'
         default:
           description: Error
           content:
@@ -2836,6 +2917,21 @@ components:
           description: Stripe-hosted onboarding page URL
       required:
         - onboarding_url
+    DeleteEmergencyContactBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DeleteEmergencyContactBody.json
+          readOnly: true
+        success_message:
+          type: string
+      required:
+        - success_message
     DeleteEventOutputBody:
       type: object
       additionalProperties: false
