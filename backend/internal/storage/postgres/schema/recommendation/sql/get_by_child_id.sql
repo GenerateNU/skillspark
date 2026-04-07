@@ -31,5 +31,5 @@ AND (
 AND (
     $2::int IS NULL OR e.age_range_max IS NULL OR (EXTRACT(YEAR FROM NOW()) - $2) <= e.age_range_max
 )
-ORDER BY score DESC
+ORDER BY score DESC, e.created_at DESC, e.id DESC
 LIMIT $3 OFFSET $4;
