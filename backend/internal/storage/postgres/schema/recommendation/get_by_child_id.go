@@ -58,17 +58,16 @@ func scanEvent(row pgx.CollectableRow, language string) (models.Event, error) {
 		&score,
 	)
 
-	switch language {
-	case "th-TH":
+	e.Title = titleEN
+	e.Description = descriptionEN
+
+	if language == "th-TH" {
 		if titleTH != nil {
 			e.Title = *titleTH
 		}
 		if descriptionTH != nil {
 			e.Description = *descriptionTH
 		}
-	default:
-		e.Title = titleEN
-		e.Description = descriptionEN
 	}
 
 	return e, err
