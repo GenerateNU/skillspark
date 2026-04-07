@@ -6,19 +6,18 @@ import (
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
 	"skillspark/internal/utils"
-	"time"
 
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *RecommendationRepository) GetRecommendationsByChildID(ctx context.Context, childInterests []string, childBirthYear int, acceptLanguage string, pagination utils.Pagination, minDate *time.Time, maxDate *time.Time) ([]models.Event, error) {
+func (r *RecommendationRepository) GetRecommendationsByChildID(ctx context.Context, childInterests []string, childBirthYear int, acceptLanguage string, pagination utils.Pagination, filters models.RecommendationFilters) ([]models.Event, error) {
 	query, err := schema.ReadSQLBaseScript("get_by_child_id.sql", SqlRecommendationFiles)
 	if err != nil {
 		e := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &e
 	}
 
-	rows, err := r.db.Query(ctx, query, childInterests, childBirthYear, pagination.Limit, pagination.GetOffset(), minDate, maxDate)
+	rows, err := r.db.Query(ctx, query, childInterests, childBirthYear, pagination.Limit, pagination.GetOffset(), filters.MinDate, filters.MaxDate, filters.Latitude, filters.Longitude, filters.RadiusKm)
 	if err != nil {
 		e := errs.InternalServerError("Failed to fetch recommendations: ", err.Error())
 		return nil, &e

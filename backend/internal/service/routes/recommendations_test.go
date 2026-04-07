@@ -8,6 +8,7 @@ import (
 
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	s3mocks "skillspark/internal/s3_client/mocks"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
@@ -24,6 +25,7 @@ import (
 func setupRecommendationTestAPI(
 	childRepo *repomocks.MockChildRepository,
 	recommendationRepo *repomocks.MockRecommendationRepository,
+	s3Client *s3mocks.S3ClientMock,
 ) (*fiber.App, huma.API) {
 	app := fiber.New()
 	api := humafiber.New(app, huma.DefaultConfig("Test API", "1.0.0"))
@@ -31,7 +33,7 @@ func setupRecommendationTestAPI(
 		Child:          childRepo,
 		Recommendation: recommendationRepo,
 	}
-	routes.SetupRecommendationRoutes(api, repo)
+	routes.SetupRecommendationRoutes(api, repo, s3Client)
 	return app, api
 }
 
@@ -64,26 +66,27 @@ func TestGetRecommendationsByChildID(t *testing.T) {
 	}
 
 	defaultPagination := utils.Pagination{Page: 1, Limit: 10}
+	defaultFilters := models.RecommendationFilters{}
 
 	tests := []struct {
 		name       string
 		childID    string
-		mockSetup  func(*repomocks.MockChildRepository, *repomocks.MockRecommendationRepository)
+		mockSetup  func(*repomocks.MockChildRepository, *repomocks.MockRecommendationRepository, *s3mocks.S3ClientMock)
 		statusCode int
 	}{
 		{
 			name:    "success",
 			childID: childID.String(),
-			mockSetup: func(c *repomocks.MockChildRepository, r *repomocks.MockRecommendationRepository) {
+			mockSetup: func(c *repomocks.MockChildRepository, r *repomocks.MockRecommendationRepository, s3 *s3mocks.S3ClientMock) {
 				c.On("GetChildByID", mock.Anything, childID).Return(child, nil)
-				r.On("GetRecommendationsByChildID", mock.Anything, child.Interests, child.BirthYear, "en-US", defaultPagination, (*time.Time)(nil), (*time.Time)(nil)).Return(events, nil)
+				r.On("GetRecommendationsByChildID", mock.Anything, child.Interests, child.BirthYear, "en-US", defaultPagination, defaultFilters).Return(events, nil)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name:    "child not found",
 			childID: childID.String(),
-			mockSetup: func(c *repomocks.MockChildRepository, r *repomocks.MockRecommendationRepository) {
+			mockSetup: func(c *repomocks.MockChildRepository, r *repomocks.MockRecommendationRepository, s3 *s3mocks.S3ClientMock) {
 				notFound := errs.NotFound("Child", "id", childID)
 				c.On("GetChildByID", mock.Anything, childID).Return(nil, &notFound)
 			},
@@ -92,17 +95,17 @@ func TestGetRecommendationsByChildID(t *testing.T) {
 		{
 			name:    "invalid child_id",
 			childID: "not-a-uuid",
-			mockSetup: func(c *repomocks.MockChildRepository, r *repomocks.MockRecommendationRepository) {
+			mockSetup: func(c *repomocks.MockChildRepository, r *repomocks.MockRecommendationRepository, s3 *s3mocks.S3ClientMock) {
 			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
 			name:    "repo error",
 			childID: childID.String(),
-			mockSetup: func(c *repomocks.MockChildRepository, r *repomocks.MockRecommendationRepository) {
+			mockSetup: func(c *repomocks.MockChildRepository, r *repomocks.MockRecommendationRepository, s3 *s3mocks.S3ClientMock) {
 				c.On("GetChildByID", mock.Anything, childID).Return(child, nil)
 				repoErr := errs.InternalServerError("db error", "")
-				r.On("GetRecommendationsByChildID", mock.Anything, child.Interests, child.BirthYear, "en-US", defaultPagination, (*time.Time)(nil), (*time.Time)(nil)).Return(nil, &repoErr)
+				r.On("GetRecommendationsByChildID", mock.Anything, child.Interests, child.BirthYear, "en-US", defaultPagination, defaultFilters).Return(nil, &repoErr)
 			},
 			statusCode: http.StatusInternalServerError,
 		},
@@ -115,9 +118,10 @@ func TestGetRecommendationsByChildID(t *testing.T) {
 
 			mockChild := new(repomocks.MockChildRepository)
 			mockRec := new(repomocks.MockRecommendationRepository)
-			tt.mockSetup(mockChild, mockRec)
+			mockS3 := new(s3mocks.S3ClientMock)
+			tt.mockSetup(mockChild, mockRec, mockS3)
 
-			app, _ := setupRecommendationTestAPI(mockChild, mockRec)
+			app, _ := setupRecommendationTestAPI(mockChild, mockRec, mockS3)
 
 			req, err := http.NewRequest(http.MethodGet, "/api/v1/recommendations/"+tt.childID, nil)
 			assert.NoError(t, err)

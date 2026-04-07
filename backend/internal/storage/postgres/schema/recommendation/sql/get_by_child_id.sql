@@ -31,5 +31,11 @@ AND (
 AND (
     $2::int IS NULL OR e.age_range_max IS NULL OR (EXTRACT(YEAR FROM NOW()) - $2) <= e.age_range_max
 )
+AND (
+    earth_distance(
+        ll_to_earth(l.latitude, l.longitude),
+        ll_to_earth($7, $8)
+    )/1000 <= $9
+)
 ORDER BY score DESC
 LIMIT $3 OFFSET $4;

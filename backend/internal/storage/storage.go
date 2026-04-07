@@ -12,8 +12,8 @@ import (
 	"skillspark/internal/storage/postgres/schema/manager"
 	notification "skillspark/internal/storage/postgres/schema/notification"
 	"skillspark/internal/storage/postgres/schema/organization"
-	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/recommendation"
+	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/review"
 	"skillspark/internal/storage/postgres/schema/saved"
 	"skillspark/internal/storage/postgres/schema/school"
@@ -144,7 +144,7 @@ type EmergencyContactRepository interface {
 }
 
 type RecommendationRepository interface {
-	GetRecommendationsByChildID(ctx context.Context, childInterests []string, childBirthYear int, acceptLanguage string, pagination utils.Pagination, minDate *time.Time, maxDate *time.Time) ([]models.Event, error)
+	GetRecommendationsByChildID(ctx context.Context, childInterests []string, childBirthYear int, acceptLanguage string, pagination utils.Pagination, filters models.RecommendationFilters) ([]models.Event, error)
 }
 
 type Repository struct {

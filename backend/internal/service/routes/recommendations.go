@@ -4,16 +4,17 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 	recommendation "skillspark/internal/service/handler/recommendation"
 	"skillspark/internal/storage"
 	"skillspark/internal/utils"
-	"time"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupRecommendationRoutes(api huma.API, repo *storage.Repository) {
-	recommendationHandler := recommendation.NewHandler(repo)
+func SetupRecommendationRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface) {
+
+	recommendationHandler := recommendation.NewHandler(repo, s3Client)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-recommendations-by-child-id",
@@ -24,16 +25,15 @@ func SetupRecommendationRoutes(api huma.API, repo *storage.Repository) {
 		Tags:        []string{"Recommendations"},
 	}, func(ctx context.Context, input *models.GetRecommendationsByChildIDInput) (*models.GetRecommendationsByChildIDOutput, error) {
 		pagination := utils.Pagination{Page: input.Page, Limit: input.Limit}
-
-		var minDate, maxDate *time.Time
-		if !input.MinDate.IsZero() {
-			minDate = &input.MinDate
+		filters := models.RecommendationFilters{
+			Latitude:  input.Latitude,
+			Longitude: input.Longitude,
+			RadiusKm:  input.RadiusKm,
+			MinDate:   input.MinDate,
+			MaxDate:   input.MaxDate,
 		}
-		if !input.MaxDate.IsZero() {
-			maxDate = &input.MaxDate
-		}
 
-		recommendations, err := recommendationHandler.GetRecommendationsByChildID(ctx, input.ChildID, input.AcceptLanguage, pagination, minDate, maxDate)
+		recommendations, err := recommendationHandler.GetRecommendationsByChildID(ctx, input.ChildID, input.AcceptLanguage, pagination, filters)
 		if err != nil {
 			return nil, err
 		}

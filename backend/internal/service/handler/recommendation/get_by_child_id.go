@@ -3,6 +3,7 @@ package recommendation
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 	"skillspark/internal/utils"
 	"time"
 
@@ -10,11 +11,42 @@ import (
 )
 
 
-func (h *Handler) GetRecommendationsByChildID(ctx context.Context, childID uuid.UUID, acceptLanguage string, pagination utils.Pagination, minDate *time.Time, maxDate *time.Time) ([]models.Event, error) {
+func (h *Handler) GetRecommendationsByChildID(ctx context.Context, childID uuid.UUID, acceptLanguage string, pagination utils.Pagination, filters models.RecommendationFilters) ([]models.Event, error) {
 	child, err := h.ChildRepository.GetChildByID(ctx, childID)
 	if err != nil {
 		return nil, err
 	}
 
-	return h.RecommendationRepository.GetRecommendationsByChildID(ctx, child.Interests, child.BirthYear, acceptLanguage, pagination, minDate, maxDate)
+	output, err := h.RecommendationRepository.GetRecommendationsByChildID(ctx, child.Interests, child.BirthYear, acceptLanguage, pagination, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	for idx := range output {
+
+		event := output[idx]
+		err := AssignURL(ctx, &event, h.S3Client)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	return output, nil
+}
+
+func AssignURL(ctx context.Context, event *models.Event, s3Client s3_client.S3Interface) error {
+
+	key := event.HeaderImageS3Key
+	if key != nil {
+		url, err := s3Client.GeneratePresignedURL(ctx, *key, time.Hour)
+		if err != nil {
+			return err
+		}
+
+		event.PresignedURL = &url
+	}
+
+	return nil
+
 }
