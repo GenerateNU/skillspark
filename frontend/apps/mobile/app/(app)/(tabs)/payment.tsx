@@ -23,6 +23,7 @@ import PaymentMethodRow from "@/components/PaymentMethodRow";
 import CardForm from "@/components/CardForm";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import DeletePaymentMethodModal from "@/components/DeletePaymentMethodModal";
+import { useAuthContext } from "@/hooks/use-auth-context";
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -36,7 +37,8 @@ export default function PaymentScreen() {
   const [error, setError] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<boolean>(false);
-  const { guardian } = useGuardian();
+  const { guardianId } = useAuthContext();
+  const { guardian } = useGuardian(guardianId);
 
   async function fetchPaymentMethods(): Promise<void> {
     if (!guardian) return;
