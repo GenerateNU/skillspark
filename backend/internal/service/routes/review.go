@@ -178,4 +178,24 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		}, nil
 	})
 
+	huma.Register(api, huma.Operation{
+		OperationID: "get-review-aggregate-organization",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/review/organization_aggregate/{id}",
+		Summary:     "Get review aggregate by organization id",
+		Description: "Get review aggregate by organization id",
+		Tags:        []string{"Review"},
+	}, func(ctx context.Context, input *models.GetReviewsAggregateInput) (*models.ReviewsAggregateOutput, error) {
+
+		aggregate, err := reviewHandler.GetAggregateReviewsForOrganization(ctx, input.ID)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.ReviewsAggregateOutput{
+			Body: *aggregate,
+		}, nil
+	})
+
 }

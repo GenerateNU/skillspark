@@ -116,6 +116,7 @@ type ReviewRepository interface {
 	GetReviewsByOrganizationID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	DeleteReview(ctx context.Context, id uuid.UUID) error
 	GetAggregateReviews(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
+	GetAggregateReviewsForOrganization(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
 }
 
 type UserRepository interface {

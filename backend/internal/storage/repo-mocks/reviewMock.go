@@ -72,3 +72,14 @@ func (m *MockReviewRepository) GetAggregateReviews(ctx context.Context, id uuid.
 	}
 	return args.Get(0).(*models.ReviewAggregate), args.Error(1)
 }
+
+func (m *MockReviewRepository) GetAggregateReviewsForOrganization(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(error)
+	}
+	return args.Get(0).(*models.ReviewAggregate), args.Error(1)
+}
