@@ -18,6 +18,7 @@ import { StarRating } from "@/components/StarRating";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { formatDuration } from "@/utils/format";
 import { useTranslation } from "react-i18next";
+import { ListItem } from "@/components/ListItem";
 
 function formatAddress(occurrence: EventOccurrence) {
   const loc = occurrence.location;
@@ -130,6 +131,13 @@ function EventOccurrenceDetail({
                 {address}
               </Text>
               <StarRating size={17} />
+              <ListItem
+                label={translate("review.title")}
+                isLast
+                onPress={() =>
+                  router.push(`/event/review?id=${occurrence.event.id}`)
+                }
+              />
             </View>
             <Text
               numberOfLines={descriptionExpanded ? undefined : 5}

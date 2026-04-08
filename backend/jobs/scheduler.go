@@ -13,7 +13,7 @@ type JobScheduler struct {
 	cron         *cron.Cron
 	repo         *storage.Repository
 	stripeClient stripeClient.StripeClientInterface
-	notifService 		 notification.Service
+	notifService notification.Service
 }
 
 func NewJobScheduler(repo *storage.Repository, sc stripeClient.StripeClientInterface, notif notification.Service) *JobScheduler {
@@ -33,12 +33,12 @@ func (j *JobScheduler) Start() {
 	if err != nil {
 		log.Fatalf("Failed to schedule payment capture job: %v", err)
 	}
-	
+
 	_, err = j.cron.AddFunc("*/5 * * * *", func() {
 		log.Println("Running scheduled notification job...")
 		j.SendScheduledNotificationsJob()
 	})
-	if  err != nil {
+	if err != nil {
 		log.Fatalf("Failed to schedule notification job: %v", err)
 	}
 

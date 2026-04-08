@@ -32,6 +32,12 @@
     "plugins": [
       "expo-router",
       [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "SkillSpark needs your location to show events near you."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/generate.png",

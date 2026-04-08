@@ -6,4 +6,3 @@ import (
 
 //go:embed sql/*.sql
 var SqlNotificationFiles embed.FS
-

@@ -35,8 +35,7 @@ export default function ManageEmergencyContactScreen() {
   const insets = useSafeAreaInsets();
   const theme = Colors[colorScheme ?? "light"];
 
-  //const { guardianId } = useAuthContext();
-  const { guardianId } = useGuardian();
+  const { guardianId } = useAuthContext();
 
   const createEmergencyContactMutation = useCreateEmergencyContact();
   const updateEmergencyContactMutation = useUpdateEmergencyContact();

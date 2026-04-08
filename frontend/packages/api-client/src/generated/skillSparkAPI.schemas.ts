@@ -254,9 +254,9 @@ export interface Organization {
   location_id: string;
   name: string;
   pfp_s3_key?: string;
-  presigned_url: string;
+  presigned_url?: string;
   stripe_account_activated: boolean;
-  stripe_account_id: string;
+  stripe_account_id?: string;
   updated_at: string;
 }
 
@@ -961,6 +961,23 @@ export type UpdateOrganizationBody = {
    */
   name: Blob | string;
   profile_image?: Blob;
+};
+
+export type GetRecommendationsByChildIdParams = {
+/**
+ * @minimum 1
+ */
+page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+lat?: string;
+lng?: string;
+radius_km?: number;
+min_date?: string;
+max_date?: string;
 };
 
 export type GetReviewByEventIdParams = {

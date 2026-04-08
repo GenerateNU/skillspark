@@ -9,13 +9,13 @@ import (
 )
 
 type Service struct {
-	repo     *storage.Repository
+	repo      *storage.Repository
 	sqsClient sqs_client.SQSInterface
 }
 
 func NewService(repo *storage.Repository, sqsClient sqs_client.SQSInterface) *Service {
 	return &Service{
-		repo:     repo,
+		repo:      repo,
 		sqsClient: sqsClient,
 	}
 }
@@ -77,4 +77,3 @@ func validateNotificationInput(notificationType models.NotificationType, email *
 	}
 	return nil
 }
-

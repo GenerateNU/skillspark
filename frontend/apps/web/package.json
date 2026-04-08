@@ -16,6 +16,11 @@
   },
   "dependencies": {
     "@skillspark/api-client": "workspace:*",
+    "@tanstack/react-query": "^5.x.x",
+    "axios": "^1.x.x",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-hook-form": "^7.71.2",
     "react-router-dom": "^7.12.0"
   },
   "devDependencies": {

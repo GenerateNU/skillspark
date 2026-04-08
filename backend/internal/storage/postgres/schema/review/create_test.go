@@ -27,7 +27,6 @@ func TestCreateReview(t *testing.T) {
 		i := &models.CreateReviewDBInput{}
 		i.Body.RegistrationID = registrationID
 		i.Body.GuardianID = guardianID
-		i.Body.Rating = 3
 		i.Body.Description_EN = "Test review"
 		i.Body.Description_TH = &descriptionTH
 		i.Body.Categories = []string{"informative"}
@@ -44,7 +43,6 @@ func TestCreateReview(t *testing.T) {
 	assert.Equal(t, guardianID, created.GuardianID)
 	assert.Equal(t, input.Body.Description_EN, created.Description)
 	assert.Equal(t, input.Body.Categories, created.Categories)
-	assert.Equal(t, input.Body.Rating, created.Rating)
 	assert.NotEqual(t, uuid.Nil, created.ID)
 	assert.NotZero(t, created.CreatedAt)
 	assert.NotZero(t, created.UpdatedAt)
@@ -64,7 +62,6 @@ func TestCreateReview_FailsInvalidRegistration(t *testing.T) {
 		i := &models.CreateReviewDBInput{}
 		i.Body.RegistrationID = uuid.New()
 		i.Body.GuardianID = validGuardianID
-		i.Body.Rating = 3
 		i.Body.Description_EN = "Test review"
 		i.Body.Description_TH = &descriptionTH
 		i.Body.Categories = []string{"informative"}
@@ -91,7 +88,6 @@ func TestCreateReview_FailsInvalidGuardian(t *testing.T) {
 		i := &models.CreateReviewDBInput{}
 		i.Body.RegistrationID = registration.ID
 		i.Body.GuardianID = uuid.New()
-		i.Body.Rating = 3
 		i.Body.Description_EN = "Test review"
 		i.Body.Description_TH = &descriptionTH
 		i.Body.Categories = []string{"informative"}
