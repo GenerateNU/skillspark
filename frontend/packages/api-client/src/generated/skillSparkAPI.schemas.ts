@@ -340,6 +340,12 @@ export interface CreateStripeOnboardingLinkOutputBody {
   onboarding_url: string;
 }
 
+export interface DeleteEmergencyContactBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  success_message: string;
+}
+
 export interface DeleteEventOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -948,6 +954,23 @@ export type UpdateOrganizationBody = {
   profile_image?: Blob;
 };
 
+export type GetRecommendationsByChildIdParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  lat?: string;
+  lng?: string;
+  radius_km?: number;
+  min_date?: string;
+  max_date?: string;
+};
+
 export type GetReviewByEventIdParams = {
   /**
    * Page number (starts at 1)
@@ -963,6 +986,20 @@ export type GetReviewByEventIdParams = {
 };
 
 export type GetReviewByGuardianIdParams = {
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+};
+
+export type GetReviewByOrganizationIdParams = {
   /**
    * Page number (starts at 1)
    * @minimum 1

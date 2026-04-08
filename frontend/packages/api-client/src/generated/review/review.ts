@@ -27,6 +27,7 @@ import type {
   ErrorModel,
   GetReviewByEventIdParams,
   GetReviewByGuardianIdParams,
+  GetReviewByOrganizationIdParams,
   Review,
   ReviewAggregate,
 } from "../skillSparkAPI.schemas";
@@ -950,6 +951,435 @@ export function useGetReviewByGuardianId<
   const queryOptions = getGetReviewByGuardianIdQueryOptions(
     id,
     params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Returns all reviews with the given organization ID
+ * @summary Get reviews by organization ID
+ */
+export type getReviewByOrganizationIdResponse200 = {
+  data: Review[];
+  status: 200;
+};
+
+export type getReviewByOrganizationIdResponseDefault = {
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getReviewByOrganizationIdResponseSuccess =
+  getReviewByOrganizationIdResponse200 & {
+    headers: Headers;
+  };
+export type getReviewByOrganizationIdResponseError =
+  getReviewByOrganizationIdResponseDefault & {
+    headers: Headers;
+  };
+
+export type getReviewByOrganizationIdResponse =
+  | getReviewByOrganizationIdResponseSuccess
+  | getReviewByOrganizationIdResponseError;
+
+export const getGetReviewByOrganizationIdUrl = (
+  id: string,
+  params?: GetReviewByOrganizationIdParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/review/organization/${id}?${stringifiedParams}`
+    : `/api/v1/review/organization/${id}`;
+};
+
+export const getReviewByOrganizationId = async (
+  id: string,
+  params?: GetReviewByOrganizationIdParams,
+  options?: RequestInit,
+): Promise<getReviewByOrganizationIdResponse> => {
+  return customInstance<getReviewByOrganizationIdResponse>(
+    getGetReviewByOrganizationIdUrl(id, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getGetReviewByOrganizationIdQueryKey = (
+  id: string,
+  params?: GetReviewByOrganizationIdParams,
+) => {
+  return [
+    `/api/v1/review/organization/${id}`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetReviewByOrganizationIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+  TError = ErrorModel,
+>(
+  id: string,
+  params?: GetReviewByOrganizationIdParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetReviewByOrganizationIdQueryKey(id, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getReviewByOrganizationId>>
+  > = ({ signal }) =>
+    getReviewByOrganizationId(id, params, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetReviewByOrganizationIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getReviewByOrganizationId>>
+>;
+export type GetReviewByOrganizationIdQueryError = ErrorModel;
+
+export function useGetReviewByOrganizationId<
+  TData = Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+  TError = ErrorModel,
+>(
+  id: string,
+  params: undefined | GetReviewByOrganizationIdParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+          TError,
+          Awaited<ReturnType<typeof getReviewByOrganizationId>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetReviewByOrganizationId<
+  TData = Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+  TError = ErrorModel,
+>(
+  id: string,
+  params?: GetReviewByOrganizationIdParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+          TError,
+          Awaited<ReturnType<typeof getReviewByOrganizationId>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetReviewByOrganizationId<
+  TData = Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+  TError = ErrorModel,
+>(
+  id: string,
+  params?: GetReviewByOrganizationIdParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get reviews by organization ID
+ */
+
+export function useGetReviewByOrganizationId<
+
+  TData = Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+  TError = ErrorModel,
+>(
+  id: string,
+  params?: GetReviewByOrganizationIdParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReviewByOrganizationId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetReviewByOrganizationIdQueryOptions(
+    id,
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Get review aggregate by organization id
+ * @summary Get review aggregate by organization id
+ */
+export type getReviewAggregateOrganizationResponse200 = {
+  data: ReviewAggregate;
+  status: 200;
+};
+
+export type getReviewAggregateOrganizationResponseDefault = {
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getReviewAggregateOrganizationResponseSuccess =
+  getReviewAggregateOrganizationResponse200 & {
+    headers: Headers;
+  };
+export type getReviewAggregateOrganizationResponseError =
+  getReviewAggregateOrganizationResponseDefault & {
+    headers: Headers;
+  };
+
+export type getReviewAggregateOrganizationResponse =
+  | getReviewAggregateOrganizationResponseSuccess
+  | getReviewAggregateOrganizationResponseError;
+
+export const getGetReviewAggregateOrganizationUrl = (id: string) => {
+  return `/api/v1/review/organization_aggregate/${id}`;
+};
+
+export const getReviewAggregateOrganization = async (
+  id: string,
+  options?: RequestInit,
+): Promise<getReviewAggregateOrganizationResponse> => {
+  return customInstance<getReviewAggregateOrganizationResponse>(
+    getGetReviewAggregateOrganizationUrl(id),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getGetReviewAggregateOrganizationQueryKey = (id: string) => {
+  return [`/api/v1/review/organization_aggregate/${id}`] as const;
+};
+
+export const getGetReviewAggregateOrganizationQueryOptions = <
+  TData = Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+  TError = ErrorModel,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetReviewAggregateOrganizationQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getReviewAggregateOrganization>>
+  > = ({ signal }) =>
+    getReviewAggregateOrganization(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetReviewAggregateOrganizationQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getReviewAggregateOrganization>>
+>;
+export type GetReviewAggregateOrganizationQueryError = ErrorModel;
+
+export function useGetReviewAggregateOrganization<
+  TData = Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+  TError = ErrorModel,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+          TError,
+          Awaited<ReturnType<typeof getReviewAggregateOrganization>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetReviewAggregateOrganization<
+  TData = Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+  TError = ErrorModel,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+          TError,
+          Awaited<ReturnType<typeof getReviewAggregateOrganization>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetReviewAggregateOrganization<
+  TData = Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+  TError = ErrorModel,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get review aggregate by organization id
+ */
+
+export function useGetReviewAggregateOrganization<
+  TData = Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+  TError = ErrorModel,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReviewAggregateOrganization>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetReviewAggregateOrganizationQueryOptions(
+    id,
     options,
   );
 

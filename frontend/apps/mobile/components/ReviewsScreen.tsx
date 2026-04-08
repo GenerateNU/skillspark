@@ -7,12 +7,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, Colors } from "@/constants/theme";
-import {
-  Review,
-  ReviewAggregate,
-  useGetReviewAggregate,
-  useGetReviewByEventId,
-} from "@skillspark/api-client";
+import { Review, ReviewAggregate } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -26,7 +21,30 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function ReviewsScreen() {
+interface QueryResult<T> {
+  data: T | undefined;
+  isLoading: boolean;
+  error: unknown;
+}
+
+interface ReviewsScreenProps<
+  TAggregate extends { status: number; data: unknown },
+  TReviews extends { status: number; data: unknown },
+> {
+  useGetAggregate: (id: string) => QueryResult<TAggregate>;
+  useGetReviews: (id: string) => QueryResult<TReviews>;
+  /** When true, shows the rating smileys and write-a-review CTA */
+  canReview?: boolean;
+}
+
+export default function ReviewsScreen<
+  TAggregate extends { status: number; data: unknown },
+  TReviews extends { status: number; data: unknown },
+>({
+  useGetAggregate,
+  useGetReviews,
+  canReview = false,
+}: ReviewsScreenProps<TAggregate, TReviews>) {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const colorScheme = useColorScheme();
@@ -41,17 +59,13 @@ export default function ReviewsScreen() {
     data: aggregateResponse,
     isLoading: aggregateIsLoading,
     error: aggregateError,
-  } = useGetReviewAggregate(id, {
-    query: { enabled: !!id },
-  });
+  } = useGetAggregate(id ?? "");
 
   const {
     data: reviewsResponse,
     isLoading: reviewsIsLoading,
     error: reviewsError,
-  } = useGetReviewByEventId(id, undefined, {
-    query: { enabled: !!id },
-  });
+  } = useGetReviews(id ?? "");
 
   if (!id) {
     return <ErrorScreen message={translate("common.noEventId")} />;
@@ -94,7 +108,6 @@ export default function ReviewsScreen() {
   }
 
   const aggregate = aggregateResponse.data as ReviewAggregate;
-
   const reviews = reviewsResponse.data as Review[];
 
   return (
@@ -119,26 +132,28 @@ export default function ReviewsScreen() {
       >
         <RatingAggregateCard aggregate={aggregate} />
 
-        <View
-          className="mx-5 mt-4 p-4 rounded-2xl border"
-          style={{ borderColor: AppColors.borderLight }}
-        >
-          <ThemedText className="text-lg mb-4 text-center">
-            {aggregate.total_reviews > 0
-              ? translate("review.tapToReview")
-              : translate("review.firstReview")}
-          </ThemedText>
-          <RatingSmileys onSelect={(rating) => {}} />
-          <TouchableOpacity
-            className="mt-4 py-4 rounded-2xl items-center"
-            style={{ backgroundColor: AppColors.primaryText }}
-            onPress={() => router.back()}
+        {canReview && (
+          <View
+            className="mx-5 mt-4 p-4 rounded-2xl border"
+            style={{ borderColor: AppColors.borderLight }}
           >
-            <Text className="text-white text-base">
-              {translate("review.writeReview")}
-            </Text>
-          </TouchableOpacity>
-        </View>
+            <ThemedText className="text-lg mb-4 text-center">
+              {aggregate.total_reviews > 0
+                ? translate("review.tapToReview")
+                : translate("review.firstReview")}
+            </ThemedText>
+            <RatingSmileys onSelect={(rating) => {}} />
+            <TouchableOpacity
+              className="mt-4 py-4 rounded-2xl items-center"
+              style={{ backgroundColor: AppColors.primaryText }}
+              onPress={() => router.back()}
+            >
+              <Text className="text-white text-base">
+                {translate("review.writeReview")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {aggregate.total_reviews > 0 && (
           <FilterTabs

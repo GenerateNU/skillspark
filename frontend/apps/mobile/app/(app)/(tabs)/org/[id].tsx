@@ -118,7 +118,15 @@ function OrgDetail({
             </View>
           </View>
         </View>
-        <View className="mb-3 mt-2 mx-[15px] rounded-[32px] bg-white p-5 shadow">
+        
+        <TouchableOpacity
+          activeOpacity={0.7}
+          className="mb-3 mt-2 mx-[15px] rounded-[32px] bg-white p-5 shadow"
+          onPress={() => router.push({
+            pathname: `/(app)/(tabs)/org/[id]/reviews`,
+            params: { id: org.id },
+          })}
+        >
           <View className="items-center">
             <Text className="mb-1 text-[22px] font-nunito-bold">
               {translate("org.reviews")}
@@ -137,7 +145,7 @@ function OrgDetail({
               (140)
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <View className="px-4 pb-2.5 pt-1">
           <TouchableOpacity
             activeOpacity={0.85}

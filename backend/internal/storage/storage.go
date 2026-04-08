@@ -113,8 +113,10 @@ type ReviewRepository interface {
 	CreateReview(ctx context.Context, input *models.CreateReviewDBInput) (*models.Review, error)
 	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
+	GetReviewsByOrganizationID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	DeleteReview(ctx context.Context, id uuid.UUID) error
 	GetAggregateReviews(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
+	GetAggregateReviewsForOrganization(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
 }
 
 type UserRepository interface {
