@@ -29,15 +29,10 @@ export function RecommendedCard({
       >
         {occurrence.event.presigned_url ? (
           <Image
-  source={{ 
-  uri: occurrence.event.presigned_url,
-  headers: { 'Accept': 'image/*' } 
-}}
-  className="w-[79px] h-[72px]"
-  contentFit="cover"
-  onLoadStart={() => console.log('Started loading:', occurrence.event.presigned_url)}
-  onError={(error) => console.log('Image Load Error:', error.error)}
-/>
+            source={{ uri: occurrence.event.presigned_url }}
+            className="w-[79px] h-[72px]"
+            contentFit="cover"
+          />
         ) : (
           <View
             className="w-[79px] h-[72px]"
