@@ -40,7 +40,7 @@ func TestCreateReview(t *testing.T) {
 	require.NotNil(t, created)
 
 	assert.Equal(t, registrationID, created.RegistrationID)
-	assert.Equal(t, guardianID, created.GuardianID)
+	assert.Equal(t, *input.Body.GuardianID, *created.GuardianID)
 	assert.Equal(t, input.Body.Description_EN, created.Description)
 	assert.Equal(t, input.Body.Categories, created.Categories)
 	assert.NotEqual(t, uuid.Nil, created.ID)
