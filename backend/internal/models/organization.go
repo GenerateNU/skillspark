@@ -8,16 +8,17 @@ import (
 )
 
 type Organization struct {
-	ID                     uuid.UUID `json:"id" db:"id"`
-	Name                   string    `json:"name" db:"name"`
-	Active                 bool      `json:"active" db:"active"`
-	PfpS3Key               *string   `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
-	PresignedURL           *string   `json:"presigned_url,omitempty"`
-	LocationID             uuid.UUID `json:"location_id" db:"location_id"`
-	CreatedAt              time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt              time.Time `json:"updated_at" db:"updated_at"`
-	StripeAccountID        *string   `json:"stripe_account_id,omitempty" db:"stripe_account_id"`
-	StripeAccountActivated bool      `json:"stripe_account_activated" db:"stripe_account_activated" default:"false"`
+	ID                     uuid.UUID         `json:"id" db:"id"`
+	Name                   string            `json:"name" db:"name"`
+	Active                 bool              `json:"active" db:"active"`
+	PfpS3Key               *string           `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
+	PresignedURL           *string           `json:"presigned_url,omitempty"`
+	LocationID             uuid.UUID         `json:"location_id" db:"location_id"`
+	CreatedAt              time.Time         `json:"created_at" db:"created_at"`
+	UpdatedAt              time.Time         `json:"updated_at" db:"updated_at"`
+	StripeAccountID        *string           `json:"stripe_account_id,omitempty" db:"stripe_account_id"`
+	StripeAccountActivated bool              `json:"stripe_account_activated" db:"stripe_account_activated" default:"false"`
+	ReviewSummary          *OrgReviewSummary `json:"review_summary,omitempty"`
 }
 
 // CreateOrganizationRouteInput is the multipart form input for creating an organization with an image

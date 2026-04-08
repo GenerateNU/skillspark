@@ -14,7 +14,7 @@ import (
 )
 
 func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface) {
-	orgHandler := organization.NewHandler(repo.Organization, repo.Location, s3Client)
+	orgHandler := organization.NewHandler(repo.Organization, repo.Location, repo.Review, s3Client)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "create-organization",
