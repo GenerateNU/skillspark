@@ -46,20 +46,19 @@ func InitApp(config config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Initialize SQS client
 	sqsClient, err := sqs_client.NewClient(config.SQS)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Initialize notification service and scheduler
 	var notifService *notification.Service
-	
-	if config.TestMode { 
+
+	if config.TestMode {
 		notifService = notification.NewService(repo, sqsClient)
 	}
-	
 
 	c := &http.Client{}
 	translateClient := translations.NewClient(c)
@@ -77,9 +76,9 @@ func InitApp(config config.Config) (*App, error) {
 		return nil, err
 	}
 	return &App{
-		Server:      app,
-		Repo:        repo,
-		API:         humaAPI,
+		Server:       app,
+		Repo:         repo,
+		API:          humaAPI,
 		NotifService: notifService,
 		StripeClient: newStripeClient,
 	}, nil
@@ -101,7 +100,7 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	}))
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000,http://localhost:8080,https://cdn.scalar.com,http://127.0.0.1:8080,http://10.0.2.2:8080",
+		AllowOrigins:     "http://localhost:3000,http://localhost:8080,https://cdn.scalar.com,http://127.0.0.1:8080,http://10.0.2.2:8080,http://localhost:5173,http://localhost",
 		AllowMethods:     "GET,POST,PUT,PATCH,DELETE,OPTIONS",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
@@ -122,6 +121,8 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	// Register public routes BEFORE auth middleware
 	routes.SetupAuthRoutes(humaAPI, repo, config)
+	routes.SetupOrganizationRoutes(humaAPI, repo, s3Client)
+	routes.SetupManagerRoutes(humaAPI, repo, config)
 
 	// Apply auth middleware — only affects routes registered after this point
 	if !config.TestMode {
@@ -171,5 +172,7 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetupPaymentRoutes(api, repo, sc)
 	routes.SetUpSavedRoutes(api, repo)
 	routes.SetupGeocodingRoutes(api, geocodingService)
+	routes.SetupEmergencyContactRoutes(api, repo)
+	routes.SetupRecommendationRoutes(api, repo, s3Client)
 	return nil
 }

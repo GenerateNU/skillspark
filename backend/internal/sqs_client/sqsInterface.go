@@ -7,4 +7,3 @@ import (
 type SQSInterface interface {
 	SendMessage(ctx context.Context, messageBody interface{}) error
 }
-

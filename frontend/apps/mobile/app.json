@@ -11,7 +11,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "SkillSpark needs your location to show events and activities near you."
+        "NSLocationWhenInUseUsageDescription": "SkillSpark needs your location to show events and activities near you.",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "config": {},
       "bundleIdentifier": "com.skillspark.app"
@@ -30,6 +31,12 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "SkillSpark needs your location to show events near you."
+        }
+      ],
       [
         "expo-splash-screen",
         {

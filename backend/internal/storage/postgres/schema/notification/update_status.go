@@ -42,4 +42,3 @@ func (r *NotificationRepository) UpdateNotificationStatus(ctx context.Context, i
 
 	return &notification, nil
 }
-

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
 )
 
 //go:embed sql/*.sql
@@ -21,20 +22,17 @@ func CreateTestOrganization(
 	t.Helper()
 
 	repo := NewOrganizationRepository(db)
+	location := location.CreateTestLocation(t, ctx, db)
 
 	active := true
 	i := &models.CreateOrganizationInput{}
 	i.Body.Name = "Test Corp"
 	i.Body.Active = &active
-	locationID := location.CreateTestLocation(t, ctx, db).ID
-	i.Body.LocationID = locationID
+	i.Body.LocationID = location.ID
 
-	organization, _ := repo.CreateOrganization(ctx, i, nil)
-
-	// t.Logf("error returned: %v", err)
-
-	// require.NoError(t, err)
-	// require.NotNil(t, organization)
+	organization, err := repo.CreateOrganization(ctx, i, nil)
+	require.NoError(t, err)
+	require.NotNil(t, organization)
 
 	return organization
 }

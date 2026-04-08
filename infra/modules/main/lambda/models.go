@@ -24,7 +24,6 @@ type NotificationMessage struct {
 	Metadata           json.RawMessage  `json:"metadata,omitempty"`
 }
 
-
 // SQSEvent represents an SQS event
 type SQSEvent struct {
 	Records []SQSEventRecord `json:"Records"`
@@ -32,9 +31,9 @@ type SQSEvent struct {
 
 // SQSEventRecord represents a single SQS record
 type SQSEventRecord struct {
-	MessageID     string `json:"messageId"`
-	ReceiptHandle string `json:"receiptHandle"`
-	Body          string `json:"body"`
+	MessageID     string                 `json:"messageId"`
+	ReceiptHandle string                 `json:"receiptHandle"`
+	Body          string                 `json:"body"`
 	Attributes    map[string]interface{} `json:"attributes,omitempty"`
 }
 
@@ -56,9 +55,9 @@ type Handler struct {
 
 // ResendClient handles email sending via Resend API
 type ResendClient struct {
-	apiKey  string
-	client  *http.Client
-	from    string
+	apiKey string
+	client *http.Client
+	from   string
 }
 
 // ResendEmailRequest represents the request payload for Resend API

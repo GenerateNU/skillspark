@@ -139,6 +139,14 @@ export interface CreateChildInputBody {
   school_id: string;
 }
 
+export interface CreateEmergencyContactInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  guardian_id: string;
+  name: string;
+  phone_number: string;
+}
+
 export interface CreateEventOccurrenceInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -246,9 +254,9 @@ export interface Organization {
   location_id: string;
   name: string;
   pfp_s3_key?: string;
-  presigned_url: string;
+  presigned_url?: string;
   stripe_account_activated: boolean;
-  stripe_account_id: string;
+  stripe_account_id?: string;
   updated_at: string;
 }
 
@@ -351,6 +359,17 @@ export interface DeleteSavedOutputBody {
   readonly $schema?: string;
   /** Success message */
   message: string;
+}
+
+export interface EmergencyContact {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  created_at: string;
+  guardian_id: string;
+  id: string;
+  name: string;
+  phone_number: string;
+  updated_at: string;
 }
 
 export interface ErrorDetail {
@@ -719,6 +738,14 @@ export interface UpdateChildInputBody {
   name?: string;
   /** ID of the school the child goes to */
   school_id?: string;
+}
+
+export interface UpdateEmergencyContactInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  guardian_id: string;
+  name: string;
+  phone_number: string;
 }
 
 export interface UpdateEventOccurrenceInputBody {

@@ -3,9 +3,9 @@ package jobs
 import (
 	"context"
 	"fmt"
+	"log"
 	"log/slog"
 	"skillspark/internal/models"
-	"log"
 )
 
 func (j *JobScheduler) SendScheduledNotificationsJob() {
@@ -14,7 +14,7 @@ func (j *JobScheduler) SendScheduledNotificationsJob() {
 			log.Printf("CapturePaymentsJob panicked: %v", r)
 		}
 	}()
-	
+
 	ctx := context.Background()
 
 	// Get pending notifications that are due
@@ -28,7 +28,6 @@ func (j *JobScheduler) SendScheduledNotificationsJob() {
 		slog.Info("No pending notifications found")
 		return
 	}
-	
 
 	slog.Info("Found pending notifications", "count", len(notifications))
 
@@ -55,7 +54,6 @@ func (j *JobScheduler) SendScheduledNotificationsJob() {
 		}
 	}
 }
-
 
 func (j *JobScheduler) processNotification(ctx context.Context, notification models.Notification) error {
 	// Create notification message for SQS

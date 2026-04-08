@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   useColorScheme,
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,7 +18,8 @@ import { SectionHeader } from "@/components/SectionHeader";
 import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { ErrorScreen } from "@/components/ErrorScreen";
+import { EmergencyContactListItem } from "@/components/EmergencyContactListItem";
+import { NoProfilePic } from "@/components/NoProfilePic";
 
 export default function FamilyListScreen() {
   const router = useRouter();
@@ -26,11 +28,29 @@ export default function FamilyListScreen() {
   const theme = Colors[colorScheme ?? "light"];
   const { t: translate } = useTranslation();
 
-  const { guardian, children, isLoading } = useGuardian();
   const { guardianId } = useAuthContext();
+  const { guardian, children, emergencyContacts, isLoading } =
+    useGuardian(guardianId);
+  const profilePic = guardian?.profile_picture_s3_key ?? null;
 
   const handleAddChild = () => {
     router.push("/family/manage");
+  };
+
+  const handleAddEmergencyContact = () => {
+    router.push("./family/emergency-contact/manage");
+  };
+
+  const handleEditEmergencyContact = (emergencyContact: any) => {
+    router.push({
+      pathname: "./family/emergency-contact/manage",
+      params: {
+        id: emergencyContact.id,
+        guardian_id: emergencyContact.guardian_id,
+        name: emergencyContact.name,
+        phone_number: emergencyContact.phone_number,
+      },
+    });
   };
 
   const handleEditChild = (child: any) => {
@@ -46,10 +66,6 @@ export default function FamilyListScreen() {
       },
     });
   };
-
-  if (!guardianId) {
-    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
-  }
 
   if (isLoading) {
     return (
@@ -76,15 +92,26 @@ export default function FamilyListScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12 }}
+        className="px-[20px] pt-[12px]"
         showsVerticalScrollIndicator={false}
       >
         <TouchableOpacity
           className="flex-row items-start py-4 gap-3"
           activeOpacity={0.7}
+          onPress={() => router.navigate("./family/edit-profile")}
         >
-          <View className="w-11 h-11 items-center justify-center">
-            <IconSymbol name="person.circle" size={40} color={theme.text} />
+          <View
+            className="w-14 h-14 items-center border justify-center rounded-full overflow-hidden"
+            style={{ borderColor: theme.borderColor }}
+          >
+            {profilePic && (
+              <Image
+                source={{ uri: profilePic }}
+                className="w-full h-full"
+                resizeMode="cover"
+              />
+            )}
+            {!profilePic && <NoProfilePic width={56} height={56} />}
           </View>
           <View className="flex-1 gap-1">
             <ThemedText className="text-base font-nunito-semibold">
@@ -103,6 +130,11 @@ export default function FamilyListScreen() {
               {guardian?.email}
             </ThemedText>
           </View>
+          <IconSymbol
+            name="chevron.right"
+            size={18}
+            color={AppColors.subtleText}
+          />
         </TouchableOpacity>
         <View
           className="h-px my-3"
@@ -142,33 +174,30 @@ export default function FamilyListScreen() {
         <SectionHeader
           title={translate("familyInformation.emergencyContact")}
           actionLabel={translate("familyInformation.addContact")}
-          onAction={() => {}}
+          onAction={() => handleAddEmergencyContact()}
         />
-        {/* TODO: Replace with real emergency contact data from API */}
-        <TouchableOpacity
-          className="flex-row items-start py-4 gap-3"
-          activeOpacity={0.7}
-        >
-          <View className="w-11 h-11 items-center justify-center">
-            <IconSymbol name="person.circle" size={40} color={theme.text} />
-          </View>
-          <View className="flex-1 gap-1">
-            <ThemedText className="text-base font-nunito-semibold">
-              Martha Smith
-            </ThemedText>
-            <ThemedText
-              className="text-[13px] font-nunito"
-              style={{ color: AppColors.mutedText }}
-            >
-              (555) 123-4567
-            </ThemedText>
-          </View>
-          <IconSymbol
-            name="chevron.right"
-            size={18}
-            color={AppColors.subtleText}
-          />
-        </TouchableOpacity>
+        {emergencyContacts.length === 0 && (
+          <ThemedText
+            className="text-sm pb-4 font-nunito"
+            style={{ color: AppColors.subtleText }}
+          >
+            {translate("common.noEmergencyContactsAdded")}
+          </ThemedText>
+        )}
+        {emergencyContacts.map((emergencyContact: any, idx: number) => (
+          <React.Fragment key={emergencyContact.id}>
+            <EmergencyContactListItem
+              emergencyContact={emergencyContact}
+              onPress={() => handleEditEmergencyContact(emergencyContact)}
+            />
+            {idx < emergencyContacts.length - 1 && (
+              <View
+                className="h-px my-3"
+                style={{ backgroundColor: AppColors.divider }}
+              />
+            )}
+          </React.Fragment>
+        ))}
         <View className="h-10" />
       </ScrollView>
     </ThemedView>

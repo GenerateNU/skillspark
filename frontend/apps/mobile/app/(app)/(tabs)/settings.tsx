@@ -61,6 +61,7 @@ export default function SettingsScreen() {
           <TouchableOpacity
             className="flex-row items-center justify-between px-4 py-[18px]"
             activeOpacity={0.6}
+            onPress={() => router.push("/terms-and-conditions")}
           >
             <ThemedText className="text-[17px] font-nunito">
               {translate("settings.termsAndConditions")}
@@ -71,6 +72,7 @@ export default function SettingsScreen() {
           <TouchableOpacity
             className="flex-row items-center justify-between px-4 py-[18px]"
             activeOpacity={0.6}
+            onPress={() => router.push("/privacy-policy")}
           >
             <ThemedText className="text-[17px] font-nunito">
               {translate("settings.privacyPolicy")}
