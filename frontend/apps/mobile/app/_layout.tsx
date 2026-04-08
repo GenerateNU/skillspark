@@ -76,9 +76,11 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 
-  if (StripeProvider) {
+  const stripePublishableKey : string = process.env.EXPO_PUBLIC_STRIPE_KEY ?? "";
+
+  if (StripeProvider && stripePublishableKey) {
     return (
-      <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_KEY ?? ""}>
+      <StripeProvider publishableKey={stripePublishableKey}>
         {content}
       </StripeProvider>
     );

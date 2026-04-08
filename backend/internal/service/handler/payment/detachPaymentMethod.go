@@ -2,13 +2,26 @@ package payment
 
 import (
 	"context"
+	"skillspark/internal/errs"
 	"skillspark/internal/models"
 )
 
 func (h *Handler) DetachGuardianPaymentMethod(ctx context.Context, input *models.DetachPaymentMethodInput) (*struct{}, error) {
-	err := h.StripeClient.DetachPaymentMethod(ctx, input.Body.PaymentMethodID)
+
+	pms, err := h.GetPaymentMethodsByGuardianID(ctx, &models.GetPaymentMethodsByGuardianIDInput{GuardianID: input.Body.GuardianID})
 	if err != nil {
 		return nil, err
 	}
-	return &struct{}{}, nil
+
+	for _, pm := range pms.Body.PaymentMethods {
+		if pm.ID == input.Body.PaymentMethodID {
+			err := h.StripeClient.DetachPaymentMethod(ctx, input.Body.PaymentMethodID)
+			if err != nil {
+				return nil, err
+			}
+			return &struct{}{}, nil
+		}
+	}
+
+	return nil, errs.NotFound("PaymentMethod", "id", input.Body.PaymentMethodID)
 }

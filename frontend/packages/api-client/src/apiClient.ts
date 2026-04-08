@@ -1,6 +1,4 @@
 import axios, {
-  // AxiosRequestConfig,
-  // AxiosResponse,
   type InternalAxiosRequestConfig,
 } from "axios";
 export let currentLanguage = "en";

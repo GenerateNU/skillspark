@@ -430,35 +430,100 @@ func TestHandler_CreateSetupIntent(t *testing.T) {
 }
 
 func TestHandler_DetachGuardianPaymentMethod(t *testing.T) {
+	testGuardianID := uuid.MustParse("10000000-0000-0000-0000-000000000001")
+	testStripeCustomerID := "cus_test123"
+
+	makeInput := func(pmID string) *models.DetachPaymentMethodInput {
+		i := &models.DetachPaymentMethodInput{}
+		i.Body.PaymentMethodID = pmID
+		i.Body.GuardianID = testGuardianID
+		return i
+	}
+
+	makeGuardian := func() *models.Guardian {
+		return &models.Guardian{
+			ID:               testGuardianID,
+			StripeCustomerID: &testStripeCustomerID,
+		}
+	}
+
+	makePMsOutput := func(pmIDs ...string) *models.GetPaymentMethodsByGuardianIDOutput {
+		pms := make([]models.PaymentMethod, len(pmIDs))
+		for i, id := range pmIDs {
+			pms[i] = models.PaymentMethod{ID: id}
+		}
+		out := &models.GetPaymentMethodsByGuardianIDOutput{}
+		out.Body.PaymentMethods = pms
+		return out
+	}
+
 	tests := []struct {
 		name      string
 		input     *models.DetachPaymentMethodInput
-		mockSetup func(*stripemocks.MockStripeClient)
+		mockSetup func(*repomocks.MockGuardianRepository, *stripemocks.MockStripeClient)
 		wantErr   bool
 	}{
 		{
-			name: "successfully detaches payment method",
-			input: &models.DetachPaymentMethodInput{Body: struct {
-				PaymentMethodID string `json:"payment_method_id" doc:"Payment Method ID"`
-			}{PaymentMethodID: testPMID}},
-			mockSetup: func(sc *stripemocks.MockStripeClient) {
+			name:  "successfully detaches payment method",
+			input: makeInput(testPMID),
+			mockSetup: func(gr *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
+				gr.On("GetGuardianByID", mock.Anything, testGuardianID).Return(makeGuardian(), nil)
+				sc.On("GetPaymentMethodsByCustomerID", mock.Anything, testStripeCustomerID).Return(makePMsOutput(testPMID), nil)
 				sc.On("DetachPaymentMethod", mock.Anything, testPMID).Return(nil)
 			},
 			wantErr: false,
 		},
 		{
-			name: "fails when stripe returns error",
-			input: &models.DetachPaymentMethodInput{Body: struct {
-				PaymentMethodID string `json:"payment_method_id" doc:"Payment Method ID"`
-			}{PaymentMethodID: testPMID}},
-			mockSetup: func(sc *stripemocks.MockStripeClient) {
+			name:  "fails when payment method does not belong to guardian",
+			input: makeInput("pm_other"),
+			mockSetup: func(gr *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
+				gr.On("GetGuardianByID", mock.Anything, testGuardianID).Return(makeGuardian(), nil)
+				sc.On("GetPaymentMethodsByCustomerID", mock.Anything, testStripeCustomerID).Return(makePMsOutput(testPMID), nil)
+			},
+			wantErr: true,
+		},
+		{
+			name:  "fails when stripe returns error on detach",
+			input: makeInput(testPMID),
+			mockSetup: func(gr *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
+				gr.On("GetGuardianByID", mock.Anything, testGuardianID).Return(makeGuardian(), nil)
+				sc.On("GetPaymentMethodsByCustomerID", mock.Anything, testStripeCustomerID).Return(makePMsOutput(testPMID), nil)
 				sc.On("DetachPaymentMethod", mock.Anything, testPMID).Return(errors.New("stripe error"))
+			},
+			wantErr: true,
+		},
+		{
+			name:  "fails when fetching payment methods from stripe errors",
+			input: makeInput(testPMID),
+			mockSetup: func(gr *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
+				gr.On("GetGuardianByID", mock.Anything, testGuardianID).Return(makeGuardian(), nil)
+				sc.On("GetPaymentMethodsByCustomerID", mock.Anything, testStripeCustomerID).Return(nil, errors.New("stripe error"))
+			},
+			wantErr: true,
+		},
+		{
+			name:  "fails when guardian has no stripe customer account",
+			input: makeInput(testPMID),
+			mockSetup: func(gr *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
+				gr.On("GetGuardianByID", mock.Anything, testGuardianID).Return(&models.Guardian{
+					ID:               testGuardianID,
+					StripeCustomerID: nil,
+				}, nil)
+			},
+			wantErr: true,
+		},
+		{
+			name:  "fails when guardian repo errors",
+			input: makeInput(testPMID),
+			mockSetup: func(gr *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
+				gr.On("GetGuardianByID", mock.Anything, testGuardianID).Return(nil, errors.New("db error"))
 			},
 			wantErr: true,
 		},
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -468,7 +533,7 @@ func TestHandler_DetachGuardianPaymentMethod(t *testing.T) {
 			mockLocationRepo := new(repomocks.MockLocationRepository)
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
 			mockStripeClient := new(stripemocks.MockStripeClient)
-			tt.mockSetup(mockStripeClient)
+			tt.mockSetup(mockGuardianRepo, mockStripeClient)
 
 			handler := newHandler(mockOrgRepo, mockManagerRepo, mockRegRepo, mockLocationRepo, mockGuardianRepo, mockStripeClient)
 			result, err := handler.DetachGuardianPaymentMethod(context.Background(), tt.input)
@@ -481,6 +546,7 @@ func TestHandler_DetachGuardianPaymentMethod(t *testing.T) {
 				assert.NotNil(t, result)
 			}
 
+			mockGuardianRepo.AssertExpectations(t)
 			mockStripeClient.AssertExpectations(t)
 		})
 	}

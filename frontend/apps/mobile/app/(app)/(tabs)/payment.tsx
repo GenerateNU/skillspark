@@ -46,6 +46,7 @@ export default function PaymentScreen() {
       const methods = (res.data as GetPaymentMethodsByGuardianIDOutputBody)
         .payment_methods;
       setPaymentMethods(methods ? methods : []);
+      setError(null);
     } catch (e) {
       setError("Failed to fetch payment methods");
     } finally {
@@ -60,16 +61,20 @@ export default function PaymentScreen() {
   async function confirmDelete(): Promise<void> {
     if (!pendingDeleteId) return;
     try {
+      if (!guardian) {
+        throw new Error("No guardian is logged in.")
+      }
       setDeleting(true);
       const res = await detachGuardianPaymentMethod({
         payment_method_id: pendingDeleteId,
+        guardian_id: guardian!.id
       });
-      if (res.status !== 204) throw res.data;
-      setPaymentMethods(function (prev) {
-        return prev.filter(function (pm) {
-          return pm.id !== pendingDeleteId;
-        });
-      });
+      if (res.status !== 200 && res.status !== 204) {
+        throw res.data;
+      }
+      setPaymentMethods(paymentMethods.filter((pm) => {
+        return pm.id !== pendingDeleteId;
+      }));
     } catch (e) {
       setError("Failed to delete payment method");
     } finally {
@@ -117,11 +122,11 @@ export default function PaymentScreen() {
             onCancel={() => setEditingCard(false)}
           />
         ) : paymentMethods.length > 0 ? (
-          paymentMethods.map((method, i) => (
+          paymentMethods.map((method) => (
             <PaymentMethodRow
               method={method}
               onDelete={(id) => setPendingDeleteId(id)}
-              key={i}
+              key={method.id}
             />
           ))
         ) : (

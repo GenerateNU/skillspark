@@ -157,7 +157,8 @@ type CancelRegistrationWithPaymentInput struct {
 
 type DetachPaymentMethodInput struct {
 	Body struct {
-		PaymentMethodID string `json:"payment_method_id" doc:"Payment Method ID"`
+		PaymentMethodID string    `json:"payment_method_id" doc:"Payment Method ID"`
+		GuardianID      uuid.UUID `json:"guardian_id" doc:"Guardian ID"`
 	} `json:"body"`
 }
 
