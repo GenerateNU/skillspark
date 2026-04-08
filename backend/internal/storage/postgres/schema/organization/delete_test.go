@@ -2,6 +2,8 @@ package organization
 
 import (
 	"context"
+	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
@@ -16,7 +18,20 @@ func TestDeleteOrganization(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	created := CreateTestOrganization(t, ctx, testDB)
+	active := true
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
+
+	input := func() *models.CreateOrganizationInput {
+		i := &models.CreateOrganizationInput{}
+		i.Body.Name = "To Be Deleted"
+		i.Body.Active = &active
+		i.Body.LocationID = &locationID
+		return i
+	}()
+
+	created, err := repo.CreateOrganization(ctx, input, nil)
+	require.NoError(t, err)
+	require.NotNil(t, created)
 
 	deleted, err := repo.DeleteOrganization(ctx, created.ID)
 	require.NoError(t, err)
@@ -48,9 +63,22 @@ func TestDeleteOrganization_AlreadyDeleted(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	created := CreateTestOrganization(t, ctx, testDB)
+	active := true
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 
-	_, err := repo.DeleteOrganization(ctx, created.ID)
+	input := func() *models.CreateOrganizationInput {
+		i := &models.CreateOrganizationInput{}
+		i.Body.Name = "Delete Twice"
+		i.Body.Active = &active
+		i.Body.LocationID = &locationID
+		return i
+	}()
+
+	created, err := repo.CreateOrganization(ctx, input, nil)
+	require.NoError(t, err)
+	require.NotNil(t, created)
+
+	_, err = repo.DeleteOrganization(ctx, created.ID)
 	require.NoError(t, err)
 
 	deleted2, err := repo.DeleteOrganization(ctx, created.ID)

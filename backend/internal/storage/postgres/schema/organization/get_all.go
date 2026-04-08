@@ -40,6 +40,7 @@ func scanOrganization(row pgx.CollectableRow) (models.Organization, error) {
 		&org.ID,
 		&org.Name,
 		&org.Active,
+		&org.About,
 		&org.PfpS3Key,
 		&org.LocationID,
 		&org.StripeAccountID,

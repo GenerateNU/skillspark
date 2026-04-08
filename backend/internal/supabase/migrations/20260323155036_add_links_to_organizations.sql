@@ -1,0 +1,2 @@
+ALTER TABLE organization
+  ADD COLUMN IF NOT EXISTS links JSONB NOT NULL DEFAULT '[]'::jsonb;
