@@ -1,23 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 export default function ActivityScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Activity</Text>
+    <View className="flex-1 items-center justify-center bg-white">
+      <Text className="text-lg font-semibold text-[#11181C]">
+        Activity
+      </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-  },
-  text: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#11181C",
-  },
-});

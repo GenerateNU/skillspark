@@ -20,7 +20,7 @@ const GAP = 4;
 
 const VISIBLE_TABS = ["index", "map", "activity", "profile"];
 
-const TAB_ICONS: Record<string, string> = {
+const TAB_ICONS: Record<string, any> = {
   index: "house.fill",
   map: "map.fill",
   activity: "bolt.fill",
