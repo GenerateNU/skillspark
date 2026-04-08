@@ -54,9 +54,13 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 			LocationID: &formData.LocationID,
 		}
 
-		image_data, err := io.ReadAll(formData.ProfileImage)
-		if err != nil {
-			return nil, err
+		var image_data []byte
+		var err error
+		if formData.ProfileImage.Size > 0 {
+			image_data, err = io.ReadAll(formData.ProfileImage)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		organization, err := orgHandler.CreateOrganization(ctx, &organizationModel, &updateBody, &image_data, s3Client)
@@ -153,10 +157,13 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 			ID:   input.ID,
 		}
 
-		image_data, err := io.ReadAll(formData.ProfileImage)
-		if err != nil {
-
-			return nil, err
+		var image_data []byte
+		var err error
+		if formData.ProfileImage.Size > 0 {
+			image_data, err = io.ReadAll(formData.ProfileImage)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		organization, err := orgHandler.UpdateOrganization(ctx, &organizationModel, &image_data, s3Client)

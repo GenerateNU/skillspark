@@ -81,11 +81,12 @@ func setupOrganizationTestAPI(
 	return app, api
 }
 
+var testLocationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
+
 func TestHumaValidation_GetOrganizationById(t *testing.T) {
 	t.Parallel()
 
 	pfpKey := "orgs/babel_street.jpg"
-	locationID := uuid.MustParse("10000000-0000-0000-0000-000000000001")
 
 	tests := []struct {
 		name           string
@@ -106,7 +107,7 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 					Name:       "Science Academy Bangkok",
 					Active:     true,
 					PfpS3Key:   &pfpKey,
-					LocationID: &locationID,
+					LocationID: &testLocationID,
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
 				}, nil)
@@ -180,63 +181,20 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 		statusCode  int
 	}{
 		{
-			name: "valid payload without location",
-			formFields: map[string]string{
-				"name":   "Tech Innovations",
-				"active": "true",
-			},
-			includeFile: true,
-			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
-				// Handler calls GetLocationByID with zero UUID when location_id is not provided
-				l.On(
-					"GetLocationByID",
-					mock.Anything,
-					uuid.UUID{},
-				).Return(nil, nil)
-				m.On(
-					"CreateOrganization",
-					mock.Anything,
-					mock.AnythingOfType("*models.CreateOrganizationInput"),
-					mock.Anything,
-				).Return(&models.Organization{
-					ID:        uuid.New(),
-					Name:      "Tech Innovations",
-					Active:    true,
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
-				}, nil)
-
-				m.On(
-					"UpdateOrganization",
-					mock.Anything,
-					mock.AnythingOfType("*models.UpdateOrganizationInput"),
-					mock.Anything,
-				).Return(&models.Organization{
-					ID:        uuid.New(),
-					Name:      "Tech Innovations",
-					Active:    true,
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
-				}, nil)
-			},
-			statusCode: http.StatusOK,
-		},
-		{
 			name: "valid payload with location",
 			formFields: map[string]string{
 				"name":        "Tech Innovations",
 				"active":      "true",
-				"location_id": "10000000-0000-0000-0000-000000000001",
+				"location_id": testLocationID.String(),
 			},
 			includeFile: true,
 			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
-				locationID := uuid.MustParse("10000000-0000-0000-0000-000000000001")
 				l.On(
 					"GetLocationByID",
 					mock.Anything,
-					locationID,
+					testLocationID,
 				).Return(&models.Location{
-					ID: locationID,
+					ID: testLocationID,
 				}, nil)
 				m.On(
 					"CreateOrganization",
@@ -247,7 +205,7 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 					ID:         uuid.New(),
 					Name:       "Tech Innovations",
 					Active:     true,
-					LocationID: &locationID,
+					LocationID: &testLocationID,
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
 				}, nil)
@@ -261,7 +219,7 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 					ID:         uuid.New(),
 					Name:       "Tech Innovations",
 					Active:     true,
-					LocationID: &locationID,
+					LocationID: &testLocationID,
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
 				}, nil)
@@ -271,8 +229,9 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 		{
 			name: "name below minimum length",
 			formFields: map[string]string{
-				"name":   "",
-				"active": "true",
+				"name":        "",
+				"active":      "true",
+				"location_id": testLocationID.String(),
 			},
 			includeFile: true,
 			mockSetup:   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
@@ -281,8 +240,9 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 		{
 			name: "name above maximum length",
 			formFields: map[string]string{
-				"name":   string(make([]byte, 256)),
-				"active": "true",
+				"name":        string(make([]byte, 256)),
+				"active":      "true",
+				"location_id": testLocationID.String(),
 			},
 			includeFile: true,
 			mockSetup:   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
@@ -350,8 +310,8 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 					mock.Anything,
 					mock.AnythingOfType("utils.Pagination"),
 				).Return([]models.Organization{
-					{ID: uuid.New(), Name: "Org 1", Active: true},
-					{ID: uuid.New(), Name: "Org 2", Active: true},
+					{ID: uuid.New(), Name: "Org 1", Active: true, LocationID: &testLocationID},
+					{ID: uuid.New(), Name: "Org 2", Active: true, LocationID: &testLocationID},
 				}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -365,7 +325,7 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 					mock.Anything,
 					utils.Pagination{Page: 2, Limit: 5},
 				).Return([]models.Organization{
-					{ID: uuid.New(), Name: "Org 3", Active: true},
+					{ID: uuid.New(), Name: "Org 3", Active: true, LocationID: &testLocationID},
 				}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -435,27 +395,30 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 			name:           "valid partial update",
 			organizationID: orgID.String(),
 			formFields: map[string]string{
-				"name": "Updated Name",
+				"name":        "Updated Name",
+				"location_id": testLocationID.String(),
 			},
 			includeFile: true,
 			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
-				// Handler calls GetLocationByID with zero UUID when location_id is not provided
 				l.On(
 					"GetLocationByID",
 					mock.Anything,
-					uuid.UUID{},
-				).Return(nil, nil)
+					testLocationID,
+				).Return(&models.Location{
+					ID: testLocationID,
+				}, nil)
 				m.On(
 					"UpdateOrganization",
 					mock.Anything,
 					mock.AnythingOfType("*models.UpdateOrganizationInput"),
 					mock.Anything,
 				).Return(&models.Organization{
-					ID:        orgID,
-					Name:      "Updated Name",
-					Active:    true,
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+					ID:         orgID,
+					Name:       "Updated Name",
+					Active:     true,
+					LocationID: &testLocationID,
+					CreatedAt:  time.Now(),
+					UpdatedAt:  time.Now(),
 				}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -542,11 +505,12 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 					mock.Anything,
 					orgID,
 				).Return(&models.Organization{
-					ID:        orgID,
-					Name:      "Deleted Org",
-					Active:    true,
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+					ID:         orgID,
+					Name:       "Deleted Org",
+					Active:     true,
+					LocationID: &testLocationID,
+					CreatedAt:  time.Now(),
+					UpdatedAt:  time.Now(),
 				}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -636,7 +600,7 @@ func TestHumaValidation_GetEventOccurrencesByOrganizationId(t *testing.T) {
 	}
 
 	location := models.Location{
-		ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
+		ID:           testLocationID,
 		Latitude:     13.7650000,
 		Longitude:    100.5380000,
 		AddressLine1: "321 Phetchaburi Road",

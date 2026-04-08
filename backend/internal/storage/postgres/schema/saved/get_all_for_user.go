@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *SavedRepository) GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination) ([]models.Saved, error) {
+func (r *SavedRepository) GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination, AcceptLanguage string) ([]models.Saved, error) {
 
 	query, err := schema.ReadSQLBaseScript("get_all_for_user.sql", SqlSavedFiles)
 	if err != nil {
@@ -64,7 +64,7 @@ func (r *SavedRepository) GetByGuardianID(ctx context.Context, user_id uuid.UUID
 			return nil, &err
 		}
 
-		switch language {
+		switch AcceptLanguage {
 		case "th-TH":
 			if titleTH != nil {
 				s.Event.Title = *titleTH

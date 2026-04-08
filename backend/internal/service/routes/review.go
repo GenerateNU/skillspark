@@ -14,7 +14,7 @@ import (
 
 func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient translations.TranslationInterface) {
 
-	reviewHandler := review.NewHandler(repo.Registration, repo.Review, repo.Guardian, repo.Event, translateClient)
+	reviewHandler := review.NewHandler(repo.Registration, repo.Review, repo.Guardian, repo.Event, repo.Organization, translateClient)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-review-by-guardian-id",
@@ -83,6 +83,39 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 	})
 
 	huma.Register(api, huma.Operation{
+		OperationID: "get-review-by-organization-id",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/review/organization/{id}",
+		Summary:     "Get reviews by organization ID",
+		Description: "Returns all reviews with the given organization ID",
+		Tags:        []string{"Review"},
+	}, func(ctx context.Context, input *models.GetReviewsByOrganizationIDInput) (*models.ReviewsOutput, error) {
+
+		page := input.Page
+		if page == 0 {
+			page = 1
+		}
+		limit := input.PageSize
+		if limit == 0 {
+			limit = 10
+		}
+
+		pagination := utils.Pagination{
+			Page:  page,
+			Limit: limit,
+		}
+
+		reviews, err := reviewHandler.GetReviewsByOrganizationID(ctx, input.ID, input.AcceptLanguage, pagination)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.ReviewsOutput{
+			Body: reviews,
+		}, nil
+	})
+
+	huma.Register(api, huma.Operation{
 		OperationID: "delete-review",
 		Method:      http.MethodDelete,
 		Path:        "/api/v1/review/{id}",
@@ -113,12 +146,56 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		Tags:        []string{"Review"},
 	}, func(ctx context.Context, input *models.CreateReviewInput) (*models.CreateReviewOutput, error) {
 
+		if input.Body.Rating != 0 && (input.Body.Rating < 1 || input.Body.Rating > 5) {
+			return nil, huma.Error400BadRequest("rating must be between 1 and 5")
+		}
+
 		reviewOutput, err := reviewHandler.CreateReview(ctx, input)
 		if err != nil {
 			return nil, err
 		}
 
 		return reviewOutput, nil
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-review-aggregate",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/review/event_aggregate/{id}",
+		Summary:     "Get review aggregate by event id",
+		Description: "Get review aggregate by event id",
+		Tags:        []string{"Review"},
+	}, func(ctx context.Context, input *models.GetReviewsAggregateInput) (*models.ReviewsAggregateOutput, error) {
+
+		aggregate, err := reviewHandler.GetAggregateReviews(ctx, input.ID)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.ReviewsAggregateOutput{
+			Body: *aggregate,
+		}, nil
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-review-aggregate-organization",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/review/organization_aggregate/{id}",
+		Summary:     "Get review aggregate by organization id",
+		Description: "Get review aggregate by organization id",
+		Tags:        []string{"Review"},
+	}, func(ctx context.Context, input *models.GetReviewsAggregateInput) (*models.ReviewsAggregateOutput, error) {
+
+		aggregate, err := reviewHandler.GetAggregateReviewsForOrganization(ctx, input.ID)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.ReviewsAggregateOutput{
+			Body: *aggregate,
+		}, nil
 	})
 
 }

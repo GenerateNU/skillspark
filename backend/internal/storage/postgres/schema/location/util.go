@@ -22,9 +22,10 @@ func CreateTestLocation(
 
 	repo := NewLocationRepository(db)
 
+	lat, lng := 40.7128, -74.0060
 	input := &models.CreateLocationInput{}
-	input.Body.Latitude = 40.7128
-	input.Body.Longitude = -74.0060
+	input.Body.Latitude = &lat
+	input.Body.Longitude = &lng
 	input.Body.AddressLine1 = "123 Broadway"
 	input.Body.AddressLine2 = nil
 	input.Body.Subdistrict = "Manhattan"
@@ -34,6 +35,8 @@ func CreateTestLocation(
 	input.Body.Country = "USA"
 
 	location, err := repo.CreateLocation(ctx, input)
+	t.Logf("CreateLocation error: %v", err)
+	t.Logf("CreateLocation result: %v", location)
 
 	require.NoError(t, err)
 	require.NotNil(t, location)

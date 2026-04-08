@@ -31,6 +31,7 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 		input := &models.CreateReviewDBInput{}
 		input.Body.RegistrationID = firstReview.RegistrationID
 		input.Body.GuardianID = firstReview.GuardianID
+		input.Body.Rating = 3
 		input.Body.Description_EN = "Review number " + strconv.Itoa(i+2)
 		input.Body.Description_TH = &descriptionTH
 		input.Body.Categories = []string{"interesting"}

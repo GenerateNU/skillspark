@@ -13,4 +13,3 @@ func NewNotificationRepository(db *pgxpool.Pool) *NotificationRepository {
 		db: db,
 	}
 }
-

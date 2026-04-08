@@ -1,11 +1,14 @@
 // Fallback for using MaterialIcons on Android and web.
 
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
-import { ComponentProps } from 'react';
-import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { SymbolWeight, SymbolViewProps } from "expo-symbols";
+import { ComponentProps } from "react";
+import { OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
 
-type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
+type IconMapping = Record<
+  SymbolViewProps["name"],
+  ComponentProps<typeof MaterialIcons>["name"]
+>;
 type IconSymbolName = keyof typeof MAPPING;
 
 /**
@@ -14,22 +17,29 @@ type IconSymbolName = keyof typeof MAPPING;
  * - see SF Symbols in the [SF Symbols](https://developer.apple.com/sf-symbols/) app.
  */
 const MAPPING = {
-  'house.fill': 'home',
-  'paperplane.fill': 'send',
-  'chevron.left.forwardslash.chevron.right': 'code',
-  'chevron.left': 'chevron-left',
-  'chevron.right': 'chevron-right',
-  'map.fill': 'map',
-  'gearshape.fill': 'settings',
-  'gearshape': 'settings',
-  'photo': 'photo',
-  'person.fill': 'person',
-  'person.circle': 'account-circle',
-  'camera.filters': 'tune',
-  'chevron.down': 'expand-more',
-  'magnifyingglass': 'search',
-  'checkmark.circle.fill': 'check-circle',
-  'circle': 'radio-button-unchecked',
+  "house.fill": "home",
+  "paperplane.fill": "send",
+  "chevron.left.forwardslash.chevron.right": "code",
+  "chevron.left": "chevron-left",
+  "chevron.right": "chevron-right",
+  "map.fill": "map",
+  "gearshape.fill": "settings",
+  gearshape: "settings",
+  photo: "photo",
+  "person.fill": "person",
+  "person.circle": "account-circle",
+  "camera.filters": "tune",
+  "chevron.down": "expand-more",
+  magnifyingglass: "search",
+  "checkmark.circle.fill": "check-circle",
+  circle: "radio-button-unchecked",
+  "star.fill": "star",
+  bookmark: "bookmark",
+  "bookmark.fill": "bookmark",
+  "location.fill": "place",
+  "record.circle": "radio-button-on",
+  "slider.horizontal.3": "tune",
+  checkmark: "check",
 } as IconMapping;
 
 /**
@@ -53,5 +63,12 @@ export function IconSymbol({
   if (!materialName) {
     console.log(`MISSING MAPPING for icon: ${name}`);
   }
-  return <MaterialIcons color={color} size={size} name={materialName} style={style} />;
+  return (
+    <MaterialIcons
+      color={color}
+      size={size}
+      name={materialName}
+      style={style}
+    />
+  );
 }

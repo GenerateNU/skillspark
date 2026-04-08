@@ -71,6 +71,7 @@ func TestGetSavedByGuardianID_Success(t *testing.T) {
 		mock.Anything,
 		guardianID,
 		utils.Pagination{Page: 1, Limit: 10},
+		mock.AnythingOfType("string"),
 	).Return(expectedSaved, nil)
 
 	app, _ := setupSavedTestAPI(mockRepo)
@@ -141,6 +142,7 @@ func TestGetSavedByGuardianID_WithPagination(t *testing.T) {
 		mock.Anything,
 		guardianID,
 		utils.Pagination{Page: 2, Limit: 10},
+		mock.AnythingOfType("string"),
 	).Return(expectedSaved, nil)
 
 	app, _ := setupSavedTestAPI(mockRepo)

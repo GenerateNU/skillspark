@@ -24,8 +24,8 @@ func (m *MockSavedRepository) CreateSaved(ctx context.Context, input *models.Cre
 	return args.Get(0).(*models.Saved), args.Error(1)
 }
 
-func (m *MockSavedRepository) GetByGuardianID(ctx context.Context, id uuid.UUID, pagination utils.Pagination) ([]models.Saved, error) {
-	args := m.Called(ctx, id, pagination)
+func (m *MockSavedRepository) GetByGuardianID(ctx context.Context, id uuid.UUID, pagination utils.Pagination, acceptLanguage string) ([]models.Saved, error) {
+	args := m.Called(ctx, id, pagination, acceptLanguage)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil
