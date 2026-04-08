@@ -2,6 +2,7 @@
   "nav": {
     "home": "Home",
     "map": "Map",
+    "activity": "Activity",
     "profile": "Profile",
     "events": "Events",
     "about": "About"
