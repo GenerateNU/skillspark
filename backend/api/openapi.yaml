@@ -1310,12 +1310,12 @@ paths:
             schema:
               type: object
               properties:
+                about:
+                  type: string
                 active:
                   type: boolean
                 links:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/OrgLink'
+                  type: string
                 location_id:
                   type: string
                 name:
@@ -1329,6 +1329,8 @@ paths:
               required:
                 - name
             encoding:
+              about:
+                contentType: text/plain
               active:
                 contentType: text/plain
               links:
@@ -1428,12 +1430,12 @@ paths:
             schema:
               type: object
               properties:
+                about:
+                  type: string
                 active:
                   type: boolean
                 links:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/OrgLink'
+                  type: string
                 location_id:
                   type: string
                 name:
@@ -1447,6 +1449,8 @@ paths:
               required:
                 - name
             encoding:
+              about:
+                contentType: text/plain
               active:
                 contentType: text/plain
               links:
@@ -3763,6 +3767,8 @@ components:
           examples:
             - http://localhost:8080/schemas/Organization.json
           readOnly: true
+        about:
+          type: string
         active:
           type: boolean
         created_at:
@@ -3794,9 +3800,11 @@ components:
         - id
         - name
         - active
-        - location_id
+        - links
+        - presigned_url
         - created_at
         - updated_at
+        - stripe_account_id
         - stripe_account_activated
     PatchManagerInputBody:
       type: object

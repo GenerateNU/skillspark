@@ -316,12 +316,23 @@ export const createOrganization = async (
   options?: RequestInit,
 ): Promise<createOrganizationResponse> => {
   const formData = new FormData();
+  if (createOrganizationBody.about !== undefined) {
+    formData.append(
+      `about`,
+      createOrganizationBody.about instanceof Blob
+        ? createOrganizationBody.about
+        : new Blob([createOrganizationBody.about], { type: "text/plain" }),
+    );
+  }
   if (createOrganizationBody.active !== undefined) {
     formData.append(`active`, createOrganizationBody.active.toString());
   }
   if (createOrganizationBody.links !== undefined) {
-    createOrganizationBody.links.forEach((value) =>
-      formData.append(`links`, JSON.stringify(value)),
+    formData.append(
+      `links`,
+      createOrganizationBody.links instanceof Blob
+        ? createOrganizationBody.links
+        : new Blob([createOrganizationBody.links], { type: "text/plain" }),
     );
   }
   if (createOrganizationBody.location_id !== undefined) {
@@ -763,12 +774,23 @@ export const updateOrganization = async (
   options?: RequestInit,
 ): Promise<updateOrganizationResponse> => {
   const formData = new FormData();
+  if (updateOrganizationBody.about !== undefined) {
+    formData.append(
+      `about`,
+      updateOrganizationBody.about instanceof Blob
+        ? updateOrganizationBody.about
+        : new Blob([updateOrganizationBody.about], { type: "text/plain" }),
+    );
+  }
   if (updateOrganizationBody.active !== undefined) {
     formData.append(`active`, updateOrganizationBody.active.toString());
   }
   if (updateOrganizationBody.links !== undefined) {
-    updateOrganizationBody.links.forEach((value) =>
-      formData.append(`links`, JSON.stringify(value)),
+    formData.append(
+      `links`,
+      updateOrganizationBody.links instanceof Blob
+        ? updateOrganizationBody.links
+        : new Blob([updateOrganizationBody.links], { type: "text/plain" }),
     );
   }
   if (updateOrganizationBody.location_id !== undefined) {

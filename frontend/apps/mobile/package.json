@@ -2,7 +2,7 @@
   "name": "skillspark",
   "version": "1.0.0",
   "scripts": {
-    "start": "bash ../../../scripts/load-root-env.sh expo start --tunnel",
+    "start": "bash ../../../scripts/load-root-env.sh expo start",
     "android": "bash ../../../scripts/load-root-env.sh expo run:android",
     "ios": "bash ../../../scripts/load-root-env.sh expo run:ios",
     "web": "bash ../../../scripts/load-root-env.sh expo start --web",

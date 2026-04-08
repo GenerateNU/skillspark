@@ -1,13 +1,11 @@
 import { Image } from "expo-image";
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetEventOccurrencesById } from "@skillspark/api-client";
@@ -19,7 +17,7 @@ import { BookmarkButton } from "@/components/BookmarkButton";
 import { formatDuration } from "@/utils/format";
 import { useTranslation } from "react-i18next";
 import { ListItem } from "@/components/ListItem";
-import { useOrgLinks } from "@/hooks/useOrgLinks";
+import { AboutPage } from "@/components/AboutPage";
 
 function formatAddress(occurrence: EventOccurrence) {
   const loc = occurrence.location;
@@ -34,10 +32,7 @@ function EventOccurrenceDetail({
 }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
-  const [descriptionTruncated, setDescriptionTruncated] = useState(false);
   const { t: translate } = useTranslation();
-  const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
   const duration = formatDuration(occurrence.start_time, occurrence.end_time, {
     hr: translate("event.hr"),
     min: translate("event.min"),
@@ -66,7 +61,7 @@ function EventOccurrenceDetail({
             {occurrence.event.presigned_url ? (
               <Image
                 source={{ uri: occurrence.event.presigned_url }}
-                className="w-full h-full"
+                style={{ width: "100%", height: "100%" }}
                 contentFit="cover"
               />
             ) : (
@@ -141,34 +136,11 @@ function EventOccurrenceDetail({
                 }
               />
             </View>
-            <Text
-              numberOfLines={descriptionExpanded ? undefined : 5}
-              onTextLayout={(e) => {
-                if (!descriptionExpanded) {
-                  setDescriptionTruncated(e.nativeEvent.lines.length >= 5);
-                }
-              }}
-              className={`text-sm leading-[22px] ${descriptionTruncated ? "mb-1" : "mb-[18px]"}`}
-              style={{ color: AppColors.secondaryText }}
-            >
-              {occurrence.event.description}
-            </Text>
-            {descriptionTruncated && (
-              <Pressable
-                onPress={() => setDescriptionExpanded((prev) => !prev)}
-                className="mb-3.5"
-              >
-                <Text
-                  className="text-[13px] font-semibold"
-                  style={{ color: AppColors.primaryText }}
-                >
-                  {descriptionExpanded
-                    ? translate("event.seeLess")
-                    : translate("event.seeMore")}
-                </Text>
-              </Pressable>
-            )}
-            <View className="flex-row items-center justify-between">
+            <AboutPage
+              description={occurrence.event.description}
+              links={occurrence.org_links ?? []}
+            />
+            <View className="flex-row items-center justify-between mt-2">
               <View className="flex-row gap-2 flex-1 flex-wrap">
                 {occurrence.event.category?.map((cat) => (
                   <View
@@ -200,27 +172,6 @@ function EventOccurrenceDetail({
                 </Text>
               </View>
             </View>
-            {hasLinks && (
-              <View className="flex-row flex-wrap gap-2.5 mt-4">
-                {(occurrence.org_links ?? []).map((link, index) => (
-                  <Pressable
-                    key={index}
-                    onPress={() => openLink(link.href)}
-                    className="rounded-full px-5 py-2.5 items-center"
-                    style={{
-                      backgroundColor: AppColors.borderLight,
-                    }}
-                  >
-                    <Text
-                      className="text-[13px] font-semibold"
-                      style={{ color: AppColors.primaryText }}
-                    >
-                      {link.label}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            )}
           </View>
 
           {/* Divider */}

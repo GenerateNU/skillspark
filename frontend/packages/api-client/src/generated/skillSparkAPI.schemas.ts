@@ -255,16 +255,17 @@ export interface OrgLink {
 export interface Organization {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
+  about?: string;
   active: boolean;
   created_at: string;
   id: string;
   links: OrgLink[];
-  location_id: string;
+  location_id?: string;
   name: string;
   pfp_s3_key?: string;
-  presigned_url?: string;
+  presigned_url: string;
   stripe_account_activated: boolean;
-  stripe_account_id?: string;
+  stripe_account_id: string;
   updated_at: string;
 }
 
@@ -942,8 +943,9 @@ export type ListOrganizationsParams = {
 };
 
 export type CreateOrganizationBody = {
+  about?: Blob | string;
   active?: boolean;
-  links?: OrgLink[];
+  links?: Blob | string;
   location_id?: Blob | string;
   /**
    * @minLength 1
@@ -954,8 +956,9 @@ export type CreateOrganizationBody = {
 };
 
 export type UpdateOrganizationBody = {
+  about?: Blob | string;
   active?: boolean;
-  links?: OrgLink[];
+  links?: Blob | string;
   location_id?: Blob | string;
   /**
    * @minLength 1
