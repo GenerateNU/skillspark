@@ -52,7 +52,7 @@ function CardFormInner({
   const [cardComplete, setCardComplete] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { confirmSetupIntent } = useStripe();
+  const { confirmCardSetup } = useStripe();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "light"];
   const { t: translate } = useTranslation();
@@ -71,7 +71,7 @@ function CardFormInner({
 
       const clientSecret = (res.data as CreateSetupIntentOutputBody)
         .client_secret;
-      const { error: stripeError } = await confirmSetupIntent(clientSecret, {
+      const { error: stripeError } = await confirmCardSetup(clientSecret, {
         paymentMethodType: "Card",
       });
       if (stripeError)
