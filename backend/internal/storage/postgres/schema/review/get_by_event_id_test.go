@@ -55,7 +55,7 @@ func TestGetReviewsByEventID(t *testing.T) {
 		descriptionTH := "รีวิวหมายเลข " + strconv.Itoa(i+2)
 		input := &models.CreateReviewDBInput{}
 		input.Body.RegistrationID = regoutput.Body.ID
-		input.Body.GuardianID = child.GuardianID
+		input.Body.GuardianID = &child.GuardianID
 		input.Body.Rating = 3
 		input.Body.Description_EN = "Review number " + strconv.Itoa(i+2)
 		input.Body.Description_TH = &descriptionTH

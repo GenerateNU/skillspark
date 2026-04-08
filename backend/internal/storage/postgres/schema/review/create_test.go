@@ -26,7 +26,7 @@ func TestCreateReview(t *testing.T) {
 	input := func() *models.CreateReviewDBInput {
 		i := &models.CreateReviewDBInput{}
 		i.Body.RegistrationID = registrationID
-		i.Body.GuardianID = guardianID
+		i.Body.GuardianID = &guardianID
 		i.Body.Description_EN = "Test review"
 		i.Body.Description_TH = &descriptionTH
 		i.Body.Categories = []string{"informative"}
@@ -61,7 +61,7 @@ func TestCreateReview_FailsInvalidRegistration(t *testing.T) {
 	input := func() *models.CreateReviewDBInput {
 		i := &models.CreateReviewDBInput{}
 		i.Body.RegistrationID = uuid.New()
-		i.Body.GuardianID = validGuardianID
+		i.Body.GuardianID = &validGuardianID
 		i.Body.Description_EN = "Test review"
 		i.Body.Description_TH = &descriptionTH
 		i.Body.Categories = []string{"informative"}
@@ -87,7 +87,8 @@ func TestCreateReview_FailsInvalidGuardian(t *testing.T) {
 	input := func() *models.CreateReviewDBInput {
 		i := &models.CreateReviewDBInput{}
 		i.Body.RegistrationID = registration.ID
-		i.Body.GuardianID = uuid.New()
+		invalidGuardianID := uuid.New()
+		i.Body.GuardianID = &invalidGuardianID
 		i.Body.Description_EN = "Test review"
 		i.Body.Description_TH = &descriptionTH
 		i.Body.Categories = []string{"informative"}

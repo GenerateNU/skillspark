@@ -29,7 +29,7 @@ func CreateTestReview(
 	desc_ptr := "รีวิวการทดสอบ ให้คะแนนเต็มสิบ"
 	input := &models.CreateReviewDBInput{}
 	input.Body.RegistrationID = r.ID
-	input.Body.GuardianID = g.ID
+	input.Body.GuardianID = &g.ID
 	input.Body.Rating = 3
 	input.Body.Description_EN = "Test review, ten out of ten"
 	input.Body.Description_TH = &desc_ptr

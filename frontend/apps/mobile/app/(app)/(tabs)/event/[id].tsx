@@ -137,7 +137,14 @@ function EventOccurrenceDetail({
                 onPress={() =>
                   router.push({
                     pathname: `/event/[id]/reviews`,
-                    params: { id: occurrence.event.id, canReview: "true" },
+                    params: {
+                      id: occurrence.event.id,
+                      occurrenceId: occurrence.id,
+                      canReview: "true",
+                      eventName: occurrence.event.title,
+                      eventLocation: address,
+                      eventImageUrl: occurrence.event.presigned_url ?? "",
+                    },
                   })
                 }
               />
