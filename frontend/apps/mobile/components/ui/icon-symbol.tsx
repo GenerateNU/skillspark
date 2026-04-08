@@ -41,6 +41,7 @@ const MAPPING = {
   "slider.horizontal.3": "tune",
   checkmark: "check",
   "bolt.fill": "bolt",
+  "mappin.fill": "location-on",
 } as IconMapping;
 
 /**

@@ -8,7 +8,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -60,15 +60,33 @@ export function FloatingTabBar({
 
   return (
     <View
-      style={[
-        styles.outerContainer,
-        { bottom: Math.max(insets.bottom, 8) + 12 },
-      ]}
+      className="absolute left-0 right-0 items-center"
+      style={{ bottom: Math.max(insets.bottom, 8) + 12 }}
       pointerEvents="box-none"
     >
-      <View style={styles.pill}>
+      <View
+        className="flex-row items-center bg-[#1a1a1a] rounded-[50px] p-2 gap-1"
+        style={{
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.22,
+          shadowRadius: 18,
+          elevation: 12,
+        }}
+      >
         <Animated.View
-          style={[styles.bubble, bubbleStyle]}
+          style={[
+            {
+              position: "absolute",
+              top: PILL_PADDING,
+              left: 0,
+              width: TAB_WIDTH,
+              height: TAB_HEIGHT,
+              borderRadius: 36,
+              backgroundColor: "rgba(235, 237, 255, 0.95)",
+            },
+            bubbleStyle,
+          ]}
           pointerEvents="none"
         />
         {visibleRoutes.map((route) => {
@@ -104,7 +122,8 @@ export function FloatingTabBar({
               accessibilityRole="button"
               accessibilityState={isFocused ? { selected: true } : {}}
               accessibilityLabel={label}
-              style={styles.tab}
+              className="flex-col items-center justify-center gap-[3px]"
+              style={{ width: TAB_WIDTH, height: TAB_HEIGHT }}
             >
               <IconSymbol
                 name={iconName}
@@ -115,7 +134,12 @@ export function FloatingTabBar({
                 <Animated.Text
                   entering={FadeIn.duration(200)}
                   exiting={FadeOut.duration(120)}
-                  style={styles.label}
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: "#1a1a1a",
+                    letterSpacing: 0.1,
+                  }}
                 >
                   {label}
                 </Animated.Text>
@@ -127,49 +151,3 @@ export function FloatingTabBar({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  outerContainer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    alignItems: "center",
-  },
-  pill: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#1a1a1a",
-    borderRadius: 50,
-    paddingVertical: PILL_PADDING,
-    paddingHorizontal: PILL_PADDING,
-    gap: GAP,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.22,
-    shadowRadius: 18,
-    elevation: 12,
-  },
-  bubble: {
-    position: "absolute",
-    top: PILL_PADDING,
-    left: 0,
-    width: TAB_WIDTH,
-    height: TAB_HEIGHT,
-    borderRadius: 36,
-    backgroundColor: "rgba(235, 237, 255, 0.95)",
-  },
-  tab: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    width: TAB_WIDTH,
-    height: TAB_HEIGHT,
-    gap: 3,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#1a1a1a",
-    letterSpacing: 0.1,
-  },
-});
