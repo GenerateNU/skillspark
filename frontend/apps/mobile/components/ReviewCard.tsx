@@ -1,6 +1,6 @@
 import { RATING_OPTIONS } from "@/constants/ratings";
 import { AppColors } from "@/constants/theme";
-import { Review } from "@skillspark/api-client";
+import { Review, useGetGuardianById } from "@skillspark/api-client";
 import { useTranslation } from "react-i18next";
 import { Image, Text, View } from "react-native";
 
@@ -22,6 +22,16 @@ function timeAgo(dateStr: string, translate: (key: string) => string) {
 export function ReviewCard({ review }: { review: Review }) {
   const { t: translate } = useTranslation();
   const match = RATING_OPTIONS.find((r) => r.rating === review.rating);
+
+  const { data: guardianResp } = useGetGuardianById(review.guardian_id ?? "", {
+    query: { enabled: !!review.guardian_id },
+  });
+  const guardianName = (guardianResp as unknown as { data: { name: string } } | undefined)
+    ?.data?.name ?? null;
+
+  const displayName = review.guardian_id
+    ? (guardianName ?? "...")
+    : translate("review.anonymous");
 
   return (
     <View className="flex-row gap-3 p-4 rounded-2xl">
@@ -58,7 +68,7 @@ export function ReviewCard({ review }: { review: Review }) {
 
         <View className="flex-row justify-between items-center">
           <Text className="text-xs" style={{ color: AppColors.subtleText }}>
-            Anonymous
+            {displayName}
           </Text>
           <Text className="text-xs" style={{ color: AppColors.subtleText }}>
             {timeAgo(review.created_at, translate)}

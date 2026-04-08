@@ -48,7 +48,7 @@ func TestGetAggregateReviews(t *testing.T) {
 	for i, rating := range ratingsToCreate {
 		reviewInput := &models.CreateReviewDBInput{}
 		reviewInput.Body.RegistrationID = regOutput.Body.ID
-		reviewInput.Body.GuardianID = child.GuardianID
+		reviewInput.Body.GuardianID = &child.GuardianID
 		reviewInput.Body.Rating = rating
 		reviewInput.Body.Description_EN = "Review number " + strconv.Itoa(i+1)
 		reviewInput.Body.Description_TH = &descriptionTH
@@ -126,7 +126,7 @@ func TestGetAggregateReviews_AllSameRating(t *testing.T) {
 	for i := 0; i < 4; i++ {
 		reviewInput := &models.CreateReviewDBInput{}
 		reviewInput.Body.RegistrationID = regOutput.Body.ID
-		reviewInput.Body.GuardianID = child.GuardianID
+		reviewInput.Body.GuardianID = &child.GuardianID
 		reviewInput.Body.Rating = 5
 		reviewInput.Body.Description_EN = "Perfect! " + strconv.Itoa(i+1)
 		reviewInput.Body.Description_TH = &descriptionTH
