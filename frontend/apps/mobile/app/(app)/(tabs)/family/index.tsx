@@ -107,7 +107,7 @@ export default function FamilyListScreen() {
             {profilePic && (
               <Image
                 source={{ uri: profilePic }}
-                className="w-full h-full"
+                style={{ width: "100%", height: "100%" }}
                 resizeMode="cover"
               />
             )}
