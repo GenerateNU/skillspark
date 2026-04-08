@@ -1310,8 +1310,12 @@ paths:
             schema:
               type: object
               properties:
+                about:
+                  type: string
                 active:
                   type: boolean
+                links:
+                  type: string
                 location_id:
                   type: string
                 name:
@@ -1325,7 +1329,11 @@ paths:
               required:
                 - name
             encoding:
+              about:
+                contentType: text/plain
               active:
+                contentType: text/plain
+              links:
                 contentType: text/plain
               location_id:
                 contentType: text/plain
@@ -1422,8 +1430,12 @@ paths:
             schema:
               type: object
               properties:
+                about:
+                  type: string
                 active:
                   type: boolean
+                links:
+                  type: string
                 location_id:
                   type: string
                 name:
@@ -1437,7 +1449,11 @@ paths:
               required:
                 - name
             encoding:
+              about:
+                contentType: text/plain
               active:
+                contentType: text/plain
+              links:
                 contentType: text/plain
               location_id:
                 contentType: text/plain
@@ -2916,7 +2932,7 @@ components:
           description: The review text
         guardian_id:
           type: string
-          description: ID of the guardian
+          description: ID of the guardian. Omit or set to null for an anonymous review.
         rating:
           type: integer
           description: Rating left with the review, can be 1-5 inclusive
@@ -3241,6 +3257,10 @@ components:
         max_attendees:
           type: integer
           format: int64
+        org_links:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgLink'
         price:
           type: integer
           description: Price in cents (e.g., 10000 = $100)
@@ -3262,6 +3282,7 @@ components:
         - manager_id
         - event
         - location
+        - org_links
         - start_time
         - end_time
         - max_attendees
@@ -3722,6 +3743,19 @@ components:
       required:
         - token
         - manager_id
+    OrgLink:
+      type: object
+      additionalProperties: false
+      properties:
+        href:
+          type: string
+          description: URL to the organization resource
+        label:
+          type: string
+          description: Human-readable label for the organization link
+      required:
+        - href
+        - label
     Organization:
       type: object
       additionalProperties: false
@@ -3733,6 +3767,8 @@ components:
           examples:
             - http://localhost:8080/schemas/Organization.json
           readOnly: true
+        about:
+          type: string
         active:
           type: boolean
         created_at:
@@ -3740,6 +3776,10 @@ components:
           format: date-time
         id:
           type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgLink'
         location_id:
           type: string
         name:
@@ -3760,9 +3800,11 @@ components:
         - id
         - name
         - active
-        - location_id
+        - links
+        - presigned_url
         - created_at
         - updated_at
+        - stripe_account_id
         - stripe_account_activated
     PatchManagerInputBody:
       type: object
@@ -3963,7 +4005,7 @@ components:
           description: ID of the event
         guardian_id:
           type: string
-          description: ID of the guardian
+          description: ID of the guardian. Null when the review was submitted anonymously.
         id:
           type: string
           description: Unique review identifier
