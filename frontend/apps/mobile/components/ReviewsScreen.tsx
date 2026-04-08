@@ -13,7 +13,6 @@ import {
   Review,
   ReviewAggregate,
   useGetRegistrationsByGuardianId,
-  type Registration,
 } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -93,13 +92,11 @@ export default function ReviewsScreen<
     guardianId ?? "",
     { query: { enabled: canReview && !!guardianId && !!occurrenceId } },
   );
-  const registration: Registration | undefined = useMemo(() => {
-    const list: Registration[] =
-      (
-        registrationsResp as unknown as
-          | { data: { registrations: Registration[] } }
-          | undefined
-      )?.data?.registrations ?? [];
+  const registration = useMemo(() => {
+    const list =
+      registrationsResp?.status === 200
+        ? registrationsResp.data.registrations
+        : [];
     return list.find(
       (r) => r.event_occurrence_id === occurrenceId && r.status === "registered",
     );
