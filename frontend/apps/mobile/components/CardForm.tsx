@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useColorScheme, View, TouchableOpacity, Text } from "react-native";
 import { ThemedText } from "./themed-text";
 import { ErrorMessage } from "./ErrorMessage";
+import { useAuthContext } from "@/hooks/use-auth-context";
 
 let useStripe: any = null;
 let CardField: any = null;
@@ -55,7 +56,8 @@ function CardFormInner({
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "light"];
   const { t: translate } = useTranslation();
-  const { guardian } = useGuardian();
+  const { guardianId } = useAuthContext(); 
+  const { guardian } = useGuardian(guardianId);
 
   async function handleSave(): Promise<void> {
     try {
