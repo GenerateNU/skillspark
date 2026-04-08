@@ -300,7 +300,7 @@ export interface CreateReviewInputBody {
   categories: string[];
   /** The review text */
   description: string;
-  /** ID of the guardian */
+  /** ID of the guardian. Omit or set to null for an anonymous review. */
   guardian_id: string;
   /** Rating left with the review, can be 1-5 inclusive */
   rating: number;
@@ -338,6 +338,12 @@ export interface CreateStripeOnboardingLinkOutputBody {
   readonly $schema?: string;
   /** Stripe-hosted onboarding page URL */
   onboarding_url: string;
+}
+
+export interface DeleteEmergencyContactBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  success_message: string;
 }
 
 export interface DeleteEventOutputBody {
@@ -667,7 +673,7 @@ export interface Review {
   description: string;
   /** ID of the event */
   event_id: string;
-  /** ID of the guardian */
+  /** ID of the guardian. Null when the review was submitted anonymously. */
   guardian_id: string;
   /** Unique review identifier */
   id: string;
@@ -948,6 +954,23 @@ export type UpdateOrganizationBody = {
   profile_image?: Blob;
 };
 
+export type GetRecommendationsByChildIdParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  lat?: string;
+  lng?: string;
+  radius_km?: number;
+  min_date?: string;
+  max_date?: string;
+};
+
 export type GetReviewByEventIdParams = {
   /**
    * Page number (starts at 1)
@@ -963,6 +986,20 @@ export type GetReviewByEventIdParams = {
 };
 
 export type GetReviewByGuardianIdParams = {
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+};
+
+export type GetReviewByOrganizationIdParams = {
   /**
    * Page number (starts at 1)
    * @minimum 1

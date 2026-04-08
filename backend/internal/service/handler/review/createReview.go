@@ -24,13 +24,16 @@ func (h *Handler) CreateReview(ctx context.Context, input *models.CreateReviewIn
 		return nil, &e
 	}
 
-	if _, err := h.GuardianRepository.GetGuardianByID(ctx, input.Body.GuardianID); err != nil {
-		e := errs.BadRequest("Invalid guardian_id: guardian does not exist")
-		return nil, &e
+	if input.Body.GuardianID != nil {
+		if _, err := h.GuardianRepository.GetGuardianByID(ctx, *input.Body.GuardianID); err != nil {
+			e := errs.BadRequest("Invalid guardian_id: guardian does not exist")
+			return nil, &e
+		}
 	}
 
 	review, err := h.ReviewRepository.CreateReview(ctx, CreateReviewInput)
 	if err != nil {
+
 		if httpErr, ok := err.(*errs.HTTPError); ok {
 			return nil, httpErr
 		}

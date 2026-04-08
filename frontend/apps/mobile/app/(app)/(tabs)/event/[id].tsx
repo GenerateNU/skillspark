@@ -135,7 +135,17 @@ function EventOccurrenceDetail({
                 label={translate("review.title")}
                 isLast
                 onPress={() =>
-                  router.push(`/event/review?id=${occurrence.event.id}`)
+                  router.push({
+                    pathname: `/event/[id]/reviews`,
+                    params: {
+                      id: occurrence.event.id,
+                      occurrenceId: occurrence.id,
+                      canReview: "true",
+                      eventName: occurrence.event.title,
+                      eventLocation: address,
+                      eventImageUrl: occurrence.event.presigned_url ?? "",
+                    },
+                  })
                 }
               />
             </View>

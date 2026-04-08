@@ -44,7 +44,7 @@ func TestGetReviewsByGuardianID(t *testing.T) {
 	}
 
 	pagination := utils.Pagination{Limit: 10, Page: 1}
-	reviews, err := repo.GetReviewsByGuardianID(ctx, firstReview.GuardianID, "en-US", pagination)
+	reviews, err := repo.GetReviewsByGuardianID(ctx, *firstReview.GuardianID, "en-US", pagination)
 	require.Nil(t, err)
 	require.Len(t, reviews, len(expectedReviews))
 

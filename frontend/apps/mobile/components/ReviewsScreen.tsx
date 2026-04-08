@@ -1,4 +1,5 @@
 import { ErrorScreen } from "@/components/ErrorScreen";
+import { LeaveReviewModal } from "@/components/LeaveReviewModal";
 import { RatingSmileys } from "@/components/RatingSmileys";
 import { RatingAggregateCard } from "@/components/ReviewAggregate";
 import { ReviewCard } from "@/components/ReviewCard";
@@ -7,14 +8,14 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, Colors } from "@/constants/theme";
+import { useAuthContext } from "@/hooks/use-auth-context";
 import {
   Review,
   ReviewAggregate,
-  useGetReviewAggregate,
-  useGetReviewByEventId,
+  useGetRegistrationsByGuardianId,
 } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -26,7 +27,39 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function ReviewsScreen() {
+interface QueryResult<T> {
+  data: T | undefined;
+  isLoading: boolean;
+  error: unknown;
+}
+
+interface ReviewsScreenProps<
+  TAggregate extends { status: number; data: unknown },
+  TReviews extends { status: number; data: unknown },
+> {
+  useGetAggregate: (id: string) => QueryResult<TAggregate>;
+  useGetReviews: (id: string) => QueryResult<TReviews>;
+  /** When true, shows the rating smileys and write-a-review CTA */
+  canReview?: boolean;
+  /** Event occurrence ID, used to look up the guardian's registration */
+  occurrenceId?: string;
+  eventName?: string;
+  eventLocation?: string;
+  eventImageUrl?: string;
+}
+
+export default function ReviewsScreen<
+  TAggregate extends { status: number; data: unknown },
+  TReviews extends { status: number; data: unknown },
+>({
+  useGetAggregate,
+  useGetReviews,
+  canReview = false,
+  occurrenceId,
+  eventName = "",
+  eventLocation = "",
+  eventImageUrl,
+}: ReviewsScreenProps<TAggregate, TReviews>) {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const colorScheme = useColorScheme();
@@ -36,22 +69,40 @@ export default function ReviewsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t: translate } = useTranslation();
+  const { guardianId } = useAuthContext();
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [initialRating, setInitialRating] = useState<number | undefined>(
+    undefined,
+  );
 
   const {
     data: aggregateResponse,
     isLoading: aggregateIsLoading,
     error: aggregateError,
-  } = useGetReviewAggregate(id, {
-    query: { enabled: !!id },
-  });
+  } = useGetAggregate(id ?? "");
 
   const {
     data: reviewsResponse,
     isLoading: reviewsIsLoading,
     error: reviewsError,
-  } = useGetReviewByEventId(id, undefined, {
-    query: { enabled: !!id },
-  });
+  } = useGetReviews(id ?? "");
+
+  const { data: registrationsResp } = useGetRegistrationsByGuardianId(
+    guardianId ?? "",
+    { query: { enabled: canReview && !!guardianId && !!occurrenceId } },
+  );
+  const registration = useMemo(() => {
+    const list =
+      registrationsResp?.status === 200
+        ? registrationsResp.data.registrations
+        : [];
+    return list.find(
+      (r) => r.event_occurrence_id === occurrenceId && r.status === "registered",
+    );
+  }, [registrationsResp, occurrenceId]);
+
+  const showReviewCTA = canReview && !!registration;
 
   if (!id) {
     return <ErrorScreen message={translate("common.noEventId")} />;
@@ -94,7 +145,6 @@ export default function ReviewsScreen() {
   }
 
   const aggregate = aggregateResponse.data as ReviewAggregate;
-
   const reviews = reviewsResponse.data as Review[];
 
   return (
@@ -119,26 +169,50 @@ export default function ReviewsScreen() {
       >
         <RatingAggregateCard aggregate={aggregate} />
 
-        <View
-          className="mx-5 mt-4 p-4 rounded-2xl border"
-          style={{ borderColor: AppColors.borderLight }}
-        >
-          <ThemedText className="text-lg mb-4 text-center">
-            {aggregate.total_reviews > 0
-              ? translate("review.tapToReview")
-              : translate("review.firstReview")}
-          </ThemedText>
-          <RatingSmileys onSelect={(rating) => {}} />
-          <TouchableOpacity
-            className="mt-4 py-4 rounded-2xl items-center"
-            style={{ backgroundColor: AppColors.primaryText }}
-            onPress={() => router.back()}
+        {showReviewCTA && (
+          <View
+            className="mx-5 mt-4 p-4 rounded-2xl border"
+            style={{ borderColor: AppColors.borderLight }}
           >
-            <Text className="text-white text-base">
-              {translate("review.writeReview")}
-            </Text>
-          </TouchableOpacity>
-        </View>
+            <ThemedText className="text-lg mb-4 text-center">
+              {aggregate.total_reviews > 0
+                ? translate("review.tapToReview")
+                : translate("review.firstReview")}
+            </ThemedText>
+            <RatingSmileys
+              onSelect={(r) => {
+                setInitialRating(r);
+                setModalVisible(true);
+              }}
+            />
+            <TouchableOpacity
+              className="mt-4 py-4 rounded-2xl items-center"
+              style={{ backgroundColor: AppColors.primaryText }}
+              onPress={() => {
+                setInitialRating(undefined);
+                setModalVisible(true);
+              }}
+            >
+              <Text className="text-white text-base">
+                {translate("review.writeReview")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {showReviewCTA && guardianId && (
+          <LeaveReviewModal
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+            eventId={id}
+            eventName={eventName}
+            eventLocation={eventLocation}
+            eventImageUrl={eventImageUrl}
+            registrationId={registration!.id}
+            guardianId={guardianId}
+            initialRating={initialRating}
+          />
+        )}
 
         {aggregate.total_reviews > 0 && (
           <FilterTabs

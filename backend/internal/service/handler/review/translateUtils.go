@@ -15,6 +15,7 @@ func (h *Handler) CreateTranslateStruct(ctx context.Context, event *models.Creat
 			RegistrationID: eventBody.RegistrationID,
 			GuardianID:     eventBody.GuardianID,
 			Categories:     eventBody.Categories,
+			Rating:         eventBody.Rating,
 		},
 	}
 
