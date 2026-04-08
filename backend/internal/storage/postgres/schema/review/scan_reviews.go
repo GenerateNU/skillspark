@@ -22,7 +22,7 @@ func (r *ReviewRepository) ScanReviews(row pgx.CollectableRow) (models.Review, e
 	output = models.Review{
 		ID:             review.ID,
 		RegistrationID: review.RegistrationID,
-		GuardianID:     review.GuardianID, // *uuid.UUID — nil for anonymous reviews
+		GuardianID:     review.GuardianID,
 		EventID:        review.EventID,
 		Rating:         review.Rating,
 		Description:    *desc,
