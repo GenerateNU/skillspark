@@ -2916,7 +2916,7 @@ components:
           description: The review text
         guardian_id:
           type: string
-          description: ID of the guardian
+          description: ID of the guardian. Omit or set to null for an anonymous review.
         rating:
           type: integer
           description: Rating left with the review, can be 1-5 inclusive
@@ -3963,7 +3963,7 @@ components:
           description: ID of the event
         guardian_id:
           type: string
-          description: ID of the guardian
+          description: ID of the guardian. Null when the review was submitted anonymously.
         id:
           type: string
           description: Unique review identifier

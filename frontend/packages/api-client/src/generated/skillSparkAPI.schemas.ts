@@ -300,7 +300,7 @@ export interface CreateReviewInputBody {
   categories: string[];
   /** The review text */
   description: string;
-  /** ID of the guardian */
+  /** ID of the guardian. Omit or set to null for an anonymous review. */
   guardian_id: string;
   /** Rating left with the review, can be 1-5 inclusive */
   rating: number;
@@ -673,7 +673,7 @@ export interface Review {
   description: string;
   /** ID of the event */
   event_id: string;
-  /** ID of the guardian */
+  /** ID of the guardian. Null when the review was submitted anonymously. */
   guardian_id: string;
   /** Unique review identifier */
   id: string;

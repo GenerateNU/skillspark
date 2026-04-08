@@ -12,13 +12,24 @@ const useGetReviews = (id: string) =>
   useGetReviewByEventId(id, undefined, { query: { enabled: !!id } });
 
 export default function EventReviewsPage() {
-  const { canReview } = useLocalSearchParams<{ canReview?: string }>();
+  const { canReview, occurrenceId, eventName, eventLocation, eventImageUrl } =
+    useLocalSearchParams<{
+      canReview?: string;
+      occurrenceId?: string;
+      eventName?: string;
+      eventLocation?: string;
+      eventImageUrl?: string;
+    }>();
 
   return (
     <ReviewsScreen
       useGetAggregate={useGetAggregate}
       useGetReviews={useGetReviews}
       canReview={canReview === "true"}
+      occurrenceId={occurrenceId}
+      eventName={eventName}
+      eventLocation={eventLocation}
+      eventImageUrl={eventImageUrl}
     />
   );
 }
