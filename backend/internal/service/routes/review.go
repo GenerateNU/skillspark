@@ -14,7 +14,7 @@ import (
 
 func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient translations.TranslationInterface) {
 
-	reviewHandler := review.NewHandler(repo.Registration, repo.Review, repo.Guardian, repo.Event, translateClient)
+	reviewHandler := review.NewHandler(repo.Registration, repo.Review, repo.Guardian, repo.Event, repo.Organization, translateClient)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-review-by-guardian-id",
@@ -73,6 +73,39 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		}
 
 		reviews, err := reviewHandler.GetReviewsByEventID(ctx, input.ID, input.AcceptLanguage, pagination)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.ReviewsOutput{
+			Body: reviews,
+		}, nil
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-review-by-organization-id",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/review/organization/{id}",
+		Summary:     "Get reviews by organization ID",
+		Description: "Returns all reviews with the given organization ID",
+		Tags:        []string{"Review"},
+	}, func(ctx context.Context, input *models.GetReviewsByOrganizationIDInput) (*models.ReviewsOutput, error) {
+
+		page := input.Page
+		if page == 0 {
+			page = 1
+		}
+		limit := input.PageSize
+		if limit == 0 {
+			limit = 10
+		}
+
+		pagination := utils.Pagination{
+			Page:  page,
+			Limit: limit,
+		}
+
+		reviews, err := reviewHandler.GetReviewsByOrganizationID(ctx, input.ID, input.AcceptLanguage, pagination)
 		if err != nil {
 			return nil, err
 		}
