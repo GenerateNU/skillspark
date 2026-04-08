@@ -317,14 +317,6 @@ func TestHandler_CreateStripeCustomer(t *testing.T) {
 func TestHandler_CreateSetupIntent(t *testing.T) {
 	clientSecret := "seti_test_secret_123"
 
-	existingPMs := &models.GetPaymentMethodsByGuardianIDOutput{}
-	existingPMs.Body.PaymentMethods = []models.PaymentMethod{
-		{ID: testPMID},
-	}
-
-	emptyPMs := &models.GetPaymentMethodsByGuardianIDOutput{}
-	emptyPMs.Body.PaymentMethods = []models.PaymentMethod{}
-
 	tests := []struct {
 		name      string
 		input     *models.CreateSetupIntentInput
@@ -332,22 +324,10 @@ func TestHandler_CreateSetupIntent(t *testing.T) {
 		wantErr   bool
 	}{
 		{
-			name:  "successfully creates setup intent with no existing payment methods",
+			name:  "successfully creates setup intent",
 			input: &models.CreateSetupIntentInput{GuardianID: testGuardianID},
 			mockSetup: func(guardianRepo *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
 				guardianRepo.On("GetGuardianByID", mock.Anything, testGuardianID).Return(guardianWithStripe, nil)
-				sc.On("GetPaymentMethodsByCustomerID", mock.Anything, stripeCustomerID).Return(emptyPMs, nil)
-				sc.On("CreateSetupIntent", mock.Anything, stripeCustomerID).Return(clientSecret, nil)
-			},
-			wantErr: false,
-		},
-		{
-			name:  "successfully creates setup intent after detaching existing payment method",
-			input: &models.CreateSetupIntentInput{GuardianID: testGuardianID},
-			mockSetup: func(guardianRepo *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
-				guardianRepo.On("GetGuardianByID", mock.Anything, testGuardianID).Return(guardianWithStripe, nil)
-				sc.On("GetPaymentMethodsByCustomerID", mock.Anything, stripeCustomerID).Return(existingPMs, nil)
-				sc.On("DetachPaymentMethod", mock.Anything, testPMID).Return(nil)
 				sc.On("CreateSetupIntent", mock.Anything, stripeCustomerID).Return(clientSecret, nil)
 			},
 			wantErr: false,
@@ -369,30 +349,10 @@ func TestHandler_CreateSetupIntent(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:  "fails when fetching existing payment methods fails",
-			input: &models.CreateSetupIntentInput{GuardianID: testGuardianID},
-			mockSetup: func(guardianRepo *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
-				guardianRepo.On("GetGuardianByID", mock.Anything, testGuardianID).Return(guardianWithStripe, nil)
-				sc.On("GetPaymentMethodsByCustomerID", mock.Anything, stripeCustomerID).Return(nil, errors.New("stripe error"))
-			},
-			wantErr: true,
-		},
-		{
-			name:  "fails when detaching existing payment method fails",
-			input: &models.CreateSetupIntentInput{GuardianID: testGuardianID},
-			mockSetup: func(guardianRepo *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
-				guardianRepo.On("GetGuardianByID", mock.Anything, testGuardianID).Return(guardianWithStripe, nil)
-				sc.On("GetPaymentMethodsByCustomerID", mock.Anything, stripeCustomerID).Return(existingPMs, nil)
-				sc.On("DetachPaymentMethod", mock.Anything, testPMID).Return(errors.New("stripe error"))
-			},
-			wantErr: true,
-		},
-		{
 			name:  "fails when stripe returns error on setup intent creation",
 			input: &models.CreateSetupIntentInput{GuardianID: testGuardianID},
 			mockSetup: func(guardianRepo *repomocks.MockGuardianRepository, sc *stripemocks.MockStripeClient) {
 				guardianRepo.On("GetGuardianByID", mock.Anything, testGuardianID).Return(guardianWithStripe, nil)
-				sc.On("GetPaymentMethodsByCustomerID", mock.Anything, stripeCustomerID).Return(emptyPMs, nil)
 				sc.On("CreateSetupIntent", mock.Anything, stripeCustomerID).Return("", errors.New("stripe error"))
 			},
 			wantErr: true,
