@@ -132,7 +132,7 @@ function OrgDetail({
               {translate("org.reviews")}
             </Text>
             <Text className="text-[42px] font-nunito-bold leading-[46px]">
-              4.5
+              {org.review_summary?.average_rating.toFixed(1) ?? "–"}
             </Text>
             <Image
               source={require("@/assets/images/faces.png")}
@@ -142,7 +142,7 @@ function OrgDetail({
               className="mt-1.5 text-[14px] font-nunito"
               style={{ color: AppColors.subtleText }}
             >
-              (140)
+              ({org.review_summary?.total_reviews ?? 0})
             </Text>
           </View>
         </TouchableOpacity>

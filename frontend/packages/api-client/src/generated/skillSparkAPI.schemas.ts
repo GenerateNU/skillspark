@@ -245,6 +245,12 @@ export interface CreateOrgLoginLinkOutputBody {
   login_url: string;
 }
 
+export interface OrgReviewSummary {
+  average_rating: number;
+  breakdown: ReviewRatingCount[];
+  total_reviews: number;
+}
+
 export interface Organization {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -255,6 +261,7 @@ export interface Organization {
   name: string;
   pfp_s3_key?: string;
   presigned_url?: string;
+  review_summary?: OrgReviewSummary;
   stripe_account_activated: boolean;
   stripe_account_id?: string;
   updated_at: string;
