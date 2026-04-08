@@ -20,17 +20,6 @@ func (h *Handler) CreateSetupIntent(
 		return nil, errors.New("guardian must have stripe customer ID")
 	}
 
-	existing, err := h.StripeClient.GetPaymentMethodsByCustomerID(ctx, *guardian.StripeCustomerID)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, pm := range existing.Body.PaymentMethods {
-		if err := h.StripeClient.DetachPaymentMethod(ctx, pm.ID); err != nil {
-			return nil, err
-		}
-	}
-
 	clientSecret, err := h.StripeClient.CreateSetupIntent(ctx, *guardian.StripeCustomerID)
 	if err != nil {
 		return nil, err
