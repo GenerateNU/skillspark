@@ -50,7 +50,7 @@ export const ImageSelector = ({
         {image && (
           <Image
             source={{ uri: image }}
-            className="w-full h-full"
+            style={{ width: "100%", height: "100%" }}
             resizeMode="cover"
           />
         )}

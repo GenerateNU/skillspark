@@ -64,7 +64,7 @@ function EventOccurrenceDetail({
             {occurrence.event.presigned_url ? (
               <Image
                 source={{ uri: occurrence.event.presigned_url }}
-                className="w-full h-full"
+                style={{ width: "100%", height: "100%" }}
                 contentFit="cover"
               />
             ) : (

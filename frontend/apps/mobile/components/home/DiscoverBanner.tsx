@@ -21,6 +21,7 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
         {event.event.presigned_url ? (
           <Image
             source={{ uri: event.event.presigned_url }}
+            style={{ width: "100%", height: "100%" }}
             className="absolute inset-0 opacity-50"
             contentFit="cover"
           />

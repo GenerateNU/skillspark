@@ -65,7 +65,7 @@ function OrgDetail({
           {org.presigned_url ? (
             <Image
               source={{ uri: org.presigned_url }}
-              className="h-full w-full"
+              style={{ width: "100%", height: "100%" }}
               contentFit="cover"
             />
           ) : (
