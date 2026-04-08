@@ -69,6 +69,7 @@ func createMockS3Client() *s3mocks.S3ClientMock {
 func setupOrganizationTestAPI(
 	organizationRepo *repomocks.MockOrganizationRepository,
 	locationRepo *repomocks.MockLocationRepository,
+	reviewRepo *repomocks.MockReviewRepository,
 	s3Client s3_client.S3Interface,
 ) (*fiber.App, huma.API) {
 	app := fiber.New()
@@ -76,6 +77,7 @@ func setupOrganizationTestAPI(
 	repo := &storage.Repository{
 		Organization: organizationRepo,
 		Location:     locationRepo,
+		Review:       reviewRepo,
 	}
 	SetupOrganizationRoutes(api, repo, s3Client)
 	return app, api
@@ -91,13 +93,13 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 	tests := []struct {
 		name           string
 		organizationID string
-		mockSetup      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockSetup      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository)
 		statusCode     int
 	}{
 		{
 			name:           "valid UUID",
 			organizationID: "40000000-0000-0000-0000-000000000001",
-			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
+			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository, r *repomocks.MockReviewRepository) {
 				m.On(
 					"GetOrganizationByID",
 					mock.Anything,
@@ -111,19 +113,29 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
 				}, nil)
+				r.On(
+					"GetAggregateReviewsForOrganization",
+					mock.Anything,
+					uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				).Return(&models.ReviewAggregate{
+					TotalReviews:  5,
+					AverageRating: 4.2,
+					Breakdown:     []models.ReviewRatingCount{},
+				}, nil)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name:           "invalid UUID",
 			organizationID: "not-a-uuid",
-			mockSetup:      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
-			statusCode:     http.StatusUnprocessableEntity,
+			mockSetup: func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository) {
+			},
+			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
 			name:           "organization not found",
 			organizationID: "00000000-0000-0000-0000-000000000000",
-			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
+			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository, r *repomocks.MockReviewRepository) {
 				m.On(
 					"GetOrganizationByID",
 					mock.Anything,
@@ -144,14 +156,15 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
-			tt.mockSetup(mockOrgRepo, mockLocRepo)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
+			tt.mockSetup(mockOrgRepo, mockLocRepo, mockReviewRepo)
 
 			mockS3 := createMockS3Client()
 			if tt.statusCode == http.StatusOK {
 				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/babel_street.jpg"
 				mockS3.On("GeneratePresignedURL", mock.Anything, mock.Anything, mock.Anything).Return(mockURL, nil)
 			}
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -166,6 +179,7 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockOrgRepo.AssertExpectations(t)
+			mockReviewRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -177,7 +191,7 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 		name        string
 		formFields  map[string]string
 		includeFile bool
-		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository)
 		statusCode  int
 	}{
 		{
@@ -188,7 +202,7 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 				"location_id": testLocationID.String(),
 			},
 			includeFile: true,
-			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
+			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository, r *repomocks.MockReviewRepository) {
 				l.On(
 					"GetLocationByID",
 					mock.Anything,
@@ -234,8 +248,9 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 				"location_id": testLocationID.String(),
 			},
 			includeFile: true,
-			mockSetup:   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
-			statusCode:  http.StatusUnprocessableEntity,
+			mockSetup: func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository) {
+			},
+			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
 			name: "name above maximum length",
@@ -245,8 +260,9 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 				"location_id": testLocationID.String(),
 			},
 			includeFile: true,
-			mockSetup:   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
-			statusCode:  http.StatusUnprocessableEntity,
+			mockSetup: func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository) {
+			},
+			statusCode: http.StatusUnprocessableEntity,
 		},
 	}
 
@@ -257,14 +273,15 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
-			tt.mockSetup(mockOrgRepo, mockLocRepo)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
+			tt.mockSetup(mockOrgRepo, mockLocRepo, mockReviewRepo)
 
 			mockS3 := createMockS3Client()
 			if tt.statusCode == http.StatusOK {
 				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/test/pfp.jpg"
 				mockS3.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			}
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
 
 			body, contentType := createMultipartForm(tt.formFields, tt.includeFile, "profile_image")
 
@@ -298,13 +315,13 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 	tests := []struct {
 		name       string
 		query      string
-		mockSetup  func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockSetup  func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository)
 		statusCode int
 	}{
 		{
 			name:  "valid pagination defaults",
 			query: "",
-			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
+			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository, r *repomocks.MockReviewRepository) {
 				m.On(
 					"GetAllOrganizations",
 					mock.Anything,
@@ -313,13 +330,22 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 					{ID: uuid.New(), Name: "Org 1", Active: true, LocationID: testLocationID},
 					{ID: uuid.New(), Name: "Org 2", Active: true, LocationID: testLocationID},
 				}, nil)
+				r.On(
+					"GetAggregateReviewsForOrganization",
+					mock.Anything,
+					mock.AnythingOfType("uuid.UUID"),
+				).Return(&models.ReviewAggregate{
+					TotalReviews:  0,
+					AverageRating: 0,
+					Breakdown:     []models.ReviewRatingCount{},
+				}, nil)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name:  "valid pagination with page and page_size",
 			query: "?page=2&page_size=5",
-			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
+			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository, r *repomocks.MockReviewRepository) {
 				m.On(
 					"GetAllOrganizations",
 					mock.Anything,
@@ -327,19 +353,30 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 				).Return([]models.Organization{
 					{ID: uuid.New(), Name: "Org 3", Active: true, LocationID: testLocationID},
 				}, nil)
+				r.On(
+					"GetAggregateReviewsForOrganization",
+					mock.Anything,
+					mock.AnythingOfType("uuid.UUID"),
+				).Return(&models.ReviewAggregate{
+					TotalReviews:  0,
+					AverageRating: 0,
+					Breakdown:     []models.ReviewRatingCount{},
+				}, nil)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
-			name:       "page below minimum",
-			query:      "?page=0",
-			mockSetup:  func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
+			name:  "page below minimum",
+			query: "?page=0",
+			mockSetup: func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository) {
+			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name:       "page_size above maximum",
-			query:      "?page_size=101",
-			mockSetup:  func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
+			name:  "page_size above maximum",
+			query: "?page_size=101",
+			mockSetup: func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository) {
+			},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 	}
@@ -351,10 +388,11 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
-			tt.mockSetup(mockOrgRepo, mockLocRepo)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
+			tt.mockSetup(mockOrgRepo, mockLocRepo, mockReviewRepo)
 
 			mockS3 := createMockS3Client()
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -388,7 +426,7 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 		organizationID string
 		formFields     map[string]string
 		includeFile    bool
-		mockSetup      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockSetup      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository)
 		statusCode     int
 	}{
 		{
@@ -399,7 +437,7 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 				"location_id": testLocationID.String(),
 			},
 			includeFile: true,
-			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
+			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository, r *repomocks.MockReviewRepository) {
 				l.On(
 					"GetLocationByID",
 					mock.Anything,
@@ -428,8 +466,9 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 			organizationID: "not-a-uuid",
 			formFields:     map[string]string{},
 			includeFile:    true,
-			mockSetup:      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
-			statusCode:     http.StatusUnprocessableEntity,
+			mockSetup: func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository) {
+			},
+			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
 			name:           "name below minimum length",
@@ -438,8 +477,9 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 				"name": "",
 			},
 			includeFile: true,
-			mockSetup:   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
-			statusCode:  http.StatusUnprocessableEntity,
+			mockSetup: func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository) {
+			},
+			statusCode: http.StatusUnprocessableEntity,
 		},
 	}
 
@@ -450,14 +490,15 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
-			tt.mockSetup(mockOrgRepo, mockLocRepo)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
+			tt.mockSetup(mockOrgRepo, mockLocRepo, mockReviewRepo)
 
 			mockS3 := createMockS3Client()
 			if tt.statusCode == http.StatusOK {
 				mockURL := "https://test-bucket.s3.amazonaws.com/orgs/test/pfp.jpg"
 				mockS3.On("UploadImage", mock.Anything, mock.Anything, mock.Anything).Return(&mockURL, nil)
 			}
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
 
 			body, contentType := createMultipartForm(tt.formFields, tt.includeFile, "profile_image")
 
@@ -493,13 +534,13 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 	tests := []struct {
 		name           string
 		organizationID string
-		mockSetup      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockSetup      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository)
 		statusCode     int
 	}{
 		{
 			name:           "valid delete",
 			organizationID: orgID.String(),
-			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
+			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository, r *repomocks.MockReviewRepository) {
 				m.On(
 					"DeleteOrganization",
 					mock.Anything,
@@ -518,13 +559,14 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 		{
 			name:           "invalid UUID",
 			organizationID: "not-a-uuid",
-			mockSetup:      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository) {},
-			statusCode:     http.StatusUnprocessableEntity,
+			mockSetup: func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository, *repomocks.MockReviewRepository) {
+			},
+			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
 			name:           "organization not found",
 			organizationID: "00000000-0000-0000-0000-000000000000",
-			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository) {
+			mockSetup: func(m *repomocks.MockOrganizationRepository, l *repomocks.MockLocationRepository, r *repomocks.MockReviewRepository) {
 				m.On(
 					"DeleteOrganization",
 					mock.Anything,
@@ -545,10 +587,11 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
-			tt.mockSetup(mockOrgRepo, mockLocRepo)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
+			tt.mockSetup(mockOrgRepo, mockLocRepo, mockReviewRepo)
 
 			mockS3 := createMockS3Client()
-			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockS3)
+			app, _ := setupOrganizationTestAPI(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodDelete,
@@ -675,6 +718,7 @@ func TestHumaValidation_GetEventOccurrencesByOrganizationId(t *testing.T) {
 
 			mockRepo := new(repomocks.MockOrganizationRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
 			tt.mockSetup(mockRepo)
 
 			mockS3 := createMockS3Client()
@@ -682,7 +726,7 @@ func TestHumaValidation_GetEventOccurrencesByOrganizationId(t *testing.T) {
 				mockURL := "https://test-bucket.s3.amazonaws.com/events/robotics_workshop.jpg"
 				mockS3.On("GeneratePresignedURL", mock.Anything, mock.Anything, mock.Anything).Return(mockURL, nil)
 			}
-			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo, mockS3)
+			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo, mockReviewRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
@@ -720,8 +764,9 @@ func TestHumaValidation_Organization_InvalidAcceptLanguage(t *testing.T) {
 
 			mockRepo := new(repomocks.MockOrganizationRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
 			mockS3 := new(s3mocks.S3ClientMock)
-			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo, mockS3)
+			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo, mockReviewRepo, mockS3)
 
 			req, err := http.NewRequest(
 				http.MethodGet,
