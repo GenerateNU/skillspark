@@ -34,6 +34,9 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 	if input.Body.Links != nil {
 		existing.Links = *input.Body.Links
 	}
+	if input.Body.About != nil {
+		existing.About = input.Body.About
+	}
 
 	jsonLinks, err := byteSliceLinks(existing.Links)
 	if err != nil {
@@ -47,6 +50,7 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 		existing.PfpS3Key,
 		existing.LocationID,
 		jsonLinks,
+		existing.About,
 		input.ID,
 	)
 
@@ -57,6 +61,7 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 		&updatedOrganization.ID,
 		&updatedOrganization.Name,
 		&updatedOrganization.Active,
+		&updatedOrganization.About,
 		&updatedOrganization.PfpS3Key,
 		&updatedOrganization.LocationID,
 		&rawLinks,

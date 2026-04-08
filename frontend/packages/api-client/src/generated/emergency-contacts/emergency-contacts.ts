@@ -430,7 +430,7 @@ export function useGetEmergencyContactsByGuardianId<
  * @summary Delete an emergency contact
  */
 export type deleteEmergencyContactResponse200 = {
-  data: DeleteEmergencyContactBody;
+  data: EmergencyContact;
   status: 200;
 };
 

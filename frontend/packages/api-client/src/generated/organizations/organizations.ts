@@ -319,6 +319,11 @@ export const createOrganization = async (
   if (createOrganizationBody.active !== undefined) {
     formData.append(`active`, createOrganizationBody.active.toString());
   }
+  if (createOrganizationBody.links !== undefined) {
+    createOrganizationBody.links.forEach((value) =>
+      formData.append(`links`, JSON.stringify(value)),
+    );
+  }
   if (createOrganizationBody.location_id !== undefined) {
     formData.append(
       `location_id`,
@@ -760,6 +765,11 @@ export const updateOrganization = async (
   const formData = new FormData();
   if (updateOrganizationBody.active !== undefined) {
     formData.append(`active`, updateOrganizationBody.active.toString());
+  }
+  if (updateOrganizationBody.links !== undefined) {
+    updateOrganizationBody.links.forEach((value) =>
+      formData.append(`links`, JSON.stringify(value)),
+    );
   }
   if (updateOrganizationBody.location_id !== undefined) {
     formData.append(

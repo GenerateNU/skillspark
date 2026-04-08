@@ -23,13 +23,14 @@ func CreateTestOrganization(
 	t.Helper()
 
 	repo := NewOrganizationRepository(db)
-	location := location.CreateTestLocation(t, ctx, db)
+	testLocation := location.CreateTestLocation(t, ctx, db)
 
 	active := true
 	i := &models.CreateOrganizationInput{}
 	i.Body.Name = "Test Corp"
 	i.Body.Active = &active
-	i.Body.LocationID = &location.ID
+	locationID := testLocation.ID
+	i.Body.LocationID = &locationID
 
 	organization, err := repo.CreateOrganization(ctx, i, nil)
 	require.NoError(t, err)

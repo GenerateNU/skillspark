@@ -27,6 +27,7 @@ func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *
 		PfpS3Key,
 		input.Body.LocationID,
 		jsonLinks,
+		input.Body.About,
 	)
 
 	var createdOrganization models.Organization
@@ -35,6 +36,7 @@ func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *
 		&createdOrganization.ID,
 		&createdOrganization.Name,
 		&createdOrganization.Active,
+		&createdOrganization.About,
 		&createdOrganization.PfpS3Key,
 		&createdOrganization.LocationID,
 		&rawLinks,

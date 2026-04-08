@@ -26,6 +26,7 @@ func createMockS3Client() *s3mocks.S3ClientMock {
 }
 
 var testLocationID = uuid.MustParse("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+var testInvalidLocationID = uuid.MustParse("00000000-0000-0000-0000-000000000000")
 
 func TestHandler_GetOrganizationById(t *testing.T) {
 	tests := []struct {
@@ -197,11 +198,41 @@ func TestHandler_CreateOrganization(t *testing.T) {
 			wantURL: true,
 		},
 		{
+			name: "successful create with about",
+			input: &models.CreateOrganizationInput{
+				Body: models.CreateOrganizationBody{
+					Name:       "Tech Corp",
+					About:      func() *string { s := "A leading tech company"; return &s }(),
+					LocationID: &testLocationID,
+				},
+			},
+			updateBody: nil,
+			imageData:  nil,
+			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
+				about := "A leading tech company"
+				locRepo.On("GetLocationByID", mock.Anything, testLocationID).Return(&models.Location{
+					ID: testLocationID,
+				}, nil)
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput"), mock.Anything).Return(&models.Organization{
+					ID:         uuid.New(),
+					Name:       "Tech Corp",
+					About:      &about,
+					Active:     true,
+					LocationID: &testLocationID,
+					CreatedAt:  time.Now(),
+					UpdatedAt:  time.Now(),
+				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {},
+			wantErr:     false,
+			wantURL:     false,
+		},
+		{
 			name: "invalid location_id",
 			input: &models.CreateOrganizationInput{
 				Body: models.CreateOrganizationBody{
 					Name:       "Tech Corp",
-					LocationID: func() *uuid.UUID { id := uuid.New(); return &id }(),
+					LocationID: &testInvalidLocationID,
 				},
 			},
 			updateBody: nil,
@@ -410,6 +441,31 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			wantErr: false,
 			wantURL: true,
+		},
+		{
+			name: "successful update about",
+			input: &models.UpdateOrganizationInput{
+				ID: existingID,
+				Body: models.UpdateOrganizationBody{
+					About: func() *string { s := "Updated description"; return &s }(),
+				},
+			},
+			imageData: nil,
+			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
+				about := "Updated description"
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(&models.Organization{
+					ID:         existingID,
+					Name:       "Existing Name",
+					About:      &about,
+					Active:     true,
+					LocationID: &testLocationID,
+					CreatedAt:  time.Now(),
+					UpdatedAt:  time.Now(),
+				}, nil)
+			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {},
+			wantErr:     false,
+			wantURL:     false,
 		},
 		{
 			name: "organization not found on update",

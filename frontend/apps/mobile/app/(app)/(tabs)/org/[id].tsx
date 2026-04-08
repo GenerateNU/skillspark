@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
 import type { Location, Organization } from "@skillspark/api-client";
+import { AboutPage } from "@/components/AboutPage";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { AppColors } from "@/constants/theme";
@@ -145,7 +146,12 @@ function OrgDetail({
               (140)
             </Text>
           </View>
-        </TouchableOpacity>
+        </View>
+        {org.links.length > 0 && (
+          <View className="mx-4 mb-3">
+            <AboutPage description="" links={org.links} />
+          </View>
+        )}
         <View className="px-4 pb-2.5 pt-1">
           <TouchableOpacity
             activeOpacity={0.85}

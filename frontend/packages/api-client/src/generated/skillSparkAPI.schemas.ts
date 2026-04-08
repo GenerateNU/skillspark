@@ -258,6 +258,7 @@ export interface Organization {
   active: boolean;
   created_at: string;
   id: string;
+  links: OrgLink[];
   location_id: string;
   name: string;
   pfp_s3_key?: string;

@@ -19,6 +19,7 @@ import { BookmarkButton } from "@/components/BookmarkButton";
 import { formatDuration } from "@/utils/format";
 import { useTranslation } from "react-i18next";
 import { ListItem } from "@/components/ListItem";
+import { useOrgLinks } from "@/hooks/useOrgLinks";
 
 function formatAddress(occurrence: EventOccurrence) {
   const loc = occurrence.location;
@@ -36,6 +37,7 @@ function EventOccurrenceDetail({
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [descriptionTruncated, setDescriptionTruncated] = useState(false);
   const { t: translate } = useTranslation();
+  const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
   const duration = formatDuration(occurrence.start_time, occurrence.end_time, {
     hr: translate("event.hr"),
     min: translate("event.min"),
@@ -135,10 +137,7 @@ function EventOccurrenceDetail({
                 label={translate("review.title")}
                 isLast
                 onPress={() =>
-                  router.push({
-                    pathname: `/event/[id]/reviews`,
-                    params: { id: occurrence.event.id, canReview: "true" },
-                  })
+                  router.push(`/event/review?id=${occurrence.event.id}`)
                 }
               />
             </View>
@@ -201,6 +200,27 @@ function EventOccurrenceDetail({
                 </Text>
               </View>
             </View>
+            {hasLinks && (
+              <View className="flex-row flex-wrap gap-2.5 mt-4">
+                {(occurrence.org_links ?? []).map((link, index) => (
+                  <Pressable
+                    key={index}
+                    onPress={() => openLink(link.href)}
+                    className="rounded-full px-5 py-2.5 items-center"
+                    style={{
+                      backgroundColor: AppColors.borderLight,
+                    }}
+                  >
+                    <Text
+                      className="text-[13px] font-semibold"
+                      style={{ color: AppColors.primaryText }}
+                    >
+                      {link.label}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
           </View>
 
           {/* Divider */}

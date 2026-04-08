@@ -3,6 +3,7 @@ package organization
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/storage/postgres/schema/location"
 	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 
@@ -18,6 +19,7 @@ func TestCreateOrganization_WithLinks(t *testing.T) {
 	t.Parallel()
 
 	active := true
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 	links := []models.OrgLink{
 		{Href: "https://example.com", Label: "Website"},
 		{Href: "https://instagram.com/test", Label: "Instagram"},
@@ -25,6 +27,7 @@ func TestCreateOrganization_WithLinks(t *testing.T) {
 	input := &models.CreateOrganizationInput{}
 	input.Body.Name = "Links Corp"
 	input.Body.Active = &active
+	input.Body.LocationID = &locationID
 	input.Body.Links = links
 
 	created, err := repo.CreateOrganization(ctx, input, nil)
@@ -43,9 +46,11 @@ func TestCreateOrganization_DefaultsToEmptyLinks(t *testing.T) {
 	t.Parallel()
 
 	active := true
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 	input := &models.CreateOrganizationInput{}
 	input.Body.Name = "No Links Corp"
 	input.Body.Active = &active
+	input.Body.LocationID = &locationID
 
 	created, err := repo.CreateOrganization(ctx, input, nil)
 
@@ -62,12 +67,14 @@ func TestGetOrganizationByID_ReturnsLinks(t *testing.T) {
 	t.Parallel()
 
 	active := true
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 	links := []models.OrgLink{
 		{Href: "https://example.com", Label: "Website"},
 	}
 	input := &models.CreateOrganizationInput{}
 	input.Body.Name = "Get Links Corp"
 	input.Body.Active = &active
+	input.Body.LocationID = &locationID
 	input.Body.Links = links
 
 	created, err := repo.CreateOrganization(ctx, input, nil)
