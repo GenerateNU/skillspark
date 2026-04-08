@@ -23,7 +23,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 interface Props {
   visible: boolean;
   onClose: () => void;
-  /** Event ID used to invalidate the reviews + aggregate queries on success */
   eventId: string;
   eventName: string;
   eventLocation: string;
@@ -33,17 +32,38 @@ interface Props {
   initialRating?: number;
 }
 
-const VALUE_OPTIONS = [
-  { value: "Affordable", labelKey: "review.affordable" },
-  { value: "Fair", labelKey: "review.fair" },
-  { value: "Expensive", labelKey: "review.expensive" },
+const CONTENT_OPTIONS = [
+  { value: "fun", labelKey: "review.fun" },
+  { value: "engaging", labelKey: "review.engaging" },
+  { value: "interesting", labelKey: "review.interesting" },
+  { value: "informative", labelKey: "review.informative" },
+  { value: "interactive", labelKey: "review.interactive" },
+  { value: "immersive", labelKey: "review.immersive" },
+  { value: "educational", labelKey: "review.educational" },
+  { value: "insightful", labelKey: "review.insightful" },
+  { value: "well structured", labelKey: "review.wellStructured" },
 ];
 
 const DIFFICULTY_OPTIONS = [
-  { value: "Beginner-Friendly", labelKey: "review.beginnerFriendly" },
-  { value: "Just Right", labelKey: "review.justRight" },
-  { value: "Too Easy", labelKey: "review.tooEasy" },
-  { value: "Challenging", labelKey: "review.challenging" },
+  { value: "beginner friendly", labelKey: "review.beginnerFriendly" },
+  { value: "intermediate", labelKey: "review.intermediate" },
+  { value: "too easy", labelKey: "review.tooEasy" },
+  { value: "advanced", labelKey: "review.advanced" },
+  { value: "challenging", labelKey: "review.challenging" },
+];
+
+const INSTRUCTOR_OPTIONS = [
+  { value: "punctual", labelKey: "review.punctual" },
+  { value: "clear instruction", labelKey: "review.clearInstruction" },
+  { value: "welcoming", labelKey: "review.welcoming" },
+  { value: "inclusive", labelKey: "review.inclusive" },
+  { value: "collaborative", labelKey: "review.collaborative" },
+];
+
+const VALUE_OPTIONS = [
+  { value: "affordable", labelKey: "review.affordable" },
+  { value: "fair", labelKey: "review.fair" },
+  { value: "expensive", labelKey: "review.expensive" },
 ];
 
 function CategoryPill({
@@ -74,6 +94,41 @@ function CategoryPill({
   );
 }
 
+function CategorySection({
+  title,
+  options,
+  selected,
+  onToggle,
+  translate,
+}: {
+  title: string;
+  options: { value: string; labelKey: string }[];
+  selected: string[];
+  onToggle: (value: string) => void;
+  translate: (key: string) => string;
+}) {
+  return (
+    <>
+      <Text
+        className="text-base font-nunito-bold mb-3"
+        style={{ color: AppColors.primaryText }}
+      >
+        {title}
+      </Text>
+      <View className="flex-row flex-wrap gap-2 mb-5">
+        {options.map(({ value, labelKey }) => (
+          <CategoryPill
+            key={value}
+            label={translate(labelKey)}
+            selected={selected.includes(value)}
+            onPress={() => onToggle(value)}
+          />
+        ))}
+      </View>
+    </>
+  );
+}
+
 export function LeaveReviewModal({
   visible,
   onClose,
@@ -91,10 +146,7 @@ export function LeaveReviewModal({
 
   const [step, setStep] = useState<1 | 2 | "done">(1);
   const [rating, setRating] = useState<number | null>(initialRating ?? null);
-  const [valueCategory, setValueCategory] = useState<string | null>(null);
-  const [difficultyCategory, setDifficultyCategory] = useState<string | null>(
-    null,
-  );
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [anonymous, setAnonymous] = useState(false);
 
@@ -102,28 +154,30 @@ export function LeaveReviewModal({
     if (visible) {
       setStep(1);
       setRating(initialRating ?? null);
-      setValueCategory(null);
-      setDifficultyCategory(null);
+      setSelectedCategories([]);
       setDescription("");
       setAnonymous(false);
     }
   }, [visible, initialRating]);
 
+  function toggleCategory(value: string) {
+    setSelectedCategories((prev) =>
+      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value]
+    );
+  }
+
   const { mutate: createReview, isPending } = useCreateReview();
 
   function handleSubmit() {
     if (!rating) return;
-    const categories: string[] = [];
-    if (valueCategory) categories.push(valueCategory);
-    if (difficultyCategory) categories.push(difficultyCategory);
 
     createReview(
       {
         data: {
-          guardian_id: anonymous ? null : guardianId,
+          guardian_id: anonymous ? "" : guardianId,
           registration_id: registrationId,
           rating,
-          categories,
+          categories: selectedCategories,
           description,
         },
       },
@@ -156,7 +210,6 @@ export function LeaveReviewModal({
       >
         <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
           {step === "done" ? (
-            /* ── Thank-you confirmation ── */
             <View className="flex-1 items-center justify-center px-8">
               <Text
                 className="text-3xl font-nunito-bold mb-6"
@@ -172,10 +225,7 @@ export function LeaveReviewModal({
               )}
               <Text
                 className="text-base text-center mb-10"
-                style={{
-                  color: AppColors.secondaryText,
-                  lineHeight: 24,
-                }}
+                style={{ color: AppColors.secondaryText, lineHeight: 24 }}
               >
                 {translate("review.thankYouMessage")}
               </Text>
@@ -191,7 +241,7 @@ export function LeaveReviewModal({
             </View>
           ) : (
             <>
-              {/* ── Header ── */}
+              {/* Header */}
               <View
                 className="flex-row items-center justify-between px-5 py-4 border-b"
                 style={{ borderColor: AppColors.borderLight }}
@@ -279,10 +329,7 @@ export function LeaveReviewModal({
                             opacity: rating === null || rating === r ? 1 : 0.3,
                           }}
                         >
-                          <Image
-                            source={image}
-                            style={{ width: 55, height: 55 }}
-                          />
+                          <Image source={image} style={{ width: 55, height: 55 }} />
                           <Text
                             className="text-sm text-center"
                             style={{ color: AppColors.secondaryText }}
@@ -293,54 +340,42 @@ export function LeaveReviewModal({
                       ))}
                     </View>
 
-                    {/* Value */}
-                    <Text
-                      className="text-base font-nunito-bold mb-3"
-                      style={{ color: AppColors.primaryText }}
-                    >
-                      {translate("review.value")}
-                    </Text>
-                    <View className="flex-row flex-wrap gap-2 mb-5">
-                      {VALUE_OPTIONS.map(({ value, labelKey }) => (
-                        <CategoryPill
-                          key={value}
-                          label={translate(labelKey)}
-                          selected={valueCategory === value}
-                          onPress={() =>
-                            setValueCategory(
-                              valueCategory === value ? null : value,
-                            )
-                          }
-                        />
-                      ))}
-                    </View>
+                    <CategorySection
+                      title={translate("review.content")}
+                      options={CONTENT_OPTIONS}
+                      selected={selectedCategories}
+                      onToggle={toggleCategory}
+                      translate={translate}
+                    />
 
-                    {/* Difficulty */}
-                    <Text
-                      className="text-base font-nunito-bold mb-3"
-                      style={{ color: AppColors.primaryText }}
-                    >
-                      {translate("review.difficulty")}
-                    </Text>
-                    <View className="flex-row flex-wrap gap-2 mb-8">
-                      {DIFFICULTY_OPTIONS.map(({ value, labelKey }) => (
-                        <CategoryPill
-                          key={value}
-                          label={translate(labelKey)}
-                          selected={difficultyCategory === value}
-                          onPress={() =>
-                            setDifficultyCategory(
-                              difficultyCategory === value ? null : value,
-                            )
-                          }
-                        />
-                      ))}
-                    </View>
+                    <CategorySection
+                      title={translate("review.difficulty")}
+                      options={DIFFICULTY_OPTIONS}
+                      selected={selectedCategories}
+                      onToggle={toggleCategory}
+                      translate={translate}
+                    />
+
+                    <CategorySection
+                      title={translate("review.instructor")}
+                      options={INSTRUCTOR_OPTIONS}
+                      selected={selectedCategories}
+                      onToggle={toggleCategory}
+                      translate={translate}
+                    />
+
+                    <CategorySection
+                      title={translate("review.value")}
+                      options={VALUE_OPTIONS}
+                      selected={selectedCategories}
+                      onToggle={toggleCategory}
+                      translate={translate}
+                    />
 
                     <TouchableOpacity
                       onPress={() => setStep(2)}
                       disabled={!rating}
-                      className="py-4 rounded-2xl items-center"
+                      className="py-4 rounded-2xl items-center mt-3"
                       style={{
                         backgroundColor: rating
                           ? AppColors.primaryText
@@ -349,9 +384,7 @@ export function LeaveReviewModal({
                     >
                       <Text
                         className="text-base font-nunito-bold"
-                        style={{
-                          color: rating ? "#fff" : AppColors.subtleText,
-                        }}
+                        style={{ color: rating ? "#fff" : AppColors.subtleText }}
                       >
                         {translate("review.next")}
                       </Text>
