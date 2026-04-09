@@ -245,6 +245,13 @@ export interface CreateOrgLoginLinkOutputBody {
   login_url: string;
 }
 
+export interface OrgLink {
+  /** URL to the organization resource */
+  href: string;
+  /** Human-readable label for the organization link */
+  label: string;
+}
+
 export interface OrgReviewSummary {
   average_rating: number;
   breakdown: ReviewRatingCount[];
@@ -254,16 +261,18 @@ export interface OrgReviewSummary {
 export interface Organization {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
+  about?: string;
   active: boolean;
   created_at: string;
   id: string;
-  location_id: string;
+  links: OrgLink[];
+  location_id?: string;
   name: string;
   pfp_s3_key?: string;
-  presigned_url?: string;
+  presigned_url: string;
   review_summary?: OrgReviewSummary;
   stripe_account_activated: boolean;
-  stripe_account_id?: string;
+  stripe_account_id: string;
   updated_at: string;
 }
 
@@ -307,7 +316,7 @@ export interface CreateReviewInputBody {
   categories: string[];
   /** The review text */
   description: string;
-  /** ID of the guardian */
+  /** ID of the guardian. Omit or set to null for an anonymous review. */
   guardian_id: string;
   /** Rating left with the review, can be 1-5 inclusive */
   rating: number;
@@ -469,6 +478,7 @@ export interface EventOccurrence {
   location: Location;
   manager_id: string;
   max_attendees: number;
+  org_links: OrgLink[];
   /** Price in cents (e.g., 10000 = $100) */
   price: number;
   start_time: string;
@@ -680,7 +690,7 @@ export interface Review {
   description: string;
   /** ID of the event */
   event_id: string;
-  /** ID of the guardian */
+  /** ID of the guardian. Null when the review was submitted anonymously. */
   guardian_id: string;
   /** Unique review identifier */
   id: string;
@@ -940,7 +950,9 @@ export type ListOrganizationsParams = {
 };
 
 export type CreateOrganizationBody = {
+  about?: Blob | string;
   active?: boolean;
+  links?: Blob | string;
   location_id?: Blob | string;
   /**
    * @minLength 1
@@ -951,7 +963,9 @@ export type CreateOrganizationBody = {
 };
 
 export type UpdateOrganizationBody = {
+  about?: Blob | string;
   active?: boolean;
+  links?: Blob | string;
   location_id?: Blob | string;
   /**
    * @minLength 1

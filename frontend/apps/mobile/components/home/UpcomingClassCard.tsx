@@ -38,7 +38,7 @@ export function UpcomingClassCard({
           {occurrence.event.presigned_url ? (
             <Image
               source={{ uri: occurrence.event.presigned_url }}
-              className="w-[88px] h-[88px]"
+              style={{ width: "100%", height: "100%" }}
               contentFit="cover"
             />
           ) : (

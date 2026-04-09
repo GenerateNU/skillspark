@@ -7,24 +7,24 @@ import (
 )
 
 type Review struct {
-	ID             uuid.UUID `json:"id" db:"id" doc:"Unique review identifier"`
-	RegistrationID uuid.UUID `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
-	GuardianID     uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian"`
-	EventID        uuid.UUID `json:"event_id" db:"event_id" doc:"ID of the event"`
-	Description    string    `json:"description" db:"description" doc:"The review text"`
-	Categories     []string  `json:"categories" db:"categories" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
-	Rating         int       `json:"rating" db:"rating" doc:"Rating left with the review, can be 1-5 inclusive"`
-	CreatedAt      time.Time `json:"created_at" db:"created_at" doc:"Timestamp when registration was created"`
-	UpdatedAt      time.Time `json:"updated_at" db:"updated_at" doc:"Timestamp when registration was last updated"`
+	ID             uuid.UUID  `json:"id" db:"id" doc:"Unique review identifier"`
+	RegistrationID uuid.UUID  `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
+	GuardianID     *uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian. Null when the review was submitted anonymously."`
+	EventID        uuid.UUID  `json:"event_id" db:"event_id" doc:"ID of the event"`
+	Description    string     `json:"description" db:"description" doc:"The review text"`
+	Categories     []string   `json:"categories" db:"categories" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
+	Rating         int        `json:"rating" db:"rating" doc:"Rating left with the review, can be 1-5 inclusive"`
+	CreatedAt      time.Time  `json:"created_at" db:"created_at" doc:"Timestamp when registration was created"`
+	UpdatedAt      time.Time  `json:"updated_at" db:"updated_at" doc:"Timestamp when registration was last updated"`
 }
 
 type CreateReviewDBBody struct {
-	RegistrationID uuid.UUID `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
-	GuardianID     uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian"`
-	Description_EN string    `json:"description_en" db:"description_en" doc:"The review text"`
-	Description_TH *string   `json:"description_th" db:"description_th" doc:"The review text"`
-	Categories     []string  `json:"categories" db:"categories" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
-	Rating         int       `json:"rating" db:"rating" doc:"Rating left with the review, can be 1-5 inclusive"`
+	RegistrationID uuid.UUID  `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
+	GuardianID     *uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian. Omit or set to null for an anonymous review."`
+	Description_EN string     `json:"description_en" db:"description_en" doc:"The review text"`
+	Description_TH *string    `json:"description_th" db:"description_th" doc:"The review text"`
+	Categories     []string   `json:"categories" db:"categories" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
+	Rating         int        `json:"rating" db:"rating" doc:"Rating left with the review, can be 1-5 inclusive"`
 }
 
 type CreateReviewDBInput struct {
@@ -33,26 +33,26 @@ type CreateReviewDBInput struct {
 }
 
 type GetReviewInput struct {
-	ID             uuid.UUID `json:"id" db:"id" doc:"Unique review identifier"`
-	RegistrationID uuid.UUID `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
-	GuardianID     uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian"`
-	EventID        uuid.UUID `json:"event_id" db:"event_id" doc:"ID of the event"`
-	Rating         int       `json:"rating" db:"rating" doc:"Rating left with the review, can be 1-5 inclusive"`
-	Description_EN string    `json:"description_en" db:"description" doc:"The review text"`
-	Description_TH *string   `json:"description_th" db:"description" doc:"The review text"`
-	Categories     []string  `json:"categories" db:"categories" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
-	CreatedAt      time.Time `json:"created_at" db:"created_at" doc:"Timestamp when registration was created"`
-	UpdatedAt      time.Time `json:"updated_at" db:"updated_at" doc:"Timestamp when registration was last updated"`
+	ID             uuid.UUID  `json:"id" db:"id" doc:"Unique review identifier"`
+	RegistrationID uuid.UUID  `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
+	GuardianID     *uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian. Null for anonymous reviews."`
+	EventID        uuid.UUID  `json:"event_id" db:"event_id" doc:"ID of the event"`
+	Rating         int        `json:"rating" db:"rating" doc:"Rating left with the review, can be 1-5 inclusive"`
+	Description_EN string     `json:"description_en" db:"description" doc:"The review text"`
+	Description_TH *string    `json:"description_th" db:"description" doc:"The review text"`
+	Categories     []string   `json:"categories" db:"categories" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
+	CreatedAt      time.Time  `json:"created_at" db:"created_at" doc:"Timestamp when registration was created"`
+	UpdatedAt      time.Time  `json:"updated_at" db:"updated_at" doc:"Timestamp when registration was last updated"`
 }
 
 type CreateReviewInput struct {
 	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Body           struct {
-		RegistrationID uuid.UUID `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
-		GuardianID     uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the guardian"`
-		Description    string    `json:"description" db:"description" doc:"The review text"`
-		Categories     []string  `json:"categories" db:"categories" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
-		Rating         int       `json:"rating" db:"rating" doc:"Rating left with the review, can be 1-5 inclusive"`
+		RegistrationID uuid.UUID  `json:"registration_id" db:"registration_id" doc:"ID of the linked registration"`
+		GuardianID     *uuid.UUID `json:"guardian_id,omitempty" db:"guardian_id" doc:"ID of the guardian. Omit or set to null for an anonymous review."`
+		Description    string     `json:"description" db:"description" doc:"The review text"`
+		Categories     []string   `json:"categories" db:"categories" doc:"Review categories for this review, can be one of fun, engaging, interesting or informative."`
+		Rating         int        `json:"rating" db:"rating" doc:"Rating left with the review, can be 1-5 inclusive"`
 	}
 }
 

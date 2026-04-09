@@ -64,6 +64,7 @@ func scanEventOccurrence(row pgx.CollectableRow, language string) (models.EventO
 	var createdEventOccurrence models.EventOccurrence
 	var titleEN, descriptionEN string
 	var titleTH, descriptionTH *string
+	var orgLinks []byte
 	// populate data from each row
 	err := row.Scan(
 		// event occurrence fields
@@ -107,6 +108,8 @@ func scanEventOccurrence(row pgx.CollectableRow, language string) (models.EventO
 		&createdEventOccurrence.Location.Country,
 		&createdEventOccurrence.Location.CreatedAt,
 		&createdEventOccurrence.Location.UpdatedAt,
+
+		&orgLinks,
 	)
 
 	switch language {

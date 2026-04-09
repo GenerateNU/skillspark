@@ -7,13 +7,20 @@ import (
 	"github.com/google/uuid"
 )
 
+type OrgLink struct {
+	Href  string `json:"href" doc:"URL to the organization resource"`
+	Label string `json:"label" doc:"Human-readable label for the organization link"`
+}
+
 type Organization struct {
 	ID                     uuid.UUID         `json:"id" db:"id"`
 	Name                   string            `json:"name" db:"name"`
+	About                  *string           `json:"about,omitempty" db:"about"`
 	Active                 bool              `json:"active" db:"active"`
+	Links                  []OrgLink         `json:"links" db:"links"`
 	PfpS3Key               *string           `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
 	PresignedURL           *string           `json:"presigned_url,omitempty"`
-	LocationID             uuid.UUID         `json:"location_id" db:"location_id"`
+	LocationID             *uuid.UUID        `json:"location_id,omitempty" db:"location_id"`
 	CreatedAt              time.Time         `json:"created_at" db:"created_at"`
 	UpdatedAt              time.Time         `json:"updated_at" db:"updated_at"`
 	StripeAccountID        *string           `json:"stripe_account_id,omitempty" db:"stripe_account_id"`
@@ -29,15 +36,19 @@ type CreateOrganizationRouteInput struct {
 // CreateOrganizationFormData holds the parsed form data for creating an organization
 type UpdateOrganizationFormData struct {
 	Name         string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
+	About        string        `form:"about"`
 	Active       bool          `form:"active"`
 	LocationID   uuid.UUID     `form:"location_id"`
 	ProfileImage huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
+	Links        string        `form:"links"`
 }
 
 type CreateOrganizationFormData struct {
 	Name         string        `form:"name" required:"true" minLength:"1" maxLength:"255"`
+	About        string        `form:"about"`
 	Active       bool          `form:"active"`
 	LocationID   uuid.UUID     `form:"location_id"`
+	Links        string        `form:"links"`
 	ProfileImage huma.FormFile `form:"profile_image" contentType:"image/png,image/jpeg"`
 }
 
@@ -47,15 +58,19 @@ type UpdateOrganizationRouteInput struct {
 }
 
 type CreateOrganizationBody struct {
-	Name       string    `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
-	Active     *bool     `json:"active,omitempty" doc:"Active status (defaults to true)"`
-	LocationID uuid.UUID `json:"location_id" format:"uuid" doc:"Associated location ID"`
+	Name       string     `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
+	About      *string    `json:"about,omitempty" doc:"Short description of the organization"`
+	Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
+	LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
+	Links      []OrgLink  `json:"links,omitempty" doc:"List of links associated with the organization"`
 }
 
 type UpdateOrganizationBody struct {
 	Name       *string    `json:"name" minLength:"1" maxLength:"255" doc:"Organization name"`
+	About      *string    `json:"about,omitempty" doc:"Short description of the organization"`
 	Active     *bool      `json:"active,omitempty" doc:"Active status (defaults to true)"`
 	LocationID *uuid.UUID `json:"location_id,omitempty" format:"uuid" doc:"Associated location ID"`
+	Links      *[]OrgLink `json:"links,omitempty" doc:"List of links associated with the organization"`
 }
 
 type CreateOrganizationInput struct {

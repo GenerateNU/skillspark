@@ -1157,7 +1157,6 @@ export function useGetReviewByOrganizationId<
  */
 
 export function useGetReviewByOrganizationId<
-
   TData = Awaited<ReturnType<typeof getReviewByOrganizationId>>,
   TError = ErrorModel,
 >(
