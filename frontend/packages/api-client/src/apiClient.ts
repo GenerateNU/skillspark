@@ -1,4 +1,6 @@
-/// <reference types="vite/client" />
+declare interface ImportMeta {
+  readonly env: Record<string, string | undefined>;
+}
 
 import axios from "axios";
 import type { InternalAxiosRequestConfig } from "axios";
