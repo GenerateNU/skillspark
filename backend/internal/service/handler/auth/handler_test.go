@@ -103,7 +103,7 @@ func TestHandler_GuardianLogin(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt // capture range variable for parallel
 		t.Run(tt.name, func(t *testing.T) {
-
+			t.Parallel()
 			// Fixup for specific tests
 			if tt.name == "successful login" {
 				resp := tt.authResponse.(models.LoginResponse)
@@ -191,6 +191,7 @@ func TestHandler_ManagerLogin(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if tt.name == "successful manager login" {
 				resp := tt.authResponse.(models.LoginResponse)
 				resp.User.ID = uuid.MustParse("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b22")
@@ -276,6 +277,7 @@ func TestHandler_GuardianSignUp(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
@@ -355,6 +357,7 @@ func TestHandler_ManagerSignUp(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockManagerRepo := new(repomocks.MockManagerRepository)
