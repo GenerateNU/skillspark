@@ -1,6 +1,7 @@
 FROM oven/bun AS build
 WORKDIR /app
 COPY package.json bun.lock ./
+COPY scripts ./scripts
 COPY packages ./packages
 COPY apps/web ./apps/web
 RUN bun install
