@@ -1,6 +1,6 @@
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -17,6 +17,10 @@ const TAB_WIDTH = 68;
 const TAB_HEIGHT = 52;
 const PILL_PADDING = 8;
 const GAP = 4;
+
+// Use this as contentContainerStyle paddingBottom in scroll views so content
+// clears the floating pill on all devices (pill height + bottom inset + gap).
+export const FLOATING_TAB_BAR_SCROLL_PADDING = 130;
 
 const VISIBLE_TABS = ["index", "map", "activity", "profile"];
 
@@ -41,18 +45,22 @@ export function FloatingTabBar({
     (r) => r.name === state.routes[state.index]?.name,
   );
 
+  const lastActiveIndexRef = useRef(Math.max(activeIndex, 0));
+  if (activeIndex !== -1) {
+    lastActiveIndexRef.current = activeIndex;
+  }
+  const effectiveActiveIndex = activeIndex !== -1 ? activeIndex : lastActiveIndexRef.current;
+
   const translateX = useSharedValue(
-    PILL_PADDING + Math.max(activeIndex, 0) * (TAB_WIDTH + GAP),
+    PILL_PADDING + effectiveActiveIndex * (TAB_WIDTH + GAP)
   );
 
   useEffect(() => {
-    if (activeIndex !== -1) {
-      translateX.value = withSpring(
-        PILL_PADDING + activeIndex * (TAB_WIDTH + GAP),
-        { damping: 28, stiffness: 350, mass: 0.8 },
-      );
-    }
-  }, [activeIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+    translateX.value = withSpring(
+      PILL_PADDING + effectiveActiveIndex * (TAB_WIDTH + GAP),
+      { damping: 28, stiffness: 350, mass: 0.8 }
+    );
+  }, [effectiveActiveIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const bubbleStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
@@ -90,7 +98,7 @@ export function FloatingTabBar({
           pointerEvents="none"
         />
         {visibleRoutes.map((route) => {
-          const isFocused = state.routes[state.index]?.name === route.name;
+          const isFocused = visibleRoutes[effectiveActiveIndex]?.name === route.name;
           const options = descriptors[route.key].options;
           const label =
             typeof options.title === "string" ? options.title : route.name;

@@ -35,6 +35,7 @@ import { TrendingCard } from "@/components/home/TrendingCard";
 
 import * as Location from "expo-location";
 import CarouselCard from "@/components/home/CarouselCard";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
@@ -204,7 +205,7 @@ export default function HomeScreen() {
     <ScrollView
       className="flex-1 bg-white"
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
     >
       {/* Header */}
       <View className="px-5 pt-14 pb-4">
