@@ -34,22 +34,22 @@ export function FloatingTabBar({
 }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const visibleRoutes = state.routes.filter((r) =>
-    VISIBLE_TABS.includes(r.name)
+    VISIBLE_TABS.includes(r.name),
   );
 
   const activeIndex = visibleRoutes.findIndex(
-    (r) => r.name === state.routes[state.index]?.name
+    (r) => r.name === state.routes[state.index]?.name,
   );
 
   const translateX = useSharedValue(
-    PILL_PADDING + Math.max(activeIndex, 0) * (TAB_WIDTH + GAP)
+    PILL_PADDING + Math.max(activeIndex, 0) * (TAB_WIDTH + GAP),
   );
 
   useEffect(() => {
     if (activeIndex !== -1) {
       translateX.value = withSpring(
         PILL_PADDING + activeIndex * (TAB_WIDTH + GAP),
-        { damping: 28, stiffness: 350, mass: 0.8 }
+        { damping: 28, stiffness: 350, mass: 0.8 },
       );
     }
   }, [activeIndex]); // eslint-disable-line react-hooks/exhaustive-deps

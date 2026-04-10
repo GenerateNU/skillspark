@@ -108,12 +108,15 @@ export default function HomeScreen() {
     return Array.isArray(d?.data) ? d.data : [];
   }, [childrenResp]);
 
-
-  const { data: trendingResp, isError, error, isLoading: trendingLoading } = 
- useGetTrendingEventOccurrences(
+  const {
+    data: trendingResp,
+    isError,
+    error,
+    isLoading: trendingLoading,
+  } = useGetTrendingEventOccurrences(
     {
-      lat: 13.73000000,
-      lng: 100.52400000,
+      lat: 13.73,
+      lng: 100.524,
       radius: 50,
       max_returns: 5,
     },
@@ -126,13 +129,13 @@ export default function HomeScreen() {
 
   console.log({ trendingResp, isError, error, trendingLoading });
 
-
   const trendingEvents: EventOccurrence[] = useMemo(() => {
-    const d = trendingResp as unknown as { data: EventOccurrence[] } | undefined;
+    const d = trendingResp as unknown as
+      | { data: EventOccurrence[] }
+      | undefined;
     return Array.isArray(d?.data) ? d.data : [];
   }, [trendingResp]);
 
-  
   const upcomingClasses = useMemo(() => {
     const upcomingIds = new Set(
       registrations
