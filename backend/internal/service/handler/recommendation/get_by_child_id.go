@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-
 func (h *Handler) GetRecommendationsByChildID(ctx context.Context, childID uuid.UUID, acceptLanguage string, pagination utils.Pagination, filters models.RecommendationFilters) ([]models.Event, error) {
 	child, err := h.ChildRepository.GetChildByID(ctx, childID)
 	if err != nil {

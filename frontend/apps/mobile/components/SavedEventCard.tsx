@@ -47,7 +47,7 @@ export function SavedEventCard({
         {event.presigned_url && (
           <Image
             source={{ uri: event.presigned_url }}
-            className="w-full h-full"
+            style={{ width: "100%", height: "100%" }}
           />
         )}
       </View>
