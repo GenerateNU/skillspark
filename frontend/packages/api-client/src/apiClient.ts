@@ -29,9 +29,11 @@ const removeStorageItem = (key: string): void => {
 const getBaseURL = () => {
   if (typeof process !== "undefined" && process.env) {
     if (process.env.EXPO_PUBLIC_API_BASE_URL) {
+      console.log("EXPO_PUBLIC_API_BASE_URL");
       return process.env.EXPO_PUBLIC_API_BASE_URL;
     }
     if (process.env.VITE_API_BASE_URL) {
+      console.log("VITE_API_BASE_URL");
       return process.env.VITE_API_BASE_URL;
     }
     if (process.env.NEXT_PUBLIC_API_BASE_URL) {
