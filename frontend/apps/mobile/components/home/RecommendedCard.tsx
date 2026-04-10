@@ -30,7 +30,7 @@ export function RecommendedCard({
         {occurrence.event.presigned_url ? (
           <Image
             source={{ uri: occurrence.event.presigned_url }}
-            className="w-[79px] h-[72px]"
+            style={{ width: "100%", height: "100%" }}
             contentFit="cover"
           />
         ) : (

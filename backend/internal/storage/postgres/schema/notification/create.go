@@ -49,4 +49,3 @@ func (r *NotificationRepository) CreateScheduledNotification(ctx context.Context
 
 	return &notification, nil
 }
-

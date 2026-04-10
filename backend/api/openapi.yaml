@@ -1360,8 +1360,12 @@ paths:
             schema:
               type: object
               properties:
+                about:
+                  type: string
                 active:
                   type: boolean
+                links:
+                  type: string
                 location_id:
                   type: string
                 name:
@@ -1375,7 +1379,11 @@ paths:
               required:
                 - name
             encoding:
+              about:
+                contentType: text/plain
               active:
+                contentType: text/plain
+              links:
                 contentType: text/plain
               location_id:
                 contentType: text/plain
@@ -1472,8 +1480,12 @@ paths:
             schema:
               type: object
               properties:
+                about:
+                  type: string
                 active:
                   type: boolean
+                links:
+                  type: string
                 location_id:
                   type: string
                 name:
@@ -1487,7 +1499,11 @@ paths:
               required:
                 - name
             encoding:
+              about:
+                contentType: text/plain
               active:
+                contentType: text/plain
+              links:
                 contentType: text/plain
               location_id:
                 contentType: text/plain
@@ -1541,6 +1557,88 @@ paths:
                 description: List of event occurrences in the database that match the organization ID
                 items:
                   $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/recommendations/{child_id}:
+    get:
+      tags:
+        - Recommendations
+      summary: Get recommendations by child ID
+      description: Returns a list of recommended events for a child
+      operationId: get-recommendations-by-child-id
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: child_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: lat
+          in: query
+          explode: false
+          schema:
+            type: string
+        - name: lng
+          in: query
+          explode: false
+          schema:
+            type: string
+        - name: radius_km
+          in: query
+          explode: false
+          schema:
+            type: number
+            format: double
+        - name: min_date
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: date-time
+        - name: max_date
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of recommended events for the child
+                items:
+                  $ref: '#/components/schemas/Event'
         default:
           description: Error
           content:
@@ -2051,6 +2149,91 @@ paths:
                 description: List of reviews
                 items:
                   $ref: '#/components/schemas/Review'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/review/organization/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get reviews by organization ID
+      description: Returns all reviews with the given organization ID
+      operationId: get-review-by-organization-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: page_size
+          in: query
+          description: Number of items per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of items per page
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of reviews
+                items:
+                  $ref: '#/components/schemas/Review'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/review/organization_aggregate/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get review aggregate by organization id
+      description: Get review aggregate by organization id
+      operationId: get-review-aggregate-organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Aggregate review data including breakdown by rating, total reviews, and average rating
+                $ref: '#/components/schemas/ReviewAggregate'
         default:
           description: Error
           content:
@@ -2799,7 +2982,7 @@ components:
           description: The review text
         guardian_id:
           type: string
-          description: ID of the guardian
+          description: ID of the guardian. Omit or set to null for an anonymous review.
         rating:
           type: integer
           description: Rating left with the review, can be 1-5 inclusive
@@ -3124,6 +3307,10 @@ components:
         max_attendees:
           type: integer
           format: int64
+        org_links:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgLink'
         price:
           type: integer
           description: Price in cents (e.g., 10000 = $100)
@@ -3145,6 +3332,7 @@ components:
         - manager_id
         - event
         - location
+        - org_links
         - start_time
         - end_time
         - max_attendees
@@ -3605,6 +3793,19 @@ components:
       required:
         - token
         - manager_id
+    OrgLink:
+      type: object
+      additionalProperties: false
+      properties:
+        href:
+          type: string
+          description: URL to the organization resource
+        label:
+          type: string
+          description: Human-readable label for the organization link
+      required:
+        - href
+        - label
     Organization:
       type: object
       additionalProperties: false
@@ -3616,6 +3817,8 @@ components:
           examples:
             - http://localhost:8080/schemas/Organization.json
           readOnly: true
+        about:
+          type: string
         active:
           type: boolean
         created_at:
@@ -3623,6 +3826,10 @@ components:
           format: date-time
         id:
           type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgLink'
         location_id:
           type: string
         name:
@@ -3643,8 +3850,8 @@ components:
         - id
         - name
         - active
+        - links
         - presigned_url
-        - location_id
         - created_at
         - updated_at
         - stripe_account_id
@@ -3848,7 +4055,7 @@ components:
           description: ID of the event
         guardian_id:
           type: string
-          description: ID of the guardian
+          description: ID of the guardian. Null when the review was submitted anonymously.
         id:
           type: string
           description: Unique review identifier

@@ -23,6 +23,7 @@ func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, 
 	var eventOccurrence models.EventOccurrence
 	var titleEN, descriptionEN string
 	var titleTH, descriptionTH *string
+	var orgLinks []byte
 	// populate data in struct, embedding event and location data
 	err = row.Scan(
 		// event occurrence fields
@@ -66,6 +67,8 @@ func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, 
 		&eventOccurrence.Location.Country,
 		&eventOccurrence.Location.CreatedAt,
 		&eventOccurrence.Location.UpdatedAt,
+
+		&orgLinks,
 	)
 
 	switch language {
@@ -83,6 +86,12 @@ func (r *EventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, 
 			return nil, &err
 		}
 		err := errs.InternalServerError("Failed to fetch event occurrence by id: ", err.Error())
+		return nil, &err
+	}
+
+	eventOccurrence.OrgLinks, err = scanLinks(orgLinks)
+	if err != nil {
+		err := errs.InternalServerError("Failed to deserialize org links: ", err.Error())
 		return nil, &err
 	}
 

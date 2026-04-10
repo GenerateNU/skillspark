@@ -1,8 +1,8 @@
-import axios, {
-  AxiosRequestConfig,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from "axios";
+import axios from "axios";
+import type { InternalAxiosRequestConfig } from "axios";
+
+// process is available in Node/Expo but not in browser environments — declare it as optional
+declare const process: { env: Record<string, string | undefined> } | undefined;
 export let currentLanguage = "en";
 export function setCurrentLanguage(lang: string) {
   currentLanguage = lang;
@@ -39,7 +39,7 @@ const getBaseURL = () => {
     }
   }
 
-  return "http://localhost:8080";
+  return "https://octopus-app-kwwy7.ondigitalocean.app";
 };
 
 // NOTE: This axios instance is preserved for future use or interceptor logic,
@@ -64,7 +64,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 let isRetrying = false;
@@ -126,15 +126,16 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export async function customInstance<T>(
   url: string,
-  options?: RequestInit,
+  options?: RequestInit
 ): Promise<T> {
   const baseURL = getBaseURL();
   const fullUrl = `${baseURL}${url}`;
+  const isFormData = options?.body instanceof FormData;
 
   const languageHeader = currentLanguage === "th" ? "th-TH" : "en-US";
 
@@ -144,7 +145,7 @@ export async function customInstance<T>(
     ...options,
     credentials: "include",
     headers: {
-      "Content-Type": "application/json",
+      ...(!isFormData && { "Content-Type": "application/json" }),
       "Accept-Language": languageHeader,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,

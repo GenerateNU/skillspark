@@ -19,6 +19,7 @@ type EventOccurrence struct {
 	ManagerId    *uuid.UUID            `json:"manager_id" db:"manager_id"`
 	Event        Event                 `json:"event" db:"-"`
 	Location     Location              `json:"location" db:"-"`
+	OrgLinks     []OrgLink             `json:"org_links" db:"-"`
 	StartTime    time.Time             `json:"start_time" db:"start_time"`
 	EndTime      time.Time             `json:"end_time" db:"end_time"`
 	MaxAttendees int                   `json:"max_attendees" db:"max_attendees"`

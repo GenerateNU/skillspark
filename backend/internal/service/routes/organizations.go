@@ -10,6 +10,8 @@ import (
 	"skillspark/internal/storage"
 	"skillspark/internal/utils"
 
+	"encoding/json"
+
 	"github.com/danielgtaylor/huma/v2"
 )
 
@@ -27,10 +29,25 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 
 		formData := input.RawBody.Data()
 
+		var links []models.OrgLink
+
+		if formData.Links != "" {
+			if err := json.Unmarshal([]byte(formData.Links), &links); err != nil {
+				return nil, err
+			}
+		}
+
+		var about *string
+		if formData.About != "" {
+			about = &formData.About
+		}
+
 		organizationBody := models.CreateOrganizationBody{
 			Name:       formData.Name,
+			About:      about,
 			Active:     &formData.Active,
-			LocationID: formData.LocationID,
+			LocationID: &formData.LocationID,
+			Links:      links,
 		}
 
 		organizationModel := models.CreateOrganizationInput{
@@ -39,13 +56,18 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 
 		updateBody := models.UpdateOrganizationBody{
 			Name:       &formData.Name,
+			About:      about,
 			Active:     &formData.Active,
 			LocationID: &formData.LocationID,
 		}
 
-		image_data, err := io.ReadAll(formData.ProfileImage)
-		if err != nil {
-			return nil, err
+		var image_data []byte
+		var err error
+		if formData.ProfileImage.Size > 0 {
+			image_data, err = io.ReadAll(formData.ProfileImage)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		organization, err := orgHandler.CreateOrganization(ctx, &organizationModel, &updateBody, &image_data, s3Client)
@@ -122,10 +144,25 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 	}, func(ctx context.Context, input *models.UpdateOrganizationRouteInput) (*models.UpdateOrganizationOutput, error) {
 		formData := input.RawBody.Data()
 
+		var links []models.OrgLink
+
+		if formData.Links != "" {
+			if err := json.Unmarshal([]byte(formData.Links), &links); err != nil {
+				return nil, err
+			}
+		}
+
+		var about *string
+		if formData.About != "" {
+			about = &formData.About
+		}
+
 		organizationBody := models.UpdateOrganizationBody{
 			Name:       &formData.Name,
+			About:      about,
 			Active:     &formData.Active,
 			LocationID: &formData.LocationID,
+			Links:      &links,
 		}
 
 		organizationModel := models.UpdateOrganizationInput{
@@ -133,10 +170,13 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 			ID:   input.ID,
 		}
 
-		image_data, err := io.ReadAll(formData.ProfileImage)
-		if err != nil {
-
-			return nil, err
+		var image_data []byte
+		var err error
+		if formData.ProfileImage.Size > 0 {
+			image_data, err = io.ReadAll(formData.ProfileImage)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		organization, err := orgHandler.UpdateOrganization(ctx, &organizationModel, &image_data, s3Client)

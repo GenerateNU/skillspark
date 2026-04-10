@@ -232,7 +232,7 @@ func TestHandler_CreateLocation(t *testing.T) {
 			name: "lat/lng within range - accepted, geocoded values used",
 			input: func() *models.CreateLocationInput {
 				input := &models.CreateLocationInput{}
-				input.Body.Latitude = ptr(13.7600)  // ~0.5 km from geocoded 13.7563
+				input.Body.Latitude = ptr(13.7600)   // ~0.5 km from geocoded 13.7563
 				input.Body.Longitude = ptr(100.5100) // ~0.5 km from geocoded 100.5018
 				input.Body.AddressLine1 = "1 Sukhumvit Rd"
 				input.Body.Subdistrict = "Khlong Toei"
@@ -268,7 +268,7 @@ func TestHandler_CreateLocation(t *testing.T) {
 			name: "lat/lng too far from geocoded address - returns bad request",
 			input: func() *models.CreateLocationInput {
 				input := &models.CreateLocationInput{}
-				input.Body.Latitude = ptr(13.7563)  // Bangkok
+				input.Body.Latitude = ptr(13.7563)   // Bangkok
 				input.Body.Longitude = ptr(100.5018) // Bangkok
 				input.Body.AddressLine1 = "Nimman Rd"
 				input.Body.Subdistrict = "Suthep"

@@ -30,4 +30,3 @@ func (c *Client) SendMessage(ctx context.Context, messageBody interface{}) error
 
 	return nil
 }
-

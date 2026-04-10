@@ -12,6 +12,7 @@ import (
 	"skillspark/internal/storage/postgres/schema/manager"
 	notification "skillspark/internal/storage/postgres/schema/notification"
 	"skillspark/internal/storage/postgres/schema/organization"
+	"skillspark/internal/storage/postgres/schema/recommendation"
 	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/review"
 	"skillspark/internal/storage/postgres/schema/saved"
@@ -113,8 +114,10 @@ type ReviewRepository interface {
 	CreateReview(ctx context.Context, input *models.CreateReviewDBInput) (*models.Review, error)
 	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
+	GetReviewsByOrganizationID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	DeleteReview(ctx context.Context, id uuid.UUID) error
 	GetAggregateReviews(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
+	GetAggregateReviewsForOrganization(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
 }
 
 type UserRepository interface {
@@ -143,6 +146,10 @@ type EmergencyContactRepository interface {
 	DeleteEmergencyContact(ctx context.Context, guardian_id uuid.UUID) (*models.DeleteEmergencyContactOutput, error)
 }
 
+type RecommendationRepository interface {
+	GetRecommendationsByChildID(ctx context.Context, childInterests []string, childBirthYear int, acceptLanguage string, pagination utils.Pagination, filters models.RecommendationFilters) ([]models.Event, error)
+}
+
 type Repository struct {
 	db               *pgxpool.Pool
 	Location         LocationRepository
@@ -159,6 +166,7 @@ type Repository struct {
 	Notification     NotificationRepository
 	Saved            SavedRepository
 	EmergencyContact EmergencyContactRepository
+	Recommendation   RecommendationRepository
 }
 
 // Close closes the database connection pool
@@ -190,5 +198,6 @@ func NewRepository(db *pgxpool.Pool) *Repository {
 		Notification:     notification.NewNotificationRepository(db),
 		Saved:            saved.NewSavedRepository(db),
 		EmergencyContact: emergencycontact.NewEmergencyContactRepository(db),
+		Recommendation:   recommendation.NewRecommendationRepository(db),
 	}
 }

@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 export default function EmergencyContactLayout() {
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? 'light'];
+  const theme = Colors[colorScheme ?? "light"];
   const { t: translate } = useTranslation();
 
   return (
@@ -15,16 +15,19 @@ export default function EmergencyContactLayout() {
         headerShown: false,
         headerTintColor: theme.tint,
         headerStyle: { backgroundColor: theme.background },
-        headerTitleStyle: { fontFamily: 'NunitoSans_600SemiBold', color: theme.text },
-        headerBackTitle: "", 
+        headerTitleStyle: {
+          fontFamily: "NunitoSans_600SemiBold",
+          color: theme.text,
+        },
+        headerBackTitle: "",
       }}
     >
-      <Stack.Screen 
-        name="manage" 
-        options={{ 
-          title: translate('emergencyContact.manageTitle'),
-          headerShown: false
-        }} 
+      <Stack.Screen
+        name="manage"
+        options={{
+          title: translate("emergencyContact.manageTitle"),
+          headerShown: false,
+        }}
       />
     </Stack>
   );

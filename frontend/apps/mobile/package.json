@@ -23,6 +23,7 @@
     "expo-font": "^14.0.11",
     "expo-haptics": "~15.0.8",
     "expo-image": "~3.0.11",
+    "expo-image-picker": "^55.0.16",
     "expo-linking": "~8.0.11",
     "expo-location": "~19.0.8",
     "expo-router": "~6.0.21",
@@ -43,6 +44,7 @@
     "react-native-maps": "1.20.1",
     "react-native-picker-select": "^9.3.1",
     "react-native-reanimated": "~4.1.1",
+    "react-native-reanimated-carousel": "^4.0.3",
     "react-native-safe-area-context": "~5.6.2",
     "react-native-screens": "~4.16.0",
     "react-native-svg": "15.12.1",
@@ -51,16 +53,19 @@
     "use-debounce": "^10.1.0"
   },
   "devDependencies": {
-    "@expo/ngrok": "^4.1.3",
     "@babel/plugin-transform-react-jsx": "^7.28.6",
+    "@expo/ngrok": "^4.1.3",
     "@types/bun": "latest",
     "@types/react": "~19.1.0",
+    "babel-preset-expo": "^54.0.10",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
-    "babel-preset-expo": "^54.0.10",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.9.2"
+  },
+  "peerDependencies": {
+    "react": "^19.1.0"
   },
   "private": true,
   "main": "expo-router/entry"

@@ -5,6 +5,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "expo-router";
 
 export interface LocationPin {
   id: string;
@@ -26,6 +27,7 @@ export function EventCard({ pin }: EventCardProps) {
     { light: "#D0D0D0", dark: "#333333" },
     "background",
   );
+  const router = useRouter();
   const { t: translate } = useTranslation();
 
   return (
@@ -74,7 +76,9 @@ export function EventCard({ pin }: EventCardProps) {
       <TouchableOpacity
         className="w-full items-center rounded-xl bg-[#333] py-[15px]"
         activeOpacity={1}
-        onPress={() => {}}
+        onPress={() => {
+          router.push(`/(app)/(tabs)/org/${pin.id}`);
+        }}
       >
         <Text className="font-nunito-semibold text-[18px] text-white">
           {translate("dashboard.learnMore")}

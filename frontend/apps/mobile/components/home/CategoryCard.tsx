@@ -34,6 +34,7 @@ export function CategoryCard({
         {occurrence?.event.presigned_url ? (
           <Image
             source={{ uri: occurrence.event.presigned_url }}
+            style={{ width: "100%", height: "100%" }}
             className="absolute inset-0 opacity-80"
             contentFit="cover"
           />
