@@ -18,9 +18,9 @@ import {
   type Registration,
   type Child,
   getTrendingEventOccurrences,
+  useGetTrendingEventOccurrences,
 } from "@skillspark/api-client";
 import { useEffect, useMemo, useState } from "react";
-import { useMemo, useState, useEffect } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useDebounce } from "use-debounce";
@@ -32,7 +32,6 @@ import { CategoryCard } from "@/components/home/CategoryCard";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { TrendingCard } from "@/components/home/TrendingCard";
-import { getCurrentPositionAsync, getLastKnownPositionAsync } from "expo-location";
 
 import * as Location from "expo-location";
 import CarouselCard from "@/components/home/CarouselCard";
@@ -42,7 +41,6 @@ export default function HomeScreen() {
   const { guardianId } = useAuthContext();
   const [searchText, setSearchText] = useState("");
   const [_debouncedSearch] = useDebounce(searchText, 300);
-  const [trendingEvents, setTrendingEvents] = useState<EventOccurrence[]>();
   const { width, height } = useWindowDimensions();
 
   const [geoLocationLat, setGeoLocationLat] = useState<string | undefined>(
@@ -110,6 +108,31 @@ export default function HomeScreen() {
     return Array.isArray(d?.data) ? d.data : [];
   }, [childrenResp]);
 
+
+  const { data: trendingResp, isError, error, isLoading: trendingLoading } = 
+ useGetTrendingEventOccurrences(
+    {
+      lat: 13.73000000,
+      lng: 100.52400000,
+      radius: 50,
+      max_returns: 5,
+    },
+    {
+      query: {
+        enabled: !!geoLocationLat && !!geoLocationLong,
+      },
+    },
+  );
+
+  console.log({ trendingResp, isError, error, trendingLoading });
+
+
+  const trendingEvents: EventOccurrence[] = useMemo(() => {
+    const d = trendingResp as unknown as { data: EventOccurrence[] } | undefined;
+    return Array.isArray(d?.data) ? d.data : [];
+  }, [trendingResp]);
+
+  
   const upcomingClasses = useMemo(() => {
     const upcomingIds = new Set(
       registrations
@@ -123,39 +146,10 @@ export default function HomeScreen() {
     return allOccurrences.filter((o) => upcomingIds.has(o.id));
   }, [registrations, allOccurrences]);
 
-  useEffect(() => {
-    async function fetchTrending() {
-      try {
-        if (!geoLocationLat || !geoLocationLong) {
-          return;
-        }
-        const data = await getTrendingEventOccurrences({
-          lat: Number(geoLocationLat), 
-          lng: Number(geoLocationLong),
-          radius: 50,
-          max_returns: 5
-        });
-        if (data.status !== 200) {
-          throw data.data;
-        }
-        setTrendingEvents(data.data)
-      } catch (e){
-        console.error(e)
-      }
-    }
-
-    fetchTrending();
-  }, [geoLocationLat, geoLocationLong])
-
   const futureOccurrences = useMemo(
     () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
     [allOccurrences],
   );
-
-  // const trendingEvents = useMemo(
-  //   () => [...futureOccurrences].sort(() => Math.random() - 0.5).slice(0, 5),
-  //   [futureOccurrences],
-  // );
 
   const childRecommendations = useMemo(() => {
     const shuffled = [...futureOccurrences].sort(() => Math.random() - 0.5);
