@@ -4,11 +4,22 @@ WITH nearby_orgs AS (
     JOIN location l ON o.location_id = l.id
     WHERE l.latitude BETWEEN $1 - 0.05 AND $1 + 0.05
         AND l.longitude BETWEEN $2 - 0.05 AND $2 + 0.05
-        AND haversine_distance($1, $2, l.latitude, l.longitude) <= 5
+        AND 6371 * 2 * ATAN2(
+            SQRT(
+                SIN(RADIANS((l.latitude - $1) / 2)) ^ 2 +
+                COS(RADIANS($1)) * COS(RADIANS(l.latitude)) *
+                SIN(RADIANS((l.longitude - $2) / 2)) ^ 2
+            ),
+            SQRT(1 - (
+                SIN(RADIANS((l.latitude - $1) / 2)) ^ 2 +
+                COS(RADIANS($1)) * COS(RADIANS(l.latitude)) *
+                SIN(RADIANS((l.longitude - $2) / 2)) ^ 2
+            )) -- haversine distance function
+        ) <= 5 -- in kilometers
 ),
 
 event_popularity AS (
-    SELECT 
+    SELECT
         eo.event_id,
         SUM(eo.curr_enrolled) AS total_enrolled
     FROM event_occurrence eo
@@ -18,7 +29,7 @@ event_popularity AS (
 ),
 
 ranked_occurrences AS (
-    SELECT 
+    SELECT
         eo.id,
         eo.event_id,
         eo.manager_id,
@@ -33,14 +44,14 @@ ranked_occurrences AS (
         eo.price,
         eo.currency,
         ROW_NUMBER() OVER (
-            PARTITION BY eo.event_id 
+            PARTITION BY eo.event_id
             ORDER BY eo.start_time
         ) AS rn
     FROM event_occurrence eo
     WHERE eo.start_time > NOW() + INTERVAL '1 day'
 )
 
-SELECT 
+SELECT
     ro.id,
     ro.manager_id,
     ro.start_time,

@@ -11,7 +11,7 @@ import (
 
 func (r *EventOccurrenceRepository) GetTrendingEventOccurrences(ctx context.Context, input *models.GetTrendingEventOccurrencesInput) ([]models.EventOccurrence, error) {
 	lang := input.AcceptLanguage
-	query, err := schema.ReadSQLBaseScript("get_trending_eventoccurences.sql", SqlEventOccurrenceFiles)
+	query, err := schema.ReadSQLBaseScript("get_trending_eventoccurrences.sql", SqlEventOccurrenceFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &err

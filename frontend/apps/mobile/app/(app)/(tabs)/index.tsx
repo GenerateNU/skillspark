@@ -16,8 +16,9 @@ import {
   type Guardian,
   type Registration,
   type Child,
+  getTrendingEventOccurrences,
 } from "@skillspark/api-client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useDebounce } from "use-debounce";
@@ -29,7 +30,7 @@ import { CategoryCard } from "@/components/home/CategoryCard";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { TrendingCard } from "@/components/home/TrendingCard";
-import { getCurrentPositionAsync } from "expo-location";
+import { getCurrentPositionAsync, getLastKnownPositionAsync } from "expo-location";
 
 
 export default function HomeScreen() {
@@ -37,6 +38,7 @@ export default function HomeScreen() {
   const { guardianId } = useAuthContext();
   const [searchText, setSearchText] = useState("");
   const [_debouncedSearch] = useDebounce(searchText, 300);
+  const [trendingEvents, setTrendingEvents] = useState<EventOccurrence[]>();
 
   const { data: guardianResp } = useGetGuardianById(guardianId!, {
     query: { enabled: !!guardianId },
@@ -86,15 +88,34 @@ export default function HomeScreen() {
     return allOccurrences.filter((o) => upcomingIds.has(o.id));
   }, [registrations, allOccurrences]);
 
+  useEffect(() => {
+    async function fetchTrending() {
+      try {
+        const userLoc = await getLastKnownPositionAsync() 
+        ?? await getCurrentPositionAsync(); // This takes longer, so it is the fallback for last known loc
+
+        const data = await getTrendingEventOccurrences({lat: userLoc.coords.latitude, lng: userLoc.coords.longitude});
+        if (data.status !== 200) {
+          throw data.data;
+        }
+        setTrendingEvents(data.data)
+      } catch (e){
+        console.error(e)
+      }
+    }
+
+    fetchTrending();
+  }, [])
+
   const futureOccurrences = useMemo(
     () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
     [allOccurrences],
   );
 
-  const trendingEvents = useMemo(
-    () => [...futureOccurrences].sort(() => Math.random() - 0.5).slice(0, 5),
-    [futureOccurrences],
-  );
+  // const trendingEvents = useMemo(
+  //   () => [...futureOccurrences].sort(() => Math.random() - 0.5).slice(0, 5),
+  //   [futureOccurrences],
+  // );
 
   const childRecommendations = useMemo(() => {
     const shuffled = [...futureOccurrences].sort(() => Math.random() - 0.5);
@@ -238,7 +259,7 @@ export default function HomeScreen() {
       )}
 
       {/* Trending In Your Area */}
-      {trendingEvents.length > 0 && (
+      {trendingEvents && trendingEvents.length > 0 && (
         <View className="mb-6">
           <Text
             className="font-nunito-bold px-5 mb-3"
