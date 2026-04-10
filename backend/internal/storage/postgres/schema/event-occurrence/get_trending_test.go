@@ -15,6 +15,8 @@ func bangkokInput() *models.GetTrendingEventOccurrencesInput {
 	i := &models.GetTrendingEventOccurrencesInput{AcceptLanguage: "en-US"}
 	i.Latitude = 13.74
 	i.Longitude = 100.545
+	i.Radius = 5
+	i.MaxReturns = 5
 	return i
 }
 
@@ -38,7 +40,7 @@ func TestEventOccurrenceRepository_GetTrendingEventOccurrences(t *testing.T) {
 	}
 }
 
-// The SQL limits results to 5 — verify this hard cap is respected
+// MaxReturns controls the LIMIT — verify it is respected
 func TestEventOccurrenceRepository_GetTrendingEventOccurrences_LimitFive(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping database test in short mode")
@@ -51,7 +53,27 @@ func TestEventOccurrenceRepository_GetTrendingEventOccurrences_LimitFive(t *test
 
 	eventOccurrences, err := repo.GetTrendingEventOccurrences(ctx, bangkokInput())
 	require.NoError(t, err)
-	assert.LessOrEqual(t, len(eventOccurrences), 5, "trending should return at most 5 results")
+	assert.LessOrEqual(t, len(eventOccurrences), bangkokInput().MaxReturns,
+		"trending should return at most MaxReturns results")
+}
+
+// MaxReturns=1 should return at most 1 result
+func TestEventOccurrenceRepository_GetTrendingEventOccurrences_MaxReturnsOne(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+
+	testDB := testutil.SetupTestDB(t)
+	repo := NewEventOccurrenceRepository(testDB)
+	ctx := context.Background()
+	t.Parallel()
+
+	i := bangkokInput()
+	i.MaxReturns = 1
+
+	eventOccurrences, err := repo.GetTrendingEventOccurrences(ctx, i)
+	require.NoError(t, err)
+	assert.LessOrEqual(t, len(eventOccurrences), 1, "MaxReturns=1 should return at most 1 result")
 }
 
 // The SQL uses ROW_NUMBER() PARTITION BY event_id — only the next upcoming
@@ -99,7 +121,35 @@ func TestEventOccurrenceRepository_GetTrendingEventOccurrences_OnlyFutureOccurre
 	}
 }
 
-// The SQL joins nearby_orgs which filters orgs within 5km via HaversineDistance
+// A large radius should return more results than a very small one
+func TestEventOccurrenceRepository_GetTrendingEventOccurrences_RadiusAffectsResults(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database test in short mode")
+	}
+
+	testDB := testutil.SetupTestDB(t)
+	repo := NewEventOccurrenceRepository(testDB)
+	ctx := context.Background()
+	t.Parallel()
+
+	largeRadius := bangkokInput()
+	largeRadius.Radius = 50
+	largeRadius.MaxReturns = 100
+
+	tinyRadius := bangkokInput()
+	tinyRadius.Radius = 1
+	tinyRadius.MaxReturns = 100
+
+	large, err := repo.GetTrendingEventOccurrences(ctx, largeRadius)
+	require.NoError(t, err)
+
+	tiny, err := repo.GetTrendingEventOccurrences(ctx, tinyRadius)
+	require.NoError(t, err)
+
+	assert.GreaterOrEqual(t, len(large), len(tiny),
+		"larger radius should return at least as many results as a smaller radius")
+}
+
 // A far-away coordinate should return no results since no orgs are nearby
 func TestEventOccurrenceRepository_GetTrendingEventOccurrences_NoResultsForRemoteLocation(t *testing.T) {
 	if testing.Short() {
@@ -114,6 +164,8 @@ func TestEventOccurrenceRepository_GetTrendingEventOccurrences_NoResultsForRemot
 	i := &models.GetTrendingEventOccurrencesInput{AcceptLanguage: "en-US"}
 	i.Latitude = 51.5074 // London — no seed orgs nearby
 	i.Longitude = -0.1278
+	i.Radius = 5
+	i.MaxReturns = 5
 
 	eventOccurrences, err := repo.GetTrendingEventOccurrences(ctx, i)
 	require.NoError(t, err)
@@ -139,7 +191,6 @@ func TestEventOccurrenceRepository_GetTrendingEventOccurrences_OrderedByStartTim
 		t.Skip("Not enough results to verify ordering")
 	}
 
-	// among results with equal popularity, earlier start times should come first
 	for i := 1; i < len(eventOccurrences); i++ {
 		prev := eventOccurrences[i-1].StartTime
 		curr := eventOccurrences[i].StartTime

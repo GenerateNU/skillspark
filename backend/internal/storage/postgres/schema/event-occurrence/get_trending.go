@@ -22,6 +22,8 @@ func (r *EventOccurrenceRepository) GetTrendingEventOccurrences(ctx context.Cont
 		query,
 		input.Latitude,
 		input.Longitude,
+		input.Radius,
+		input.MaxReturns,
 	)
 
 	if err != nil {

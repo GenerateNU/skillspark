@@ -126,10 +126,15 @@ export default function HomeScreen() {
   useEffect(() => {
     async function fetchTrending() {
       try {
-        const userLoc = await getLastKnownPositionAsync() 
-        ?? await getCurrentPositionAsync(); // This takes longer, so it is the fallback for last known loc
-
-        const data = await getTrendingEventOccurrences({lat: userLoc.coords.latitude, lng: userLoc.coords.longitude});
+        if (!geoLocationLat || !geoLocationLong) {
+          return;
+        }
+        const data = await getTrendingEventOccurrences({
+          lat: Number(geoLocationLat), 
+          lng: Number(geoLocationLong),
+          radius: 50,
+          max_returns: 5
+        });
         if (data.status !== 200) {
           throw data.data;
         }
@@ -140,7 +145,7 @@ export default function HomeScreen() {
     }
 
     fetchTrending();
-  }, [])
+  }, [geoLocationLat, geoLocationLong])
 
   const futureOccurrences = useMemo(
     () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),

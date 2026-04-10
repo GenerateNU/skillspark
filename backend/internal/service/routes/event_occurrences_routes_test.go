@@ -780,6 +780,10 @@ func TestHumaValidation_GetTrendingEventOccurrences(t *testing.T) {
 		}
 	}
 
+	// base query with all required params
+	baseQuery := "?lat=13.74&lng=100.545&radius=5&max_returns=5"
+	londonQuery := "?lat=51.5074&lng=-0.1278&radius=5&max_returns=5"
+
 	tests := []struct {
 		name       string
 		query      string
@@ -787,8 +791,8 @@ func TestHumaValidation_GetTrendingEventOccurrences(t *testing.T) {
 		statusCode int
 	}{
 		{
-			name:  "valid lat and lng returns 200",
-			query: "?lat=13.74&lng=100.545",
+			name:  "valid lat, lng, radius and max_returns returns 200",
+			query: baseQuery,
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {
 				m.On("GetTrendingEventOccurrences", mock.Anything, mock.AnythingOfType("*models.GetTrendingEventOccurrencesInput")).
 					Return([]models.EventOccurrence{makeOccurrence()}, nil)
@@ -799,7 +803,7 @@ func TestHumaValidation_GetTrendingEventOccurrences(t *testing.T) {
 		},
 		{
 			name:  "no nearby results returns empty 200",
-			query: "?lat=51.5074&lng=-0.1278",
+			query: londonQuery,
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {
 				m.On("GetTrendingEventOccurrences", mock.Anything, mock.AnythingOfType("*models.GetTrendingEventOccurrencesInput")).
 					Return([]models.EventOccurrence{}, nil)
@@ -808,31 +812,43 @@ func TestHumaValidation_GetTrendingEventOccurrences(t *testing.T) {
 		},
 		{
 			name:       "missing lat returns 422",
-			query:      "?lng=100.545",
+			query:      "?lng=100.545&radius=5&max_returns=5",
 			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
 			name:       "missing lng returns 422",
-			query:      "?lat=13.74",
+			query:      "?lat=13.74&radius=5&max_returns=5",
 			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name:       "missing both lat and lng returns 422",
+			name:       "missing radius returns 422",
+			query:      "?lat=13.74&lng=100.545&max_returns=5",
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name:       "missing max_returns returns 422",
+			query:      "?lat=13.74&lng=100.545&radius=5",
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name:       "missing all params returns 422",
 			query:      "",
 			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
 			name:       "invalid Accept-Language returns 422",
-			query:      "?lat=13.74&lng=100.545",
+			query:      baseQuery,
 			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
 			name:  "repository error returns 500",
-			query: "?lat=13.74&lng=100.545",
+			query: baseQuery,
 			mockSetup: func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {
 				m.On("GetTrendingEventOccurrences", mock.Anything, mock.AnythingOfType("*models.GetTrendingEventOccurrencesInput")).
 					Return(nil, &errs.HTTPError{Code: 500, Message: "db error"})

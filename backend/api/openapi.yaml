@@ -681,6 +681,24 @@ paths:
             type: number
             description: The user's longitude
             format: double
+        - name: max_returns
+          in: query
+          description: the maximum number of returns
+          required: true
+          explode: false
+          schema:
+            type: integer
+            description: the maximum number of returns
+            format: int64
+        - name: radius
+          in: query
+          description: the distance away from the user a returned event can be in km
+          required: true
+          explode: false
+          schema:
+            type: integer
+            description: the distance away from the user a returned event can be in km
+            format: int64
       responses:
         "200":
           description: OK
@@ -2992,7 +3010,6 @@ components:
           description: ID of the linked registration
       required:
         - registration_id
-        - guardian_id
         - description
         - categories
         - rating

@@ -758,6 +758,15 @@ func TestHandler_GetTrendingEventOccurrences(t *testing.T) {
 		}
 	}
 
+	makeTrendingInput := func(lat, lng float64) *models.GetTrendingEventOccurrencesInput {
+		i := &models.GetTrendingEventOccurrencesInput{AcceptLanguage: "en-US"}
+		i.Latitude = lat
+		i.Longitude = lng
+		i.Radius = 5
+		i.MaxReturns = 5
+		return i
+	}
+
 	future1 := time.Now().Add(48 * time.Hour)
 	future2 := time.Now().Add(72 * time.Hour)
 
@@ -769,13 +778,8 @@ func TestHandler_GetTrendingEventOccurrences(t *testing.T) {
 		wantLen   int
 	}{
 		{
-			name: "returns trending occurrences with presigned URLs assigned",
-			input: func() *models.GetTrendingEventOccurrencesInput {
-				i := &models.GetTrendingEventOccurrencesInput{AcceptLanguage: "en-US"}
-				i.Latitude = 13.74
-				i.Longitude = 100.545
-				return i
-			}(),
+			name:  "returns trending occurrences with presigned URLs assigned",
+			input: makeTrendingInput(13.74, 100.545),
 			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {
 				eoRepo.On("GetTrendingEventOccurrences", mock.Anything, mock.AnythingOfType("*models.GetTrendingEventOccurrencesInput")).
 					Return([]models.EventOccurrence{
@@ -789,13 +793,8 @@ func TestHandler_GetTrendingEventOccurrences(t *testing.T) {
 			wantLen: 2,
 		},
 		{
-			name: "returns empty slice when no nearby occurrences",
-			input: func() *models.GetTrendingEventOccurrencesInput {
-				i := &models.GetTrendingEventOccurrencesInput{AcceptLanguage: "en-US"}
-				i.Latitude = 51.5074
-				i.Longitude = -0.1278
-				return i
-			}(),
+			name:  "returns empty slice when no nearby occurrences",
+			input: makeTrendingInput(51.5074, -0.1278),
 			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {
 				eoRepo.On("GetTrendingEventOccurrences", mock.Anything, mock.AnythingOfType("*models.GetTrendingEventOccurrencesInput")).
 					Return([]models.EventOccurrence{}, nil)
@@ -804,13 +803,8 @@ func TestHandler_GetTrendingEventOccurrences(t *testing.T) {
 			wantLen: 0,
 		},
 		{
-			name: "propagates repository error",
-			input: func() *models.GetTrendingEventOccurrencesInput {
-				i := &models.GetTrendingEventOccurrencesInput{AcceptLanguage: "en-US"}
-				i.Latitude = 13.74
-				i.Longitude = 100.545
-				return i
-			}(),
+			name:  "propagates repository error",
+			input: makeTrendingInput(13.74, 100.545),
 			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {
 				eoRepo.On("GetTrendingEventOccurrences", mock.Anything, mock.AnythingOfType("*models.GetTrendingEventOccurrencesInput")).
 					Return(nil, &errs.HTTPError{Code: 500, Message: "db error"})
@@ -819,13 +813,8 @@ func TestHandler_GetTrendingEventOccurrences(t *testing.T) {
 			wantLen: 0,
 		},
 		{
-			name: "propagates s3 presign error",
-			input: func() *models.GetTrendingEventOccurrencesInput {
-				i := &models.GetTrendingEventOccurrencesInput{AcceptLanguage: "en-US"}
-				i.Latitude = 13.74
-				i.Longitude = 100.545
-				return i
-			}(),
+			name:  "propagates s3 presign error",
+			input: makeTrendingInput(13.74, 100.545),
 			mockSetup: func(eoRepo *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {
 				eoRepo.On("GetTrendingEventOccurrences", mock.Anything, mock.AnythingOfType("*models.GetTrendingEventOccurrencesInput")).
 					Return([]models.EventOccurrence{

@@ -95,6 +95,8 @@ type GetTrendingEventOccurrencesInput struct {
 	AcceptLanguage string  `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Latitude       float64 `query:"lat" required:"true" doc:"The user's latitude"`
 	Longitude      float64 `query:"lng" required:"true" doc:"The user's longitude"`
+	MaxReturns     int     `query:"max_returns" required:"true" doc:"the maximum number of returns"`
+	Radius         int     `query:"radius" required:"true" doc:"the distance away from the user a returned event can be in km"`
 }
 
 type CreateEventOccurrenceInput struct {

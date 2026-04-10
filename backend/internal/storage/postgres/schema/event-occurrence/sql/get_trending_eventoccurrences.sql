@@ -2,9 +2,7 @@ WITH nearby_orgs AS (
     SELECT o.id
     FROM organization o
     JOIN location l ON o.location_id = l.id
-    WHERE l.latitude BETWEEN $1 - 0.05 AND $1 + 0.05
-        AND l.longitude BETWEEN $2 - 0.05 AND $2 + 0.05
-        AND 6371 * 2 * ATAN2(
+    WHERE 6371 * 2 * ATAN2(
             SQRT(
                 SIN(RADIANS((l.latitude - $1) / 2)) ^ 2 +
                 COS(RADIANS($1)) * COS(RADIANS(l.latitude)) *
@@ -15,7 +13,7 @@ WITH nearby_orgs AS (
                 COS(RADIANS($1)) * COS(RADIANS(l.latitude)) *
                 SIN(RADIANS((l.longitude - $2) / 2)) ^ 2
             )) -- haversine distance function
-        ) <= 5 -- in kilometers
+        ) <= $3 -- in kilometers
 ),
 
 event_popularity AS (
@@ -89,7 +87,9 @@ SELECT
     l.postal_code,
     l.country,
     l.created_at AS location_created_at,
-    l.updated_at AS location_updated_at
+    l.updated_at AS location_updated_at,
+
+    o.links AS org_links
 
 FROM ranked_occurrences ro
 JOIN event e ON e.id = ro.event_id
@@ -101,4 +101,4 @@ LEFT JOIN event_popularity ep ON ep.event_id = e.id
 WHERE ro.rn = 1
 
 ORDER BY COALESCE(ep.total_enrolled, 0) DESC, ro.start_time ASC
-LIMIT 5;
+LIMIT $4;
