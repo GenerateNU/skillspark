@@ -2,8 +2,7 @@ import React from "react";
 import { View, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors, TAG_COLORS, Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { AppColors, TAG_COLORS } from "@/constants/theme";
 import { SchoolPicker } from "@/components/SchoolPicker";
 import { useTranslation } from "react-i18next";
 
@@ -22,21 +21,19 @@ export function EmergencyContactForm({
   phoneNumber,
   setPhoneNumber,
 }: EmergencyContactFormProps) {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
   const { t: translate } = useTranslation();
 
   return (
     <>
       <TextInput
-        className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3 bg-[#F3F4F6] dark:bg-[#27272a] text-[#11181C] dark:text-[#ECEDEE]"
+        className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3 bg-[#F3F4F6] text-[#11181C]"
         value={name}
         onChangeText={setName}
         placeholder={translate("emergencyContact.name")}
         placeholderTextColor={AppColors.placeholderText}
       />
       <TextInput
-        className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3 bg-[#F3F4F6] dark:bg-[#27272a] text-[#11181C] dark:text-[#ECEDEE]"
+        className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3 bg-[#F3F4F6] text-[#11181C]"
         value={phoneNumber}
         onChangeText={setPhoneNumber}
         placeholder={translate("emergencyContact.phoneNumber")}

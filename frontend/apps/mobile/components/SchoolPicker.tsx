@@ -3,7 +3,6 @@ import { View, TouchableOpacity, ScrollView } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useGetAllSchools, School } from "@skillspark/api-client";
 import { useTranslation } from "react-i18next";
 
@@ -14,8 +13,7 @@ type SchoolPickerProps = {
 
 export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
   const [showDrop, setShowDrop] = useState(false);
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
   const { t: translate } = useTranslation();
 
   const { data, isLoading, isError } = useGetAllSchools();
@@ -31,7 +29,7 @@ export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
   return (
     <View className="z-[20]">
       <TouchableOpacity
-        className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between mb-6 bg-[#F3F4F6] dark:bg-[#27272a]"
+        className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between mb-6 bg-[#F3F4F6]"
         onPress={() => setShowDrop((prev) => !prev)}
         disabled={isLoading || isError}
       >
@@ -58,7 +56,7 @@ export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
             {schools.map((school) => (
               <TouchableOpacity
                 key={school.id}
-                className="px-4 py-3 border-b border-b-[#E5E7EB] dark:border-b-[#3f3f46]"
+                className="px-4 py-3 border-b border-b-[#E5E7EB]"
                 onPress={() => {
                   onChange(school.id);
                   setShowDrop(false);
