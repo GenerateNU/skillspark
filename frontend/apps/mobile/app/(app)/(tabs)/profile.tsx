@@ -11,6 +11,7 @@ import { useGuardian } from "@/hooks/use-guardian";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { NoProfilePic } from "@/components/NoProfilePic";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -45,7 +46,8 @@ export default function ProfileScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         bounces={false}
-        className="pt-[10px] pb-5"
+        className="pt-[10px]"
+        contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
       >
         <View className="items-center mb-5 mt-[5px]">
           <View

@@ -18,6 +18,10 @@ const TAB_HEIGHT = 52;
 const PILL_PADDING = 8;
 const GAP = 4;
 
+// Use this as contentContainerStyle paddingBottom in scroll views so content
+// clears the floating pill on all devices (pill height + bottom inset + gap).
+export const FLOATING_TAB_BAR_SCROLL_PADDING = 130;
+
 const VISIBLE_TABS = ["index", "map", "activity", "profile"];
 
 const TAB_ICONS: Record<string, any> = {
