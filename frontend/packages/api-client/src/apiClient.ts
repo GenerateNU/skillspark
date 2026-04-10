@@ -1,7 +1,3 @@
-declare interface ImportMeta {
-  readonly env: Record<string, string | undefined>;
-}
-
 import axios from "axios";
 import type { InternalAxiosRequestConfig } from "axios";
 
@@ -31,11 +27,6 @@ const removeStorageItem = (key: string): void => {
 };
 
 const getBaseURL = () => {
-  // Vite browser environment
-  if (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
-  }
-
   if (typeof process !== "undefined" && process.env) {
     if (process.env.EXPO_PUBLIC_API_BASE_URL) {
       return process.env.EXPO_PUBLIC_API_BASE_URL;
