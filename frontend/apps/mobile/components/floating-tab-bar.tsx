@@ -49,16 +49,17 @@ export function FloatingTabBar({
   if (activeIndex !== -1) {
     lastActiveIndexRef.current = activeIndex;
   }
-  const effectiveActiveIndex = activeIndex !== -1 ? activeIndex : lastActiveIndexRef.current;
+  const effectiveActiveIndex =
+    activeIndex !== -1 ? activeIndex : lastActiveIndexRef.current;
 
   const translateX = useSharedValue(
-    PILL_PADDING + effectiveActiveIndex * (TAB_WIDTH + GAP)
+    PILL_PADDING + effectiveActiveIndex * (TAB_WIDTH + GAP),
   );
 
   useEffect(() => {
     translateX.value = withSpring(
       PILL_PADDING + effectiveActiveIndex * (TAB_WIDTH + GAP),
-      { damping: 28, stiffness: 350, mass: 0.8 }
+      { damping: 28, stiffness: 350, mass: 0.8 },
     );
   }, [effectiveActiveIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -98,7 +99,8 @@ export function FloatingTabBar({
           pointerEvents="none"
         />
         {visibleRoutes.map((route) => {
-          const isFocused = visibleRoutes[effectiveActiveIndex]?.name === route.name;
+          const isFocused =
+            visibleRoutes[effectiveActiveIndex]?.name === route.name;
           const options = descriptors[route.key].options;
           const label =
             typeof options.title === "string" ? options.title : route.name;
