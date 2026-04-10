@@ -269,6 +269,8 @@
     "about": "เกี่ยวกับ",
     "noDescription": "ไม่มีคำอธิบาย",
     "seeSchedule": "ดูตารางเวลา",
+    "schedule": "คลาสเรียน",
+    "noSchedule": "ไม่มีคลาสที่กำลังจะมาถึงสำหรับองค์กรนี้",
     "notFound": "ไม่พบองค์กร",
     "bookingsThisWeek": "การจองสัปดาห์นี้",
     "reviews": "รีวิว"

@@ -216,7 +216,7 @@ function OrgDetail({
             activeOpacity={0.85}
             className="w-full items-center rounded-full py-4"
             style={{ backgroundColor: AppColors.checkboxSelected }}
-            onPress={() => {}}
+            onPress={() => router.push(`/org/${org.id}/schedule`)}
           >
             <Text className="text-[17px] font-nunito-bold text-white">
               {translate("org.seeSchedule")}

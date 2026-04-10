@@ -269,6 +269,8 @@
     "about": "About",
     "noDescription": "No description available.",
     "seeSchedule": "See Schedule",
+    "schedule": "Classes",
+    "noSchedule": "No upcoming classes for this organization.",
     "notFound": "Organization not found.",
     "bookingsThisWeek": "Bookings this week",
     "reviews": "Reviews"
