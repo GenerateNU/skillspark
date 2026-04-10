@@ -22,6 +22,7 @@ import {
   getGetChildrenByGuardianIdQueryKey,
 } from "@skillspark/api-client";
 import { ChildProfileForm, MONTHS } from "@/components/ChildProfileForm";
+import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
 import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 
@@ -66,6 +67,14 @@ export default function ManageChildScreen() {
       : [];
   const [interests, setInterests] = useState<string[]>(initialInterests);
 
+  const [avatarFace, setAvatarFace] = useState<string | null>(
+    (params.avatar_face as string) || null,
+  );
+  const [avatarBackground, setAvatarBackground] = useState(
+    (params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
+  );
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showMonthDrop, setShowMonthDrop] = useState(false);
   const [showYearDrop, setShowYearDrop] = useState(false);
@@ -98,6 +107,8 @@ export default function ManageChildScreen() {
         guardian_id: guardianId,
         school_id: schoolId,
         interests,
+        avatar_face: avatarFace,
+        avatar_background: avatarBackground || DEFAULT_AVATAR_COLOR,
       };
       if (isEditing) {
         await updateChildMutation.mutateAsync({
@@ -217,6 +228,12 @@ export default function ManageChildScreen() {
             setShowMonthDrop={setShowMonthDrop}
             showYearDrop={showYearDrop}
             setShowYearDrop={setShowYearDrop}
+            avatarFace={avatarFace}
+            setAvatarFace={setAvatarFace}
+            avatarBackground={avatarBackground}
+            setAvatarBackground={setAvatarBackground}
+            showAvatarPicker={showAvatarPicker}
+            setShowAvatarPicker={setShowAvatarPicker}
           />
           <TouchableOpacity
             className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}

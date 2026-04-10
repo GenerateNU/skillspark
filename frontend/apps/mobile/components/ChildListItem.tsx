@@ -6,6 +6,7 @@ import { InterestTags } from "./InterestTags";
 import { Child } from "@skillspark/api-client";
 import { AppColors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
+import { ChildAvatar } from "@/components/ChildAvatar";
 
 type ChildListItemProps = {
   child: Child;
@@ -20,14 +21,12 @@ export function ChildListItem({ child, onPress }: ChildListItemProps) {
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View
-        className="w-11 h-11 rounded-[22px] border-[1.5px] items-center justify-center"
-        style={{ borderColor: AppColors.subtleText }}
-      >
-        <ThemedText className="text-[15px] font-nunito-semibold">
-          {child.name?.slice(0, 2).toUpperCase() || "??"}
-        </ThemedText>
-      </View>
+      <ChildAvatar
+        name={child.name}
+        avatarFace={child.avatar_face}
+        avatarBackground={child.avatar_background}
+        size={44}
+      />
       <View className="flex-1 gap-[2px]">
         <ThemedText className="text-base font-nunito-semibold">
           {child.name}

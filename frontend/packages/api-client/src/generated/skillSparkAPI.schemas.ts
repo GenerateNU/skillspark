@@ -98,6 +98,8 @@ export interface CancelRegistrationOutputBody {
 export interface Child {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
+  avatar_background?: string | null;
+  avatar_face?: string | null;
   birth_month: number;
   birth_year: number;
   created_at: string;
@@ -113,6 +115,10 @@ export interface Child {
 export interface CreateChildInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
+  /** Avatar background color hex for the child's profile picture */
+  avatar_background?: string | null;
+  /** Avatar face identifier for the child's profile picture */
+  avatar_face?: string | null;
   /**
    * Birth month of the child
    * @minimum 1
@@ -730,6 +736,10 @@ export interface School {
 export interface UpdateChildInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
+  /** Avatar background color hex for the child's profile picture */
+  avatar_background?: string | null;
+  /** Avatar face identifier for the child's profile picture */
+  avatar_face?: string | null;
   /**
    * Birth month of the child
    * @minimum 1

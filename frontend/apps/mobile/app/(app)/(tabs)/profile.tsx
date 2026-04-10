@@ -87,9 +87,10 @@ export default function ProfileScreen() {
               children.map((child: any) => (
                 <FamilyCard
                   key={child.id}
-                  initials={child.name?.charAt(0) ?? ""}
                   name={child.name}
                   date={translate("profile.born", { year: child.birth_year })}
+                  avatarFace={child.avatar_face}
+                  avatarBackground={child.avatar_background}
                 />
               ))
             ) : (
