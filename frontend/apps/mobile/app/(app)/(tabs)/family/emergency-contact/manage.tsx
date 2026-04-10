@@ -3,7 +3,6 @@ import {
   View,
   TouchableOpacity,
   Alert,
-  useColorScheme,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -31,9 +30,8 @@ import { useGuardian } from "@/hooks/use-guardian";
 export default function ManageEmergencyContactScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
 
   const { guardianId } = useAuthContext();
 
@@ -195,13 +193,13 @@ export default function ManageEmergencyContactScreen() {
           />
           <TouchableOpacity
             className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
-            style={{ backgroundColor: Colors.dark.dropdownBg }}
+            style={{ backgroundColor: "#1c1c1e" }}
             onPress={handleSave}
             disabled={isSubmitting}
           >
             <ThemedText
               className="text-base font-nunito-semibold"
-              style={{ color: Colors.light.dropdownBg }}
+              style={{ color: "#FFFFFF" }}
             >
               {isSubmitting
                 ? translate("emergencyContact.saving")

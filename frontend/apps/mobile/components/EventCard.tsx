@@ -24,7 +24,7 @@ interface EventCardProps {
 
 export function EventCard({ pin }: EventCardProps) {
   const placeholderColor = useThemeColor(
-    { light: "#D0D0D0", dark: "#333333" },
+    { light: "#D0D0D0" },
     "background",
   );
   const router = useRouter();
