@@ -1,11 +1,9 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Colors } from "@/constants/theme";
 
 export default function EditLayout() {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
 
   return (
     <Stack

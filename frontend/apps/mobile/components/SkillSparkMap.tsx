@@ -45,7 +45,7 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
         showsUserLocation={true}
         showsMyLocationButton={true}
         onPress={() => setSelectedPin(null)}
-        userInterfaceStyle="dark"
+        userInterfaceStyle="light"
       >
         {locations.map((loc) => (
           <Marker

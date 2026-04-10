@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  View,
-  ScrollView,
-  ActivityIndicator,
-  useColorScheme,
-  Image,
-} from "react-native";
+import { View, ScrollView, ActivityIndicator, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
@@ -20,12 +14,11 @@ import { NoProfilePic } from "@/components/NoProfilePic";
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
   const router = useRouter();
   const { t: translate } = useTranslation();
 
-  const listBackgroundColor = colorScheme === "dark" ? "#1c1c1e" : "#F9FAFB";
-  const borderColor = colorScheme === "dark" ? "#3f3f46" : "#E5E7EB";
+  const listBackgroundColor = "#F9FAFB";
+  const borderColor = "#E5E7EB";
 
   const { guardianId } = useAuthContext();
   const { guardian, children, isLoading } = useGuardian(guardianId);
