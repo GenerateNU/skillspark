@@ -109,12 +109,7 @@ export default function HomeScreen() {
     return Array.isArray(d?.data) ? d.data : [];
   }, [childrenResp]);
 
-  const {
-    data: trendingResp,
-    isError,
-    error,
-    isLoading: trendingLoading,
-  } = useGetTrendingEventOccurrences(
+  const { data: trendingResp } = useGetTrendingEventOccurrences(
     {
       lat: Number(geoLocationLat),
       lng: Number(geoLocationLong),
@@ -127,8 +122,6 @@ export default function HomeScreen() {
       },
     },
   );
-
-  console.log({ trendingResp, isError, error, trendingLoading });
 
   const trendingEvents: EventOccurrence[] = useMemo(() => {
     const d = trendingResp as unknown as
