@@ -39,7 +39,7 @@ const getBaseURL = () => {
     }
   }
 
-  return "https://octopus-app-kwwy7.ondigitalocean.app";
+  return "http://10.110.4.248:8080";
 };
 
 // NOTE: This axios instance is preserved for future use or interceptor logic,

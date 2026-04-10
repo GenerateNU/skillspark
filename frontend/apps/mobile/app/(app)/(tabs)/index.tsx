@@ -62,8 +62,8 @@ export default function HomeScreen() {
   }, []);
 
   const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({
-    lat: "13.7563",
-    lng: "100.5018",
+    lat: geoLocationLat,
+    lng: geoLocationLong,
     radius_km: 50,
     limit: 5,
   });
@@ -116,8 +116,8 @@ export default function HomeScreen() {
     isLoading: trendingLoading,
   } = useGetTrendingEventOccurrences(
     {
-      lat: 13.73,
-      lng: 100.524,
+      lat: Number(geoLocationLat),
+      lng: Number(geoLocationLong),
       radius: 50,
       max_returns: 5,
     },
