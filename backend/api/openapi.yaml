@@ -2619,6 +2619,10 @@ components:
           examples:
             - http://localhost:8080/schemas/Child.json
           readOnly: true
+        avatar_background:
+          type: string
+        avatar_face:
+          type: string
         birth_month:
           type: integer
           format: int64
@@ -2654,6 +2658,8 @@ components:
         - birth_year
         - interests
         - guardian_id
+        - avatar_face
+        - avatar_background
         - created_at
         - updated_at
     CreateChildInputBody:
@@ -2667,6 +2673,12 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateChildInputBody.json
           readOnly: true
+        avatar_background:
+          type: string
+          description: Background color hex for the child's avatar
+        avatar_face:
+          type: string
+          description: Avatar face identifier for the child's profile picture
         birth_month:
           type: integer
           description: Birth month of the child
@@ -2942,7 +2954,6 @@ components:
           description: ID of the linked registration
       required:
         - registration_id
-        - guardian_id
         - description
         - categories
         - rating
@@ -4133,6 +4144,12 @@ components:
           examples:
             - http://localhost:8080/schemas/UpdateChildInputBody.json
           readOnly: true
+        avatar_background:
+          type: string
+          description: Background color hex for the child's avatar
+        avatar_face:
+          type: string
+          description: Avatar face identifier for the child's profile picture
         birth_month:
           type: integer
           description: Birth month of the child
