@@ -8,8 +8,7 @@
   "scripts": {
     "dev:web": "bun --filter apps/web dev",
     "dev:mobile": "cd apps/mobile && bun run start",
-    "generate:api": "cd packages/api-client && bun run generate",
-    "postinstall": "node ../scripts/patch-expo-ngrok.js"
+    "generate:api": "cd packages/api-client && bun run generate"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",
