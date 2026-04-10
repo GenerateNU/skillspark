@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, useColorScheme } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
@@ -20,12 +20,11 @@ const LANGUAGES = [
 export default function LanguageScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
   const { t: translate, i18n } = useTranslation();
 
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
 
-  const dividerColor = colorScheme === "dark" ? "#3a3a3c" : "#E5E7EB";
+  const dividerColor = "#E5E7EB";
 
   const [selected, setSelected] = useState(i18n.language ?? "en");
   const [errorText, setErrorText] = useState("");

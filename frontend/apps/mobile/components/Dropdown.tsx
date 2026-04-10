@@ -1,5 +1,4 @@
 import { AppColors, Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { useState } from "react";
 import { View, Text, TouchableOpacity, Modal, ViewStyle } from "react-native";
 
@@ -25,8 +24,7 @@ export const Dropdown = ({
 }: DropdownProps) => {
   const [isOpen, setOpen] = useState(false);
   const selected = options.find((o) => o.value === value);
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? "light"];
+  const colors = Colors.light;
 
   return (
     <>
