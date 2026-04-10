@@ -2550,6 +2550,7 @@ paths:
         - name: lat
           in: query
           description: The user's latitude
+          required: true
           explode: false
           schema:
             type: number
@@ -2558,6 +2559,7 @@ paths:
         - name: lng
           in: query
           description: The user's longitude
+          required: true
           explode: false
           schema:
             type: number

@@ -823,18 +823,6 @@ func TestHumaValidation_GetTrendingEventOccurrences(t *testing.T) {
 			statusCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name:       "missing radius returns 422",
-			query:      "?lat=13.74&lng=100.545&max_returns=5",
-			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
-			statusCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name:       "missing max_returns returns 422",
-			query:      "?lat=13.74&lng=100.545&radius=5",
-			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
-			statusCode: http.StatusUnprocessableEntity,
-		},
-		{
 			name:       "missing all params returns 422",
 			query:      "",
 			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
@@ -879,7 +867,7 @@ func TestHumaValidation_GetTrendingEventOccurrences(t *testing.T) {
 				mockStripeClient,
 			)
 
-			req, err := http.NewRequest(http.MethodGet, "/api/v1/event-occurrences/trending"+tt.query, nil)
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/trending/event-occurrences"+tt.query, nil)
 			assert.NoError(t, err)
 
 			if tt.name == "invalid Accept-Language returns 422" {

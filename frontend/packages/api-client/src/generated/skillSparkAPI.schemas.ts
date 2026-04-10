@@ -1057,11 +1057,11 @@ export type GetTrendingEventOccurrencesParams = {
 /**
  * The user's latitude
  */
-lat?: number;
+lat: number;
 /**
  * The user's longitude
  */
-lng?: number;
+lng: number;
 /**
  * the maximum number of returns
  * @minimum 1

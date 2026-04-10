@@ -612,7 +612,7 @@ export type getTrendingEventOccurrencesResponseError = (getTrendingEventOccurren
 
 export type getTrendingEventOccurrencesResponse = (getTrendingEventOccurrencesResponseSuccess | getTrendingEventOccurrencesResponseError)
 
-export const getGetTrendingEventOccurrencesUrl = (params?: GetTrendingEventOccurrencesParams,) => {
+export const getGetTrendingEventOccurrencesUrl = (params: GetTrendingEventOccurrencesParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -627,7 +627,7 @@ export const getGetTrendingEventOccurrencesUrl = (params?: GetTrendingEventOccur
   return stringifiedParams.length > 0 ? `/api/v1/trending/event-occurrences?${stringifiedParams}` : `/api/v1/trending/event-occurrences`
 }
 
-export const getTrendingEventOccurrences = async (params?: GetTrendingEventOccurrencesParams, options?: RequestInit): Promise<getTrendingEventOccurrencesResponse> => {
+export const getTrendingEventOccurrences = async (params: GetTrendingEventOccurrencesParams, options?: RequestInit): Promise<getTrendingEventOccurrencesResponse> => {
   
   return customInstance<getTrendingEventOccurrencesResponse>(getGetTrendingEventOccurrencesUrl(params),
   {      
@@ -649,7 +649,7 @@ export const getGetTrendingEventOccurrencesQueryKey = (params?: GetTrendingEvent
     }
 
     
-export const getGetTrendingEventOccurrencesQueryOptions = <TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError = ErrorModel>(params?: GetTrendingEventOccurrencesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetTrendingEventOccurrencesQueryOptions = <TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError = ErrorModel>(params: GetTrendingEventOccurrencesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -672,7 +672,7 @@ export type GetTrendingEventOccurrencesQueryError = ErrorModel
 
 
 export function useGetTrendingEventOccurrences<TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError = ErrorModel>(
- params: undefined |  GetTrendingEventOccurrencesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError, TData>> & Pick<
+ params: GetTrendingEventOccurrencesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
           TError,
@@ -682,7 +682,7 @@ export function useGetTrendingEventOccurrences<TData = Awaited<ReturnType<typeof
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetTrendingEventOccurrences<TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError = ErrorModel>(
- params?: GetTrendingEventOccurrencesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError, TData>> & Pick<
+ params: GetTrendingEventOccurrencesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
           TError,
@@ -692,7 +692,7 @@ export function useGetTrendingEventOccurrences<TData = Awaited<ReturnType<typeof
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetTrendingEventOccurrences<TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError = ErrorModel>(
- params?: GetTrendingEventOccurrencesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: GetTrendingEventOccurrencesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -700,7 +700,7 @@ export function useGetTrendingEventOccurrences<TData = Awaited<ReturnType<typeof
  */
 
 export function useGetTrendingEventOccurrences<TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError = ErrorModel>(
- params?: GetTrendingEventOccurrencesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: GetTrendingEventOccurrencesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendingEventOccurrences>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
