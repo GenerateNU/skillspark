@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION notify_opensearch()
 RETURNS TRIGGER AS $$
 BEGIN
   PERFORM net.http_post(
-    url     := 'http://127.0.0.1:54321/functions/v1/opensearch-access',
+    url     := 'http://supabase_edge_runtime_skillspark:8081/opensearch-access',
     headers := jsonb_build_object(
       'Content-Type',  'application/json',
       'Authorization', 'Bearer sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH'
