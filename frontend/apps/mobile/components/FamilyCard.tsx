@@ -1,5 +1,5 @@
 import React from "react";
-import { View, useColorScheme } from "react-native";
+import { View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { Colors, AppColors } from "@/constants/theme";
 
@@ -10,8 +10,7 @@ type FamilyCardProps = {
 };
 
 export function FamilyCard({ initials, name, date }: FamilyCardProps) {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
 
   return (
     <View

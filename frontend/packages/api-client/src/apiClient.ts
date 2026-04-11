@@ -1,7 +1,3 @@
-declare interface ImportMeta {
-  readonly env: Record<string, string | undefined>;
-}
-
 import axios from "axios";
 import type { InternalAxiosRequestConfig } from "axios";
 
@@ -31,11 +27,6 @@ const removeStorageItem = (key: string): void => {
 };
 
 const getBaseURL = () => {
-  // Vite browser environment
-  if (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
-  }
-
   if (typeof process !== "undefined" && process.env) {
     if (process.env.EXPO_PUBLIC_API_BASE_URL) {
       return process.env.EXPO_PUBLIC_API_BASE_URL;
@@ -48,7 +39,7 @@ const getBaseURL = () => {
     }
   }
 
-  return "http://localhost:8080";
+  return "https://octopus-app-kwwy7.ondigitalocean.app";
 };
 
 // NOTE: This axios instance is preserved for future use or interceptor logic,
@@ -73,7 +64,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 let isRetrying = false;
@@ -135,12 +126,12 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export async function customInstance<T>(
   url: string,
-  options?: RequestInit,
+  options?: RequestInit
 ): Promise<T> {
   const baseURL = getBaseURL();
   const fullUrl = `${baseURL}${url}`;
