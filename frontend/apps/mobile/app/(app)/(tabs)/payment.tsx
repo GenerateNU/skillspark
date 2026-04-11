@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   TouchableOpacity,
   useColorScheme,
   ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -60,6 +60,14 @@ export default function PaymentScreen() {
     fetchPaymentMethods();
   }, [guardian]);
 
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setError(null);
+      };
+    }, [])
+  );
+
   async function confirmDelete(): Promise<void> {
     if (!pendingDeleteId) return;
     try {
@@ -74,9 +82,7 @@ export default function PaymentScreen() {
       if (res.status !== 200 && res.status !== 204) {
         throw res.data;
       }
-      setPaymentMethods(paymentMethods.filter((pm) => {
-        return pm.id !== pendingDeleteId;
-      }));
+      setPaymentMethods(prev => prev.filter(pm => pm.id !== pendingDeleteId));
     } catch (e) {
       setError("Failed to delete payment method");
     } finally {
@@ -118,8 +124,11 @@ export default function PaymentScreen() {
         ) : editingCard ? (
           <CardForm
             onSave={async () => {
+              setLoading(true);
+              await new Promise(resolve => setTimeout(resolve, 2000));
               await fetchPaymentMethods();
               setEditingCard(false);
+              setLoading(false);
             }}
             onCancel={() => setEditingCard(false)}
           />
