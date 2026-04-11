@@ -8,6 +8,7 @@ import (
 	"skillspark/internal/config"
 	"skillspark/internal/models"
 
+	"github.com/google/uuid"
 	"github.com/opensearch-project/opensearch-go/v4"
 	"github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 )
@@ -65,13 +66,39 @@ func (c *Client) FuzzySearch(ctx context.Context, query string, acceptLanguage s
 		return nil, fmt.Errorf("opensearch: search failed: %w", err)
 	}
 
-	var events []models.Event
+	type osEvent struct {
+		ID            string   `json:"id"`
+		TitleEN       string   `json:"title_en"`
+		TitleTH       string   `json:"title_th"`
+		DescriptionEN string   `json:"description_en"`
+		DescriptionTH string   `json:"description_th"`
+		Category      []string `json:"category"`
+		AgeRangeMin   *int     `json:"age_range_min"`
+		AgeRangeMax   *int     `json:"age_range_max"`
+	}
+
+	events := make([]models.Event, 0)
 	for _, hit := range resp.Hits.Hits {
-		var event models.Event
-		if err := json.Unmarshal(hit.Source, &event); err != nil {
+		var src osEvent
+		if err := json.Unmarshal(hit.Source, &src); err != nil {
 			return nil, fmt.Errorf("opensearch: failed to unmarshal hit: %w", err)
 		}
-		events = append(events, event)
+		id, err := uuid.Parse(src.ID)
+		if err != nil {
+			return nil, fmt.Errorf("opensearch: invalid event id: %w", err)
+		}
+		title, description := src.TitleEN, src.DescriptionEN
+		if acceptLanguage == "th-TH" && src.TitleTH != "" {
+			title, description = src.TitleTH, src.DescriptionTH
+		}
+		events = append(events, models.Event{
+			ID:          id,
+			Title:       title,
+			Description: description,
+			Category:    src.Category,
+			AgeRangeMin: src.AgeRangeMin,
+			AgeRangeMax: src.AgeRangeMax,
+		})
 	}
 	return events, nil
 }
