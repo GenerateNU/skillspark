@@ -28,3 +28,4 @@ backend/coverage_filtered.out.local.env
 backend/coverage_filtered.out
 
 frontend/.expo
+.claude/settings.local.json
