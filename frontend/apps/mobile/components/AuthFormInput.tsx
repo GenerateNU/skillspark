@@ -1,5 +1,4 @@
 import { AppColors, Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
 import { TextInput, TextInputProps, View } from "react-native";
 
@@ -13,8 +12,7 @@ export const AuthFormInput = <T extends FieldValues>({
   name,
   ...props
 }: AuthFormInputProps<T>) => {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? "light"];
+  const colors = Colors.light;
 
   return (
     <Controller
