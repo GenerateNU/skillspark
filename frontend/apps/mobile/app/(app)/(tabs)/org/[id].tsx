@@ -1,11 +1,13 @@
 import { Image } from "expo-image";
 import {
   ActivityIndicator,
+  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
@@ -14,6 +16,7 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { AppColors } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { useTranslation } from "react-i18next";
 
 function OrgDetail({
@@ -27,6 +30,17 @@ function OrgDetail({
   const { t: translate } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
   const borderColor = useThemeColor({}, "borderColor");
+  const { openLink, hasLinks } = useOrgLinks(org.links ?? []);
+  const [aboutExpanded, setAboutExpanded] = useState(false);
+  const [aboutTruncated, setAboutTruncated] = useState(false);
+
+  const cardStyle = {
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  };
 
   return (
     <SafeAreaView
@@ -34,6 +48,7 @@ function OrgDetail({
       style={{ backgroundColor }}
       edges={["top", "bottom"]}
     >
+      {/* Header */}
       <View
         className="flex-row items-center border-b px-4 pb-2.5 pt-3"
         style={{ backgroundColor, borderBottomColor: borderColor }}
@@ -57,15 +72,17 @@ function OrgDetail({
         </ThemedText>
         <View className="w-8" />
       </View>
-      <ScrollView showsVerticalScrollIndicator={false} className="pb-6">
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Hero image */}
         <View
-          className="h-[160px]"
+          className="h-[200px]"
           style={{ backgroundColor: AppColors.imagePlaceholder }}
         >
           {org.presigned_url ? (
             <Image
               source={{ uri: org.presigned_url }}
-              className="h-full w-full"
+              style={{ width: "100%", height: "100%" }}
               contentFit="cover"
             />
           ) : (
@@ -74,25 +91,22 @@ function OrgDetail({
             </View>
           )}
         </View>
-        <View className="px-4 pb-2 pt-4">
+
+        {/* Org info */}
+        <View className="px-4 pb-4 pt-4">
           <View className="flex-row items-start justify-between">
             <View className="mr-3 flex-1">
-              <Text className="mb-0.5 text-[24px] font-nunito-bold">
+              <Text className="mb-1 text-[24px] font-nunito-bold">
                 {org.name}
               </Text>
-              <Text
-                className="mb-[5px] text-[14px] font-nunito"
-                style={{ color: AppColors.mutedText }}
-              >
-                {location && (
-                  <Text
-                    className="mb-[5px] text-[14px] font-nunito"
-                    style={{ color: AppColors.mutedText }}
-                  >
-                    {location.district}, {location.province}
-                  </Text>
-                )}
-              </Text>
+              {location && (
+                <Text
+                  className="mb-1 text-[14px] font-nunito"
+                  style={{ color: AppColors.mutedText }}
+                >
+                  {location.district}, {location.province}
+                </Text>
+              )}
               <View className="flex-row items-center gap-1.5">
                 <Text className="text-[14px]">🔥</Text>
                 <Text
@@ -103,50 +117,101 @@ function OrgDetail({
                 </Text>
               </View>
             </View>
-            <View className="mt-1 flex-col items-center gap-2">
-              <TouchableOpacity
-                activeOpacity={0.7}
-                className="h-9 w-9 items-center justify-center rounded-full border-2"
-                style={{ borderColor: AppColors.borderLight }}
-              >
-                <IconSymbol
-                  name="square.and.arrow.up"
-                  size={18}
-                  color={AppColors.secondaryText}
-                />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              className="mt-1 h-9 w-9 items-center justify-center rounded-full border-2"
+              style={{ borderColor: AppColors.borderLight }}
+            >
+              <IconSymbol
+                name="square.and.arrow.up"
+                size={18}
+                color={AppColors.secondaryText}
+              />
+            </TouchableOpacity>
           </View>
         </View>
-        
-        <TouchableOpacity
-          activeOpacity={0.7}
-          className="mb-3 mt-2 mx-[15px] rounded-[32px] bg-white p-5 shadow"
-          onPress={() => router.push({
-            pathname: `/(app)/(tabs)/org/[id]/reviews`,
-            params: { id: org.id },
-          })}
-        >
-          <View className="items-center">
-            <Text className="mb-1 text-[22px] font-nunito-bold">
-              {translate("org.reviews")}
-            </Text>
+
+        {/* Divider */}
+        <View
+          className="mx-4 mb-5 border-b border-dashed"
+          style={{ borderColor: AppColors.divider }}
+        />
+
+        {/* About card */}
+        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardStyle}>
+          <Text className="mb-2.5 text-[18px] font-nunito-bold">
+            {translate("org.about")}
+          </Text>
+          <Text
+            numberOfLines={aboutExpanded ? undefined : 4}
+            onTextLayout={(e) => {
+              if (!aboutExpanded) setAboutTruncated(e.nativeEvent.lines.length >= 4);
+            }}
+            className={`text-sm leading-[22px] ${aboutTruncated ? "mb-1" : "mb-4"}`}
+            style={{ color: AppColors.secondaryText }}
+          >
+            {org.about ?? ""}
+          </Text>
+          {aboutTruncated && (
+            <Pressable
+              onPress={() => setAboutExpanded((prev) => !prev)}
+              className="mb-4"
+            >
+              <Text
+                className="text-[13px] font-semibold"
+                style={{ color: AppColors.primaryText }}
+              >
+                {aboutExpanded ? translate("event.seeLess") : translate("event.seeMore")}
+              </Text>
+            </Pressable>
+          )}
+          {hasLinks && (
+            <View className="flex-row flex-wrap gap-2.5">
+              {(org.links ?? []).map((link, index) => (
+                <Pressable
+                  key={index}
+                  onPress={() => openLink(link.href)}
+                  className="rounded-full px-5 py-2.5 items-center"
+                  style={{ backgroundColor: AppColors.borderLight }}
+                >
+                  <Text
+                    className="text-[13px] font-semibold"
+                    style={{ color: AppColors.primaryText }}
+                  >
+                    {link.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Rating card */}
+        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardStyle}>
+          <Text className="mb-3 text-[18px] font-nunito-bold">
+            {translate("org.reviews")}
+          </Text>
+          <View className="flex-row items-center gap-4">
             <Text className="text-[42px] font-nunito-bold leading-[46px]">
               4.5
             </Text>
-            <Image
-              source={require("@/assets/images/faces.png")}
-              className="my-3 h-10 w-[140px]"
-            />
-            <Text
-              className="mt-1.5 text-[14px] font-nunito"
-              style={{ color: AppColors.subtleText }}
-            >
-              (140)
-            </Text>
+            <View className="items-start">
+              <Image
+                source={require("@/assets/images/faces.png")}
+                className="h-10 w-[140px]"
+              />
+              <Text
+                className="mt-1 text-[13px] font-nunito"
+                style={{ color: AppColors.subtleText }}
+              >
+                (140)
+              </Text>
+            </View>
           </View>
-        </TouchableOpacity>
-        <View className="px-4 pb-2.5 pt-1">
+        </View>
+
+        {/* See Schedule CTA */}
+        <View className="px-4 pb-6 pt-1">
           <TouchableOpacity
             activeOpacity={0.85}
             className="w-full items-center rounded-full py-4"

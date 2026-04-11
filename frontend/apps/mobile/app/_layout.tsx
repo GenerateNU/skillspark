@@ -1,8 +1,4 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import * as SecureStore from "expo-secure-store";
@@ -11,7 +7,6 @@ import "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/constants/query-client";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import "../global.css";
 import {
   NunitoSans_400Regular,
@@ -36,7 +31,6 @@ try {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [langReady, setLangReady] = useState(false);
   const [loaded, error] = useFonts({
     NunitoSans_400Regular,
@@ -65,9 +59,7 @@ export default function RootLayout() {
   const content = (
     <GestureHandlerRootView>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
+        <ThemeProvider value={DefaultTheme}>
           <AuthProvider>
             <LoginRedirect />
           </AuthProvider>

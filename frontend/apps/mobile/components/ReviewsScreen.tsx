@@ -1,4 +1,5 @@
 import { ErrorScreen } from "@/components/ErrorScreen";
+import { LeaveReviewModal } from "@/components/LeaveReviewModal";
 import { RatingSmileys } from "@/components/RatingSmileys";
 import { RatingAggregateCard } from "@/components/ReviewAggregate";
 import { ReviewCard } from "@/components/ReviewCard";
@@ -7,16 +8,20 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, Colors } from "@/constants/theme";
-import { Review, ReviewAggregate } from "@skillspark/api-client";
+import { useAuthContext } from "@/hooks/use-auth-context";
+import {
+  Review,
+  ReviewAggregate,
+  useGetRegistrationsByGuardianId,
+} from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   ScrollView,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -35,6 +40,11 @@ interface ReviewsScreenProps<
   useGetReviews: (id: string) => QueryResult<TReviews>;
   /** When true, shows the rating smileys and write-a-review CTA */
   canReview?: boolean;
+  /** Event occurrence ID, used to look up the guardian's registration */
+  occurrenceId?: string;
+  eventName?: string;
+  eventLocation?: string;
+  eventImageUrl?: string;
 }
 
 export default function ReviewsScreen<
@@ -44,16 +54,24 @@ export default function ReviewsScreen<
   useGetAggregate,
   useGetReviews,
   canReview = false,
+  occurrenceId,
+  eventName = "",
+  eventLocation = "",
+  eventImageUrl,
 }: ReviewsScreenProps<TAggregate, TReviews>) {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const colorScheme = useColorScheme();
-  const scheme = (colorScheme ?? "light") as "light" | "dark";
-  const theme = Colors[scheme];
+  const theme = Colors.light;
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t: translate } = useTranslation();
+  const { guardianId } = useAuthContext();
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [initialRating, setInitialRating] = useState<number | undefined>(
+    undefined,
+  );
 
   const {
     data: aggregateResponse,
@@ -66,6 +84,22 @@ export default function ReviewsScreen<
     isLoading: reviewsIsLoading,
     error: reviewsError,
   } = useGetReviews(id ?? "");
+
+  const { data: registrationsResp } = useGetRegistrationsByGuardianId(
+    guardianId ?? "",
+    { query: { enabled: canReview && !!guardianId && !!occurrenceId } },
+  );
+  const registration = useMemo(() => {
+    const list =
+      registrationsResp?.status === 200
+        ? registrationsResp.data.registrations
+        : [];
+    return list.find(
+      (r) => r.event_occurrence_id === occurrenceId && r.status === "registered",
+    );
+  }, [registrationsResp, occurrenceId]);
+
+  const showReviewCTA = canReview && !!registration;
 
   if (!id) {
     return <ErrorScreen message={translate("common.noEventId")} />;
@@ -132,7 +166,7 @@ export default function ReviewsScreen<
       >
         <RatingAggregateCard aggregate={aggregate} />
 
-        {canReview && (
+        {showReviewCTA && (
           <View
             className="mx-5 mt-4 p-4 rounded-2xl border"
             style={{ borderColor: AppColors.borderLight }}
@@ -142,17 +176,39 @@ export default function ReviewsScreen<
                 ? translate("review.tapToReview")
                 : translate("review.firstReview")}
             </ThemedText>
-            <RatingSmileys onSelect={(rating) => {}} />
+            <RatingSmileys
+              onSelect={(r) => {
+                setInitialRating(r);
+                setModalVisible(true);
+              }}
+            />
             <TouchableOpacity
               className="mt-4 py-4 rounded-2xl items-center"
               style={{ backgroundColor: AppColors.primaryText }}
-              onPress={() => router.back()}
+              onPress={() => {
+                setInitialRating(undefined);
+                setModalVisible(true);
+              }}
             >
               <Text className="text-white text-base">
                 {translate("review.writeReview")}
               </Text>
             </TouchableOpacity>
           </View>
+        )}
+
+        {showReviewCTA && guardianId && (
+          <LeaveReviewModal
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+            eventId={id}
+            eventName={eventName}
+            eventLocation={eventLocation}
+            eventImageUrl={eventImageUrl}
+            registrationId={registration!.id}
+            guardianId={guardianId}
+            initialRating={initialRating}
+          />
         )}
 
         {aggregate.total_reviews > 0 && (
