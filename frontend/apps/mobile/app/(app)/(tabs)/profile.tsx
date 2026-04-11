@@ -47,7 +47,9 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         bounces={false}
         className="pt-[10px]"
-        contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
+        contentContainerStyle={{
+          paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+        }}
       >
         <View className="items-center mb-5 mt-[5px]">
           <View

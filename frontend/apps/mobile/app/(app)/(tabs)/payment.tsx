@@ -64,24 +64,26 @@ export default function PaymentScreen() {
       return () => {
         setError(null);
       };
-    }, [])
+    }, []),
   );
 
   async function confirmDelete(): Promise<void> {
     if (!pendingDeleteId) return;
     try {
       if (!guardian) {
-        throw new Error("No guardian is logged in.")
+        throw new Error("No guardian is logged in.");
       }
       setDeleting(true);
       const res = await detachGuardianPaymentMethod({
         payment_method_id: pendingDeleteId,
-        guardian_id: guardian!.id
+        guardian_id: guardian!.id,
       });
       if (res.status !== 200 && res.status !== 204) {
         throw res.data;
       }
-      setPaymentMethods(prev => prev.filter(pm => pm.id !== pendingDeleteId));
+      setPaymentMethods((prev) =>
+        prev.filter((pm) => pm.id !== pendingDeleteId),
+      );
     } catch (e) {
       setError("Failed to delete payment method");
     } finally {
@@ -124,7 +126,7 @@ export default function PaymentScreen() {
           <CardForm
             onSave={async () => {
               setLoading(true);
-              await new Promise(resolve => setTimeout(resolve, 2000));
+              await new Promise((resolve) => setTimeout(resolve, 2000));
               await fetchPaymentMethods();
               setEditingCard(false);
               setLoading(false);

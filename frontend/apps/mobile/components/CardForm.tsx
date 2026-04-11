@@ -56,7 +56,7 @@ const CardFormInner = ({
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "light"];
   const { t: translate } = useTranslation();
-  const { guardianId } = useAuthContext(); 
+  const { guardianId } = useAuthContext();
   const { guardian } = useGuardian(guardianId);
 
   async function handleSave(): Promise<void> {
@@ -132,4 +132,4 @@ const CardFormInner = ({
       {error && <ErrorMessage message={error} />}
     </View>
   );
-}
+};
