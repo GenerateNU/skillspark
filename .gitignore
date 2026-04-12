@@ -29,3 +29,4 @@ backend/coverage_filtered.out
 
 frontend/.expo
 .claude/settings.local.json
+terraform.tfvars

@@ -78,4 +78,48 @@ variable "expo_access_token" {
   default     = ""
 }
 
+variable "opensearch_domain_name" {
+  description = "name for opensearch instance"
+  type        = string
+  default     = "skillsparkdomain"
+
+}
+
+variable "opensearch_engine_version" {
+  description = "engine version for opensearch"
+  type = string
+  default = "OpenSearch_2.17"
+
+}
+variable "opensearch_instance" {
+  description = "instance to use for opensearch"
+  type        = string
+  default     = "r8g.large.search"
+}
+
+variable "master_user" {
+  description = "master username for opensearch"
+  type        = string
+  default     = ""
+}
+
+variable "master_pass" {
+  description = "master password for opensearch"
+  type        = string
+  sensitive   = true 
+  default     = "" 
+}
+
+variable "event_shards" {
+  description = "shards to use for events index"
+  type        = integer
+  default     = 2 
+}
+
+variable "event_replicas" {
+  description = "replicas to use for events index"
+  type        = integer
+  default     = 3
+}
+
 
