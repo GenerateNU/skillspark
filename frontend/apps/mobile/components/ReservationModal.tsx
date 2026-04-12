@@ -142,7 +142,10 @@ function EventPreviewSection({
   occurrence: EventOccurrence;
   titleOverride?: string;
 }) {
-  const timeLabel = `${formatModalTime(occurrence.start_time)} Class`;
+  const { t: translate } = useTranslation();
+  const timeLabel = translate("occurrence.classTime", {
+    time: formatModalTime(occurrence.start_time),
+  });
   return (
     <View className="items-center mb-6">
       <View
@@ -243,10 +246,7 @@ export function ReservationModal({
           const message =
             error instanceof Error
               ? error.message
-              : translate("reservation.paymentFailed", {
-                  defaultValue:
-                    "Payment failed. Please try again or contact support.",
-                });
+              : translate("reservation.paymentFailed");
           setReservationError(message);
         },
       }
@@ -294,9 +294,7 @@ export function ReservationModal({
           occurrence={occurrence}
           titleOverride={
             step === "done"
-              ? translate("reservation.completed", {
-                  defaultValue: "Completed",
-                })
+              ? translate("reservation.completed")
               : undefined
           }
         />
@@ -312,9 +310,7 @@ export function ReservationModal({
                   color: AppColors.secondaryText,
                 }}
               >
-                {translate("reservation.selectChildLabel", {
-                  defaultValue: "Select Child",
-                })}
+                {translate("reservation.selectChildLabel")}
               </Text>
               {childrenLoading ? (
                 <ActivityIndicator size="small" />
@@ -326,9 +322,7 @@ export function ReservationModal({
                     color: AppColors.mutedText,
                   }}
                 >
-                  {translate("reservation.noChildren", {
-                    defaultValue: "No children found.",
-                  })}
+                  {translate("reservation.noChildren")}
                 </Text>
               ) : (
                 <View className="flex-row gap-4 flex-wrap">
@@ -357,10 +351,7 @@ export function ReservationModal({
                   color: AppColors.mutedText,
                 }}
               >
-                {translate("reservation.termsNote", {
-                  defaultValue:
-                    "By clicking 'Pay Now', you authorize Skill Spark to charge your card for the total amount, plus applicable fees.",
-                })}
+                {translate("reservation.termsNote")}
               </Text>
               <Text
                 className="text-xs text-center mt-1"
@@ -370,9 +361,7 @@ export function ReservationModal({
                   textDecorationLine: "underline",
                 }}
               >
-                {translate("reservation.terms", {
-                  defaultValue: "Terms & Conditions",
-                })}
+                {translate("reservation.terms")}
               </Text>
             </View>
 
@@ -413,9 +402,7 @@ export function ReservationModal({
                   className="text-white text-base"
                   style={{ fontFamily: FontFamilies.bold }}
                 >
-                  {translate("reservation.payAndReserve", {
-                    defaultValue: "Pay Now & Reserve",
-                  })}
+                  {translate("reservation.payAndReserve")}
                 </Text>
               )}
             </TouchableOpacity>
@@ -430,9 +417,7 @@ export function ReservationModal({
                 color: AppColors.mutedText,
               }}
             >
-              {translate("reservation.seeYouSoon", {
-                defaultValue: "See you soon!",
-              })}
+              {translate("reservation.seeYouSoon")}
             </Text>
             <TouchableOpacity
               onPress={handleClose}
@@ -444,7 +429,7 @@ export function ReservationModal({
                 className="text-white text-base"
                 style={{ fontFamily: FontFamilies.bold }}
               >
-                {translate("common.close", { defaultValue: "Close" })}
+                {translate("common.close")}
               </Text>
             </TouchableOpacity>
           </>
