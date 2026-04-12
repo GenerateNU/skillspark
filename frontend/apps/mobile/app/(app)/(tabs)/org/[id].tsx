@@ -145,9 +145,12 @@ function OrgDetail({
           <Text
             numberOfLines={aboutExpanded ? undefined : 4}
             onTextLayout={(e) => {
-              if (!aboutExpanded) setAboutTruncated(e.nativeEvent.lines.length >= 4);
+              if (!aboutExpanded)
+                setAboutTruncated(e.nativeEvent.lines.length >= 4);
             }}
-            className={`text-sm leading-[22px] ${aboutTruncated ? "mb-1" : "mb-4"}`}
+            className={`text-sm leading-[22px] ${
+              aboutTruncated ? "mb-1" : "mb-4"
+            }`}
             style={{ color: AppColors.secondaryText }}
           >
             {org.about ?? ""}
@@ -161,7 +164,9 @@ function OrgDetail({
                 className="text-[13px] font-semibold"
                 style={{ color: AppColors.primaryText }}
               >
-                {aboutExpanded ? translate("event.seeLess") : translate("event.seeMore")}
+                {aboutExpanded
+                  ? translate("event.seeLess")
+                  : translate("event.seeMore")}
               </Text>
             </Pressable>
           )}
@@ -215,7 +220,7 @@ function OrgDetail({
           <TouchableOpacity
             activeOpacity={0.85}
             className="w-full items-center rounded-full py-4"
-            style={{ backgroundColor: AppColors.checkboxSelected }}
+            style={{ backgroundColor: "#000000" }}
             onPress={() => router.push(`/org/${org.id}/schedule`)}
           >
             <Text className="text-[17px] font-nunito-bold text-white">
@@ -233,12 +238,12 @@ export default function OrgScreen() {
   const { data: response, isLoading, error } = useGetOrganization(id);
   const { t: translate } = useTranslation();
   const { data: locationResponse } = useGetLocationById(
-    response?.status === 200 ? (response.data.location_id ?? "") : "",
+    response?.status === 200 ? response.data.location_id ?? "" : "",
     {
       query: {
         enabled: response?.status === 200 && !!response.data.location_id,
       },
-    },
+    }
   );
 
   if (isLoading) {

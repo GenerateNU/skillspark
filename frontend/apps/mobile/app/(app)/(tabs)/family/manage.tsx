@@ -6,6 +6,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  Pressable,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -38,10 +40,10 @@ export default function ManageChildScreen() {
   const isEditing = !!params.id;
 
   const [firstName, setFirstName] = useState(
-    params.name ? (params.name as string).split(" ")[0] : "",
+    params.name ? (params.name as string).split(" ")[0] : ""
   );
   const [lastName, setLastName] = useState(
-    params.name ? (params.name as string).split(" ").slice(1).join(" ") : "",
+    params.name ? (params.name as string).split(" ").slice(1).join(" ") : ""
   );
 
   const initialMonthStr = params.birth_month
@@ -50,18 +52,18 @@ export default function ManageChildScreen() {
 
   const [birthMonth, setBirthMonth] = useState(initialMonthStr);
   const [birthYear, setBirthYear] = useState(
-    (params.birth_year as string) || "",
+    (params.birth_year as string) || ""
   );
   const [schoolId, setSchoolId] = useState((params.school_id as string) || "");
 
   const initialInterests = Array.isArray(params.interests)
     ? params.interests
     : params.interests
-      ? (params.interests as string)
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [];
+    ? (params.interests as string)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
   const [interests, setInterests] = useState<string[]>(initialInterests);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,7 +84,7 @@ export default function ManageChildScreen() {
     if (!firstName || !birthYear || !birthMonth || !schoolId) {
       Alert.alert(
         translate("common.error"),
-        translate("childProfile.requiredFieldsError"),
+        translate("childProfile.requiredFieldsError")
       );
       return;
     }
@@ -113,7 +115,7 @@ export default function ManageChildScreen() {
       console.error(error);
       Alert.alert(
         translate("common.errorOccurred"),
-        translate("childProfile.saveError"),
+        translate("childProfile.saveError") + " " + JSON.stringify(error)
       );
     } finally {
       setIsSubmitting(false);
@@ -142,13 +144,13 @@ export default function ManageChildScreen() {
             } catch {
               Alert.alert(
                 translate("common.errorOccurred"),
-                translate("childProfile.deleteError"),
+                translate("childProfile.deleteError")
               );
               setIsSubmitting(false);
             }
           },
         },
-      ],
+      ]
     );
   };
 
@@ -167,67 +169,72 @@ export default function ManageChildScreen() {
             paddingTop: 10,
           }}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <View className="flex-row items-center justify-between mb-6">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="w-8 h-8 justify-center items-start"
-            >
-              <IconSymbol name="chevron.left" size={24} color={theme.text} />
-            </TouchableOpacity>
-            <ThemedText className="text-xl text-center font-nunito-bold">
-              {translate("familyInformation.title")}
-            </ThemedText>
-            {isEditing ? (
-              <TouchableOpacity onPress={handleDelete}>
-                <ThemedText
-                  className="font-nunito-semibold"
-                  style={{ color: AppColors.danger }}
-                >
-                  {translate("payment.delete")}
-                </ThemedText>
+          <Pressable onPress={Keyboard.dismiss}>
+            <View className="flex-row items-center justify-between mb-6">
+              <TouchableOpacity
+                onPress={() => router.back()}
+                className="w-8 h-8 justify-center items-start"
+              >
+                <IconSymbol name="chevron.left" size={24} color={theme.text} />
               </TouchableOpacity>
-            ) : (
-              <View className="w-10" />
-            )}
-          </View>
-          <ThemedText className="text-[22px] font-nunito-semibold mb-5">
-            {isEditing
-              ? translate("childProfile.editTitle")
-              : translate("childProfile.createTitle")}
-          </ThemedText>
-          <ChildProfileForm
-            firstName={firstName}
-            setFirstName={setFirstName}
-            lastName={lastName}
-            setLastName={setLastName}
-            birthMonth={birthMonth}
-            setBirthMonth={setBirthMonth}
-            birthYear={birthYear}
-            setBirthYear={setBirthYear}
-            schoolId={schoolId}
-            setSchoolId={setSchoolId}
-            interests={interests}
-            setInterests={setInterests}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            showMonthDrop={showMonthDrop}
-            setShowMonthDrop={setShowMonthDrop}
-            showYearDrop={showYearDrop}
-            setShowYearDrop={setShowYearDrop}
-          />
-          <TouchableOpacity
-            className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
-            style={{ backgroundColor: theme.tint }}
-            onPress={handleSave}
-            disabled={isSubmitting}
-          >
-            <ThemedText className="text-white text-base font-nunito-semibold">
-              {isSubmitting
-                ? translate("childProfile.saving")
-                : translate("childProfile.saveChanges")}
+              <ThemedText className="text-xl text-center font-nunito-bold">
+                {translate("familyInformation.title")}
+              </ThemedText>
+              {isEditing ? (
+                <TouchableOpacity onPress={handleDelete}>
+                  <ThemedText
+                    className="font-nunito-semibold"
+                    style={{ color: AppColors.danger }}
+                  >
+                    {translate("payment.delete")}
+                  </ThemedText>
+                </TouchableOpacity>
+              ) : (
+                <View className="w-10" />
+              )}
+            </View>
+            <ThemedText className="text-[22px] font-nunito-semibold mb-5">
+              {isEditing
+                ? translate("childProfile.editTitle")
+                : translate("childProfile.createTitle")}
             </ThemedText>
-          </TouchableOpacity>
+            <ChildProfileForm
+              firstName={firstName}
+              setFirstName={setFirstName}
+              lastName={lastName}
+              setLastName={setLastName}
+              birthMonth={birthMonth}
+              setBirthMonth={setBirthMonth}
+              birthYear={birthYear}
+              setBirthYear={setBirthYear}
+              schoolId={schoolId}
+              setSchoolId={setSchoolId}
+              interests={interests}
+              setInterests={setInterests}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              showMonthDrop={showMonthDrop}
+              setShowMonthDrop={setShowMonthDrop}
+              showYearDrop={showYearDrop}
+              setShowYearDrop={setShowYearDrop}
+            />
+            <TouchableOpacity
+              className={`py-4 rounded-full items-center justify-center ${
+                isSubmitting ? "opacity-70" : "opacity-100"
+              }`}
+              style={{ backgroundColor: "#000000" }}
+              onPress={handleSave}
+              disabled={isSubmitting}
+            >
+              <ThemedText className="text-white" style={{ color: "#FFFFFF" }}>
+                {isSubmitting
+                  ? translate("childProfile.saving")
+                  : translate("childProfile.saveChanges")}
+              </ThemedText>
+            </TouchableOpacity>
+          </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
     </ThemedView>

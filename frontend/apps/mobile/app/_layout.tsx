@@ -17,6 +17,7 @@ import {
 import { AuthProvider } from "@/contexts/auth-context";
 import { LoginRedirect } from "@/components/LoginRedirect";
 import { setCurrentLanguage } from "@skillspark/api-client";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -50,7 +51,9 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider value={DefaultTheme}>
           <AuthProvider>
-            <LoginRedirect />
+            <BottomSheetModalProvider>
+              <LoginRedirect />
+            </BottomSheetModalProvider>
           </AuthProvider>
         </ThemeProvider>
       </QueryClientProvider>

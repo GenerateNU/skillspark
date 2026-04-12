@@ -31,7 +31,6 @@ export default function TabLayout() {
         name="profile"
         options={{ title: translate("nav.profile") }}
       />
-      <Tabs.Screen name="event" options={{ href: null }} />
       <Tabs.Screen name="org" options={{ href: null }} />
       <Tabs.Screen name="family" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />

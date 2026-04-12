@@ -34,8 +34,8 @@ export const MONTHS = [
   "December",
 ];
 
-export const YEARS = Array.from({ length: 20 }, (_, i) =>
-  String(new Date().getFullYear() - i),
+export const YEARS = Array.from({ length: 30 }, (_, i) =>
+  String(new Date().getFullYear() - i)
 );
 
 export type ChildProfileFormProps = {
@@ -87,12 +87,12 @@ export function ChildProfileForm({
 
   const toggleInterest = (item: string) => {
     setInterests((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item],
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
     );
   };
 
   const filteredOptions = INTEREST_OPTIONS.filter((o) =>
-    o.toLowerCase().includes(searchQuery.toLowerCase()),
+    o.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -144,7 +144,7 @@ export function ChildProfileForm({
                 shadowOffset: { width: 0, height: 2 },
               }}
             >
-              <ScrollView nestedScrollEnabled className="max-h-[180px]">
+              <ScrollView nestedScrollEnabled className="max-h-[180px] z-40">
                 {MONTHS.map((m) => (
                   <TouchableOpacity
                     key={m}
