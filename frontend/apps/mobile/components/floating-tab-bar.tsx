@@ -35,7 +35,11 @@ type Props = {
   state: { routes: Array<{ key: string; name: string }>; index: number };
   descriptors: Record<string, { options: { title?: string } }>;
   navigation: {
-    emit: (e: { type: string; target?: string; canPreventDefault?: boolean }) => { defaultPrevented: boolean };
+    emit: (e: {
+      type: string;
+      target?: string;
+      canPreventDefault?: boolean;
+    }) => { defaultPrevented: boolean };
     navigate: (name: string) => void;
   };
 };

@@ -17,7 +17,10 @@ export function useFilters() {
   const hasActiveFilters = Object.values(filters).some((v) => v !== undefined);
 
   function setFilters(newFilters: GetAllEventOccurrencesParams) {
-    queryClient.setQueryData<GetAllEventOccurrencesParams>(FILTERS_KEY, newFilters);
+    queryClient.setQueryData<GetAllEventOccurrencesParams>(
+      FILTERS_KEY,
+      newFilters,
+    );
   }
 
   function clearFilters() {

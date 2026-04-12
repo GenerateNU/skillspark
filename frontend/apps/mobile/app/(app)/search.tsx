@@ -1,4 +1,7 @@
-import { useGetAllEventOccurrences, type EventOccurrence } from "@skillspark/api-client";
+import {
+  useGetAllEventOccurrences,
+  type EventOccurrence,
+} from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
@@ -41,7 +44,11 @@ export default function SearchScreen() {
       {/* Search bar */}
       <View className="px-5 pb-3 flex-row items-center gap-2">
         <Pressable onPress={() => router.back()} hitSlop={12}>
-          <IconSymbol name="chevron.left" size={22} color={AppColors.primaryText} />
+          <IconSymbol
+            name="chevron.left"
+            size={22}
+            color={AppColors.primaryText}
+          />
         </Pressable>
         <View className="flex-1 flex-row items-center rounded-full px-4 py-[10px] bg-[#F3F4F6]">
           <IconSymbol
