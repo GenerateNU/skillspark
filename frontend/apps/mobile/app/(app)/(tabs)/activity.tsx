@@ -62,8 +62,16 @@ const formatTime = (d: Date) =>
 const formatDate = (d: Date) =>
   d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })
 
+const CHILD_BUBBLE_COLORS = [
+  "#F87171", "#FB923C", "#FBBF24", "#34D399", "#60A5FA", "#A78BFA", "#F472B6",
+]
+
+function getInitials(name: string) {
+  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+}
+
 function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
-  const childNames = Array.from(data.children).map((c) => c.name).join(", ")
+  const children = Array.from(data.children)
 
   return (
     <View
@@ -83,42 +91,52 @@ function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
         source={{ uri: data.image_uri }}
         className="w-full h-44 px-4 pt-4 rounded-md"
       />
-      <View className="flex flex-row justify-between"> 
-        <View className="px-4 pb-4 gap-1">
+      <View className="flex flex-row justify-between items-center p-1">
+        <View className="px-4 pb-4 gap-1 flex flex-col justify-between">
           <ThemedText type="subtitle">
             {data.title}
           </ThemedText>
-          <View className="flex flex-row gap-2 items-center "> 
-            <IconSymbol name="clock" color="black" size={20}/>
+          <View className="flex flex-row gap-2 items-center ">
+            <IconSymbol name="clock" color="black" size={18}/>
             <ThemedText className="text-sm" >
               {formatTime(data.start_time)} – {formatTime(data.end_time)}
             </ThemedText>
           </View>
-          <View className="flex flex-row gap-2 items-center "> 
-            <IconSymbol name="location" color="black" size={20}/>
+          <View className="flex flex-row gap-2 items-center ">
+            <IconSymbol name="location" color="black" size={18}/>
             <ThemedText className="text-sm" >
               {data.location}
             </ThemedText>
           </View>
-          {childNames ? (
-            <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
-              {childNames}
-            </ThemedText>
-          ) : null}
-          <TouchableOpacity
-            onPress={data.onClickRemove}
-            className="mt-2 items-center rounded-lg py-2"
-            style={{ backgroundColor: AppColors.danger }}
-            activeOpacity={0.7}
-          >
-            <ThemedText className="text-sm font-medium text-white">
-              Remove Registration
-            </ThemedText>
-          </TouchableOpacity>
         </View>
-        <View>
-          TODO: make this date box
+        <View className="flex flex-col justify-center items-center bg-[#E69BF040] w-20 h-20 mr-2 rounded-md">
+          <ThemedText type="subtitle" className="font-bold leading-none mr-2"> {data.start_time.getDate() < 10 ? "0" + data.start_time.getDate().toString() : data.start_time.getDate().toString()}</ThemedText>
+          <ThemedText type="subtitle" className=" font-semibold tracking-widest "> {data.start_time.toLocaleString('default', { month: 'short' }) }</ThemedText>
         </View>
+      </View>
+      <View
+        className="flex flex-row justify-between items-center px-4 py-3"
+      >
+        <View className="flex flex-row gap-2">
+          {children.map((child, i) => (
+            <View
+              key={child.id}
+              className="w-8 h-8 rounded-full justify-center items-center"
+              style={{ backgroundColor: CHILD_BUBBLE_COLORS[i % CHILD_BUBBLE_COLORS.length] }}
+            >
+              <ThemedText className="text-xs font-semibold text-white">
+                {getInitials(child.name)}
+              </ThemedText>
+            </View>
+          ))}
+        </View>
+        <TouchableOpacity
+          onPress={data.onClickRemove}
+          className="px-6 py-2 rounded-full bg-black"
+          activeOpacity={0.7}
+        >
+          <ThemedText lightColor="white" className="text-sm font-medium">Remove</ThemedText>
+        </TouchableOpacity>
       </View>
     </View>
   );
