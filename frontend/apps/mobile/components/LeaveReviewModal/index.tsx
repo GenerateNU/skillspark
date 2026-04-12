@@ -61,7 +61,7 @@ export function LeaveReviewModal({
 
   function toggleCategory(value: string) {
     setSelectedCategories((prev) =>
-      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value],
     );
   }
 

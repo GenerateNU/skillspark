@@ -26,6 +26,18 @@ func (m *MockEventOccurrenceRepository) GetAllEventOccurrences(ctx context.Conte
 	return eventOccurrences.([]models.EventOccurrence), nil
 }
 
+func (m *MockEventOccurrenceRepository) GetTrendingEventOccurrences(ctx context.Context, input *models.GetTrendingEventOccurrencesInput) ([]models.EventOccurrence, error) {
+	args := m.Called(ctx, input)
+	eventOccurrences := args.Get(0)
+	if eventOccurrences == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(error)
+	}
+	return eventOccurrences.([]models.EventOccurrence), nil
+}
+
 func (m *MockEventOccurrenceRepository) GetEventOccurrenceByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.EventOccurrence, error) {
 	args := m.Called(ctx, id, AcceptLanguage)
 	if args.Get(0) == nil {

@@ -310,7 +310,7 @@ export interface CreateReviewInputBody {
   /** The review text */
   description: string;
   /** ID of the guardian. Omit or set to null for an anonymous review. */
-  guardian_id: string;
+  guardian_id?: string;
   /** Rating left with the review, can be 1-5 inclusive */
   rating: number;
   /** ID of the linked registration */
@@ -1051,4 +1051,25 @@ export type GetAllSchoolsParams = {
    * @maximum 100
    */
   limit?: number;
+};
+
+export type GetTrendingEventOccurrencesParams = {
+  /**
+   * The user's latitude
+   */
+  lat: number;
+  /**
+   * The user's longitude
+   */
+  lng: number;
+  /**
+   * the maximum number of returns
+   * @minimum 1
+   */
+  max_returns?: number;
+  /**
+   * the distance away from the user a returned event can be in km
+   * @minimum 1
+   */
+  radius?: number;
 };

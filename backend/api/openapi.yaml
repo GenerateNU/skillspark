@@ -2531,6 +2531,76 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/trending/event-occurrences:
+    get:
+      tags:
+        - Event Occurrences
+      summary: Get the top 5 trending event occurrences
+      description: Returns a list of trending event occurrences in the user's location
+      operationId: get-trending-event-occurrences
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: lat
+          in: query
+          description: The user's latitude
+          required: true
+          explode: false
+          schema:
+            type: number
+            description: The user's latitude
+            format: double
+        - name: lng
+          in: query
+          description: The user's longitude
+          required: true
+          explode: false
+          schema:
+            type: number
+            description: The user's longitude
+            format: double
+        - name: max_returns
+          in: query
+          description: the maximum number of returns
+          explode: false
+          schema:
+            type: integer
+            description: the maximum number of returns
+            format: int64
+            default: 5
+            minimum: 1
+        - name: radius
+          in: query
+          description: the distance away from the user a returned event can be in km
+          explode: false
+          schema:
+            type: integer
+            description: the distance away from the user a returned event can be in km
+            format: int64
+            default: 50
+            minimum: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of trending in the user's area
+                items:
+                  $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
     AttachPaymentMethodInputBody:
@@ -2942,7 +3012,6 @@ components:
           description: ID of the linked registration
       required:
         - registration_id
-        - guardian_id
         - description
         - categories
         - rating
