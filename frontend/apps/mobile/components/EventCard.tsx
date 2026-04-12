@@ -1,10 +1,11 @@
 import React from "react";
-import { Alert, View, TouchableOpacity, Platform } from "react-native";
+import { Alert, View, TouchableOpacity, Platform, Text } from "react-native";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "expo-router";
 
 export interface LocationPin {
   id: string;
@@ -22,10 +23,8 @@ interface EventCardProps {
 }
 
 export function EventCard({ pin }: EventCardProps) {
-  const placeholderColor = useThemeColor(
-    { light: "#D0D0D0", dark: "#333333" },
-    "background",
-  );
+  const placeholderColor = useThemeColor({ light: "#D0D0D0" }, "background");
+  const router = useRouter();
   const { t: translate } = useTranslation();
 
   return (
@@ -70,23 +69,17 @@ export function EventCard({ pin }: EventCardProps) {
             {pin.description}
           </ThemedText>
         </View>
-        <View className="ml-[10px] mt-[5px] items-end justify-start">
-          <IconSymbol name="record.circle" size={24} color="#888" />
-        </View>
       </View>
       <TouchableOpacity
         className="w-full items-center rounded-xl bg-[#333] py-[15px]"
         activeOpacity={1}
-        onPress={() =>
-          Alert.alert(
-            translate("dashboard.reserve"),
-            `${translate("dashboard.reserved")}: ${pin.title}`,
-          )
-        }
+        onPress={() => {
+          router.push(`/(app)/(tabs)/org/${pin.id}`);
+        }}
       >
-        <ThemedText className="text-[18px] font-semibold text-white">
-          {translate("dashboard.reserve")}
-        </ThemedText>
+        <Text className="font-nunito-semibold text-[18px] text-white">
+          {translate("dashboard.learnMore")}
+        </Text>
       </TouchableOpacity>
     </ThemedView>
   );

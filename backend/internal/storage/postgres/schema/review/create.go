@@ -25,7 +25,8 @@ func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.Creat
 	)
 
 	var createdReview models.Review
-	var descEN, descTH string
+	var descEN string
+	var descTH *string
 
 	err = row.Scan(&createdReview.ID, &createdReview.RegistrationID, &createdReview.GuardianID, &createdReview.EventID, &createdReview.Rating, &descEN, &descTH, &createdReview.Categories, &createdReview.CreatedAt, &createdReview.UpdatedAt)
 
@@ -36,8 +37,10 @@ func (r *ReviewRepository) CreateReview(ctx context.Context, input *models.Creat
 
 	switch input.AcceptLanguage {
 	case "th-TH":
-		createdReview.Description = descTH
-	case "en-US":
+		if descTH != nil {
+			createdReview.Description = *descTH
+		}
+	default:
 		createdReview.Description = descEN
 	}
 

@@ -20,12 +20,15 @@ func (r *OrganizationRepository) GetOrganizationByID(ctx context.Context, id uui
 
 	row := r.db.QueryRow(ctx, query, id)
 	var org models.Organization
+	var rawLinks []byte
 	err = row.Scan(
 		&org.ID,
 		&org.Name,
 		&org.Active,
+		&org.About,
 		&org.PfpS3Key,
 		&org.LocationID,
+		&rawLinks,
 		&org.StripeAccountID,
 		&org.StripeAccountActivated,
 		&org.CreatedAt,
@@ -39,6 +42,12 @@ func (r *OrganizationRepository) GetOrganizationByID(ctx context.Context, id uui
 		}
 		err := errs.InternalServerError("Failed to fetch organization by id: ", err.Error())
 		return nil, &err
+	}
+
+	org.Links, err = scanLinks(rawLinks)
+	if err != nil {
+		errr := errs.InternalServerError("Failed to deserialize links: ", err.Error())
+		return nil, &errr
 	}
 
 	return &org, nil

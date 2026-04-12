@@ -2,10 +2,10 @@ package registration
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"skillspark/internal/errs"
-	"errors"
 	"skillspark/internal/models"
 	"time"
 )
@@ -29,7 +29,6 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 	if err != nil {
 		return nil, errs.BadRequest("Invalid guardian_id: guardian does not exist")
 	}
-	
 
 	if guardian.StripeCustomerID == nil {
 		return nil, errors.New("guardian must have a Stripe Customer ID")

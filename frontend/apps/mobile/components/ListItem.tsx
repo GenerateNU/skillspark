@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  TouchableOpacity,
-  TouchableOpacityProps,
-  useColorScheme,
-} from "react-native";
+import { TouchableOpacity, TouchableOpacityProps } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 
@@ -13,8 +9,7 @@ type ListItemProps = TouchableOpacityProps & {
 };
 
 export function ListItem({ label, isLast, style, ...rest }: ListItemProps) {
-  const colorScheme = useColorScheme();
-  const borderColor = colorScheme === "dark" ? "#3f3f46" : "#E5E7EB";
+  const borderColor = "#E5E7EB";
 
   return (
     <TouchableOpacity

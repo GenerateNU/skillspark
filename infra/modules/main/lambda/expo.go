@@ -24,7 +24,7 @@ type ExpoClient struct {
 // NewExpoClient creates a new Expo client
 func NewExpoClient() *ExpoClient {
 	accessToken := os.Getenv("EXPO_ACCESS_TOKEN")
-	
+
 	return &ExpoClient{
 		accessToken: accessToken,
 		client: &http.Client{
@@ -45,11 +45,11 @@ type ExpoPushMessage struct {
 
 // ExpoPushRequest represents the request payload for Expo API
 type ExpoPushRequest struct {
-	To    []string         `json:"to"`
-	Title string           `json:"title,omitempty"`
-	Body  string           `json:"body"`
-	Data  json.RawMessage  `json:"data,omitempty"`
-	Sound string           `json:"sound,omitempty"`
+	To    []string        `json:"to"`
+	Title string          `json:"title,omitempty"`
+	Body  string          `json:"body"`
+	Data  json.RawMessage `json:"data,omitempty"`
+	Sound string          `json:"sound,omitempty"`
 }
 
 // ExpoPushResponse represents the response from Expo API
@@ -59,8 +59,8 @@ type ExpoPushResponse struct {
 
 // ExpoPushTicket represents a ticket for a push notification
 type ExpoPushTicket struct {
-	Status string `json:"status"`
-	ID     string `json:"id,omitempty"`
+	Status  string `json:"status"`
+	ID      string `json:"id,omitempty"`
 	Message string `json:"message,omitempty"`
 }
 
@@ -72,9 +72,9 @@ func (c *ExpoClient) SendPushNotification(ctx context.Context, token string, bod
 
 	// Create request payload
 	reqBody := ExpoPushRequest{
-		To:   []string{token},
-		Body: body,
-		Data: metadata,
+		To:    []string{token},
+		Body:  body,
+		Data:  metadata,
 		Sound: "default",
 	}
 
@@ -105,12 +105,12 @@ func (c *ExpoClient) SendPushNotification(ctx context.Context, token string, bod
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		var errorBody bytes.Buffer
 		errorBody.ReadFrom(resp.Body)
-		
+
 		slog.Error("Expo API error",
 			"status", resp.StatusCode,
 			"response", errorBody.String(),
 		)
-		
+
 		return fmt.Errorf("expo API returned status %d: %s", resp.StatusCode, errorBody.String())
 	}
 
@@ -126,7 +126,7 @@ func (c *ExpoClient) SendPushNotification(ctx context.Context, token string, bod
 		if ticket.Status != "ok" {
 			return fmt.Errorf("expo push notification failed: %s", ticket.Message)
 		}
-		
+
 		slog.Info("Push notification sent successfully",
 			"token", token,
 			"ticket_id", ticket.ID,
@@ -135,4 +135,3 @@ func (c *ExpoClient) SendPushNotification(ctx context.Context, token string, bod
 
 	return nil
 }
-

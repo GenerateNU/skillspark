@@ -1,0 +1,2 @@
+ALTER TABLE organization
+  ADD COLUMN IF NOT EXISTS about TEXT;

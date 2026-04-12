@@ -1,44 +1,70 @@
-import { useState, type SetStateAction } from "react";
+import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useAuthContext } from "../contexts/use-auth-context";
+import { useNavigate } from "react-router-dom";
+import { AuthProvider } from "../contexts/auth-context.tsx";
+
+type LoginFormData = {
+  email: string;
+  password: string;
+};
 
 export default function Login() {
-  const [emailText, setEmailText] = useState("");
-  const [passwordText, setPasswordText] = useState("");
+  const [errorText, setErrorText] = useState("");
+  const { login, isAuthenticated } = useAuthContext();
+  const navigate = useNavigate();
 
-  const handleEmailChange = (event: {
-    target: { value: SetStateAction<string> };
-  }) => {
-    setEmailText(event.target.value);
+  const { register, handleSubmit } = useForm<LoginFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = (formData: LoginFormData) => {
+    if (formData.email === "" || formData.password === "") {
+      setErrorText("Missing email or password");
+    } else {
+      login(formData.email, formData.password, setErrorText);
+    }
   };
 
-  const handlePasswordChange = (event: {
-    target: { value: SetStateAction<string> };
-  }) => {
-    setPasswordText(event.target.value);
-  };
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [navigate, isAuthenticated]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-4xl font-bold pb-16">Log In</h1>
-      <div className="flex flex-col items-center justify-center gap-4 w-full max-w-md">
-        <input
-          type="text"
-          placeholder="Email"
-          onChange={handleEmailChange}
-          value={emailText}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={handlePasswordChange}
-          value={passwordText}
-        />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+    <AuthProvider>
+      <div className="flex flex-col items-center justify-center h-screen">
+        <h1 className="text-4xl font-bold pb-16">Log In</h1>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col items-center justify-center gap-4 w-full max-w-md"
         >
-          Log in
-        </button>
+          <input type="text" placeholder="Email" {...register("email")} />
+          <input
+            type="password"
+            placeholder="Password"
+            {...register("password")}
+          />
+          {errorText && <p className="text-red-500 text-sm">{errorText}</p>}
+          <button
+            type="submit"
+            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+          >
+            Log In
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/signup")}
+            className="text-blue-500 hover:underline"
+          >
+            Don't have an account? Sign up
+          </button>
+        </form>
       </div>
-    </div>
+    </AuthProvider>
   );
 }

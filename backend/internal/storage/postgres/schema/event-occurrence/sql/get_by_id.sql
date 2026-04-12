@@ -36,7 +36,9 @@ SELECT
     l.postal_code,
     l.country,
     l.created_at,
-    l.updated_at
+    l.updated_at,
+
+    o.links
 FROM event_occurrence eo
 JOIN event e ON e.id = eo.event_id
 JOIN organization o ON o.id = e.organization_id

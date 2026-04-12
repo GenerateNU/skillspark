@@ -257,6 +257,125 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/emergency-contact:
+    post:
+      tags:
+        - Emergency Contacts
+      summary: Creates an emergency contact
+      description: Creates an emergency contact
+      operationId: create-emergency-contact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: New emergency contact to add
+              $ref: '#/components/schemas/CreateEmergencyContactInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Created Emergency Contact
+                $ref: '#/components/schemas/EmergencyContact'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/emergency-contact/{guardian_id}:
+    get:
+      tags:
+        - Emergency Contacts
+      summary: Get emergency contacts by guardian id
+      description: Returns emergency contacts by guardian id
+      operationId: get-emergency-contacts-by-guardian-id
+      parameters:
+        - name: guardian_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of all emergency contacts related to the given guardian in the database
+                items:
+                  $ref: '#/components/schemas/EmergencyContact'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/emergency-contact/{id}:
+    delete:
+      tags:
+        - Emergency Contacts
+      summary: Delete an emergency contact
+      description: Deletes an emergency contact
+      operationId: delete-emergency-contact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteEmergencyContactBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+    patch:
+      tags:
+        - Emergency Contacts
+      summary: Updates an emergency contact
+      description: Update an emergency contact
+      operationId: update-emergency-contact
+      parameters:
+        - name: id
+          in: path
+          description: Emergency Contact ID to update
+          required: true
+          schema:
+            type: string
+            description: Emergency Contact ID to update
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Emergency contact to update
+              $ref: '#/components/schemas/UpdateEmergencyContactInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Updated Emergency Contact
+                $ref: '#/components/schemas/EmergencyContact'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/event-occurrences:
     get:
       tags:
@@ -1191,8 +1310,12 @@ paths:
             schema:
               type: object
               properties:
+                about:
+                  type: string
                 active:
                   type: boolean
+                links:
+                  type: string
                 location_id:
                   type: string
                 name:
@@ -1206,7 +1329,11 @@ paths:
               required:
                 - name
             encoding:
+              about:
+                contentType: text/plain
               active:
+                contentType: text/plain
+              links:
                 contentType: text/plain
               location_id:
                 contentType: text/plain
@@ -1303,8 +1430,12 @@ paths:
             schema:
               type: object
               properties:
+                about:
+                  type: string
                 active:
                   type: boolean
+                links:
+                  type: string
                 location_id:
                   type: string
                 name:
@@ -1318,7 +1449,11 @@ paths:
               required:
                 - name
             encoding:
+              about:
+                contentType: text/plain
               active:
+                contentType: text/plain
+              links:
                 contentType: text/plain
               location_id:
                 contentType: text/plain
@@ -1372,6 +1507,88 @@ paths:
                 description: List of event occurrences in the database that match the organization ID
                 items:
                   $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/recommendations/{child_id}:
+    get:
+      tags:
+        - Recommendations
+      summary: Get recommendations by child ID
+      description: Returns a list of recommended events for a child
+      operationId: get-recommendations-by-child-id
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: child_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: lat
+          in: query
+          explode: false
+          schema:
+            type: string
+        - name: lng
+          in: query
+          explode: false
+          schema:
+            type: string
+        - name: radius_km
+          in: query
+          explode: false
+          schema:
+            type: number
+            format: double
+        - name: min_date
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: date-time
+        - name: max_date
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of recommended events for the child
+                items:
+                  $ref: '#/components/schemas/Event'
         default:
           description: Error
           content:
@@ -1888,6 +2105,91 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/review/organization/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get reviews by organization ID
+      description: Returns all reviews with the given organization ID
+      operationId: get-review-by-organization-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: page_size
+          in: query
+          description: Number of items per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of items per page
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of reviews
+                items:
+                  $ref: '#/components/schemas/Review'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/review/organization_aggregate/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get review aggregate by organization id
+      description: Get review aggregate by organization id
+      operationId: get-review-aggregate-organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Aggregate review data including breakdown by rating, total reviews, and average rating
+                $ref: '#/components/schemas/ReviewAggregate'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/saved:
     post:
       tags:
@@ -2229,6 +2531,76 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/trending/event-occurrences:
+    get:
+      tags:
+        - Event Occurrences
+      summary: Get the top 5 trending event occurrences
+      description: Returns a list of trending event occurrences in the user's location
+      operationId: get-trending-event-occurrences
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: lat
+          in: query
+          description: The user's latitude
+          required: true
+          explode: false
+          schema:
+            type: number
+            description: The user's latitude
+            format: double
+        - name: lng
+          in: query
+          description: The user's longitude
+          required: true
+          explode: false
+          schema:
+            type: number
+            description: The user's longitude
+            format: double
+        - name: max_returns
+          in: query
+          description: the maximum number of returns
+          explode: false
+          schema:
+            type: integer
+            description: the maximum number of returns
+            format: int64
+            default: 5
+            minimum: 1
+        - name: radius
+          in: query
+          description: the distance away from the user a returned event can be in km
+          explode: false
+          schema:
+            type: integer
+            description: the distance away from the user a returned event can be in km
+            format: int64
+            default: 50
+            minimum: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of trending in the user's area
+                items:
+                  $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
     AttachPaymentMethodInputBody:
@@ -2400,6 +2772,27 @@ components:
         - birth_year
         - interests
         - guardian_id
+    CreateEmergencyContactInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreateEmergencyContactInputBody.json
+          readOnly: true
+        guardian_id:
+          type: string
+        name:
+          type: string
+        phone_number:
+          type: string
+      required:
+        - name
+        - guardian_id
+        - phone_number
     CreateEventOccurrenceInputBody:
       type: object
       additionalProperties: false
@@ -2609,7 +3002,7 @@ components:
           description: The review text
         guardian_id:
           type: string
-          description: ID of the guardian
+          description: ID of the guardian. Omit or set to null for an anonymous review.
         rating:
           type: integer
           description: Rating left with the review, can be 1-5 inclusive
@@ -2619,7 +3012,6 @@ components:
           description: ID of the linked registration
       required:
         - registration_id
-        - guardian_id
         - description
         - categories
         - rating
@@ -2695,6 +3087,21 @@ components:
           description: Stripe-hosted onboarding page URL
       required:
         - onboarding_url
+    DeleteEmergencyContactBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DeleteEmergencyContactBody.json
+          readOnly: true
+        success_message:
+          type: string
+      required:
+        - success_message
     DeleteEventOutputBody:
       type: object
       additionalProperties: false
@@ -2743,6 +3150,38 @@ components:
           description: Success message
       required:
         - message
+    EmergencyContact:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/EmergencyContact.json
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        guardian_id:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        phone_number:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - guardian_id
+        - phone_number
+        - created_at
+        - updated_at
     ErrorDetail:
       type: object
       additionalProperties: false
@@ -2887,6 +3326,10 @@ components:
         max_attendees:
           type: integer
           format: int64
+        org_links:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgLink'
         price:
           type: integer
           description: Price in cents (e.g., 10000 = $100)
@@ -2908,6 +3351,7 @@ components:
         - manager_id
         - event
         - location
+        - org_links
         - start_time
         - end_time
         - max_attendees
@@ -3368,6 +3812,19 @@ components:
       required:
         - token
         - manager_id
+    OrgLink:
+      type: object
+      additionalProperties: false
+      properties:
+        href:
+          type: string
+          description: URL to the organization resource
+        label:
+          type: string
+          description: Human-readable label for the organization link
+      required:
+        - href
+        - label
     Organization:
       type: object
       additionalProperties: false
@@ -3379,6 +3836,8 @@ components:
           examples:
             - http://localhost:8080/schemas/Organization.json
           readOnly: true
+        about:
+          type: string
         active:
           type: boolean
         created_at:
@@ -3386,6 +3845,10 @@ components:
           format: date-time
         id:
           type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgLink'
         location_id:
           type: string
         name:
@@ -3406,8 +3869,8 @@ components:
         - id
         - name
         - active
+        - links
         - presigned_url
-        - location_id
         - created_at
         - updated_at
         - stripe_account_id
@@ -3611,7 +4074,7 @@ components:
           description: ID of the event
         guardian_id:
           type: string
-          description: ID of the guardian
+          description: ID of the guardian. Null when the review was submitted anonymously.
         id:
           type: string
           description: Unique review identifier
@@ -3767,6 +4230,27 @@ components:
         school_id:
           type: string
           description: ID of the school the child goes to
+    UpdateEmergencyContactInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UpdateEmergencyContactInputBody.json
+          readOnly: true
+        guardian_id:
+          type: string
+        name:
+          type: string
+        phone_number:
+          type: string
+      required:
+        - guardian_id
+        - phone_number
+        - name
     UpdateEventOccurrenceInputBody:
       type: object
       additionalProperties: false

@@ -25,7 +25,7 @@ func TestUpdateOrganization(t *testing.T) {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Original Name"
 		i.Body.Active = &active
-		i.Body.LocationID = locationID
+		i.Body.LocationID = &locationID
 		return i
 	}()
 
@@ -72,7 +72,7 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Test Org"
 		i.Body.Active = &active
-		i.Body.LocationID = locationID
+		i.Body.LocationID = &locationID
 		return i
 	}()
 
@@ -94,7 +94,8 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	require.Nil(t, updateErr)
 	require.NotNil(t, updated)
 	assert.Equal(t, "Test Org with Location", updated.Name)
-	assert.Equal(t, newLocationID, updated.LocationID)
+	require.NotNil(t, updated.LocationID)
+	assert.Equal(t, newLocationID, *updated.LocationID)
 	assert.Nil(t, updated.StripeAccountID)
 	assert.False(t, updated.StripeAccountActivated)
 }
@@ -132,7 +133,7 @@ func TestUpdateOrganization_DoesNotModifyStripeFields(t *testing.T) {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Stripe Test Org"
 		i.Body.Active = &active
-		i.Body.LocationID = locationID
+		i.Body.LocationID = &locationID
 		return i
 	}()
 

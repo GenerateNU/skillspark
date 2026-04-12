@@ -107,7 +107,7 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 					Name:       "Science Academy Bangkok",
 					Active:     true,
 					PfpS3Key:   &pfpKey,
-					LocationID: testLocationID,
+					LocationID: &testLocationID,
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
 				}, nil)
@@ -205,7 +205,7 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 					ID:         uuid.New(),
 					Name:       "Tech Innovations",
 					Active:     true,
-					LocationID: testLocationID,
+					LocationID: &testLocationID,
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
 				}, nil)
@@ -219,7 +219,7 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 					ID:         uuid.New(),
 					Name:       "Tech Innovations",
 					Active:     true,
-					LocationID: testLocationID,
+					LocationID: &testLocationID,
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
 				}, nil)
@@ -310,8 +310,8 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 					mock.Anything,
 					mock.AnythingOfType("utils.Pagination"),
 				).Return([]models.Organization{
-					{ID: uuid.New(), Name: "Org 1", Active: true, LocationID: testLocationID},
-					{ID: uuid.New(), Name: "Org 2", Active: true, LocationID: testLocationID},
+					{ID: uuid.New(), Name: "Org 1", Active: true, LocationID: &testLocationID},
+					{ID: uuid.New(), Name: "Org 2", Active: true, LocationID: &testLocationID},
 				}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -325,7 +325,7 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 					mock.Anything,
 					utils.Pagination{Page: 2, Limit: 5},
 				).Return([]models.Organization{
-					{ID: uuid.New(), Name: "Org 3", Active: true, LocationID: testLocationID},
+					{ID: uuid.New(), Name: "Org 3", Active: true, LocationID: &testLocationID},
 				}, nil)
 			},
 			statusCode: http.StatusOK,
@@ -416,7 +416,7 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 					ID:         orgID,
 					Name:       "Updated Name",
 					Active:     true,
-					LocationID: testLocationID,
+					LocationID: &testLocationID,
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
 				}, nil)
@@ -508,7 +508,7 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 					ID:         orgID,
 					Name:       "Deleted Org",
 					Active:     true,
-					LocationID: testLocationID,
+					LocationID: &testLocationID,
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
 				}, nil)
