@@ -66,10 +66,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const { mutate: signupFunc } = useSignupGuardian();
 	const { mutate: updateFunc } = useUpdateGuardian();
 
-	let { guardian } = useGuardian(guardianId);
+	let { guardian, hasError } = useGuardian(guardianId);
+
+	const logout = async () => {
+		router.replace("/(auth)/login");
+		await SecureStore.deleteItemAsync("token");
+		setJWT(null);
+		await SecureStore.deleteItemAsync("guardian_id");
+		setGuardianId(null);
+		await SecureStore.deleteItemAsync("language_preference");
+		setLangPref(null);
+	};
 
 	useEffect(() => {
 		const checkAlreadyAuth = async () => {
+			if (hasError) {
+				// invalid JWT, log out old session
+				logout();
+				return;
+			}
 			const storedJWT = await SecureStore.getItemAsync("token");
 			const storedGuardianId = await SecureStore.getItemAsync("guardian_id");
 			const storedLangPref = await SecureStore.getItemAsync(
@@ -88,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			setIsLoading(false);
 		};
 		checkAlreadyAuth();
-	}, [queryClient]);
+	}, [queryClient, hasError]);
 
 	useEffect(() => {
 		const getUpdatedLangPref = async () => {
@@ -164,16 +179,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		);
 	};
 
-	const logout = async () => {
-		router.replace("/(auth)/login");
-		await SecureStore.deleteItemAsync("token");
-		setJWT(null);
-		await SecureStore.deleteItemAsync("guardian_id");
-		setGuardianId(null);
-		await SecureStore.deleteItemAsync("language_preference");
-		setLangPref(null);
-	};
-
 	const update = (
 		onSuccess: () => void,
 		onError: (msg: string) => void,
@@ -228,7 +233,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				guardianId,
 				jwt,
 				langPref,
-				isAuthenticated: !!(jwt && guardianId),
+				isAuthenticated: !!jwt && !!guardianId,
 				isLoading,
 				login,
 				signup,

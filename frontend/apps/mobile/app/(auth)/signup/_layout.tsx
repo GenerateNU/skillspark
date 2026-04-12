@@ -9,6 +9,7 @@ export default function OnboardingStackLayout() {
 		<QueryClientProvider client={queryClient}>
 			<Stack>
 				<Stack.Screen name="index" options={{ headerShown: false }} />
+				<Stack.Screen name="account" options={{ headerShown: false }} />
 				<Stack.Screen name="name" options={{ headerShown: false }} />
 				<Stack.Screen name="photo" options={{ headerShown: false }} />
 				<Stack.Screen

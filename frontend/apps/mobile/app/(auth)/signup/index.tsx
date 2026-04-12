@@ -1,132 +1,110 @@
+import React, { useState } from "react";
+import { View, TouchableOpacity, Image } from "react-native";
+import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { router } from "expo-router";
-import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTranslation } from "react-i18next";
+import { setCurrentLanguage } from "@skillspark/api-client";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { Controller, useForm } from "react-hook-form";
 import { ErrorMessage } from "@/components/ErrorMessage";
-import { PageRedirectButton } from "@/components/PageRedirectButton";
 import { Button } from "@/components/Button";
-import { AuthFormInput } from "@/components/AuthFormInput";
-import { Dropdown } from "@/components/Dropdown";
+import { AppColors, FontSizes } from "@/constants/theme";
 
-type SignupFormData = {
-	name: string;
-	email: string;
-	username: string;
-	password: string;
-	language_preference: string;
-	profile_picture_s3_key: string | undefined;
-};
+const LANGUAGES = [
+	{ code: "en", label: "English", flag: "🇺🇸" },
+	{ code: "th", label: "Thai", flag: "🇹🇭" },
+];
 
-export default function SignupScreen() {
+export default function WelcomeScreen() {
+	const router = useRouter();
+	const insets = useSafeAreaInsets();
+	const { t: translate, i18n } = useTranslation();
+
+	const dividerColor = "#E5E7EB";
+
+	const [selected, setSelected] = useState(i18n.language ?? "en");
 	const [errorText, setErrorText] = useState("");
-	const { signup } = useAuthContext();
-	const { control, handleSubmit } = useForm<SignupFormData>({
-		defaultValues: {
-			name: "",
-			email: "",
-			username: "",
-			password: "",
-			language_preference: "",
-			profile_picture_s3_key: undefined,
-		},
-	});
+	const { setLanguage } = useAuthContext();
 
-	const onSubmit = (formData: SignupFormData) => {
-		if (
-			formData.name === "" ||
-			formData.email === "" ||
-			formData.username === "" ||
-			formData.password === "" ||
-			formData.language_preference === ""
-		) {
-			setErrorText("Missing a required field");
-		} else {
-			signup(
-				formData.name,
-				formData.email,
-				formData.username,
-				formData.password,
-				formData.language_preference,
-				formData.profile_picture_s3_key,
-				setErrorText,
-			);
-		}
-	};
+	const updateLanguageData = async (langCode: string) => {
+		setSelected(langCode);
+		await i18n.changeLanguage(langCode);
+		setCurrentLanguage(langCode);
 
-	const handleGoToLogIn = () => {
-		router.push("/(auth)/login");
+		setLanguage(langCode);
 	};
 
 	return (
 		<ThemedView className="flex-1">
-			<KeyboardAvoidingView
-				behavior={Platform.OS === "ios" ? "padding" : "height"}
-				className="flex-1"
-			>
-				<ScrollView
-					contentContainerStyle={{ flexGrow: 1 }}
-					keyboardShouldPersistTaps="handled"
+			<View className="px-6 pt-8 items-center">
+				<ThemedText
+					className="font-nunito-bold leading-[60px]"
+					style={{
+						letterSpacing: -0.5,
+						fontSize: FontSizes.hero,
+						color: AppColors.primaryText,
+					}}
 				>
-					<View className="flex-1 items-center justify-center px-6 gap-4">
-						<ThemedText type="title" className="text-3xl font-bold mb-8">
-							Sign Up
-						</ThemedText>
-						<AuthFormInput
-							control={control}
-							name="name"
-							placeholder="Full Name"
-							autoCapitalize="none"
-						/>
-						<AuthFormInput
-							control={control}
-							name="email"
-							placeholder="Email"
-							keyboardType="email-address"
-							autoCapitalize="none"
-						/>
-						<AuthFormInput
-							control={control}
-							name="username"
-							placeholder="Username"
-							autoCapitalize="none"
-						/>
-						<AuthFormInput
-							control={control}
-							name="password"
-							placeholder="Password"
-							secureTextEntry={true}
-						/>
-						<Controller
-							control={control}
-							name="language_preference"
-							render={({ field: { onChange, value } }) => (
-								<Dropdown
-									value={value}
-									onChange={onChange}
-									options={[
-										{ label: "English", value: "en" },
-										{ label: "Thai", value: "th" },
-									]}
-									placeholder="Select a language..."
-								/>
-							)}
-						/>
-						<Button
-							label="Sign Up"
-							onPress={handleSubmit(onSubmit)}
-							disabled={false}
-						/>
-						<PageRedirectButton
-							label="Already have an account? Log in"
-							onPress={handleGoToLogIn}
-						/>
-						<ErrorMessage message={errorText} />
-					</View>
-				</ScrollView>
-			</KeyboardAvoidingView>
+					{translate("onboarding.welcome")}
+				</ThemedText>
+			</View>
+
+			{/* need to add smiley here */}
+			<View className="items-center justify-center flex-1">
+				<Image
+					source={require("@/assets/images/great.png")}
+					className="w-36 h-36"
+				/>
+			</View>
+
+			<ThemedText className="text-xl font-nunito-bold text-center mb-6">
+				{translate("onboarding.chooseLanguage")}
+			</ThemedText>
+			<View className="px-6 mb-8">
+				{LANGUAGES.map((lang, index) => (
+					<React.Fragment key={lang.code}>
+						<TouchableOpacity
+							className="flex-row items-center py-5 gap-4"
+							onPress={() => updateLanguageData(lang.code)}
+							activeOpacity={0.6}
+						>
+							<ThemedText className="text-[38px] leading-[46px]">
+								{lang.flag}
+							</ThemedText>
+							<ThemedText className="flex-1 text-lg font-nunito">
+								{translate(`settings.languages.${lang.code}`)}
+							</ThemedText>
+							<IconSymbol
+								name={
+									selected === lang.code ? "checkmark.circle.fill" : "circle"
+								}
+								size={26}
+								color={selected === lang.code ? "#1C1C1E" : "#C7C7CC"}
+							/>
+						</TouchableOpacity>
+						{index < LANGUAGES.length - 1 && (
+							<View
+								className="h-px ml-[58px]"
+								style={{ backgroundColor: dividerColor }}
+							/>
+						)}
+					</React.Fragment>
+				))}
+			</View>
+
+			<View
+				className="px-6 items-center"
+				style={{ paddingBottom: insets.bottom + 16 }}
+			>
+				<Button
+					label={translate("common.submit")}
+					onPress={() => router.push("/(auth)/signup/account")}
+					disabled={false}
+				/>
+				<ErrorMessage message={errorText} />
+			</View>
 		</ThemedView>
 	);
 }

@@ -1,6 +1,7 @@
 import { AuthFormInput } from "@/components/AuthFormInput";
 import { Button } from "@/components/Button";
 import { ErrorMessage } from "@/components/ErrorMessage";
+import { PageRedirectButton } from "@/components/PageRedirectButton";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -9,10 +10,10 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { TouchableOpacity, View } from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
 
-// 2. name and username
-export default function NameScreen() {
+// 1. email and password
+export default function AccountScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
 	const [errorText, setErrorText] = useState("");
@@ -40,35 +41,60 @@ export default function NameScreen() {
 						color: AppColors.primaryText,
 					}}
 				>
-					{translate("onboarding.whatName")}
+					{translate("onboarding.makeAccount")}
 				</ThemedText>
+			</View>
+
+			{/* need to add smiley here */}
+			<View className="items-center justify-center flex-1">
+				<Image
+					source={require("@/assets/images/great.png")}
+					className="w-36 h-36"
+				/>
 			</View>
 
 			<View className="px-6 gap-5">
 				<View className="gap-2">
 					<ThemedText className="text-lg font-nunito-semibold">
-						{translate("onboarding.name")}
+						{translate("onboarding.email")}
 					</ThemedText>
-					<AuthFormInput control={control} name="name" autoCapitalize="none" />
+					<AuthFormInput
+						control={control}
+						name="email"
+						keyboardType="email-address"
+						autoCapitalize="none"
+					/>
 				</View>
 
 				<View className="gap-2">
 					<ThemedText className="text-lg font-nunito-semibold">
-						{translate("onboarding.username")}
+						{translate("onboarding.password")}
+					</ThemedText>
+					<AuthFormInput control={control} name="password" secureTextEntry />
+				</View>
+
+				<View className="gap-2">
+					<ThemedText className="text-lg font-nunito-semibold">
+						{translate("onboarding.confirmPassword")}
 					</ThemedText>
 					<AuthFormInput
 						control={control}
-						name="username"
-						autoCapitalize="none"
+						name="confirm_password"
+						secureTextEntry
 					/>
 				</View>
 			</View>
 
 			<View className="px-6 items-center">
 				<Button
-					label={translate("onboarding.continue")}
-					onPress={() => router.push("/(auth)/signup/photo")}
+					label={translate("onboarding.createAccount")}
+					onPress={() => router.push("/(auth)/signup/name")}
 					disabled={false}
+				/>
+
+				<PageRedirectButton
+					label={translate("onboarding.alreadyHaveAccount")}
+					onPress={() => router.navigate("/(auth)/login")}
 				/>
 
 				<ErrorMessage message={errorText} />

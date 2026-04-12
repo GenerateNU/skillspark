@@ -4,20 +4,20 @@ import { useEffect } from "react";
 import i18n from "@/i18n";
 
 export const LoginRedirect = () => {
-  const { isAuthenticated, isLoading } = useAuthContext();
+	const { isAuthenticated, isLoading } = useAuthContext();
 
-  if (isLoading) {
-    return <Stack />;
-  }
+	if (isLoading) {
+		return <Stack />;
+	}
 
-  return (
-    <>
-      <Stack>
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(app)" options={{ headerShown: false }} />
-      </Stack>
-      {!isAuthenticated && <Redirect href="/(auth)/login" />}
-      {isAuthenticated && <Redirect href="/(app)/(tabs)" />}
-    </>
-  );
+	return (
+		<>
+			<Stack>
+				<Stack.Screen name="(auth)" options={{ headerShown: false }} />
+				<Stack.Screen name="(app)" options={{ headerShown: false }} />
+			</Stack>
+			{!isAuthenticated && <Redirect href="/(auth)/signup" />}
+			{isAuthenticated && <Redirect href="/(app)/(tabs)" />}
+		</>
+	);
 };
