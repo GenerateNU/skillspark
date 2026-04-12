@@ -1,4 +1,3 @@
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
 import { useEffect, useRef } from "react";
 import Animated, {
@@ -23,6 +22,7 @@ const GAP = 4;
 export const FLOATING_TAB_BAR_SCROLL_PADDING = 130;
 
 const VISIBLE_TABS = ["index", "map", "activity", "profile"];
+const HIDDEN_ROUTES = ["filters"];
 
 const TAB_ICONS: Record<string, any> = {
   index: "house.fill",
@@ -31,12 +31,20 @@ const TAB_ICONS: Record<string, any> = {
   profile: "person.fill",
 };
 
-export function FloatingTabBar({
-  state,
-  descriptors,
-  navigation,
-}: BottomTabBarProps) {
+type Props = {
+  state: { routes: Array<{ key: string; name: string }>; index: number };
+  descriptors: Record<string, { options: { title?: string } }>;
+  navigation: {
+    emit: (e: { type: string; target?: string; canPreventDefault?: boolean }) => { defaultPrevented: boolean };
+    navigate: (name: string) => void;
+  };
+};
+
+export function FloatingTabBar({ state, descriptors, navigation }: Props) {
   const insets = useSafeAreaInsets();
+  const activeRouteName = state.routes[state.index]?.name;
+  if (HIDDEN_ROUTES.includes(activeRouteName)) return null;
+
   const visibleRoutes = state.routes.filter((r) =>
     VISIBLE_TABS.includes(r.name),
   );
