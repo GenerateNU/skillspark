@@ -1,4 +1,3 @@
-import { Image } from "expo-image";
 import {
   Animated,
   ActivityIndicator,
@@ -7,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from "react-native";
 import { useMemo, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -90,17 +90,31 @@ function OccurrenceCard({
   const toggle = () => {
     const toValue = expanded ? 0 : 1;
     setExpanded((prev) => !prev);
-    Animated.timing(progress, { toValue, duration: 250, useNativeDriver: false }).start();
+    Animated.timing(progress, {
+      toValue,
+      duration: 250,
+      useNativeDriver: false,
+    }).start();
   };
 
   const buttonsAnimStyle = {
-    height: progress.interpolate({ inputRange: [0, 1], outputRange: [0, BUTTON_ROW_HEIGHT] }),
+    height: progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, BUTTON_ROW_HEIGHT],
+    }),
     opacity: progress,
     overflow: "hidden" as const,
   };
 
   const chevronAnimStyle = {
-    transform: [{ rotate: progress.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "180deg"] }) }],
+    transform: [
+      {
+        rotate: progress.interpolate({
+          inputRange: [0, 1],
+          outputRange: ["0deg", "180deg"],
+        }),
+      },
+    ],
   };
 
   const ageRange = formatAgeRange(
@@ -138,7 +152,6 @@ function OccurrenceCard({
                 <Image
                   source={{ uri: occurrence.event.presigned_url }}
                   style={{ width: "100%", height: "100%" }}
-                  contentFit="cover"
                 />
               ) : null}
             </View>
