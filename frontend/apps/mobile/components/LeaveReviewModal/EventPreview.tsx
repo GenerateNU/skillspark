@@ -9,7 +9,11 @@ interface Props {
   eventImageUrl?: string;
 }
 
-export function EventPreview({ eventName, eventLocation, eventImageUrl }: Props) {
+export function EventPreview({
+  eventName,
+  eventLocation,
+  eventImageUrl,
+}: Props) {
   return (
     <View className="flex-row items-center gap-3 mb-6">
       <View

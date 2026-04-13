@@ -47,7 +47,9 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         bounces={false}
         className="pt-[10px]"
-        contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
+        contentContainerStyle={{
+          paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+        }}
       >
         <View className="items-center mb-5 mt-[5px]">
           <View
@@ -82,9 +84,10 @@ export default function ProfileScreen() {
               children.map((child: any) => (
                 <FamilyCard
                   key={child.id}
-                  initials={child.name?.charAt(0) ?? ""}
                   name={child.name}
                   date={translate("profile.born", { year: child.birth_year })}
+                  avatarFace={child.avatar_face}
+                  avatarBackground={child.avatar_background}
                 />
               ))
             ) : (

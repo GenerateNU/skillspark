@@ -11,7 +11,11 @@ export const NoProfilePic = ({ width, height }: NoProfilePicProps) => {
   return (
     <View
       className="rounded-full border items-center justify-center overflow-hidden"
-      style={{ borderColor: Colors.light.borderColor, width: width, height: height }}
+      style={{
+        borderColor: Colors.light.borderColor,
+        width: width,
+        height: height,
+      }}
     >
       <IconSymbol
         name="person"

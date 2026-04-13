@@ -145,7 +145,8 @@ function OrgDetail({
           <Text
             numberOfLines={aboutExpanded ? undefined : 4}
             onTextLayout={(e) => {
-              if (!aboutExpanded) setAboutTruncated(e.nativeEvent.lines.length >= 4);
+              if (!aboutExpanded)
+                setAboutTruncated(e.nativeEvent.lines.length >= 4);
             }}
             className={`text-sm leading-[22px] ${aboutTruncated ? "mb-1" : "mb-4"}`}
             style={{ color: AppColors.secondaryText }}
@@ -161,7 +162,9 @@ function OrgDetail({
                 className="text-[13px] font-semibold"
                 style={{ color: AppColors.primaryText }}
               >
-                {aboutExpanded ? translate("event.seeLess") : translate("event.seeMore")}
+                {aboutExpanded
+                  ? translate("event.seeLess")
+                  : translate("event.seeMore")}
               </Text>
             </Pressable>
           )}

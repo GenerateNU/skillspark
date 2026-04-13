@@ -21,6 +21,8 @@ import {
   getGetChildrenByGuardianIdQueryKey,
 } from "@skillspark/api-client";
 import { ChildProfileForm, MONTHS } from "@/components/ChildProfileForm";
+import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
+import { setPendingAvatarCallback } from "@/constants/avatarPickerStore";
 import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 
@@ -64,6 +66,13 @@ export default function ManageChildScreen() {
       : [];
   const [interests, setInterests] = useState<string[]>(initialInterests);
 
+  const [avatarFace, setAvatarFace] = useState<string | null>(
+    (params.avatar_face as string) || null,
+  );
+  const [avatarBackground, setAvatarBackground] = useState(
+    (params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
+  );
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showMonthDrop, setShowMonthDrop] = useState(false);
   const [showYearDrop, setShowYearDrop] = useState(false);
@@ -96,6 +105,8 @@ export default function ManageChildScreen() {
         guardian_id: guardianId,
         school_id: schoolId,
         interests,
+        avatar_face: avatarFace ?? undefined,
+        avatar_background: avatarBackground || DEFAULT_AVATAR_COLOR,
       };
       if (isEditing) {
         await updateChildMutation.mutateAsync({
@@ -118,6 +129,22 @@ export default function ManageChildScreen() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleAvatarPress = () => {
+    setPendingAvatarCallback(({ face, background }) => {
+      setAvatarFace(face);
+      setAvatarBackground(background);
+    });
+    const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
+    router.push({
+      pathname: "/(app)/(tabs)/family/avatar-picker",
+      params: {
+        avatarFace: avatarFace ?? "",
+        avatarBackground,
+        childName,
+      },
+    });
   };
 
   const handleDelete = () => {
@@ -163,7 +190,7 @@ export default function ManageChildScreen() {
         <ScrollView
           contentContainerStyle={{
             paddingHorizontal: 20,
-            paddingBottom: 40,
+            paddingBottom: insets.bottom + 80,
             paddingTop: 10,
           }}
           showsVerticalScrollIndicator={false}
@@ -215,6 +242,9 @@ export default function ManageChildScreen() {
             setShowMonthDrop={setShowMonthDrop}
             showYearDrop={showYearDrop}
             setShowYearDrop={setShowYearDrop}
+            avatarFace={avatarFace}
+            avatarBackground={avatarBackground}
+            onAvatarPress={handleAvatarPress}
           />
           <TouchableOpacity
             className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}

@@ -60,6 +60,8 @@ func (r *ChildRepository) GetChildrenByParentID(
 				&child.BirthYear,
 				&child.Interests,
 				&child.GuardianID,
+				&child.AvatarFace,
+				&child.AvatarBackground,
 				&child.CreatedAt,
 				&child.UpdatedAt,
 			)

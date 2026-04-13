@@ -27,6 +27,7 @@ import type {
   ErrorModel,
   EventOccurrence,
   GetAllEventOccurrencesParams,
+  GetTrendingEventOccurrencesParams,
   UpdateEventOccurrenceInputBody,
 } from "../skillSparkAPI.schemas";
 
@@ -861,3 +862,216 @@ export const usePatchEventOccurrence = <
     queryClient,
   );
 };
+/**
+ * Returns a list of trending event occurrences in the user's location
+ * @summary Get the top 5 trending event occurrences
+ */
+export type getTrendingEventOccurrencesResponse200 = {
+  data: EventOccurrence[];
+  status: 200;
+};
+
+export type getTrendingEventOccurrencesResponseDefault = {
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getTrendingEventOccurrencesResponseSuccess =
+  getTrendingEventOccurrencesResponse200 & {
+    headers: Headers;
+  };
+export type getTrendingEventOccurrencesResponseError =
+  getTrendingEventOccurrencesResponseDefault & {
+    headers: Headers;
+  };
+
+export type getTrendingEventOccurrencesResponse =
+  | getTrendingEventOccurrencesResponseSuccess
+  | getTrendingEventOccurrencesResponseError;
+
+export const getGetTrendingEventOccurrencesUrl = (
+  params: GetTrendingEventOccurrencesParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/trending/event-occurrences?${stringifiedParams}`
+    : `/api/v1/trending/event-occurrences`;
+};
+
+export const getTrendingEventOccurrences = async (
+  params: GetTrendingEventOccurrencesParams,
+  options?: RequestInit,
+): Promise<getTrendingEventOccurrencesResponse> => {
+  return customInstance<getTrendingEventOccurrencesResponse>(
+    getGetTrendingEventOccurrencesUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getGetTrendingEventOccurrencesQueryKey = (
+  params?: GetTrendingEventOccurrencesParams,
+) => {
+  return [
+    `/api/v1/trending/event-occurrences`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetTrendingEventOccurrencesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+  TError = ErrorModel,
+>(
+  params: GetTrendingEventOccurrencesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetTrendingEventOccurrencesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getTrendingEventOccurrences>>
+  > = ({ signal }) =>
+    getTrendingEventOccurrences(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetTrendingEventOccurrencesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTrendingEventOccurrences>>
+>;
+export type GetTrendingEventOccurrencesQueryError = ErrorModel;
+
+export function useGetTrendingEventOccurrences<
+  TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+  TError = ErrorModel,
+>(
+  params: GetTrendingEventOccurrencesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+          TError,
+          Awaited<ReturnType<typeof getTrendingEventOccurrences>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTrendingEventOccurrences<
+  TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+  TError = ErrorModel,
+>(
+  params: GetTrendingEventOccurrencesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+          TError,
+          Awaited<ReturnType<typeof getTrendingEventOccurrences>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTrendingEventOccurrences<
+  TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+  TError = ErrorModel,
+>(
+  params: GetTrendingEventOccurrencesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get the top 5 trending event occurrences
+ */
+
+export function useGetTrendingEventOccurrences<
+  TData = Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+  TError = ErrorModel,
+>(
+  params: GetTrendingEventOccurrencesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTrendingEventOccurrences>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetTrendingEventOccurrencesQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
