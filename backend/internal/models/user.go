@@ -69,11 +69,13 @@ type DeleteUserOutput struct {
 	Body *User `json:"body"`
 }
 
-// Get by username
+// Username exists check
 type GetUserByUsernameInput struct {
 	Username string `path:"username"`
 }
 
-type GetUserByUsernameOutput struct {
-	Body *User `json:"body"`
+type UsernameExistsOutput struct {
+	Body struct {
+		Exists bool `json:"exists"`
+	}
 }

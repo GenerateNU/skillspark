@@ -5,11 +5,11 @@ import (
 	"skillspark/internal/models"
 )
 
-func (h *Handler) GetUserByUsername(ctx context.Context, input *models.GetUserByUsernameInput) (*models.User, error) {
-	user, err := h.UserRepository.GetUserByUsername(ctx, input.Username)
+func (h *Handler) GetUserByUsername(ctx context.Context, input *models.GetUserByUsernameInput) (bool, error) {
+	exists, err := h.UserRepository.GetUserByUsername(ctx, input.Username)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	return user, nil
+	return exists, nil
 }

@@ -3,17 +3,14 @@ package routes_test
 import (
 	"net/http"
 	"skillspark/internal/errs"
-	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"testing"
-	"time"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -45,41 +42,31 @@ func TestHumaValidation_GetUserByUsername(t *testing.T) {
 		statusCode int
 	}{
 		{
-			name:     "valid username",
+			name:     "username exists",
 			username: "jamesw",
 			mockSetup: func(m *repomocks.MockUserRepository) {
-				m.On(
-					"GetUserByUsername",
-					mock.Anything,
-					"jamesw",
-				).Return(&models.User{
-					ID:                  uuid.MustParse("b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e"),
-					Name:                "James Wilson",
-					Email:               "james.wilson@email.com",
-					Username:            "jamesw",
-					ProfilePictureS3Key: nil,
-					LanguagePreference:  "en",
-					CreatedAt:           time.Now(),
-					UpdatedAt:           time.Now(),
-					AuthID:              uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-				}, nil)
+				m.On("GetUserByUsername", mock.Anything, "jamesw").Return(true, nil)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
-			name:     "user not found",
+			name:     "username does not exist",
 			username: "randomusername",
 			mockSetup: func(m *repomocks.MockUserRepository) {
-				m.On(
-					"GetUserByUsername",
-					mock.Anything,
-					"randomusername",
-				).Return(nil, &errs.HTTPError{
-					Code:    errs.NotFound("User", "username", "randomusername").GetStatus(),
-					Message: "Not found",
+				m.On("GetUserByUsername", mock.Anything, "randomusername").Return(false, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:     "repository error",
+			username: "erroruser",
+			mockSetup: func(m *repomocks.MockUserRepository) {
+				m.On("GetUserByUsername", mock.Anything, "erroruser").Return(false, &errs.HTTPError{
+					Code:    500,
+					Message: "internal server error",
 				})
 			},
-			statusCode: http.StatusNotFound,
+			statusCode: http.StatusInternalServerError,
 		},
 	}
 
@@ -104,6 +91,7 @@ func TestHumaValidation_GetUserByUsername(t *testing.T) {
 			assert.NoError(t, err)
 			defer func() { _ = resp.Body.Close() }()
 
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRepo.AssertExpectations(t)
 		})
 	}

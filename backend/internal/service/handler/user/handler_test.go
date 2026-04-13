@@ -6,9 +6,7 @@ import (
 	"skillspark/internal/models"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -19,36 +17,37 @@ func TestHandler_GetUserByUsername(t *testing.T) {
 		username  string
 		mockSetup func(*repomocks.MockUserRepository)
 		wantErr   bool
+		wantExist bool
 	}{
 		{
-			name:     "successful get user by username",
+			name:     "username exists",
 			username: "jamesw",
 			mockSetup: func(m *repomocks.MockUserRepository) {
-				m.On("GetUserByUsername", mock.Anything, "jamesw").
-					Return(&models.User{
-						ID:                 uuid.MustParse("b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e"),
-						Name:               "James Wilson",
-						Email:              "james.wilson@email.com",
-						Username:           "jamesw",
-						LanguagePreference: "en",
-						AuthID:             uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-						CreatedAt:          time.Now(),
-						UpdatedAt:          time.Now(),
-					}, nil)
+				m.On("GetUserByUsername", mock.Anything, "jamesw").Return(true, nil)
 			},
-			wantErr: false,
+			wantErr:   false,
+			wantExist: true,
 		},
 		{
-			name:     "username not found",
+			name:     "username does not exist",
 			username: "randomusername",
 			mockSetup: func(m *repomocks.MockUserRepository) {
-				m.On("GetUserByUsername", mock.Anything, "randomusername").
-					Return(nil, &errs.HTTPError{
-						Code:    errs.NotFound("User", "username", "randomusername").Code,
-						Message: "Not found",
-					})
+				m.On("GetUserByUsername", mock.Anything, "randomusername").Return(false, nil)
 			},
-			wantErr: true,
+			wantErr:   false,
+			wantExist: false,
+		},
+		{
+			name:     "repository error",
+			username: "erroruser",
+			mockSetup: func(m *repomocks.MockUserRepository) {
+				m.On("GetUserByUsername", mock.Anything, "erroruser").Return(false, &errs.HTTPError{
+					Code:    500,
+					Message: "internal server error",
+				})
+			},
+			wantErr:   true,
+			wantExist: false,
 		},
 	}
 
@@ -63,15 +62,14 @@ func TestHandler_GetUserByUsername(t *testing.T) {
 			ctx := context.Background()
 			input := &models.GetUserByUsernameInput{Username: tt.username}
 
-			user, err := handler.GetUserByUsername(ctx, input)
+			exists, err := handler.GetUserByUsername(ctx, input)
 
 			if tt.wantErr {
 				assert.Error(t, err)
-				assert.Nil(t, user)
+				assert.False(t, exists)
 			} else {
 				assert.NoError(t, err)
-				assert.NotNil(t, user)
-				assert.Equal(t, tt.username, user.Username)
+				assert.Equal(t, tt.wantExist, exists)
 			}
 
 			mockRepo.AssertExpectations(t)

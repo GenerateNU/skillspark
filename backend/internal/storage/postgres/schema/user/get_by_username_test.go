@@ -32,18 +32,15 @@ func TestUserRepository_GetByUsername(t *testing.T) {
 		t.Fatalf("Failed to create user setup: %v", err)
 	}
 
-	t.Run("Success", func(t *testing.T) {
-		user, err := repo.GetUserByUsername(ctx, createdUser.Username)
+	t.Run("Exists", func(t *testing.T) {
+		exists, err := repo.GetUserByUsername(ctx, createdUser.Username)
 		assert.NoError(t, err)
-		assert.NotNil(t, user)
-		assert.Equal(t, createdUser.ID, user.ID)
-		assert.Equal(t, createdUser.Username, user.Username)
-		assert.Equal(t, createdUser.Email, user.Email)
+		assert.True(t, exists)
 	})
 
-	t.Run("Not Found", func(t *testing.T) {
-		user, err := repo.GetUserByUsername(ctx, "randomusername")
-		assert.Error(t, err)
-		assert.Nil(t, user)
+	t.Run("Does Not Exist", func(t *testing.T) {
+		exists, err := repo.GetUserByUsername(ctx, "randomusername")
+		assert.NoError(t, err)
+		assert.False(t, exists)
 	})
 }

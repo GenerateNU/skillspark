@@ -15,20 +15,20 @@ func SetupUserRoutes(api huma.API, repo *storage.Repository) {
 	userHandler := user.NewHandler(repo.User)
 
 	huma.Register(api, huma.Operation{
-		OperationID: "get-user-by-username",
+		OperationID: "username-exists",
 		Method:      http.MethodGet,
 		Path:        "/api/v1/user/{username}",
-		Summary:     "Get a user by username",
-		Description: "Returns a user by username",
+		Summary:     "Check if a username exists",
+		Description: "Returns whether a user with the given username exists",
 		Tags:        []string{"User"},
-	}, func(ctx context.Context, input *models.GetUserByUsernameInput) (*models.GetUserByUsernameOutput, error) {
-		user, err := userHandler.GetUserByUsername(ctx, input)
+	}, func(ctx context.Context, input *models.GetUserByUsernameInput) (*models.UsernameExistsOutput, error) {
+		exists, err := userHandler.GetUserByUsername(ctx, input)
 		if err != nil {
 			return nil, err
 		}
 
-		return &models.GetUserByUsernameOutput{
-			Body: user,
-		}, nil
+		out := &models.UsernameExistsOutput{}
+		out.Body.Exists = exists
+		return out, nil
 	})
 }
