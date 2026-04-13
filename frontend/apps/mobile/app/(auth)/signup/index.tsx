@@ -102,6 +102,9 @@ export default function WelcomeScreen() {
 					label={translate("common.submit")}
 					onPress={() => router.push("/(auth)/signup/account")}
 					disabled={false}
+					bgColor={"#1B1B1B"}
+					width={"91.666667%"}
+					textColor={"#FFFFFF"}
 				/>
 				<ErrorMessage message={errorText} />
 			</View>

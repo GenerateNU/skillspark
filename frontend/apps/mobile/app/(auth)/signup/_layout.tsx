@@ -20,6 +20,8 @@ export default function OnboardingStackLayout() {
 					name="emergency-contact"
 					options={{ headerShown: false }}
 				/>
+				<Stack.Screen name="payment" options={{ headerShown: false }} />
+				<Stack.Screen name="all-set" options={{ headerShown: false }} />
 			</Stack>
 			<StatusBar style="auto" />
 		</QueryClientProvider>

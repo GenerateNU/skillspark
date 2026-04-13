@@ -46,22 +46,29 @@ export default function PhotoScreen() {
 				</ThemedText>
 			</View>
 
-			<ImageSelector
-				setImage={function (value: SetStateAction<string | undefined>): void {
-					throw new Error("Function not implemented.");
-				}}
-				image={undefined}
-				width={10}
-				height={10}
-			/>
+			<View className="items-center shadow-sm">
+				<ImageSelector
+					setImage={function (value: SetStateAction<string | undefined>): void {
+						throw new Error("Function not implemented.");
+					}}
+					image={undefined}
+					width={150}
+					height={150}
+				/>
+			</View>
 
 			<View className="px-6 items-center">
 				<Button
 					label={translate("onboarding.choosePhoto")}
 					onPress={() => console.log("choose photo")}
 					disabled={false}
+					bgColor={"#FFFFFF"}
+					width={"40%"}
+					textColor={"#1B1B1B"}
 				/>
-				<ThemedText>{translate("onboarding.personalize")}</ThemedText>
+				<ThemedText className="font-nunito">
+					{translate("onboarding.personalize")}
+				</ThemedText>
 			</View>
 
 			<View className="px-6 items-center">
@@ -69,6 +76,9 @@ export default function PhotoScreen() {
 					label={translate("onboarding.skip")}
 					onPress={() => router.push("/(auth)/signup/child-profile")}
 					disabled={false}
+					bgColor={"#1B1B1B"}
+					width={"91.666667%"}
+					textColor={"#FFFFFF"}
 				/>
 				<ErrorMessage message={errorText} />
 			</View>
