@@ -9,8 +9,9 @@ import {
 	useUpdateGuardian,
 	setCurrentLanguage,
 	updateGuardianResponse,
-	getUserByUsername,
-	getUserByUsernameResponseError,
+	usernameExists as checkUsernameExists,
+	usernameExistsResponseError,
+	UsernameExistsOutputBody
 } from "@skillspark/api-client";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
@@ -224,18 +225,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		onError: (msg: string) => void,
 	) => {
 		try {
-			await getUserByUsername(username);
-			onError("Username is taken.");
-			return false;
-		} catch (err) {
-			const typedErr = err as getUserByUsernameResponseError;
-			if (typedErr.status === 404) {
-				// username not found -> username can be used
-				return true;
-			} else {
-				onError(typedErr.data.detail ?? "An unexpected error occurred.");
+			const resp = await checkUsernameExists(username);
+			const data = resp.data as UsernameExistsOutputBody;
+			if (data.exists) {
+				onError("Username is taken.");
 				return false;
 			}
+			return true;
+		} catch (err) {
+			const typedErr = err as usernameExistsResponseError;
+			onError(typedErr.data?.detail ?? "An unexpected error occurred.");
+			return false;
 		}
 	};
 
