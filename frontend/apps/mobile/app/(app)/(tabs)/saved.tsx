@@ -17,7 +17,6 @@ import {
   Alert,
   FlatList,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -27,9 +26,8 @@ import { useTranslation } from "react-i18next";
 
 export default function SavedScreen() {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
   const router = useRouter();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
   const queryClient = useQueryClient();
   const { guardianId } = useAuthContext();
   const { t: translate } = useTranslation();

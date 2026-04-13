@@ -1062,3 +1062,24 @@ export type GetAllSchoolsParams = {
    */
   limit?: number;
 };
+
+export type GetTrendingEventOccurrencesParams = {
+  /**
+   * The user's latitude
+   */
+  lat: number;
+  /**
+   * The user's longitude
+   */
+  lng: number;
+  /**
+   * the maximum number of returns
+   * @minimum 1
+   */
+  max_returns?: number;
+  /**
+   * the distance away from the user a returned event can be in km
+   * @minimum 1
+   */
+  radius?: number;
+};

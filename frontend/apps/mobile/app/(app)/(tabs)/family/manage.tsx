@@ -3,7 +3,6 @@ import {
   View,
   TouchableOpacity,
   Alert,
-  useColorScheme,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -33,9 +32,8 @@ import { ErrorScreen } from "@/components/ErrorScreen";
 export default function ManageChildScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
   const { guardianId } = useAuthContext();
 
   const { t: translate } = useTranslation();

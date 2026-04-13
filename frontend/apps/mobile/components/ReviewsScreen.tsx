@@ -22,7 +22,6 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -62,9 +61,7 @@ export default function ReviewsScreen<
 }: ReviewsScreenProps<TAggregate, TReviews>) {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const colorScheme = useColorScheme();
-  const scheme = (colorScheme ?? "light") as "light" | "dark";
-  const theme = Colors[scheme];
+  const theme = Colors.light;
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -98,7 +95,8 @@ export default function ReviewsScreen<
         ? registrationsResp.data.registrations
         : [];
     return list.find(
-      (r) => r.event_occurrence_id === occurrenceId && r.status === "registered",
+      (r) =>
+        r.event_occurrence_id === occurrenceId && r.status === "registered",
     );
   }, [registrationsResp, occurrenceId]);
 

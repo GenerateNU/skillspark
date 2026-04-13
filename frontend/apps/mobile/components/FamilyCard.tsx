@@ -1,5 +1,5 @@
 import React from "react";
-import { View, useColorScheme } from "react-native";
+import { View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { Colors, AppColors } from "@/constants/theme";
 import { ChildAvatar } from "@/components/ChildAvatar";
@@ -12,8 +12,7 @@ type FamilyCardProps = {
 };
 
 export function FamilyCard({ name, date, avatarFace, avatarBackground }: FamilyCardProps) {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
 
   return (
     <View

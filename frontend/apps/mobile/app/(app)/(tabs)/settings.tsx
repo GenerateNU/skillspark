@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, useColorScheme } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
@@ -12,12 +12,11 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
   const { t: translate } = useTranslation();
 
-  const cardBg = colorScheme === "dark" ? "#1c1c1e" : "#EFEFEF";
-  const dividerColor = colorScheme === "dark" ? "#3a3a3c" : "#D1D5DB";
+  const cardBg = "#EFEFEF";
+  const dividerColor = "#D1D5DB";
 
   const handleDeleteAccount = () => {};
 
