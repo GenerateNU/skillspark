@@ -7,6 +7,7 @@ import { Child } from "@skillspark/api-client";
 import { AppColors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
 import { ChildAvatar } from "@/components/ChildAvatar";
+import { MONTHS } from "@/components/ChildProfileForm";
 
 type ChildListItemProps = {
   child: Child;
@@ -35,7 +36,7 @@ export function ChildListItem({ child, onPress }: ChildListItemProps) {
           className="text-[13px] font-nunito"
           style={{ color: AppColors.mutedText }}
         >
-          {child.birth_month ? `${child.birth_month}, ` : ""}
+          {child.birth_month ? `${MONTHS[child.birth_month - 1]} ` : ""}
           {child.birth_year}
         </ThemedText>
         {child.interests && (
