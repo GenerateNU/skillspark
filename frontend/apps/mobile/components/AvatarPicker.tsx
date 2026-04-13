@@ -24,6 +24,19 @@ export const AVATAR_COLORS = [
   "#B0B0B0",
 ];
 
+/** Darker shade of each AVATAR_COLOR for use as initials text */
+export const DARK_AVATAR_COLORS: Record<string, string> = {
+  "#9CAF7D": "#5E694B",
+  "#F5D878": "#938248",
+  "#F5A85A": "#936536",
+  "#B5A8E0": "#6D6586",
+  "#F0A0BC": "#906071",
+  "#E07070": "#864343",
+  "#6B9FD4": "#405F7F",
+  "#A8D4E8": "#657F8B",
+  "#B0B0B0": "#6A6A6A",
+};
+
 export const DEFAULT_AVATAR_COLOR = AVATAR_COLORS[3];
 
 const CIRCLE_SIZE = 62;
@@ -181,7 +194,10 @@ export function AvatarPicker({
                         >
                           <ThemedText
                             className="text-lg font-nunito-bold"
-                            style={{ color: "#fff" }}
+                            style={{
+                              color:
+                                DARK_AVATAR_COLORS[selectedBg] ?? "#5A5A5A",
+                            }}
                           >
                             {childInitials}
                           </ThemedText>

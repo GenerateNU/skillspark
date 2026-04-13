@@ -2,7 +2,7 @@ import React from "react";
 import { View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { ThemedText } from "@/components/themed-text";
-import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
+import { DEFAULT_AVATAR_COLOR, DARK_AVATAR_COLORS } from "@/components/AvatarPicker";
 import { getAvatarSvg, getSvgWithColor } from "@/constants/avatarFaces";
 
 type ChildAvatarProps = {
@@ -64,7 +64,7 @@ export function ChildAvatar({
         style={{
           fontSize: size * 0.32,
           fontFamily: "Nunito-SemiBold",
-          color: "#fff",
+          color: DARK_AVATAR_COLORS[bgColor] ?? "#5A5A5A",
         }}
       >
         {getInitials(name)}
