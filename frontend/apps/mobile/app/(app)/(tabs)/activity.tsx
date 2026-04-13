@@ -115,7 +115,7 @@ function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
           </View>
         </View>
         <View className="flex flex-col justify-center items-center bg-[#E69BF040] w-20 h-20 mr-2 rounded-md">
-          <ThemedText type="subtitle" className="font-bold leading-none mr-2"> {data.start_time.getDate() < 10 ? "0" + data.start_time.getDate().toString() : data.start_time.getDate().toString()}</ThemedText>
+          <ThemedText type="subtitle" className="font-bold leading-none mr-1"> {data.start_time.getDate() < 10 ? "0" + data.start_time.getDate().toString() : data.start_time.getDate().toString()}</ThemedText>
           <ThemedText type="subtitle" className=" font-semibold tracking-widest "> {data.start_time.toLocaleString('default', { month: 'short' }) }</ThemedText>
         </View>
       </View>
@@ -158,7 +158,7 @@ function PastRegistrationCard({ data }: RegistrationCardProps) {
     <View
       className="w-11/12 rounded-xl overflow-hidden mb-4 flex-row"
       style={{
-        height: 130,
+        height: 150,
         borderWidth: 1,
         borderColor: AppColors.borderLight,
         backgroundColor: AppColors.white,
@@ -169,29 +169,29 @@ function PastRegistrationCard({ data }: RegistrationCardProps) {
         elevation: 2,
       }}
     >
-      {/* Col 1: Square image */}
+      {/* Col 1: Image */}
       <View className="py-3 pl-3">
         <Image
           source={{ uri: data.image_uri }}
-          style={{ width: 90, flex: 1, borderRadius: 8 }}
+          style={{ width: 100, flex: 1, borderRadius: 8 }}
           resizeMode="cover"
         />
       </View>
 
       {/* Col 2: Title, date/time, payment */}
       <View className="flex-1 px-3 py-3 justify-between">
-        <ThemedText type="defaultSemiBold" className="text-base font-bold" numberOfLines={2}>
+        <ThemedText type="subtitle" numberOfLines={2}>
           {data.title}
         </ThemedText>
         <View>
-          <ThemedText className="text-xs" style={{ color: AppColors.mutedText }}>
+          <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
             {formatDate(data.start_time)}
           </ThemedText>
-          <ThemedText className="text-xs" style={{ color: AppColors.mutedText }}>
+          <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
             {formatTime(data.start_time)} – {formatTime(data.end_time)}
           </ThemedText>
         </View>
-        <ThemedText className="text-xs" style={{ color: AppColors.mutedText }}>
+        <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
           Payment: {priceDisplay}
         </ThemedText>
       </View>
@@ -215,10 +215,10 @@ function PastRegistrationCard({ data }: RegistrationCardProps) {
           })}
         </View>
         <TouchableOpacity
-          className="px-4 py-2 rounded-full bg-black"
+          className="px-6 py-2 rounded-full bg-black"
           activeOpacity={0.7}
         >
-          <ThemedText lightColor="white" className="text-xs font-medium">Review</ThemedText>
+          <ThemedText lightColor="white" className="text-sm font-medium">Review</ThemedText>
         </TouchableOpacity>
       </View>
     </View>
@@ -473,7 +473,7 @@ export default function ActivityScreen() {
             <IconSymbol
               name="line.3.horizontal.decrease"
               size={22}
-              color={filterActive ? AppColors.primary ?? "#7C3AED" : "black"}
+              color={filterActive ? AppColors.primaryText ?? "#7C3AED" : "black"}
             />
           </TouchableOpacity>
         </ThemedView>
