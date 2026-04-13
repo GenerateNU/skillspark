@@ -24,6 +24,8 @@ func (r *GuardianRepository) GetGuardianByAuthID(ctx context.Context, authID str
 		&guardian.UserID,
 		&guardian.StripeCustomerID,
 		&guardian.ExpoPushToken,
+		&guardian.PushNotifications,
+		&guardian.EmailNotifications,
 		&guardian.CreatedAt,
 		&guardian.UpdatedAt,
 	)

@@ -20,6 +20,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"io"
 )
 
 func setupGuardianTestAPI(
@@ -84,6 +85,8 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 					Email:              "jane@example.com",
 					Username:           "janedoe",
 					LanguagePreference: "es",
+					PushNotifications:  true,
+					EmailNotifications: true,
 					CreatedAt:          time.Now(),
 					UpdatedAt:          time.Now(),
 				}, nil)
@@ -119,6 +122,8 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 					Username:           "janedoe",
 					LanguagePreference: "es",
 					ExpoPushToken:      &token,
+					PushNotifications:  true,
+					EmailNotifications: true,
 					CreatedAt:          time.Now(),
 					UpdatedAt:          time.Now(),
 				}, nil)
@@ -161,10 +166,18 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
+
+			// Add this temporarily
+
+			body, _ := io.ReadAll(resp.Body)
+			t.Logf("Response body: %s", string(body))
 			defer func() { _ = resp.Body.Close() }()
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRepo.AssertExpectations(t)
+
 		})
 	}
 }
@@ -197,6 +210,8 @@ func TestHumaValidation_DeleteGuardian(t *testing.T) {
 					Name:               "James Wilson",
 					Email:              "james.wilson@email.com",
 					Username:           "jamesw",
+					PushNotifications:  true,
+					EmailNotifications: true,
 					LanguagePreference: "en",
 				}, nil)
 			},
@@ -269,6 +284,8 @@ func TestHumaValidation_GetGuardianByChildID(t *testing.T) {
 					Email:              "parent@example.com",
 					Username:           "parentuser",
 					LanguagePreference: "en",
+					PushNotifications:  true,
+					EmailNotifications: true,
 					CreatedAt:          time.Now(),
 					UpdatedAt:          time.Now(),
 				}, nil)

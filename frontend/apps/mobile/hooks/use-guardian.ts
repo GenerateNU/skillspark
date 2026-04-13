@@ -5,8 +5,10 @@ import {
 } from "@skillspark/api-client";
 
 export function useGuardian(guardianId: string | null) {
-  const { data: guardianResponse, isLoading: guardianLoading } =
+
+  const { data: guardianResponse, isLoading: guardianLoading, error: guardianError } =
     useGetGuardianById(guardianId || "");
+
   const { data: childrenResponse, isLoading: childrenLoading } =
     useGetChildrenByGuardianId(guardianId || "");
   const { data: emergencycontactResponse, isLoading: emergencycontactLoading } =
@@ -20,6 +22,13 @@ export function useGuardian(guardianId: string | null) {
     emergencycontactResponse?.status === 200
       ? emergencycontactResponse.data
       : [];
+
+  console.log("guardianId going into useGuardian:", guardianId);
+  console.log("guardianResponse:", guardianResponse);
+
+
+  console.log("guardianResponse:", guardianResponse);
+  console.log("guardianError:", guardianError);
 
   return {
     guardian,
