@@ -19,25 +19,32 @@ import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  ScrollView,
+  FlatList,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 interface QueryResult<T> {
   data: T | undefined;
   isLoading: boolean;
   error: unknown;
 }
 
+type InfiniteReviewsResult = {
+  data: { pages: Array<{ data: unknown; status: number }> } | undefined;
+  isLoading: boolean;
+  error: unknown;
+  fetchNextPage: () => void;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+};
+
 interface ReviewsScreenProps<
   TAggregate extends { status: number; data: unknown },
-  TReviews extends { status: number; data: unknown },
 > {
   useGetAggregate: (id: string) => QueryResult<TAggregate>;
-  useGetReviews: (id: string) => QueryResult<TReviews>;
+  useGetReviews: (id: string) => InfiniteReviewsResult;
   /** When true, shows the rating smileys and write-a-review CTA */
   canReview?: boolean;
   /** Event occurrence ID, used to look up the guardian's registration */
@@ -49,7 +56,6 @@ interface ReviewsScreenProps<
 
 export default function ReviewsScreen<
   TAggregate extends { status: number; data: unknown },
-  TReviews extends { status: number; data: unknown },
 >({
   useGetAggregate,
   useGetReviews,
@@ -58,7 +64,7 @@ export default function ReviewsScreen<
   eventName = "",
   eventLocation = "",
   eventImageUrl,
-}: ReviewsScreenProps<TAggregate, TReviews>) {
+}: ReviewsScreenProps<TAggregate>) {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const theme = Colors.light;
@@ -80,10 +86,21 @@ export default function ReviewsScreen<
   } = useGetAggregate(id ?? "");
 
   const {
-    data: reviewsResponse,
+    data: reviewsData,
     isLoading: reviewsIsLoading,
     error: reviewsError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   } = useGetReviews(id ?? "");
+
+  const reviews: Review[] = useMemo(
+    () =>
+      reviewsData?.pages.flatMap((page) =>
+        Array.isArray(page.data) ? (page.data as Review[]) : [],
+      ) ?? [],
+    [reviewsData],
+  );
 
   const { data: registrationsResp } = useGetRegistrationsByGuardianId(
     guardianId ?? "",
@@ -134,16 +151,69 @@ export default function ReviewsScreen<
     );
   }
 
-  if (!reviewsResponse || reviewsResponse.status !== 200) {
-    return (
-      <View className="flex-1 items-center justify-center p-4">
-        <ThemedText>{translate("common.noReviewsAvailable")}</ThemedText>
-      </View>
-    );
-  }
-
   const aggregate = aggregateResponse.data as ReviewAggregate;
-  const reviews = reviewsResponse.data as Review[];
+
+  const ListHeader = (
+    <>
+      <RatingAggregateCard aggregate={aggregate} />
+
+      {showReviewCTA && (
+        <View
+          className="mx-5 mt-4 p-4 rounded-2xl border"
+          style={{ borderColor: AppColors.borderLight }}
+        >
+          <ThemedText className="text-lg mb-4 text-center">
+            {aggregate.total_reviews > 0
+              ? translate("review.tapToReview")
+              : translate("review.firstReview")}
+          </ThemedText>
+          <RatingSmileys
+            onSelect={(r) => {
+              setInitialRating(r);
+              setModalVisible(true);
+            }}
+          />
+          <TouchableOpacity
+            className="mt-4 py-4 rounded-2xl items-center"
+            style={{ backgroundColor: AppColors.primaryText }}
+            onPress={() => {
+              setInitialRating(undefined);
+              setModalVisible(true);
+            }}
+          >
+            <Text className="text-white text-base">
+              {translate("review.writeReview")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {showReviewCTA && guardianId && (
+        <LeaveReviewModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          eventId={id}
+          eventName={eventName}
+          eventLocation={eventLocation}
+          eventImageUrl={eventImageUrl}
+          registrationId={registration!.id}
+          guardianId={guardianId}
+          initialRating={initialRating}
+        />
+      )}
+
+      {aggregate.total_reviews > 0 && (
+        <FilterTabs
+          options={[
+            { label: translate("review.mostRecent"), value: "most_recent" },
+            { label: translate("review.highest"), value: "highest" },
+            { label: translate("review.lowest"), value: "lowest" },
+          ]}
+          onChange={(value) => {}}
+        />
+      )}
+    </>
+  );
 
   return (
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
@@ -161,82 +231,37 @@ export default function ReviewsScreen<
         <View className="w-5" />
       </View>
 
-      <ScrollView
+      <FlatList
+        data={reviews}
+        keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
-      >
-        <RatingAggregateCard aggregate={aggregate} />
-
-        {showReviewCTA && (
-          <View
-            className="mx-5 mt-4 p-4 rounded-2xl border"
-            style={{ borderColor: AppColors.borderLight }}
-          >
-            <ThemedText className="text-lg mb-4 text-center">
-              {aggregate.total_reviews > 0
-                ? translate("review.tapToReview")
-                : translate("review.firstReview")}
-            </ThemedText>
-            <RatingSmileys
-              onSelect={(r) => {
-                setInitialRating(r);
-                setModalVisible(true);
-              }}
-            />
-            <TouchableOpacity
-              className="mt-4 py-4 rounded-2xl items-center"
-              style={{ backgroundColor: AppColors.primaryText }}
-              onPress={() => {
-                setInitialRating(undefined);
-                setModalVisible(true);
-              }}
-            >
-              <Text className="text-white text-base">
-                {translate("review.writeReview")}
-              </Text>
-            </TouchableOpacity>
+        ListHeaderComponent={ListHeader}
+        renderItem={({ item, index }) => (
+          <View className="px-5">
+            <ReviewCard review={item} />
+            {index < reviews.length - 1 && (
+              <View
+                style={{ backgroundColor: AppColors.borderLight }}
+                className="my-3 h-px"
+              />
+            )}
           </View>
         )}
-
-        {showReviewCTA && guardianId && (
-          <LeaveReviewModal
-            visible={modalVisible}
-            onClose={() => setModalVisible(false)}
-            eventId={id}
-            eventName={eventName}
-            eventLocation={eventLocation}
-            eventImageUrl={eventImageUrl}
-            registrationId={registration!.id}
-            guardianId={guardianId}
-            initialRating={initialRating}
-          />
-        )}
-
-        {aggregate.total_reviews > 0 && (
-          <FilterTabs
-            options={[
-              { label: translate("review.mostRecent"), value: "most_recent" },
-              { label: translate("review.highest"), value: "highest" },
-              { label: translate("review.lowest"), value: "lowest" },
-            ]}
-            onChange={(value) => {}}
-          />
-        )}
-
-        <View className="gap-0 px-5 mt-4">
-          {reviews.map((review, index) => (
-            <View key={review.id}>
-              <ReviewCard review={review} />
-              {index < reviews.length - 1 && (
-                <View
-                  style={{ backgroundColor: AppColors.borderLight }}
-                  className="my-3 h-px"
-                />
-              )}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View className="py-4 items-center">
+              <ActivityIndicator size="small" />
             </View>
-          ))}
-        </View>
-      </ScrollView>
+          ) : null
+        }
+      />
     </ThemedView>
   );
 }

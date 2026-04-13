@@ -1,15 +1,12 @@
 import ReviewsScreen from "@/components/ReviewsScreen";
-import {
-  useGetReviewAggregate,
-  useGetReviewByEventId,
-} from "@skillspark/api-client";
+import { useInfiniteReviewsByEventId } from "@/hooks/use-infinite-reviews";
+import { useGetReviewAggregate } from "@skillspark/api-client";
 import { useLocalSearchParams } from "expo-router";
 
 const useGetAggregate = (id: string) =>
   useGetReviewAggregate(id, { query: { enabled: !!id } });
 
-const useGetReviews = (id: string) =>
-  useGetReviewByEventId(id, undefined, { query: { enabled: !!id } });
+const useGetReviews = (id: string) => useInfiniteReviewsByEventId(id);
 
 export default function EventReviewsPage() {
   const { canReview, occurrenceId, eventName, eventLocation, eventImageUrl } =
