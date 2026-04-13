@@ -157,7 +157,10 @@
     "deleteConfirm": "คุณต้องการลบโปรไฟล์เด็กนี้ใช่ไหม?",
     "requiredFieldsError": "กรุณากรอกข้อมูลที่จำเป็นทั้งหมด (ชื่อ วันเกิด รหัสโรงเรียน)",
     "saveError": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
-    "deleteError": "ลบไม่สำเร็จ"
+    "deleteError": "ลบไม่สำเร็จ",
+    "changeProfilePicture": "เปลี่ยนรูปโปรไฟล์",
+    "avatarTabColors": "สี",
+    "avatarTabAvatar": "อวตาร"
   },
   "saved": {
     "title": "ที่บันทึกไว้",
@@ -262,7 +265,7 @@
     "filterDistance": "ระยะทาง",
     "sortBy": "เรียงตาม",
     "filter": "กรอง",
-    "miles": "ไมล์",
+    "km": "กม.",
     "stars": "ดาว"
   },
   "org": {

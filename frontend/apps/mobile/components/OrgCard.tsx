@@ -33,7 +33,7 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
           </ThemedText>
           {distance !== null && (
             <ThemedText className="font-nunito text-[15px] leading-[22px]">
-              {distance.toFixed(1)} {translate("map.miles")}
+              {distance.toFixed(1)} {translate("map.km")}
             </ThemedText>
           )}
           <ThemedText className="font-nunito text-[15px] leading-[22px]">

@@ -61,6 +61,8 @@ export default function FamilyListScreen() {
         birth_year: child.birth_year,
         school_id: child.school_id ?? "",
         interests: child.interests ?? [],
+        avatar_face: child.avatar_face ?? "",
+        avatar_background: child.avatar_background ?? "",
       },
     });
   };
