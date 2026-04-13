@@ -2,7 +2,7 @@ import React from "react";
 import { View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { ThemedText } from "@/components/themed-text";
-import { DEFAULT_AVATAR_COLOR, DARK_AVATAR_COLORS } from "@/components/AvatarPicker";
+import { DEFAULT_AVATAR_COLOR, DARK_AVATAR_COLORS } from "@/constants/avatarColors";
 import { getAvatarSvg, getSvgWithColor } from "@/constants/avatarFaces";
 
 type ChildAvatarProps = {
