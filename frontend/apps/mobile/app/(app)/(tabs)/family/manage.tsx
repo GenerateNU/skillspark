@@ -190,7 +190,7 @@ export default function ManageChildScreen() {
         <ScrollView
           contentContainerStyle={{
             paddingHorizontal: 20,
-            paddingBottom: 40,
+            paddingBottom: insets.bottom + 80,
             paddingTop: 10,
           }}
           showsVerticalScrollIndicator={false}
