@@ -39,18 +39,12 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user *models.UpdateUser
 	if user.Body.AuthID != nil {
 		existing.AuthID = *user.Body.AuthID
 	}
-	if user.Body.PushNotification != nil {
-		existing.PushNotification = *user.Body.PushNotification
-	}
-	if user.Body.EmailNotification != nil {
-		existing.EmailNotification = *user.Body.EmailNotification
-	}
 
-	row := r.db.QueryRow(ctx, query, existing.Name, existing.Email, existing.Username, existing.ProfilePictureS3Key, existing.LanguagePreference, existing.AuthID, existing.PushNotification, existing.EmailNotification, existing.ID)
+	row := r.db.QueryRow(ctx, query, existing.Name, existing.Email, existing.Username, existing.ProfilePictureS3Key, existing.LanguagePreference, existing.AuthID, existing.ID)
 
 	var updatedUser models.User
 
-	err = row.Scan(&updatedUser.ID, &updatedUser.Name, &updatedUser.Email, &updatedUser.Username, &updatedUser.ProfilePictureS3Key, &updatedUser.LanguagePreference, &updatedUser.AuthID, &updatedUser.PushNotification, &updatedUser.EmailNotification, &updatedUser.CreatedAt, &updatedUser.UpdatedAt)
+	err = row.Scan(&updatedUser.ID, &updatedUser.Name, &updatedUser.Email, &updatedUser.Username, &updatedUser.ProfilePictureS3Key, &updatedUser.LanguagePreference, &updatedUser.AuthID, &updatedUser.CreatedAt, &updatedUser.UpdatedAt)
 	if err != nil {
 		err := errs.InternalServerError("Failed to update user: ", err.Error())
 		return nil, &err
