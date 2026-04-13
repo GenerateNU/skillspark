@@ -5,6 +5,8 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, TAG_COLORS, Colors } from "@/constants/theme";
 import { SchoolPicker } from "@/components/SchoolPicker";
 import { useTranslation } from "react-i18next";
+import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
+import { ChildAvatar } from "@/components/ChildAvatar";
 
 const INTEREST_OPTIONS = [
   "science",
@@ -57,6 +59,9 @@ export type ChildProfileFormProps = {
   setShowMonthDrop: (v: boolean) => void;
   showYearDrop: boolean;
   setShowYearDrop: (v: boolean) => void;
+  avatarFace: string | null;
+  avatarBackground: string;
+  onAvatarPress: () => void;
 };
 
 export function ChildProfileForm({
@@ -78,6 +83,9 @@ export function ChildProfileForm({
   setShowMonthDrop,
   showYearDrop,
   setShowYearDrop,
+  avatarFace,
+  avatarBackground,
+  onAvatarPress,
 }: ChildProfileFormProps) {
   const theme = Colors.light;
   const { t: translate } = useTranslation();
@@ -97,6 +105,46 @@ export function ChildProfileForm({
 
   return (
     <>
+      {/* Avatar selection */}
+      <View className="items-center mb-5">
+        <TouchableOpacity
+          onPress={onAvatarPress}
+          className="items-center gap-2"
+          activeOpacity={0.7}
+        >
+          <View style={{ position: "relative" }}>
+            <ChildAvatar
+              name={[firstName, lastName].filter(Boolean).join(" ") || "?"}
+              avatarFace={avatarFace}
+              avatarBackground={avatarBackground || DEFAULT_AVATAR_COLOR}
+              size={72}
+            />
+            <View
+              style={{
+                position: "absolute",
+                bottom: 0,
+                right: 0,
+                width: 22,
+                height: 22,
+                borderRadius: 11,
+                backgroundColor: theme.text,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <IconSymbol name="pencil" size={11} color={theme.background} />
+            </View>
+          </View>
+          <ThemedText
+            className="text-sm font-nunito-semibold"
+            style={{ color: AppColors.mutedText }}
+          >
+            {translate("childProfile.changeProfilePicture", {
+              defaultValue: "Change Profile Picture",
+            })}
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
       <TextInput
         className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3 bg-[#F3F4F6] text-[#11181C]"
         value={firstName}

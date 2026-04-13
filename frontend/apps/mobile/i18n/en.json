@@ -167,7 +167,10 @@
     "deleteConfirm": "Are you sure you want to remove this child profile?",
     "requiredFieldsError": "Please fill in all required fields (Name, Birth Date, School ID)",
     "saveError": "Failed to save. Please try again.",
-    "deleteError": "Failed to delete."
+    "deleteError": "Failed to delete.",
+    "changeProfilePicture": "Change Profile Picture",
+    "avatarTabColors": "Colors",
+    "avatarTabAvatar": "Avatar"
   },
   "saved": {
     "title": "Saved",
@@ -272,7 +275,7 @@
     "filterDistance": "Distance",
     "sortBy": "Sort by",
     "filter": "Filter",
-    "miles": "mi",
+    "km": "km",
     "stars": "Stars"
   },
   "activity": {
