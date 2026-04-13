@@ -1,12 +1,12 @@
 import {
-  useGetGuardianById,
   useGetChildrenByGuardianId,
   useGetEmergencyContactsByGuardianId,
+  useGetGuardianById,
 } from "@skillspark/api-client";
 
 export function useGuardian(guardianId: string | null) {
 
-  const { data: guardianResponse, isLoading: guardianLoading, error: guardianError } =
+  const { data: guardianResponse, isLoading: guardianLoading } =
     useGetGuardianById(guardianId || "");
 
   const { data: childrenResponse, isLoading: childrenLoading } =
@@ -22,13 +22,6 @@ export function useGuardian(guardianId: string | null) {
     emergencycontactResponse?.status === 200
       ? emergencycontactResponse.data
       : [];
-
-  console.log("guardianId going into useGuardian:", guardianId);
-  console.log("guardianResponse:", guardianResponse);
-
-
-  console.log("guardianResponse:", guardianResponse);
-  console.log("guardianError:", guardianError);
 
   return {
     guardian,

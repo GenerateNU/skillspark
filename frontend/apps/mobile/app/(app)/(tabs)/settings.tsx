@@ -28,11 +28,8 @@ export default function SettingsScreen() {
   };
 
   const { guardianId, update } = useAuthContext();
-  // const { guardian } = useGuardian(guardianId);
 
-  const { guardian, isLoading } = useGuardian(guardianId);
-  console.log("guardian:", guardian);
-  console.log("isLoading:", isLoading);
+  const { guardian } = useGuardian(guardianId);
 
   const [pushEnabled, setPushEnabled] = useState(false);
   const [emailEnabled, setEmailEnabled] = useState(false);
@@ -154,7 +151,6 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Notifications section */}
         <View
           className="rounded-2xl overflow-hidden mt-5"
           style={{ backgroundColor: cardBg }}
@@ -167,7 +163,7 @@ export default function SettingsScreen() {
               value={pushEnabled}
               onValueChange={handlePushToggle}
               trackColor={{ false: AppColors.borderLight, true: AppColors.checkboxSelected }}
-              thumbColor="#FFFFFF"
+              thumbColor={Colors.light.dropdownBg}
             />
           </View>
           <View className="h-px" style={{ backgroundColor: dividerColor }} />
@@ -179,7 +175,7 @@ export default function SettingsScreen() {
               value={emailEnabled}
               onValueChange={handleEmailToggle}
               trackColor={{ false: AppColors.borderLight, true: AppColors.checkboxSelected }}
-              thumbColor="#FFFFFF"
+              thumbColor={Colors.light.dropdownBg}
             />
           </View>
         </View>
