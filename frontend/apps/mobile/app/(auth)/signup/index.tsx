@@ -29,6 +29,7 @@ type SignupFormData = {
 
 export default function SignupScreen() {
 	const [errorText, setErrorText] = useState("");
+	const [cannotSubmit, setCannotSubmit] = useState(false);
 	const { signup, usernameExists } = useAuthContext();
 	const {
 		control,
@@ -71,17 +72,23 @@ export default function SignupScreen() {
 	};
 
 	const onClickOut = async () => {
-		const result = await usernameExists(
-			getValues("username") ?? "",
-			setErrorText,
-		);
+		let username = getValues("username");
+		if (!username) {
+			setCannotSubmit(false);
+			setErrorText("");
+			return;
+		}
+		const result = await usernameExists(username, setErrorText);
 		if (!result) {
 			setError("username", {
 				type: "manual",
 				message: "Username is taken.",
 			});
+			setCannotSubmit(true);
 		} else {
 			clearErrors("username");
+			setErrorText("");
+			setCannotSubmit(false);
 		}
 	};
 
@@ -148,7 +155,11 @@ export default function SignupScreen() {
 								/>
 							)}
 						/>
-						<Button label="Sign Up" onPress={handleSubmit(onSubmit)} />
+						<Button
+							label="Sign Up"
+							onPress={handleSubmit(onSubmit)}
+							disabled={cannotSubmit}
+						/>
 						<PageRedirectButton
 							label="Already have an account? Log in"
 							onPress={handleGoToLogIn}
