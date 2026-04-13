@@ -22,15 +22,6 @@ export default function TabLayout() {
         options={{ title: translate("nav.activity") }}
       />
       <Tabs.Screen
-        name="activity"
-        options={{
-          title: "Activity",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="bolt.fill" color={color} />
-          ),
-        }}
-      /> 
-      <Tabs.Screen
         name="profile"
         options={{ title: translate("nav.profile") }}
       />

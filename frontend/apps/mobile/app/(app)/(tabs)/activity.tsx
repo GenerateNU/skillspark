@@ -2,13 +2,16 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
-import { useMemo, useState } from "react";
-import { Image, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
+import { useMemo, useRef, useState } from "react";
+import { Alert, Animated, Image, Modal, PanResponder, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   useGetAllEventOccurrences,
   useGetRegistrationsByGuardianId,
   useGetChildrenByGuardianId,
+  useCancelRegistration,
+  getGetRegistrationsByGuardianIdQueryKey,
   type EventOccurrence,
   type Registration,
   type Child,
@@ -48,6 +51,7 @@ interface RegistrationCardData {
   end_time: Date
   title: string
   children: Set<Child>
+  childColorMap: Record<string, string>
   location: string
   price: number
   onClickRemove: () => void
@@ -63,7 +67,8 @@ const formatDate = (d: Date) =>
   d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })
 
 const CHILD_BUBBLE_COLORS = [
-  "#F87171", "#FB923C", "#FBBF24", "#34D399", "#60A5FA", "#A78BFA", "#F472B6",
+  "#E53E3E", "#DD6B20", "#D69E2E", "#276749", "#2B6CB0",
+  "#553C9A", "#B83280", "#00695C", "#C53030", "#2C5282",
 ]
 
 function getInitials(name: string) {
@@ -118,17 +123,20 @@ function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
         className="flex flex-row justify-between items-center px-4 py-3"
       >
         <View className="flex flex-row gap-2">
-          {children.map((child, i) => (
-            <View
-              key={child.id}
-              className="w-8 h-8 rounded-full justify-center items-center"
-              style={{ backgroundColor: CHILD_BUBBLE_COLORS[i % CHILD_BUBBLE_COLORS.length] }}
-            >
-              <ThemedText className="text-xs font-semibold text-white">
-                {getInitials(child.name)}
-              </ThemedText>
-            </View>
-          ))}
+          {children.map((child) => {
+            const color = data.childColorMap[child.id] ?? CHILD_BUBBLE_COLORS[0]
+            return (
+              <View
+                key={child.id}
+                className="w-8 h-8 rounded-full justify-center items-center"
+                style={{ backgroundColor: `${color}33`, borderWidth: 1, borderColor: color }}
+              >
+                <ThemedText className="text-xs font-semibold" style={{ color }}>
+                  {getInitials(child.name)}
+                </ThemedText>
+              </View>
+            )
+          })}
         </View>
         <TouchableOpacity
           onPress={data.onClickRemove}
@@ -143,13 +151,14 @@ function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
 }
 
 function PastRegistrationCard({ data }: RegistrationCardProps) {
-  const childNames = Array.from(data.children).map((c) => c.name).join(", ")
+  const children = Array.from(data.children)
   const priceDisplay = `฿${(data.price / 100).toLocaleString()}`
 
   return (
     <View
-      className="w-11/12 rounded-xl overflow-hidden mb-4"
+      className="w-11/12 rounded-xl overflow-hidden mb-4 flex-row"
       style={{
+        height: 130,
         borderWidth: 1,
         borderColor: AppColors.borderLight,
         backgroundColor: AppColors.white,
@@ -160,37 +169,56 @@ function PastRegistrationCard({ data }: RegistrationCardProps) {
         elevation: 2,
       }}
     >
-      <Image
-        source={{ uri: data.image_uri }}
-        className="w-full h-44 px-4 pt-4 rounded-md"
-      />
-      <View className="px-4 pb-4">
-        <ThemedText type="defaultSemiBold" className="text-xl">
+      {/* Col 1: Square image */}
+      <View className="py-3 pl-3">
+        <Image
+          source={{ uri: data.image_uri }}
+          style={{ width: 90, flex: 1, borderRadius: 8 }}
+          resizeMode="cover"
+        />
+      </View>
+
+      {/* Col 2: Title, date/time, payment */}
+      <View className="flex-1 px-3 py-3 justify-between">
+        <ThemedText type="defaultSemiBold" className="text-base font-bold" numberOfLines={2}>
           {data.title}
         </ThemedText>
-        <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
-          {formatDate(data.start_time)} · {formatTime(data.start_time)} – {formatTime(data.end_time)}
-        </ThemedText>
-        <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
-          {data.location}
-        </ThemedText>
-        {childNames ? (
-          <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
-            {childNames}
+        <View>
+          <ThemedText className="text-xs" style={{ color: AppColors.mutedText }}>
+            {formatDate(data.start_time)}
           </ThemedText>
-        ) : null}
-        <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
-          {priceDisplay}
+          <ThemedText className="text-xs" style={{ color: AppColors.mutedText }}>
+            {formatTime(data.start_time)} – {formatTime(data.end_time)}
+          </ThemedText>
+        </View>
+        <ThemedText className="text-xs" style={{ color: AppColors.mutedText }}>
+          Payment: {priceDisplay}
         </ThemedText>
+      </View>
+
+      {/* Col 3: Child initials (top) + Review button (bottom) */}
+      <View className="py-3 pr-3 items-end justify-between">
+        <View className="flex-row flex-wrap gap-1 justify-end" style={{ maxWidth: 80 }}>
+          {children.map((child) => {
+            const color = data.childColorMap[child.id] ?? CHILD_BUBBLE_COLORS[0]
+            return (
+              <View
+                key={child.id}
+                className="w-7 h-7 rounded-full justify-center items-center"
+                style={{ backgroundColor: `${color}33`, borderWidth: 1, borderColor: color }}
+              >
+                <ThemedText className="text-xs font-semibold" style={{ color }}>
+                  {getInitials(child.name)}
+                </ThemedText>
+              </View>
+            )
+          })}
+        </View>
         <TouchableOpacity
-          onPress={data.onClickRemove}
-          className="mt-2 items-center rounded-lg py-2"
-          style={{ backgroundColor: AppColors.danger }}
+          className="px-4 py-2 rounded-full bg-black"
           activeOpacity={0.7}
         >
-          <ThemedText className="text-sm font-medium text-white">
-            Remove Registration
-          </ThemedText>
+          <ThemedText lightColor="white" className="text-xs font-medium">Review</ThemedText>
         </TouchableOpacity>
       </View>
     </View>
@@ -205,9 +233,51 @@ export default function ActivityScreen() {
   // const { guardianId } = useAuthContext();
   const guardianId = "11111111-1111-1111-1111-111111111111";
 
-  const getOnRemove = (registrationId: string) => {
+  const queryClient = useQueryClient()
+  const { mutate: cancelRegistration } = useCancelRegistration()
+
+  const getOnRemove = (registrationIds: string[]) => {
     return function () {
-      console.log(registrationId)
+      Alert.alert(
+        "Remove Registration",
+        "Are you sure you want to cancel this registration?",
+        [
+          { text: "Keep", style: "cancel" },
+          {
+            text: "Remove",
+            style: "destructive",
+            onPress: () => {
+              const queryKey = getGetRegistrationsByGuardianIdQueryKey(guardianId)
+              // Optimistically update the cache so the UI reflects the change immediately
+              queryClient.setQueryData(queryKey, (old: unknown) => {
+                const prev = old as { data: { registrations: Registration[] } } | undefined
+                if (!prev?.data?.registrations) return old
+                const idSet = new Set(registrationIds)
+                return {
+                  ...prev,
+                  data: {
+                    ...prev.data,
+                    registrations: prev.data.registrations.map((r) =>
+                      idSet.has(r.id) ? { ...r, status: "cancelled" } : r
+                    ),
+                  },
+                }
+              })
+              registrationIds.forEach((id) =>
+                cancelRegistration(
+                  { id },
+                  {
+                    onError: () => {
+                      // Roll back on failure
+                      queryClient.invalidateQueries({ queryKey })
+                    },
+                  },
+                )
+              )
+            },
+          },
+        ],
+      )
     }
   }
 
@@ -221,10 +291,11 @@ export default function ActivityScreen() {
     const d = registrationsResp as unknown as
       | { data: { registrations: Registration[] } }
       | undefined;
+    // console.log(d?.data?.registrations)
     return d?.data?.registrations ?? [];
   }, [registrationsResp]);
 
-  const { data: occurrencesResp } = useGetAllEventOccurrences();
+  const { data: occurrencesResp } = useGetAllEventOccurrences({ limit: 100 });
   const allOccurrences: EventOccurrence[] = useMemo(() => {
     const d = occurrencesResp as unknown as
       | { data: EventOccurrence[] }
@@ -262,30 +333,45 @@ export default function ActivityScreen() {
     return map
   }, [children])
 
+  const childColorMap = useMemo(() => {
+    const map: Record<string, string> = {}
+    children.forEach((c, i) => {
+      map[c.id] = CHILD_BUBBLE_COLORS[i % CHILD_BUBBLE_COLORS.length]
+    })
+    return map
+  }, [children])
+
   const { upcomingRegistrations, pastRegistrations } = useMemo(() => {
     const now = new Date()
-    const grouped: Record<string, RegistrationCardData> = {}
+    const grouped: Record<string, RegistrationCardData & { registrationIds: string[] }> = {}
     registrations.filter((r) => r.status === "registered").forEach((r) => {
       const occurrence = eventOccurrencesMap[r.event_occurrence_id]
       if (!occurrence) return
       const child = childMap[r.child_id]
       if (grouped[r.event_occurrence_id]) {
+        grouped[r.event_occurrence_id].registrationIds.push(r.id)
         if (child) grouped[r.event_occurrence_id].children.add(child)
       } else {
         const startDate = new Date(occurrence.start_time)
         const endDate = new Date(occurrence.end_time)
         grouped[r.event_occurrence_id] = {
           event_occurrence_id: r.event_occurrence_id,
+          registrationIds: [r.id],
           image_uri: "https://picsum.photos/800/300",
           start_time: startDate,
           end_time: endDate,
           title: occurrence.event.title,
           children: new Set(child ? [child] : []),
+          childColorMap,
           location: occurrence.location.address_line1,
           price: occurrence.price,
-          onClickRemove: getOnRemove(r.id),
+          onClickRemove: () => {},
         }
       }
+    })
+    // Wire up onClickRemove after all IDs are collected
+    Object.values(grouped).forEach((g) => {
+      g.onClickRemove = getOnRemove(g.registrationIds)
     })
     const all = Object.values(grouped)
     return {
@@ -298,7 +384,62 @@ export default function ActivityScreen() {
     setSelection(newValue!);
   };
 
-  const displayed = selection === "upcoming" ? upcomingRegistrations : pastRegistrations;
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [activeFilter, setActiveFilter] = useState<Set<string>>(new Set())
+  const [pendingFilter, setPendingFilter] = useState<Set<string>>(new Set())
+
+  const sheetTranslateY = useRef(new Animated.Value(0)).current
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gs) => gs.dy > 4,
+      onPanResponderMove: (_, gs) => {
+        if (gs.dy > 0) sheetTranslateY.setValue(gs.dy)
+      },
+      onPanResponderRelease: (_, gs) => {
+        if (gs.dy > 100) {
+          setFilterOpen(false)
+        } else {
+          Animated.spring(sheetTranslateY, { toValue: 0, useNativeDriver: true }).start()
+        }
+      },
+    })
+  ).current
+
+  const openFilter = () => {
+    const allIds = new Set(children.map((c) => c.id))
+    setPendingFilter(activeFilter.size === 0 ? allIds : new Set(activeFilter))
+    sheetTranslateY.setValue(0)
+    setFilterOpen(true)
+  }
+
+  const togglePending = (id: string) => {
+    setPendingFilter((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const applyFilter = () => {
+    const allSelected = children.every((c) => pendingFilter.has(c.id))
+    setActiveFilter(allSelected ? new Set() : new Set(pendingFilter))
+    setFilterOpen(false)
+  }
+
+  const resetFilter = () => {
+    setPendingFilter(new Set(children.map((c) => c.id)))
+  }
+
+  const baseDisplayed = selection === "upcoming" ? upcomingRegistrations : pastRegistrations;
+  const displayed = activeFilter.size === 0
+    ? baseDisplayed
+    : baseDisplayed.filter((reg) =>
+        Array.from(reg.children).some((c) => activeFilter.has(c.id))
+      )
+
+  const filterActive = activeFilter.size > 0
 
   return (
     <ThemedView className="w-full flex-1" style={{ paddingTop: insets.top }}>
@@ -309,6 +450,34 @@ export default function ActivityScreen() {
       <ThemedView className="w-full flex items-center">
         <Toggle value={selection} onChange={toggleSelection} />
       </ThemedView>
+
+      {children.length > 0 && (
+        <ThemedView className="w-11/12 self-center flex flex-row items-center justify-between py-3">
+          <View className="flex flex-row flex-wrap gap-3">
+            {children.map((child) => {
+              const color = childColorMap[child.id] ?? CHILD_BUBBLE_COLORS[0]
+              return (
+                <View
+                  key={child.id}
+                  className="w-8 h-8 rounded-full justify-center items-center"
+                  style={{ backgroundColor: `${color}33`, borderWidth: 1, borderColor: color }}
+                >
+                  <ThemedText className="text-xs font-semibold" style={{ color }}>
+                    {getInitials(child.name)}
+                  </ThemedText>
+                </View>
+              )
+            })}
+          </View>
+          <TouchableOpacity onPress={openFilter} activeOpacity={0.7}>
+            <IconSymbol
+              name="line.3.horizontal.decrease"
+              size={22}
+              color={filterActive ? AppColors.primary ?? "#7C3AED" : "black"}
+            />
+          </TouchableOpacity>
+        </ThemedView>
+      )}
 
       <ScrollView
         contentContainerStyle={{ alignItems: "center", paddingTop: 16, paddingBottom: 32 }}
@@ -326,6 +495,98 @@ export default function ActivityScreen() {
           )
         )}
       </ScrollView>
+
+      <Modal
+        visible={filterOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setFilterOpen(false)}
+      >
+        <Pressable
+          className="flex-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+          onPress={() => setFilterOpen(false)}
+        />
+        <Animated.View
+          style={{
+            transform: [{ translateY: sheetTranslateY }],
+            backgroundColor: AppColors.white,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            paddingBottom: insets.bottom + 16,
+            paddingHorizontal: 24,
+            paddingTop: 12,
+          }}
+        >
+          <View {...panResponder.panHandlers} className="items-center pb-3">
+            <View
+              style={{
+                width: 36,
+                height: 4,
+                borderRadius: 2,
+                backgroundColor: AppColors.borderLight,
+              }}
+            />
+          </View>
+
+          <View className="flex flex-row items-center gap-2 mb-5">
+            <IconSymbol name="line.3.horizontal.decrease" size={20} color="black" />
+            <ThemedText type="defaultSemiBold" className="text-lg">Filter by child</ThemedText>
+          </View>
+
+          {children.map((child) => {
+            const color = childColorMap[child.id] ?? CHILD_BUBBLE_COLORS[0]
+            const checked = pendingFilter.has(child.id)
+            return (
+              <Pressable
+                key={child.id}
+                onPress={() => togglePending(child.id)}
+                className="flex flex-row items-center justify-between py-3"
+                style={{ borderBottomWidth: 1, borderBottomColor: AppColors.borderLight }}
+              >
+                <View className="flex flex-row items-center gap-3">
+                  <View
+                    className="w-9 h-9 rounded-full justify-center items-center"
+                    style={{ backgroundColor: `${color}33`, borderWidth: 1, borderColor: color }}
+                  >
+                    <ThemedText className="text-xs font-semibold" style={{ color }}>
+                      {getInitials(child.name)}
+                    </ThemedText>
+                  </View>
+                  <ThemedText className="text-base">{child.name}</ThemedText>
+                </View>
+                <View
+                  className="w-5 h-5 rounded border justify-center items-center"
+                  style={{
+                    borderColor: checked ? "#000" : AppColors.borderLight,
+                    backgroundColor: checked ? "#000" : "transparent",
+                  }}
+                >
+                  {checked && <ThemedText lightColor="white" className="text-xs leading-none">✓</ThemedText>}
+                </View>
+              </Pressable>
+            )
+          })}
+
+          <View className="flex flex-row gap-3 mt-5">
+            <TouchableOpacity
+              onPress={resetFilter}
+              activeOpacity={0.7}
+              className="flex-1 py-3 rounded-xl items-center"
+              style={{ borderWidth: 1, borderColor: AppColors.borderLight }}
+            >
+              <ThemedText className="font-medium">Reset</ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={applyFilter}
+              activeOpacity={0.7}
+              className="flex-1 py-3 rounded-xl items-center bg-black"
+            >
+              <ThemedText lightColor="white" className="font-medium">Apply</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </Modal>
     </ThemedView>
   );
 }
