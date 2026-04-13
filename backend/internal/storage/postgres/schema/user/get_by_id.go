@@ -21,7 +21,7 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*models
 
 	var user models.User
 
-	err = row.Scan(&user.ID, &user.Name, &user.Email, &user.Username, &user.ProfilePictureS3Key, &user.LanguagePreference, &user.AuthID, &user.CreatedAt, &user.UpdatedAt)
+	err = row.Scan(&user.ID, &user.Name, &user.Email, &user.Username, &user.ProfilePictureS3Key, &user.LanguagePreference, &user.AuthID, &user.PushNotification, &user.EmailNotification, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			err := errs.NotFound("User", "id", id)

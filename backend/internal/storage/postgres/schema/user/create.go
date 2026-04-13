@@ -18,7 +18,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *models.CreateUser
 
 	var createdUser models.User
 
-	err = row.Scan(&createdUser.ID, &createdUser.Name, &createdUser.Email, &createdUser.Username, &createdUser.ProfilePictureS3Key, &createdUser.LanguagePreference, &createdUser.AuthID, &createdUser.CreatedAt, &createdUser.UpdatedAt)
+	err = row.Scan(&createdUser.ID, &createdUser.Name, &createdUser.Email, &createdUser.Username, &createdUser.ProfilePictureS3Key, &createdUser.LanguagePreference, &createdUser.AuthID, &createdUser.PushNotification, &createdUser.EmailNotification, &createdUser.CreatedAt, &createdUser.UpdatedAt)
 	if err != nil {
 		err := errs.InternalServerError("Failed to create user: ", err.Error())
 		return nil, &err

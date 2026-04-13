@@ -20,7 +20,7 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id uuid.UUID) (*models.
 
 	var deletedUser models.User
 
-	err = row.Scan(&deletedUser.ID, &deletedUser.Name, &deletedUser.Email, &deletedUser.Username, &deletedUser.ProfilePictureS3Key, &deletedUser.LanguagePreference, &deletedUser.AuthID, &deletedUser.CreatedAt, &deletedUser.UpdatedAt)
+	err = row.Scan(&deletedUser.ID, &deletedUser.Name, &deletedUser.Email, &deletedUser.Username, &deletedUser.ProfilePictureS3Key, &deletedUser.LanguagePreference, &deletedUser.AuthID, &deletedUser.PushNotification, &deletedUser.EmailNotification, &deletedUser.CreatedAt, &deletedUser.UpdatedAt)
 	if err != nil {
 		err := errs.InternalServerError("Failed to delete user: ", err.Error())
 		return nil, &err
