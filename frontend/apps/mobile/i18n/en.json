@@ -275,6 +275,9 @@
     "miles": "mi",
     "stars": "Stars"
   },
+  "activity": {
+    "activity": "Activity"
+  },
   "org": {
     "about": "About",
     "noDescription": "No description available.",

@@ -55,6 +55,33 @@ export default function PaymentScreen() {
     }
   }
 
+  // After adding a card, the backend webhook deletes all previous methods and
+  // keeps only the new one. Poll until Stripe reflects that (≤1 method) rather
+  // than waiting a fixed delay.
+  async function pollUntilWebhookSettled(): Promise<PaymentMethod[]> {
+    const MAX_ATTEMPTS = 10;
+    const INTERVAL_MS = 400;
+    for (let i = 0; i < MAX_ATTEMPTS; i++) {
+      await new Promise<void>((resolve) => setTimeout(resolve, INTERVAL_MS));
+      try {
+        const res = await getGuardianPaymentMethods(guardian!.id);
+        if (res.status === 200 || res.status === 201) {
+          const methods =
+            (res.data as GetPaymentMethodsByGuardianIDOutputBody)
+              .payment_methods ?? [];
+          if (methods.length <= 1) return methods;
+        }
+      } catch {
+        // transient error — keep retrying
+      }
+    }
+    // max attempts reached — return whatever is there now
+    const res = await getGuardianPaymentMethods(guardian!.id);
+    return (
+      (res.data as GetPaymentMethodsByGuardianIDOutputBody).payment_methods ?? []
+    );
+  }
+
   useEffect(() => {
     fetchPaymentMethods();
   }, [guardian]);
@@ -126,8 +153,8 @@ export default function PaymentScreen() {
           <CardForm
             onSave={async () => {
               setLoading(true);
-              await new Promise((resolve) => setTimeout(resolve, 2000));
-              await fetchPaymentMethods();
+              const methods = await pollUntilWebhookSettled();
+              setPaymentMethods(methods);
               setEditingCard(false);
               setLoading(false);
             }}

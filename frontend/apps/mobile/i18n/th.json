@@ -275,6 +275,9 @@
     "miles": "ไมล์",
     "stars": "ดาว"
   },
+  "activity": {
+    "activity": "กิจกรรม"
+  },
   "org": {
     "about": "เกี่ยวกับ",
     "noDescription": "ไม่มีคำอธิบาย",
