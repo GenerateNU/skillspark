@@ -39,7 +39,7 @@ export default function SavedScreen() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteSavedByGuardianId(guardianId);
+  } = useInfiniteSavedByGuardianId(guardianId ?? undefined);
 
   const deleteSavedMutation = useDeleteSaved();
 
