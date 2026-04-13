@@ -69,9 +69,6 @@ export default function EmergencyContactScreen() {
 					label={translate("onboarding.continue")}
 					onPress={() => router.push("/(auth)/signup/payment")}
 					disabled={false}
-					bgColor={"#1B1B1B"}
-					width={"91.666667%"}
-					textColor={"#FFFFFF"}
 				/>
 
 				<ErrorMessage message={errorText} />

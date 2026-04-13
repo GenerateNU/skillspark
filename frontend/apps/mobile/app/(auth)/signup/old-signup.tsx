@@ -52,6 +52,7 @@ export default function SignupScreen() {
 				formData.language_preference,
 				formData.profile_picture_s3_key,
 				setErrorText,
+				() => router.push("/(app)/(tabs)"),
 			);
 		}
 	};

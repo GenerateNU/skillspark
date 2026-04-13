@@ -36,6 +36,7 @@ interface AuthContextType {
 		language_preference: string,
 		profile_picture_s3_key: string | undefined,
 		onError: (msg: string) => void,
+		onSuccess: () => void,
 	) => void;
 	logout: () => void;
 	update: (
@@ -150,7 +151,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		language_preference: string,
 		profile_picture_s3_key: string | undefined,
 		onError: (msg: string) => void,
+		onSuccess: () => void,
 	) => {
+		console.log(
+			"values: {",
+			name,
+			email,
+			username,
+			password,
+			language_preference,
+			profile_picture_s3_key,
+			")",
+		);
 		signupFunc(
 			{
 				data: {
@@ -165,11 +177,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			{
 				onSuccess: async (resp: signupGuardianResponse) => {
 					const success = resp.data as GuardianSignUpOutputBody;
+					console.log("response: ", JSON.stringify(resp));
 					await SecureStore.setItemAsync("token", success.token);
 					setJWT(success.token);
 					await SecureStore.setItemAsync("guardian_id", success.guardian_id);
 					setGuardianId(success.guardian_id);
-					router.replace("/(app)/(tabs)");
+					onSuccess();
 				},
 				onError: (err) => {
 					const fail = err as unknown as { data?: { message?: string } };

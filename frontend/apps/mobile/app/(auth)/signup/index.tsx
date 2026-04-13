@@ -11,6 +11,8 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { Button } from "@/components/Button";
 import { AppColors, FontSizes } from "@/constants/theme";
+import { useFormContext } from "react-hook-form";
+import { SignupFormData } from "@/constants/signup-types";
 
 const LANGUAGES = [
 	{ code: "en", label: "English", flag: "🇺🇸" },
@@ -25,15 +27,16 @@ export default function WelcomeScreen() {
 	const dividerColor = "#E5E7EB";
 
 	const [selected, setSelected] = useState(i18n.language ?? "en");
-	const [errorText, setErrorText] = useState("");
 	const { setLanguage } = useAuthContext();
+
+	const { setValue } = useFormContext<SignupFormData>();
 
 	const updateLanguageData = async (langCode: string) => {
 		setSelected(langCode);
 		await i18n.changeLanguage(langCode);
 		setCurrentLanguage(langCode);
-
 		setLanguage(langCode);
+		setValue("language_preference", langCode);
 	};
 
 	return (
@@ -102,11 +105,7 @@ export default function WelcomeScreen() {
 					label={translate("common.submit")}
 					onPress={() => router.push("/(auth)/signup/account")}
 					disabled={false}
-					bgColor={"#1B1B1B"}
-					width={"91.666667%"}
-					textColor={"#FFFFFF"}
 				/>
-				<ErrorMessage message={errorText} />
 			</View>
 		</ThemedView>
 	);

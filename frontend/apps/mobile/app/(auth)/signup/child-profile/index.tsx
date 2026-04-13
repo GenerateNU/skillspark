@@ -63,9 +63,6 @@ export default function ChildProfileScreen() {
 					label={translate("onboarding.continue")}
 					onPress={() => router.push("/(auth)/signup/emergency-contact")}
 					disabled={false}
-					bgColor={"#1B1B1B"}
-					width={"95%"}
-					textColor={"#FFFFFF"}
 				/>
 				<ErrorMessage message={errorText} />
 			</View>

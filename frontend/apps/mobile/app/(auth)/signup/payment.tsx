@@ -76,9 +76,6 @@ export default function PaymentScreen() {
 					label={translate("onboarding.finish")}
 					onPress={() => router.push("/(auth)/signup/all-set")}
 					disabled={false}
-					bgColor={"#1B1B1B"}
-					width={"91.666667%"}
-					textColor={"#FFFFFF"}
 				/>
 
 				<ErrorMessage message={errorText} />

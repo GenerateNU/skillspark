@@ -8,8 +8,9 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { SignupFormData } from "@/constants/signup-types";
 import { Image, TouchableOpacity, View } from "react-native";
 
 // 1. email and password
@@ -17,7 +18,7 @@ export default function AccountScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
 	const [errorText, setErrorText] = useState("");
-	const { control } = useForm();
+	const { control } = useFormContext<SignupFormData>();
 
 	return (
 		<ThemedView className="flex-1">
@@ -90,9 +91,6 @@ export default function AccountScreen() {
 					label={translate("onboarding.createAccount")}
 					onPress={() => router.push("/(auth)/signup/name")}
 					disabled={false}
-					bgColor={"#1B1B1B"}
-					width={"91.666667%"}
-					textColor={"#FFFFFF"}
 				/>
 
 				<PageRedirectButton

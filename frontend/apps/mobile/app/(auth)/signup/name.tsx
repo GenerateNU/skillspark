@@ -7,8 +7,9 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { SignupFormData } from "@/constants/signup-types";
 import { TouchableOpacity, View } from "react-native";
 
 // 2. name and username
@@ -16,7 +17,7 @@ export default function NameScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
 	const [errorText, setErrorText] = useState("");
-	const { control } = useForm();
+	const { control } = useFormContext<SignupFormData>();
 
 	return (
 		<ThemedView className="flex-1">
@@ -69,9 +70,6 @@ export default function NameScreen() {
 					label={translate("onboarding.continue")}
 					onPress={() => router.push("/(auth)/signup/photo")}
 					disabled={false}
-					bgColor={"#1B1B1B"}
-					width={"91.666667%"}
-					textColor={"#FFFFFF"}
 				/>
 
 				<ErrorMessage message={errorText} />

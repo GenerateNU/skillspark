@@ -1,24 +1,43 @@
-import { AuthFormInput } from "@/components/AuthFormInput";
 import { Button } from "@/components/Button";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { ImageSelector } from "@/components/ImageSelector";
-import { PageRedirectButton } from "@/components/PageRedirectButton";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontSizes } from "@/constants/theme";
+import { SignupFormData } from "@/constants/signup-types";
+import { useAuthContext } from "@/hooks/use-auth-context";
 import { useRouter } from "expo-router";
-import { SetStateAction, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Image, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 // 3. add your profile photo or skip for now
 export default function PhotoScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
+	const { signup } = useAuthContext();
 	const [errorText, setErrorText] = useState("");
-	const { control } = useForm();
+	const [image, setImage] = useState<string | undefined>(undefined);
+	const { setValue, handleSubmit } = useFormContext<SignupFormData>();
+
+	useEffect(() => {
+		setValue("profile_picture_s3_key", image);
+	}, [image, setValue]);
+
+	const onSubmit = (formData: SignupFormData) => {
+		signup(
+			formData.name,
+			formData.email,
+			formData.username,
+			formData.password,
+			formData.language_preference,
+			formData.profile_picture_s3_key,
+			setErrorText,
+			() => router.push("/(auth)/signup/child-profile"),
+		);
+	};
 
 	return (
 		<ThemedView className="flex-1">
@@ -48,10 +67,8 @@ export default function PhotoScreen() {
 
 			<View className="items-center shadow-sm">
 				<ImageSelector
-					setImage={function (value: SetStateAction<string | undefined>): void {
-						throw new Error("Function not implemented.");
-					}}
-					image={undefined}
+					setImage={setImage}
+					image={image}
 					width={150}
 					height={150}
 				/>
@@ -74,11 +91,8 @@ export default function PhotoScreen() {
 			<View className="px-6 items-center">
 				<Button
 					label={translate("onboarding.skip")}
-					onPress={() => router.push("/(auth)/signup/child-profile")}
+					onPress={handleSubmit(onSubmit)}
 					disabled={false}
-					bgColor={"#1B1B1B"}
-					width={"91.666667%"}
-					textColor={"#FFFFFF"}
 				/>
 				<ErrorMessage message={errorText} />
 			</View>
