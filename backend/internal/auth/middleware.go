@@ -1,30 +1,30 @@
 package auth
 
 import (
-	"github.com/danielgtaylor/huma/v2"
-	"net/http"
-	"skillspark/internal/config"
-	"log/slog"
-	"github.com/golang-jwt/jwt/v5"
-	"os"
 	"errors"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/golang-jwt/jwt/v5"
+	"log/slog"
+	"net/http"
+	"os"
+	"skillspark/internal/config"
 )
 
 var (
-	ErrMissingToken   = errors.New("missing JWT token")
-	ErrInvalidToken   = errors.New("invalid JWT token")
-	ErrInvalidMethod  = errors.New("unexpected JWT signing method")
+	ErrMissingToken  = errors.New("missing JWT token")
+	ErrInvalidToken  = errors.New("invalid JWT token")
+	ErrInvalidMethod = errors.New("unexpected JWT signing method")
 )
 
 // SupabaseClaims represents the JWT claims from Supabase Auth
 type SupabaseClaims struct {
-	Sub           string                 `json:"sub"`
-	Email         string                 `json:"email"`
-	Phone         string                 `json:"phone"`
-	Role          string                 `json:"role"`
-	Aud           string                 `json:"aud"`
-	AppMetadata   map[string]interface{} `json:"app_metadata"`
-	UserMetadata  map[string]interface{} `json:"user_metadata"`
+	Sub          string                 `json:"sub"`
+	Email        string                 `json:"email"`
+	Phone        string                 `json:"phone"`
+	Role         string                 `json:"role"`
+	Aud          string                 `json:"aud"`
+	AppMetadata  map[string]interface{} `json:"app_metadata"`
+	UserMetadata map[string]interface{} `json:"user_metadata"`
 	jwt.RegisteredClaims
 }
 
@@ -86,7 +86,7 @@ func AuthMiddleware(api huma.API, cfg *config.Supabase) func(ctx huma.Context, n
 			}
 			return
 		}
-		
+
 		_, err = NewVerifier("").Verify(cookie.Value)
 		if err != nil {
 			err := huma.WriteErr(api, ctx, http.StatusUnauthorized, "Invalid/Expired Token")

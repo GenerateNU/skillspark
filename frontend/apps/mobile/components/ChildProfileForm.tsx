@@ -3,9 +3,10 @@ import { View, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, TAG_COLORS, Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { SchoolPicker } from "@/components/SchoolPicker";
 import { useTranslation } from "react-i18next";
+import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
+import { ChildAvatar } from "@/components/ChildAvatar";
 
 const INTEREST_OPTIONS = [
   "science",
@@ -58,6 +59,9 @@ export type ChildProfileFormProps = {
   setShowMonthDrop: (v: boolean) => void;
   showYearDrop: boolean;
   setShowYearDrop: (v: boolean) => void;
+  avatarFace: string | null;
+  avatarBackground: string;
+  onAvatarPress: () => void;
 };
 
 export function ChildProfileForm({
@@ -79,9 +83,11 @@ export function ChildProfileForm({
   setShowMonthDrop,
   showYearDrop,
   setShowYearDrop,
+  avatarFace,
+  avatarBackground,
+  onAvatarPress,
 }: ChildProfileFormProps) {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
   const { t: translate } = useTranslation();
 
   const removeInterest = (tag: string) =>
@@ -99,15 +105,55 @@ export function ChildProfileForm({
 
   return (
     <>
+      {/* Avatar selection */}
+      <View className="items-center mb-5">
+        <TouchableOpacity
+          onPress={onAvatarPress}
+          className="items-center gap-2"
+          activeOpacity={0.7}
+        >
+          <View style={{ position: "relative" }}>
+            <ChildAvatar
+              name={[firstName, lastName].filter(Boolean).join(" ") || "?"}
+              avatarFace={avatarFace}
+              avatarBackground={avatarBackground || DEFAULT_AVATAR_COLOR}
+              size={72}
+            />
+            <View
+              style={{
+                position: "absolute",
+                bottom: 0,
+                right: 0,
+                width: 22,
+                height: 22,
+                borderRadius: 11,
+                backgroundColor: theme.text,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <IconSymbol name="pencil" size={11} color={theme.background} />
+            </View>
+          </View>
+          <ThemedText
+            className="text-sm font-nunito-semibold"
+            style={{ color: AppColors.mutedText }}
+          >
+            {translate("childProfile.changeProfilePicture", {
+              defaultValue: "Change Profile Picture",
+            })}
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
       <TextInput
-        className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3 bg-[#F3F4F6] dark:bg-[#27272a] text-[#11181C] dark:text-[#ECEDEE]"
+        className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3 bg-[#F3F4F6] text-[#11181C]"
         value={firstName}
         onChangeText={setFirstName}
         placeholder={translate("childProfile.firstName")}
         placeholderTextColor={AppColors.placeholderText}
       />
       <TextInput
-        className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3 bg-[#F3F4F6] dark:bg-[#27272a] text-[#11181C] dark:text-[#ECEDEE]"
+        className="rounded-[10px] px-4 py-[14px] text-base font-nunito mb-3 bg-[#F3F4F6] text-[#11181C]"
         value={lastName}
         onChangeText={setLastName}
         placeholder={translate("childProfile.lastName")}
@@ -117,7 +163,7 @@ export function ChildProfileForm({
         {/* Month picker */}
         <View className="flex-1 z-10">
           <TouchableOpacity
-            className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6] dark:bg-[#27272a]"
+            className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6]"
             onPress={() => {
               setShowMonthDrop(!showMonthDrop);
               setShowYearDrop(false);
@@ -150,7 +196,7 @@ export function ChildProfileForm({
                 {MONTHS.map((m) => (
                   <TouchableOpacity
                     key={m}
-                    className="px-4 py-3 border-b border-b-[#E5E7EB] dark:border-b-[#3f3f46]"
+                    className="px-4 py-3 border-b border-b-[#E5E7EB]"
                     onPress={() => {
                       setBirthMonth(m);
                       setShowMonthDrop(false);
@@ -166,7 +212,7 @@ export function ChildProfileForm({
         {/* Year picker */}
         <View className="flex-1 z-10">
           <TouchableOpacity
-            className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6] dark:bg-[#27272a]"
+            className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6]"
             onPress={() => {
               setShowYearDrop(!showYearDrop);
               setShowMonthDrop(false);
@@ -199,7 +245,7 @@ export function ChildProfileForm({
                 {YEARS.map((y) => (
                   <TouchableOpacity
                     key={y}
-                    className="px-4 py-3 border-b border-b-[#E5E7EB] dark:border-b-[#3f3f46]"
+                    className="px-4 py-3 border-b border-b-[#E5E7EB]"
                     onPress={() => {
                       setBirthYear(y);
                       setShowYearDrop(false);
@@ -251,10 +297,10 @@ export function ChildProfileForm({
           })}
         </ScrollView>
       )}
-      <View className="border rounded-[10px] overflow-hidden mb-6 border-[#E5E7EB] dark:border-[#3f3f46]">
+      <View className="border rounded-[10px] overflow-hidden mb-6 border-[#E5E7EB]">
         <View className="flex-row items-center px-4 py-3 gap-2">
           <TextInput
-            className="flex-1 text-base font-nunito text-[#11181C] dark:text-[#ECEDEE]"
+            className="flex-1 text-base font-nunito text-[#11181C]"
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder={translate("childProfile.searchInterests")}
@@ -266,7 +312,7 @@ export function ChildProfileForm({
             color={AppColors.mutedText}
           />
         </View>
-        <View className="h-px bg-[#E5E7EB] dark:bg-[#3f3f46]" />
+        <View className="h-px bg-[#E5E7EB]" />
         <View
           onStartShouldSetResponder={() => true}
           onMoveShouldSetResponder={() => true}
@@ -279,7 +325,7 @@ export function ChildProfileForm({
             {filteredOptions.map((item) => (
               <TouchableOpacity
                 key={item}
-                className="flex-row items-center justify-between px-4 py-4 border-b border-b-[#F3F4F6] dark:border-b-[#27272a]"
+                className="flex-row items-center justify-between px-4 py-4 border-b border-b-[#F3F4F6]"
                 onPress={() => toggleInterest(item)}
               >
                 <ThemedText className="text-base font-nunito">

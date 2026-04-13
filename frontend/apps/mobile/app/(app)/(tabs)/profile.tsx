@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  View,
-  ScrollView,
-  ActivityIndicator,
-  useColorScheme,
-  Image,
-} from "react-native";
+import { View, ScrollView, ActivityIndicator, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
@@ -17,15 +11,15 @@ import { useGuardian } from "@/hooks/use-guardian";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { NoProfilePic } from "@/components/NoProfilePic";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
   const router = useRouter();
   const { t: translate } = useTranslation();
 
-  const listBackgroundColor = colorScheme === "dark" ? "#1c1c1e" : "#F9FAFB";
-  const borderColor = colorScheme === "dark" ? "#3f3f46" : "#E5E7EB";
+  const listBackgroundColor = "#F9FAFB";
+  const borderColor = "#E5E7EB";
 
   const { guardianId } = useAuthContext();
   const { guardian, children, isLoading } = useGuardian(guardianId);
@@ -52,7 +46,10 @@ export default function ProfileScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         bounces={false}
-        className="pt-[10px] pb-5"
+        className="pt-[10px]"
+        contentContainerStyle={{
+          paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+        }}
       >
         <View className="items-center mb-5 mt-[5px]">
           <View
@@ -87,9 +84,10 @@ export default function ProfileScreen() {
               children.map((child: any) => (
                 <FamilyCard
                   key={child.id}
-                  initials={child.name?.charAt(0) ?? ""}
                   name={child.name}
                   date={translate("profile.born", { year: child.birth_year })}
+                  avatarFace={child.avatar_face}
+                  avatarBackground={child.avatar_background}
                 />
               ))
             ) : (

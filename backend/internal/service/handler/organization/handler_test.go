@@ -88,6 +88,7 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			app := fiber.New(fiber.Config{
 				ErrorHandler: errs.ErrorHandler,
 			})
@@ -292,6 +293,7 @@ func TestHandler_CreateOrganization(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			mockReviewRepo := new(repomocks.MockReviewRepository)
@@ -528,6 +530,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			mockReviewRepo := new(repomocks.MockReviewRepository)
@@ -603,6 +606,7 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
@@ -704,6 +708,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
 			mockReviewRepo := new(repomocks.MockReviewRepository)

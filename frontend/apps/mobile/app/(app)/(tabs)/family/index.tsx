@@ -4,7 +4,6 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  useColorScheme,
   Image,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -24,8 +23,7 @@ import { NoProfilePic } from "@/components/NoProfilePic";
 export default function FamilyListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
   const { t: translate } = useTranslation();
 
   const { guardianId } = useAuthContext();
@@ -63,6 +61,8 @@ export default function FamilyListScreen() {
         birth_year: child.birth_year,
         school_id: child.school_id ?? "",
         interests: child.interests ?? [],
+        avatar_face: child.avatar_face ?? "",
+        avatar_background: child.avatar_background ?? "",
       },
     });
   };

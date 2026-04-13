@@ -48,7 +48,7 @@ type CreateManagerInput struct {
 		LanguagePreference  string     `json:"language_preference" doc:"Language preference"`
 		OrganizationID      *uuid.UUID `json:"organization_id,omitempty" db:"organization_id" doc:"organization id of the organization the manager is associated with"`
 		Role                string     `json:"role" db:"role" doc:"role of the manager being created"`
-		AuthID              uuid.UUID `json:"auth_id" db:"auth_id" doc:"auth id of the manager being created"`
+		AuthID              uuid.UUID  `json:"auth_id" db:"auth_id" doc:"auth id of the manager being created"`
 	}
 }
 
