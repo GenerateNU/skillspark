@@ -1,35 +1,32 @@
 import React from "react";
-import {
-  View,
-  ScrollView,
-  ActivityIndicator,
-  useColorScheme,
-} from "react-native";
+import { View, ScrollView, ActivityIndicator, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { FamilyCard } from "@/components/FamilyCard";
 import { ListItem } from "@/components/ListItem";
 import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
+import { NoProfilePic } from "@/components/NoProfilePic";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
   const router = useRouter();
   const { t: translate } = useTranslation();
 
-  const listBackgroundColor = colorScheme === "dark" ? "#1c1c1e" : "#F9FAFB";
-  const borderColor = colorScheme === "dark" ? "#3f3f46" : "#E5E7EB";
+  const listBackgroundColor = "#F9FAFB";
+  const borderColor = "#E5E7EB";
 
-  const { guardian, children, isLoading } = useGuardian();
   const { guardianId } = useAuthContext();
+  const { guardian, children, isLoading } = useGuardian(guardianId);
+  const profilePic = guardian?.profile_picture_s3_key ?? null;
 
   if (!guardianId) {
+    // change to reroute to login
     return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
   }
 
@@ -48,15 +45,25 @@ export default function ProfileScreen() {
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: 10, paddingBottom: 20 }}
         bounces={false}
+        className="pt-[10px]"
+        contentContainerStyle={{
+          paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+        }}
       >
         <View className="items-center mb-5 mt-[5px]">
           <View
-            className="w-[72px] h-[72px] rounded-full items-center justify-center mb-[10px]"
+            className="w-[72px] h-[72px] rounded-full items-center justify-center mb-[10px] overflow-hidden"
             style={{ backgroundColor: listBackgroundColor }}
           >
-            <IconSymbol name="photo" size={32} color="#9CA3AF" />
+            {profilePic && (
+              <Image
+                source={{ uri: profilePic }}
+                style={{ width: "100%", height: "100%" }}
+                resizeMode="cover"
+              />
+            )}
+            {!profilePic && <NoProfilePic width={72} height={72} />}
           </View>
           <ThemedText className="text-xl leading-6 mb-[2px] text-center font-nunito-semibold">
             {guardian?.name}
@@ -118,7 +125,7 @@ export default function ProfileScreen() {
             />
             <ListItem
               label={translate("profile.familyInformation")}
-              onPress={() => router.push("/family")}
+              onPress={() => router.replace("/family")}
             />
             <ListItem
               label={translate("profile.settings")}

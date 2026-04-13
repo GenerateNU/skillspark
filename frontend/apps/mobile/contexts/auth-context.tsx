@@ -5,18 +5,16 @@ import {
 	signupGuardianResponse,
 	useLoginGuardian,
 	useSignupGuardian,
-	useGetGuardianById,
 	Guardian,
+	useUpdateGuardian,
 	setCurrentLanguage,
-	getGuardianById,
-	getGetSavedByGuardianIdQueryKey,
-	getUserByUsername,
-	getUserByUsernameResponseError,
+	updateGuardianResponse,
 } from "@skillspark/api-client";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 import { createContext, useState, useEffect, ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useGuardian } from "@/hooks/use-guardian";
 import i18n from "@/i18n";
 
 interface AuthContextType {
@@ -40,6 +38,17 @@ interface AuthContextType {
 		onError: (msg: string) => void,
 	) => void;
 	logout: () => void;
+	update: (
+		onSuccess: () => void,
+		onError: (msg: string) => void,
+		id: string,
+		email: string,
+		language_preference: string,
+		name: string,
+		username: string,
+		profile_picture_s3_key?: string | undefined,
+		expo_push_token?: string | undefined,
+	) => void;
 	usernameExists: (
 		username: string,
 		onError: (msg: string) => void,
@@ -58,12 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const queryClient = useQueryClient();
 	const { mutate: loginFunc } = useLoginGuardian();
 	const { mutate: signupFunc } = useSignupGuardian();
+	const { mutate: updateFunc } = useUpdateGuardian();
 
-	const { data: guardianData } = useGetGuardianById(guardianId!, {
-		query: {
-			enabled: !!guardianId,
-		},
-	});
+	let { guardian } = useGuardian(guardianId);
 
 	useEffect(() => {
 		const checkAlreadyAuth = async () => {
@@ -89,23 +95,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	useEffect(() => {
 		const getUpdatedLangPref = async () => {
-			if (!guardianData) return;
-			// SecureStore is the source of truth — only fall back to server value
-			// if there is no locally stored preference (e.g. first login on a new device).
-			const stored = await SecureStore.getItemAsync("language_preference");
-			if (stored) {
-				setLangPref(stored);
-				return;
-			}
-			const guardian = (guardianData as unknown as { data: Guardian })?.data;
-			const pref = guardian?.language_preference ?? "en";
+			if (!guardian) return;
+			const pref = guardian.language_preference ?? "en";
 			await i18n.changeLanguage(pref);
 			setCurrentLanguage(pref);
 			await SecureStore.setItemAsync("language_preference", pref);
 			setLangPref(pref);
+			queryClient.invalidateQueries({ refetchType: "all" });
 		};
 		getUpdatedLangPref();
-	}, [guardianData]);
+	}, [guardian, queryClient]);
 
 	const login = (
 		email: string,
@@ -212,6 +211,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				login,
 				signup,
 				logout,
+				update,
 				usernameExists,
 			}}
 		>

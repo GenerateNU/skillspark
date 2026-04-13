@@ -78,12 +78,12 @@ func (c *ResendClient) SendEmail(ctx context.Context, recipient string, subject 
 		// Try to read error response
 		var errorBody bytes.Buffer
 		errorBody.ReadFrom(resp.Body)
-		
+
 		slog.Error("Resend API error",
 			"status", resp.StatusCode,
 			"response", errorBody.String(),
 		)
-		
+
 		return fmt.Errorf("resend API returned status %d: %s", resp.StatusCode, errorBody.String())
 	}
 
@@ -102,4 +102,3 @@ func (c *ResendClient) SendEmail(ctx context.Context, recipient string, subject 
 
 	return nil
 }
-

@@ -45,11 +45,11 @@ func TestHumaValidation_CreateLocation(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name          string
-		payload       map[string]interface{}
-		geocodeSetup  func(*mockGeocoder)
-		mockSetup     func(*repomocks.MockLocationRepository)
-		statusCode    int
+		name         string
+		payload      map[string]interface{}
+		geocodeSetup func(*mockGeocoder)
+		mockSetup    func(*repomocks.MockLocationRepository)
+		statusCode   int
 	}{
 		{
 			name: "valid payload",

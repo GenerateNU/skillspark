@@ -7,7 +7,6 @@ import (
 	"log/slog"
 )
 
-
 // NewHandler creates a new SQS event handler
 func NewHandler(processor *NotificationProcessor) *Handler {
 	return &Handler{
@@ -74,4 +73,3 @@ func (h *Handler) processRecord(ctx context.Context, record SQSEventRecord) erro
 
 	return nil
 }
-

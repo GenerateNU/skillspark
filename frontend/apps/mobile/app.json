@@ -4,8 +4,8 @@
     "slug": "SkillSpark",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/generate.png",
-    "userInterfaceStyle": "automatic",
+    "icon": "./assets/images/skillspark.png",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "scheme": "skillspark",
     "ios": {
@@ -20,7 +20,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "image": "./assets/images/generate.png"
+        "image": "./assets/images/skillspark.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -32,15 +32,18 @@
     "plugins": [
       "expo-router",
       [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "SkillSpark needs your location to show events near you."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
-          "image": "./assets/images/generate.png",
+          "image": "./assets/images/skillspark.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#111111",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
+          "backgroundColor": "#111111"
         }
       ]
     ],

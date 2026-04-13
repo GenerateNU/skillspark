@@ -21,29 +21,25 @@ export const AuthFormInput = <T extends FieldValues>({
 	error,
 	...props
 }: AuthFormInputProps<T>) => {
-	const colorScheme = useColorScheme();
-	const colors = Colors[colorScheme ?? "light"];
+	const colors = Colors.light;
 
 	return (
 		<Controller
 			control={control}
 			name={name}
-			rules={{ required: name + " is required" }}
 			render={({ field: { onChange, value } }) => (
 				<View className="w-full gap-1">
 					<TextInput
-						className="w-full border rounded-lg px-[10px] py-[10px] text-base"
-						style={{ borderColor: colors.borderColor }}
+						className="w-full border rounded-lg px-[10px] text-base h-12 leading-5"
+						style={{
+							borderColor: colors.borderColor,
+						}}
 						placeholderTextColor={AppColors.placeholderText}
+						autoCorrect={false}
 						onChangeText={onChange}
 						value={value}
 						{...props}
 					/>
-					{error && (
-						<Text style={{ color: AppColors.danger, fontSize: 13 }}>
-							{error.message}
-						</Text>
-					)}
 				</View>
 			)}
 		/>

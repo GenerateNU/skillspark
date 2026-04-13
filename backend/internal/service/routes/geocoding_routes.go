@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/geocoding"
-	geocodingHandler "skillspark/internal/service/handler/geocoding"
 	"skillspark/internal/models"
+	geocodingHandler "skillspark/internal/service/handler/geocoding"
 
 	"github.com/danielgtaylor/huma/v2"
 )

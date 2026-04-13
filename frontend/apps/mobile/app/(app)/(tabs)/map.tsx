@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Linking, Button, ActivityIndicator, View } from "react-native";
 import * as Location from "expo-location";
-import { useGetAllEventOccurrences } from "@skillspark/api-client";
-import type { EventOccurrence } from "@skillspark/api-client";
+import {
+  useListOrganizations,
+  useGetAllLocations,
+} from "@skillspark/api-client";
+import type {
+  Organization,
+  Location as OrgLocation,
+} from "@skillspark/api-client";
 import { ThemedView } from "@/components/themed-view";
 import { ThemedText } from "@/components/themed-text";
 import { SkillSparkMap } from "@/components/SkillSparkMap";
 import { useTranslation } from "react-i18next";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface LocationPin {
   id: string;
@@ -22,26 +27,40 @@ export interface LocationPin {
 
 export default function MapScreen() {
   const { t: translate } = useTranslation();
-  const { data, isLoading: isApiLoading, error } = useGetAllEventOccurrences();
+  const {
+    data: orgsData,
+    isLoading: isOrgsLoading,
+    error,
+  } = useListOrganizations();
+  const { data: locsData, isLoading: isLocsLoading } = useGetAllLocations();
 
-  const occurrences: EventOccurrence[] = data?.status === 200 ? data.data : [];
+  const organizations: Organization[] =
+    orgsData?.status === 200 ? orgsData.data : [];
+  const locations: OrgLocation[] =
+    locsData?.status === 200 ? locsData.data : [];
+
+  const isApiLoading = isOrgsLoading || isLocsLoading;
 
   const mapLocations: LocationPin[] = useMemo(() => {
-    if (!Array.isArray(occurrences)) return [];
+    if (!Array.isArray(organizations)) return [];
 
-    return occurrences
-      .filter((occ) => occ.location && occ.event)
-      .map((occ) => ({
-        id: occ.id,
-        title: occ.event.title,
-        description: occ.event.description,
-        latitude: occ.location.latitude,
-        longitude: occ.location.longitude,
-        rating: 5.0,
-        members: occ.curr_enrolled,
-        image: occ.event.header_image_s3_key,
-      }));
-  }, [occurrences]);
+    return organizations
+      .map((org) => {
+        const location = locations.find((l) => l.id === org.location_id);
+        if (!location) return null;
+        return {
+          id: org.id,
+          title: org.name,
+          description: "",
+          latitude: location.latitude,
+          longitude: location.longitude,
+          rating: 5.0,
+          members: 0,
+          image: org.pfp_s3_key,
+        };
+      })
+      .filter(Boolean) as LocationPin[];
+  }, [organizations, locations]);
 
   const [userLocation, setUserLocation] =
     useState<Location.LocationObject | null>(null);

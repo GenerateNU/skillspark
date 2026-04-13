@@ -99,14 +99,18 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 		Level: compress.LevelBestSpeed,
 	}))
 	app.Use(logger.New())
+
+	allowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
+	if allowedOrigins == "" {
+		allowedOrigins = "http://localhost:3000,http://localhost:8080,https://cdn.scalar.com,http://127.0.0.1:8080,http://10.0.2.2:8080,http://localhost:5173,http://localhost"
+	}
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000,http://localhost:8080,https://cdn.scalar.com,http://127.0.0.1:8080,http://10.0.2.2:8080",
+		AllowOrigins:     allowedOrigins,
 		AllowMethods:     "GET,POST,PUT,PATCH,DELETE,OPTIONS",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 		ExposeHeaders:    "Content-Length, X-Request-ID",
 	}))
-
 	// Create Huma API with OpenAPI configuration
 	humaConfig := huma.DefaultConfig("SkillSpark API", "1.0.0")
 	humaConfig.Info.Description = "API for the SkillSpark application"
@@ -121,6 +125,8 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	// Register public routes BEFORE auth middleware
 	routes.SetupAuthRoutes(humaAPI, repo, config)
+	routes.SetupOrganizationRoutes(humaAPI, repo, s3Client)
+	routes.SetupManagerRoutes(humaAPI, repo, config)
 
 	// Apply auth middleware — only affects routes registered after this point
 	if !config.TestMode {
@@ -170,6 +176,8 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetupPaymentRoutes(api, repo, sc)
 	routes.SetUpSavedRoutes(api, repo)
 	routes.SetupGeocodingRoutes(api, geocodingService)
+	routes.SetupEmergencyContactRoutes(api, repo)
+	routes.SetupRecommendationRoutes(api, repo, s3Client)
 	routes.SetupUserRoutes(api, repo)
 	return nil
 }

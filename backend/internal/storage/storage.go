@@ -4,6 +4,7 @@ import (
 	"context"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema/child"
+	emergencycontact "skillspark/internal/storage/postgres/schema/emergency-contact"
 	"skillspark/internal/storage/postgres/schema/event"
 	eventoccurrence "skillspark/internal/storage/postgres/schema/event-occurrence"
 	"skillspark/internal/storage/postgres/schema/guardian"
@@ -11,6 +12,7 @@ import (
 	"skillspark/internal/storage/postgres/schema/manager"
 	notification "skillspark/internal/storage/postgres/schema/notification"
 	"skillspark/internal/storage/postgres/schema/organization"
+	"skillspark/internal/storage/postgres/schema/recommendation"
 	"skillspark/internal/storage/postgres/schema/registration"
 	"skillspark/internal/storage/postgres/schema/review"
 	"skillspark/internal/storage/postgres/schema/saved"
@@ -88,6 +90,7 @@ type ChildRepository interface {
 
 type EventOccurrenceRepository interface {
 	GetAllEventOccurrences(ctx context.Context, pagination utils.Pagination, AcceptLanguage string, filters models.GetAllEventOccurrencesFilter) ([]models.EventOccurrence, error)
+	GetTrendingEventOccurrences(ctx context.Context, input *models.GetTrendingEventOccurrencesInput) ([]models.EventOccurrence, error)
 	GetEventOccurrenceByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.EventOccurrence, error)
 	CreateEventOccurrence(ctx context.Context, input *models.CreateEventOccurrenceInput) (*models.EventOccurrence, error)
 	UpdateEventOccurrence(ctx context.Context, input *models.UpdateEventOccurrenceInput, tx *pgx.Tx) (*models.EventOccurrence, error)
@@ -111,8 +114,10 @@ type ReviewRepository interface {
 	CreateReview(ctx context.Context, input *models.CreateReviewDBInput) (*models.Review, error)
 	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
+	GetReviewsByOrganizationID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	DeleteReview(ctx context.Context, id uuid.UUID) error
 	GetAggregateReviews(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
+	GetAggregateReviewsForOrganization(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
 }
 
 type UserRepository interface {
@@ -135,21 +140,34 @@ type SavedRepository interface {
 	GetByGuardianID(ctx context.Context, user_id uuid.UUID, pagination utils.Pagination, AcceptLanguage string) ([]models.Saved, error)
 }
 
+type EmergencyContactRepository interface {
+	CreateEmergencyContact(ctx context.Context, emergencyContact *models.CreateEmergencyContactInput) (*models.CreateEmergencyContactOutput, error)
+	UpdateEmergencyContact(ctx context.Context, emergencyContact *models.UpdateEmergencyContactInput) (*models.UpdateEmergencyContactOutput, error)
+	GetEmergencyContactByGuardianID(ctx context.Context, guardian_id uuid.UUID) ([]*models.EmergencyContact, error)
+	DeleteEmergencyContact(ctx context.Context, guardian_id uuid.UUID) (*models.DeleteEmergencyContactOutput, error)
+}
+
+type RecommendationRepository interface {
+	GetRecommendationsByChildID(ctx context.Context, childInterests []string, childBirthYear int, acceptLanguage string, pagination utils.Pagination, filters models.RecommendationFilters) ([]models.Event, error)
+}
+
 type Repository struct {
-	db              *pgxpool.Pool
-	Location        LocationRepository
-	Organization    OrganizationRepository
-	School          SchoolRepository
-	Manager         ManagerRepository
-	Guardian        GuardianRepository
-	Event           EventRepository
-	Child           ChildRepository
-	EventOccurrence EventOccurrenceRepository
-	Registration    RegistrationRepository
-	Review          ReviewRepository
-	User            UserRepository
-	Notification    NotificationRepository
-	Saved           SavedRepository
+	db               *pgxpool.Pool
+	Location         LocationRepository
+	Organization     OrganizationRepository
+	School           SchoolRepository
+	Manager          ManagerRepository
+	Guardian         GuardianRepository
+	Event            EventRepository
+	Child            ChildRepository
+	EventOccurrence  EventOccurrenceRepository
+	Registration     RegistrationRepository
+	Review           ReviewRepository
+	User             UserRepository
+	Notification     NotificationRepository
+	Saved            SavedRepository
+	EmergencyContact EmergencyContactRepository
+	Recommendation   RecommendationRepository
 }
 
 // Close closes the database connection pool
@@ -166,19 +184,21 @@ func (r *Repository) GetDB() *pgxpool.Pool {
 // NewRepository creates a new Repository instance with the given database pool
 func NewRepository(db *pgxpool.Pool) *Repository {
 	return &Repository{
-		db:              db,
-		Location:        location.NewLocationRepository(db),
-		Organization:    organization.NewOrganizationRepository(db),
-		School:          school.NewSchoolRepository(db),
-		Manager:         manager.NewManagerRepository(db),
-		Guardian:        guardian.NewGuardianRepository(db),
-		Event:           event.NewEventRepository(db),
-		Child:           child.NewChildRepository(db),
-		EventOccurrence: eventoccurrence.NewEventOccurrenceRepository(db),
-		User:            user.NewUserRepository(db),
-		Registration:    registration.NewRegistrationRepository(db),
-		Review:          review.NewReviewRepository(db),
-		Notification:    notification.NewNotificationRepository(db),
-		Saved:           saved.NewSavedRepository(db),
+		db:               db,
+		Location:         location.NewLocationRepository(db),
+		Organization:     organization.NewOrganizationRepository(db),
+		School:           school.NewSchoolRepository(db),
+		Manager:          manager.NewManagerRepository(db),
+		Guardian:         guardian.NewGuardianRepository(db),
+		Event:            event.NewEventRepository(db),
+		Child:            child.NewChildRepository(db),
+		EventOccurrence:  eventoccurrence.NewEventOccurrenceRepository(db),
+		User:             user.NewUserRepository(db),
+		Registration:     registration.NewRegistrationRepository(db),
+		Review:           review.NewReviewRepository(db),
+		Notification:     notification.NewNotificationRepository(db),
+		Saved:            saved.NewSavedRepository(db),
+		EmergencyContact: emergencycontact.NewEmergencyContactRepository(db),
+		Recommendation:   recommendation.NewRecommendationRepository(db),
 	}
 }

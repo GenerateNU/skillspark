@@ -8,15 +8,15 @@ import (
 )
 
 type Handler struct {
-	ManagerRepository  storage.ManagerRepository
-	db *pgxpool.Pool
-	config             config.Supabase
+	ManagerRepository storage.ManagerRepository
+	db                *pgxpool.Pool
+	config            config.Supabase
 }
 
 func NewHandler(managerRepository storage.ManagerRepository, db *pgxpool.Pool, config config.Supabase) *Handler {
 	return &Handler{
-		ManagerRepository:  managerRepository,
-		db: db,
-		config: config,
+		ManagerRepository: managerRepository,
+		db:                db,
+		config:            config,
 	}
 }

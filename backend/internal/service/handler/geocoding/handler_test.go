@@ -33,11 +33,11 @@ func TestHandler_GeocodeAddress(t *testing.T) {
 	internalErrCode := http.StatusInternalServerError
 
 	tests := []struct {
-		name       string
-		address    string
-		mockSetup  func(*mockGeocoder)
-		wantLat    float64
-		wantLng    float64
+		name        string
+		address     string
+		mockSetup   func(*mockGeocoder)
+		wantLat     float64
+		wantLng     float64
 		wantErrCode *int
 	}{
 		{

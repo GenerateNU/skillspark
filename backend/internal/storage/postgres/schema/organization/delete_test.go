@@ -25,7 +25,7 @@ func TestDeleteOrganization(t *testing.T) {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "To Be Deleted"
 		i.Body.Active = &active
-		i.Body.LocationID = locationID
+		i.Body.LocationID = &locationID
 		return i
 	}()
 
@@ -37,7 +37,7 @@ func TestDeleteOrganization(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, deleted)
 	assert.Equal(t, created.ID, deleted.ID)
-	assert.Equal(t, "To Be Deleted", deleted.Name)
+	assert.Equal(t, created.Name, deleted.Name)
 	assert.Nil(t, deleted.StripeAccountID)
 	assert.False(t, deleted.StripeAccountActivated)
 
@@ -52,6 +52,7 @@ func TestDeleteOrganization_NotFound(t *testing.T) {
 	t.Parallel()
 
 	deleted, err := repo.DeleteOrganization(ctx, uuid.New())
+
 	require.Error(t, err)
 	assert.Nil(t, deleted)
 }
@@ -69,7 +70,7 @@ func TestDeleteOrganization_AlreadyDeleted(t *testing.T) {
 		i := &models.CreateOrganizationInput{}
 		i.Body.Name = "Delete Twice"
 		i.Body.Active = &active
-		i.Body.LocationID = locationID
+		i.Body.LocationID = &locationID
 		return i
 	}()
 
@@ -92,11 +93,10 @@ func TestDeleteOrganization_WithStripeAccount(t *testing.T) {
 	t.Parallel()
 
 	testOrg := CreateTestOrganization(t, ctx, testDB)
-
 	stripeAccountID := "acct_delete_test123"
+
 	_, err := repo.SetStripeAccountID(ctx, testOrg.ID, stripeAccountID)
 	require.NoError(t, err)
-
 	_, err = repo.SetStripeAccountStatus(ctx, stripeAccountID, true)
 	require.NoError(t, err)
 
