@@ -6,21 +6,31 @@ import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { SignupFormData } from "@/constants/signup-types";
 import { TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // 2. name and username
 export default function NameScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
+	const insets = useSafeAreaInsets();
 	const [errorText, setErrorText] = useState("");
-	const { control } = useFormContext<SignupFormData>();
+	const [isDisabled, setIsDisabled] = useState(true);
+	const { control, watch } = useFormContext<SignupFormData>();
+
+	const watchName = watch("name");
+	const watchUsername = watch("username");
+
+	useEffect(() => {
+		setIsDisabled(!watchName || !watchUsername);
+	}, [watchName, watchUsername]);
 
 	return (
-		<ThemedView className="flex-1">
+		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
 			<TouchableOpacity
 				onPress={() => router.back()}
 				className="flex-row items-center px-5 py-3 gap-1"
@@ -69,7 +79,7 @@ export default function NameScreen() {
 				<Button
 					label={translate("onboarding.continue")}
 					onPress={() => router.push("/(auth)/signup/photo")}
-					disabled={false}
+					disabled={isDisabled}
 				/>
 
 				<ErrorMessage message={errorText} />

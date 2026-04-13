@@ -2,7 +2,6 @@ import { AuthFormInput } from "@/components/AuthFormInput";
 import { Button } from "@/components/Button";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { ImageSelector } from "@/components/ImageSelector";
-import { PageRedirectButton } from "@/components/PageRedirectButton";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -12,17 +11,19 @@ import { SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Image, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // 4. set up your child's profile
 // add new child profile -> go to "set up your child's profile page"
 export default function ChildProfileScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
+	const insets = useSafeAreaInsets();
 	const [errorText, setErrorText] = useState("");
 	const { control } = useForm();
 
 	return (
-		<ThemedView className="flex-1">
+		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
 			<TouchableOpacity
 				onPress={() => router.back()}
 				className="flex-row items-center px-5 py-3 gap-1"

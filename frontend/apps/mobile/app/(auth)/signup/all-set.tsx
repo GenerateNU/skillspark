@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Image } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -9,7 +10,8 @@ import { AppColors, FontSizes } from "@/constants/theme";
 // 7. done with onboarding
 export default function AllSetScreen() {
 	const router = useRouter();
-const { t: translate } = useTranslation();
+	const { t: translate } = useTranslation();
+	const insets = useSafeAreaInsets();
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -19,7 +21,7 @@ const { t: translate } = useTranslation();
 	}, [router]);
 
 	return (
-		<ThemedView className="flex-1">
+		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
 			<View className="px-6 pt-8 items-center">
 				<ThemedText
 					className="font-nunito-bold leading-[60px]"

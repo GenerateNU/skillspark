@@ -10,16 +10,18 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // 5. add emergency contact
 export default function EmergencyContactScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
+	const insets = useSafeAreaInsets();
 	const [errorText, setErrorText] = useState("");
 	const { control } = useForm();
 
 	return (
-		<ThemedView className="flex-1">
+		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
 			<TouchableOpacity
 				onPress={() => router.back()}
 				className="flex-row items-center px-5 py-3 gap-1"

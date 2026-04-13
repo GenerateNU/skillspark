@@ -40,7 +40,7 @@ export default function WelcomeScreen() {
 	};
 
 	return (
-		<ThemedView className="flex-1">
+		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
 			<View className="px-6 pt-8 items-center">
 				<ThemedText
 					className="font-nunito-bold leading-[60px]"

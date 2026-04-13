@@ -323,6 +323,8 @@
 		"zipCode": "Zip Code",
 		"finish": "Finish",
 		"allSet": "You're All Set!",
-		"settingUp": "Setting up your profile now..."
+		"settingUp": "Setting up your profile now...",
+		"passwordMismatch": "Both passwords must match",
+		"signUp": "Sign Up"
 	}
 }

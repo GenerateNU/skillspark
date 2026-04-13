@@ -7,21 +7,47 @@ import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { SignupFormData } from "@/constants/signup-types";
 import { Image, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // 1. email and password
 export default function AccountScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
+	const insets = useSafeAreaInsets();
 	const [errorText, setErrorText] = useState("");
-	const { control } = useFormContext<SignupFormData>();
+	const [isDisabled, setIsDisabled] = useState(true);
+	const { control, watch } = useFormContext<SignupFormData>();
+
+	const watchEmail = watch("email");
+	const watchPassword = watch("password");
+	const watchConfirmPassword = watch("confirm_password");
+
+	useEffect(() => {
+		const allFilled = !!watchEmail && !!watchPassword && !!watchConfirmPassword;
+		const passwordsMatch = watchPassword === watchConfirmPassword;
+
+		if (allFilled && passwordsMatch) {
+			setErrorText("");
+		}
+
+		setIsDisabled(!allFilled || !passwordsMatch);
+	}, [watchEmail, watchPassword, watchConfirmPassword]);
+
+	const checkPasswordMatch = (password: string, confirmPassword: string) => {
+		if (watchEmail && watchPassword && watchConfirmPassword) {
+			if (password !== confirmPassword) {
+				setErrorText(translate("onboarding.passwordMismatch"));
+			}
+		}
+	};
 
 	return (
-		<ThemedView className="flex-1">
+		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
 			<TouchableOpacity
 				onPress={() => router.back()}
 				className="flex-row items-center px-5 py-3 gap-1"
@@ -71,7 +97,14 @@ export default function AccountScreen() {
 					<ThemedText className="text-lg font-nunito-semibold">
 						{translate("onboarding.password")}
 					</ThemedText>
-					<AuthFormInput control={control} name="password" secureTextEntry />
+					<AuthFormInput
+						control={control}
+						name="password"
+						secureTextEntry
+						onBlur={() =>
+							checkPasswordMatch(watchPassword, watchConfirmPassword)
+						}
+					/>
 				</View>
 
 				<View className="gap-2">
@@ -82,6 +115,9 @@ export default function AccountScreen() {
 						control={control}
 						name="confirm_password"
 						secureTextEntry
+						onBlur={() =>
+							checkPasswordMatch(watchPassword, watchConfirmPassword)
+						}
 					/>
 				</View>
 			</View>
@@ -90,7 +126,7 @@ export default function AccountScreen() {
 				<Button
 					label={translate("onboarding.createAccount")}
 					onPress={() => router.push("/(auth)/signup/name")}
-					disabled={false}
+					disabled={isDisabled}
 				/>
 
 				<PageRedirectButton

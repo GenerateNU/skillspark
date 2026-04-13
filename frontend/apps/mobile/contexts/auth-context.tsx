@@ -23,6 +23,7 @@ interface AuthContextType {
 	langPref: string | null;
 	isAuthenticated: boolean;
 	isLoading: boolean;
+	hasAccount: boolean;
 	login: (
 		email: string,
 		password: string,
@@ -62,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [jwt, setJWT] = useState<string | null>(null);
 	const [langPref, setLangPref] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
+	const [hasAccount, setHasAccount] = useState(false);
 	const queryClient = useQueryClient();
 	const { mutate: loginFunc } = useLoginGuardian();
 	const { mutate: signupFunc } = useSignupGuardian();
@@ -96,6 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				setCurrentLanguage(storedLangPref);
 				queryClient.invalidateQueries({ refetchType: "all" });
 			}
+			const storedHasAccount = await SecureStore.getItemAsync("has_account");
+			setHasAccount(storedHasAccount === "true");
 			if (storedJWT && storedGuardianId) {
 				setJWT(storedJWT);
 				setGuardianId(storedGuardianId);
@@ -161,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			password,
 			language_preference,
 			profile_picture_s3_key,
-			")",
+			"}",
 		);
 		signupFunc(
 			{
@@ -182,6 +186,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					setJWT(success.token);
 					await SecureStore.setItemAsync("guardian_id", success.guardian_id);
 					setGuardianId(success.guardian_id);
+					await SecureStore.setItemAsync("has_account", "true");
+					setHasAccount(true);
 					onSuccess();
 				},
 				onError: (err) => {
@@ -248,6 +254,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				langPref,
 				isAuthenticated: !!jwt && !!guardianId,
 				isLoading,
+				hasAccount,
 				login,
 				signup,
 				logout,
