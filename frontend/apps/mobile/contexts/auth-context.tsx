@@ -177,7 +177,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		setLangPref(null);
 	};
 
-	// add update const for changing the guardian
+	const update = (
+		onSuccess: () => void,
+		onError: (msg: string) => void,
+		id: string,
+		email: string,
+		language_preference: string,
+		name: string,
+		username: string,
+		profile_picture_s3_key?: string | undefined,
+		expo_push_token?: string | undefined,
+	) => {
+		updateFunc(
+			{
+				id: id,
+				data: {
+					email,
+					language_preference,
+					name,
+					profile_picture_s3_key,
+					username,
+					expo_push_token,
+				},
+			},
+			{
+				onSuccess: async (resp: updateGuardianResponse) => {
+					guardian = resp.data as Guardian;
+					// refetch all getGuardian queries to show changes
+					queryClient.invalidateQueries({
+						queryKey: [`/api/v1/guardians/${id}`],
+					});
+					onSuccess();
+				},
+				onError: (err) => {
+					const fail = err as unknown as { data?: { message?: string } };
+					onError(fail.data?.message ?? "An unexpected error occurred");
+				},
+			},
+		);
+	};
 
 	const usernameExists = async (
 		username: string,
