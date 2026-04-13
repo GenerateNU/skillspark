@@ -169,7 +169,6 @@ function PastRegistrationCard({ data }: RegistrationCardProps) {
         elevation: 2,
       }}
     >
-      {/* Col 1: Image */}
       <View className="py-3 pl-3">
         <Image
           source={{ uri: data.image_uri }}
@@ -178,7 +177,6 @@ function PastRegistrationCard({ data }: RegistrationCardProps) {
         />
       </View>
 
-      {/* Col 2: Title, date/time, payment */}
       <View className="flex-1 px-3 py-3 justify-between">
         <ThemedText type="subtitle" numberOfLines={2}>
           {data.title}
@@ -196,7 +194,6 @@ function PastRegistrationCard({ data }: RegistrationCardProps) {
         </ThemedText>
       </View>
 
-      {/* Col 3: Child initials (top) + Review button (bottom) */}
       <View className="py-3 pr-3 items-end justify-between">
         <View className="flex-row flex-wrap gap-1 justify-end" style={{ maxWidth: 80 }}>
           {children.map((child) => {
@@ -453,7 +450,7 @@ export default function ActivityScreen() {
 
       {children.length > 0 && (
         <ThemedView className="w-11/12 self-center flex flex-row items-center justify-between py-3">
-          <View className="flex flex-row flex-wrap gap-3">
+          <View className="flex flex-row flex-wrap gap-1.5">
             {children.map((child) => {
               const color = childColorMap[child.id] ?? CHILD_BUBBLE_COLORS[0]
               return (
