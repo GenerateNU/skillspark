@@ -23,10 +23,7 @@ interface EventCardProps {
 }
 
 export function EventCard({ pin }: EventCardProps) {
-  const placeholderColor = useThemeColor(
-    { light: "#D0D0D0" },
-    "background",
-  );
+  const placeholderColor = useThemeColor({ light: "#D0D0D0" }, "background");
   const router = useRouter();
   const { t: translate } = useTranslation();
 
@@ -77,7 +74,7 @@ export function EventCard({ pin }: EventCardProps) {
         className="w-full items-center rounded-xl bg-[#333] py-[15px]"
         activeOpacity={1}
         onPress={() => {
-          router.push(`/(app)/(tabs)/org/${pin.id}`);
+          router.push(`/org/${pin.id}`);
         }}
       >
         <Text className="font-nunito-semibold text-[18px] text-white">

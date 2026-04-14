@@ -31,6 +31,12 @@ export default function FamilyLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="avatar-picker"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

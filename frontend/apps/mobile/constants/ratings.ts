@@ -24,4 +24,8 @@ export const RATING_OPTIONS = [
     image: require("@/assets/images/terrible.png"),
     labelKey: "review.terrible",
   },
+  {
+    rating: null,
+    image: require("@/assets/images/noreview.png"),
+  },
 ];

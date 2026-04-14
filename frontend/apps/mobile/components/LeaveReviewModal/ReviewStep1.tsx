@@ -94,7 +94,9 @@ export function ReviewStep1({
         disabled={!rating}
         className="py-4 rounded-2xl items-center mt-3"
         style={{
-          backgroundColor: rating ? AppColors.primaryText : AppColors.borderLight,
+          backgroundColor: rating
+            ? AppColors.primaryText
+            : AppColors.borderLight,
         }}
       >
         <Text

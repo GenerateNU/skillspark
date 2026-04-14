@@ -145,9 +145,12 @@ function OrgDetail({
           <Text
             numberOfLines={aboutExpanded ? undefined : 4}
             onTextLayout={(e) => {
-              if (!aboutExpanded) setAboutTruncated(e.nativeEvent.lines.length >= 4);
+              if (!aboutExpanded)
+                setAboutTruncated(e.nativeEvent.lines.length >= 4);
             }}
-            className={`text-sm leading-[22px] ${aboutTruncated ? "mb-1" : "mb-4"}`}
+            className={`text-sm leading-[22px] ${
+              aboutTruncated ? "mb-1" : "mb-4"
+            }`}
             style={{ color: AppColors.secondaryText }}
           >
             {org.about ?? ""}
@@ -161,7 +164,9 @@ function OrgDetail({
                 className="text-[13px] font-semibold"
                 style={{ color: AppColors.primaryText }}
               >
-                {aboutExpanded ? translate("event.seeLess") : translate("event.seeMore")}
+                {aboutExpanded
+                  ? translate("event.seeLess")
+                  : translate("event.seeMore")}
               </Text>
             </Pressable>
           )}
@@ -187,6 +192,10 @@ function OrgDetail({
         </View>
 
         {/* Rating card */}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => router.push(`/org/${org.id}/reviews`)}
+        >
         <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardStyle}>
           <Text className="mb-3 text-[18px] font-nunito-bold">
             {translate("org.reviews")}
@@ -209,14 +218,15 @@ function OrgDetail({
             </View>
           </View>
         </View>
+        </TouchableOpacity>
 
         {/* See Schedule CTA */}
         <View className="px-4 pb-6 pt-1">
           <TouchableOpacity
             activeOpacity={0.85}
             className="w-full items-center rounded-full py-4"
-            style={{ backgroundColor: AppColors.checkboxSelected }}
-            onPress={() => {}}
+            style={{ backgroundColor: "#000000" }}
+            onPress={() => router.push(`/org/${org.id}/schedule`)}
           >
             <Text className="text-[17px] font-nunito-bold text-white">
               {translate("org.seeSchedule")}
@@ -233,12 +243,12 @@ export default function OrgScreen() {
   const { data: response, isLoading, error } = useGetOrganization(id);
   const { t: translate } = useTranslation();
   const { data: locationResponse } = useGetLocationById(
-    response?.status === 200 ? (response.data.location_id ?? "") : "",
+    response?.status === 200 ? response.data.location_id ?? "" : "",
     {
       query: {
         enabled: response?.status === 200 && !!response.data.location_id,
       },
-    },
+    }
   );
 
   if (isLoading) {
