@@ -191,6 +191,10 @@ function OrgDetail({
         </View>
 
         {/* Rating card */}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => router.push(`/org/${org.id}/reviews`)}
+        >
         <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardStyle}>
           <Text className="mb-4 text-[24px] font-nunito-bold">
             {translate("org.reviews")}
@@ -222,6 +226,7 @@ function OrgDetail({
             </View>
           )}
         </View>
+        </TouchableOpacity>
 
         {/* See Schedule CTA */}
         <View className="px-4 pb-6 pt-1">
