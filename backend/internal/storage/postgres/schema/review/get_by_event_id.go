@@ -23,7 +23,15 @@ func (r *ReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.UUID
 		return nil, &errr
 	}
 
-	orderByClause := buildReviewOrderBy(sortBy)
+	var orderByClause string
+	switch sortBy {
+	case "highest":
+		orderByClause = "r.rating DESC, r.created_at DESC"
+	case "lowest":
+		orderByClause = "r.rating ASC, r.created_at DESC"
+	default:
+		orderByClause = "r.created_at DESC"
+	}
 
 	query := fmt.Sprintf(baseQuery, orderByClause)
 

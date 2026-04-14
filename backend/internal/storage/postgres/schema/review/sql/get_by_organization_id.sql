@@ -6,5 +6,5 @@ JOIN event_occurrence eo
 ON reg.event_occurrence_id = eo.id
 JOIN event e ON e.id = eo.event_id
 WHERE e.organization_id = $1
-ORDER BY %s 
+ORDER BY id
 LIMIT $2 OFFSET $3;

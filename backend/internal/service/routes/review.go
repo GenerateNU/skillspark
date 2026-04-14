@@ -87,7 +87,7 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 			Limit: input.PageSize,
 		}
 
-		reviews, err := reviewHandler.GetReviewsByOrganizationID(ctx, input.ID, input.AcceptLanguage, pagination, input.SortBy)
+		reviews, err := reviewHandler.GetReviewsByOrganizationID(ctx, input.ID, input.AcceptLanguage, pagination)
 		if err != nil {
 			return nil, err
 		}

@@ -46,8 +46,8 @@ func (m *MockReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.
 	return args.Get(0).([]models.Review), args.Error(1)
 }
 
-func (m *MockReviewRepository) GetReviewsByOrganizationID(ctx context.Context, id uuid.UUID, acceptLanguage string, pagination utils.Pagination, sortBy string) ([]models.Review, error) {
-	args := m.Called(ctx, id, acceptLanguage, pagination, sortBy)
+func (m *MockReviewRepository) GetReviewsByOrganizationID(ctx context.Context, id uuid.UUID, acceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
+	args := m.Called(ctx, id, acceptLanguage, pagination)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil
