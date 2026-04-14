@@ -1,58 +1,36 @@
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { useFilters } from "@/hooks/use-filters";
 import { useRouter } from "expo-router";
-import {
-  Pressable,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { SliderCard } from "@/components/filters/SliderCard";
-import { PillRow } from "@/components/filters/PillRow";
-import { SectionLabel, Divider } from "@/components/filters/FilterLayout";
+import { Divider } from "@/components/filters/FilterLayout";
+import { DateRangePicker } from "@/components/filters/DateRangePicker";
+import { CategoryPicker } from "@/components/filters/CategoryPicker";
+import { SoldOutToggle } from "@/components/filters/SoldOutToggle";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const CATEGORIES = ["Sport", "Arts", "Music", "Tech", "Activity", "Tutoring"];
+// Backend values — must match the Postgres category enum exactly
+const CATEGORY_KEYS = [
+  "science", "math", "music", "art", "sports", "technology", "language", "other",
+  "physics", "chemistry", "biology", "astronomy", "earth science", "data science",
+  "robotics", "engineering", "statistics", "coding",
+  "painting", "drawing", "sculpture", "photography", "filmmaking", "graphic design",
+  "fashion", "crafts", "creative writing",
+  "instrumental music", "vocal music", "theater", "acting", "dance", "improv",
+  "soccer", "basketball", "tennis", "swimming", "martial arts", "yoga", "fitness",
+  "running", "hiking", "cycling",
+  "language learning", "linguistics", "history",
+];
 
 const DISTANCE_MAX = 50;
 const DURATION_MAX = 180; // minutes
 const PRICE_MAX = 2000;
 const AGE_MAX = 18;
-
-function todayStart() {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d.toISOString();
-}
-function todayEnd() {
-  const d = new Date();
-  d.setHours(23, 59, 59, 999);
-  return d.toISOString();
-}
-function weekEnd() {
-  const d = new Date();
-  d.setDate(d.getDate() + (6 - d.getDay()));
-  d.setHours(23, 59, 59, 999);
-  return d.toISOString();
-}
-function monthEnd() {
-  const d = new Date();
-  d.setMonth(d.getMonth() + 1, 0);
-  d.setHours(23, 59, 59, 999);
-  return d.toISOString();
-}
-
-type DateOption = { label: string; minDate?: string; maxDate?: string };
-const DATE_OPTIONS: DateOption[] = [
-  { label: "Any" },
-  { label: "Today", minDate: todayStart(), maxDate: todayEnd() },
-  { label: "This week", minDate: todayStart(), maxDate: weekEnd() },
-  { label: "This month", minDate: todayStart(), maxDate: monthEnd() },
-];
 
 // ─── Label helpers ────────────────────────────────────────────────────────────
 
@@ -68,24 +46,24 @@ function durationLabel(min: number) {
   return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
-function durationRangeLabel(lo: number, hi: number) {
-  if (lo === 0 && hi >= DURATION_MAX) return "Any";
-  if (hi >= DURATION_MAX) return `${durationLabel(lo)} +`;
-  if (lo === 0) return `Up to ${durationLabel(hi)}`;
+function durationRangeLabel(lo: number, hi: number, t: TFunction) {
+  if (lo === 0 && hi >= DURATION_MAX) return t("filters.any");
+  if (hi >= DURATION_MAX) return t("filters.orMore", { value: durationLabel(lo) });
+  if (lo === 0) return t("filters.upTo", { value: durationLabel(hi) });
   return `${durationLabel(lo)} – ${durationLabel(hi)}`;
 }
 
-function priceRangeLabel(lo: number, hi: number) {
-  if (lo === 0 && hi >= PRICE_MAX) return "Any";
-  if (hi >= PRICE_MAX) return `฿${lo.toLocaleString()} +`;
-  if (lo === 0) return `Up to ฿${hi.toLocaleString()}`;
+function priceRangeLabel(lo: number, hi: number, t: TFunction) {
+  if (lo === 0 && hi >= PRICE_MAX) return t("filters.any");
+  if (hi >= PRICE_MAX) return t("filters.orMore", { value: `฿${lo.toLocaleString()}` });
+  if (lo === 0) return t("filters.upTo", { value: `฿${hi.toLocaleString()}` });
   return `฿${lo.toLocaleString()} – ฿${hi.toLocaleString()}`;
 }
 
-function ageRangeLabel(lo: number, hi: number) {
-  if (lo === 0 && hi >= AGE_MAX) return "Any";
-  if (hi >= AGE_MAX) return `${lo}y +`;
-  if (lo === 0) return `Up to ${hi}y`;
+function ageRangeLabel(lo: number, hi: number, t: TFunction) {
+  if (lo === 0 && hi >= AGE_MAX) return t("filters.any");
+  if (hi >= AGE_MAX) return t("filters.orMore", { value: `${lo}y` });
+  if (lo === 0) return t("filters.upTo", { value: `${hi}y` });
   return `${lo} – ${hi}y`;
 }
 
@@ -95,95 +73,57 @@ export default function FiltersScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { filters, setFilters, clearFilters } = useFilters();
+  const { t } = useTranslation();
 
-  const categoryIdx = filters.category
-    ? CATEGORIES.indexOf(filters.category)
-    : -1;
+  const categoryLabels: string[] = t("filters.categories", { returnObjects: true }) as string[];
+
+  const categoryIdx = filters.category ? CATEGORY_KEYS.indexOf(filters.category) : -1;
   const distanceKm = filters.radius_km ?? DISTANCE_MAX;
-  const durationRange: [number, number] = [
-    filters.min_duration ?? 0,
-    filters.max_duration ?? DURATION_MAX,
-  ];
-  const priceRange: [number, number] = [
-    filters.min_price ?? 0,
-    filters.max_price ?? PRICE_MAX,
-  ];
-  const ageRange: [number, number] = [
-    filters.min_age ?? 0,
-    filters.max_age ?? AGE_MAX,
-  ];
+  const durationRange: [number, number] = [filters.min_duration ?? 0, filters.max_duration ?? DURATION_MAX];
+  const priceRange: [number, number] = [filters.min_price ?? 0, filters.max_price ?? PRICE_MAX];
+  const ageRange: [number, number] = [filters.min_age ?? 0, filters.max_age ?? AGE_MAX];
   const soldOut = filters.soldout ?? false;
-  const dateIdx = Math.max(
-    DATE_OPTIONS.findIndex((o) => o.minDate === filters.min_date),
-    0,
-  );
+  const startDate = filters.min_date ? new Date(filters.min_date) : undefined;
+  const endDate = filters.max_date ? new Date(filters.max_date) : undefined;
 
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
-      {/* Header */}
       <View
         className="flex-row items-center justify-between px-5 py-4"
         style={{ borderBottomWidth: 1, borderBottomColor: AppColors.divider }}
       >
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={12}
-          className="flex-row items-center gap-1"
-        >
-          <IconSymbol
-            name="chevron.left"
-            size={20}
-            color={AppColors.primaryText}
-          />
-          <Text
-            style={{
-              fontFamily: FontFamilies.semiBold,
-              fontSize: FontSizes.base,
-              color: AppColors.primaryText,
-            }}
-          >
-            Back
+        <Pressable onPress={() => router.back()} hitSlop={12} className="flex-row items-center gap-1">
+          <IconSymbol name="chevron.left" size={20} color={AppColors.primaryText} />
+          <Text style={{ fontFamily: FontFamilies.semiBold, fontSize: FontSizes.base, color: AppColors.primaryText }}>
+            {t("filters.back")}
           </Text>
         </Pressable>
 
-        <Text
-          style={{
-            fontFamily: FontFamilies.bold,
-            fontSize: FontSizes.lg,
-            color: AppColors.primaryText,
-          }}
-        >
-          Filters
+        <Text style={{ fontFamily: FontFamilies.bold, fontSize: FontSizes.lg, color: AppColors.primaryText }}>
+          {t("filters.title")}
         </Text>
 
         <Pressable onPress={clearFilters} hitSlop={12}>
-          <Text
-            style={{
-              fontFamily: FontFamilies.semiBold,
-              fontSize: FontSizes.base,
-              color: AppColors.primaryBlue,
-            }}
-          >
-            Reset
+          <Text style={{ fontFamily: FontFamilies.semiBold, fontSize: FontSizes.base, color: AppColors.primaryBlue }}>
+            {t("filters.reset")}
           </Text>
         </Pressable>
       </View>
 
-      {/* Scrollable content */}
       <ScrollView
         className="flex-1 px-5"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: 20, paddingBottom: 32 }}
         keyboardShouldPersistTaps="handled"
       >
-        <SectionLabel label="Category" />
-        <PillRow
-          options={CATEGORIES}
+        <CategoryPicker
+          label={t("filters.category")}
+          categoryLabels={categoryLabels}
           activeIndex={categoryIdx}
           onSelect={(idx) =>
             setFilters({
               ...filters,
-              category: categoryIdx === idx ? undefined : CATEGORIES[idx],
+              category: categoryIdx === idx ? undefined : CATEGORY_KEYS[idx],
             })
           }
         />
@@ -191,14 +131,11 @@ export default function FiltersScreen() {
         <Divider />
 
         <SliderCard
-          label="Distance"
+          label={t("filters.distance")}
           valueLabel={distanceLabel(distanceKm)}
           value={distanceKm}
           onValueChange={(val) =>
-            setFilters({
-              ...filters,
-              radius_km: val[0] < DISTANCE_MAX ? val[0] : undefined,
-            })
+            setFilters({ ...filters, radius_km: val[0] < DISTANCE_MAX ? val[0] : undefined })
           }
           min={0}
           max={DISTANCE_MAX}
@@ -210,15 +147,14 @@ export default function FiltersScreen() {
         <View className="h-4" />
 
         <SliderCard
-          label="Duration"
-          valueLabel={durationRangeLabel(durationRange[0], durationRange[1])}
+          label={t("filters.duration")}
+          valueLabel={durationRangeLabel(durationRange[0], durationRange[1], t)}
           value={durationRange}
           onValueChange={(val) =>
             setFilters({
               ...filters,
               min_duration: val[0] > 0 ? Math.round(val[0]) : undefined,
-              max_duration:
-                val[1] < DURATION_MAX ? Math.round(val[1]) : undefined,
+              max_duration: val[1] < DURATION_MAX ? Math.round(val[1]) : undefined,
             })
           }
           min={0}
@@ -231,8 +167,8 @@ export default function FiltersScreen() {
         <View className="h-4" />
 
         <SliderCard
-          label="Price"
-          valueLabel={priceRangeLabel(priceRange[0], priceRange[1])}
+          label={t("filters.price")}
+          valueLabel={priceRangeLabel(priceRange[0], priceRange[1], t)}
           value={priceRange}
           onValueChange={(val) =>
             setFilters({
@@ -251,8 +187,8 @@ export default function FiltersScreen() {
         <View className="h-4" />
 
         <SliderCard
-          label="Age Range"
-          valueLabel={ageRangeLabel(ageRange[0], ageRange[1])}
+          label={t("filters.ageRange")}
+          valueLabel={ageRangeLabel(ageRange[0], ageRange[1], t)}
           value={ageRange}
           onValueChange={(val) =>
             setFilters({
@@ -270,61 +206,21 @@ export default function FiltersScreen() {
 
         <Divider />
 
-        <SectionLabel label="Date" />
-        <PillRow
-          options={DATE_OPTIONS.map((o) => o.label)}
-          activeIndex={dateIdx}
-          onSelect={(idx) => {
-            const opt = DATE_OPTIONS[idx];
-            setFilters({
-              ...filters,
-              min_date: opt?.minDate,
-              max_date: opt?.maxDate,
-            });
-          }}
+        <DateRangePicker
+          startDate={startDate}
+          endDate={endDate}
+          onChange={(start, end) =>
+            setFilters({ ...filters, min_date: start?.toISOString(), max_date: end?.toISOString() })
+          }
         />
 
         <Divider />
 
-        <TouchableOpacity
-          onPress={() =>
-            setFilters({ ...filters, soldout: soldOut ? undefined : true })
-          }
-          activeOpacity={0.7}
-          className="flex-row items-center justify-between"
-        >
-          <Text
-            style={{
-              fontFamily: FontFamilies.bold,
-              fontSize: FontSizes.lg,
-              color: AppColors.primaryText,
-            }}
-          >
-            Show sold out
-          </Text>
-          <View
-            style={{
-              width: 46,
-              height: 26,
-              borderRadius: 13,
-              backgroundColor: soldOut
-                ? AppColors.primaryText
-                : AppColors.borderLight,
-              justifyContent: "center",
-              paddingHorizontal: 3,
-            }}
-          >
-            <View
-              style={{
-                width: 20,
-                height: 20,
-                borderRadius: 10,
-                backgroundColor: AppColors.white,
-                alignSelf: soldOut ? "flex-end" : "flex-start",
-              }}
-            />
-          </View>
-        </TouchableOpacity>
+        <SoldOutToggle
+          label={t("filters.showSoldOut")}
+          value={soldOut}
+          onToggle={() => setFilters({ ...filters, soldout: soldOut ? undefined : true })}
+        />
       </ScrollView>
 
       {/* Search button */}
@@ -352,7 +248,7 @@ export default function FiltersScreen() {
               color: AppColors.white,
             }}
           >
-            Search
+            {t("filters.search")}
           </Text>
         </TouchableOpacity>
       </View>

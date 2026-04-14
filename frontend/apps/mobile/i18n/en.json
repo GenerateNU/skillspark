@@ -286,6 +286,44 @@
     "language": "Language",
     "other": "Other"
   },
+  "filters": {
+    "title": "Filters",
+    "back": "Back",
+    "reset": "Reset",
+    "search": "Search",
+    "category": "Category",
+    "distance": "Distance",
+    "duration": "Duration",
+    "price": "Price",
+    "ageRange": "Age Range",
+    "showSoldOut": "Show sold out",
+    "any": "Any",
+    "upTo": "Up to {{value}}",
+    "orMore": "{{value}} +",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "categories": [
+      "Science", "Math", "Music", "Art", "Sports", "Technology", "Language", "Other",
+      "Physics", "Chemistry", "Biology", "Astronomy", "Earth Science", "Data Science",
+      "Robotics", "Engineering", "Statistics", "Coding",
+      "Painting", "Drawing", "Sculpture", "Photography", "Filmmaking", "Graphic Design",
+      "Fashion", "Crafts", "Creative Writing",
+      "Instrumental Music", "Vocal Music", "Theater", "Acting", "Dance", "Improv",
+      "Soccer", "Basketball", "Tennis", "Swimming", "Martial Arts", "Yoga", "Fitness",
+      "Running", "Hiking", "Cycling",
+      "Language Learning", "Linguistics", "History"
+    ]
+  },
+  "calendar": {
+    "months": [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ],
+    "days": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+    "clearDates": "Clear dates",
+    "any": "Any",
+    "from": "From {{date}}"
+  },
   "editProfile": {
     "title": "Family Information",
     "subtitle": "Edit Profile",
