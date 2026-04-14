@@ -399,7 +399,7 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 			}
 
 			pagination := utils.Pagination{Page: 1, Limit: 10}
-			reviews, err := handler.GetReviewsByEventID(context.Background(), tt.eventID, tt.acceptLanguage, pagination)
+			reviews, err := handler.GetReviewsByEventID(context.Background(), tt.eventID, tt.acceptLanguage, pagination, "most-recent")
 
 			if tt.wantErr {
 				assert.Error(t, err)

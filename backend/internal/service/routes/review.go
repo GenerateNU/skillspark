@@ -58,21 +58,12 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		Tags:        []string{"Review"},
 	}, func(ctx context.Context, input *models.GetReviewsByEventIDInput) (*models.ReviewsOutput, error) {
 
-		page := input.Page
-		if page == 0 {
-			page = 1
-		}
-		limit := input.PageSize
-		if limit == 0 {
-			limit = 10
-		}
-
 		pagination := utils.Pagination{
-			Page:  page,
-			Limit: limit,
+			Page:  input.Page,
+			Limit: input.PageSize,
 		}
 
-		reviews, err := reviewHandler.GetReviewsByEventID(ctx, input.ID, input.AcceptLanguage, pagination)
+		reviews, err := reviewHandler.GetReviewsByEventID(ctx, input.ID, input.AcceptLanguage, pagination, input.SortBy)
 		if err != nil {
 			return nil, err
 		}
@@ -91,21 +82,12 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		Tags:        []string{"Review"},
 	}, func(ctx context.Context, input *models.GetReviewsByOrganizationIDInput) (*models.ReviewsOutput, error) {
 
-		page := input.Page
-		if page == 0 {
-			page = 1
-		}
-		limit := input.PageSize
-		if limit == 0 {
-			limit = 10
-		}
-
 		pagination := utils.Pagination{
-			Page:  page,
-			Limit: limit,
+			Page:  input.Page,
+			Limit: input.PageSize,
 		}
 
-		reviews, err := reviewHandler.GetReviewsByOrganizationID(ctx, input.ID, input.AcceptLanguage, pagination)
+		reviews, err := reviewHandler.GetReviewsByOrganizationID(ctx, input.ID, input.AcceptLanguage, pagination, input.SortBy)
 		if err != nil {
 			return nil, err
 		}

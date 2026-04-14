@@ -68,13 +68,14 @@ type GetReviewsByEventIDInput struct {
 	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Page           int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
 	PageSize       int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+	SortBy         string    `query:"sort_by" default:"most_recent" enum:"most_recent,highest_rating,lowest_rating" doc:"Sort order for reviews"`
 }
-
 type GetReviewsByOrganizationIDInput struct {
 	ID             uuid.UUID `path:"id"`
 	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Page           int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
 	PageSize       int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+	SortBy         string    `query:"sort_by" default:"most_recent" enum:"most_recent,highest_rating,lowest_rating" doc:"Sort order for reviews"`
 }
 
 type GetReviewsAggregateInput struct {

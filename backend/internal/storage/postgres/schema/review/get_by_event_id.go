@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *ReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
+func (r *ReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination, sortBy string) ([]models.Review, error) {
 
 	language = AcceptLanguage
 	baseQuery, err := schema.ReadSQLBaseScript("get_by_event_id.sql", SqlReviewFiles)
