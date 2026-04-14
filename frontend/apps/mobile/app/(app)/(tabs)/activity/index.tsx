@@ -110,7 +110,8 @@ function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
     >
       <Image
         source={{ uri: data.image_uri }}
-        className="w-full h-44 px-4 pt-4 rounded-md"
+        style={{ width: "100%", height: 176, borderRadius: 6 }}
+        resizeMode="cover"
       />
       <View className="flex flex-row justify-between items-center p-1">
         <View className="px-4 pb-4 gap-1 flex flex-col justify-between">
@@ -420,7 +421,7 @@ export default function ActivityScreen() {
         grouped[r.event_occurrence_id] = {
           event_id: occurrence.event.id,
           event_occurrence_id: r.event_occurrence_id,
-          image_uri: "https://picsum.photos/800/300",
+          image_uri: occurrence.event.presigned_url,
           start_time: startDate,
           end_time: endDate,
           title: occurrence.event.title,
