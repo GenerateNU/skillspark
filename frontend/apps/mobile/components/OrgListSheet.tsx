@@ -10,7 +10,7 @@ import type { LocationObject } from "expo-location";
 import { haversineDistance } from "@/utils/distance";
 import { OrgCard } from "@/components/OrgCard";
 
-const SNAP_POINTS = [30, "65%"];
+const SNAP_POINTS = [60, "65%"];
 
 interface OrgListSheetProps {
   locations: LocationPin[];
@@ -62,7 +62,7 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
                   userLocation.coords.latitude,
                   userLocation.coords.longitude,
                   loc.latitude,
-                  loc.longitude,
+                  loc.longitude
                 )
               : null;
           return <OrgCard key={loc.id} pin={loc} distance={distance} />;
