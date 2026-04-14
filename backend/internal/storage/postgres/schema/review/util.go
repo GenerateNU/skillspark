@@ -42,3 +42,14 @@ func CreateTestReview(
 
 	return review
 }
+
+func buildReviewOrderBy(sortBy string) string {
+	switch sortBy {
+	case "highest_rating":
+		return "r.rating DESC, r.created_at DESC"
+	case "lowest_rating":
+		return "r.rating ASC, r.created_at DESC"
+	default:
+		return "r.created_at DESC"
+	}
+}

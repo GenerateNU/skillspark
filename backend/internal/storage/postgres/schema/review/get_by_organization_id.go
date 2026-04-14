@@ -2,6 +2,7 @@ package review
 
 import (
 	"context"
+	"fmt"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
@@ -11,16 +12,27 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *ReviewRepository) GetReviewsByOrganizationID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination, sortBy string) ([]models.Review, error) {
+func (r *ReviewRepository) GetReviewsByOrganizationID(
+	ctx context.Context,
+	id uuid.UUID,
+	AcceptLanguage string,
+	pagination utils.Pagination,
+	sortBy string,
+) ([]models.Review, error) {
 
 	language = AcceptLanguage
+
 	baseQuery, err := schema.ReadSQLBaseScript("get_by_organization_id.sql", SqlReviewFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
 	}
 
-	rows, err := r.db.Query(ctx, baseQuery, id, pagination.Limit, pagination.GetOffset())
+	orderByClause := buildReviewOrderBy(sortBy)
+
+	query := fmt.Sprintf(baseQuery, orderByClause)
+
+	rows, err := r.db.Query(ctx, query, id, pagination.Limit, pagination.GetOffset())
 	if err != nil {
 		errr := errs.InternalServerError("Failed to get reviews: ", err.Error())
 		return nil, &errr
