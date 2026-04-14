@@ -13,6 +13,7 @@ import {
   Review,
   ReviewAggregate,
   useGetRegistrationsByGuardianId,
+  useGetReviewByGuardianId,
 } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -100,7 +101,20 @@ export default function ReviewsScreen<
     );
   }, [registrationsResp, occurrenceId]);
 
-  const showReviewCTA = canReview && !!registration;
+  const { data: guardianReviewsResp } = useGetReviewByGuardianId(
+    guardianId ?? "",
+    undefined,
+    { query: { enabled: canReview && !!guardianId && !!id } },
+  );
+  const hasAlreadyReviewed = useMemo(() => {
+    const list =
+      guardianReviewsResp?.status === 200
+        ? (guardianReviewsResp.data as Review[])
+        : [];
+    return list.some((r) => r.event_id === id);
+  }, [guardianReviewsResp, id]);
+
+  const showReviewCTA = canReview && !!registration && !hasAlreadyReviewed;
 
   if (!id) {
     return <ErrorScreen message={translate("common.noEventId")} />;

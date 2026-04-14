@@ -283,6 +283,22 @@
     "language": "Language",
     "other": "Other"
   },
+  "activity": {
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "noUpcomingRegistrations": "No upcoming registrations.",
+    "noPastRegistrations": "No past registrations.",
+    "filterByChild": "Filter by child",
+    "reset": "Reset",
+    "apply": "Apply",
+    "cancelTitle": "Cancel Registration",
+    "cancelSubtitle": "Select which children to remove from this event.",
+    "keep": "Keep",
+    "remove": "Remove",
+    "reviewed": "Reviewed!",
+    "review": "Review",
+    "payment": "Payment: {{price}}"
+  },
   "editProfile": {
     "title": "Family Information",
     "subtitle": "Edit Profile",
