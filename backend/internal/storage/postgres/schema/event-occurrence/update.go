@@ -51,7 +51,7 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 	var updatedEventOccurrence models.EventOccurrence
 	var titleEN, descriptionEN string
 	var titleTH, descriptionTH *string
-
+	var orgLinks []byte
 	// populate data in struct, embedding event and location data
 	err = row.Scan(
 		// event occurrence fields
@@ -95,6 +95,8 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 		&updatedEventOccurrence.Location.Country,
 		&updatedEventOccurrence.Location.CreatedAt,
 		&updatedEventOccurrence.Location.UpdatedAt,
+
+		&orgLinks,
 	)
 
 	switch language {
@@ -108,6 +110,12 @@ func (r *EventOccurrenceRepository) UpdateEventOccurrence(ctx context.Context, i
 
 	if err != nil {
 		err := errs.InternalServerError("Failed to update event occurrence: ", err.Error())
+		return nil, &err
+	}
+
+	updatedEventOccurrence.OrgLinks, err = scanLinks(orgLinks)
+	if err != nil {
+		err := errs.InternalServerError("Failed to deserialize org links: ", err.Error())
 		return nil, &err
 	}
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, ScrollView, useColorScheme } from "react-native";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
@@ -11,8 +11,7 @@ import { useTranslation } from "react-i18next";
 export default function TermsAndConditionsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
   const { t: translate } = useTranslation();
 
   return (
@@ -34,7 +33,10 @@ export default function TermsAndConditionsScreen() {
         showsVerticalScrollIndicator={false}
         className="px-5 pt-2 pb-10"
       >
-        <ThemedText className="text-[15px] font-nunito italic mb-4" style={{ color: theme.icon }}>
+        <ThemedText
+          className="text-[15px] font-nunito italic mb-4"
+          style={{ color: theme.icon }}
+        >
           {translate("termsAndConditions.lastUpdated")}
         </ThemedText>
 

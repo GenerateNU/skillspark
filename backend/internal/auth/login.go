@@ -39,7 +39,7 @@ func SupabaseLogin(cfg *config.Supabase, email string, password string) (models.
 		slog.Error("Failed to execute Request", "err", err)
 		return models.LoginResponse{}, errs.BadRequest("Failed to execute Request")
 	}
-	
+
 	defer func() { _ = res.Body.Close() }()
 
 	body, err := io.ReadAll(res.Body)

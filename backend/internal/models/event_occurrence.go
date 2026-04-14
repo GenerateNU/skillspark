@@ -19,6 +19,7 @@ type EventOccurrence struct {
 	ManagerId    *uuid.UUID            `json:"manager_id" db:"manager_id"`
 	Event        Event                 `json:"event" db:"-"`
 	Location     Location              `json:"location" db:"-"`
+	OrgLinks     []OrgLink             `json:"org_links" db:"-"`
 	StartTime    time.Time             `json:"start_time" db:"start_time"`
 	EndTime      time.Time             `json:"end_time" db:"end_time"`
 	MaxAttendees int                   `json:"max_attendees" db:"max_attendees"`
@@ -51,6 +52,14 @@ type GetAllEventOccurrencesInput struct {
 	MaxDate        time.Time       `query:"max_date"`
 }
 
+type GetTrendingEventOccurrencesInput struct {
+	AcceptLanguage string  `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	Latitude       float64 `query:"lat" doc:"The user's latitude" required:"true"`
+	Longitude      float64 `query:"lng" doc:"The user's longitude" required:"true"`
+	MaxReturns     int     `query:"max_returns" doc:"the maximum number of returns" minimum:"1" default:"5"`
+	Radius         int     `query:"radius" doc:"the distance away from the user a returned event can be in km" minimum:"1" default:"50"`
+}
+
 type GetAllEventOccurrencesFilter struct {
 	Search             *string
 	Latitude           *float64
@@ -70,6 +79,10 @@ type GetAllEventOccurrencesFilter struct {
 
 type GetAllEventOccurrencesOutput struct {
 	Body []EventOccurrence `json:"body" doc:"List of all event occurrences in the database"`
+}
+
+type GetTrendingEventOccurrencesOutput struct {
+	Body []EventOccurrence `json:"body" doc:"List of trending in the user's area"`
 }
 
 type GetEventOccurrenceByIDInput struct {

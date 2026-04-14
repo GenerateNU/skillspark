@@ -29,7 +29,8 @@ func TestHandler_CreateReview(t *testing.T) {
 				in := &models.CreateReviewInput{}
 				in.AcceptLanguage = "en-US"
 				in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
-				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
+				guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+				in.Body.GuardianID = &guardianID
 				in.Body.Description = "Great event!"
 				in.Body.Categories = []string{"fun", "engaging"}
 				return in
@@ -61,11 +62,12 @@ func TestHandler_CreateReview(t *testing.T) {
 					}, nil)
 
 				// create review
+				guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 				reviewRepo.On("CreateReview", mock.Anything, mock.AnythingOfType("*models.CreateReviewDBInput")).
 					Return(&models.Review{
 						ID:             uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 						RegistrationID: uuid.MustParse("10000000-0000-0000-0000-000000000001"),
-						GuardianID:     uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+						GuardianID:     &guardianID,
 						Description:    "Great event!",
 						Categories:     []string{"fun", "engaging"},
 						CreatedAt:      time.Now(),
@@ -80,7 +82,8 @@ func TestHandler_CreateReview(t *testing.T) {
 				in := &models.CreateReviewInput{}
 				in.AcceptLanguage = "en-US"
 				in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
-				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
+				guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+				in.Body.GuardianID = &guardianID
 				in.Body.Description = "Great event!"
 				in.Body.Categories = []string{"fun", "engaging"}
 				return in
@@ -97,7 +100,8 @@ func TestHandler_CreateReview(t *testing.T) {
 				in := &models.CreateReviewInput{}
 				in.AcceptLanguage = "en-US"
 				in.Body.RegistrationID = uuid.MustParse("99999999-0000-0000-0000-000000000000")
-				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
+				guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+				in.Body.GuardianID = &guardianID
 				in.Body.Description = "Great event!"
 				in.Body.Categories = []string{"fun", "engaging"}
 				return in
@@ -126,7 +130,8 @@ func TestHandler_CreateReview(t *testing.T) {
 				in := &models.CreateReviewInput{}
 				in.AcceptLanguage = "en-US"
 				in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
-				in.Body.GuardianID = uuid.MustParse("22222222-2222-2222-2222-222222222222")
+				guardianID := uuid.MustParse("22222222-2222-2222-2222-222222222222")
+				in.Body.GuardianID = &guardianID
 				in.Body.Description = "Great event!"
 				in.Body.Categories = []string{"fun", "engaging"}
 				return in
@@ -166,7 +171,8 @@ func TestHandler_CreateReview(t *testing.T) {
 				in := &models.CreateReviewInput{}
 				in.AcceptLanguage = "en-US"
 				in.Body.RegistrationID = uuid.MustParse("10000000-0000-0000-0000-000000000001")
-				in.Body.GuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
+				guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+				in.Body.GuardianID = &guardianID
 				in.Body.Description = "Great event!"
 				in.Body.Categories = []string{"fun", "engaging"}
 				return in
@@ -332,7 +338,7 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 						{
 							ID:             uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 							RegistrationID: uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-							GuardianID:     uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+							GuardianID:     func() *uuid.UUID { id := uuid.MustParse("40000000-0000-0000-0000-000000000001"); return &id }(),
 							Description:    "Great event!",
 							Categories:     []string{"fun", "engaging"},
 							CreatedAt:      time.Now(),
@@ -344,7 +350,7 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 				{
 					ID:             uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 					RegistrationID: uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-					GuardianID:     uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+					GuardianID:     func() *uuid.UUID { id := uuid.MustParse("40000000-0000-0000-0000-000000000001"); return &id }(),
 					Description:    "Great event!",
 					Categories:     []string{"fun", "engaging"},
 				},
@@ -441,7 +447,7 @@ func TestHandler_GetReviewsByGuardianID(t *testing.T) {
 						{
 							ID:             uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 							RegistrationID: uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-							GuardianID:     uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+							GuardianID:     func() *uuid.UUID { id := uuid.MustParse("11111111-1111-1111-1111-111111111111"); return &id }(),
 							Description:    "Amazing!",
 							Categories:     []string{"fun", "informative"},
 							CreatedAt:      time.Now(),
@@ -453,7 +459,7 @@ func TestHandler_GetReviewsByGuardianID(t *testing.T) {
 				{
 					ID:             uuid.MustParse("20000000-0000-0000-0000-000000000001"),
 					RegistrationID: uuid.MustParse("30000000-0000-0000-0000-000000000001"),
-					GuardianID:     uuid.MustParse("11111111-1111-1111-1111-111111111111"),
+					GuardianID:     func() *uuid.UUID { id := uuid.MustParse("11111111-1111-1111-1111-111111111111"); return &id }(),
 					Description:    "Amazing!",
 					Categories:     []string{"fun", "informative"},
 				},

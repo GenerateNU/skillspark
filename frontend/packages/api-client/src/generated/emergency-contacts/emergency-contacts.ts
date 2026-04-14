@@ -5,10 +5,7 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,444 +18,646 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   CreateEmergencyContactInputBody,
+  DeleteEmergencyContactBody,
   EmergencyContact,
   ErrorModel,
-  UpdateEmergencyContactInputBody
-} from '../skillSparkAPI.schemas';
+  UpdateEmergencyContactInputBody,
+} from "../skillSparkAPI.schemas";
 
-import { customInstance } from '../../apiClient';
+import { customInstance } from "../../apiClient";
 
 // https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
-type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
-T,
->() => T extends Y ? 1 : 2
-? A
-: B;
+type IfEquals<X, Y, A = X, B = never> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
 
 type WritableKeys<T> = {
-[P in keyof T]-?: IfEquals<
-  { [Q in P]: T[P] },
-  { -readonly [Q in P]: T[P] },
-  P
->;
+  [P in keyof T]-?: IfEquals<
+    { [Q in P]: T[P] },
+    { -readonly [Q in P]: T[P] },
+    P
+  >;
 }[keyof T];
 
-type UnionToIntersection<U> =
-  (U extends any ? (k: U)=>void : never) extends ((k: infer I)=>void) ? I : never;
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I,
+) => void
+  ? I
+  : never;
 type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
 
 type Writable<T> = Pick<T, WritableKeys<T>>;
-type NonReadonly<T> = [T] extends [UnionToIntersection<T>] ? {
-  [P in keyof Writable<T>]: T[P] extends object
-    ? NonReadonly<NonNullable<T[P]>>
-    : T[P];
-} : DistributeReadOnlyOverUnions<T>;
-
-
+type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
+  ? {
+      [P in keyof Writable<T>]: T[P] extends object
+        ? NonReadonly<NonNullable<T[P]>>
+        : T[P];
+    }
+  : DistributeReadOnlyOverUnions<T>;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
 export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
-export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 419 | 420 | 421 | 422 | 423 | 424 | 426 | 428 | 429 | 431 | 451;
+export type HTTPStatusCode4xx =
+  | 400
+  | 401
+  | 402
+  | 403
+  | 404
+  | 405
+  | 406
+  | 407
+  | 408
+  | 409
+  | 410
+  | 411
+  | 412
+  | 413
+  | 414
+  | 415
+  | 416
+  | 417
+  | 418
+  | 419
+  | 420
+  | 421
+  | 422
+  | 423
+  | 424
+  | 426
+  | 428
+  | 429
+  | 431
+  | 451;
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
-export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
-
+export type HTTPStatusCodes =
+  | HTTPStatusCode1xx
+  | HTTPStatusCode2xx
+  | HTTPStatusCode3xx
+  | HTTPStatusCode4xx
+  | HTTPStatusCode5xx;
 
 /**
  * Creates an emergency contact
  * @summary Creates an emergency contact
  */
 export type createEmergencyContactResponse200 = {
-  data: EmergencyContact
-  status: 200
-}
+  data: EmergencyContact;
+  status: 200;
+};
 
 export type createEmergencyContactResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type createEmergencyContactResponseSuccess = (createEmergencyContactResponse200) & {
-  headers: Headers;
-};
-export type createEmergencyContactResponseError = (createEmergencyContactResponseDefault) & {
-  headers: Headers;
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type createEmergencyContactResponse = (createEmergencyContactResponseSuccess | createEmergencyContactResponseError)
+export type createEmergencyContactResponseSuccess =
+  createEmergencyContactResponse200 & {
+    headers: Headers;
+  };
+export type createEmergencyContactResponseError =
+  createEmergencyContactResponseDefault & {
+    headers: Headers;
+  };
+
+export type createEmergencyContactResponse =
+  | createEmergencyContactResponseSuccess
+  | createEmergencyContactResponseError;
 
 export const getCreateEmergencyContactUrl = () => {
+  return `/api/v1/emergency-contact`;
+};
 
+export const createEmergencyContact = async (
+  createEmergencyContactInputBody: NonReadonly<CreateEmergencyContactInputBody>,
+  options?: RequestInit,
+): Promise<createEmergencyContactResponse> => {
+  return customInstance<createEmergencyContactResponse>(
+    getCreateEmergencyContactUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createEmergencyContactInputBody),
+    },
+  );
+};
 
-  
+export const getCreateEmergencyContactMutationOptions = <
+  TError = ErrorModel,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createEmergencyContact>>,
+    TError,
+    { data: NonReadonly<CreateEmergencyContactInputBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createEmergencyContact>>,
+  TError,
+  { data: NonReadonly<CreateEmergencyContactInputBody> },
+  TContext
+> => {
+  const mutationKey = ["createEmergencyContact"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-  return `/api/v1/emergency-contact`
-}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createEmergencyContact>>,
+    { data: NonReadonly<CreateEmergencyContactInputBody> }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const createEmergencyContact = async (createEmergencyContactInputBody: NonReadonly<CreateEmergencyContactInputBody>, options?: RequestInit): Promise<createEmergencyContactResponse> => {
-  
-  return customInstance<createEmergencyContactResponse>(getCreateEmergencyContactUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createEmergencyContactInputBody,)
-  }
-);}
+    return createEmergencyContact(data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type CreateEmergencyContactMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createEmergencyContact>>
+>;
+export type CreateEmergencyContactMutationBody =
+  NonReadonly<CreateEmergencyContactInputBody>;
+export type CreateEmergencyContactMutationError = ErrorModel;
 
-
-export const getCreateEmergencyContactMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createEmergencyContact>>, TError,{data: NonReadonly<CreateEmergencyContactInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createEmergencyContact>>, TError,{data: NonReadonly<CreateEmergencyContactInputBody>}, TContext> => {
-
-const mutationKey = ['createEmergencyContact'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createEmergencyContact>>, {data: NonReadonly<CreateEmergencyContactInputBody>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createEmergencyContact(data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateEmergencyContactMutationResult = NonNullable<Awaited<ReturnType<typeof createEmergencyContact>>>
-    export type CreateEmergencyContactMutationBody = NonReadonly<CreateEmergencyContactInputBody>
-    export type CreateEmergencyContactMutationError = ErrorModel
-
-    /**
+/**
  * @summary Creates an emergency contact
  */
-export const useCreateEmergencyContact = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createEmergencyContact>>, TError,{data: NonReadonly<CreateEmergencyContactInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createEmergencyContact>>,
-        TError,
-        {data: NonReadonly<CreateEmergencyContactInputBody>},
-        TContext
-      > => {
-      return useMutation(getCreateEmergencyContactMutationOptions(options), queryClient);
-    }
-    /**
+export const useCreateEmergencyContact = <
+  TError = ErrorModel,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createEmergencyContact>>,
+      TError,
+      { data: NonReadonly<CreateEmergencyContactInputBody> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createEmergencyContact>>,
+  TError,
+  { data: NonReadonly<CreateEmergencyContactInputBody> },
+  TContext
+> => {
+  return useMutation(
+    getCreateEmergencyContactMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * Returns emergency contacts by guardian id
  * @summary Get emergency contacts by guardian id
  */
 export type getEmergencyContactsByGuardianIdResponse200 = {
-  data: EmergencyContact[]
-  status: 200
-}
+  data: EmergencyContact[];
+  status: 200;
+};
 
 export type getEmergencyContactsByGuardianIdResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type getEmergencyContactsByGuardianIdResponseSuccess = (getEmergencyContactsByGuardianIdResponse200) & {
-  headers: Headers;
-};
-export type getEmergencyContactsByGuardianIdResponseError = (getEmergencyContactsByGuardianIdResponseDefault) & {
-  headers: Headers;
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type getEmergencyContactsByGuardianIdResponse = (getEmergencyContactsByGuardianIdResponseSuccess | getEmergencyContactsByGuardianIdResponseError)
+export type getEmergencyContactsByGuardianIdResponseSuccess =
+  getEmergencyContactsByGuardianIdResponse200 & {
+    headers: Headers;
+  };
+export type getEmergencyContactsByGuardianIdResponseError =
+  getEmergencyContactsByGuardianIdResponseDefault & {
+    headers: Headers;
+  };
 
-export const getGetEmergencyContactsByGuardianIdUrl = (guardianId: string,) => {
+export type getEmergencyContactsByGuardianIdResponse =
+  | getEmergencyContactsByGuardianIdResponseSuccess
+  | getEmergencyContactsByGuardianIdResponseError;
 
+export const getGetEmergencyContactsByGuardianIdUrl = (guardianId: string) => {
+  return `/api/v1/emergency-contact/${guardianId}`;
+};
 
-  
+export const getEmergencyContactsByGuardianId = async (
+  guardianId: string,
+  options?: RequestInit,
+): Promise<getEmergencyContactsByGuardianIdResponse> => {
+  return customInstance<getEmergencyContactsByGuardianIdResponse>(
+    getGetEmergencyContactsByGuardianIdUrl(guardianId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
-  return `/api/v1/emergency-contact/${guardianId}`
-}
-
-export const getEmergencyContactsByGuardianId = async (guardianId: string, options?: RequestInit): Promise<getEmergencyContactsByGuardianIdResponse> => {
-  
-  return customInstance<getEmergencyContactsByGuardianIdResponse>(getGetEmergencyContactsByGuardianIdUrl(guardianId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getGetEmergencyContactsByGuardianIdQueryKey = (guardianId: string,) => {
-    return [
-    `/api/v1/emergency-contact/${guardianId}`
-    ] as const;
-    }
-
-    
-export const getGetEmergencyContactsByGuardianIdQueryOptions = <TData = Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError = ErrorModel>(guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetEmergencyContactsByGuardianIdQueryKey = (
+  guardianId: string,
 ) => {
+  return [`/api/v1/emergency-contact/${guardianId}`] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getGetEmergencyContactsByGuardianIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+  TError = ErrorModel,
+>(
+  guardianId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetEmergencyContactsByGuardianIdQueryKey(guardianId);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetEmergencyContactsByGuardianIdQueryKey(guardianId);
 
-  
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>
+  > = ({ signal }) =>
+    getEmergencyContactsByGuardianId(guardianId, { signal, ...requestOptions });
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>> = ({ signal }) => getEmergencyContactsByGuardianId(guardianId, { signal, ...requestOptions });
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!guardianId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      
+export type GetEmergencyContactsByGuardianIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>
+>;
+export type GetEmergencyContactsByGuardianIdQueryError = ErrorModel;
 
-      
-
-   return  { queryKey, queryFn, enabled: !!(guardianId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetEmergencyContactsByGuardianIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>>
-export type GetEmergencyContactsByGuardianIdQueryError = ErrorModel
-
-
-export function useGetEmergencyContactsByGuardianId<TData = Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError = ErrorModel>(
- guardianId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError, TData>> & Pick<
+export function useGetEmergencyContactsByGuardianId<
+  TData = Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+  TError = ErrorModel,
+>(
+  guardianId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
           TError,
           Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetEmergencyContactsByGuardianId<TData = Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError = ErrorModel>(
- guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetEmergencyContactsByGuardianId<
+  TData = Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+  TError = ErrorModel,
+>(
+  guardianId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
           TError,
           Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetEmergencyContactsByGuardianId<TData = Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError = ErrorModel>(
- guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetEmergencyContactsByGuardianId<
+  TData = Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+  TError = ErrorModel,
+>(
+  guardianId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get emergency contacts by guardian id
  */
 
-export function useGetEmergencyContactsByGuardianId<TData = Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError = ErrorModel>(
- guardianId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetEmergencyContactsByGuardianId<
+  TData = Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+  TError = ErrorModel,
+>(
+  guardianId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getEmergencyContactsByGuardianId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetEmergencyContactsByGuardianIdQueryOptions(
+    guardianId,
+    options,
+  );
 
-  const queryOptions = getGetEmergencyContactsByGuardianIdQueryOptions(guardianId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
 
 /**
  * Deletes an emergency contact
  * @summary Delete an emergency contact
  */
 export type deleteEmergencyContactResponse200 = {
-  data: EmergencyContact
-  status: 200
-}
+  data: DeleteEmergencyContactBody;
+  status: 200;
+};
 
 export type deleteEmergencyContactResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type deleteEmergencyContactResponseSuccess = (deleteEmergencyContactResponse200) & {
-  headers: Headers;
-};
-export type deleteEmergencyContactResponseError = (deleteEmergencyContactResponseDefault) & {
-  headers: Headers;
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type deleteEmergencyContactResponse = (deleteEmergencyContactResponseSuccess | deleteEmergencyContactResponseError)
+export type deleteEmergencyContactResponseSuccess =
+  deleteEmergencyContactResponse200 & {
+    headers: Headers;
+  };
+export type deleteEmergencyContactResponseError =
+  deleteEmergencyContactResponseDefault & {
+    headers: Headers;
+  };
 
-export const getDeleteEmergencyContactUrl = (id: string,) => {
+export type deleteEmergencyContactResponse =
+  | deleteEmergencyContactResponseSuccess
+  | deleteEmergencyContactResponseError;
 
+export const getDeleteEmergencyContactUrl = (id: string) => {
+  return `/api/v1/emergency-contact/${id}`;
+};
 
-  
+export const deleteEmergencyContact = async (
+  id: string,
+  options?: RequestInit,
+): Promise<deleteEmergencyContactResponse> => {
+  return customInstance<deleteEmergencyContactResponse>(
+    getDeleteEmergencyContactUrl(id),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
 
-  return `/api/v1/emergency-contact/${id}`
-}
+export const getDeleteEmergencyContactMutationOptions = <
+  TError = ErrorModel,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteEmergencyContact>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteEmergencyContact>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ["deleteEmergencyContact"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const deleteEmergencyContact = async (id: string, options?: RequestInit): Promise<deleteEmergencyContactResponse> => {
-  
-  return customInstance<deleteEmergencyContactResponse>(getDeleteEmergencyContactUrl(id),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteEmergencyContact>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
+    return deleteEmergencyContact(id, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type DeleteEmergencyContactMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteEmergencyContact>>
+>;
 
-export const getDeleteEmergencyContactMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEmergencyContact>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteEmergencyContact>>, TError,{id: string}, TContext> => {
+export type DeleteEmergencyContactMutationError = ErrorModel;
 
-const mutationKey = ['deleteEmergencyContact'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEmergencyContact>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  deleteEmergencyContact(id,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteEmergencyContactMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEmergencyContact>>>
-    
-    export type DeleteEmergencyContactMutationError = ErrorModel
-
-    /**
+/**
  * @summary Delete an emergency contact
  */
-export const useDeleteEmergencyContact = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEmergencyContact>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteEmergencyContact>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
-      return useMutation(getDeleteEmergencyContactMutationOptions(options), queryClient);
-    }
-    /**
+export const useDeleteEmergencyContact = <
+  TError = ErrorModel,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteEmergencyContact>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteEmergencyContact>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  return useMutation(
+    getDeleteEmergencyContactMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * Update an emergency contact
  * @summary Updates an emergency contact
  */
 export type updateEmergencyContactResponse200 = {
-  data: EmergencyContact
-  status: 200
-}
+  data: EmergencyContact;
+  status: 200;
+};
 
 export type updateEmergencyContactResponseDefault = {
-  data: ErrorModel
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type updateEmergencyContactResponseSuccess = (updateEmergencyContactResponse200) & {
-  headers: Headers;
-};
-export type updateEmergencyContactResponseError = (updateEmergencyContactResponseDefault) & {
-  headers: Headers;
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type updateEmergencyContactResponse = (updateEmergencyContactResponseSuccess | updateEmergencyContactResponseError)
+export type updateEmergencyContactResponseSuccess =
+  updateEmergencyContactResponse200 & {
+    headers: Headers;
+  };
+export type updateEmergencyContactResponseError =
+  updateEmergencyContactResponseDefault & {
+    headers: Headers;
+  };
 
-export const getUpdateEmergencyContactUrl = (id: string,) => {
+export type updateEmergencyContactResponse =
+  | updateEmergencyContactResponseSuccess
+  | updateEmergencyContactResponseError;
 
+export const getUpdateEmergencyContactUrl = (id: string) => {
+  return `/api/v1/emergency-contact/${id}`;
+};
 
-  
+export const updateEmergencyContact = async (
+  id: string,
+  updateEmergencyContactInputBody: NonReadonly<UpdateEmergencyContactInputBody>,
+  options?: RequestInit,
+): Promise<updateEmergencyContactResponse> => {
+  return customInstance<updateEmergencyContactResponse>(
+    getUpdateEmergencyContactUrl(id),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateEmergencyContactInputBody),
+    },
+  );
+};
 
-  return `/api/v1/emergency-contact/${id}`
-}
+export const getUpdateEmergencyContactMutationOptions = <
+  TError = ErrorModel,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateEmergencyContact>>,
+    TError,
+    { id: string; data: NonReadonly<UpdateEmergencyContactInputBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateEmergencyContact>>,
+  TError,
+  { id: string; data: NonReadonly<UpdateEmergencyContactInputBody> },
+  TContext
+> => {
+  const mutationKey = ["updateEmergencyContact"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const updateEmergencyContact = async (id: string,
-    updateEmergencyContactInputBody: NonReadonly<UpdateEmergencyContactInputBody>, options?: RequestInit): Promise<updateEmergencyContactResponse> => {
-  
-  return customInstance<updateEmergencyContactResponse>(getUpdateEmergencyContactUrl(id),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      updateEmergencyContactInputBody,)
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateEmergencyContact>>,
+    { id: string; data: NonReadonly<UpdateEmergencyContactInputBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return updateEmergencyContact(id, data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type UpdateEmergencyContactMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateEmergencyContact>>
+>;
+export type UpdateEmergencyContactMutationBody =
+  NonReadonly<UpdateEmergencyContactInputBody>;
+export type UpdateEmergencyContactMutationError = ErrorModel;
 
-export const getUpdateEmergencyContactMutationOptions = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateEmergencyContact>>, TError,{id: string;data: NonReadonly<UpdateEmergencyContactInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateEmergencyContact>>, TError,{id: string;data: NonReadonly<UpdateEmergencyContactInputBody>}, TContext> => {
-
-const mutationKey = ['updateEmergencyContact'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateEmergencyContact>>, {id: string;data: NonReadonly<UpdateEmergencyContactInputBody>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  updateEmergencyContact(id,data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateEmergencyContactMutationResult = NonNullable<Awaited<ReturnType<typeof updateEmergencyContact>>>
-    export type UpdateEmergencyContactMutationBody = NonReadonly<UpdateEmergencyContactInputBody>
-    export type UpdateEmergencyContactMutationError = ErrorModel
-
-    /**
+/**
  * @summary Updates an emergency contact
  */
-export const useUpdateEmergencyContact = <TError = ErrorModel,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateEmergencyContact>>, TError,{id: string;data: NonReadonly<UpdateEmergencyContactInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updateEmergencyContact>>,
-        TError,
-        {id: string;data: NonReadonly<UpdateEmergencyContactInputBody>},
-        TContext
-      > => {
-      return useMutation(getUpdateEmergencyContactMutationOptions(options), queryClient);
-    }
-    
+export const useUpdateEmergencyContact = <
+  TError = ErrorModel,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateEmergencyContact>>,
+      TError,
+      { id: string; data: NonReadonly<UpdateEmergencyContactInputBody> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateEmergencyContact>>,
+  TError,
+  { id: string; data: NonReadonly<UpdateEmergencyContactInputBody> },
+  TContext
+> => {
+  return useMutation(
+    getUpdateEmergencyContactMutationOptions(options),
+    queryClient,
+  );
+};

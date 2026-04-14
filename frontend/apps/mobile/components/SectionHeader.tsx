@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, useColorScheme } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { Colors } from "@/constants/theme";
 
@@ -14,8 +14,7 @@ export function SectionHeader({
   actionLabel,
   onAction,
 }: SectionHeaderProps) {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
 
   return (
     <View className="flex-row justify-between items-center py-[14px]">

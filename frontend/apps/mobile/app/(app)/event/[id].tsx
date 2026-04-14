@@ -18,17 +18,10 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { StarRating } from "@/components/StarRating";
 import { useTranslation } from "react-i18next";
+import { ListItem } from "@/components/ListItem";
+import { AboutPage } from "@/components/AboutPage";
 
-function formatRelativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const days = Math.floor(diff / 86400000);
-  if (days < 1) return "today";
-  if (days < 7) return `${days}d`;
-  if (days < 30) return `${Math.floor(days / 7)}w`;
-  return `${Math.floor(days / 30)}mo`;
-}
-
-function formatLocation(occurrence: EventOccurrence) {
+function formatAddress(occurrence: EventOccurrence) {
   const loc = occurrence.location;
   const parts = [loc.address_line1, loc.district].filter(Boolean);
   return parts.join(", ") || "Location";
@@ -61,58 +54,44 @@ function EventOccurrenceDetail({
       <View
         className="flex-row items-center bg-white px-4 border-b"
         style={{
-          paddingTop: insets.top + 6,
-          paddingBottom: 10,
-          borderBottomColor: AppColors.divider,
+          marginTop: insets.top + 8,
+          marginBottom: insets.bottom - 20,
+          shadowColor: "#000",
+          shadowOpacity: 0.12,
+          shadowRadius: 20,
         }}
       >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          activeOpacity={0.7}
-          className="w-8 h-8 items-center justify-center"
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          contentContainerStyle={{ flexGrow: 1 }}
         >
-          <IconSymbol
-            name="chevron.left"
-            size={28}
-            color={AppColors.primaryText}
-          />
-        </TouchableOpacity>
-        <Text
-          className="flex-1 text-center"
-          style={{
-            fontSize: 17,
-            fontFamily: FontFamilies.bold,
-            color: AppColors.primaryText,
-          }}
-          numberOfLines={1}
-        >
-          {occurrence.event.title}
-        </Text>
-        <View style={{ width: 32 }} />
-      </View>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 24 }}
-      >
-        <View
-          style={{
-            height: 220,
-            backgroundColor: AppColors.imagePlaceholder,
-          }}
-        >
-          {occurrence.event.presigned_url ? (
-            <Image
-              source={{ uri: occurrence.event.presigned_url }}
-              className="w-full h-full"
-              contentFit="cover"
-            />
-          ) : (
-            <View className="flex-1 bg-[#C5C5C5]" />
-          )}
-        </View>
-        <View className="px-4 pt-4 pb-2">
-          <View className="flex-row items-start justify-between">
-            <View className="flex-1 mr-3">
+          {/* Hero image */}
+          <View className="h-[250px] bg-[#1a1a1a]">
+            {occurrence.event.presigned_url ? (
+              <Image
+                source={{ uri: occurrence.event.presigned_url }}
+                style={{ width: "100%", height: "100%" }}
+                contentFit="cover"
+              />
+            ) : (
+              <View className="flex-1 bg-[#C5C5C5]" />
+            )}
+            <TouchableOpacity
+              onPress={() => router.back()}
+              activeOpacity={0.7}
+              className="absolute top-4 left-4 z-10 flex-row items-center bg-white rounded-full px-4 py-2.5 elevation-10"
+              style={{
+                shadowColor: "#000",
+                shadowOpacity: 0.15,
+                shadowRadius: 8,
+              }}
+            >
+              <MaterialIcons
+                name="chevron-left"
+                size={20}
+                color={AppColors.primaryText}
+              />
               <Text
                 style={{
                   fontSize: 26,
@@ -133,15 +112,36 @@ function EventOccurrenceDetail({
               >
                 {location}
               </Text>
-              {!!categories && (
-                <View className="flex-row items-center gap-1.5 mb-1.5">
-                  <Text style={{ fontSize: FontSizes.base }}>⚽</Text>
-                  <Text
-                    style={{
-                      fontSize: FontSizes.base,
-                      color: AppColors.secondaryText,
-                      fontFamily: FontFamilies.regular,
-                    }}
+              <StarRating size={17} />
+              <ListItem
+                label={translate("review.title")}
+                isLast
+                onPress={() =>
+                  router.push({
+                    pathname: `/event/[id]/reviews`,
+                    params: {
+                      id: occurrence.event.id,
+                      occurrenceId: occurrence.id,
+                      canReview: "true",
+                      eventName: occurrence.event.title,
+                      eventLocation: address,
+                      eventImageUrl: occurrence.event.presigned_url ?? "",
+                    },
+                  })
+                }
+              />
+            </View>
+            <AboutPage
+              description={occurrence.event.description}
+              links={occurrence.org_links ?? []}
+            />
+            <View className="flex-row items-center justify-between mt-2">
+              <View className="flex-row gap-2 flex-1 flex-wrap">
+                {occurrence.event.category?.map((cat) => (
+                  <View
+                    key={cat}
+                    className="border-[1.5px] rounded-full px-4 py-[7px]"
+                    style={{ borderColor: AppColors.borderLight }}
                   >
                     {categories}
                   </Text>

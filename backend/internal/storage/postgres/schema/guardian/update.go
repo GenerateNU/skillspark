@@ -58,6 +58,7 @@ func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *model
 		&updatedGuardian.Username,
 		&updatedGuardian.ProfilePictureS3Key,
 		&updatedGuardian.LanguagePreference,
+		&updatedGuardian.AuthID,
 	)
 
 	if err != nil {

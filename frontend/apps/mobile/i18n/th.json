@@ -2,6 +2,7 @@
   "nav": {
     "home": "หน้าหลัก",
     "map": "แผนที่",
+    "activity": "กิจกรรม",
     "profile": "โปรไฟล์",
     "events": "กิจกรรม",
     "about": "เกี่ยวกับ"
@@ -10,6 +11,7 @@
     "submit": "ส่ง",
     "cancel": "ยกเลิก",
     "loading": "กำลังโหลด...",
+    "saving": "กำลังบันทึก...",
     "loadingMapData": "กำลังโหลดข้อมูลแผนที่...",
     "loadingEvents": "กำลังโหลดกิจกรรม...",
     "errorLoadingEvents": "เกิดข้อผิดพลาดในการโหลดกิจกรรม",
@@ -19,6 +21,8 @@
     "noEventsAvailable": "ไม่มีกิจกรรม",
     "noUpcomingEvents": "ไม่มีกิจกรรมที่จะมาถึง",
     "noGuardianId": "ไม่สามารถโหลดได้: ไม่พบบัญชี",
+    "noEventId": "โหลดไม่ได้: ไม่พบรหัสเหตุการณ์",
+    "noReviewsAvailable": "ไม่มีบทวิจารณ์",
     "noChildrenFound": "ไม่พบข้อมูลเด็ก",
     "noChildProfilesAdded": "ยังไม่มีโปรไฟล์เด็ก",
     "noEmergencyContactsAdded": "ยังไม่มีผู้ติดต่อฉุกเฉิน",
@@ -37,7 +41,7 @@
     "forYou": "สำหรับคุณ",
     "basedOn": "ตามจาก",
     "upcomingEvents": "กิจกรรมที่จะมาถึง",
-    "reserve": "จอง",
+    "learnMore": "Learn More",
     "reserved": "จองแล้ว",
     "learnMore": "ดูเพิ่มเติม",
     "members": "สมาชิก",
@@ -125,9 +129,18 @@
     "title": "การชำระเงิน",
     "manageBilling": "จัดการการเรียกเก็บเงิน",
     "creditCard": "บัตรเครดิต",
+    "expires": "วันหมดอายุ",
     "name": "ชื่อ",
+    "save": "บันทึก",
+    "noCard": "ไม่มีบัตรที่ลงทะเบียนไว้",
     "updateBilling": "อัปเดตการเรียกเก็บเงิน",
-    "delete": "ลบ"
+    "delete": "ลบ",
+    "deleteModal": {
+      "title": "ลบหรือไม่?",
+      "description": "คุณแน่ใจหรือไม่ว่าต้องการลบวิธีการชำระเงินนี้?",
+      "confirm": "ยืนยัน",
+      "deleting": "กำลังลบ..."
+    }
   },
   "familyInformation": {
     "title": "ข้อมูลครอบครัว",
@@ -155,13 +168,80 @@
     "deleteConfirm": "คุณต้องการลบโปรไฟล์เด็กนี้ใช่ไหม?",
     "requiredFieldsError": "กรุณากรอกข้อมูลที่จำเป็นทั้งหมด (ชื่อ วันเกิด รหัสโรงเรียน)",
     "saveError": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
-    "deleteError": "ลบไม่สำเร็จ"
+    "deleteError": "ลบไม่สำเร็จ",
+    "changeProfilePicture": "เปลี่ยนรูปโปรไฟล์",
+    "avatarTabColors": "สี",
+    "avatarTabAvatar": "อวตาร"
   },
   "saved": {
     "title": "ที่บันทึกไว้",
     "noEvents": "คุณไม่มีกิจกรรมที่บันทึกไว้",
     "deleteTitle": "ลบกิจกรรมที่บันทึก",
     "deleteConfirm": "คุณต้องการลบกิจกรรมที่บันทึกนี้ใช่ไหม?"
+  },
+  "review": {
+    "title": "บทวิจารณ์",
+    "bad": "ไม่ดี",
+    "okay": "โอเค",
+    "good": "น่าพึงพอใจ",
+    "terrible": "แย่มาก",
+    "excellent": "ดีเยี่ยม",
+    "noReviews": "ไม่มีความคิดเห็น",
+    "tapToReview": "แตะเพื่อรีวิว",
+    "writeReview": "เขียนรีวิว",
+    "firstReview": "เป็นคนแรกที่รีวิว!",
+    "mostRecent": "ล่าสุด",
+    "mostRated": "ได้รับการประเมินมากที่สุด",
+    "highest": "สูงสุด",
+    "lowest": "ต่ำสุด",
+    "reviews": "รีวิว",
+    "leaveReview": "เขียนรีวิว",
+    "howWasExperience": "ประสบการณ์ของคุณเป็นอย่างไร?",
+    "content": "เนื้อหา",
+    "fun": "สนุก",
+    "engaging": "น่าดึงดูด",
+    "interesting": "น่าสนใจ",
+    "informative": "ให้ข้อมูลดี",
+    "interactive": "มีปฏิสัมพันธ์",
+    "immersive": "ดื่มด่ำ",
+    "educational": "เรียนรู้ได้ดี",
+    "insightful": "ให้ข้อคิดดี",
+    "wellStructured": "มีโครงสร้างดี",
+    "difficulty": "ระดับความยาก",
+    "beginnerFriendly": "เหมาะสำหรับมือใหม่",
+    "intermediate": "ระดับกลาง",
+    "tooEasy": "ง่ายเกินไป",
+    "advanced": "ระดับสูง",
+    "challenging": "ท้าทาย",
+    "instructor": "ผู้สอน",
+    "punctual": "ตรงต่อเวลา",
+    "clearInstruction": "สอนชัดเจน",
+    "welcoming": "เป็นกันเอง",
+    "inclusive": "ดูแลทุกคน",
+    "collaborative": "ร่วมมือกันดี",
+    "value": "ความคุ้มค่า",
+    "affordable": "ราคาเหมาะสม",
+    "fair": "พอรับได้",
+    "expensive": "แพง",
+    "tellUsMore": "บอกเราเพิ่มเติมหน่อย",
+    "optional": "(ไม่บังคับ)",
+    "typeDescription": "พิมพ์คำอธิบายที่นี่...",
+    "submitAnonymously": "ส่งแบบไม่ระบุชื่อ",
+    "next": "ถัดไป",
+    "back": "ย้อนกลับ",
+    "close": "ปิด",
+    "thankYou": "ขอบคุณ!",
+    "thankYouMessage": "ขอบคุณที่แบ่งปันประสบการณ์ของคุณ! ความคิดเห็นของคุณช่วยให้ผู้อื่นในชุมชนค้นพบกิจกรรมที่พวกเขาจะชอบ",
+    "anonymous": "ไม่ระบุชื่อ"
+  },
+  "time": {
+    "today": "วันนี้",
+    "oneDayAgo": "1 วันที่แล้ว",
+    "daysAgo": "หลายวันก่อน",
+    "oneMonthAgo": "1 เดือนที่แล้ว",
+    "monthsAgo": "หลายเดือนก่อน",
+    "oneYearAgo": "1 ปีที่แล้ว",
+    "yearsAgo": "หลายปีที่แล้ว"
   },
   "event": {
     "back": "กลับ",
@@ -199,6 +279,25 @@
     "saveError": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
     "deleteError": "ลบไม่สำเร็จ"
   },
+  "map": {
+    "filterTime": "เวลา",
+    "filterDistance": "ระยะทาง",
+    "sortBy": "เรียงตาม",
+    "filter": "กรอง",
+    "km": "กม.",
+    "stars": "ดาว"
+  },
+  "activity": {
+    "activity": "กิจกรรม"
+  },
+  "org": {
+    "about": "เกี่ยวกับ",
+    "noDescription": "ไม่มีคำอธิบาย",
+    "seeSchedule": "ดูตารางเวลา",
+    "notFound": "ไม่พบองค์กร",
+    "bookingsThisWeek": "การจองสัปดาห์นี้",
+    "reviews": "รีวิว"
+  },
   "interests": {
     "science": "วิทยาศาสตร์",
     "math": "คณิตศาสตร์",
@@ -208,5 +307,13 @@
     "technology": "เทคโนโลยี",
     "language": "ภาษา",
     "other": "อื่นๆ"
+  },
+  "editProfile": {
+    "title": "ข้อมูลครอบครัว",
+    "subtitle": "แก้ไขโปรไฟล์",
+    "name": "ชื่อ",
+    "username": "ชื่อผู้ใช้",
+    "changeImage": "เปลี่ยนรูปภาพ",
+    "saveChanges": "บันทึกการเปลี่ยนแปลง"
   }
 }

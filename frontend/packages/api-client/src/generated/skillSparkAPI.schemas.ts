@@ -98,6 +98,8 @@ export interface CancelRegistrationOutputBody {
 export interface Child {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
+  avatar_background: string;
+  avatar_face: string;
   birth_month: number;
   birth_year: number;
   created_at: string;
@@ -113,6 +115,10 @@ export interface Child {
 export interface CreateChildInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
+  /** Background color hex for the child's avatar */
+  avatar_background?: string;
+  /** Avatar face identifier for the child's profile picture */
+  avatar_face?: string;
   /**
    * Birth month of the child
    * @minimum 1
@@ -245,13 +251,22 @@ export interface CreateOrgLoginLinkOutputBody {
   login_url: string;
 }
 
+export interface OrgLink {
+  /** URL to the organization resource */
+  href: string;
+  /** Human-readable label for the organization link */
+  label: string;
+}
+
 export interface Organization {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
+  about?: string;
   active: boolean;
   created_at: string;
   id: string;
-  location_id: string;
+  links: OrgLink[];
+  location_id?: string;
   name: string;
   pfp_s3_key?: string;
   presigned_url: string;
@@ -300,8 +315,8 @@ export interface CreateReviewInputBody {
   categories: string[];
   /** The review text */
   description: string;
-  /** ID of the guardian */
-  guardian_id: string;
+  /** ID of the guardian. Omit or set to null for an anonymous review. */
+  guardian_id?: string;
   /** Rating left with the review, can be 1-5 inclusive */
   rating: number;
   /** ID of the linked registration */
@@ -340,6 +355,12 @@ export interface CreateStripeOnboardingLinkOutputBody {
   onboarding_url: string;
 }
 
+export interface DeleteEmergencyContactBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  success_message: string;
+}
+
 export interface DeleteEventOutputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -359,6 +380,15 @@ export interface DeleteSavedOutputBody {
   readonly $schema?: string;
   /** Success message */
   message: string;
+}
+
+export interface DetachPaymentMethodInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Guardian ID */
+  guardian_id: string;
+  /** Payment Method ID */
+  payment_method_id: string;
 }
 
 export interface EmergencyContact {
@@ -456,6 +486,7 @@ export interface EventOccurrence {
   location: Location;
   manager_id: string;
   max_attendees: number;
+  org_links: OrgLink[];
   /** Price in cents (e.g., 10000 = $100) */
   price: number;
   start_time: string;
@@ -667,7 +698,7 @@ export interface Review {
   description: string;
   /** ID of the event */
   event_id: string;
-  /** ID of the guardian */
+  /** ID of the guardian. Null when the review was submitted anonymously. */
   guardian_id: string;
   /** Unique review identifier */
   id: string;
@@ -714,6 +745,10 @@ export interface School {
 export interface UpdateChildInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
+  /** Background color hex for the child's avatar */
+  avatar_background?: string;
+  /** Avatar face identifier for the child's profile picture */
+  avatar_face?: string;
   /**
    * Birth month of the child
    * @minimum 1
@@ -927,7 +962,9 @@ export type ListOrganizationsParams = {
 };
 
 export type CreateOrganizationBody = {
+  about?: Blob | string;
   active?: boolean;
+  links?: Blob | string;
   location_id?: Blob | string;
   /**
    * @minLength 1
@@ -938,7 +975,9 @@ export type CreateOrganizationBody = {
 };
 
 export type UpdateOrganizationBody = {
+  about?: Blob | string;
   active?: boolean;
+  links?: Blob | string;
   location_id?: Blob | string;
   /**
    * @minLength 1
@@ -946,6 +985,23 @@ export type UpdateOrganizationBody = {
    */
   name: Blob | string;
   profile_image?: Blob;
+};
+
+export type GetRecommendationsByChildIdParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  lat?: string;
+  lng?: string;
+  radius_km?: number;
+  min_date?: string;
+  max_date?: string;
 };
 
 export type GetReviewByEventIdParams = {
@@ -963,6 +1019,20 @@ export type GetReviewByEventIdParams = {
 };
 
 export type GetReviewByGuardianIdParams = {
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+};
+
+export type GetReviewByOrganizationIdParams = {
   /**
    * Page number (starts at 1)
    * @minimum 1
@@ -1000,4 +1070,25 @@ export type GetAllSchoolsParams = {
    * @maximum 100
    */
   limit?: number;
+};
+
+export type GetTrendingEventOccurrencesParams = {
+  /**
+   * The user's latitude
+   */
+  lat: number;
+  /**
+   * The user's longitude
+   */
+  lng: number;
+  /**
+   * the maximum number of returns
+   * @minimum 1
+   */
+  max_returns?: number;
+  /**
+   * the distance away from the user a returned event can be in km
+   * @minimum 1
+   */
+  radius?: number;
 };

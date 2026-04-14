@@ -70,4 +70,3 @@ func (p *NotificationProcessor) ProcessNotification(ctx context.Context, message
 
 	return nil
 }
-
