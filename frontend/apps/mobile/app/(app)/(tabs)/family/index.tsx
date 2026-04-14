@@ -17,6 +17,7 @@ import { SectionHeader } from "@/components/SectionHeader";
 import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import { ErrorScreen } from "@/components/ErrorScreen";
 import { EmergencyContactListItem } from "@/components/EmergencyContactListItem";
 import { NoProfilePic } from "@/components/NoProfilePic";
 

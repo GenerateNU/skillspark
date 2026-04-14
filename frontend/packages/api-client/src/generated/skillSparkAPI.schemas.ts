@@ -389,6 +389,15 @@ export interface DeleteSavedOutputBody {
   message: string;
 }
 
+export interface DetachPaymentMethodInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Guardian ID */
+  guardian_id: string;
+  /** Payment Method ID */
+  payment_method_id: string;
+}
+
 export interface EmergencyContact {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
