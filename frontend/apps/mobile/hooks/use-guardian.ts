@@ -5,7 +5,6 @@ import {
 } from "@skillspark/api-client";
 
 export function useGuardian(guardianId: string | null) {
-
   const { data: guardianResponse, isLoading: guardianLoading } =
     useGetGuardianById(guardianId || "");
 

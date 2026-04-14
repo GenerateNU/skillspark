@@ -49,7 +49,7 @@ interface AuthContextType {
     profile_picture_s3_key?: string | undefined,
     expo_push_token?: string | undefined,
     push_notifications?: boolean,
-    email_notifications?: boolean
+    email_notifications?: boolean,
   ) => void;
 }
 
@@ -198,8 +198,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           profile_picture_s3_key,
           username,
           expo_push_token,
-          push_notifications, 
-          email_notifications
+          push_notifications,
+          email_notifications,
         },
       },
       {

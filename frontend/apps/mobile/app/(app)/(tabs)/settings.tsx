@@ -162,7 +162,10 @@ export default function SettingsScreen() {
             <Switch
               value={pushEnabled}
               onValueChange={handlePushToggle}
-              trackColor={{ false: AppColors.borderLight, true: AppColors.checkboxSelected }}
+              trackColor={{
+                false: AppColors.borderLight,
+                true: AppColors.checkboxSelected,
+              }}
               thumbColor={Colors.light.dropdownBg}
             />
           </View>
@@ -174,7 +177,10 @@ export default function SettingsScreen() {
             <Switch
               value={emailEnabled}
               onValueChange={handleEmailToggle}
-              trackColor={{ false: AppColors.borderLight, true: AppColors.checkboxSelected }}
+              trackColor={{
+                false: AppColors.borderLight,
+                true: AppColors.checkboxSelected,
+              }}
               thumbColor={Colors.light.dropdownBg}
             />
           </View>
