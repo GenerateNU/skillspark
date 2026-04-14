@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -19,7 +19,7 @@ import { AppColors, FontFamilies } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
 import { OccurrenceCard } from "./OccurrenceCard";
-import { groupOccurrencesByDate } from "./utils";
+import { formatSectionDate } from "@/utils/format";
 
 export default function OrgScheduleScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -67,6 +67,30 @@ export default function OrgScheduleScreen() {
   const grouped = useMemo(
     () => groupOccurrencesByDate(occurrences),
     [occurrences]
+  );
+
+  const groupOccurrencesByDate = useCallback(
+    (
+      occurrences: EventOccurrence[]
+    ): { label: string; items: EventOccurrence[] }[] => {
+      const sorted = [...occurrences].sort(
+        (a, b) =>
+          new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+      );
+
+      const groups: Map<string, EventOccurrence[]> = new Map();
+      for (const occ of sorted) {
+        const key = new Date(occ.start_time).toDateString();
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key)!.push(occ);
+      }
+
+      return Array.from(groups.entries()).map(([, items]) => ({
+        label: formatSectionDate(items[0].start_time),
+        items,
+      }));
+    },
+    []
   );
 
   return (

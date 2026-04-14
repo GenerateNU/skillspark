@@ -13,7 +13,11 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { ReservationModal } from "@/components/ReservationModal";
 import { RatingSmiley } from "@/components/RatingSmiley";
-import { formatAgeRange, formatPrice, formatTime } from "./utils";
+import {
+  formatAgeRange,
+  formatPrice,
+  formatTime,
+} from "../../../../../utils/utils";
 import { useTranslation } from "react-i18next";
 
 const BUTTON_ROW_HEIGHT = 52;
