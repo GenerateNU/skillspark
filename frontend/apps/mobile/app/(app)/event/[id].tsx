@@ -68,7 +68,7 @@ function EventOccurrenceDetail({
               <View className="flex-1 bg-[#C5C5C5]" />
             )}
             <TouchableOpacity
-              onPress={() => router.navigate("/")}
+              onPress={() => router.back()}
               activeOpacity={0.7}
               className="absolute top-4 left-4 z-10 flex-row items-center bg-white rounded-full px-4 py-2.5 elevation-10"
               style={{
