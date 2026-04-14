@@ -17,7 +17,7 @@ import {
   formatAgeRange,
   formatPrice,
   formatTime,
-} from "../../../../../utils/utils";
+} from "../../../../../utils/format";
 import { useTranslation } from "react-i18next";
 
 const BUTTON_ROW_HEIGHT = 52;
