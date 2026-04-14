@@ -13,7 +13,6 @@ export interface RegistrationCardData {
   end_time: Date;
   title: string;
   childRegistrations: ChildRegistration[];
-  childColorMap: Record<string, string>;
   location: string;
   price: number;
   hasReviewed: boolean;

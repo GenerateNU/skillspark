@@ -53,7 +53,7 @@ export default function ActivityScreen() {
   const { t } = useTranslation();
   const [selection, setSelection] = useState<"upcoming" | "past">("upcoming");
 
-  const { guardianId, registrations, eventOccurrencesMap, children, childMap, childColorMap, reviewedEventIds } =
+  const { guardianId, registrations, eventOccurrencesMap, children, childMap, reviewedEventIds } =
     useActivityData();
 
   const queryClient = useQueryClient();
@@ -155,7 +155,6 @@ export default function ActivityScreen() {
             end_time: new Date(occurrence.end_time),
             title: occurrence.event.title,
             childRegistrations: child ? [{ child, registrationId: r.id }] : [],
-            childColorMap,
             location: occurrence.location.address_line1,
             price: occurrence.price,
             hasReviewed: false,

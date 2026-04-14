@@ -10,7 +10,6 @@ import {
   type Review,
 } from "@skillspark/api-client";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { CHILD_BUBBLE_COLORS } from "@/constants/childBubbleColors";
 
 export function useActivityData() {
   const { guardianId } = useAuthContext();
@@ -47,14 +46,6 @@ export function useActivityData() {
     return map;
   }, [children]);
 
-  const childColorMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    children.forEach((c, i) => {
-      map[c.id] = CHILD_BUBBLE_COLORS[i % CHILD_BUBBLE_COLORS.length];
-    });
-    return map;
-  }, [children]);
-
   const { data: guardianReviewsResp } = useGetReviewByGuardianId(guardianId!, undefined, {
     query: { enabled: !!guardianId },
   });
@@ -70,7 +61,6 @@ export function useActivityData() {
     eventOccurrencesMap,
     children,
     childMap,
-    childColorMap,
     reviewedEventIds,
   };
 }
