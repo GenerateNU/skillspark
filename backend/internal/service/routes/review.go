@@ -180,4 +180,42 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		}, nil
 	})
 
+	huma.Register(api, huma.Operation{
+		OperationID: "get-event-reviews-for-organization",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/organization/event-reviews/{id}",
+		Summary:     "Get event review aggregates for an organization",
+		Description: "Returns review aggregates (total reviews + average rating) for all events in an organization",
+		Tags:        []string{"Review"},
+	}, func(ctx context.Context, input *models.GetEventReviewsForOrganizationInput) (*models.GetEventReviewsForOrganizationOutput, error) {
+
+		page := input.Page
+		if page == 0 {
+			page = 1
+		}
+		limit := input.PageSize
+		if limit == 0 {
+			limit = 10
+		}
+
+		pagination := utils.Pagination{
+			Page:  page,
+			Limit: limit,
+		}
+
+		result, err := reviewHandler.GetEventReviewsForOrganization(
+			ctx,
+			input.ID,
+			pagination,
+			input.SortBy,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetEventReviewsForOrganizationOutput{
+			Body: result,
+		}, nil
+	})
+
 }

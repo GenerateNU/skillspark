@@ -83,3 +83,22 @@ func (m *MockReviewRepository) GetAggregateReviewsForOrganization(ctx context.Co
 	}
 	return args.Get(0).(*models.ReviewAggregate), args.Error(1)
 }
+
+func (m *MockReviewRepository) GetEventReviewsForOrganization(
+	ctx context.Context,
+	id uuid.UUID,
+	pagination utils.Pagination,
+	sortBy string,
+) ([]models.SimpleReviewAggregate, error) {
+
+	args := m.Called(ctx, id, pagination, sortBy)
+
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Error(1)
+	}
+
+	return args.Get(0).([]models.SimpleReviewAggregate), args.Error(1)
+}

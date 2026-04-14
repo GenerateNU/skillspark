@@ -114,3 +114,20 @@ type ReviewAggregate struct {
 	AverageRating float64             `json:"average_rating"`
 	Breakdown     []ReviewRatingCount `json:"breakdown"`
 }
+
+type SimpleReviewAggregate struct {
+	EventID       uuid.UUID `json:"event_id"`
+	TotalReviews  int       `json:"total_reviews"`
+	AverageRating float64   `json:"average_rating"`
+}
+
+type GetEventReviewsForOrganizationInput struct {
+	ID       uuid.UUID `path:"id"`
+	Page     int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
+	PageSize int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+	SortBy   string    `query:"sort_by" default:"most_rated" enum:"most_rated,highest,lowest"`
+}
+
+type GetEventReviewsForOrganizationOutput struct {
+	Body []SimpleReviewAggregate `json:"body" doc:"List of review aggregates"`
+}
