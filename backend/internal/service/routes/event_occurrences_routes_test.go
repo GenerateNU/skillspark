@@ -728,6 +728,168 @@ func TestHumaValidation_GetAllEventOccurrences(t *testing.T) {
 	}
 }
 
+func TestHumaValidation_GetTrendingEventOccurrences(t *testing.T) {
+	t.Parallel()
+
+	mid := uuid.MustParse("50000000-0000-0000-0000-000000000001")
+	eight := 8
+	twelve := 12
+	jpg := "events/robotics_workshop.jpg"
+	addr := "Suite 15"
+	future := time.Now().Add(48 * time.Hour)
+
+	makeOccurrence := func() models.EventOccurrence {
+		return models.EventOccurrence{
+			ID:        uuid.MustParse("70000000-0000-0000-0000-000000000001"),
+			ManagerId: &mid,
+			Event: models.Event{
+				ID:               uuid.MustParse("60000000-0000-0000-0000-000000000001"),
+				Title:            "Junior Robotics Workshop",
+				Description:      "Learn the basics of robotics",
+				OrganizationID:   uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+				AgeRangeMin:      &eight,
+				AgeRangeMax:      &twelve,
+				Category:         []string{"science", "technology"},
+				HeaderImageS3Key: &jpg,
+				CreatedAt:        time.Now(),
+				UpdatedAt:        time.Now(),
+			},
+			Location: models.Location{
+				ID:           uuid.MustParse("10000000-0000-0000-0000-000000000004"),
+				Latitude:     13.765,
+				Longitude:    100.538,
+				AddressLine1: "321 Phetchaburi Road",
+				AddressLine2: &addr,
+				Subdistrict:  "Ratchathewi",
+				District:     "Ratchathewi",
+				Province:     "Bangkok",
+				PostalCode:   "10400",
+				Country:      "Thailand",
+				CreatedAt:    time.Now(),
+				UpdatedAt:    time.Now(),
+			},
+			StartTime:    future,
+			EndTime:      future.Add(2 * time.Hour),
+			MaxAttendees: 15,
+			Language:     "en",
+			CurrEnrolled: 5,
+			Price:        50000,
+			Currency:     "thb",
+			CreatedAt:    time.Now(),
+			UpdatedAt:    time.Now(),
+		}
+	}
+
+	// base query with all required params
+	baseQuery := "?lat=13.74&lng=100.545&radius=5&max_returns=5"
+	londonQuery := "?lat=51.5074&lng=-0.1278&radius=5&max_returns=5"
+
+	tests := []struct {
+		name       string
+		query      string
+		mockSetup  func(*repomocks.MockEventOccurrenceRepository, *s3mocks.S3ClientMock)
+		statusCode int
+	}{
+		{
+			name:  "valid lat, lng, radius and max_returns returns 200",
+			query: baseQuery,
+			mockSetup: func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {
+				m.On("GetTrendingEventOccurrences", mock.Anything, mock.AnythingOfType("*models.GetTrendingEventOccurrencesInput")).
+					Return([]models.EventOccurrence{makeOccurrence()}, nil)
+				s3.On("GeneratePresignedURL", mock.Anything, mock.Anything, mock.Anything).
+					Return("https://test-bucket.s3.amazonaws.com/presigned", nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:  "no nearby results returns empty 200",
+			query: londonQuery,
+			mockSetup: func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {
+				m.On("GetTrendingEventOccurrences", mock.Anything, mock.AnythingOfType("*models.GetTrendingEventOccurrencesInput")).
+					Return([]models.EventOccurrence{}, nil)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name:       "missing lat returns 422",
+			query:      "?lng=100.545&radius=5&max_returns=5",
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name:       "missing lng returns 422",
+			query:      "?lat=13.74&radius=5&max_returns=5",
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name:       "missing all params returns 422",
+			query:      "",
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name:       "invalid Accept-Language returns 422",
+			query:      baseQuery,
+			mockSetup:  func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {},
+			statusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name:  "repository error returns 500",
+			query: baseQuery,
+			mockSetup: func(m *repomocks.MockEventOccurrenceRepository, s3 *s3mocks.S3ClientMock) {
+				m.On("GetTrendingEventOccurrences", mock.Anything, mock.AnythingOfType("*models.GetTrendingEventOccurrencesInput")).
+					Return(nil, &errs.HTTPError{Code: 500, Message: "db error"})
+			},
+			statusCode: http.StatusInternalServerError,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockRepo := new(repomocks.MockEventOccurrenceRepository)
+			mockManagerRepo := new(repomocks.MockManagerRepository)
+			mockEventRepo := new(repomocks.MockEventRepository)
+			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockS3 := new(s3mocks.S3ClientMock)
+			mockStripeClient := new(stripemocks.MockStripeClient)
+			tt.mockSetup(mockRepo, mockS3)
+
+			app, _ := setupEventOccurrencesTestAPI(
+				mockRepo,
+				mockManagerRepo,
+				mockEventRepo,
+				mockLocationRepo,
+				mockS3,
+				mockStripeClient,
+			)
+
+			req, err := http.NewRequest(http.MethodGet, "/api/v1/trending/event-occurrences"+tt.query, nil)
+			assert.NoError(t, err)
+
+			if tt.name == "invalid Accept-Language returns 422" {
+				req.Header.Set("Accept-Language", "fr-FR")
+			}
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() { _ = resp.Body.Close() }()
+
+			if tt.statusCode != resp.StatusCode {
+				bodyBytes, _ := io.ReadAll(resp.Body)
+				t.Logf("Response body: %s", string(bodyBytes))
+			}
+
+			assert.Equal(t, tt.statusCode, resp.StatusCode)
+			mockRepo.AssertExpectations(t)
+			mockS3.AssertExpectations(t)
+		})
+	}
+}
+
 func TestHumaValidation_EventOccurrence_InvalidAcceptLanguage(t *testing.T) {
 	t.Parallel()
 

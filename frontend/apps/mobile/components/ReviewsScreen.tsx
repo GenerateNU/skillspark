@@ -95,7 +95,8 @@ export default function ReviewsScreen<
         ? registrationsResp.data.registrations
         : [];
     return list.find(
-      (r) => r.event_occurrence_id === occurrenceId && r.status === "registered",
+      (r) =>
+        r.event_occurrence_id === occurrenceId && r.status === "registered",
     );
   }, [registrationsResp, occurrenceId]);
 

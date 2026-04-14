@@ -26,8 +26,9 @@ export function ReviewCard({ review }: { review: Review }) {
   const { data: guardianResp } = useGetGuardianById(review.guardian_id ?? "", {
     query: { enabled: !!review.guardian_id },
   });
-  const guardianName = (guardianResp as unknown as { data: { name: string } } | undefined)
-    ?.data?.name ?? null;
+  const guardianName =
+    (guardianResp as unknown as { data: { name: string } } | undefined)?.data
+      ?.name ?? null;
 
   const displayName = review.guardian_id
     ? (guardianName ?? "...")

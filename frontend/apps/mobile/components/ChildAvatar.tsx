@@ -1,62 +1,74 @@
-import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
-import { Child } from "@skillspark/api-client";
-import { Text, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { View } from "react-native";
+import { SvgXml } from "react-native-svg";
+import { ThemedText } from "@/components/themed-text";
+import { DEFAULT_AVATAR_COLOR, DARK_AVATAR_COLORS } from "@/constants/avatarColors";
+import { getAvatarSvg, getSvgWithColor } from "@/constants/avatarFaces";
+
+type ChildAvatarProps = {
+  name: string;
+  avatarFace?: string | null;
+  avatarBackground?: string | null;
+  size?: number;
+};
+
+/** First letter of first word + first letter of last word (if present). */
+export function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 export function ChildAvatar({
-  child,
-  selected,
-  onPress,
-}: {
-  child: Child;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  const initials = child.name
-    .split(" ")
-    .map((p) => p[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  name,
+  avatarFace,
+  avatarBackground,
+  size = 44,
+}: ChildAvatarProps) {
+  const bgColor = avatarBackground || DEFAULT_AVATAR_COLOR;
+  const svgTemplate = avatarFace ? getAvatarSvg(avatarFace) : null;
+  const borderRadius = size / 2;
+
+  if (svgTemplate) {
+    return (
+      <View
+        style={{
+          width: size,
+          height: size,
+          borderRadius,
+          overflow: "hidden",
+        }}
+      >
+        <SvgXml
+          xml={getSvgWithColor(svgTemplate, bgColor)}
+          width={size}
+          height={size}
+        />
+      </View>
+    );
+  }
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.7}
-      className="items-center gap-1.5"
+    <View
+      style={{
+        width: size,
+        height: size,
+        borderRadius,
+        backgroundColor: bgColor,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
-      <View
-        className="w-[52px] h-[52px] rounded-full items-center justify-center"
+      <ThemedText
         style={{
-          backgroundColor: selected
-            ? AppColors.checkboxSelected
-            : AppColors.surfaceGray,
-          borderWidth: selected ? 2.5 : 2,
-          borderColor: selected
-            ? AppColors.checkboxSelected
-            : AppColors.borderLight,
-          borderStyle: selected ? "solid" : "dashed",
+          fontSize: size * 0.32,
+          fontFamily: "Nunito-SemiBold",
+          color: DARK_AVATAR_COLORS[bgColor] ?? "#5A5A5A",
         }}
       >
-        <Text
-          style={{
-            fontFamily: FontFamilies.bold,
-            fontSize: FontSizes.base,
-            color: selected ? "#fff" : AppColors.mutedText,
-          }}
-        >
-          {initials}
-        </Text>
-      </View>
-      <Text
-        style={{
-          fontFamily: FontFamilies.regular,
-          fontSize: FontSizes.xs,
-          color: AppColors.mutedText,
-        }}
-        numberOfLines={1}
-      >
-        {child.name.split(" ")[0]}
-      </Text>
-    </TouchableOpacity>
+        {getInitials(name)}
+      </ThemedText>
+    </View>
   );
 }

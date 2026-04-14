@@ -12,17 +12,11 @@ export default function TabLayout() {
       tabBar={(props) => <FloatingTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        sceneStyle: { backgroundColor: '#fff' },
+        sceneStyle: { backgroundColor: "#fff" },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{ title: translate("nav.home") }}
-      />
-      <Tabs.Screen
-        name="map"
-        options={{ title: translate("nav.map") }}
-      />
+      <Tabs.Screen name="index" options={{ title: translate("nav.home") }} />
+      <Tabs.Screen name="map" options={{ title: translate("nav.map") }} />
       <Tabs.Screen
         name="activity"
         options={{ title: translate("nav.activity") }}

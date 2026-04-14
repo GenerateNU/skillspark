@@ -2412,6 +2412,28 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/stripe/detach:
+    delete:
+      tags:
+        - Payments
+      summary: Detach a payment method from a guardian
+      description: Detaches a Stripe payment method from a guardian's customer account
+      operationId: detach-guardian-payment-method
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DetachPaymentMethodInputBody'
+        required: true
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/stripe/login/{organization_id}:
     post:
       tags:
@@ -2531,6 +2553,76 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/trending/event-occurrences:
+    get:
+      tags:
+        - Event Occurrences
+      summary: Get the top 5 trending event occurrences
+      description: Returns a list of trending event occurrences in the user's location
+      operationId: get-trending-event-occurrences
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: lat
+          in: query
+          description: The user's latitude
+          required: true
+          explode: false
+          schema:
+            type: number
+            description: The user's latitude
+            format: double
+        - name: lng
+          in: query
+          description: The user's longitude
+          required: true
+          explode: false
+          schema:
+            type: number
+            description: The user's longitude
+            format: double
+        - name: max_returns
+          in: query
+          description: the maximum number of returns
+          explode: false
+          schema:
+            type: integer
+            description: the maximum number of returns
+            format: int64
+            default: 5
+            minimum: 1
+        - name: radius
+          in: query
+          description: the distance away from the user a returned event can be in km
+          explode: false
+          schema:
+            type: integer
+            description: the distance away from the user a returned event can be in km
+            format: int64
+            default: 50
+            minimum: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of trending in the user's area
+                items:
+                  $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
     AttachPaymentMethodInputBody:
@@ -2619,6 +2711,10 @@ components:
           examples:
             - http://localhost:8080/schemas/Child.json
           readOnly: true
+        avatar_background:
+          type: string
+        avatar_face:
+          type: string
         birth_month:
           type: integer
           format: int64
@@ -2654,6 +2750,8 @@ components:
         - birth_year
         - interests
         - guardian_id
+        - avatar_face
+        - avatar_background
         - created_at
         - updated_at
     CreateChildInputBody:
@@ -2667,6 +2765,12 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateChildInputBody.json
           readOnly: true
+        avatar_background:
+          type: string
+          description: Background color hex for the child's avatar
+        avatar_face:
+          type: string
+          description: Avatar face identifier for the child's profile picture
         birth_month:
           type: integer
           description: Birth month of the child
@@ -2942,7 +3046,6 @@ components:
           description: ID of the linked registration
       required:
         - registration_id
-        - guardian_id
         - description
         - categories
         - rating
@@ -3081,6 +3184,26 @@ components:
           description: Success message
       required:
         - message
+    DetachPaymentMethodInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DetachPaymentMethodInputBody.json
+          readOnly: true
+        guardian_id:
+          type: string
+          description: Guardian ID
+        payment_method_id:
+          type: string
+          description: Payment Method ID
+      required:
+        - payment_method_id
+        - guardian_id
     EmergencyContact:
       type: object
       additionalProperties: false
@@ -4133,6 +4256,12 @@ components:
           examples:
             - http://localhost:8080/schemas/UpdateChildInputBody.json
           readOnly: true
+        avatar_background:
+          type: string
+          description: Background color hex for the child's avatar
+        avatar_face:
+          type: string
+          description: Avatar face identifier for the child's profile picture
         birth_month:
           type: integer
           description: Birth month of the child

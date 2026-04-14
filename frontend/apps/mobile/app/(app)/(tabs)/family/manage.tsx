@@ -23,6 +23,8 @@ import {
   getGetChildrenByGuardianIdQueryKey,
 } from "@skillspark/api-client";
 import { ChildProfileForm, MONTHS } from "@/components/ChildProfileForm";
+import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
+import { setPendingAvatarCallback } from "@/constants/avatarPickerStore";
 import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 
@@ -40,10 +42,10 @@ export default function ManageChildScreen() {
   const isEditing = !!params.id;
 
   const [firstName, setFirstName] = useState(
-    params.name ? (params.name as string).split(" ")[0] : ""
+    params.name ? (params.name as string).split(" ")[0] : "",
   );
   const [lastName, setLastName] = useState(
-    params.name ? (params.name as string).split(" ").slice(1).join(" ") : ""
+    params.name ? (params.name as string).split(" ").slice(1).join(" ") : "",
   );
 
   const initialMonthStr = params.birth_month
@@ -52,19 +54,26 @@ export default function ManageChildScreen() {
 
   const [birthMonth, setBirthMonth] = useState(initialMonthStr);
   const [birthYear, setBirthYear] = useState(
-    (params.birth_year as string) || ""
+    (params.birth_year as string) || "",
   );
   const [schoolId, setSchoolId] = useState((params.school_id as string) || "");
 
   const initialInterests = Array.isArray(params.interests)
     ? params.interests
     : params.interests
-    ? (params.interests as string)
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean)
-    : [];
+      ? (params.interests as string)
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
   const [interests, setInterests] = useState<string[]>(initialInterests);
+
+  const [avatarFace, setAvatarFace] = useState<string | null>(
+    (params.avatar_face as string) || null,
+  );
+  const [avatarBackground, setAvatarBackground] = useState(
+    (params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showMonthDrop, setShowMonthDrop] = useState(false);
@@ -84,7 +93,7 @@ export default function ManageChildScreen() {
     if (!firstName || !birthYear || !birthMonth || !schoolId) {
       Alert.alert(
         translate("common.error"),
-        translate("childProfile.requiredFieldsError")
+        translate("childProfile.requiredFieldsError"),
       );
       return;
     }
@@ -98,6 +107,8 @@ export default function ManageChildScreen() {
         guardian_id: guardianId,
         school_id: schoolId,
         interests,
+        avatar_face: avatarFace ?? undefined,
+        avatar_background: avatarBackground || DEFAULT_AVATAR_COLOR,
       };
       if (isEditing) {
         await updateChildMutation.mutateAsync({
@@ -115,11 +126,27 @@ export default function ManageChildScreen() {
       console.error(error);
       Alert.alert(
         translate("common.errorOccurred"),
-        translate("childProfile.saveError") + " " + JSON.stringify(error)
+        translate("childProfile.saveError") + " " + JSON.stringify(error),
       );
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleAvatarPress = () => {
+    setPendingAvatarCallback(({ face, background }) => {
+      setAvatarFace(face);
+      setAvatarBackground(background);
+    });
+    const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
+    router.push({
+      pathname: "/(app)/(tabs)/family/avatar-picker",
+      params: {
+        avatarFace: avatarFace ?? "",
+        avatarBackground,
+        childName,
+      },
+    });
   };
 
   const handleDelete = () => {
@@ -144,13 +171,13 @@ export default function ManageChildScreen() {
             } catch {
               Alert.alert(
                 translate("common.errorOccurred"),
-                translate("childProfile.deleteError")
+                translate("childProfile.deleteError"),
               );
               setIsSubmitting(false);
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -165,7 +192,7 @@ export default function ManageChildScreen() {
         <ScrollView
           contentContainerStyle={{
             paddingHorizontal: 20,
-            paddingBottom: 40,
+            paddingBottom: insets.bottom + 80,
             paddingTop: 10,
           }}
           showsVerticalScrollIndicator={false}
@@ -219,16 +246,17 @@ export default function ManageChildScreen() {
               setShowMonthDrop={setShowMonthDrop}
               showYearDrop={showYearDrop}
               setShowYearDrop={setShowYearDrop}
+              avatarFace={avatarFace}
+              avatarBackground={avatarBackground}
+              onAvatarPress={handleAvatarPress}
             />
             <TouchableOpacity
-              className={`py-4 rounded-full items-center justify-center ${
-                isSubmitting ? "opacity-70" : "opacity-100"
-              }`}
-              style={{ backgroundColor: "#000000" }}
+              className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
+              style={{ backgroundColor: theme.tint }}
               onPress={handleSave}
               disabled={isSubmitting}
             >
-              <ThemedText className="text-white" style={{ color: "#FFFFFF" }}>
+              <ThemedText className="text-white text-base font-nunito-semibold">
                 {isSubmitting
                   ? translate("childProfile.saving")
                   : translate("childProfile.saveChanges")}

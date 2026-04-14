@@ -12,6 +12,7 @@
     "cancel": "ยกเลิก",
     "close": "ปิด",
     "loading": "กำลังโหลด...",
+    "saving": "กำลังบันทึก...",
     "loadingMapData": "กำลังโหลดข้อมูลแผนที่...",
     "loadingEvents": "กำลังโหลดกิจกรรม...",
     "errorLoadingEvents": "เกิดข้อผิดพลาดในการโหลดกิจกรรม",
@@ -128,9 +129,18 @@
     "title": "การชำระเงิน",
     "manageBilling": "จัดการการเรียกเก็บเงิน",
     "creditCard": "บัตรเครดิต",
+    "expires": "วันหมดอายุ",
     "name": "ชื่อ",
+    "save": "บันทึก",
+    "noCard": "ไม่มีบัตรที่ลงทะเบียนไว้",
     "updateBilling": "อัปเดตการเรียกเก็บเงิน",
-    "delete": "ลบ"
+    "delete": "ลบ",
+    "deleteModal": {
+      "title": "ลบหรือไม่?",
+      "description": "คุณแน่ใจหรือไม่ว่าต้องการลบวิธีการชำระเงินนี้?",
+      "confirm": "ยืนยัน",
+      "deleting": "กำลังลบ..."
+    }
   },
   "familyInformation": {
     "title": "ข้อมูลครอบครัว",
@@ -158,7 +168,10 @@
     "deleteConfirm": "คุณต้องการลบโปรไฟล์เด็กนี้ใช่ไหม?",
     "requiredFieldsError": "กรุณากรอกข้อมูลที่จำเป็นทั้งหมด (ชื่อ วันเกิด รหัสโรงเรียน)",
     "saveError": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
-    "deleteError": "ลบไม่สำเร็จ"
+    "deleteError": "ลบไม่สำเร็จ",
+    "changeProfilePicture": "เปลี่ยนรูปโปรไฟล์",
+    "avatarTabColors": "สี",
+    "avatarTabAvatar": "อวตาร"
   },
   "saved": {
     "title": "ที่บันทึกไว้",
@@ -263,8 +276,11 @@
     "filterDistance": "ระยะทาง",
     "sortBy": "เรียงตาม",
     "filter": "กรอง",
-    "miles": "ไมล์",
+    "km": "กม.",
     "stars": "ดาว"
+  },
+  "activity": {
+    "activity": "กิจกรรม"
   },
   "org": {
     "about": "เกี่ยวกับ",

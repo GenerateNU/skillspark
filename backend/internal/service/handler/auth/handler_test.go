@@ -275,7 +275,6 @@ func TestHandler_GuardianSignUp(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockGuardianRepo := new(repomocks.MockGuardianRepository)
@@ -355,7 +354,6 @@ func TestHandler_ManagerSignUp(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			SetupMockAuthClient(t, tt.authResponse, tt.authStatus)
 
 			mockManagerRepo := new(repomocks.MockManagerRepository)
