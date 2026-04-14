@@ -155,6 +155,13 @@ type CancelRegistrationWithPaymentInput struct {
 	PaymentIntentStatus string             `json:"payment_intent_status"`
 }
 
+type DetachPaymentMethodInput struct {
+	Body struct {
+		PaymentMethodID string    `json:"payment_method_id" doc:"Payment Method ID"`
+		GuardianID      uuid.UUID `json:"guardian_id" doc:"Guardian ID"`
+	} `json:"body"`
+}
+
 type GetRegistrationByPaymentIntentIDOutput struct {
 	ID                    uuid.UUID          `json:"id"`
 	EventOccurrenceID     uuid.UUID          `json:"event_occurrence_id"`
