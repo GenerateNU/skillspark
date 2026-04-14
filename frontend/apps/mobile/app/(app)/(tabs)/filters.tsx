@@ -14,7 +14,8 @@ import { TFunction } from "i18next";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-// Backend values — must match the Postgres category enum exactly
+// Backend values — must match the Postgres category enum exactly and list should be same length
+// as the list of categories in all i18n files
 const CATEGORY_KEYS = [
   "science", "math", "music", "art", "sports", "technology", "language", "other",
   "physics", "chemistry", "biology", "astronomy", "earth science", "data science",
@@ -32,7 +33,6 @@ const DURATION_MAX = 180; // minutes
 const PRICE_MAX = 2000;
 const AGE_MAX = 18;
 
-// ─── Label helpers ────────────────────────────────────────────────────────────
 
 function distanceLabel(km: number) {
   return km >= DISTANCE_MAX ? `${DISTANCE_MAX}+ km` : `${km} km`;
@@ -66,8 +66,6 @@ function ageRangeLabel(lo: number, hi: number, t: TFunction) {
   if (lo === 0) return t("filters.upTo", { value: `${hi}y` });
   return `${lo} – ${hi}y`;
 }
-
-// ─── Main screen ──────────────────────────────────────────────────────────────
 
 export default function FiltersScreen() {
   const router = useRouter();
