@@ -16,6 +16,7 @@ import { createContext, useState, useEffect, ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGuardian } from "@/hooks/use-guardian";
 import i18n from "@/i18n";
+import { useTranslation } from "react-i18next";
 
 interface AuthContextType {
 	guardianId: string | null;
@@ -68,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const { mutate: loginFunc } = useLoginGuardian();
 	const { mutate: signupFunc } = useSignupGuardian();
 	const { mutate: updateFunc } = useUpdateGuardian();
+	const { t: translate } = useTranslation();
 
 	let { guardian, hasError } = useGuardian(guardianId);
 
@@ -88,8 +90,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				logout();
 				return;
 			}
-			const storedJWT = await SecureStore.getItemAsync("token");
-			const storedGuardianId = await SecureStore.getItemAsync("guardian_id");
 			const storedLangPref = await SecureStore.getItemAsync(
 				"language_preference",
 			);
@@ -100,10 +100,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 			const storedHasAccount = await SecureStore.getItemAsync("has_account");
 			setHasAccount(storedHasAccount === "true");
-			if (storedJWT && storedGuardianId) {
-				setJWT(storedJWT);
-				setGuardianId(storedGuardianId);
-				setLangPref(storedLangPref);
+			if (storedHasAccount) {
+				// values set once onboarding is finished
+				const storedJWT = await SecureStore.getItemAsync("token");
+				const storedGuardianId = await SecureStore.getItemAsync("guardian_id");
+				if (storedJWT && storedGuardianId) {
+					setJWT(storedJWT);
+					setGuardianId(storedGuardianId);
+					setLangPref(storedLangPref);
+				}
 			}
 			setIsLoading(false);
 		};
@@ -141,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				},
 				onError: (err) => {
 					const fail = err as unknown as { data?: { message?: string } };
-					onError(fail.data?.message ?? "An unexpected error occurred");
+					onError(fail.data?.message ?? translate("common.errorOccurred"));
 				},
 			},
 		);
@@ -186,13 +191,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					setJWT(success.token);
 					await SecureStore.setItemAsync("guardian_id", success.guardian_id);
 					setGuardianId(success.guardian_id);
-					await SecureStore.setItemAsync("has_account", "true");
-					setHasAccount(true);
 					onSuccess();
 				},
 				onError: (err) => {
+					console.log(JSON.stringify(err));
 					const fail = err as unknown as { data?: { message?: string } };
-					onError(fail.data?.message ?? "An unexpected error occurred");
+					onError(fail.data?.message ?? translate("common.errorOccurred"));
 				},
 			},
 		);
@@ -232,7 +236,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				},
 				onError: (err) => {
 					const fail = err as unknown as { data?: { message?: string } };
-					onError(fail.data?.message ?? "An unexpected error occurred");
+					onError(fail.data?.message ?? translate("common.errorOccurred"));
 				},
 			},
 		);

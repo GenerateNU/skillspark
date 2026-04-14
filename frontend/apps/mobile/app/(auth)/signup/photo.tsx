@@ -5,40 +5,39 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontSizes } from "@/constants/theme";
-import { SignupFormData } from "@/constants/signup-types";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useGuardian } from "@/hooks/use-guardian";
 
 // 3. add your profile photo or skip for now
 export default function PhotoScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
 	const insets = useSafeAreaInsets();
-	const { signup } = useAuthContext();
 	const [errorText, setErrorText] = useState("");
 	const [image, setImage] = useState<string | undefined>(undefined);
-	const { setValue, handleSubmit } = useFormContext<SignupFormData>();
+	const { update, guardianId } = useAuthContext();
+	const { guardian } = useGuardian(guardianId);
 
-	useEffect(() => {
-		setValue("profile_picture_s3_key", image);
-	}, [image, setValue]);
-
-	const onSubmit = (formData: SignupFormData) => {
-		signup(
-			formData.name,
-			formData.email,
-			formData.username,
-			formData.password,
-			formData.language_preference,
-			formData.profile_picture_s3_key,
-			setErrorText,
-			() => router.push("/(auth)/signup/child-profile"),
-		);
+	const onSubmit = () => {
+		if (!guardian) {
+			setErrorText("ERROR: Could not fetch guardian ID");
+		} else {
+			update(
+				() => router.push("/(auth)/signup/all-set"),
+				setErrorText,
+				guardian.id,
+				guardian.email,
+				guardian.language_preference,
+				guardian.name,
+				guardian.username,
+				image,
+			);
+		}
 	};
 
 	return (
@@ -93,7 +92,7 @@ export default function PhotoScreen() {
 			<View className="px-6 items-center">
 				<Button
 					label={translate("onboarding.skip")}
-					onPress={handleSubmit(onSubmit)}
+					onPress={onSubmit}
 					disabled={false}
 				/>
 				<ErrorMessage message={errorText} />

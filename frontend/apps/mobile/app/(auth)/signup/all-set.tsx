@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useTranslation } from "react-i18next";
 import { AppColors, FontSizes } from "@/constants/theme";
+import * as SecureStore from "expo-secure-store";
 
 // 7. done with onboarding
 export default function AllSetScreen() {
@@ -14,10 +15,14 @@ export default function AllSetScreen() {
 	const insets = useSafeAreaInsets();
 
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			router.replace("/(app)/(tabs)");
-		}, 2500);
-		return () => clearTimeout(timer);
+		const finishOnboarding = async () => {
+			await SecureStore.setItemAsync("has_account", "true");
+			const timer = setTimeout(() => {
+				router.replace("/(app)/(tabs)");
+			}, 2500);
+			return () => clearTimeout(timer);
+		};
+		finishOnboarding();
 	}, [router]);
 
 	return (
