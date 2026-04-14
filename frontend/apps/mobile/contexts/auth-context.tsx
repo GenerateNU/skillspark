@@ -11,7 +11,6 @@ import {
 	updateGuardianResponse,
 } from "@skillspark/api-client";
 import * as SecureStore from "expo-secure-store";
-import { router } from "expo-router";
 import { createContext, useState, useEffect, ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGuardian } from "@/hooks/use-guardian";
@@ -25,10 +24,12 @@ interface AuthContextType {
 	isAuthenticated: boolean;
 	isLoading: boolean;
 	hasAccount: boolean;
+	inOnboarding: boolean;
 	login: (
 		email: string,
 		password: string,
 		onError: (msg: string) => void,
+		onSuccess: () => void,
 	) => void;
 	signup: (
 		name: string,
@@ -53,6 +54,8 @@ interface AuthContextType {
 		expo_push_token?: string | undefined,
 	) => void;
 	setLanguage: (language: string) => void;
+	setInOnboarding: (value: boolean) => void;
+	completeOnboarding: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -65,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [langPref, setLangPref] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [hasAccount, setHasAccount] = useState(false);
+	const [inOnboarding, setInOnboarding] = useState(false);
 	const queryClient = useQueryClient();
 	const { mutate: loginFunc } = useLoginGuardian();
 	const { mutate: signupFunc } = useSignupGuardian();
@@ -74,13 +78,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	let { guardian, hasError } = useGuardian(guardianId);
 
 	const logout = async () => {
-		router.replace("/(auth)/login");
 		await SecureStore.deleteItemAsync("token");
 		setJWT(null);
 		await SecureStore.deleteItemAsync("guardian_id");
 		setGuardianId(null);
 		await SecureStore.deleteItemAsync("language_preference");
 		setLangPref(null);
+		console.log(hasAccount);
 	};
 
 	useEffect(() => {
@@ -100,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 			const storedHasAccount = await SecureStore.getItemAsync("has_account");
 			setHasAccount(storedHasAccount === "true");
+			console.log("hasAccount: ", storedHasAccount);
 			if (storedHasAccount) {
 				// values set once onboarding is finished
 				const storedJWT = await SecureStore.getItemAsync("token");
@@ -108,6 +113,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					setJWT(storedJWT);
 					setGuardianId(storedGuardianId);
 					setLangPref(storedLangPref);
+					console.log(
+						"everything set: ",
+						storedJWT,
+						storedGuardianId,
+						storedLangPref,
+					);
 				}
 			}
 			setIsLoading(false);
@@ -132,7 +143,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		email: string,
 		password: string,
 		onError: (msg: string) => void,
+		onSuccess: () => void,
 	) => {
+		console.log(hasAccount);
 		loginFunc(
 			{ data: { email, password } },
 			{
@@ -142,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					setJWT(success.token);
 					await SecureStore.setItemAsync("guardian_id", success.guardian_id);
 					setGuardianId(success.guardian_id);
-					router.replace("/(app)/(tabs)");
+					onSuccess();
 				},
 				onError: (err) => {
 					const fail = err as unknown as { data?: { message?: string } };
@@ -150,6 +163,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				},
 			},
 		);
+	};
+
+	const completeOnboarding = async () => {
+		await SecureStore.setItemAsync("has_account", "true");
+		setHasAccount(true);
+		setInOnboarding(false);
 	};
 
 	const signup = (
@@ -162,6 +181,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		onError: (msg: string) => void,
 		onSuccess: () => void,
 	) => {
+		// entering onboarding — suppress redirects until completeOnboarding is called
+		setInOnboarding(true);
+		// reset for each new account during onboarding
+		setHasAccount(false);
+		SecureStore.deleteItemAsync("has_account");
 		console.log(
 			"values: {",
 			name,
@@ -170,6 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			password,
 			language_preference,
 			profile_picture_s3_key,
+			onSuccess,
 			"}",
 		);
 		signupFunc(
@@ -259,11 +284,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				isAuthenticated: !!jwt && !!guardianId,
 				isLoading,
 				hasAccount,
+				inOnboarding,
 				login,
 				signup,
 				logout,
 				update,
 				setLanguage,
+				setInOnboarding,
+				completeOnboarding,
 			}}
 		>
 			{children}

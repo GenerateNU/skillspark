@@ -28,7 +28,7 @@ export default function PhotoScreen() {
 			setErrorText("ERROR: Could not fetch guardian ID");
 		} else {
 			update(
-				() => router.push("/(auth)/signup/all-set"),
+				() => router.push("/(auth)/signup/child-profile"),
 				setErrorText,
 				guardian.id,
 				guardian.email,

@@ -36,12 +36,14 @@ export default function LoginScreen() {
 		if (formData.email === "" || formData.password === "") {
 			setErrorText("Missing email or password");
 		} else {
-			login(formData.email, formData.password, setErrorText);
+			login(formData.email, formData.password, setErrorText, () =>
+				router.push("/(app)/(tabs)"),
+			);
 		}
 	};
 
 	const handleGoToSignUp = () => {
-		router.navigate("/(auth)/signup/account");
+		router.navigate("/(auth)/signup/name");
 	};
 
 	return (

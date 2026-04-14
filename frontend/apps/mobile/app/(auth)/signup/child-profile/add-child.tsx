@@ -13,96 +13,108 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors, AppColors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useTranslation } from "react-i18next";
-import { useAuthContext } from "@/hooks/use-auth-context";
-import { ErrorScreen } from "@/components/ErrorScreen";
-import { EmergencyContactForm } from "@/components/EmergencyContactProfileForm";
-import { queryClient } from "@/constants/query-client";
+import { useQueryClient } from "@tanstack/react-query";
 import {
-	getGetEmergencyContactsByGuardianIdQueryKey,
-	useCreateEmergencyContact,
-	useDeleteEmergencyContact,
-	useUpdateEmergencyContact,
+	useCreateChild,
+	useUpdateChild,
+	useDeleteChild,
+	getGetChildrenByGuardianIdQueryKey,
 } from "@skillspark/api-client";
+import { ChildProfileForm, MONTHS } from "@/components/ChildProfileForm";
+import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 
-// screen for adding an emergency contact
-export default function ManageEmergencyContactScreen() {
+import { useAuthContext } from "@/hooks/use-auth-context";
+import { ErrorScreen } from "@/components/ErrorScreen";
+
+export default function AddChildScreen() {
 	const router = useRouter();
 	const params = useLocalSearchParams();
 	const insets = useSafeAreaInsets();
 	const theme = Colors.light;
-
 	const { guardianId } = useAuthContext();
-
-	const createEmergencyContactMutation = useCreateEmergencyContact();
-	const updateEmergencyContactMutation = useUpdateEmergencyContact();
-	const deleteEmergencyContactMutation = useDeleteEmergencyContact();
 
 	const { t: translate } = useTranslation();
 	const isEditing = !!params.id;
-	const [phoneNumber, setPhoneNumber] = useState(
-		(params.phone_number as string) || "",
+
+	const [firstName, setFirstName] = useState(
+		params.name ? (params.name as string).split(" ")[0] : "",
 	);
-	const [name, setName] = useState((params.name as string) || "");
+	const [lastName, setLastName] = useState(
+		params.name ? (params.name as string).split(" ").slice(1).join(" ") : "",
+	);
+
+	const initialMonthStr = params.birth_month
+		? MONTHS[parseInt(params.birth_month as string) - 1]
+		: "";
+
+	const [birthMonth, setBirthMonth] = useState(initialMonthStr);
+	const [birthYear, setBirthYear] = useState(
+		(params.birth_year as string) || "",
+	);
+	const [schoolId, setSchoolId] = useState((params.school_id as string) || "");
+
+	const initialInterests = Array.isArray(params.interests)
+		? params.interests
+		: params.interests
+			? (params.interests as string)
+					.split(",")
+					.map((s) => s.trim())
+					.filter(Boolean)
+			: [];
+	const [interests, setInterests] = useState<string[]>(initialInterests);
+
+	const [searchQuery, setSearchQuery] = useState("");
+	const [showMonthDrop, setShowMonthDrop] = useState(false);
+	const [showYearDrop, setShowYearDrop] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const queryClient = useQueryClient();
+	const createChildMutation = useCreateChild();
+	const updateChildMutation = useUpdateChild();
+	const deleteChildMutation = useDeleteChild();
 
 	if (!guardianId) {
 		return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
 	}
 
-	const isValidPhoneNumber = (phoneNumber: string) => {
-		const phoneValidationRegex =
-			/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
-		const isValid = (str: string) => phoneValidationRegex.test(str);
-
-		return isValid(phoneNumber);
-	};
-
-	const emergencyContactData = {
-		guardian_id: guardianId,
-		name: name,
-		phone_number: phoneNumber,
-	};
-
 	const handleSave = async () => {
-		if (!name || !phoneNumber) {
+		if (!firstName || !birthYear || !birthMonth || !schoolId) {
 			Alert.alert(
 				translate("common.error"),
 				translate("childProfile.requiredFieldsError"),
 			);
 			return;
 		}
-
-		if (!isValidPhoneNumber(phoneNumber)) {
-			Alert.alert(
-				translate("common.error"),
-				translate("emergencyContact.invalidPhoneNumber"),
-			);
-			return;
-		}
-
+		const name = [firstName, lastName].filter(Boolean).join(" ");
 		setIsSubmitting(true);
 		try {
+			const childData = {
+				name,
+				birth_year: parseInt(birthYear, 10),
+				birth_month: MONTHS.indexOf(birthMonth) + 1,
+				guardian_id: guardianId,
+				school_id: schoolId,
+				interests,
+			};
 			if (isEditing) {
-				await updateEmergencyContactMutation.mutateAsync({
+				await updateChildMutation.mutateAsync({
 					id: params.id as string,
-					data: emergencyContactData,
+					data: childData,
 				});
 			} else {
-				await createEmergencyContactMutation.mutateAsync({
-					data: emergencyContactData,
-				});
+				await createChildMutation.mutateAsync({ data: childData });
 			}
 			await queryClient.invalidateQueries({
-				queryKey: getGetEmergencyContactsByGuardianIdQueryKey(guardianId),
+				queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
 			});
 			if (isEditing) {
 				router.back();
 			} else {
-				router.push("/(auth)/signup/payment");
+				router.push("/(auth)/signup/emergency-contact");
 			}
 		} catch (error) {
+			console.error(error);
 			Alert.alert(
 				translate("common.errorOccurred"),
 				translate("childProfile.saveError"),
@@ -124,12 +136,11 @@ export default function ManageEmergencyContactScreen() {
 					onPress: async () => {
 						setIsSubmitting(true);
 						try {
-							await deleteEmergencyContactMutation.mutateAsync({
+							await deleteChildMutation.mutateAsync({
 								id: params.id as string,
 							});
 							await queryClient.invalidateQueries({
-								queryKey:
-									getGetEmergencyContactsByGuardianIdQueryKey(guardianId),
+								queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
 							});
 							router.back();
 						} catch {
@@ -172,8 +183,8 @@ export default function ManageEmergencyContactScreen() {
 								{translate("onboarding.back")}
 							</ThemedText>
 						</TouchableOpacity>
-						<ThemedText className="text-xl text-center font-nunito-bold mt-0.5">
-							{translate("profile.familyInformation")}
+						<ThemedText className="text-xl text-center font-nunito-bold">
+							{translate("familyInformation.title")}
 						</ThemedText>
 						{isEditing ? (
 							<TouchableOpacity onPress={handleDelete}>
@@ -181,7 +192,7 @@ export default function ManageEmergencyContactScreen() {
 									className="font-nunito-semibold"
 									style={{ color: AppColors.danger }}
 								>
-									{translate("emergencyContact.deleteContact")}
+									{translate("payment.delete")}
 								</ThemedText>
 							</TouchableOpacity>
 						) : (
@@ -190,30 +201,39 @@ export default function ManageEmergencyContactScreen() {
 					</View>
 					<ThemedText className="text-[22px] font-nunito-semibold mb-5">
 						{isEditing
-							? translate("emergencyContact.editTitle")
-							: translate("emergencyContact.addTitle")}
+							? translate("childProfile.editTitle")
+							: translate("childProfile.createTitle")}
 					</ThemedText>
-					<EmergencyContactForm
-						name={name}
-						setName={setName}
-						phoneNumber={phoneNumber}
-						setPhoneNumber={setPhoneNumber}
+					<ChildProfileForm
+						firstName={firstName}
+						setFirstName={setFirstName}
+						lastName={lastName}
+						setLastName={setLastName}
+						birthMonth={birthMonth}
+						setBirthMonth={setBirthMonth}
+						birthYear={birthYear}
+						setBirthYear={setBirthYear}
+						schoolId={schoolId}
+						setSchoolId={setSchoolId}
+						interests={interests}
+						setInterests={setInterests}
+						searchQuery={searchQuery}
+						setSearchQuery={setSearchQuery}
+						showMonthDrop={showMonthDrop}
+						setShowMonthDrop={setShowMonthDrop}
+						showYearDrop={showYearDrop}
+						setShowYearDrop={setShowYearDrop}
 					/>
 					<TouchableOpacity
 						className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
-						style={{ backgroundColor: "#1c1c1e" }}
+						style={{ backgroundColor: theme.tint }}
 						onPress={handleSave}
 						disabled={isSubmitting}
 					>
-						<ThemedText
-							className="text-base font-nunito-semibold"
-							style={{ color: "#FFFFFF" }}
-						>
+						<ThemedText className="text-white text-base font-nunito-semibold">
 							{isSubmitting
-								? translate("emergencyContact.saving")
-								: isEditing
-									? translate("emergencyContact.saveChanges")
-									: translate("emergencyContact.addContact")}
+								? translate("childProfile.saving")
+								: translate("childProfile.saveChanges")}
 						</ThemedText>
 					</TouchableOpacity>
 				</ScrollView>

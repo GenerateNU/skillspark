@@ -1,29 +1,25 @@
 import React, { useEffect } from "react";
 import { View, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useTranslation } from "react-i18next";
 import { AppColors, FontSizes } from "@/constants/theme";
-import * as SecureStore from "expo-secure-store";
+import { useAuthContext } from "@/hooks/use-auth-context";
 
 // 7. done with onboarding
 export default function AllSetScreen() {
-	const router = useRouter();
 	const { t: translate } = useTranslation();
 	const insets = useSafeAreaInsets();
+	const { completeOnboarding } = useAuthContext();
 
 	useEffect(() => {
-		const finishOnboarding = async () => {
-			await SecureStore.setItemAsync("has_account", "true");
-			const timer = setTimeout(() => {
-				router.replace("/(app)/(tabs)");
-			}, 2500);
-			return () => clearTimeout(timer);
-		};
-		finishOnboarding();
-	}, [router]);
+		const timer = setTimeout(async () => {
+			await completeOnboarding();
+			// LoginRedirect handles navigation once hasAccount=true and inOnboarding=false
+		}, 2500);
+		return () => clearTimeout(timer);
+	}, [completeOnboarding]);
 
 	return (
 		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>

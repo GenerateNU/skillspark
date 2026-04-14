@@ -1,86 +1,82 @@
-import { AuthFormInput } from "@/components/AuthFormInput";
-import { Button } from "@/components/Button";
-import { ErrorMessage } from "@/components/ErrorMessage";
+import React from "react";
+import { View, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors, FontSizes } from "@/constants/theme";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Colors, AppColors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
-import { TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// 6. add payment info
 export default function PaymentScreen() {
 	const router = useRouter();
-	const { t: translate } = useTranslation();
 	const insets = useSafeAreaInsets();
-	const [errorText, setErrorText] = useState("");
-	const { control } = useForm();
+	const theme = Colors.light;
+	const { t: translate } = useTranslation();
+
+	const handleUpdateBilling = () => {
+		router.push("/(auth)/signup/all-set");
+	};
+	const handleDelete = () => {};
 
 	return (
 		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
-			<TouchableOpacity
-				onPress={() => router.back()}
-				className="flex-row items-center px-5 py-3 gap-1"
-				hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-			>
-				<IconSymbol name="chevron.left" size={18} color="#11181C" />
-				<ThemedText className="text-base font-nunito">
-					{translate("onboarding.back")}
-				</ThemedText>
-			</TouchableOpacity>
-
-			<View className="px-6 pt-8 items-center">
-				<ThemedText
-					className="font-nunito-bold leading-[60px]"
-					style={{
-						letterSpacing: -0.5,
-						fontSize: FontSizes.hero,
-						color: AppColors.primaryText,
-					}}
+			<View className="flex-row items-center justify-between px-5 py-[14px]">
+				<TouchableOpacity
+					onPress={() => router.back()}
+					className="flex-row items-center px-5 py-3 gap-1"
+					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 				>
-					{translate("onboarding.paymentInformation")}
+					<IconSymbol name="chevron.left" size={18} color="#11181C" />
+					<ThemedText className="text-base font-nunito">
+						{translate("onboarding.back")}
+					</ThemedText>
+				</TouchableOpacity>
+				<ThemedText className="text-xl text-center font-nunito-bold">
+					{translate("payment.title")}
 				</ThemedText>
+				<View className="w-10" />
 			</View>
+			<View className="px-5 pt-5">
+				<ThemedText className="text-[22px] font-nunito-bold mb-5">
+					{translate("payment.manageBilling")}
+				</ThemedText>
+				{/* TODO: Replace with real payment method data from billing API */}
+				<ThemedText className="text-base font-nunito mb-[6px]">
+					{translate("payment.creditCard")}
+				</ThemedText>
+				<ThemedText className="text-base font-nunito mb-[6px]">
+					{translate("payment.name")}
+				</ThemedText>
+				<ThemedText className="text-base font-nunito mb-8 tracking-widest">
+					**** **** **** XXXX
+				</ThemedText>
+				<View className="flex-row gap-4">
+					<TouchableOpacity
+						className="flex-1 py-[14px] rounded-lg items-center justify-center"
+						style={{ backgroundColor: AppColors.primaryBlue }}
+						onPress={handleUpdateBilling}
+						activeOpacity={0.8}
+					>
+						<ThemedText className="text-white text-[15px] font-nunito-semibold">
+							{translate("payment.updateBilling")}
+						</ThemedText>
+					</TouchableOpacity>
 
-			<View className="px-6 gap-5">
-				<View className="gap-2">
-					<ThemedText className="text-lg font-nunito-semibold">
-						{translate("onboarding.cardNumber")}
-					</ThemedText>
-					<AuthFormInput control={control} name="name" autoCapitalize="none" />
+					<TouchableOpacity
+						className="flex-1 py-[14px] rounded-lg border-[1.5px] items-center justify-center"
+						style={{ borderColor: theme.text }}
+						onPress={handleDelete}
+						activeOpacity={0.8}
+					>
+						<ThemedText
+							className="text-[15px] font-nunito"
+							style={{ color: theme.text }}
+						>
+							{translate("payment.delete")}
+						</ThemedText>
+					</TouchableOpacity>
 				</View>
-
-				<View className="gap-2">
-					<ThemedText className="text-lg font-nunito-semibold">
-						{translate("onboarding.cvv")}
-					</ThemedText>
-					<AuthFormInput control={control} name="cvv" autoCapitalize="none" />
-				</View>
-
-				<View className="gap-2">
-					<ThemedText className="text-lg font-nunito-semibold">
-						{translate("onboarding.zipCode")}
-					</ThemedText>
-					<AuthFormInput
-						control={control}
-						name="zipcode"
-						autoCapitalize="none"
-					/>
-				</View>
-			</View>
-
-			<View className="px-6 items-center">
-				<Button
-					label={translate("onboarding.finish")}
-					onPress={() => router.push("/(auth)/signup/all-set")}
-					disabled={false}
-				/>
-
-				<ErrorMessage message={errorText} />
 			</View>
 		</ThemedView>
 	);

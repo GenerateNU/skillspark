@@ -3,18 +3,24 @@ import { Stack, router } from "expo-router";
 import { useEffect } from "react";
 
 export const LoginRedirect = () => {
-	const { isAuthenticated, isLoading, hasAccount } = useAuthContext();
+	const { isAuthenticated, isLoading, hasAccount, inOnboarding, logout } =
+		useAuthContext();
 
 	useEffect(() => {
 		if (isLoading) return;
-		if (isAuthenticated) {
+		if (inOnboarding) return;
+
+		if (isAuthenticated && hasAccount) {
 			router.replace("/(app)/(tabs)");
-		} else if (hasAccount) {
+		} else if (!isAuthenticated && hasAccount) {
 			router.replace("/(auth)/login");
-		} else {
+		} else if (!isAuthenticated && !hasAccount) {
 			router.replace("/(auth)/signup");
+		} else {
+			// isAuthenticated && !hasAccount: stale auth stored with no account — clear it
+			logout();
 		}
-	}, [isAuthenticated, isLoading, hasAccount]);
+	}, [isAuthenticated, isLoading, hasAccount, inOnboarding]);
 
 	return (
 		<Stack>

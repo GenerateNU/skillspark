@@ -51,7 +51,7 @@ export default function ChildProfileScreen() {
 			<View className="px-6 items-center">
 				<Button
 					label={translate("onboarding.addNewChild")}
-					onPress={() => console.log("add child")}
+					onPress={() => router.push("/(auth)/signup/child-profile/add-child")}
 					disabled={false}
 					bgColor={"#FFFFFF"}
 					width={"60%"}
