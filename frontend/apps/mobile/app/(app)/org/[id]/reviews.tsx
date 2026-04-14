@@ -40,7 +40,7 @@ export default function OrgReviewsPage() {
     useGetEventReviewsForOrganization(
       id ?? "",
       { sort_by: sortBy },
-      { query: { enabled: !!id } }
+      { query: { enabled: !!id } },
     );
 
   if (orgAggLoading || eventReviewsLoading) {

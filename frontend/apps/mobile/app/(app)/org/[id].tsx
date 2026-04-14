@@ -194,28 +194,31 @@ function OrgDetail({
           activeOpacity={0.8}
           onPress={() => router.push(`/org/${org.id}/reviews`)}
         >
-        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardStyle}>
-          <Text className="mb-3 text-[18px] font-nunito-bold">
-            {translate("org.reviews")}
-          </Text>
-          <View className="flex-row items-center gap-4">
-            <Text className="text-[42px] font-nunito-bold leading-[46px]">
-              4.5
+          <View
+            className="mx-4 mb-4 rounded-2xl bg-white p-5"
+            style={cardStyle}
+          >
+            <Text className="mb-3 text-[18px] font-nunito-bold">
+              {translate("org.reviews")}
             </Text>
-            <View className="items-start">
-              <Image
-                source={require("@/assets/images/faces.png")}
-                className="h-10 w-[140px]"
-              />
-              <Text
-                className="mt-1 text-[13px] font-nunito"
-                style={{ color: AppColors.subtleText }}
-              >
-                (140)
+            <View className="flex-row items-center gap-4">
+              <Text className="text-[42px] font-nunito-bold leading-[46px]">
+                4.5
               </Text>
+              <View className="items-start">
+                <Image
+                  source={require("@/assets/images/faces.png")}
+                  className="h-10 w-[140px]"
+                />
+                <Text
+                  className="mt-1 text-[13px] font-nunito"
+                  style={{ color: AppColors.subtleText }}
+                >
+                  (140)
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
         </TouchableOpacity>
 
         {/* See Schedule CTA */}

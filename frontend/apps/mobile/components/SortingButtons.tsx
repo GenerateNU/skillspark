@@ -13,7 +13,11 @@ type FilterTabsProps<T> = {
   onChange: (value: T) => void;
 };
 
-export function FilterTabs<T>({ options, value, onChange }: FilterTabsProps<T>) {
+export function FilterTabs<T>({
+  options,
+  value,
+  onChange,
+}: FilterTabsProps<T>) {
   return (
     <ScrollView
       horizontal
@@ -30,9 +34,7 @@ export function FilterTabs<T>({ options, value, onChange }: FilterTabsProps<T>) 
             onPress={() => onChange(opt.value)}
             className="px-4 py-2 rounded-full border"
             style={{
-              backgroundColor: active
-                ? AppColors.primaryText
-                : "transparent",
+              backgroundColor: active ? AppColors.primaryText : "transparent",
               borderColor: active
                 ? AppColors.primaryText
                 : AppColors.borderLight,

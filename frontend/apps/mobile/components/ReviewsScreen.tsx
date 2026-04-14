@@ -42,8 +42,8 @@ interface ReviewsScreenProps<
     id: string,
     options?: {
       sortBy?: "most_recent" | "highest" | "lowest";
-    }
-  ) => QueryResult<TReviews>; 
+    },
+  ) => QueryResult<TReviews>;
   /** When true, shows the rating smileys and write-a-review CTA */
   canReview?: boolean;
   /** Event occurrence ID, used to look up the guardian's registration */
@@ -89,10 +89,7 @@ export default function ReviewsScreen<
     error: aggregateError,
   } = useGetAggregate(id ?? "");
 
-  const reviewParams = useMemo(
-    () => ({ sort_by: sortBy }),
-    [sortBy]
-  );
+  const reviewParams = useMemo(() => ({ sort_by: sortBy }), [sortBy]);
 
   const reviewsQuery = useGetReviewByEventId(id ?? "", reviewParams);
 
