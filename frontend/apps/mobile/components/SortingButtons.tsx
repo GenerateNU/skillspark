@@ -1,25 +1,19 @@
 import { AppColors } from "@/constants/theme";
-import { useState } from "react";
+import React from "react";
 import { ScrollView, Text, TouchableOpacity } from "react-native";
 
-interface FilterOption<T> {
+type FilterTabOption<T> = {
   label: string;
   value: T;
-}
+};
 
-interface FilterTabsProps<T> {
-  options: FilterOption<T>[];
+type FilterTabsProps<T> = {
+  options: FilterTabOption<T>[];
+  value: T;
   onChange: (value: T) => void;
-}
+};
 
-export function FilterTabs<T>({ options, onChange }: FilterTabsProps<T>) {
-  const [selected, setSelected] = useState<T>(options[0]?.value);
-
-  function handleSelect(value: T) {
-    setSelected(value);
-    onChange(value);
-  }
-
+export function FilterTabs<T>({ options, value, onChange }: FilterTabsProps<T>) {
   return (
     <ScrollView
       horizontal
@@ -28,14 +22,17 @@ export function FilterTabs<T>({ options, onChange }: FilterTabsProps<T>) {
       contentContainerStyle={{ gap: 12, paddingHorizontal: 4 }}
     >
       {options.map((opt) => {
-        const active = selected === opt.value;
+        const active = value === opt.value;
+
         return (
           <TouchableOpacity
             key={String(opt.value)}
-            onPress={() => handleSelect(opt.value)}
+            onPress={() => onChange(opt.value)}
             className="px-4 py-2 rounded-full border"
             style={{
-              backgroundColor: active ? AppColors.primaryText : "transparent",
+              backgroundColor: active
+                ? AppColors.primaryText
+                : "transparent",
               borderColor: active
                 ? AppColors.primaryText
                 : AppColors.borderLight,
@@ -43,7 +40,9 @@ export function FilterTabs<T>({ options, onChange }: FilterTabsProps<T>) {
           >
             <Text
               className="text-sm"
-              style={{ color: active ? "#fff" : AppColors.secondaryText }}
+              style={{
+                color: active ? "#fff" : AppColors.secondaryText,
+              }}
             >
               {opt.label}
             </Text>
