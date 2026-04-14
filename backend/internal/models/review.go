@@ -119,6 +119,7 @@ type SimpleReviewAggregate struct {
 	EventID       uuid.UUID `json:"event_id"`
 	TotalReviews  int       `json:"total_reviews"`
 	AverageRating float64   `json:"average_rating"`
+	Event         Event     `json:"event" db:"-"`
 }
 
 type GetEventReviewsForOrganizationInput struct {

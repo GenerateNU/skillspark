@@ -744,6 +744,7 @@ export interface School {
 
 export interface SimpleReviewAggregate {
   average_rating: number;
+  event: Event;
   event_id: string;
   total_reviews: number;
 }

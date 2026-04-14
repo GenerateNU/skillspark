@@ -4324,6 +4324,8 @@ components:
         average_rating:
           type: number
           format: double
+        event:
+          $ref: '#/components/schemas/Event'
         event_id:
           type: string
         total_reviews:
@@ -4333,6 +4335,7 @@ components:
         - event_id
         - total_reviews
         - average_rating
+        - event
     UpdateChildInputBody:
       type: object
       additionalProperties: false
