@@ -3,10 +3,10 @@ RETURNS TRIGGER AS $$
 BEGIN
   BEGIN
     PERFORM net.http_post(
-      url     := 'http://supabase_edge_runtime_skillspark:8081/opensearch-access',
+      url     := current_setting('app.settings.edge_function_url'),
       headers := jsonb_build_object(
         'Content-Type',  'application/json',
-        'Authorization', 'Bearer sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH'
+        'Authorization', current_setting('app.settings.edge_function_key')
       ),
       body    := jsonb_build_object(
         'type',       TG_OP,
