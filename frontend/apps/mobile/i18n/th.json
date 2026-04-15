@@ -42,8 +42,8 @@
     "forYou": "สำหรับคุณ",
     "basedOn": "ตามจาก",
     "upcomingEvents": "กิจกรรมที่จะมาถึง",
-    "learnMore": "Learn More",
     "reserved": "จองแล้ว",
+    "learnMore": "ดูเพิ่มเติม",
     "members": "สมาชิก",
     "categories": {
       "technology": "เทคโนโลยี",
@@ -254,7 +254,14 @@
     "notFound": "ไม่พบกิจกรรม",
     "minWalk": "นาที",
     "hr": "ชั่วโมง",
-    "min": "นาที"
+    "min": "นาที",
+    "bookingsThisWeek": "การจองสัปดาห์นี้",
+    "about": "เกี่ยวกับ",
+    "reviews": "รีวิว",
+    "more": "เพิ่มเติม",
+    "noReviews": "ยังไม่มีรีวิว",
+    "seeMoreReviews": "ดูรีวิวเพิ่มเติม",
+    "reserve": "จอง"
   },
   "emergencyContact": {
     "manageTitle": "จัดการผู้ติดต่อฉุกเฉิน",
@@ -288,10 +295,12 @@
     "noDescription": "ไม่มีคำอธิบาย",
     "seeSchedule": "ดูตารางเวลา",
     "schedule": "คลาสเรียน",
+    "class": "คลาส",
     "noSchedule": "ไม่มีคลาสที่กำลังจะมาถึงสำหรับองค์กรนี้",
     "notFound": "ไม่พบองค์กร",
     "bookingsThisWeek": "การจองสัปดาห์นี้",
-    "reviews": "รีวิว"
+    "reviews": "รีวิว",
+    "allClasses": "ทุกคลาส"
   },
   "interests": {
     "science": "วิทยาศาสตร์",

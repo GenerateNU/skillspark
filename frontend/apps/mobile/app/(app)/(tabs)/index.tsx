@@ -286,7 +286,7 @@ export default function HomeScreen() {
             </Text>
           </View>
           <CarouselCard
-            events={allLocalizedOccurrences}
+            events={allLocalizedOccurrences.length > 0 ? allLocalizedOccurrences : futureOccurrences.slice(0, 5)}
             width={width}
             height={height}
           />

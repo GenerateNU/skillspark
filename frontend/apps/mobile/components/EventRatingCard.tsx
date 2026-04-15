@@ -1,14 +1,14 @@
-import { Image } from "expo-image";
-import { Text, TouchableOpacity, View } from "react-native";
-import { useTranslation } from "react-i18next";
-import { type Event, type ReviewAggregate } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { RATING_OPTIONS } from "@/constants/ratings";
 import { AppColors } from "@/constants/theme";
+import { type Event, type SimpleReviewAggregate } from "@skillspark/api-client";
+import { Image } from "expo-image";
+import { useTranslation } from "react-i18next";
+import { Text, TouchableOpacity, View } from "react-native";
 
 interface EventRatingCardProps {
   event: Event;
-  aggregate: ReviewAggregate | null;
+  aggregate: SimpleReviewAggregate | null;
   onPress: () => void;
 }
 

@@ -1,4 +1,5 @@
 import i18n from "@/i18n";
+import type { EventOccurrence } from "@skillspark/api-client";
 
 export function formatDuration(
   start: string,
@@ -71,4 +72,10 @@ export function formatAgeRange(min: number, max: number): string {
   if (!min && !max) return "";
   if (min === max) return i18n.t("occurrence.ages", { min });
   return i18n.t("occurrence.agesRange", { min, max });
+}
+
+export function formatLocation(occurrence: EventOccurrence): string {
+  const loc = occurrence.location;
+  const parts = [loc.district, loc.province].filter(Boolean);
+  return parts.join(", ") || "Location";
 }
