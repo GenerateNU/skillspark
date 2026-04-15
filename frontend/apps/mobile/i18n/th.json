@@ -289,9 +289,6 @@
     "km": "กม.",
     "stars": "ดาว"
   },
-  "activity": {
-    "activity": "กิจกรรม"
-  },
   "org": {
     "about": "เกี่ยวกับ",
     "noDescription": "ไม่มีคำอธิบาย",
@@ -313,6 +310,22 @@
     "technology": "เทคโนโลยี",
     "language": "ภาษา",
     "other": "อื่นๆ"
+  },
+  "activity": {
+    "upcoming": "กำลังจะมาถึง",
+    "past": "ที่ผ่านมา",
+    "noUpcomingRegistrations": "ไม่มีการลงทะเบียนที่กำลังจะมาถึง",
+    "noPastRegistrations": "ไม่มีการลงทะเบียนที่ผ่านมา",
+    "filterByChild": "กรองตามเด็ก",
+    "reset": "รีเซ็ต",
+    "apply": "ใช้งาน",
+    "cancelTitle": "ยกเลิกการลงทะเบียน",
+    "cancelSubtitle": "เลือกเด็กที่ต้องการถอนออกจากกิจกรรมนี้",
+    "keep": "เก็บไว้",
+    "remove": "ลบ",
+    "reviewed": "รีวิวแล้ว!",
+    "review": "รีวิว",
+    "payment": "การชำระเงิน: {{price}}"
   },
   "editProfile": {
     "title": "ข้อมูลครอบครัว",
