@@ -24,12 +24,7 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
   return (
     <Pressable
       onPress={() => router.push(`/event/${eventId}`)}
-      style={{
-        flex: 1,
-        borderRadius: 24,
-        overflow: "hidden",
-        backgroundColor: AppColors.primaryText,
-      }}
+      className="flex-1 rounded-3xl overflow-hidden bg-[#1a1a1a]"
     >
       {/* Background image */}
       {event.event.presigned_url ? (
@@ -40,102 +35,40 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
         />
       ) : (
         <>
-          <View
-            style={{
-              position: "absolute",
-              width: 140,
-              height: 140,
-              borderRadius: 70,
-              top: -20,
-              left: 20,
-              backgroundColor: AppColors.purple,
-              opacity: 0.95,
-            }}
-          />
-          <View
-            style={{
-              position: "absolute",
-              width: 120,
-              height: 120,
-              borderRadius: 60,
-              top: 10,
-              left: 90,
-              backgroundColor: AppColors.primaryBlue,
-              opacity: 0.95,
-            }}
-          />
-          <View
-            style={{
-              position: "absolute",
-              width: 100,
-              height: 100,
-              borderRadius: 50,
-              top: -5,
-              left: 170,
-              backgroundColor: AppColors.green,
-              opacity: 0.95,
-            }}
-          />
+          <View className="absolute w-[140px] h-[140px] rounded-full -top-5 left-5 bg-purple-700 opacity-95" />
+          <View className="absolute w-[120px] h-[120px] rounded-full top-[10px] left-[90px] bg-blue-600 opacity-95" />
+          <View className="absolute w-[100px] h-[100px] rounded-full -top-[5px] left-[170px] bg-green-500 opacity-95" />
         </>
       )}
 
       {/* Bottom overlay */}
-      <View
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: "rgba(0,0,0,0.60)",
-          borderBottomLeftRadius: 24,
-          borderBottomRightRadius: 24,
-          paddingHorizontal: 16,
-          paddingTop: 14,
-          paddingBottom: 14,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-          }}
-        >
+      <View className="absolute bottom-0 left-0 right-0 bg-black/60 rounded-b-3xl px-4 pt-[14px] pb-[14px]">
+        <View className="flex-row items-end justify-between">
+
           {/* Left: title + rating */}
-          <View style={{ flex: 1, marginRight: 12 }}>
+          <View className="flex-1 mr-3">
             <Text
-              style={{
-                color: "white",
-                fontFamily: FontFamilies.bold,
-                fontSize: 18,
-                marginBottom: 5,
-                lineHeight: 22,
-              }}
+              className="text-white text-lg mb-[5px] leading-[22px]"
+              style={{ fontFamily: FontFamilies.bold }}
               numberOfLines={1}
             >
               {event.event.title}
             </Text>
             {totalReviews > 0 && ratingMatch && (
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+              <View className="flex-row items-center gap-[5px]">
                 <Image
                   source={ratingMatch.image}
                   style={{ width: 20, height: 20 }}
                 />
                 <Text
-                  style={{
-                    color: "white",
-                    fontFamily: FontFamilies.semiBold,
-                    fontSize: FontSizes.sm,
-                  }}
+                  className="text-white text-sm"
+                  style={{ fontFamily: FontFamilies.semiBold }}
                 >
                   {avgRating.toFixed(1)}
                 </Text>
                 <Text
-                  style={{
-                    color: "rgba(255,255,255,0.65)",
-                    fontFamily: FontFamilies.regular,
-                    fontSize: FontSizes.sm,
-                  }}
+                  className="text-white/65 text-sm"
+                  style={{ fontFamily: FontFamilies.regular }}
                 >
                   ({totalReviews} {totalReviews === 1 ? "Review" : "Reviews"})
                 </Text>
@@ -146,22 +79,11 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
           {/* See More button */}
           <Pressable
             onPress={() => router.push(`/event/${eventId}`)}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "white",
-              borderRadius: 20,
-              paddingHorizontal: 14,
-              paddingVertical: 8,
-              gap: 4,
-            }}
+            className="flex-row items-center bg-white rounded-full px-[14px] py-2 gap-1"
           >
             <Text
-              style={{
-                fontFamily: FontFamilies.bold,
-                fontSize: FontSizes.sm,
-                color: AppColors.primaryText,
-              }}
+              className="text-sm"
+              style={{ fontFamily: FontFamilies.bold, color: AppColors.primaryText }}
             >
               See More
             </Text>
