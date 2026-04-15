@@ -10,6 +10,7 @@
   "common": {
     "submit": "Submit",
     "cancel": "Cancel",
+    "close": "Close",
     "loading": "Loading...",
     "saving": "Saving...",
     "loadingMapData": "Loading Map Data...",
@@ -286,6 +287,8 @@
     "about": "About",
     "noDescription": "No description available.",
     "seeSchedule": "See Schedule",
+    "schedule": "Classes",
+    "noSchedule": "No upcoming classes for this organization.",
     "notFound": "Organization not found.",
     "bookingsThisWeek": "Bookings this week",
     "reviews": "Reviews"
@@ -307,5 +310,23 @@
     "username": "Username",
     "changeImage": "Change Image",
     "saveChanges": "Save Changes"
+  },
+  "occurrence": {
+    "smiles": "/ 5 Smiles",
+    "learnMore": "Learn more",
+    "reserve": "Reserve",
+    "ages": "Ages {{min}}",
+    "agesRange": "Ages {{min}} - {{max}}",
+    "classTime": "{{time}} Class"
+  },
+  "reservation": {
+    "paymentFailed": "Payment failed. Please try again or contact support.",
+    "completed": "Completed",
+    "selectChildLabel": "Select Child",
+    "noChildren": "No children found.",
+    "termsNote": "By clicking 'Pay Now', you authorize Skill Spark to charge your card for the total amount, plus applicable fees.",
+    "terms": "Terms & Conditions",
+    "payAndReserve": "Pay Now & Reserve",
+    "seeYouSoon": "See you soon!"
   }
 }

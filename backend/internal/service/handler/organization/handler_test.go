@@ -780,6 +780,7 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 		name             string
 		id               string
 		mockSetup        func(*repomocks.MockOrganizationRepository)
+		mockS3Setup      func(*s3mocks.S3ClientMock)
 		wantErr          bool
 		statusCode       *int
 		messageSubstring *string
@@ -822,6 +823,10 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 					},
 				}, nil)
 			},
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {
+				m.On("GeneratePresignedURL", mock.Anything, "events/robotics_workshop.jpg", mock.Anything).
+					Return("https://presigned.url/events/robotics_workshop.jpg", nil).Times(2)
+			},
 			wantErr: false,
 		},
 		{
@@ -835,7 +840,8 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 					"en-US",
 				).Return(make([]models.EventOccurrence, 0), nil)
 			},
-			wantErr: false,
+			mockS3Setup: func(m *s3mocks.S3ClientMock) {},
+			wantErr:     false,
 		},
 	}
 
@@ -846,10 +852,11 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 
 			mockRepo := new(repomocks.MockOrganizationRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
 			tt.mockSetup(mockRepo)
 
 			mockS3 := createMockS3Client()
-			mockReviewRepo := new(repomocks.MockReviewRepository)
+			tt.mockS3Setup(mockS3)
 			handler := NewHandler(mockRepo, mockLocationRepo, mockReviewRepo, mockS3)
 			ctx := context.Background()
 
