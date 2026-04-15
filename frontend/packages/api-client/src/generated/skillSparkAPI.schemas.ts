@@ -31,12 +31,12 @@ export interface CancelEventOccurrenceOutputBody {
 /**
  * Current status of the registration
  */
-export type RegistrationStatus = typeof RegistrationStatus[keyof typeof RegistrationStatus];
-
+export type RegistrationStatus =
+  (typeof RegistrationStatus)[keyof typeof RegistrationStatus];
 
 export const RegistrationStatus = {
-  registered: 'registered',
-  cancelled: 'cancelled',
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface Registration {
@@ -297,12 +297,12 @@ export interface CreateOrgStripeAccountOutputBody {
 /**
  * Initial status of the registration
  */
-export type CreateRegistrationInputBodyStatus = typeof CreateRegistrationInputBodyStatus[keyof typeof CreateRegistrationInputBodyStatus];
-
+export type CreateRegistrationInputBodyStatus =
+  (typeof CreateRegistrationInputBodyStatus)[keyof typeof CreateRegistrationInputBodyStatus];
 
 export const CreateRegistrationInputBodyStatus = {
-  registered: 'registered',
-  cancelled: 'cancelled',
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface CreateRegistrationInputBody {
@@ -459,12 +459,12 @@ export interface Event {
 /**
  * Current status of the event occurrence
  */
-export type EventOccurrenceStatus = typeof EventOccurrenceStatus[keyof typeof EventOccurrenceStatus];
-
+export type EventOccurrenceStatus =
+  (typeof EventOccurrenceStatus)[keyof typeof EventOccurrenceStatus];
 
 export const EventOccurrenceStatus = {
-  scheduled: 'scheduled',
-  cancelled: 'cancelled',
+  scheduled: "scheduled",
+  cancelled: "cancelled",
 } as const;
 
 export interface Location {
@@ -865,12 +865,12 @@ export interface UpdateGuardianInputBody {
 /**
  * Updated registration status (optional)
  */
-export type UpdateRegistrationInputBodyStatus = typeof UpdateRegistrationInputBodyStatus[keyof typeof UpdateRegistrationInputBodyStatus];
-
+export type UpdateRegistrationInputBodyStatus =
+  (typeof UpdateRegistrationInputBodyStatus)[keyof typeof UpdateRegistrationInputBodyStatus];
 
 export const UpdateRegistrationInputBodyStatus = {
-  registered: 'registered',
-  cancelled: 'cancelled',
+  registered: "registered",
+  cancelled: "cancelled",
 } as const;
 
 export interface UpdateRegistrationInputBody {
@@ -894,29 +894,29 @@ export interface UpdateRegistrationPaymentStatusInputBody {
 }
 
 export type GetAllEventOccurrencesParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
-search?: string;
-lat?: string;
-lng?: string;
-radius_km?: number;
-min_price?: number;
-max_price?: number;
-min_duration?: number;
-max_duration?: number;
-min_age?: number;
-max_age?: number;
-category?: string;
-soldout?: boolean;
-min_date?: string;
-max_date?: string;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  search?: string;
+  lat?: string;
+  lng?: string;
+  radius_km?: number;
+  min_price?: number;
+  max_price?: number;
+  min_duration?: number;
+  max_duration?: number;
+  min_age?: number;
+  max_age?: number;
+  category?: string;
+  soldout?: boolean;
+  min_date?: string;
+  max_date?: string;
 };
 
 export type CreateEventBody = {
@@ -956,53 +956,53 @@ export type UpdateEventBody = {
 };
 
 export type GetAllLocationsParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
 };
 
 export type GetEventReviewsForOrganizationParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
-sort_by?: GetEventReviewsForOrganizationSortBy;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+  sort_by?: GetEventReviewsForOrganizationSortBy;
 };
 
-export type GetEventReviewsForOrganizationSortBy = typeof GetEventReviewsForOrganizationSortBy[keyof typeof GetEventReviewsForOrganizationSortBy];
-
+export type GetEventReviewsForOrganizationSortBy =
+  (typeof GetEventReviewsForOrganizationSortBy)[keyof typeof GetEventReviewsForOrganizationSortBy];
 
 export const GetEventReviewsForOrganizationSortBy = {
-  most_rated: 'most_rated',
-  highest: 'highest',
-  lowest: 'lowest',
+  most_rated: "most_rated",
+  highest: "highest",
+  lowest: "lowest",
 } as const;
 
 export type ListOrganizationsParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type CreateOrganizationBody = {
@@ -1032,121 +1032,120 @@ export type UpdateOrganizationBody = {
 };
 
 export type GetRecommendationsByChildIdParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
-lat?: string;
-lng?: string;
-radius_km?: number;
-min_date?: string;
-max_date?: string;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  lat?: string;
+  lng?: string;
+  radius_km?: number;
+  min_date?: string;
+  max_date?: string;
 };
 
 export type GetReviewByEventIdParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
-/**
- * Sort order for reviews
- */
-sort_by?: GetReviewByEventIdSortBy;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+  /**
+   * Sort order for reviews
+   */
+  sort_by?: GetReviewByEventIdSortBy;
 };
 
-export type GetReviewByEventIdSortBy = typeof GetReviewByEventIdSortBy[keyof typeof GetReviewByEventIdSortBy];
-
+export type GetReviewByEventIdSortBy =
+  (typeof GetReviewByEventIdSortBy)[keyof typeof GetReviewByEventIdSortBy];
 
 export const GetReviewByEventIdSortBy = {
-  most_recent: 'most_recent',
-  highest: 'highest',
-  lowest: 'lowest',
+  most_recent: "most_recent",
+  highest: "highest",
+  lowest: "lowest",
 } as const;
 
 export type GetReviewByGuardianIdParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type GetReviewByOrganizationIdParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type GetSavedByGuardianIdParams = {
-/**
- * Page number (starts at 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (starts at 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type GetAllSchoolsParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
 };
 
 export type GetTrendingEventOccurrencesParams = {
-/**
- * The user's latitude
- */
-lat: number;
-/**
- * The user's longitude
- */
-lng: number;
-/**
- * the maximum number of returns
- * @minimum 1
- */
-max_returns?: number;
-/**
- * the distance away from the user a returned event can be in km
- * @minimum 1
- */
-radius?: number;
+  /**
+   * The user's latitude
+   */
+  lat: number;
+  /**
+   * The user's longitude
+   */
+  lng: number;
+  /**
+   * the maximum number of returns
+   * @minimum 1
+   */
+  max_returns?: number;
+  /**
+   * the distance away from the user a returned event can be in km
+   * @minimum 1
+   */
+  radius?: number;
 };
-

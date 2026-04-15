@@ -10,7 +10,7 @@ import {
   updateGuardianResponse,
   useLoginGuardian,
   useSignupGuardian,
-  useUpdateGuardian
+  useUpdateGuardian,
 } from "@skillspark/api-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";

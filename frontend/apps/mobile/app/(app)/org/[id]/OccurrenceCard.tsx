@@ -13,11 +13,7 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { ReservationModal } from "@/components/ReservationModal";
 import { RatingSmiley } from "@/components/RatingSmiley";
-import {
-  formatAgeRange,
-  formatPrice,
-  formatTime,
-} from "@/utils/format";
+import { formatAgeRange, formatPrice, formatTime } from "@/utils/format";
 import { useTranslation } from "react-i18next";
 
 const BUTTON_ROW_HEIGHT = 52;
@@ -67,7 +63,7 @@ export function OccurrenceCard({
 
   const ageRange = formatAgeRange(
     occurrence.event.age_range_min,
-    occurrence.event.age_range_max
+    occurrence.event.age_range_max,
   );
   const locationText = [
     occurrence.location?.district,
