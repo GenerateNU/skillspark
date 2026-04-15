@@ -33,7 +33,7 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
           </ThemedText>
           {distance !== null && (
             <ThemedText className="font-nunito text-[15px] leading-[22px]">
-              {distance.toFixed(1)} {translate("map.miles")}
+              {distance.toFixed(1)} {translate("map.km")}
             </ThemedText>
           )}
           <ThemedText className="font-nunito text-[15px] leading-[22px]">
@@ -42,7 +42,7 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
           <TouchableOpacity
             className="mt-4 w-full items-center rounded-full py-[10px]"
             style={{ backgroundColor: AppColors.checkboxSelected }}
-            onPress={() => router.push(`/(app)/(tabs)/org/${pin.id}`)}
+            onPress={() => router.push(`/org/${pin.id}`)}
           >
             <Text className="font-nunito-semibold text-sm text-white">
               {translate("dashboard.learnMore")}

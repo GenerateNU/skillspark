@@ -28,6 +28,8 @@ func (r *ChildRepository) UpdateChildByID(ctx context.Context, childID uuid.UUID
 		child.Body.BirthYear,
 		child.Body.Interests,
 		child.Body.GuardianID,
+		child.Body.AvatarFace,
+		child.Body.AvatarBackground,
 		childID)
 
 	var updatedChild models.Child
@@ -40,6 +42,8 @@ func (r *ChildRepository) UpdateChildByID(ctx context.Context, childID uuid.UUID
 		&updatedChild.BirthYear,
 		&updatedChild.Interests,
 		&updatedChild.GuardianID,
+		&updatedChild.AvatarFace,
+		&updatedChild.AvatarBackground,
 		&updatedChild.CreatedAt,
 		&updatedChild.UpdatedAt,
 	)

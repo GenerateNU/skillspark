@@ -17,8 +17,10 @@ import {
   type Guardian,
   type Registration,
   type Child,
+  getTrendingEventOccurrences,
+  useGetTrendingEventOccurrences,
 } from "@skillspark/api-client";
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useDebounce } from "use-debounce";
@@ -30,8 +32,10 @@ import { CategoryCard } from "@/components/home/CategoryCard";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { TrendingCard } from "@/components/home/TrendingCard";
+
 import * as Location from "expo-location";
 import CarouselCard from "@/components/home/CarouselCard";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
@@ -58,8 +62,8 @@ export default function HomeScreen() {
   }, []);
 
   const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({
-    lat: "13.7563",
-    lng: "100.5018",
+    lat: geoLocationLat,
+    lng: geoLocationLong,
     radius_km: 50,
     limit: 5,
   });
@@ -105,6 +109,27 @@ export default function HomeScreen() {
     return Array.isArray(d?.data) ? d.data : [];
   }, [childrenResp]);
 
+  const { data: trendingResp } = useGetTrendingEventOccurrences(
+    {
+      lat: Number(geoLocationLat),
+      lng: Number(geoLocationLong),
+      radius: 50,
+      max_returns: 5,
+    },
+    {
+      query: {
+        enabled: !!geoLocationLat && !!geoLocationLong,
+      },
+    },
+  );
+
+  const trendingEvents: EventOccurrence[] = useMemo(() => {
+    const d = trendingResp as unknown as
+      | { data: EventOccurrence[] }
+      | undefined;
+    return Array.isArray(d?.data) ? d.data : [];
+  }, [trendingResp]);
+
   const upcomingClasses = useMemo(() => {
     const upcomingIds = new Set(
       registrations
@@ -121,11 +146,6 @@ export default function HomeScreen() {
   const futureOccurrences = useMemo(
     () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
     [allOccurrences],
-  );
-
-  const trendingEvents = useMemo(
-    () => [...futureOccurrences].sort(() => Math.random() - 0.5).slice(0, 5),
-    [futureOccurrences],
   );
 
   const childRecommendations = useMemo(() => {
@@ -178,7 +198,7 @@ export default function HomeScreen() {
     <ScrollView
       className="flex-1 bg-white"
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
     >
       {/* Header */}
       <View className="px-5 pt-14 pb-4">
@@ -266,7 +286,7 @@ export default function HomeScreen() {
             </Text>
           </View>
           <CarouselCard
-            events={allLocalizedOccurrences}
+            events={allLocalizedOccurrences.length > 0 ? allLocalizedOccurrences : futureOccurrences.slice(0, 5)}
             width={width}
             height={height}
           />
@@ -274,7 +294,7 @@ export default function HomeScreen() {
       )}
 
       {/* Trending In Your Area */}
-      {trendingEvents.length > 0 && (
+      {trendingEvents && trendingEvents.length > 0 && (
         <View className="mb-6">
           <Text
             className="font-nunito-bold px-5 mb-3"

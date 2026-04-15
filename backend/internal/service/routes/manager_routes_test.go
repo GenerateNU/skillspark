@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
+	"skillspark/internal/config"
 	"skillspark/internal/models"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
-	"skillspark/internal/config"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -31,10 +31,10 @@ func setupmanagerTestAPI(
 	api := humafiber.New(app, huma.DefaultConfig("Test API", "1.0.0"))
 
 	repo := &storage.Repository{
-		Manager:  managerRepo,
+		Manager: managerRepo,
 	}
 
-	cfg := config.Config {
+	cfg := config.Config{
 		Supabase: config.Supabase{
 			URL:            "https://example.supabase.co",
 			AnonKey:        "dummy-anon-key",
@@ -320,13 +320,13 @@ func TestHumaValidation_DeleteManager(t *testing.T) {
 					mock.Anything,
 					uuid.MustParse(managerID),
 				).Return(&models.Manager{
-					ID:             uuid.MustParse(managerID),
-					UserID:         uuid.MustParse(userID),
-					OrganizationID: uuid.MustParse(orgID),
-					Role:           "Director",
-					Name: "Dr. Amanda Lee",
-					Email: "amanda.lee@scienceacademy.com",
-					Username: "alee",
+					ID:                 uuid.MustParse(managerID),
+					UserID:             uuid.MustParse(userID),
+					OrganizationID:     uuid.MustParse(orgID),
+					Role:               "Director",
+					Name:               "Dr. Amanda Lee",
+					Email:              "amanda.lee@scienceacademy.com",
+					Username:           "alee",
 					LanguagePreference: "en",
 				}, nil)
 			},

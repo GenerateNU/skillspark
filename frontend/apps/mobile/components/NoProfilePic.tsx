@@ -1,5 +1,4 @@
 import { AppColors, Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { View } from "react-native";
 import { IconSymbol } from "./ui/icon-symbol";
 
@@ -9,13 +8,14 @@ interface NoProfilePicProps {
 }
 
 export const NoProfilePic = ({ width, height }: NoProfilePicProps) => {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
-
   return (
     <View
       className="rounded-full border items-center justify-center overflow-hidden"
-      style={{ borderColor: theme.borderColor, width: width, height: height }}
+      style={{
+        borderColor: Colors.light.borderColor,
+        width: width,
+        height: height,
+      }}
     >
       <IconSymbol
         name="person"

@@ -1,10 +1,13 @@
+import i18n from "@/i18n";
+import type { EventOccurrence } from "@skillspark/api-client";
+
 export function formatDuration(
   start: string,
   end: string,
-  labels: { hr: string; min: string } = { hr: "hr", min: "min" },
+  labels: { hr: string; min: string } = { hr: "hr", min: "min" }
 ) {
   const mins = Math.round(
-    (new Date(end).getTime() - new Date(start).getTime()) / 60000,
+    (new Date(end).getTime() - new Date(start).getTime()) / 60000
   );
   return mins >= 60
     ? `${Math.round(mins / 60)} ${labels.hr}`
@@ -33,4 +36,46 @@ export function formatEventTime(start: string, end: string): string {
       minute: "2-digit",
     });
   return `${fmt(start)} - ${fmt(end)}`;
+}
+
+export function formatModalTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+export function formatSectionDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const today = new Date();
+  if (date.toDateString() === today.toDateString()) return i18n.t("time.today");
+  return date.toLocaleDateString("en-US", { weekday: "short", day: "numeric" });
+}
+
+export function formatTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+export function formatPrice(cents: number, currency: string): string {
+  const amount = cents / 100;
+  if (currency?.toUpperCase() === "THB")
+    return `฿${amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2)}`;
+  return `$${amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2)}`;
+}
+
+export function formatAgeRange(min: number, max: number): string {
+  if (!min && !max) return "";
+  if (min === max) return i18n.t("occurrence.ages", { min });
+  return i18n.t("occurrence.agesRange", { min, max });
+}
+
+export function formatLocation(occurrence: EventOccurrence): string {
+  const loc = occurrence.location;
+  const parts = [loc.district, loc.province].filter(Boolean);
+  return parts.join(", ") || "Location";
 }

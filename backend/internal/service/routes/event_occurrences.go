@@ -134,6 +134,24 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository, s3Clien
 	})
 
 	huma.Register(api, huma.Operation{
+		OperationID: "get-trending-event-occurrences",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/trending/event-occurrences",
+		Summary:     "Get the top 5 trending event occurrences",
+		Description: "Returns a list of trending event occurrences in the user's location",
+		Tags:        []string{"Event Occurrences"},
+	}, func(ctx context.Context, input *models.GetTrendingEventOccurrencesInput) (*models.GetTrendingEventOccurrencesOutput, error) {
+		eventOccurrences, err := eventOccurrenceHandler.GetTrendingEventOccurrences(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetTrendingEventOccurrencesOutput{
+			Body: eventOccurrences,
+		}, nil
+	})
+
+	huma.Register(api, huma.Operation{
 		OperationID: "get-event-occurrences-by-id",
 		Method:      http.MethodGet,
 		Path:        "/api/v1/event-occurrences/{id}",

@@ -5,22 +5,6 @@ import { type EventOccurrence } from "@skillspark/api-client";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { StarRating } from "@/components/StarRating";
 
-const AVATAR_COLORS = [
-  AppColors.purple,
-  AppColors.emerald,
-  AppColors.blue,
-  AppColors.amber,
-  AppColors.pink,
-];
-
-function hashColor(initials: string): string {
-  let hash = 0;
-  for (let i = 0; i < initials.length; i++) {
-    hash = initials.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
 export function TrendingCard({ occurrence }: { occurrence: EventOccurrence }) {
   const router = useRouter();
   const ageLabel =
@@ -31,49 +15,11 @@ export function TrendingCard({ occurrence }: { occurrence: EventOccurrence }) {
             : "+"
         }`
       : null;
-  // Placeholder initials — not real user data
-  const letter1 = "E";
-  const letter2 = "S";
-  const color1 = hashColor(letter1);
-  const color2 = hashColor(letter2);
-
   return (
     <View className="mr-[14px] pb-2">
-      {/* Avatar circles floating above top-right of card */}
-      <View className="flex-row justify-end pr-[14px] -mb-[18px] z-[1]">
-        <View
-          className="w-9 h-9 rounded-full border-[2.5px] items-center justify-center"
-          style={{ backgroundColor: color1, borderColor: AppColors.white }}
-        >
-          <Text
-            style={{
-              color: AppColors.white,
-              fontSize: FontSizes.md,
-              fontFamily: FontFamilies.bold,
-            }}
-          >
-            {letter1}
-          </Text>
-        </View>
-        <View
-          className="w-9 h-9 rounded-full border-[2.5px] items-center justify-center -ml-[10px]"
-          style={{ backgroundColor: color2, borderColor: AppColors.white }}
-        >
-          <Text
-            style={{
-              color: AppColors.white,
-              fontSize: FontSizes.md,
-              fontFamily: FontFamilies.bold,
-            }}
-          >
-            {letter2}
-          </Text>
-        </View>
-      </View>
-
       {/* Card */}
       <Pressable
-        onPress={() => router.push(`/event/${occurrence.id}`)}
+        onPress={() => router.push(`/event/${occurrence.event.id}`)}
         className="w-[218px] h-[121px] rounded-[12px] border flex-row items-center py-[6px] px-2 gap-2"
         style={{
           backgroundColor: AppColors.white,

@@ -1,11 +1,6 @@
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useRouter } from "expo-router";
-import {
-  ScrollView,
-  TouchableOpacity,
-  useColorScheme,
-  View,
-} from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppColors, Colors } from "@/constants/theme";
 import { ThemedView } from "@/components/themed-view";
@@ -29,8 +24,7 @@ type EditFormData = {
 export default function EditProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
 
   const [errorText, setErrorText] = useState("");
   const { update, guardianId, langPref } = useAuthContext();

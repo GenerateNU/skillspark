@@ -1,12 +1,10 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Colors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
 
 export default function EmergencyContactLayout() {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
   const { t: translate } = useTranslation();
 
   return (

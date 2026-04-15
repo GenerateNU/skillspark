@@ -94,7 +94,10 @@ export function ReviewStep2({
           {isPending ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text className="text-base font-nunito-bold" style={{ color: "#fff" }}>
+            <Text
+              className="text-base font-nunito-bold"
+              style={{ color: "#fff" }}
+            >
               {translate("common.submit")}
             </Text>
           )}

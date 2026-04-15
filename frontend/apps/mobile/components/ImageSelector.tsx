@@ -5,7 +5,6 @@ import {
   View,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { AppColors, Colors } from "@/constants/theme";
 import { ThemedText } from "./themed-text";
 import { NoProfilePic } from "./NoProfilePic";
@@ -25,8 +24,7 @@ export const ImageSelector = ({
   height,
   ...props
 }: ImageSelectorProps) => {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors.light;
   const { t: translate } = useTranslation();
 
   const pickImage = async () => {

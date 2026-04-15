@@ -2,16 +2,16 @@ package manager
 
 import (
 	"context"
+	"net/http"
 	"skillspark/internal/config"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
+	supabaseMock "skillspark/internal/service/handler/auth"
+	"skillspark/internal/storage/postgres/testutil"
 	repomocks "skillspark/internal/storage/repo-mocks"
 	"skillspark/internal/utils"
-	"skillspark/internal/storage/postgres/testutil"
 	"testing"
 	"time"
-	"net/http"
-	supabaseMock "skillspark/internal/service/handler/auth"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -218,12 +218,12 @@ func TestHandler_GetManagerByOrgID(t *testing.T) {
 
 func TestHandler_DeleteManager(t *testing.T) {
 	tests := []struct {
-		name      string
-		input     *models.DeleteManagerInput
-		mockSetup func(*repomocks.MockManagerRepository)
-		authResponse  interface{}
-		authStatus    int
-		wantErr   bool
+		name         string
+		input        *models.DeleteManagerInput
+		mockSetup    func(*repomocks.MockManagerRepository)
+		authResponse interface{}
+		authStatus   int
+		wantErr      bool
 	}{
 		{
 			name: "delete manager successfully",
@@ -231,10 +231,10 @@ func TestHandler_DeleteManager(t *testing.T) {
 				ID: uuid.MustParse("50000000-0000-0000-0000-000000000001"),
 			},
 			mockSetup: func(m *repomocks.MockManagerRepository) {
-				m.On("DeleteManager", 
-				mock.Anything, 
-				uuid.MustParse("50000000-0000-0000-0000-000000000001"),
-				mock.Anything,
+				m.On("DeleteManager",
+					mock.Anything,
+					uuid.MustParse("50000000-0000-0000-0000-000000000001"),
+					mock.Anything,
 				).Return(&models.Manager{
 					ID:             uuid.MustParse("50000000-0000-0000-0000-000000000001"),
 					UserID:         uuid.MustParse("f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c"),
@@ -244,9 +244,9 @@ func TestHandler_DeleteManager(t *testing.T) {
 					UpdatedAt:      time.Now(),
 				}, nil)
 			},
-			authResponse: []string {},
-			authStatus: http.StatusOK,
-			wantErr: false,
+			authResponse: []string{},
+			authStatus:   http.StatusOK,
+			wantErr:      false,
 		},
 		{
 			name: "manager not found",
@@ -254,18 +254,18 @@ func TestHandler_DeleteManager(t *testing.T) {
 				ID: uuid.MustParse("99999999-9999-9999-9999-999999999999"),
 			},
 			mockSetup: func(m *repomocks.MockManagerRepository) {
-				m.On("DeleteManager", 
-				mock.Anything, 
-				uuid.MustParse("99999999-9999-9999-9999-999999999999"),
-				mock.Anything,
+				m.On("DeleteManager",
+					mock.Anything,
+					uuid.MustParse("99999999-9999-9999-9999-999999999999"),
+					mock.Anything,
 				).Return(nil, &errs.HTTPError{
 					Code:    404,
 					Message: "Manager not found",
 				})
 			},
-			authResponse: []string {},
-			authStatus: http.StatusOK,
-			wantErr: true,
+			authResponse: []string{},
+			authStatus:   http.StatusOK,
+			wantErr:      true,
 		},
 		{
 			name: "internal server error",
@@ -273,18 +273,18 @@ func TestHandler_DeleteManager(t *testing.T) {
 				ID: uuid.MustParse("50000000-0000-0000-0000-000000000002"),
 			},
 			mockSetup: func(m *repomocks.MockManagerRepository) {
-				m.On("DeleteManager", 
-				mock.Anything, 
-				uuid.MustParse("50000000-0000-0000-0000-000000000002"),
-				mock.Anything,
+				m.On("DeleteManager",
+					mock.Anything,
+					uuid.MustParse("50000000-0000-0000-0000-000000000002"),
+					mock.Anything,
 				).Return(nil, &errs.HTTPError{
 					Code:    500,
 					Message: "Internal server error",
 				})
 			},
-			authResponse: []string {},
-			authStatus: http.StatusOK,
-			wantErr: true,
+			authResponse: []string{},
+			authStatus:   http.StatusOK,
+			wantErr:      true,
 		},
 	}
 
