@@ -17,6 +17,8 @@ type Guardian struct {
 	StripeCustomerID    *string   `json:"stripe_customer_id,omitempty" db:"stripe_customer_id"`
 	AuthID              uuid.UUID `json:"auth_id" db:"auth_id"`
 	ExpoPushToken       *string   `json:"expo_push_token" db:"expo_push_token"`
+	PushNotifications   bool      `json:"push_notifications" db:"push_notifications"`
+	EmailNotifications  bool      `json:"email_notifications" db:"email_notifications"`
 	CreatedAt           time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -57,6 +59,8 @@ type UpdateGuardianInput struct {
 		ProfilePictureS3Key *string `json:"profile_picture_s3_key,omitempty" doc:"S3 key for profile picture"`
 		LanguagePreference  string  `json:"language_preference" doc:"Language preference"`
 		ExpoPushToken       *string `json:"expo_push_token,omitempty" doc:"Expo push notification token" required:"false"`
+		PushNotifications   *bool   `json:"push_notifications,omitempty" db:"push_notifications" doc:"Global push notification settings"`
+		EmailNotifications  *bool   `json:"email_notifications,omitempty" db:"email_notifications" doc:"Global email notification settings"`
 	}
 }
 
@@ -74,6 +78,11 @@ type GetGuardianByChildIDOutput struct {
 
 type GetGuardianByIDOutput struct {
 	Body *Guardian `json:"body"`
+}
+
+type GuardianNotificationPreferences struct {
+	PushNotifications  bool `db:"push_notifications"`
+	EmailNotifications bool `db:"email_notifications"`
 }
 
 type CreateStripeCustomerInput struct {

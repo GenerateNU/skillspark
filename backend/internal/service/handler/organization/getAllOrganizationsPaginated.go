@@ -19,6 +19,17 @@ func (h *Handler) GetAllOrganizations(ctx context.Context, pagination utils.Pagi
 		if err != nil {
 			return nil, err
 		}
+
+		aggregate, err := h.ReviewRepository.GetAggregateReviewsForOrganization(ctx, organizations[idx].ID)
+		if err != nil {
+			return nil, err
+		}
+
+		organizations[idx].ReviewSummary = &models.OrgReviewSummary{
+			TotalReviews:  aggregate.TotalReviews,
+			AverageRating: aggregate.AverageRating,
+			Breakdown:     aggregate.Breakdown,
+		}
 	}
 
 	return organizations, nil
