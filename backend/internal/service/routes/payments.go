@@ -87,6 +87,17 @@ func SetupPaymentRoutes(api huma.API, repo *storage.Repository, sc stripeClient.
 		return paymentHandler.GetPaymentMethodsByGuardianID(ctx, input)
 	})
 
+	huma.Register(api, huma.Operation{
+		OperationID: "detach-guardian-payment-method",
+		Method:      http.MethodDelete,
+		Path:        "/api/v1/stripe/detach",
+		Summary:     "Detach a payment method from a guardian",
+		Description: "Detaches a Stripe payment method from a guardian's customer account",
+		Tags:        []string{"Payments"},
+	}, func(ctx context.Context, input *models.DetachPaymentMethodInput) (*struct{}, error) {
+		return paymentHandler.DetachGuardianPaymentMethod(ctx, input)
+	})
+
 	// THIS IS FOR TESTING
 	huma.Register(api, huma.Operation{
 		OperationID: "attach-payment-method",

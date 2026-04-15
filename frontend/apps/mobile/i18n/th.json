@@ -10,7 +10,9 @@
   "common": {
     "submit": "ส่ง",
     "cancel": "ยกเลิก",
+    "close": "ปิด",
     "loading": "กำลังโหลด...",
+    "saving": "กำลังบันทึก...",
     "loadingMapData": "กำลังโหลดข้อมูลแผนที่...",
     "loadingEvents": "กำลังโหลดกิจกรรม...",
     "errorLoadingEvents": "เกิดข้อผิดพลาดในการโหลดกิจกรรม",
@@ -127,9 +129,18 @@
     "title": "การชำระเงิน",
     "manageBilling": "จัดการการเรียกเก็บเงิน",
     "creditCard": "บัตรเครดิต",
+    "expires": "วันหมดอายุ",
     "name": "ชื่อ",
+    "save": "บันทึก",
+    "noCard": "ไม่มีบัตรที่ลงทะเบียนไว้",
     "updateBilling": "อัปเดตการเรียกเก็บเงิน",
-    "delete": "ลบ"
+    "delete": "ลบ",
+    "deleteModal": {
+      "title": "ลบหรือไม่?",
+      "description": "คุณแน่ใจหรือไม่ว่าต้องการลบวิธีการชำระเงินนี้?",
+      "confirm": "ยืนยัน",
+      "deleting": "กำลังลบ..."
+    }
   },
   "familyInformation": {
     "title": "ข้อมูลครอบครัว",
@@ -157,7 +168,10 @@
     "deleteConfirm": "คุณต้องการลบโปรไฟล์เด็กนี้ใช่ไหม?",
     "requiredFieldsError": "กรุณากรอกข้อมูลที่จำเป็นทั้งหมด (ชื่อ วันเกิด รหัสโรงเรียน)",
     "saveError": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
-    "deleteError": "ลบไม่สำเร็จ"
+    "deleteError": "ลบไม่สำเร็จ",
+    "changeProfilePicture": "เปลี่ยนรูปโปรไฟล์",
+    "avatarTabColors": "สี",
+    "avatarTabAvatar": "อวตาร"
   },
   "saved": {
     "title": "ที่บันทึกไว้",
@@ -177,6 +191,7 @@
     "writeReview": "เขียนรีวิว",
     "firstReview": "เป็นคนแรกที่รีวิว!",
     "mostRecent": "ล่าสุด",
+    "mostRated": "ได้รับการประเมินมากที่สุด",
     "highest": "สูงสุด",
     "lowest": "ต่ำสุด",
     "reviews": "รีวิว",
@@ -262,13 +277,18 @@
     "filterDistance": "ระยะทาง",
     "sortBy": "เรียงตาม",
     "filter": "กรอง",
-    "miles": "ไมล์",
+    "km": "กม.",
     "stars": "ดาว"
+  },
+  "activity": {
+    "activity": "กิจกรรม"
   },
   "org": {
     "about": "เกี่ยวกับ",
     "noDescription": "ไม่มีคำอธิบาย",
     "seeSchedule": "ดูตารางเวลา",
+    "schedule": "คลาสเรียน",
+    "noSchedule": "ไม่มีคลาสที่กำลังจะมาถึงสำหรับองค์กรนี้",
     "notFound": "ไม่พบองค์กร",
     "bookingsThisWeek": "การจองสัปดาห์นี้",
     "reviews": "รีวิว"
@@ -290,5 +310,23 @@
     "username": "ชื่อผู้ใช้",
     "changeImage": "เปลี่ยนรูปภาพ",
     "saveChanges": "บันทึกการเปลี่ยนแปลง"
+  },
+  "occurrence": {
+    "smiles": "/ 5 รอยยิ้ม",
+    "learnMore": "เรียนรู้เพิ่มเติม",
+    "reserve": "จอง",
+    "ages": "อายุ {{min}} ปี",
+    "agesRange": "อายุ {{min}} - {{max}} ปี",
+    "classTime": "คลาส {{time}}"
+  },
+  "reservation": {
+    "paymentFailed": "ชำระเงินไม่สำเร็จ กรุณาลองอีกครั้งหรือติดต่อฝ่ายสนับสนุน",
+    "completed": "เสร็จสิ้น",
+    "selectChildLabel": "เลือกเด็ก",
+    "noChildren": "ไม่พบข้อมูลเด็ก",
+    "termsNote": "เมื่อคลิก 'ชำระเงินตอนนี้' คุณอนุญาตให้ Skill Spark เรียกเก็บเงินจากบัตรของคุณในจำนวนเงินรวม บวกค่าธรรมเนียมที่เกี่ยวข้อง",
+    "terms": "ข้อกำหนดและเงื่อนไข",
+    "payAndReserve": "ชำระเงินและจอง",
+    "seeYouSoon": "พบกันเร็วๆ นี้!"
   }
 }
