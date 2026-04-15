@@ -8,6 +8,7 @@ import EventsToolbar, {
 } from "./events/events-toolbar";
 import EventCardGrid from "./events/event-card-grid";
 import EventTable from "./events/event-table";
+import CreateEventButton from "./events/create-event-button";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function CompanyEvents() {
@@ -20,10 +21,9 @@ export default function CompanyEvents() {
 	const events: EventOccurrence[] = MOCK_EVENTS;
 	const isLoading = false;
 
-	const now = new Date();
-
-	const counts = useMemo(
-		() => ({
+	const counts = useMemo(() => {
+		const now = new Date();
+		return {
 			all: events.length,
 			scheduled: events.filter(
 				(e) => e.status === "scheduled" && new Date(e.start_time) >= now,
@@ -32,11 +32,11 @@ export default function CompanyEvents() {
 				(e) => e.status === "scheduled" && new Date(e.start_time) < now,
 			).length,
 			cancelled: events.filter((e) => e.status === "cancelled").length,
-		}),
-		[events, now],
-	);
+		};
+	}, [events]);
 
 	const filtered = useMemo(() => {
+		const now = new Date();
 		let result = events;
 
 		if (statusFilter === "scheduled") {
@@ -67,6 +67,11 @@ export default function CompanyEvents() {
 	return (
 		<CompanyLayout page="Events">
 			<div className="flex flex-col gap-4">
+				<div className="flex items-center justify-between">
+					<h2 className="text-lg font-semibold text-gray-900">Events</h2>
+					<CreateEventButton />
+				</div>
+
 				<EventsToolbar
 					statusFilter={statusFilter}
 					onStatusFilterChange={setStatusFilter}
@@ -78,7 +83,7 @@ export default function CompanyEvents() {
 				/>
 
 				{isLoading ? (
-					<EventCardGrid events={[]} isLoading />
+					<EventCardGrid events={[]} isLoading skeletonCount={events.length} />
 				) : filtered.length === 0 ? (
 					<p className="py-12 text-center text-sm text-gray-500">
 						No events found.

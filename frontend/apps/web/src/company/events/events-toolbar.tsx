@@ -1,6 +1,5 @@
 import { MagnifyingGlass, SquaresFour, List } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import CreateEventButton from "./create-event-button";
 import { ICON_SIZE_MD } from "./constants";
 
 export type StatusFilter = "all" | "scheduled" | "cancelled" | "past";
@@ -16,6 +15,13 @@ interface EventsToolbarProps {
 	counts: { all: number; scheduled: number; cancelled: number; past: number };
 }
 
+const FILTERS: { key: StatusFilter; label: string }[] = [
+	{ key: "all", label: "All" },
+	{ key: "scheduled", label: "Scheduled" },
+	{ key: "past", label: "Past" },
+	{ key: "cancelled", label: "Cancelled" },
+];
+
 export default function EventsToolbar({
 	statusFilter,
 	onStatusFilterChange,
@@ -25,26 +31,10 @@ export default function EventsToolbar({
 	onViewModeChange,
 	counts,
 }: EventsToolbarProps) {
-	const filters: { key: StatusFilter; label: string }[] = [
-		{ key: "all", label: "All" },
-		{ key: "scheduled", label: "Scheduled" },
-		{ key: "past", label: "Past" },
-		{ key: "cancelled", label: "Cancelled" },
-	];
-
 	return (
-		<div className="flex flex-col gap-3">
-			{/* Top row: heading + CTA */}
-			<div className="flex items-center justify-between">
-				<h2 className="text-lg font-semibold text-gray-900">Events</h2>
-				<CreateEventButton />
-			</div>
-
-			{/* Filter row */}
-			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-			{/* Left: status filter tabs */}
+		<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 			<div className="flex gap-1">
-				{filters.map(({ key, label }) => (
+				{FILTERS.map(({ key, label }) => (
 					<Button
 						key={key}
 						variant={statusFilter === key ? "secondary" : "ghost"}
@@ -59,8 +49,6 @@ export default function EventsToolbar({
 					</Button>
 				))}
 			</div>
-
-			{/* Right: search + view toggle */}
 			<div className="flex items-center gap-2">
 				<div className="relative">
 					<MagnifyingGlass
@@ -91,7 +79,6 @@ export default function EventsToolbar({
 						<List size={ICON_SIZE_MD} />
 					</Button>
 				</div>
-			</div>
 			</div>
 		</div>
 	);

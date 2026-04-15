@@ -5,9 +5,11 @@ import { useCompany } from "./company-context";
 export default function CompanyLayout({
 	page,
 	children,
+	showHeading = false,
 }: {
 	page: string;
 	children: React.ReactNode;
+	showHeading?: boolean;
 }) {
 	const { organization, isLoading } = useCompany();
 
@@ -18,12 +20,14 @@ export default function CompanyLayout({
 				companyName={organization?.name}
 				isLoading={isLoading}
 			/>
-			<CompanyHeading
-				name={organization?.name}
-				about={organization?.about}
-				avatarUrl={organization?.presigned_url}
-				isLoading={isLoading}
-			/>
+			{showHeading && (
+				<CompanyHeading
+					name={organization?.name}
+					about={organization?.about}
+					avatarUrl={organization?.presigned_url}
+					isLoading={isLoading}
+				/>
+			)}
 			<div className="mt-6">{children}</div>
 		</main>
 	);

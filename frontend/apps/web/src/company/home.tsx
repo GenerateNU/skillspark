@@ -1,31 +1,14 @@
 import CompanyLayout from "./company-layout";
-import { useCompany } from "./company-context";
-import { BentoGrid, BentoCard } from "@/components/ui/bento-grid";
+import { BentoGrid } from "@/components/ui/bento-grid";
+import StatCard from "@/components/ui/stat-card";
 
 export default function CompanyHome() {
-	const { companyId } = useCompany();
-
 	return (
-		<CompanyLayout page="Home">
+		<CompanyLayout page="Home" showHeading>
 			<BentoGrid>
-				<BentoCard>
-					<p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-						Total Events
-					</p>
-					<p className="mt-2 text-2xl font-bold text-gray-900">--</p>
-				</BentoCard>
-				<BentoCard>
-					<p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-						Customers
-					</p>
-					<p className="mt-2 text-2xl font-bold text-gray-900">--</p>
-				</BentoCard>
-				<BentoCard>
-					<p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-						Revenue
-					</p>
-					<p className="mt-2 text-2xl font-bold text-gray-900">--</p>
-				</BentoCard>
+				<StatCard label="Total Events" value="--" />
+				<StatCard label="Customers" value="--" />
+				<StatCard label="Revenue" value="--" />
 			</BentoGrid>
 		</CompanyLayout>
 	);

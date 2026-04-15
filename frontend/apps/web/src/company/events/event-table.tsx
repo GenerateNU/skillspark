@@ -1,16 +1,13 @@
 import type { EventOccurrence } from "@skillspark/api-client";
-import Badge from "@/components/badge";
-import { formatEventDate, formatPrice } from "./event-card";
+import StatusBadge from "./status-badge";
+import { formatEventDate, formatPrice } from "./formatters";
 
 interface EventTableProps {
 	events: EventOccurrence[];
 	onEventClick?: (occurrence: EventOccurrence) => void;
 }
 
-export default function EventTable({
-	events,
-	onEventClick,
-}: EventTableProps) {
+export default function EventTable({ events, onEventClick }: EventTableProps) {
 	return (
 		<div className="overflow-hidden rounded-[4px] border border-gray-200">
 			<table className="w-full text-left text-sm">
@@ -32,24 +29,14 @@ export default function EventTable({
 							onClick={() => onEventClick?.(occ)}
 						>
 							<td className="px-4 py-3">
-								{occ.status === "scheduled" ? (
-									<Badge color="green">
-										<span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-green-500" />
-										Active
-									</Badge>
-								) : (
-									<Badge color="gray">
-										<span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-gray-400" />
-										Cancelled
-									</Badge>
-								)}
+								<StatusBadge status={occ.status} />
 							</td>
 							<td className="px-4 py-3">
 								<div className="flex items-center gap-3">
 									<img
 										src={occ.event.presigned_url || undefined}
 										alt=""
-										className="h-8 w-12 rounded-[4px] object-cover bg-gray-100"
+										className="h-8 w-12 rounded-[4px] bg-gray-100 object-cover"
 										onError={(e) => {
 											(e.target as HTMLImageElement).style.display = "none";
 										}}

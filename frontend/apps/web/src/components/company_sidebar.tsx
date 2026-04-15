@@ -6,6 +6,7 @@ import {
 	Users,
 } from "@phosphor-icons/react";
 import { useCompany } from "@/company/company-context";
+import SidebarNavItem from "@/components/sidebar-nav-item";
 
 const navItems = [
 	{ label: "Home", icon: House, path: "" },
@@ -43,7 +44,7 @@ export function CompanySidebar() {
 			</Link>
 
 			<nav className="flex flex-col gap-0.5 px-2 py-3">
-				{navItems.map(({ label, icon: Icon, path }) => {
+				{navItems.map(({ label, icon, path }) => {
 					const fullPath = basePath + path;
 					const isActive =
 						path === ""
@@ -52,21 +53,13 @@ export function CompanySidebar() {
 							: location.pathname.startsWith(fullPath);
 
 					return (
-						<Link
+						<SidebarNavItem
 							key={label}
+							label={label}
+							icon={icon}
 							to={fullPath}
-							className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-								isActive
-									? "bg-blue-50 text-blue-700"
-									: "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-							}`}
-						>
-							<Icon
-								size={18}
-								weight={isActive ? "fill" : "regular"}
-							/>
-							{label}
-						</Link>
+							isActive={isActive}
+						/>
 					);
 				})}
 			</nav>
