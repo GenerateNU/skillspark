@@ -18,7 +18,7 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
-import { OccurrenceCard } from "./OccurrenceCard";
+import { OccurrenceCard } from "@/app/(app)/(tabs)/org/[id]/OccurrenceCard";
 import { formatSectionDate } from "@/utils/format";
 
 export default function OrgScheduleScreen() {
