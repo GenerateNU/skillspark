@@ -197,10 +197,10 @@ func TestEventOccurrenceRepository_Filters_NewFilters(t *testing.T) {
 		assert.True(t, eo.EndTime.IsZero() || !eo.EndTime.After(maxDate))
 	}
 
-	category := "science"
+	categories := []string{"science"}
 
 	eventOccurrences, err = repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
-		Category: &category,
+		Categories: categories,
 	})
 	require.NoError(t, err)
 	require.NotNil(t, eventOccurrences)
@@ -208,12 +208,35 @@ func TestEventOccurrenceRepository_Filters_NewFilters(t *testing.T) {
 	for _, eo := range eventOccurrences {
 		found := false
 		for _, c := range eo.Event.Category {
-			if string(c) == category {
-				found = true
-				break
+			for _, want := range categories {
+				if string(c) == want {
+					found = true
+					break
+				}
 			}
 		}
-		assert.True(t, found, "event %s does not contain category %s", eo.Event.Title, category)
+		assert.True(t, found, "event %s does not contain any of categories %v", eo.Event.Title, categories)
+	}
+
+	// multi-category OR: matches events with science OR music
+	multiCategories := []string{"science", "music"}
+	eventOccurrencesMulti, errMulti := repo.GetAllEventOccurrences(ctx, pagination, "en-US", models.GetAllEventOccurrencesFilter{
+		Categories: multiCategories,
+	})
+	require.NoError(t, errMulti)
+	require.NotNil(t, eventOccurrencesMulti)
+
+	for _, eo := range eventOccurrencesMulti {
+		found := false
+		for _, c := range eo.Event.Category {
+			for _, want := range multiCategories {
+				if string(c) == want {
+					found = true
+					break
+				}
+			}
+		}
+		assert.True(t, found, "event %s does not contain any of categories %v", eo.Event.Title, multiCategories)
 	}
 
 	soldOut := true

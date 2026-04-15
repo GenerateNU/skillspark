@@ -63,12 +63,7 @@ export default function OrgScheduleScreen() {
     });
     return map;
   }, [uniqueEventIds, reviewResults]);
-
-  const grouped = useMemo(
-    () => groupOccurrencesByDate(occurrences),
-    [occurrences]
-  );
-
+  
   const groupOccurrencesByDate = useCallback(
     (
       occurrences: EventOccurrence[]
@@ -92,6 +87,13 @@ export default function OrgScheduleScreen() {
     },
     []
   );
+
+  const grouped = useMemo(
+    () => groupOccurrencesByDate(occurrences),
+    [occurrences]
+  );
+
+  
 
   return (
     <SafeAreaView

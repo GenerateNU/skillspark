@@ -893,7 +893,7 @@ export type GetAllEventOccurrencesParams = {
   max_duration?: number;
   min_age?: number;
   max_age?: number;
-  category?: string;
+  categories?: string[];
   soldout?: boolean;
   min_date?: string;
   max_date?: string;

@@ -20,9 +20,10 @@ export interface LocationPin {
 interface SkillSparkMapProps {
   locations: LocationPin[];
   userLocation: Location.LocationObject | null;
+  onFilterPress: () => void;
 }
 
-export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
+export function SkillSparkMap({ locations, userLocation, onFilterPress }: SkillSparkMapProps) {
   const mapRef = useRef<MapView>(null);
   const [selectedPin, setSelectedPin] = useState<LocationPin | null>(null);
 
@@ -33,7 +34,12 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
       }
-    : undefined;
+    : {
+        latitude: 13.7563,
+        longitude: 100.5018,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1,
+      };
 
   return (
     <ThemedView className="flex-1">
@@ -67,7 +73,7 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
       {selectedPin ? (
         <EventCard pin={selectedPin} />
       ) : (
-        <OrgListSheet locations={locations} userLocation={userLocation} />
+        <OrgListSheet locations={locations} userLocation={userLocation} onFilterPress={onFilterPress} />
       )}
     </ThemedView>
   );

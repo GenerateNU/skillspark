@@ -15,9 +15,10 @@ const SNAP_POINTS = [60, "65%"];
 interface OrgListSheetProps {
   locations: LocationPin[];
   userLocation: LocationObject | null;
+  onFilterPress: () => void;
 }
 
-export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
+export function OrgListSheet({ locations, userLocation, onFilterPress }: OrgListSheetProps) {
   const { t: translate } = useTranslation();
   const bgColor = useThemeColor({}, "background");
   const borderColor = useThemeColor({}, "borderColor");
@@ -41,6 +42,7 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
         <TouchableOpacity
           className="rounded-full px-4 py-2"
           style={{ backgroundColor: AppColors.checkboxSelected }}
+          onPress={onFilterPress}
         >
           <Text className="font-nunito-semibold text-sm text-white">
             {translate("map.filter")}

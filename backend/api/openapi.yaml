@@ -466,11 +466,13 @@ paths:
           schema:
             type: integer
             format: int64
-        - name: category
+        - name: categories
           in: query
           explode: false
           schema:
-            type: string
+            type: array
+            items:
+              type: string
         - name: soldout
           in: query
           explode: false

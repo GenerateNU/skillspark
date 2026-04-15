@@ -92,6 +92,10 @@ func mapToDBFilters(input *models.GetAllEventOccurrencesInput) models.GetAllEven
 		filters.MaxAge = &input.MaxAge
 	}
 
+	if len(input.Categories) > 0 {
+		filters.Categories = input.Categories
+	}
+
 	if !input.MinDate.IsZero() {
 		filters.MinDate = &input.MinDate
 	}

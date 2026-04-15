@@ -46,7 +46,7 @@ type GetAllEventOccurrencesInput struct {
 	MaxDuration    int             `query:"max_duration"`
 	MinAge         int             `query:"min_age"`
 	MaxAge         int             `query:"max_age"`
-	Category       string          `query:"category"`
+	Categories     []string        `query:"categories"`
 	SoldOut        bool            `query:"soldout"`
 	MinDate        time.Time       `query:"min_date"`
 	MaxDate        time.Time       `query:"max_date"`
@@ -71,7 +71,7 @@ type GetAllEventOccurrencesFilter struct {
 	MaxDurationMinutes *int
 	MinAge             *int
 	MaxAge             *int
-	Category           *string
+	Categories         []string
 	SoldOut            *bool
 	MinDate            *time.Time
 	MaxDate            *time.Time
