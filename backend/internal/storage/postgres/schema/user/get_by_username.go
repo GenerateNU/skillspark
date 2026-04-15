@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *UserRepository) GetUserByUsername(ctx context.Context, username string) (bool, error) {
+func (r *UserRepository) UsernameExists(ctx context.Context, username string) (bool, error) {
 	query, err := schema.ReadSQLBaseScript("get_by_username.sql", SqlUserFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())

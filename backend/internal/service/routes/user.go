@@ -21,8 +21,8 @@ func SetupUserRoutes(api huma.API, repo *storage.Repository) {
 		Summary:     "Check if a username exists",
 		Description: "Returns whether a user with the given username exists",
 		Tags:        []string{"User"},
-	}, func(ctx context.Context, input *models.GetUserByUsernameInput) (*models.UsernameExistsOutput, error) {
-		exists, err := userHandler.GetUserByUsername(ctx, input)
+	}, func(ctx context.Context, input *models.UsernameExistsInput) (*models.UsernameExistsOutput, error) {
+		exists, err := userHandler.UsernameExists(ctx, input)
 		if err != nil {
 			return nil, err
 		}

@@ -125,7 +125,7 @@ type UserRepository interface {
 	GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error)
 	UpdateUser(ctx context.Context, user *models.UpdateUserInput) (*models.User, error)
 	DeleteUser(ctx context.Context, id uuid.UUID) (*models.User, error)
-	GetUserByUsername(ctx context.Context, username string) (bool, error)
+	UsernameExists(ctx context.Context, username string) (bool, error)
 }
 
 type NotificationRepository interface {

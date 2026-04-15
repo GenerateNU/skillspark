@@ -33,13 +33,13 @@ func TestUserRepository_GetByUsername(t *testing.T) {
 	}
 
 	t.Run("Exists", func(t *testing.T) {
-		exists, err := repo.GetUserByUsername(ctx, createdUser.Username)
+		exists, err := repo.UsernameExists(ctx, createdUser.Username)
 		assert.NoError(t, err)
 		assert.True(t, exists)
 	})
 
 	t.Run("Does Not Exist", func(t *testing.T) {
-		exists, err := repo.GetUserByUsername(ctx, "randomusername")
+		exists, err := repo.UsernameExists(ctx, "randomusername")
 		assert.NoError(t, err)
 		assert.False(t, exists)
 	})

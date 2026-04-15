@@ -48,7 +48,7 @@ func (m *MockUserRepository) DeleteUser(ctx context.Context, id uuid.UUID) (*mod
 	return u, args.Error(1)
 }
 
-func (m *MockUserRepository) GetUserByUsername(ctx context.Context, username string) (bool, error) {
+func (m *MockUserRepository) UsernameExists(ctx context.Context, username string) (bool, error) {
 	args := m.Called(ctx, username)
 	return args.Bool(0), args.Error(1)
 }

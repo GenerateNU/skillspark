@@ -40,12 +40,12 @@ export default function OrgScheduleScreen() {
 
   const uniqueEventIds = useMemo(
     () => [...new Set(occurrences.map((o) => o.event.id))],
-    [occurrences]
+    [occurrences],
   );
 
   const reviewResults = useQueries({
     queries: uniqueEventIds.map((eventId) =>
-      getGetReviewAggregateQueryOptions(eventId)
+      getGetReviewAggregateQueryOptions(eventId),
     ),
   });
 
@@ -66,16 +66,16 @@ export default function OrgScheduleScreen() {
 
   const grouped = useMemo(
     () => groupOccurrencesByDate(occurrences),
-    [occurrences]
+    [occurrences],
   );
 
   const groupOccurrencesByDate = useCallback(
     (
-      occurrences: EventOccurrence[]
+      occurrences: EventOccurrence[],
     ): { label: string; items: EventOccurrence[] }[] => {
       const sorted = [...occurrences].sort(
         (a, b) =>
-          new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+          new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
       );
 
       const groups: Map<string, EventOccurrence[]> = new Map();
@@ -90,7 +90,7 @@ export default function OrgScheduleScreen() {
         items,
       }));
     },
-    []
+    [],
   );
 
   return (

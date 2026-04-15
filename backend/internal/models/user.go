@@ -70,7 +70,7 @@ type DeleteUserOutput struct {
 }
 
 // Username exists check
-type GetUserByUsernameInput struct {
+type UsernameExistsInput struct {
 	Username string `path:"username"`
 }
 

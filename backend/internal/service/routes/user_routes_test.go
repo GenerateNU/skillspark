@@ -32,7 +32,7 @@ func setupUserTestAPI(
 	return app, api
 }
 
-func TestHumaValidation_GetUserByUsername(t *testing.T) {
+func TestHumaValidation_UsernameExists(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -45,7 +45,7 @@ func TestHumaValidation_GetUserByUsername(t *testing.T) {
 			name:     "username exists",
 			username: "jamesw",
 			mockSetup: func(m *repomocks.MockUserRepository) {
-				m.On("GetUserByUsername", mock.Anything, "jamesw").Return(true, nil)
+				m.On("UsernameExists", mock.Anything, "jamesw").Return(true, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -53,7 +53,7 @@ func TestHumaValidation_GetUserByUsername(t *testing.T) {
 			name:     "username does not exist",
 			username: "randomusername",
 			mockSetup: func(m *repomocks.MockUserRepository) {
-				m.On("GetUserByUsername", mock.Anything, "randomusername").Return(false, nil)
+				m.On("UsernameExists", mock.Anything, "randomusername").Return(false, nil)
 			},
 			statusCode: http.StatusOK,
 		},
@@ -61,7 +61,7 @@ func TestHumaValidation_GetUserByUsername(t *testing.T) {
 			name:     "repository error",
 			username: "erroruser",
 			mockSetup: func(m *repomocks.MockUserRepository) {
-				m.On("GetUserByUsername", mock.Anything, "erroruser").Return(false, &errs.HTTPError{
+				m.On("UsernameExists", mock.Anything, "erroruser").Return(false, &errs.HTTPError{
 					Code:    500,
 					Message: "internal server error",
 				})
