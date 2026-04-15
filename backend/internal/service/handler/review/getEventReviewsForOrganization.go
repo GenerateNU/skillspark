@@ -13,7 +13,7 @@ func (h *Handler) GetEventReviewsForOrganization(ctx context.Context, id uuid.UU
 
 	// the language here does not matter, we are just checking that the organization exists.
 	if _, err := h.OrganizationRepository.GetOrganizationByID(ctx, id); err != nil {
-		return nil, errs.BadRequest("Invalid organization_id: organization does not exist" + err.Error())
+		return nil, errs.BadRequest("Invalid organization_id: organization does not exist: " + err.Error())
 	}
 
 	aggregate, httpErr := h.ReviewRepository.GetEventReviewsForOrganization(ctx, id, pagination, sortBy)
