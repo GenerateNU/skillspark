@@ -893,6 +893,12 @@ export interface UpdateRegistrationPaymentStatusInputBody {
   payment_intent_status: string;
 }
 
+export interface UsernameExistsOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  exists: boolean;
+}
+
 export type GetAllEventOccurrencesParams = {
   /**
    * @minimum 1
