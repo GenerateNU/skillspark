@@ -11,7 +11,12 @@ type FamilyCardProps = {
   avatarBackground?: string | null;
 };
 
-export function FamilyCard({ name, date, avatarFace, avatarBackground }: FamilyCardProps) {
+export function FamilyCard({
+  name,
+  date,
+  avatarFace,
+  avatarBackground,
+}: FamilyCardProps) {
   const theme = Colors.light;
 
   return (
@@ -28,7 +33,9 @@ export function FamilyCard({ name, date, avatarFace, avatarBackground }: FamilyC
         />
       </View>
       <View className="flex-1">
-        <ThemedText className="text-sm font-nunito-medium" numberOfLines={1}>{name}</ThemedText>
+        <ThemedText className="text-sm font-nunito-medium" numberOfLines={1}>
+          {name}
+        </ThemedText>
         <ThemedText
           className="text-[10px] font-nunito"
           style={{ color: AppColors.mutedText }}

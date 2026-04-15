@@ -10,6 +10,7 @@
   "common": {
     "submit": "ส่ง",
     "cancel": "ยกเลิก",
+    "close": "ปิด",
     "loading": "กำลังโหลด...",
     "saving": "กำลังบันทึก...",
     "loadingMapData": "กำลังโหลดข้อมูลแผนที่...",
@@ -41,8 +42,8 @@
     "forYou": "สำหรับคุณ",
     "basedOn": "ตามจาก",
     "upcomingEvents": "กิจกรรมที่จะมาถึง",
-    "learnMore": "Learn More",
     "reserved": "จองแล้ว",
+    "learnMore": "ดูเพิ่มเติม",
     "members": "สมาชิก",
     "categories": {
       "technology": "เทคโนโลยี",
@@ -75,7 +76,9 @@
     "termsAndConditions": "ข้อกำหนดและเงื่อนไข",
     "privacyPolicy": "นโยบายความเป็นส่วนตัว",
     "logOut": "ออกจากระบบ",
-    "deleteAccount": "ลบบัญชี"
+    "deleteAccount": "ลบบัญชี",
+    "pushNotifications": "การแจ้งเตือนแบบพุช",
+    "emailNotifications": "การแจ้งเตือนทางอีเมล"
   },
   "privacyPolicy": {
     "lastUpdated": "อัปเดตล่าสุด: 4 เมษายน 2026",
@@ -190,6 +193,7 @@
     "writeReview": "เขียนรีวิว",
     "firstReview": "เป็นคนแรกที่รีวิว!",
     "mostRecent": "ล่าสุด",
+    "mostRated": "ได้รับการประเมินมากที่สุด",
     "highest": "สูงสุด",
     "lowest": "ต่ำสุด",
     "reviews": "รีวิว",
@@ -252,7 +256,14 @@
     "notFound": "ไม่พบกิจกรรม",
     "minWalk": "นาที",
     "hr": "ชั่วโมง",
-    "min": "นาที"
+    "min": "นาที",
+    "bookingsThisWeek": "การจองสัปดาห์นี้",
+    "about": "เกี่ยวกับ",
+    "reviews": "รีวิว",
+    "more": "เพิ่มเติม",
+    "noReviews": "ยังไม่มีรีวิว",
+    "seeMoreReviews": "ดูรีวิวเพิ่มเติม",
+    "reserve": "จอง"
   },
   "emergencyContact": {
     "manageTitle": "จัดการผู้ติดต่อฉุกเฉิน",
@@ -282,9 +293,13 @@
     "about": "เกี่ยวกับ",
     "noDescription": "ไม่มีคำอธิบาย",
     "seeSchedule": "ดูตารางเวลา",
+    "schedule": "คลาสเรียน",
+    "class": "คลาส",
+    "noSchedule": "ไม่มีคลาสที่กำลังจะมาถึงสำหรับองค์กรนี้",
     "notFound": "ไม่พบองค์กร",
     "bookingsThisWeek": "การจองสัปดาห์นี้",
-    "reviews": "รีวิว"
+    "reviews": "รีวิว",
+    "allClasses": "ทุกคลาส"
   },
   "interests": {
     "science": "วิทยาศาสตร์",
@@ -319,5 +334,23 @@
     "username": "ชื่อผู้ใช้",
     "changeImage": "เปลี่ยนรูปภาพ",
     "saveChanges": "บันทึกการเปลี่ยนแปลง"
+  },
+  "occurrence": {
+    "smiles": "/ 5 รอยยิ้ม",
+    "learnMore": "เรียนรู้เพิ่มเติม",
+    "reserve": "จอง",
+    "ages": "อายุ {{min}} ปี",
+    "agesRange": "อายุ {{min}} - {{max}} ปี",
+    "classTime": "คลาส {{time}}"
+  },
+  "reservation": {
+    "paymentFailed": "ชำระเงินไม่สำเร็จ กรุณาลองอีกครั้งหรือติดต่อฝ่ายสนับสนุน",
+    "completed": "เสร็จสิ้น",
+    "selectChildLabel": "เลือกเด็ก",
+    "noChildren": "ไม่พบข้อมูลเด็ก",
+    "termsNote": "เมื่อคลิก 'ชำระเงินตอนนี้' คุณอนุญาตให้ Skill Spark เรียกเก็บเงินจากบัตรของคุณในจำนวนเงินรวม บวกค่าธรรมเนียมที่เกี่ยวข้อง",
+    "terms": "ข้อกำหนดและเงื่อนไข",
+    "payAndReserve": "ชำระเงินและจอง",
+    "seeYouSoon": "พบกันเร็วๆ นี้!"
   }
 }

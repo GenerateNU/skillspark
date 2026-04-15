@@ -1,11 +1,12 @@
 import React from "react";
-import { Alert, View, TouchableOpacity, Platform, Text } from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 export interface LocationPin {
   id: string;
@@ -18,11 +19,11 @@ export interface LocationPin {
   image?: string;
 }
 
-interface EventCardProps {
+interface OrgMapCardProps {
   pin: LocationPin;
 }
 
-export function EventCard({ pin }: EventCardProps) {
+export function OrgMapCard({ pin }: OrgMapCardProps) {
   const placeholderColor = useThemeColor({ light: "#D0D0D0" }, "background");
   const router = useRouter();
   const { t: translate } = useTranslation();
@@ -31,7 +32,7 @@ export function EventCard({ pin }: EventCardProps) {
     <ThemedView
       className="absolute bottom-0 left-0 right-0 rounded-t-[25px] p-5 elevation-10"
       style={{
-        paddingBottom: Platform.OS === "ios" ? 40 : 20,
+        paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.1,
@@ -74,7 +75,7 @@ export function EventCard({ pin }: EventCardProps) {
         className="w-full items-center rounded-xl bg-[#333] py-[15px]"
         activeOpacity={1}
         onPress={() => {
-          router.push(`/(app)/(tabs)/org/${pin.id}`);
+          router.push(`/org/${pin.id}`);
         }}
       >
         <Text className="font-nunito-semibold text-[18px] text-white">

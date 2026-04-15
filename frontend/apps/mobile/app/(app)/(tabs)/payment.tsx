@@ -78,7 +78,8 @@ export default function PaymentScreen() {
     // max attempts reached — return whatever is there now
     const res = await getGuardianPaymentMethods(guardian!.id);
     return (
-      (res.data as GetPaymentMethodsByGuardianIDOutputBody).payment_methods ?? []
+      (res.data as GetPaymentMethodsByGuardianIDOutputBody).payment_methods ??
+      []
     );
   }
 
