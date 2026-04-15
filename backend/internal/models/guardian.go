@@ -80,6 +80,11 @@ type GetGuardianByIDOutput struct {
 	Body *Guardian `json:"body"`
 }
 
+type GuardianNotificationPreferences struct {
+	PushNotifications  bool
+	EmailNotifications bool
+}
+
 type CreateStripeCustomerInput struct {
 	GuardianID uuid.UUID `path:"guardian_id" doc:"Guardian ID"`
 }

@@ -100,3 +100,14 @@ func (m *MockGuardianRepository) SetStripeCustomerID(ctx context.Context, guardi
 	}
 	return args.Get(0).(*models.Guardian), nil
 }
+
+func (m *MockGuardianRepository) GetGuardianNotificationPreferences(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]models.GuardianNotificationPreferences, error) {
+	args := m.Called(ctx, ids)
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(error)
+	}
+	return args.Get(0).(map[uuid.UUID]models.GuardianNotificationPreferences), args.Error(1)
+}
