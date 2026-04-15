@@ -195,17 +195,21 @@ function OrgDetail({
             {translate("org.reviews")}
           </Text>
           {org.review_summary && org.review_summary.total_reviews > 0 ? (
-            <View className="items-center">
-              <RatingSmiley rating={org.review_summary.average_rating} width={48} height={48} />
-              <Text className="text-[36px] font-nunito-bold leading-[44px] mt-2">
-                {org.review_summary.average_rating.toFixed(1)}
-              </Text>
-              <Text
-                className="text-[13px] font-nunito"
-                style={{ color: AppColors.subtleText }}
-              >
-                ({org.review_summary.total_reviews})
-              </Text>
+            <View className="flex-row items-center justify-center">
+              <View className="flex-1 items-center">
+                <RatingSmiley rating={org.review_summary.average_rating} width={80} height={80} />
+              </View>
+              <View className="flex-1 items-center">
+                <Text className="text-[36px] font-nunito-bold leading-[44px]">
+                  {org.review_summary.average_rating.toFixed(1)}
+                </Text>
+                <Text
+                  className="text-[13px] font-nunito"
+                  style={{ color: AppColors.subtleText }}
+                >
+                  ({org.review_summary.total_reviews})
+                </Text>
+              </View>
             </View>
           ) : (
             <View className="flex-row items-center gap-3 py-4 justify-center">
@@ -267,9 +271,17 @@ export default function OrgScreen() {
     );
   }
 
+  const orgWithMockReviews = {
+    ...response.data,
+    review_summary: {
+      total_reviews: 34,
+      average_rating: 4.2,
+    },
+  };
+
   return (
     <OrgDetail
-      org={response.data}
+      org={orgWithMockReviews}
       location={
         locationResponse?.status === 200 ? locationResponse.data : undefined
       }
