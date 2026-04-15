@@ -1,8 +1,9 @@
 import Carousel from "react-native-reanimated-carousel";
 import { View } from "react-native";
-import { AppColors } from "@/constants/theme";
 import { type EventOccurrence } from "@skillspark/api-client";
 import { DiscoverBanner } from "./DiscoverBanner";
+
+const CARD_PADDING = 22;
 
 export default function CarouselCard({
   events,
@@ -13,25 +14,29 @@ export default function CarouselCard({
   width: number;
   height: number;
 }) {
+  const cardHeight = Math.min(height * 0.3, 240);
+
   return (
     <Carousel
-      width={width / 1.1}
-      height={height / 4}
+      width={width}
+      height={cardHeight}
       data={events}
       loop
       autoPlay
-      autoPlayInterval={3000}
-      mode="vertical-stack"
+      autoPlayInterval={3500}
+      mode="parallax"
       modeConfig={{
-        snapDirection: "left",
-        stackInterval: 0,
+        parallaxScrollingScale: 0.9,
+        parallaxScrollingOffset: 100,
+        parallaxAdjacentItemScale: 0.78,
       }}
       renderItem={({ item }) => (
-        <View className="rounded-3xl overflow-hidden flex-1">
-          <DiscoverBanner event={item} />
+        <View style={{ flex: 1, paddingHorizontal: CARD_PADDING }}>
+          <View style={{ flex: 1, borderRadius: 24, overflow: "hidden" }}>
+            <DiscoverBanner event={item} />
+          </View>
         </View>
       )}
-      style={{ alignSelf: "center" }}
     />
   );
 }

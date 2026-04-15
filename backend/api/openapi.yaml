@@ -2703,6 +2703,32 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/user/{username}:
+    get:
+      tags:
+        - User
+      summary: Check if a username exists
+      description: Returns whether a user with the given username exists
+      operationId: username-exists
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsernameExistsOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
     AttachPaymentMethodInputBody:
@@ -4571,3 +4597,18 @@ components:
           description: New payment intent status from Stripe
       required:
         - payment_intent_status
+    UsernameExistsOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UsernameExistsOutputBody.json
+          readOnly: true
+        exists:
+          type: boolean
+      required:
+        - exists
