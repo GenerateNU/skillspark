@@ -295,6 +295,7 @@
     "noDescription": "ไม่มีคำอธิบาย",
     "seeSchedule": "ดูตารางเวลา",
     "schedule": "คลาสเรียน",
+    "class": "คลาส",
     "noSchedule": "ไม่มีคลาสที่กำลังจะมาถึงสำหรับองค์กรนี้",
     "notFound": "ไม่พบองค์กร",
     "bookingsThisWeek": "การจองสัปดาห์นี้",

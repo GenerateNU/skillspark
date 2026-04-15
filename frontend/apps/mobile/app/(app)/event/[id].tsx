@@ -78,7 +78,7 @@ function EventOccurrenceDetail({
           style={{ color: AppColors.primaryText }}
           numberOfLines={1}
         >
-          {translate("org.schedule")}
+          {translate("org.class")}
         </Text>
         <View className="w-8" />
       </View>
@@ -246,7 +246,7 @@ function EventOccurrenceDetail({
                   className="text-[15px] font-nunito-bold"
                   style={{ color: AppColors.primaryText }}
                 >
-                  {translate(ratingMatch.labelKey)}
+                  {translate(ratingMatch.labelKey!)}
                 </Text>
                 <Text
                   className="text-[13px] font-nunito"
@@ -283,7 +283,7 @@ function EventOccurrenceDetail({
             className="w-full items-center rounded-full py-4"
             style={{ backgroundColor: AppColors.checkboxSelected }}
             onPress={() =>
-              router.navigate({
+              router.push({
                 pathname: "/org/[id]/schedule",
                 params: {
                   id: orgId,
