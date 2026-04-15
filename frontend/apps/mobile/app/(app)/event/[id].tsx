@@ -19,13 +19,7 @@ import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { useTranslation } from "react-i18next";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
-function formatLocation(occurrence: EventOccurrence) {
-  const loc = occurrence.location;
-  const parts = [loc.district, loc.province].filter(Boolean);
-  return parts.join(", ") || "Location";
-}
-
+import { formatLocation } from "@/utils/format";
 
 function EventOccurrenceDetail({
   occurrence,
