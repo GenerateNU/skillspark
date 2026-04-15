@@ -114,3 +114,9 @@ type ReviewAggregate struct {
 	AverageRating float64             `json:"average_rating"`
 	Breakdown     []ReviewRatingCount `json:"breakdown"`
 }
+
+type OrgReviewSummary struct {
+	TotalReviews  int                 `json:"total_reviews"`
+	AverageRating float64             `json:"average_rating"`
+	Breakdown     []ReviewRatingCount `json:"breakdown"`
+}
