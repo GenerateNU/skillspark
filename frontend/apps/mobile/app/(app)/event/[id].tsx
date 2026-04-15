@@ -20,6 +20,7 @@ import { StarRating } from "@/components/StarRating";
 import { useTranslation } from "react-i18next";
 import { ListItem } from "@/components/ListItem";
 import { AboutPage } from "@/components/AboutPage";
+import { useRouteInfo } from "expo-router/build/hooks";
 
 function formatAddress(occurrence: EventOccurrence) {
   const loc = occurrence.location;
@@ -81,11 +82,6 @@ function EventOccurrenceDetail({
               onPress={() => router.back()}
               activeOpacity={0.7}
               className="absolute top-4 left-4 z-10 flex-row items-center bg-white rounded-full px-4 py-2.5 elevation-10"
-              style={{
-                shadowColor: "#000",
-                shadowOpacity: 0.15,
-                shadowRadius: 8,
-              }}
             >
               <MaterialIcons
                 name="chevron-left"
@@ -102,6 +98,31 @@ function EventOccurrenceDetail({
               >
                 {occurrence.event.title}
               </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Content card */}
+          <View className="bg-white rounded-t-[28px] -mt-7 px-[22px] pb-6 elevation-2">
+            {/* Drag handle */}
+            <View
+              className="w-[38px] h-1 rounded-sm self-center mt-3 mb-3.5"
+              style={{ backgroundColor: AppColors.borderLight }}
+            />
+            <View className="absolute -top-[5px] left-2.5">
+              <BookmarkButton eventId={occurrence.event.id} />
+            </View>
+            <Text
+              className="text-[28px] font-bold tracking-tight mb-2"
+              style={{ color: AppColors.primaryText }}
+            >
+              {occurrence.event.title}
+            </Text>
+            <View className="flex-row items-center gap-1.5 mb-3.5">
+              <MaterialIcons
+                name="location-on"
+                size={16}
+                color={AppColors.primaryText}
+              />
               <Text
                 style={{
                   fontSize: FontSizes.base,
@@ -161,15 +182,34 @@ function EventOccurrenceDetail({
                 </Text>
               </View>
             </View>
-            <View className="flex-col items-center gap-2 mt-1">
-              <TouchableOpacity
-                activeOpacity={0.7}
-                className="w-9 h-9 rounded-full border-2 items-center justify-center"
-                style={{ borderColor: AppColors.borderLight }}
+          </View>
+
+          {/* Divider */}
+          <View
+            className="border-b"
+            style={{ borderColor: AppColors.borderLight }}
+          />
+
+          {/* Bottom section */}
+          <View
+            className="flex-1 bg-white px-[22px] pt-[22px] pb-7 elevation-2"
+            style={{
+              shadowColor: "#000",
+              shadowOpacity: 0.06,
+              shadowRadius: 12,
+            }}
+          >
+            <View className="flex-row items-center justify-between mb-[22px]">
+              <Text
+                className="text-[30px] font-bold tracking-tight"
+                style={{ color: AppColors.primaryText }}
               >
-                <IconSymbol
-                  name="bookmark"
-                  size={18}
+                {duration}
+              </Text>
+              <View className="flex-row items-center gap-[5px] bg-[#F3F4F6] rounded-full px-3 py-[7px]">
+                <MaterialIcons
+                  name="directions-walk"
+                  size={14}
                   color={AppColors.secondaryText}
                 />
               </TouchableOpacity>
