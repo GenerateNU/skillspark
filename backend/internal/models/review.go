@@ -68,8 +68,8 @@ type GetReviewsByEventIDInput struct {
 	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
 	Page           int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
 	PageSize       int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+	SortBy         string    `query:"sort_by" default:"most_recent" enum:"most_recent,highest,lowest" doc:"Sort order for reviews"`
 }
-
 type GetReviewsByOrganizationIDInput struct {
 	ID             uuid.UUID `path:"id"`
 	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
@@ -113,6 +113,25 @@ type ReviewAggregate struct {
 	TotalReviews  int                 `json:"total_reviews"`
 	AverageRating float64             `json:"average_rating"`
 	Breakdown     []ReviewRatingCount `json:"breakdown"`
+}
+
+type SimpleReviewAggregate struct {
+	EventID       uuid.UUID `json:"event_id"`
+	TotalReviews  int       `json:"total_reviews"`
+	AverageRating float64   `json:"average_rating"`
+	Event         Event     `json:"event" db:"-"`
+}
+
+type GetEventReviewsForOrganizationInput struct {
+	ID             uuid.UUID `path:"id"`
+	Page           int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
+	PageSize       int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	SortBy         string    `query:"sort_by" default:"most_rated" enum:"most_rated,highest,lowest"`
+}
+
+type GetEventReviewsForOrganizationOutput struct {
+	Body []SimpleReviewAggregate `json:"body" doc:"List of review aggregates"`
 }
 
 type OrgReviewSummary struct {

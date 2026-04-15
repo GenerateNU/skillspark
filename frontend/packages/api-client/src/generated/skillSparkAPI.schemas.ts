@@ -749,6 +749,13 @@ export interface School {
   updated_at: string;
 }
 
+export interface SimpleReviewAggregate {
+  average_rating: number;
+  event: Event;
+  event_id: string;
+  total_reviews: number;
+}
+
 export interface UpdateChildInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -954,6 +961,30 @@ page?: number;
 limit?: number;
 };
 
+export type GetEventReviewsForOrganizationParams = {
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+sort_by?: GetEventReviewsForOrganizationSortBy;
+};
+
+export type GetEventReviewsForOrganizationSortBy = typeof GetEventReviewsForOrganizationSortBy[keyof typeof GetEventReviewsForOrganizationSortBy];
+
+
+export const GetEventReviewsForOrganizationSortBy = {
+  most_rated: 'most_rated',
+  highest: 'highest',
+  lowest: 'lowest',
+} as const;
+
 export type ListOrganizationsParams = {
 /**
  * Page number (starts at 1)
@@ -1023,7 +1054,20 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
+/**
+ * Sort order for reviews
+ */
+sort_by?: GetReviewByEventIdSortBy;
 };
+
+export type GetReviewByEventIdSortBy = typeof GetReviewByEventIdSortBy[keyof typeof GetReviewByEventIdSortBy];
+
+
+export const GetReviewByEventIdSortBy = {
+  most_recent: 'most_recent',
+  highest: 'highest',
+  lowest: 'lowest',
+} as const;
 
 export type GetReviewByGuardianIdParams = {
 /**
