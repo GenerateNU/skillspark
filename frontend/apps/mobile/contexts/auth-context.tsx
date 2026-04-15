@@ -79,17 +79,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setCurrentLanguage(storedLangPref);
         queryClient.invalidateQueries({ refetchType: "all" });
       }
-      // DEV BYPASS: hardcode guardian for local testing
-      const devGuardianId = "88888888-8888-8888-8888-888888888888";
-      const devJwt = storedJWT ?? "dev-bypass-token";
-      setJWT(devJwt);
-      setGuardianId(devGuardianId);
-      setLangPref(storedLangPref);
-      // if (storedJWT && storedGuardianId) {
-      //   setJWT(storedJWT);
-      //   setGuardianId(storedGuardianId);
-      //   setLangPref(storedLangPref);
-      // }
+      if (storedJWT && storedGuardianId) {
+        setJWT(storedJWT);
+        setGuardianId(storedGuardianId);
+        setLangPref(storedLangPref);
+      }
       setIsLoading(false);
     };
     checkAlreadyAuth();
