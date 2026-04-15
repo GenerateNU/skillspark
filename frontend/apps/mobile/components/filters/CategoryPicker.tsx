@@ -4,7 +4,6 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { PillRow } from "./PillRow";
-import { SectionLabel } from "./FilterLayout";
 
 const COLLAPSED_COUNT = 8;
 
@@ -24,7 +23,13 @@ export function CategoryPicker({ label, categoryLabels, activeIndex, onSelect }:
 
   return (
     <View>
-      <SectionLabel label={label} />
+       <Text
+      style={{
+        fontFamily: FontFamilies.bold,
+        fontSize: FontSizes.lg,
+        color: AppColors.primaryText,
+      }}
+    >{label}</Text>
       <PillRow
         options={visibleLabels}
         activeIndex={visibleActiveIndex}

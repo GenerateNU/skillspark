@@ -5,28 +5,12 @@ import { Pressable, ScrollView, Text, TouchableOpacity, View } from "react-nativ
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { SliderCard } from "@/components/filters/SliderCard";
-import { Divider } from "@/components/filters/FilterLayout";
 import { DateRangePicker } from "@/components/filters/DateRangePicker";
 import { CategoryPicker } from "@/components/filters/CategoryPicker";
 import { SoldOutToggle } from "@/components/filters/SoldOutToggle";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-// Backend values — must match the Postgres category enum exactly and list should be same length
-// as the list of categories in all i18n files
-const CATEGORY_KEYS = [
-  "science", "math", "music", "art", "sports", "technology", "language", "other",
-  "physics", "chemistry", "biology", "astronomy", "earth science", "data science",
-  "robotics", "engineering", "statistics", "coding",
-  "painting", "drawing", "sculpture", "photography", "filmmaking", "graphic design",
-  "fashion", "crafts", "creative writing",
-  "instrumental music", "vocal music", "theater", "acting", "dance", "improv",
-  "soccer", "basketball", "tennis", "swimming", "martial arts", "yoga", "fitness",
-  "running", "hiking", "cycling",
-  "language learning", "linguistics", "history",
-];
+import { CATEGORY_KEYS } from "@/constants/eventCategories";
 
 const DISTANCE_MAX = 50;
 const DURATION_MAX = 180; // minutes
@@ -126,7 +110,10 @@ export default function FiltersScreen() {
           }
         />
 
-        <Divider />
+         <View
+         className="my-5 h-px"
+         style={{ backgroundColor: AppColors.divider }}
+         />
 
         <SliderCard
           label={t("filters.distance")}
@@ -202,7 +189,10 @@ export default function FiltersScreen() {
           maxLabel={`${AGE_MAX}+`}
         />
 
-        <Divider />
+         <View
+      className="my-5 h-px"
+      style={{ backgroundColor: AppColors.divider }}
+    />
 
         <DateRangePicker
           startDate={startDate}
@@ -212,7 +202,10 @@ export default function FiltersScreen() {
           }
         />
 
-        <Divider />
+         <View
+      className="my-5 h-px"
+      style={{ backgroundColor: AppColors.divider }}
+    />
 
         <SoldOutToggle
           label={t("filters.showSoldOut")}
