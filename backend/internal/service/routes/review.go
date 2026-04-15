@@ -25,18 +25,9 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		Tags:        []string{"Review"},
 	}, func(ctx context.Context, input *models.GetReviewsByGuardianIDInput) (*models.ReviewsOutput, error) {
 
-		page := input.Page
-		if page == 0 {
-			page = 1
-		}
-		limit := input.PageSize
-		if limit == 0 {
-			limit = 10
-		}
-
 		pagination := utils.Pagination{
-			Page:  page,
-			Limit: limit,
+			Page:  input.Page,
+			Limit: input.PageSize,
 		}
 
 		reviews, err := reviewHandler.GetReviewsByGuardianID(ctx, input.ID, input.AcceptLanguage, pagination)
@@ -189,18 +180,9 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		Tags:        []string{"Review"},
 	}, func(ctx context.Context, input *models.GetEventReviewsForOrganizationInput) (*models.GetEventReviewsForOrganizationOutput, error) {
 
-		page := input.Page
-		if page == 0 {
-			page = 1
-		}
-		limit := input.PageSize
-		if limit == 0 {
-			limit = 10
-		}
-
 		pagination := utils.Pagination{
-			Page:  page,
-			Limit: limit,
+			Page:  input.Page,
+			Limit: input.PageSize,
 		}
 
 		result, err := reviewHandler.GetEventReviewsForOrganization(
