@@ -44,6 +44,7 @@
     "upcomingEvents": "upcoming events",
     "learnMore": "Learn More",
     "reserved": "Reserved",
+    "learnMore": "Learn More",
     "members": "members",
     "categories": {
       "technology": "technology",
@@ -254,7 +255,14 @@
     "notFound": "Event not found",
     "minWalk": "min",
     "hr": "hr",
-    "min": "min"
+    "min": "min",
+    "bookingsThisWeek": "Bookings this week",
+    "about": "About",
+    "reviews": "Reviews",
+    "more": "more",
+    "noReviews": "No reviews yet.",
+    "seeMoreReviews": "See more reviews",
+    "reserve": "Reserve"
   },
   "emergencyContact": {
     "manageTitle": "Manage Emergency Contact",
@@ -288,10 +296,12 @@
     "noDescription": "No description available.",
     "seeSchedule": "See Schedule",
     "schedule": "Classes",
+    "class": "Class",
     "noSchedule": "No upcoming classes for this organization.",
     "notFound": "Organization not found.",
     "bookingsThisWeek": "Bookings this week",
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "allClasses": "All Classes"
   },
   "interests": {
     "science": "Science",
