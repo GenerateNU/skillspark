@@ -28,11 +28,13 @@ import type {
   CreateReviewInputBody,
   DeleteReviewOutputBody,
   ErrorModel,
+  GetEventReviewsForOrganizationParams,
   GetReviewByEventIdParams,
   GetReviewByGuardianIdParams,
   GetReviewByOrganizationIdParams,
   Review,
-  ReviewAggregate
+  ReviewAggregate,
+  SimpleReviewAggregate
 } from '../skillSparkAPI.schemas';
 
 import { customInstance } from '../../apiClient';
@@ -75,6 +77,139 @@ export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
 export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 419 | 420 | 421 | 422 | 423 | 424 | 426 | 428 | 429 | 431 | 451;
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
 export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
+
+
+/**
+ * Returns review aggregates (total reviews + average rating) for all events in an organization
+ * @summary Get event review aggregates for an organization
+ */
+export type getEventReviewsForOrganizationResponse200 = {
+  data: SimpleReviewAggregate[]
+  status: 200
+}
+
+export type getEventReviewsForOrganizationResponseDefault = {
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type getEventReviewsForOrganizationResponseSuccess = (getEventReviewsForOrganizationResponse200) & {
+  headers: Headers;
+};
+export type getEventReviewsForOrganizationResponseError = (getEventReviewsForOrganizationResponseDefault) & {
+  headers: Headers;
+};
+
+export type getEventReviewsForOrganizationResponse = (getEventReviewsForOrganizationResponseSuccess | getEventReviewsForOrganizationResponseError)
+
+export const getGetEventReviewsForOrganizationUrl = (id: string,
+    params?: GetEventReviewsForOrganizationParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/organization/event-reviews/${id}?${stringifiedParams}` : `/api/v1/organization/event-reviews/${id}`
+}
+
+export const getEventReviewsForOrganization = async (id: string,
+    params?: GetEventReviewsForOrganizationParams, options?: RequestInit): Promise<getEventReviewsForOrganizationResponse> => {
+  
+  return customInstance<getEventReviewsForOrganizationResponse>(getGetEventReviewsForOrganizationUrl(id,params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetEventReviewsForOrganizationQueryKey = (id: string,
+    params?: GetEventReviewsForOrganizationParams,) => {
+    return [
+    `/api/v1/organization/event-reviews/${id}`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getGetEventReviewsForOrganizationQueryOptions = <TData = Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError = ErrorModel>(id: string,
+    params?: GetEventReviewsForOrganizationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEventReviewsForOrganizationQueryKey(id,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEventReviewsForOrganization>>> = ({ signal }) => getEventReviewsForOrganization(id,params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEventReviewsForOrganizationQueryResult = NonNullable<Awaited<ReturnType<typeof getEventReviewsForOrganization>>>
+export type GetEventReviewsForOrganizationQueryError = ErrorModel
+
+
+export function useGetEventReviewsForOrganization<TData = Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError = ErrorModel>(
+ id: string,
+    params: undefined |  GetEventReviewsForOrganizationParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEventReviewsForOrganization>>,
+          TError,
+          Awaited<ReturnType<typeof getEventReviewsForOrganization>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEventReviewsForOrganization<TData = Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError = ErrorModel>(
+ id: string,
+    params?: GetEventReviewsForOrganizationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEventReviewsForOrganization>>,
+          TError,
+          Awaited<ReturnType<typeof getEventReviewsForOrganization>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEventReviewsForOrganization<TData = Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError = ErrorModel>(
+ id: string,
+    params?: GetEventReviewsForOrganizationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get event review aggregates for an organization
+ */
+
+export function useGetEventReviewsForOrganization<TData = Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError = ErrorModel>(
+ id: string,
+    params?: GetEventReviewsForOrganizationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventReviewsForOrganization>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEventReviewsForOrganizationQueryOptions(id,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
 
 
 /**
