@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { shareEventLink } from "@/utils/sharing";
+import * as Linking from "expo-linking";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetEventOccurrencesById } from "@skillspark/api-client";
@@ -20,6 +20,8 @@ import { useTranslation } from "react-i18next";
 import { ListItem } from "@/components/ListItem";
 import { AboutPage } from "@/components/AboutPage";
 import { useRouteInfo } from "expo-router/build/hooks";
+import { useState } from "react";
+import { ShareModal } from "@/components/ShareModal";
 
 function formatAddress(occurrence: EventOccurrence) {
   const loc = occurrence.location;
@@ -35,6 +37,7 @@ function EventOccurrenceDetail({
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t: translate } = useTranslation();
+  const [shareVisible, setShareVisible] = useState(false);
   const duration = formatDuration(occurrence.start_time, occurrence.end_time, {
     hr: translate("event.hr"),
     min: translate("event.min"),
@@ -87,7 +90,7 @@ function EventOccurrenceDetail({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => shareEventLink(occurrence.id, occurrence.event.title)}
+              onPress={() => setShareVisible(true)}
               activeOpacity={0.7}
               className="absolute top-4 right-4 z-10 bg-white rounded-full w-10 h-10 items-center justify-center elevation-10"
               style={{
@@ -300,6 +303,15 @@ function EventOccurrenceDetail({
           </View>
         </ScrollView>
       </View>
+
+      <ShareModal
+        visible={shareVisible}
+        onClose={() => setShareVisible(false)}
+        name={occurrence.event.title}
+        imageUrl={occurrence.event.presigned_url ?? undefined}
+        shareUrl={Linking.createURL(`event/${occurrence.id}`)}
+        message={`Check out "${occurrence.event.title}" on SkillSpark!`}
+      />
     </View>
   );
 }

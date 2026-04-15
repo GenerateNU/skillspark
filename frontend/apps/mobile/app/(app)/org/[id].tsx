@@ -18,7 +18,8 @@ import { AppColors } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { useTranslation } from "react-i18next";
-import { shareOrgLink } from "@/utils/sharing";
+import * as Linking from "expo-linking";
+import { ShareModal } from "@/components/ShareModal";
 
 function OrgDetail({
   org,
@@ -34,6 +35,7 @@ function OrgDetail({
   const { openLink, hasLinks } = useOrgLinks(org.links ?? []);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [aboutTruncated, setAboutTruncated] = useState(false);
+  const [shareVisible, setShareVisible] = useState(false);
 
   const cardStyle = {
     shadowColor: "#000",
@@ -119,7 +121,7 @@ function OrgDetail({
               </View>
             </View>
             <TouchableOpacity
-              onPress={() => shareOrgLink(org.id, org.name)}
+              onPress={() => setShareVisible(true)}
               activeOpacity={0.7}
               className="mt-1 h-9 w-9 items-center justify-center rounded-full border-2"
               style={{ borderColor: AppColors.borderLight }}
@@ -236,6 +238,15 @@ function OrgDetail({
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <ShareModal
+        visible={shareVisible}
+        onClose={() => setShareVisible(false)}
+        name={org.name}
+        imageUrl={org.presigned_url ?? undefined}
+        shareUrl={Linking.createURL(`org/${org.id}`)}
+        message={`Check out ${org.name} on SkillSpark and get a discount on your next class!`}
+      />
     </SafeAreaView>
   );
 }
