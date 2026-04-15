@@ -8,9 +8,14 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
-func (r *GuardianRepository) GetGuardianNotificationPreferences(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]models.GuardianNotificationPreferences, error) {
+func (r *GuardianRepository) GetGuardianNotificationPreferences(
+	ctx context.Context,
+	ids []uuid.UUID,
+) (map[uuid.UUID]models.GuardianNotificationPreferences, error) {
+
 	query, err := schema.ReadSQLBaseScript("get_notification_preferences.sql", SqlGuardianFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -29,20 +34,20 @@ func (r *GuardianRepository) GetGuardianNotificationPreferences(ctx context.Cont
 	}
 	defer rows.Close()
 
-	result := make(map[uuid.UUID]models.GuardianNotificationPreferences, len(ids))
-	for rows.Next() {
-		var id uuid.UUID
-		var prefs models.GuardianNotificationPreferences
-		if err := rows.Scan(&id, &prefs.PushNotifications, &prefs.EmailNotifications); err != nil {
-			errr := errs.InternalServerError("Failed to scan guardian notification preferences: ", err.Error())
-			return nil, &errr
-		}
-		result[id] = prefs
+	type row struct {
+		ID uuid.UUID `db:"id"`
+		models.GuardianNotificationPreferences
 	}
 
-	if err := rows.Err(); err != nil {
-		errr := errs.InternalServerError("Failed to iterate guardian notification preferences: ", err.Error())
+	collected, err := pgx.CollectRows(rows, pgx.RowToStructByName[row])
+	if err != nil {
+		errr := errs.InternalServerError("Failed to collect guardian notification preferences: ", err.Error())
 		return nil, &errr
+	}
+
+	result := make(map[uuid.UUID]models.GuardianNotificationPreferences, len(collected))
+	for _, r := range collected {
+		result[r.ID] = r.GuardianNotificationPreferences
 	}
 
 	return result, nil

@@ -81,8 +81,8 @@ type GetGuardianByIDOutput struct {
 }
 
 type GuardianNotificationPreferences struct {
-	PushNotifications  bool
-	EmailNotifications bool
+	PushNotifications  bool `db:"push_notifications"`
+	EmailNotifications bool `db:"email_notifications"`
 }
 
 type CreateStripeCustomerInput struct {

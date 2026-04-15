@@ -52,7 +52,7 @@ export default function SettingsScreen() {
       guardian.name,
       guardian.username,
       guardian.profile_picture_s3_key,
-      undefined,
+      guardian.expo_push_token,
       value,
       emailEnabled,
     );
@@ -70,7 +70,7 @@ export default function SettingsScreen() {
       guardian.name,
       guardian.username,
       guardian.profile_picture_s3_key,
-      undefined,
+      guardian.expo_push_token,
       pushEnabled,
       value,
     );
