@@ -43,7 +43,7 @@ export const MONTHS = [
 ];
 
 export const YEARS = Array.from({ length: 30 }, (_, i) =>
-  String(new Date().getFullYear() - i)
+  String(new Date().getFullYear() - i),
 );
 
 type DropdownLayout = { x: number; y: number; width: number };
@@ -73,11 +73,7 @@ function DropdownModal({
       animationType="none"
       onRequestClose={onClose}
     >
-      <TouchableOpacity
-        style={{ flex: 1 }}
-        activeOpacity={1}
-        onPress={onClose}
-      >
+      <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={onClose}>
         <View
           style={{
             position: "absolute",
@@ -174,23 +170,45 @@ export function ChildProfileForm({
 
   const monthTriggerRef = useRef<View>(null);
   const yearTriggerRef = useRef<View>(null);
-  const [monthDropLayout, setMonthDropLayout] = useState<DropdownLayout | null>(null);
-  const [yearDropLayout, setYearDropLayout] = useState<DropdownLayout | null>(null);
+  const [monthDropLayout, setMonthDropLayout] = useState<DropdownLayout | null>(
+    null,
+  );
+  const [yearDropLayout, setYearDropLayout] = useState<DropdownLayout | null>(
+    null,
+  );
 
   const openMonthDrop = () => {
-    monthTriggerRef.current?.measure((_fx: number, _fy: number, width: number, height: number, px: number, py: number) => {
-      setMonthDropLayout({ x: px, y: py + height + 4, width });
-      setShowMonthDrop(true);
-      setShowYearDrop(false);
-    });
+    monthTriggerRef.current?.measure(
+      (
+        _fx: number,
+        _fy: number,
+        width: number,
+        height: number,
+        px: number,
+        py: number,
+      ) => {
+        setMonthDropLayout({ x: px, y: py + height + 4, width });
+        setShowMonthDrop(true);
+        setShowYearDrop(false);
+      },
+    );
   };
 
   const openYearDrop = () => {
-    yearTriggerRef.current?.measure((_fx: number, _fy: number, width: number, height: number, px: number, py: number) => {
-      setYearDropLayout({ x: px, y: py + height + 4, width });
-      setShowYearDrop(true);
-      setShowMonthDrop(false);
-    });
+    yearTriggerRef.current?.measure(
+      (
+        _fx: number,
+        _fy: number,
+        width: number,
+        height: number,
+        px: number,
+        py: number,
+      ) => {
+        setYearDropLayout({ x: px, y: py + height + 4, width });
+        setShowYearDrop(true);
+        setShowMonthDrop(false);
+      },
+    );
   };
 
   const removeInterest = (tag: string) =>
@@ -198,12 +216,12 @@ export function ChildProfileForm({
 
   const toggleInterest = (item: string) => {
     setInterests((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item],
     );
   };
 
   const filteredOptions = INTEREST_OPTIONS.filter((o) =>
-    o.toLowerCase().includes(searchQuery.toLowerCase())
+    o.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -272,10 +290,16 @@ export function ChildProfileForm({
               className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6]"
               onPress={openMonthDrop}
             >
-              <ThemedText className={birthMonth ? "" : "font-nunito text-[#9CA3AF]"}>
+              <ThemedText
+                className={birthMonth ? "" : "font-nunito text-[#9CA3AF]"}
+              >
                 {birthMonth || translate("childProfile.month")}
               </ThemedText>
-              <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
+              <IconSymbol
+                name="chevron.down"
+                size={16}
+                color={AppColors.mutedText}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -287,10 +311,16 @@ export function ChildProfileForm({
               className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6]"
               onPress={openYearDrop}
             >
-              <ThemedText className={birthYear ? "" : "font-nunito text-[#9CA3AF]"}>
+              <ThemedText
+                className={birthYear ? "" : "font-nunito text-[#9CA3AF]"}
+              >
                 {birthYear || translate("childProfile.year")}
               </ThemedText>
-              <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
+              <IconSymbol
+                name="chevron.down"
+                size={16}
+                color={AppColors.mutedText}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -336,12 +366,18 @@ export function ChildProfileForm({
                 style={{ backgroundColor: color.bg, borderColor: color.border }}
                 onPress={() => removeInterest(tag)}
               >
-                <IconSymbol name="camera.filters" size={13} color={color.border} />
+                <IconSymbol
+                  name="camera.filters"
+                  size={13}
+                  color={color.border}
+                />
                 <ThemedText
                   className="text-xs font-nunito-medium"
                   style={{ color: color.text }}
                 >
-                  {translate(`interests.${tag}`, { defaultValue: capitalize(tag) })}
+                  {translate(`interests.${tag}`, {
+                    defaultValue: capitalize(tag),
+                  })}
                 </ThemedText>
               </TouchableOpacity>
             );
@@ -358,7 +394,11 @@ export function ChildProfileForm({
             placeholder={translate("childProfile.searchInterests")}
             placeholderTextColor={AppColors.placeholderText}
           />
-          <IconSymbol name="magnifyingglass" size={20} color={AppColors.mutedText} />
+          <IconSymbol
+            name="magnifyingglass"
+            size={20}
+            color={AppColors.mutedText}
+          />
         </View>
         <View className="h-px bg-[#E5E7EB]" />
         <View
@@ -377,7 +417,9 @@ export function ChildProfileForm({
                 onPress={() => toggleInterest(item)}
               >
                 <ThemedText className="text-base font-nunito">
-                  {translate(`interests.${item}`, { defaultValue: capitalize(item) })}
+                  {translate(`interests.${item}`, {
+                    defaultValue: capitalize(item),
+                  })}
                 </ThemedText>
                 <View
                   className="w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center"

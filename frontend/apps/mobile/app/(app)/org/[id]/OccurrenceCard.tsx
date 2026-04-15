@@ -13,7 +13,6 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { ReservationModal } from "@/components/ReservationModal";
 import { RatingSmiley } from "@/components/RatingSmiley";
-
 import { useTranslation } from "react-i18next";
 import { formatAgeRange, formatTime, formatPrice } from "@/utils/format";
 
@@ -179,7 +178,7 @@ export function OccurrenceCard({
           <Animated.View style={buttonsAnimStyle}>
             <View className="flex-row gap-3 px-3 pb-3">
               <TouchableOpacity
-                onPress={() => router.push(`/event/${occurrence.id}`)}
+                onPress={() => router.push(`/event/${occurrence.event.id}`)}
                 activeOpacity={0.7}
                 className="flex-1 rounded-full py-2.5 items-center"
                 style={{ backgroundColor: "#99C0EE" }}
