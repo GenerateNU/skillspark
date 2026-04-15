@@ -41,6 +41,7 @@ export default function WelcomeScreen() {
 
 	return (
 		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+			<View style={{ height: 44, justifyContent: "center" }} />
 			{/* Title */}
 			<View
 				style={{
@@ -69,29 +70,28 @@ export default function WelcomeScreen() {
 			{/* Character image */}
 			<View
 				style={{
-					flex: 1,
 					alignItems: "center",
 					justifyContent: "center",
-					paddingVertical: 60,
+					paddingVertical: 30,
 				}}
 			>
 				<JumpingCharacter />
-			</View>
-
-			{/* Language section */}
-			<View style={{ paddingHorizontal: 24, flex: 1 }}>
 				<ThemedText
 					style={{
-						fontFamily: "NunitoSans_700Bold",
+						fontFamily: "NunitoSans_600SemiBold",
 						fontSize: 16,
 						color: AppColors.secondaryText,
+						marginTop: 24,
 						marginBottom: 8,
 						textAlign: "center",
 					}}
 				>
 					{translate("onboarding.chooseLanguage")}
 				</ThemedText>
+			</View>
 
+			{/* Language section */}
+			<View style={{ paddingHorizontal: 24, flex: 1 }}>
 				<View>
 					{LANGUAGES.map((lang, index) => {
 						const isSelected = selected === lang.code;
@@ -114,9 +114,7 @@ export default function WelcomeScreen() {
 										style={{
 											flex: 1,
 											fontSize: 16,
-											fontFamily: isSelected
-												? "NunitoSans_700Bold"
-												: "NunitoSans_400Regular",
+											fontFamily: "NunitoSans_400Regular",
 											color: AppColors.primaryText,
 										}}
 									>

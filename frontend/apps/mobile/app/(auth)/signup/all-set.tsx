@@ -4,7 +4,7 @@ import { JumpingCharacter } from "@/components/JumpingCharacter";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
-import { AppColors, FontSizes } from "@/constants/theme";
+import { AppColors } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 
 const BG = "#EDE8FF";
@@ -25,35 +25,31 @@ export default function AllSetScreen() {
 
 	return (
 		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
-			{/* Top section: title + character */}
-			<View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24 }}>
+			{/* Title */}
+			<View style={{ alignItems: "center", paddingHorizontal: 24, paddingTop: 40, paddingBottom: 20 }}>
 				<ThemedText
 					style={{
 						fontFamily: "NunitoSans_700Bold",
-						fontSize: FontSizes.hero,
+						fontSize: 30,
+						lineHeight: 38,
 						color: AppColors.primaryText,
 						letterSpacing: -0.5,
 						textAlign: "center",
-						marginBottom: 28,
 					}}
+					numberOfLines={1}
+					adjustsFontSizeToFit
 				>
 					{translate("onboarding.allSet")}
 				</ThemedText>
+			</View>
+
+			{/* Character */}
+			<View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
 				<JumpingCharacter />
 			</View>
 
-			{/* Bottom white card: status text */}
-			<View
-				style={{
-					backgroundColor: "#FFFFFF",
-					borderTopLeftRadius: 28,
-					borderTopRightRadius: 28,
-					paddingHorizontal: 24,
-					paddingTop: 28,
-					paddingBottom: insets.bottom + 24,
-					alignItems: "center",
-				}}
-			>
+			{/* Status text */}
+			<View style={{ paddingHorizontal: 24, paddingBottom: insets.bottom + 24, alignItems: "center" }}>
 				<ThemedText
 					style={{
 						fontSize: 15,

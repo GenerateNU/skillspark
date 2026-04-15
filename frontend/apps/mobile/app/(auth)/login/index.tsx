@@ -61,24 +61,44 @@ export default function LoginScreen() {
 				style={{ flex: 1 }}
 			>
 				<ScrollView
-					contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 24 }}
+					contentContainerStyle={{
+						flexGrow: 1,
+						paddingBottom: insets.bottom + 24,
+					}}
 					keyboardShouldPersistTaps="handled"
 					showsVerticalScrollIndicator={false}
 				>
-					{/* Back button */}
-					<TouchableOpacity
-						onPress={() => router.back()}
-						style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingVertical: 12, gap: 4 }}
-						hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-					>
-						<IconSymbol name="chevron.left" size={18} color="#11181C" />
-						<ThemedText style={{ fontSize: 16, fontFamily: "NunitoSans_400Regular" }}>
-							{translate("onboarding.back")}
-						</ThemedText>
-					</TouchableOpacity>
+					{/* Back button — only shown when there is a previous screen to return to; space always reserved */}
+					<View style={{ height: 44, justifyContent: "center" }}>
+						{router.canGoBack() && (
+							<TouchableOpacity
+								onPress={() => router.back()}
+								style={{
+									flexDirection: "row",
+									alignItems: "center",
+									paddingHorizontal: 20,
+									gap: 4,
+								}}
+								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+							>
+								<IconSymbol name="chevron.left" size={18} color="#11181C" />
+								<ThemedText
+									style={{ fontSize: 16, fontFamily: "NunitoSans_400Regular" }}
+								>
+									{translate("onboarding.back")}
+								</ThemedText>
+							</TouchableOpacity>
+						)}
+					</View>
 
 					{/* Title */}
-					<View style={{ paddingHorizontal: 24, paddingTop: 8, alignItems: "center" }}>
+					<View
+						style={{
+							paddingHorizontal: 24,
+							paddingTop: 8,
+							alignItems: "center",
+						}}
+					>
 						<ThemedText
 							style={{
 								fontFamily: "NunitoSans_700Bold",
@@ -101,7 +121,9 @@ export default function LoginScreen() {
 					{/* Form fields */}
 					<View style={{ paddingHorizontal: 24, gap: 24 }}>
 						<View style={{ gap: 8 }}>
-							<ThemedText style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}>
+							<ThemedText
+								style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}
+							>
 								{translate("onboarding.email")}
 							</ThemedText>
 							<AuthFormInput
@@ -113,7 +135,9 @@ export default function LoginScreen() {
 						</View>
 
 						<View style={{ gap: 8 }}>
-							<ThemedText style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}>
+							<ThemedText
+								style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}
+							>
 								{translate("onboarding.password")}
 							</ThemedText>
 							<AuthFormInput
@@ -125,7 +149,13 @@ export default function LoginScreen() {
 					</View>
 
 					{/* Buttons */}
-					<View style={{ paddingHorizontal: 24, paddingTop: 32, alignItems: "center" }}>
+					<View
+						style={{
+							paddingHorizontal: 24,
+							paddingTop: 32,
+							alignItems: "center",
+						}}
+					>
 						<Button
 							label={translate("onboarding.signUp")}
 							onPress={handleSubmit(onSubmit)}

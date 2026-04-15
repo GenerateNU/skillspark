@@ -40,7 +40,7 @@ export default function NameScreen() {
 	};
 
 	return (
-		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top + 4 }}>
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				style={{ flex: 1 }}
