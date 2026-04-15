@@ -224,9 +224,9 @@ export default function ReviewsScreen<
           <FilterTabs
             value={sortBy}
             options={[
-              { label: "Most recent", value: "most_recent" },
-              { label: "Highest", value: "highest" },
-              { label: "Lowest", value: "lowest" },
+              { label: translate("review.mostRecent"), value: "most_recent" },
+              { label: translate("review.highest"), value: "highest" },
+              { label: translate("review.lowest"), value: "lowest" },
             ]}
             onChange={setSortBy}
           />
