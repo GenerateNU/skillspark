@@ -13,7 +13,12 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
   const eventId = event.event.id;
 
   const { data: aggregateResp } = useGetReviewAggregate(eventId, {
-    query: { enabled: !!eventId },
+    query: {
+      enabled: !!eventId,
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      refetchOnMount: false,
+    },
   });
   const aggregate = (aggregateResp as { status: number; data: { average_rating: number; total_reviews: number } } | undefined);
   const aggregateData = aggregate?.status === 200 ? aggregate.data : null;
