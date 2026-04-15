@@ -3879,6 +3879,24 @@ components:
       required:
         - href
         - label
+    OrgReviewSummary:
+      type: object
+      additionalProperties: false
+      properties:
+        average_rating:
+          type: number
+          format: double
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewRatingCount'
+        total_reviews:
+          type: integer
+          format: int64
+      required:
+        - total_reviews
+        - average_rating
+        - breakdown
     Organization:
       type: object
       additionalProperties: false
@@ -3911,6 +3929,8 @@ components:
           type: string
         presigned_url:
           type: string
+        review_summary:
+          $ref: '#/components/schemas/OrgReviewSummary'
         stripe_account_activated:
           type: boolean
           default: false
@@ -3924,10 +3944,8 @@ components:
         - name
         - active
         - links
-        - presigned_url
         - created_at
         - updated_at
-        - stripe_account_id
         - stripe_account_activated
     PatchManagerInputBody:
       type: object
