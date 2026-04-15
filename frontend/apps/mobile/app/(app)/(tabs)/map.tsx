@@ -117,7 +117,7 @@ export default function MapScreen() {
           description: "",
           latitude: location.latitude,
           longitude: location.longitude,
-          rating: 5.0,
+          rating: org.review_summary?.average_rating ?? 0,
           members: 0,
           image: org.pfp_s3_key,
         };

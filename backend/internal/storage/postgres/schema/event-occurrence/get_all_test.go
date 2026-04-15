@@ -178,8 +178,10 @@ func TestEventOccurrenceRepository_Filters_NewFilters(t *testing.T) {
 	require.NotNil(t, eventOccurrences)
 
 	for _, eo := range eventOccurrences {
-		assert.True(t, *eo.Event.AgeRangeMin == 0 || *eo.Event.AgeRangeMin >= minAge)
-		assert.True(t, *eo.Event.AgeRangeMax == 0 || *eo.Event.AgeRangeMax <= maxAge)
+		// overlap: event's upper bound must reach filter's lower bound
+		assert.True(t, eo.Event.AgeRangeMax == nil || *eo.Event.AgeRangeMax >= minAge)
+		// overlap: event's lower bound must not exceed filter's upper bound
+		assert.True(t, eo.Event.AgeRangeMin == nil || *eo.Event.AgeRangeMin <= maxAge)
 	}
 
 	minDate := time.Date(2026, 2, 1, 0, 0, 0, 0, time.UTC)

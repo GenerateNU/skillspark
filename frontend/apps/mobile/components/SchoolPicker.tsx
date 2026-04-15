@@ -23,8 +23,8 @@ export function SchoolPicker({ value, onChange }: SchoolPickerProps) {
   const placeholderLabel = isLoading
     ? translate("childProfile.loadingSchools")
     : isError
-    ? translate("childProfile.failedToLoadSchools")
-    : translate("childProfile.selectSchool");
+      ? translate("childProfile.failedToLoadSchools")
+      : translate("childProfile.selectSchool");
 
   return (
     <View className="mb-6">

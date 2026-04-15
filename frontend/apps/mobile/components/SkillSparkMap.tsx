@@ -1,10 +1,11 @@
 import React, { useRef, useState } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
-import { IconSymbol } from "@/components/ui/icon-symbol";
+import { SvgXml } from "react-native-svg";
 import { ThemedView } from "@/components/themed-view";
-import { EventCard } from "@/components/EventCard";
+import { OrgMapCard } from "@/components/OrgMapCard";
 import { OrgListSheet } from "@/components/OrgListSheet";
+import { pinSvg } from "@/constants/mapPins";
 
 export interface LocationPin {
   id: string;
@@ -62,16 +63,12 @@ export function SkillSparkMap({ locations, userLocation, onFilterPress }: SkillS
               setSelectedPin(loc);
             }}
           >
-            <IconSymbol
-              name="location.fill"
-              size={40}
-              color={selectedPin?.id === loc.id ? "#FF4B4B" : "#FF6B6B"}
-            />
+            <SvgXml xml={pinSvg} width={36} height={45} />
           </Marker>
         ))}
       </MapView>
       {selectedPin ? (
-        <EventCard pin={selectedPin} />
+        <OrgMapCard pin={selectedPin} />
       ) : (
         <OrgListSheet locations={locations} userLocation={userLocation} onFilterPress={onFilterPress} />
       )}

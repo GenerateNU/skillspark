@@ -96,6 +96,10 @@ func mapToDBFilters(input *models.GetAllEventOccurrencesInput) models.GetAllEven
 		filters.Categories = input.Categories
 	}
 
+	if input.SoldOut {
+		filters.SoldOut = &input.SoldOut
+	}
+
 	if !input.MinDate.IsZero() {
 		filters.MinDate = &input.MinDate
 	}

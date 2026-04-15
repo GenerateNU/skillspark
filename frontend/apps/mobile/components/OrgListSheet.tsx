@@ -64,7 +64,7 @@ export function OrgListSheet({ locations, userLocation, onFilterPress }: OrgList
                   userLocation.coords.latitude,
                   userLocation.coords.longitude,
                   loc.latitude,
-                  loc.longitude
+                  loc.longitude,
                 )
               : null;
           return <OrgCard key={loc.id} pin={loc} distance={distance} />;

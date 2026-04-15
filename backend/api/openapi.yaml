@@ -1255,6 +1255,74 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/organization/event-reviews/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get event review aggregates for an organization
+      description: Returns review aggregates (total reviews + average rating) for all events in an organization
+      operationId: get-event-reviews-for-organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: page_size
+          in: query
+          description: Number of items per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of items per page
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: sort_by
+          in: query
+          explode: false
+          schema:
+            type: string
+            default: most_rated
+            enum:
+              - most_rated
+              - highest
+              - lowest
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of review aggregates
+                items:
+                  $ref: '#/components/schemas/SimpleReviewAggregate'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/organizations:
     get:
       tags:
@@ -2006,6 +2074,18 @@ paths:
             default: 10
             minimum: 1
             maximum: 100
+        - name: sort_by
+          in: query
+          description: Sort order for reviews
+          explode: false
+          schema:
+            type: string
+            description: Sort order for reviews
+            default: most_recent
+            enum:
+              - most_recent
+              - highest
+              - lowest
       responses:
         "200":
           description: OK
@@ -2619,6 +2699,32 @@ paths:
                 description: List of trending in the user's area
                 items:
                   $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/user/{username}:
+    get:
+      tags:
+        - User
+      summary: Check if a username exists
+      description: Returns whether a user with the given username exists
+      operationId: username-exists
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsernameExistsOutputBody'
         default:
           description: Error
           content:
@@ -3546,6 +3652,8 @@ components:
           format: date-time
         email:
           type: string
+        email_notifications:
+          type: boolean
         expo_push_token:
           type: string
         id:
@@ -3556,6 +3664,8 @@ components:
           type: string
         profile_picture_s3_key:
           type: string
+        push_notifications:
+          type: boolean
         stripe_customer_id:
           type: string
         updated_at:
@@ -3575,6 +3685,8 @@ components:
         - language_preference
         - auth_id
         - expo_push_token
+        - push_notifications
+        - email_notifications
         - created_at
         - updated_at
     GuardianLoginOutputBody:
@@ -3881,6 +3993,24 @@ components:
       required:
         - href
         - label
+    OrgReviewSummary:
+      type: object
+      additionalProperties: false
+      properties:
+        average_rating:
+          type: number
+          format: double
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewRatingCount'
+        total_reviews:
+          type: integer
+          format: int64
+      required:
+        - total_reviews
+        - average_rating
+        - breakdown
     Organization:
       type: object
       additionalProperties: false
@@ -3913,6 +4043,8 @@ components:
           type: string
         presigned_url:
           type: string
+        review_summary:
+          $ref: '#/components/schemas/OrgReviewSummary'
         stripe_account_activated:
           type: boolean
           default: false
@@ -3926,10 +4058,8 @@ components:
         - name
         - active
         - links
-        - presigned_url
         - created_at
         - updated_at
-        - stripe_account_id
         - stripe_account_activated
     PatchManagerInputBody:
       type: object
@@ -4247,6 +4377,25 @@ components:
         - location_id
         - created_at
         - updated_at
+    SimpleReviewAggregate:
+      type: object
+      additionalProperties: false
+      properties:
+        average_rating:
+          type: number
+          format: double
+        event:
+          $ref: '#/components/schemas/Event'
+        event_id:
+          type: string
+        total_reviews:
+          type: integer
+          format: int64
+      required:
+        - event_id
+        - total_reviews
+        - average_rating
+        - event
     UpdateChildInputBody:
       type: object
       additionalProperties: false
@@ -4379,6 +4528,9 @@ components:
         email:
           type: string
           description: Email of the guardian
+        email_notifications:
+          type: boolean
+          description: Global email notification settings
         expo_push_token:
           type: string
           description: Expo push notification token
@@ -4391,6 +4543,9 @@ components:
         profile_picture_s3_key:
           type: string
           description: S3 key for profile picture
+        push_notifications:
+          type: boolean
+          description: Global push notification settings
         username:
           type: string
           description: Username of the guardian
@@ -4444,3 +4599,18 @@ components:
           description: New payment intent status from Stripe
       required:
         - payment_intent_status
+    UsernameExistsOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UsernameExistsOutputBody.json
+          readOnly: true
+        exists:
+          type: boolean
+      required:
+        - exists
