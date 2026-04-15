@@ -2,7 +2,6 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import {
   ActivityIndicator,
   View,
-  TextInput,
   ScrollView,
   Pressable,
   Text,
@@ -17,13 +16,13 @@ import {
   type Guardian,
   type Registration,
   type Child,
-  getTrendingEventOccurrences,
   useGetTrendingEventOccurrences,
 } from "@skillspark/api-client";
 import { useEffect, useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { useDebounce } from "use-debounce";
+import { useFilters } from "@/hooks/use-filters";
+import { useRouter } from "expo-router";
 import { isWithinNext7Days } from "@/utils/format";
 import { DiscoverBanner } from "@/components/home/DiscoverBanner";
 import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
@@ -40,8 +39,8 @@ import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
-  const [searchText, setSearchText] = useState("");
-  const [_debouncedSearch] = useDebounce(searchText, 300);
+  const { filters, hasActiveFilters } = useFilters();
+  const router = useRouter();
   const { width, height } = useWindowDimensions();
 
   const [geoLocationLat, setGeoLocationLat] = useState<string | undefined>(
@@ -80,7 +79,7 @@ export default function HomeScreen() {
   const guardian = (guardianResp as unknown as { data: Guardian } | undefined)
     ?.data;
 
-  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences();
+  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences({});
   const allOccurrences: EventOccurrence[] = useMemo(() => {
     const d = occurrencesResp as unknown as
       | { data: EventOccurrence[] }
@@ -226,17 +225,28 @@ export default function HomeScreen() {
             color={AppColors.subtleText}
             style={{ marginRight: 8 }}
           />
-          <TextInput
-            className="flex-1 text-sm font-nunito"
-            style={{ color: AppColors.primaryText }}
-            placeholder={translate("dashboard.searchPlaceholder")}
-            placeholderTextColor={AppColors.placeholderText}
-            value={searchText}
-            onChangeText={setSearchText}
-          />
           <Pressable
+            className="flex-1"
+            onPress={() => router.push("/(app)/search")}
+          >
+            <Text
+              style={{
+                fontFamily: "NunitoSans_400Regular",
+                fontSize: 14,
+                color: AppColors.placeholderText,
+              }}
+            >
+              {translate("dashboard.searchPlaceholder")}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/(app)/(tabs)/filters")}
             className="w-9 h-9 rounded-full items-center justify-center"
-            style={{ backgroundColor: AppColors.primaryText }}
+            style={{
+              backgroundColor: hasActiveFilters
+                ? AppColors.primaryBlue
+                : AppColors.primaryText,
+            }}
           >
             <IconSymbol
               name="slider.horizontal.3"
