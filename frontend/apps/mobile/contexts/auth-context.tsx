@@ -9,6 +9,7 @@ import {
   useUpdateGuardian,
   setCurrentLanguage,
   updateGuardianResponse,
+  createStripeCustomer,
 } from "@skillspark/api-client";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
@@ -153,6 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setJWT(success.token);
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
           setGuardianId(success.guardian_id);
+          await createStripeCustomer(success.guardian_id);
           router.replace("/(app)/(tabs)");
         },
         onError: (err) => {
