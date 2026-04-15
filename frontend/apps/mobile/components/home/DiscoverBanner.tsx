@@ -18,8 +18,7 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
       refetchOnMount: false,
     },
   });
-  const aggregate = (aggregateResp as { status: number; data: { average_rating: number; total_reviews: number } } | undefined);
-  const aggregateData = aggregate?.status === 200 ? aggregate.data : null;
+  const aggregateData = aggregateResp?.status === 200 ? aggregateResp.data : null;
   const avgRating = aggregateData?.average_rating ?? 0;
   const totalReviews = aggregateData?.total_reviews ?? 0;
   const ratingMatch = RATING_OPTIONS.find((r) => r.rating === Math.round(avgRating));
