@@ -21,7 +21,7 @@ export function UpcomingClassCard({
 
   return (
     <Pressable
-      onPress={() => router.push(`/event/${occurrence.id}`)}
+      onPress={() => router.push(`/event/${occurrence.event.id}`)}
       className="mr-4 w-[310px] rounded-2xl"
       style={{
         backgroundColor: AppColors.white,

@@ -1,6 +1,8 @@
 import { Image } from "expo-image";
+import { useState } from "react";
 import {
   ActivityIndicator,
+  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -8,10 +10,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useGetEventOccurrencesById } from "@skillspark/api-client";
+import { useGetEventOccurrencesByEventId } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
+import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { RatingSmiley } from "@/components/RatingSmiley";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { useTranslation } from "react-i18next";
@@ -39,6 +42,9 @@ function EventOccurrenceDetail({
 }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
+  const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
+  const [aboutExpanded, setAboutExpanded] = useState(false);
+  const [aboutTruncated, setAboutTruncated] = useState(false);
 
   const location = formatLocation(occurrence);
   const categories = occurrence.event.category?.join(" / ") ?? "";
@@ -149,6 +155,61 @@ function EventOccurrenceDetail({
           >
             {occurrence.curr_enrolled}+ {translate("event.bookingsThisWeek")}
           </Text>
+        </View>
+
+        {/* About card */}
+        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardShadow}>
+          <Text
+            className="mb-2.5 text-[18px] font-nunito-bold"
+            style={{ color: AppColors.primaryText }}
+          >
+            {translate("event.about")}
+          </Text>
+          <Text
+            numberOfLines={aboutExpanded ? undefined : 4}
+            onTextLayout={(e) => {
+              if (!aboutExpanded)
+                setAboutTruncated(e.nativeEvent.lines.length >= 4);
+            }}
+            className={`text-sm leading-[22px] font-nunito ${aboutTruncated ? "mb-1" : "mb-4"}`}
+            style={{ color: AppColors.secondaryText }}
+          >
+            {occurrence.event.description}
+          </Text>
+          {aboutTruncated && (
+            <Pressable
+              onPress={() => setAboutExpanded((prev) => !prev)}
+              className="mb-4"
+            >
+              <Text
+                className="text-[13px] font-semibold"
+                style={{ color: AppColors.primaryText }}
+              >
+                {aboutExpanded
+                  ? translate("event.seeLess")
+                  : translate("event.seeMore")}
+              </Text>
+            </Pressable>
+          )}
+          {hasLinks && (
+            <View className="flex-row flex-wrap gap-2.5">
+              {occurrence.org_links.map((link, index) => (
+                <Pressable
+                  key={index}
+                  onPress={() => openLink(link.href)}
+                  className="rounded-full px-5 py-2.5 items-center"
+                  style={{ backgroundColor: AppColors.borderLight }}
+                >
+                  <Text
+                    className="text-[13px] font-semibold"
+                    style={{ color: AppColors.primaryText }}
+                  >
+                    {link.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Reviews card */}
@@ -281,7 +342,7 @@ function EventOccurrenceDetail({
 
 export default function EventOccurrenceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: response, isLoading, error } = useGetEventOccurrencesById(id);
+  const { data: response, isLoading, error } = useGetEventOccurrencesByEventId(id);
   const { t: translate } = useTranslation();
 
   if (isLoading) {
@@ -292,7 +353,7 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  if (error || !response || response.status !== 200) {
+  if (error || !response || response.status !== 200 || response.data.length === 0) {
     return (
       <View className="flex-1 items-center justify-center p-6">
         <Text
@@ -305,5 +366,5 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  return <EventOccurrenceDetail occurrence={response.data} />;
+  return <EventOccurrenceDetail occurrence={response.data[0]} />;
 }

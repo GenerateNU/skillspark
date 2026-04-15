@@ -73,7 +73,7 @@ export function TrendingCard({ occurrence }: { occurrence: EventOccurrence }) {
 
       {/* Card */}
       <Pressable
-        onPress={() => router.push(`/event/${occurrence.id}`)}
+        onPress={() => router.push(`/event/${occurrence.event.id}`)}
         className="w-[218px] h-[121px] rounded-[12px] border flex-row items-center py-[6px] px-2 gap-2"
         style={{
           backgroundColor: AppColors.white,
