@@ -1,4 +1,4 @@
-resource "aws_opensearch_domain" "skillspark-opensearch" {
+resource "aws_opensearch_domain" "skillspark_opensearch" {
   domain_name    = var.opensearch_domain_name
   engine_version = var.opensearch_engine_version
 
