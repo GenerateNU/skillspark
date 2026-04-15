@@ -2,16 +2,15 @@ import { useRouter } from "expo-router";
 
 type BackNavigationParams = {
   from?: string;
-  category?: string;
 };
 
-export function useEventBackNavigation({ from, category }: BackNavigationParams) {
+export function useEventBackNavigation({ from }: BackNavigationParams) {
   const router = useRouter();
 
   return () => {
     switch (from) {
       case "event-categories":
-        router.push({ pathname: "/(app)/(tabs)/event-categories", params: { category } });
+        router.back();
         break;
       default:
         router.navigate("/");

@@ -154,15 +154,7 @@ export default function HomeScreen() {
       : ["science", "technology", "soccer", "painting", "dance", "coding"];
   }, [allOccurrences]);
 
-  const categoryEventMap = useMemo(() => {
-    const map: Record<string, EventOccurrence> = {};
-    allOccurrences.forEach((o) => {
-      o.event.category?.forEach((c) => {
-        if (!map[c] && o.event.presigned_url) map[c] = o;
-      });
-    });
-    return map;
-  }, [allOccurrences]);
+
 
   const firstName = guardian?.name?.split(" ")[0] ?? "there";
 
@@ -345,7 +337,6 @@ export default function HomeScreen() {
                   <CategoryCard
                     key={cat}
                     category={cat}
-                    occurrence={categoryEventMap[cat]}
                   />
                 ))}
                 {pair.length === 1 && <View className="flex-1 m-[5px]" />}

@@ -1,39 +1,75 @@
-import { Image } from "expo-image";
-import { View, Text, Pressable } from "react-native";
-import { type EventOccurrence } from "@skillspark/api-client";
-import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
+import { memo, useEffect, useState } from "react";
+import { Image as RNImage, View, Pressable } from "react-native";
+import { SvgXml } from "react-native-svg";
+import { AppColors } from "@/constants/theme";
 import { useRouter } from "expo-router";
 
-const CATEGORY_COLORS: Record<string, string> = {
-  science: AppColors.emerald,
-  technology: AppColors.blue,
-  soccer: AppColors.amber,
-  painting: AppColors.violet,
-  dance: AppColors.pink,
-  coding: AppColors.danger,
-  basketball: AppColors.amber,
-  swimming: AppColors.blue,
-  "martial arts": AppColors.danger,
-  "vocal music": AppColors.pink,
-  "instrumental music": AppColors.pink,
-  theater: AppColors.violet,
-  drawing: AppColors.violet,
-  photography: AppColors.emerald,
-};
+const CATEGORY_URIS: Record<string, string> = Object.fromEntries(
+  Object.entries({
+    art: require("@/assets/images/art.svg"),
+    sports: require("@/assets/images/sports.svg"),
+    music: require("@/assets/images/music.svg"),
+    technology: require("@/assets/images/tech.svg"),
+    science: require("@/assets/images/study.svg"),
+    math: require("@/assets/images/math.svg"),
+    language: require("@/assets/images/talking.svg"),
+    other: require("@/assets/images/life_skills.svg"),
+  }).map(([cat, moduleId]) => [
+    cat,
+    RNImage.resolveAssetSource(moduleId as number).uri,
+  ]),
+);
 
+// Module-level XML content cache — survives remounts, persists for the app's lifetime
+const svgXmlCache = new Map<string, string>();
 
+// Eagerly fetch all SVG content when this module is first imported
+Object.values(CATEGORY_URIS).forEach((uri) => {
+  if (uri && !svgXmlCache.has(uri)) {
+    fetch(uri)
+      .then((r) => r.text())
+      .then((xml) => svgXmlCache.set(uri, xml))
+      .catch(() => {});
+  }
+});
 
-export function CategoryCard({
+function useCategoryXml(uri: string | undefined): string | null {
+  const [xml, setXml] = useState<string | null>(
+    uri ? (svgXmlCache.get(uri) ?? null) : null,
+  );
+
+  useEffect(() => {
+    if (!uri) return;
+    const cached = svgXmlCache.get(uri);
+    if (cached) {
+      setXml(cached);
+      return;
+    }
+    fetch(uri)
+      .then((r) => r.text())
+      .then((text) => {
+        svgXmlCache.set(uri, text);
+        setXml(text);
+      })
+      .catch(() => {});
+  }, [uri]);
+
+  return xml;
+}
+
+export const CategoryCard = memo(function CategoryCard({
   category,
-  occurrence,
 }: {
   category: string;
-  occurrence?: EventOccurrence;
 }) {
   const router = useRouter();
+  const xml = useCategoryXml(CATEGORY_URIS[category]);
+
   return (
     <Pressable
-      onPress={() => router.push({ pathname: "/event-categories", params: { category } })}
+      onPress={() =>
+        router.push({ pathname: "/event-categories", params: { category } })
+      }
       className="flex-1 m-[5px]"
       style={{
         shadowColor: "#000",
@@ -44,37 +80,15 @@ export function CategoryCard({
       }}
     >
       <View className="h-[80px] rounded-[15px] overflow-hidden">
-        {occurrence?.event.presigned_url ? (
-          <Image
-            source={{ uri: occurrence.event.presigned_url }}
-            style={{ width: "100%", height: "100%" }}
-            className="absolute inset-0 opacity-80"
-            contentFit="cover"
-          />
+        {xml ? (
+          <SvgXml xml={xml} width="100%" height="100%" />
         ) : (
           <View
             className="absolute inset-0"
-            style={{
-              backgroundColor:
-                CATEGORY_COLORS[category] ?? AppColors.categoryFallback,
-            }}
+            style={{ backgroundColor: AppColors.categoryFallback }}
           />
         )}
-        <View
-          className="absolute bottom-0 left-0 right-0 h-[55%] justify-end px-3 pb-[10px]"
-          style={{ backgroundColor: AppColors.cardOverlay }}
-        >
-          <Text
-            style={{
-              color: AppColors.white,
-              fontFamily: FontFamilies.bold,
-              fontSize: FontSizes.base,
-            }}
-          >
-            {category}
-          </Text>
-        </View>
       </View>
     </Pressable>
   );
-}
+});

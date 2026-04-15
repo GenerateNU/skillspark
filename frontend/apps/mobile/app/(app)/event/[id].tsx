@@ -28,15 +28,13 @@ import { formatLocation } from "@/utils/format";
 function EventOccurrenceDetail({
   occurrence,
   from,
-  category,
 }: {
   occurrence: EventOccurrence;
   from?: string;
-  category?: string;
 }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
-  const handleBack = useEventBackNavigation({ from, category });
+  const handleBack = useEventBackNavigation({ from });
   const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [aboutTruncated, setAboutTruncated] = useState(false);
@@ -314,7 +312,7 @@ function EventOccurrenceDetail({
 }
 
 export default function EventOccurrenceScreen() {
-  const { id, from, category } = useLocalSearchParams<{ id: string; from?: string; category?: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const {
     data: response,
     isLoading,
@@ -348,5 +346,5 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  return <EventOccurrenceDetail occurrence={response.data[0]} from={from} category={category} />;
+  return <EventOccurrenceDetail occurrence={response.data[0]} from={from} />;
 }

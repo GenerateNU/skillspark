@@ -81,7 +81,7 @@ export default function EventCategoryScreen() {
           contentFit="contain"
         />
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.canGoBack() ? router.back() : router.navigate("/(app)/(tabs)")}
           style={{ width: 32, height: 32, justifyContent: "center", alignItems: "flex-start" }}
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
@@ -121,7 +121,7 @@ export default function EventCategoryScreen() {
             <EventCategoriesListItem
               key={o.id}
               eventOccurrence={o}
-              onPress={() => router.push({ pathname: "/event/[id]", params: { id: o.id, from: "event-categories", category } })}
+              onPress={() => router.push({ pathname: "/event/[id]", params: { id: o.event.id, from: "event-categories", category } })}
             />
           ))}
         </ScrollView>
