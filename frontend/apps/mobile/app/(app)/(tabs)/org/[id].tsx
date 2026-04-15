@@ -18,6 +18,7 @@ import { AppColors } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { useTranslation } from "react-i18next";
+import { shareOrgLink } from "@/utils/sharing";
 
 function OrgDetail({
   org,
@@ -118,6 +119,7 @@ function OrgDetail({
               </View>
             </View>
             <TouchableOpacity
+              onPress={() => shareOrgLink(org.id, org.name)}
               activeOpacity={0.7}
               className="mt-1 h-9 w-9 items-center justify-center rounded-full border-2"
               style={{ borderColor: AppColors.borderLight }}

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { shareEventLink } from "@/utils/sharing";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetEventOccurrencesById } from "@skillspark/api-client";
@@ -88,6 +89,22 @@ function EventOccurrenceDetail({
               >
                 {translate("event.back")}
               </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => shareEventLink(occurrence.id, occurrence.event.title)}
+              activeOpacity={0.7}
+              className="absolute top-4 right-4 z-10 bg-white rounded-full w-10 h-10 items-center justify-center elevation-10"
+              style={{
+                shadowColor: "#000",
+                shadowOpacity: 0.15,
+                shadowRadius: 8,
+              }}
+            >
+              <MaterialIcons
+                name="ios-share"
+                size={20}
+                color={AppColors.primaryText}
+              />
             </TouchableOpacity>
           </View>
 
