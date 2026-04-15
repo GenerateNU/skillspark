@@ -30,12 +30,13 @@ var testInvalidLocationID = uuid.MustParse("00000000-0000-0000-0000-000000000000
 
 func TestHandler_GetOrganizationById(t *testing.T) {
 	tests := []struct {
-		name           string
-		id             string
-		mockSetup      func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
-		mockS3Setup    func(*s3mocks.S3ClientMock)
-		expectedStatus int
-		wantErr        bool
+		name            string
+		id              string
+		mockSetup       func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockReviewSetup func(*repomocks.MockReviewRepository)
+		mockS3Setup     func(*s3mocks.S3ClientMock)
+		expectedStatus  int
+		wantErr         bool
 	}{
 		{
 			name: "successful get organization",
@@ -50,6 +51,13 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 					LocationID: &testLocationID,
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
+				}, nil)
+			},
+			mockReviewSetup: func(reviewRepo *repomocks.MockReviewRepository) {
+				reviewRepo.On("GetAggregateReviewsForOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.ReviewAggregate{
+					TotalReviews:  5,
+					AverageRating: 4.2,
+					Breakdown:     []models.ReviewRatingCount{{Rating: 5, ReviewCount: 3}, {Rating: 4, ReviewCount: 2}},
 				}, nil)
 			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
@@ -67,6 +75,9 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 					Message: "Internal server error",
 				})
 			},
+			mockReviewSetup: func(reviewRepo *repomocks.MockReviewRepository) {
+				// No review calls expected on org not found
+			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				// No S3 calls expected on error
 			},
@@ -83,12 +94,14 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 			})
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
+			tt.mockReviewSetup(mockReviewRepo)
 
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
 			app.Get("/organizations/:id", func(c *fiber.Ctx) error {
 				output, err := handler.GetOrganizationById(c.Context(), &models.GetOrganizationByIDInput{
 					ID: uuid.MustParse(c.Params("id")),
@@ -104,6 +117,7 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 
 			assert.Equal(t, tt.expectedStatus, res.StatusCode)
 			mockOrgRepo.AssertExpectations(t)
+			mockReviewRepo.AssertExpectations(t)
 			mockS3.AssertExpectations(t)
 		})
 	}
@@ -282,12 +296,13 @@ func TestHandler_CreateOrganization(t *testing.T) {
 			t.Parallel()
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
 			output, err := handler.CreateOrganization(context.TODO(), tt.input, tt.updateBody, tt.imageData, mockS3)
 
 			if tt.wantErr {
@@ -518,12 +533,13 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			t.Parallel()
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
 			output, err := handler.UpdateOrganization(context.TODO(), tt.input, tt.imageData, mockS3)
 
 			if tt.wantErr {
@@ -596,7 +612,8 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
 
 			mockS3 := createMockS3Client()
-			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
 			output, err := handler.DeleteOrganization(context.TODO(), &models.DeleteOrganizationInput{
 				ID: uuid.MustParse(tt.id),
 			})
@@ -616,12 +633,13 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 
 func TestHandler_GetAllOrganizations(t *testing.T) {
 	tests := []struct {
-		name        string
-		pagination  utils.Pagination
-		mockSetup   func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
-		mockS3Setup func(*s3mocks.S3ClientMock)
-		wantErr     bool
-		expectedLen int
+		name            string
+		pagination      utils.Pagination
+		mockSetup       func(*repomocks.MockOrganizationRepository, *repomocks.MockLocationRepository)
+		mockReviewSetup func(*repomocks.MockReviewRepository)
+		mockS3Setup     func(*s3mocks.S3ClientMock)
+		wantErr         bool
+		expectedLen     int
 	}{
 		{
 			name:       "successful get all with defaults",
@@ -632,6 +650,13 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 					{ID: uuid.New(), Name: "Org 2", Active: true, LocationID: &testLocationID},
 				}
 				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(orgs, nil)
+			},
+			mockReviewSetup: func(reviewRepo *repomocks.MockReviewRepository) {
+				reviewRepo.On("GetAggregateReviewsForOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.ReviewAggregate{
+					TotalReviews:  0,
+					AverageRating: 0,
+					Breakdown:     []models.ReviewRatingCount{},
+				}, nil)
 			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				// No S3 calls expected when no pfp keys
@@ -648,6 +673,13 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 				}
 				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(orgs, nil)
 			},
+			mockReviewSetup: func(reviewRepo *repomocks.MockReviewRepository) {
+				reviewRepo.On("GetAggregateReviewsForOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.ReviewAggregate{
+					TotalReviews:  0,
+					AverageRating: 0,
+					Breakdown:     []models.ReviewRatingCount{},
+				}, nil)
+			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				// No S3 calls expected when no pfp keys
 			},
@@ -663,6 +695,9 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 					Message: "Database error",
 				})
 			},
+			mockReviewSetup: func(reviewRepo *repomocks.MockReviewRepository) {
+				// No review calls expected on db error
+			},
 			mockS3Setup: func(m *s3mocks.S3ClientMock) {
 				// No S3 calls expected on error
 			},
@@ -676,12 +711,14 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			t.Parallel()
 			mockOrgRepo := new(repomocks.MockOrganizationRepository)
 			mockLocRepo := new(repomocks.MockLocationRepository)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
 			tt.mockSetup(mockOrgRepo, mockLocRepo)
+			tt.mockReviewSetup(mockReviewRepo)
 
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo, mockS3)
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
 			output, err := handler.GetAllOrganizations(context.TODO(), tt.pagination, mockS3)
 
 			if tt.wantErr {
@@ -693,6 +730,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			}
 
 			mockOrgRepo.AssertExpectations(t)
+			mockReviewRepo.AssertExpectations(t)
 			mockS3.AssertExpectations(t)
 		})
 	}
@@ -814,11 +852,12 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 
 			mockRepo := new(repomocks.MockOrganizationRepository)
 			mockLocationRepo := new(repomocks.MockLocationRepository)
+			mockReviewRepo := new(repomocks.MockReviewRepository)
 			tt.mockSetup(mockRepo)
 
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
-			handler := NewHandler(mockRepo, mockLocationRepo, mockS3)
+			handler := NewHandler(mockRepo, mockLocationRepo, mockReviewRepo, mockS3)
 			ctx := context.Background()
 
 			input := &models.GetEventOccurrencesByOrganizationIDInput{
