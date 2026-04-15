@@ -10,7 +10,9 @@
   "common": {
     "submit": "Submit",
     "cancel": "Cancel",
+    "close": "Close",
     "loading": "Loading...",
+    "saving": "Saving...",
     "loadingMapData": "Loading Map Data...",
     "loadingEvents": "Loading events...",
     "errorLoadingEvents": "Error loading events",
@@ -42,6 +44,7 @@
     "upcomingEvents": "upcoming events",
     "learnMore": "Learn More",
     "reserved": "Reserved",
+    "learnMore": "Learn More",
     "members": "members",
     "categories": {
       "technology": "technology",
@@ -129,9 +132,18 @@
     "title": "Payment",
     "manageBilling": "Manage Billing",
     "creditCard": "Credit Card",
+    "expires": "Expires",
     "name": "Name",
+    "save": "Save",
+    "noCard": "No Card Registered",
     "updateBilling": "Update Billing",
-    "delete": "Delete"
+    "delete": "Delete",
+    "deleteModal": {
+      "title": "Delete?",
+      "description": "Are you sure you want to delete this payment method?",
+      "confirm": "Confirm",
+      "deleting": "Deleting..."
+    }
   },
   "familyInformation": {
     "title": "Family Information",
@@ -159,7 +171,10 @@
     "deleteConfirm": "Are you sure you want to remove this child profile?",
     "requiredFieldsError": "Please fill in all required fields (Name, Birth Date, School ID)",
     "saveError": "Failed to save. Please try again.",
-    "deleteError": "Failed to delete."
+    "deleteError": "Failed to delete.",
+    "changeProfilePicture": "Change Profile Picture",
+    "avatarTabColors": "Colors",
+    "avatarTabAvatar": "Avatar"
   },
   "saved": {
     "title": "Saved",
@@ -179,6 +194,7 @@
     "writeReview": "Write a review",
     "firstReview": "Be the first to review!",
     "mostRecent": "Most recent",
+    "mostRated": "Most Rated",
     "highest": "Highest",
     "lowest": "Lowest",
     "reviews": "reviews",
@@ -241,7 +257,14 @@
     "notFound": "Event not found",
     "minWalk": "min",
     "hr": "hr",
-    "min": "min"
+    "min": "min",
+    "bookingsThisWeek": "Bookings this week",
+    "about": "About",
+    "reviews": "Reviews",
+    "more": "more",
+    "noReviews": "No reviews yet.",
+    "seeMoreReviews": "See more reviews",
+    "reserve": "Reserve"
   },
   "emergencyContact": {
     "manageTitle": "Manage Emergency Contact",
@@ -267,13 +290,20 @@
     "km": "km",
     "stars": "Stars"
   },
+  "activity": {
+    "activity": "Activity"
+  },
   "org": {
     "about": "About",
     "noDescription": "No description available.",
     "seeSchedule": "See Schedule",
+    "schedule": "Classes",
+    "class": "Class",
+    "noSchedule": "No upcoming classes for this organization.",
     "notFound": "Organization not found.",
     "bookingsThisWeek": "Bookings this week",
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "allClasses": "All Classes"
   },
   "interests": {
     "science": "Science",
@@ -292,5 +322,23 @@
     "username": "Username",
     "changeImage": "Change Image",
     "saveChanges": "Save Changes"
+  },
+  "occurrence": {
+    "smiles": "/ 5 Smiles",
+    "learnMore": "Learn more",
+    "reserve": "Reserve",
+    "ages": "Ages {{min}}",
+    "agesRange": "Ages {{min}} - {{max}}",
+    "classTime": "{{time}} Class"
+  },
+  "reservation": {
+    "paymentFailed": "Payment failed. Please try again or contact support.",
+    "completed": "Completed",
+    "selectChildLabel": "Select Child",
+    "noChildren": "No children found.",
+    "termsNote": "By clicking 'Pay Now', you authorize Skill Spark to charge your card for the total amount, plus applicable fees.",
+    "terms": "Terms & Conditions",
+    "payAndReserve": "Pay Now & Reserve",
+    "seeYouSoon": "See you soon!"
   }
 }

@@ -22,11 +22,13 @@ func (r *ChildRepository) CreateChild(ctx context.Context, child *models.CreateC
 		child.Body.BirthYear,
 		child.Body.Interests,
 		child.Body.GuardianID,
+		child.Body.AvatarFace,
+		child.Body.AvatarBackground,
 	)
 
 	var createdChild models.Child
 
-	err = row.Scan(&createdChild.ID, &createdChild.Name, &createdChild.SchoolID, &createdChild.SchoolName, &createdChild.BirthMonth, &createdChild.BirthYear, &createdChild.Interests, &createdChild.GuardianID, &createdChild.CreatedAt, &createdChild.UpdatedAt)
+	err = row.Scan(&createdChild.ID, &createdChild.Name, &createdChild.SchoolID, &createdChild.SchoolName, &createdChild.BirthMonth, &createdChild.BirthYear, &createdChild.Interests, &createdChild.GuardianID, &createdChild.AvatarFace, &createdChild.AvatarBackground, &createdChild.CreatedAt, &createdChild.UpdatedAt)
 
 	if err != nil {
 		err := errs.InternalServerError("Failed to create child: ", err.Error())

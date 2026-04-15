@@ -12,7 +12,7 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
       : null;
 
   return (
-    <View className="borderRadius: 24, overflow: 'hidden'">
+    <View className="rounded-3xl overflow-hidden">
       <Pressable
         onPress={() => router.push(`/event/${event.id}`)}
         className="mx-1 rounded-3xl overflow-hidden h-[188px]"

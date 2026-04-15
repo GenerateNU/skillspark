@@ -26,6 +26,8 @@ func (h *Handler) HandlePlatformWebhook(c *fiber.Ctx) error {
 	switch event.Type {
 	case "payment_intent.payment_failed":
 		return h.handlePaymentIntentFailed(c.Context(), event)
+	case "payment_method.attached":
+		return h.handlePaymentMethodAdditionSuccess(c.Context(), event)
 	default:
 		log.Printf("Unhandled platform event type: %s", event.Type)
 	}
@@ -60,5 +62,34 @@ func (h *Handler) handlePaymentIntentFailed(ctx context.Context, event stripe.Ev
 	}
 
 	log.Printf("Cancelled registration %s due to failed payment intent %s", registration.ID, pi.ID)
+	return nil
+}
+
+func (h *Handler) handlePaymentMethodAdditionSuccess(ctx context.Context, event stripe.Event) error {
+	method, err := unmarshalEvent[stripe.PaymentMethod](event)
+	if err != nil {
+		log.Printf("Failed to unmarshal payment_mehtod.attached: %v", err)
+		return err
+	}
+
+	customer := method.Customer
+	if customer == nil {
+		log.Printf("Payment method %s has no associated customer, skipping", method.ID)
+		return nil
+	}
+
+	existing, err := h.stripeClient.GetPaymentMethodsByCustomerID(ctx, customer.ID)
+
+	if err != nil {
+		return err
+	}
+
+	for _, pm := range existing.Body.PaymentMethods {
+		if pm.ID != method.ID {
+			if err := h.stripeClient.DetachPaymentMethod(ctx, pm.ID); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }

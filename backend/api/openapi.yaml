@@ -2412,6 +2412,28 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/stripe/detach:
+    delete:
+      tags:
+        - Payments
+      summary: Detach a payment method from a guardian
+      description: Detaches a Stripe payment method from a guardian's customer account
+      operationId: detach-guardian-payment-method
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DetachPaymentMethodInputBody'
+        required: true
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/stripe/login/{organization_id}:
     post:
       tags:
@@ -2689,6 +2711,10 @@ components:
           examples:
             - http://localhost:8080/schemas/Child.json
           readOnly: true
+        avatar_background:
+          type: string
+        avatar_face:
+          type: string
         birth_month:
           type: integer
           format: int64
@@ -2724,6 +2750,8 @@ components:
         - birth_year
         - interests
         - guardian_id
+        - avatar_face
+        - avatar_background
         - created_at
         - updated_at
     CreateChildInputBody:
@@ -2737,6 +2765,12 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateChildInputBody.json
           readOnly: true
+        avatar_background:
+          type: string
+          description: Background color hex for the child's avatar
+        avatar_face:
+          type: string
+          description: Avatar face identifier for the child's profile picture
         birth_month:
           type: integer
           description: Birth month of the child
@@ -3150,6 +3184,26 @@ components:
           description: Success message
       required:
         - message
+    DetachPaymentMethodInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DetachPaymentMethodInputBody.json
+          readOnly: true
+        guardian_id:
+          type: string
+          description: Guardian ID
+        payment_method_id:
+          type: string
+          description: Payment Method ID
+      required:
+        - payment_method_id
+        - guardian_id
     EmergencyContact:
       type: object
       additionalProperties: false
@@ -3831,6 +3885,24 @@ components:
       required:
         - href
         - label
+    OrgReviewSummary:
+      type: object
+      additionalProperties: false
+      properties:
+        average_rating:
+          type: number
+          format: double
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewRatingCount'
+        total_reviews:
+          type: integer
+          format: int64
+      required:
+        - total_reviews
+        - average_rating
+        - breakdown
     Organization:
       type: object
       additionalProperties: false
@@ -3863,6 +3935,8 @@ components:
           type: string
         presigned_url:
           type: string
+        review_summary:
+          $ref: '#/components/schemas/OrgReviewSummary'
         stripe_account_activated:
           type: boolean
           default: false
@@ -3876,10 +3950,8 @@ components:
         - name
         - active
         - links
-        - presigned_url
         - created_at
         - updated_at
-        - stripe_account_id
         - stripe_account_activated
     PatchManagerInputBody:
       type: object
@@ -4208,6 +4280,12 @@ components:
           examples:
             - http://localhost:8080/schemas/UpdateChildInputBody.json
           readOnly: true
+        avatar_background:
+          type: string
+          description: Background color hex for the child's avatar
+        avatar_face:
+          type: string
+          description: Avatar face identifier for the child's profile picture
         birth_month:
           type: integer
           description: Birth month of the child

@@ -14,7 +14,7 @@ export function RecommendedCard({
   const router = useRouter();
   return (
     <Pressable
-      onPress={() => router.push(`/event/${occurrence.id}`)}
+      onPress={() => router.push(`/event/${occurrence.event.id}`)}
       className="mr-5 items-center w-[79px]"
     >
       <View
