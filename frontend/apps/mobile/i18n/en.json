@@ -299,7 +299,8 @@
     "noSchedule": "No upcoming classes for this organization.",
     "notFound": "Organization not found.",
     "bookingsThisWeek": "Bookings this week",
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "allClasses": "All Classes"
   },
   "interests": {
     "science": "Science",

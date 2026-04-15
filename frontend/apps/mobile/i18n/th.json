@@ -298,7 +298,8 @@
     "noSchedule": "ไม่มีคลาสที่กำลังจะมาถึงสำหรับองค์กรนี้",
     "notFound": "ไม่พบองค์กร",
     "bookingsThisWeek": "การจองสัปดาห์นี้",
-    "reviews": "รีวิว"
+    "reviews": "รีวิว",
+    "allClasses": "ทุกคลาส"
   },
   "interests": {
     "science": "วิทยาศาสตร์",

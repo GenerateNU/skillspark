@@ -6,27 +6,31 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  useGetEventOccurrencesById,
-  useGetReviewByEventId,
-  useGetReviewAggregate,
-} from "@skillspark/api-client";
+import { useGetEventOccurrencesById } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
-import { StarRating } from "@/components/StarRating";
+import { AppColors, FontFamilies } from "@/constants/theme";
+import { RatingSmiley } from "@/components/RatingSmiley";
+import { BookmarkButton } from "@/components/BookmarkButton";
 import { useTranslation } from "react-i18next";
-import { ListItem } from "@/components/ListItem";
-import { AboutPage } from "@/components/AboutPage";
-import { useRouteInfo } from "expo-router/build/hooks";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-function formatAddress(occurrence: EventOccurrence) {
+function formatLocation(occurrence: EventOccurrence) {
   const loc = occurrence.location;
-  const parts = [loc.address_line1, loc.district].filter(Boolean);
+  const parts = [loc.district, loc.province].filter(Boolean);
   return parts.join(", ") || "Location";
 }
+
+const MOCK_REVIEW = {
+  avgRating: 4.5,
+  totalReviews: 140,
+  description:
+    "Absolutely love this! Quality is top-notch and it works exactly as described. Worth every penny.",
+  tags: ["Tag", "Tag", "Tag"],
+  timeAgo: "3d",
+};
 
 function EventOccurrenceDetail({
   occurrence,
@@ -34,363 +38,265 @@ function EventOccurrenceDetail({
   occurrence: EventOccurrence;
 }) {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { t: translate } = useTranslation();
+
   const location = formatLocation(occurrence);
   const categories = occurrence.event.category?.join(" / ") ?? "";
+  const orgId = occurrence.event.organization_id;
 
-  const { data: aggregateResp } = useGetReviewAggregate(occurrence.event.id);
-  const aggregate =
-    aggregateResp?.status === 200 ? aggregateResp.data : null;
-
-  const { data: reviewsResp } = useGetReviewByEventId(occurrence.event.id, {
-    page: 1,
-    page_size: 1,
-  });
-  const firstReview =
-    reviewsResp?.status === 200 ? reviewsResp.data[0] ?? null : null;
+  const cardShadow = {
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  };
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      {/* Header */}
       <View
-        className="flex-row items-center bg-white px-4 border-b"
-        style={{
-          marginTop: insets.top + 8,
-          marginBottom: insets.bottom - 20,
-          shadowColor: "#000",
-          shadowOpacity: 0.12,
-          shadowRadius: 20,
-        }}
+        className="flex-row items-center border-b px-4 pb-2.5 pt-3"
+        style={{ borderBottomColor: AppColors.divider }}
       >
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          contentContainerStyle={{ flexGrow: 1 }}
+        <TouchableOpacity
+          onPress={() => router.back()}
+          activeOpacity={0.7}
+          className="h-8 w-8 items-center justify-center"
         >
-          {/* Hero image */}
-          <View className="h-[250px] bg-[#1a1a1a]">
-            {occurrence.event.presigned_url ? (
-              <Image
-                source={{ uri: occurrence.event.presigned_url }}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="cover"
-              />
-            ) : (
-              <View className="flex-1 bg-[#C5C5C5]" />
-            )}
-            <TouchableOpacity
-              onPress={() => router.back()}
-              activeOpacity={0.7}
-              className="absolute top-4 left-4 z-10 flex-row items-center bg-white rounded-full px-4 py-2.5 elevation-10"
-            >
-              <MaterialIcons
-                name="chevron-left"
-                size={20}
-                color={AppColors.primaryText}
-              />
-              <Text
-                style={{
-                  fontSize: 26,
-                  fontFamily: FontFamilies.museoModerno,
-                  color: AppColors.primaryText,
-                  marginBottom: 2,
-                }}
-              >
-                {occurrence.event.title}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <IconSymbol
+            name="chevron.left"
+            size={28}
+            color={AppColors.primaryText}
+          />
+        </TouchableOpacity>
+        <Text
+          className="flex-1 text-center text-[16px] font-nunito-bold"
+          style={{ color: AppColors.primaryText }}
+          numberOfLines={1}
+        >
+          {translate("org.schedule")}
+        </Text>
+        <View className="w-8" />
+      </View>
 
-          {/* Content card */}
-          <View className="bg-white rounded-t-[28px] -mt-7 px-[22px] pb-6 elevation-2">
-            {/* Drag handle */}
-            <View
-              className="w-[38px] h-1 rounded-sm self-center mt-3 mb-3.5"
-              style={{ backgroundColor: AppColors.borderLight }}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 24 }}
+      >
+        {/* Hero image */}
+        <View
+          className="h-[250px]"
+          style={{ backgroundColor: AppColors.imagePlaceholder }}
+        >
+          {occurrence.event.presigned_url ? (
+            <Image
+              source={{ uri: occurrence.event.presigned_url }}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="cover"
             />
-            <View className="absolute -top-[5px] left-2.5">
-              <BookmarkButton eventId={occurrence.event.id} />
-            </View>
+          ) : null}
+        </View>
+
+        {/* White content card overlapping image */}
+        <View className="bg-white rounded-t-[28px] -mt-7 px-[22px] pb-6">
+          {/* Drag handle */}
+          <View
+            className="w-[38px] h-1 rounded-sm self-center mt-3 mb-3.5"
+            style={{ backgroundColor: AppColors.borderLight }}
+          />
+
+          {/* Title row with bookmark */}
+          <View className="flex-row items-start justify-between mb-3">
             <Text
-              className="text-[28px] font-bold tracking-tight mb-2"
-              style={{ color: AppColors.primaryText }}
+              className="flex-1 mr-3"
+              style={{
+                fontSize: 26,
+                fontFamily: FontFamilies.bold,
+                color: AppColors.primaryText,
+                lineHeight: 32,
+              }}
             >
               {occurrence.event.title}
             </Text>
-            <View className="flex-row items-center gap-1.5 mb-3.5">
-              <MaterialIcons
-                name="location-on"
-                size={16}
-                color={AppColors.primaryText}
-              />
-              <Text
-                style={{
-                  fontSize: FontSizes.base,
-                  color: AppColors.secondaryText,
-                  fontFamily: FontFamilies.regular,
-                  marginBottom: 5,
-                }}
-              >
-                {location}
-              </Text>
-              <StarRating size={17} />
-              <ListItem
-                label={translate("review.title")}
-                isLast
-                onPress={() =>
-                  router.push({
-                    pathname: `/event/[id]/reviews`,
-                    params: {
-                      id: occurrence.event.id,
-                      occurrenceId: occurrence.id,
-                      canReview: "true",
-                      eventName: occurrence.event.title,
-                      eventLocation: address,
-                      eventImageUrl: occurrence.event.presigned_url ?? "",
-                    },
-                  })
-                }
-              />
-            </View>
-            <AboutPage
-              description={occurrence.event.description}
-              links={occurrence.org_links ?? []}
+            <BookmarkButton eventId={occurrence.event.id} />
+          </View>
+
+          {/* Location */}
+          <View className="flex-row items-center gap-1.5 mb-2">
+            <MaterialIcons
+              name="location-on"
+              size={16}
+              color={AppColors.mutedText}
             />
-            <View className="flex-row items-center justify-between mt-2">
-              <View className="flex-row gap-2 flex-1 flex-wrap">
-                {occurrence.event.category?.map((cat) => (
-                  <View
-                    key={cat}
-                    className="border-[1.5px] rounded-full px-4 py-[7px]"
-                    style={{ borderColor: AppColors.borderLight }}
-                  >
-                    {categories}
-                  </Text>
-                </View>
-              )}
-              <View className="flex-row items-center gap-1.5">
-                <Text style={{ fontSize: FontSizes.base }}>🔥</Text>
+            <Text
+              className="text-[14px] font-nunito"
+              style={{ color: AppColors.mutedText }}
+            >
+              {location}
+            </Text>
+          </View>
+
+          {/* Category */}
+          {!!categories && (
+            <Text
+              className="text-[14px] font-nunito mb-2"
+              style={{ color: AppColors.mutedText }}
+            >
+              {categories}
+            </Text>
+          )}
+
+          {/* Bookings this week */}
+          <Text
+            className="text-[14px] font-nunito"
+            style={{ color: AppColors.primaryBlue }}
+          >
+            {occurrence.curr_enrolled}+ {translate("event.bookingsThisWeek")}
+          </Text>
+        </View>
+
+        {/* Reviews card */}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() =>
+            router.push({
+              pathname: "/event/[id]/reviews",
+              params: {
+                id: occurrence.event.id,
+                occurrenceId: occurrence.id,
+                canReview: "true",
+                eventName: occurrence.event.title,
+                eventLocation: location,
+                eventImageUrl: occurrence.event.presigned_url ?? "",
+              },
+            })
+          }
+        >
+          <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardShadow}>
+            {/* Title */}
+            <Text
+              className="mb-3 font-nunito-bold"
+              style={{ fontSize: 18, color: AppColors.primaryText }}
+            >
+              {translate("event.reviews")}
+            </Text>
+
+            {/* Rating + review row */}
+            <View className="flex-row gap-4">
+              {/* Left: score, smiley, count */}
+              <View className="items-center" style={{ width: 64 }}>
                 <Text
-                  style={{
-                    fontSize: FontSizes.base,
-                    color: AppColors.primaryBlue,
-                    fontFamily: FontFamilies.semiBold,
-                  }}
+                  className="font-nunito-bold"
+                  style={{ fontSize: 42, lineHeight: 46, color: AppColors.primaryText }}
                 >
-                  {occurrence.curr_enrolled}+{" "}
-                  {translate("event.bookingsThisWeek")}
+                  {MOCK_REVIEW.avgRating.toFixed(1)}
+                </Text>
+                <RatingSmiley
+                  rating={Math.round(MOCK_REVIEW.avgRating)}
+                  width={40}
+                  height={40}
+                />
+                <Text
+                  className="font-nunito mt-1"
+                  style={{ fontSize: 13, color: AppColors.subtleText }}
+                >
+                  ({MOCK_REVIEW.totalReviews})
                 </Text>
               </View>
-            </View>
-          </View>
 
-          {/* Divider */}
-          <View
-            className="border-b"
-            style={{ borderColor: AppColors.borderLight }}
-          />
-
-          {/* Bottom section */}
-          <View
-            className="flex-1 bg-white px-[22px] pt-[22px] pb-7 elevation-2"
-            style={{
-              shadowColor: "#000",
-              shadowOpacity: 0.06,
-              shadowRadius: 12,
-            }}
-          >
-            <View className="flex-row items-center justify-between mb-[22px]">
-              <Text
-                className="text-[30px] font-bold tracking-tight"
-                style={{ color: AppColors.primaryText }}
-              >
-                {duration}
-              </Text>
-              <View className="flex-row items-center gap-[5px] bg-[#F3F4F6] rounded-full px-3 py-[7px]">
-                <MaterialIcons
-                  name="directions-walk"
-                  size={14}
-                  color={AppColors.secondaryText}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                className="w-9 h-9 rounded-full border-2 items-center justify-center"
-                style={{ borderColor: AppColors.borderLight }}
-              >
-                <IconSymbol
-                  name="square.and.arrow.up"
-                  size={18}
-                  color={AppColors.secondaryText}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-        <View
-          className="mt-2 mb-3 p-5"
-          style={{
-            marginHorizontal: 15,
-            backgroundColor: AppColors.white,
-            borderRadius: 32,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.08,
-            shadowRadius: 8,
-            elevation: 3,
-          }}
-        >
-          {(() => {
-            const hasReviews = !!aggregate && aggregate.total_reviews > 0;
-            if (!aggregate) return null;
-            return (
-              <>
-                <View className="flex-row gap-3">
-                  <View style={{ width: 90, alignItems: "center" }}>
-                    <Text
-                      style={{
-                        fontSize: 22,
-                        fontFamily: FontFamilies.bold,
-                        color: AppColors.primaryText,
-                        marginBottom: 2,
-                        textAlign: "center",
-                      }}
+              {/* Right: description, tags, footer */}
+              <View className="flex-1">
+                <Text
+                  className="text-sm leading-[20px] mb-2"
+                  style={{
+                    color: AppColors.primaryText,
+                    fontFamily: FontFamilies.regular,
+                  }}
+                >
+                  {MOCK_REVIEW.description}
+                </Text>
+                <View className="flex-row flex-wrap gap-1.5 mb-2">
+                  {MOCK_REVIEW.tags.map((tag, i) => (
+                    <View
+                      key={i}
+                      className="rounded-xl px-3 py-1"
+                      style={{ backgroundColor: "#E9D5FF" }}
                     >
-                      {translate("event.reviews")}
-                    </Text>
-                    <Text
-                      className="text-[42px] font-nunito-bold text-[#111] leading-[46px] text-center"
-                    >
-                      {aggregate.average_rating.toFixed(1)}
-                    </Text>
-                    <StarRating
-                      rating={Math.round(aggregate.average_rating)}
-                      size={13}
-                      filledColor={AppColors.primaryText}
-                    />
-                    <Text
-                      style={{
-                        fontSize: FontSizes.sm,
-                        color: AppColors.mutedText,
-                        fontFamily: FontFamilies.regular,
-                        marginTop: 4,
-                        textAlign: "center",
-                      }}
-                    >
-                      ({aggregate.total_reviews})
-                    </Text>
-                  </View>
-                  {hasReviews && firstReview && (
-                    <View className="justify-start px-0.5 pt-1">
-                      <Image
-                        source={require("@/assets/images/faces.png")}
-                        className="w-[38px] h-[38px] rounded-full"
-                        contentFit="cover"
-                      />
-                    </View>
-                  )}
-                  {hasReviews && firstReview && (
-                    <View className="flex-1">
                       <Text
+                        className="text-[12px]"
                         style={{
-                          fontSize: FontSizes.lg,
-                          color: AppColors.primaryText,
+                          color: AppColors.secondaryText,
                           fontFamily: FontFamilies.regular,
-                          lineHeight: 24,
-                          marginBottom: 12,
                         }}
                       >
-                        {firstReview.description}
+                        {tag}
                       </Text>
-                      {firstReview.categories?.length > 0 && (
-                        <View className="flex-row gap-2 flex-wrap mb-3">
-                          {firstReview.categories.map((cat) => (
-                            <View
-                              key={cat}
-                              className="rounded-xl px-4 py-1.5"
-                              style={{ backgroundColor: "#BFCFEA" }}
-                            >
-                              <Text
-                                style={{
-                                  fontSize: FontSizes.base,
-                                  color: AppColors.secondaryText,
-                                  fontFamily: FontFamilies.regular,
-                                }}
-                              >
-                                {cat}
-                              </Text>
-                            </View>
-                          ))}
-                        </View>
-                      )}
-                      <View className="flex-row items-center justify-between">
-                        <Text
-                          style={{
-                            fontSize: FontSizes.base,
-                            color: AppColors.primaryText,
-                            fontFamily: FontFamilies.regular,
-                            fontStyle: "italic",
-                          }}
-                        >
-                          Anonymous
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: FontSizes.base,
-                            color: AppColors.primaryText,
-                            fontFamily: FontFamilies.regular,
-                          }}
-                        >
-                          {formatRelativeTime(firstReview.created_at)}
-                        </Text>
-                      </View>
                     </View>
-                  )}
+                  ))}
                 </View>
-                {hasReviews && (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    className="items-center mt-5"
-                    onPress={() => {}}
+                <View className="flex-row items-center justify-between">
+                  <Text
+                    className="text-[12px]"
+                    style={{
+                      color: AppColors.primaryText,
+                      fontFamily: FontFamilies.regular,
+                      fontStyle: "italic",
+                    }}
                   >
-                    <Text
-                      style={{
-                        fontSize: FontSizes.base,
-                        color: AppColors.primaryText,
-                        fontFamily: FontFamilies.regular,
-                      }}
-                    >
-                      {translate("event.seeMoreReviews")}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </>
-            );
-          })()}
-        </View>
-        <View
-          className="px-4"
-          style={{ paddingTop: 4, paddingBottom: insets.bottom + 10 }}
-        >
+                    {translate("review.anonymous")}
+                  </Text>
+                  <Text
+                    className="text-[12px]"
+                    style={{
+                      color: AppColors.mutedText,
+                      fontFamily: FontFamilies.regular,
+                    }}
+                  >
+                    {MOCK_REVIEW.timeAgo}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* See more */}
+            <View className="mt-4 items-center">
+              <Text
+                className="text-[13px] font-nunito"
+                style={{
+                  color: AppColors.primaryText,
+                  textDecorationLine: "underline",
+                }}
+              >
+                {translate("event.seeMoreReviews")}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        {/* Reserve button */}
+        <View className="px-4 pb-2 pt-1">
           <TouchableOpacity
             activeOpacity={0.85}
             className="w-full items-center rounded-full py-4"
-            style={{ backgroundColor: AppColors.primaryText }}
-            onPress={() => {}}
+            style={{ backgroundColor: AppColors.checkboxSelected }}
+            onPress={() =>
+              router.navigate({
+                pathname: "/org/[id]/schedule",
+                params: {
+                  id: orgId,
+                  filterClass: occurrence.event.title,
+                },
+              })
+            }
           >
-            <Text
-              style={{
-                color: AppColors.white,
-                fontSize: 17,
-                fontFamily: FontFamilies.bold,
-              }}
-            >
+            <Text className="text-[17px] font-nunito-bold text-white">
               {translate("event.reserve")}
             </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
