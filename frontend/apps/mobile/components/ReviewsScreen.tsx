@@ -13,6 +13,7 @@ import {
   Review,
   ReviewAggregate,
   useGetRegistrationsByGuardianId,
+  useGetReviewByEventId,
 } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -34,10 +35,8 @@ interface QueryResult<T> {
 
 interface ReviewsScreenProps<
   TAggregate extends { status: number; data: unknown },
-  TReviews extends { status: number; data: unknown },
 > {
   useGetAggregate: (id: string) => QueryResult<TAggregate>;
-  useGetReviews: (id: string) => QueryResult<TReviews>;
   /** When true, shows the rating smileys and write-a-review CTA */
   canReview?: boolean;
   /** Event occurrence ID, used to look up the guardian's registration */
@@ -49,16 +48,14 @@ interface ReviewsScreenProps<
 
 export default function ReviewsScreen<
   TAggregate extends { status: number; data: unknown },
-  TReviews extends { status: number; data: unknown },
 >({
   useGetAggregate,
-  useGetReviews,
   canReview = false,
   occurrenceId,
   eventName = "",
   eventLocation = "",
   eventImageUrl,
-}: ReviewsScreenProps<TAggregate, TReviews>) {
+}: ReviewsScreenProps<TAggregate>) {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const theme = Colors.light;
@@ -73,17 +70,19 @@ export default function ReviewsScreen<
     undefined,
   );
 
+  const [sortBy, setSortBy] = useState<"most_recent" | "highest" | "lowest">(
+    "most_recent",
+  );
+
   const {
     data: aggregateResponse,
     isLoading: aggregateIsLoading,
     error: aggregateError,
   } = useGetAggregate(id ?? "");
 
-  const {
-    data: reviewsResponse,
-    isLoading: reviewsIsLoading,
-    error: reviewsError,
-  } = useGetReviews(id ?? "");
+  const reviewParams = useMemo(() => ({ sort_by: sortBy }), [sortBy]);
+
+  const reviewsQuery = useGetReviewByEventId(id ?? "", reviewParams);
 
   const { data: registrationsResp } = useGetRegistrationsByGuardianId(
     guardianId ?? "",
@@ -106,7 +105,7 @@ export default function ReviewsScreen<
     return <ErrorScreen message={translate("common.noEventId")} />;
   }
 
-  if (aggregateIsLoading || reviewsIsLoading) {
+  if (aggregateIsLoading || reviewsQuery.isLoading) {
     return (
       <View className="flex-1 items-center justify-center gap-2">
         <ActivityIndicator size="large" />
@@ -115,7 +114,7 @@ export default function ReviewsScreen<
     );
   }
 
-  if (aggregateError || reviewsError) {
+  if (aggregateError || reviewsQuery.error) {
     return (
       <View className="flex-1 items-center justify-center p-4">
         <ThemedText className="text-red-500 font-semibold">
@@ -134,7 +133,7 @@ export default function ReviewsScreen<
     );
   }
 
-  if (!reviewsResponse || reviewsResponse.status !== 200) {
+  if (!reviewsQuery.data || reviewsQuery.data.status !== 200) {
     return (
       <View className="flex-1 items-center justify-center p-4">
         <ThemedText>{translate("common.noReviewsAvailable")}</ThemedText>
@@ -143,7 +142,7 @@ export default function ReviewsScreen<
   }
 
   const aggregate = aggregateResponse.data as ReviewAggregate;
-  const reviews = reviewsResponse.data as Review[];
+  const reviews = reviewsQuery.data.data as Review[];
 
   return (
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
@@ -214,12 +213,13 @@ export default function ReviewsScreen<
 
         {aggregate.total_reviews > 0 && (
           <FilterTabs
+            value={sortBy}
             options={[
               { label: translate("review.mostRecent"), value: "most_recent" },
               { label: translate("review.highest"), value: "highest" },
               { label: translate("review.lowest"), value: "lowest" },
             ]}
-            onChange={(value) => {}}
+            onChange={setSortBy}
           />
         )}
 

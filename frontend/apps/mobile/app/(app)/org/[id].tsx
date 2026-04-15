@@ -12,12 +12,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
 import type { Location, Organization } from "@skillspark/api-client";
+import { SvgXml } from "react-native-svg";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { AppColors } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { useTranslation } from "react-i18next";
+import { EMPTY_FACE_SVG } from "@/constants/avatarFaces";
+import { RatingSmiley } from "@/components/RatingSmiley";
 
 function OrgDetail({
   org,
@@ -107,15 +110,6 @@ function OrgDetail({
                   {location.district}, {location.province}
                 </Text>
               )}
-              <View className="flex-row items-center gap-1.5">
-                <Text className="text-[14px]">🔥</Text>
-                <Text
-                  className="text-[14px] font-nunito"
-                  style={{ color: AppColors.mutedText }}
-                >
-                  100+ {translate("org.bookingsThisWeek")}
-                </Text>
-              </View>
             </View>
             <TouchableOpacity
               activeOpacity={0.7}
@@ -196,28 +190,43 @@ function OrgDetail({
           activeOpacity={0.8}
           onPress={() => router.push(`/org/${org.id}/reviews`)}
         >
-        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardStyle}>
-          <Text className="mb-3 text-[18px] font-nunito-bold">
-            {translate("org.reviews")}
-          </Text>
-          <View className="flex-row items-center gap-4">
-            <Text className="text-[42px] font-nunito-bold leading-[46px]">
-              4.5
+          <View
+            className="mx-4 mb-4 rounded-2xl bg-white p-5"
+            style={cardStyle}
+          >
+            <Text className="mb-4 text-[24px] font-nunito-bold">
+              {translate("org.reviews")}
             </Text>
-            <View className="items-start">
-              <Image
-                source={require("@/assets/images/faces.png")}
-                className="h-10 w-[140px]"
-              />
-              <Text
-                className="mt-1 text-[13px] font-nunito"
-                style={{ color: AppColors.subtleText }}
-              >
-                (140)
-              </Text>
-            </View>
+            {org.review_summary && org.review_summary.total_reviews > 0 ? (
+              <View className="flex-row items-center justify-center">
+                <View className="flex-1 items-center">
+                  <RatingSmiley
+                    rating={org.review_summary.average_rating}
+                    width={80}
+                    height={80}
+                  />
+                </View>
+                <View className="flex-1 items-center">
+                  <Text className="text-[36px] font-nunito-bold leading-[44px]">
+                    {org.review_summary.average_rating.toFixed(1)}
+                  </Text>
+                  <Text
+                    className="text-[13px] font-nunito"
+                    style={{ color: AppColors.subtleText }}
+                  >
+                    ({org.review_summary.total_reviews})
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View className="flex-row items-center gap-3 py-4 justify-center">
+                <SvgXml xml={EMPTY_FACE_SVG} width={36} height={36} />
+                <Text className="text-[16px] font-nunito">
+                  {translate("review.firstReview")}
+                </Text>
+              </View>
+            )}
           </View>
-        </View>
         </TouchableOpacity>
 
         {/* See Schedule CTA */}
@@ -243,12 +252,12 @@ export default function OrgScreen() {
   const { data: response, isLoading, error } = useGetOrganization(id);
   const { t: translate } = useTranslation();
   const { data: locationResponse } = useGetLocationById(
-    response?.status === 200 ? response.data.location_id ?? "" : "",
+    response?.status === 200 ? (response.data.location_id ?? "") : "",
     {
       query: {
         enabled: response?.status === 200 && !!response.data.location_id,
       },
-    }
+    },
   );
 
   if (isLoading) {

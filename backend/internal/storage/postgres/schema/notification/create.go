@@ -23,6 +23,7 @@ func (r *NotificationRepository) CreateScheduledNotification(ctx context.Context
 		input.Metadata,
 		input.ScheduledFor,
 		models.NotificationStatusPending,
+		input.GuardianID,
 	)
 
 	var notification models.Notification
@@ -38,6 +39,7 @@ func (r *NotificationRepository) CreateScheduledNotification(ctx context.Context
 		&notification.ScheduledFor,
 		&notification.SentAt,
 		&notification.Status,
+		&notification.GuardianID,
 		&notification.CreatedAt,
 		&notification.UpdatedAt,
 	)

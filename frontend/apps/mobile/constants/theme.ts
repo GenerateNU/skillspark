@@ -62,6 +62,7 @@ export const FontFamilies = {
   medium: "NunitoSans_500Medium",
   semiBold: "NunitoSans_600SemiBold",
   bold: "NunitoSans_700Bold",
+  museoModerno: "MuseoModerno_700Bold",
 };
 
 export const FontSizes = {

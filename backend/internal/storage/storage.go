@@ -70,6 +70,7 @@ type GuardianRepository interface {
 	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
 	SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string) (*models.Guardian, error)
 	DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error)
+	GetGuardianNotificationPreferences(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]models.GuardianNotificationPreferences, error)
 }
 
 type EventRepository interface {
@@ -113,11 +114,12 @@ type RegistrationRepository interface {
 type ReviewRepository interface {
 	CreateReview(ctx context.Context, input *models.CreateReviewDBInput) (*models.Review, error)
 	GetReviewsByGuardianID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
-	GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
+	GetReviewsByEventID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination, sortBy string) ([]models.Review, error)
 	GetReviewsByOrganizationID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error)
 	DeleteReview(ctx context.Context, id uuid.UUID) error
 	GetAggregateReviews(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
 	GetAggregateReviewsForOrganization(ctx context.Context, id uuid.UUID) (*models.ReviewAggregate, error)
+	GetEventReviewsForOrganization(ctx context.Context, id uuid.UUID, pagination utils.Pagination, AcceptLanguage string, sortBy string) ([]models.SimpleReviewAggregate, error)
 }
 
 type UserRepository interface {

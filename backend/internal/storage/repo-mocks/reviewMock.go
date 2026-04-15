@@ -35,8 +35,8 @@ func (m *MockReviewRepository) GetReviewsByGuardianID(ctx context.Context, id uu
 	return args.Get(0).([]models.Review), args.Error(1)
 }
 
-func (m *MockReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.UUID, acceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
-	args := m.Called(ctx, id, acceptLanguage, pagination)
+func (m *MockReviewRepository) GetReviewsByEventID(ctx context.Context, id uuid.UUID, acceptLanguage string, pagination utils.Pagination, sortBy string) ([]models.Review, error) {
+	args := m.Called(ctx, id, acceptLanguage, pagination, sortBy)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil
@@ -82,4 +82,24 @@ func (m *MockReviewRepository) GetAggregateReviewsForOrganization(ctx context.Co
 		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.ReviewAggregate), args.Error(1)
+}
+
+func (m *MockReviewRepository) GetEventReviewsForOrganization(
+	ctx context.Context,
+	id uuid.UUID,
+	pagination utils.Pagination,
+	AcceptLanguage string,
+	sortBy string,
+) ([]models.SimpleReviewAggregate, error) {
+
+	args := m.Called(ctx, id, pagination, AcceptLanguage, sortBy)
+
+	if args.Get(0) == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Error(1)
+	}
+
+	return args.Get(0).([]models.SimpleReviewAggregate), args.Error(1)
 }
