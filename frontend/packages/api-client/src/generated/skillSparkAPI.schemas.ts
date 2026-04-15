@@ -962,27 +962,27 @@ limit?: number;
 };
 
 export type GetEventReviewsForOrganizationParams = {
-  /**
-   * Page number (starts at 1)
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * Number of items per page
-   * @minimum 1
-   * @maximum 100
-   */
-  page_size?: number;
-  sort_by?: GetEventReviewsForOrganizationSortBy;
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+sort_by?: GetEventReviewsForOrganizationSortBy;
 };
 
-export type GetEventReviewsForOrganizationSortBy =
-  (typeof GetEventReviewsForOrganizationSortBy)[keyof typeof GetEventReviewsForOrganizationSortBy];
+export type GetEventReviewsForOrganizationSortBy = typeof GetEventReviewsForOrganizationSortBy[keyof typeof GetEventReviewsForOrganizationSortBy];
+
 
 export const GetEventReviewsForOrganizationSortBy = {
-  most_rated: "most_rated",
-  highest: "highest",
-  lowest: "lowest",
+  most_rated: 'most_rated',
+  highest: 'highest',
+  lowest: 'lowest',
 } as const;
 
 export type ListOrganizationsParams = {
@@ -1043,30 +1043,30 @@ max_date?: string;
 };
 
 export type GetReviewByEventIdParams = {
-  /**
-   * Page number (starts at 1)
-   * @minimum 1
-   */
-  page?: number;
-  /**
-   * Number of items per page
-   * @minimum 1
-   * @maximum 100
-   */
-  page_size?: number;
-  /**
-   * Sort order for reviews
-   */
-  sort_by?: GetReviewByEventIdSortBy;
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+/**
+ * Sort order for reviews
+ */
+sort_by?: GetReviewByEventIdSortBy;
 };
 
-export type GetReviewByEventIdSortBy =
-  (typeof GetReviewByEventIdSortBy)[keyof typeof GetReviewByEventIdSortBy];
+export type GetReviewByEventIdSortBy = typeof GetReviewByEventIdSortBy[keyof typeof GetReviewByEventIdSortBy];
+
 
 export const GetReviewByEventIdSortBy = {
-  most_recent: "most_recent",
-  highest: "highest",
-  lowest: "lowest",
+  most_recent: 'most_recent',
+  highest: 'highest',
+  lowest: 'lowest',
 } as const;
 
 export type GetReviewByGuardianIdParams = {
