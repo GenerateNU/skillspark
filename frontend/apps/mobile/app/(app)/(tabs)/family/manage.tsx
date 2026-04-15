@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {
-  View,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
-  Pressable,
+	View,
+	TouchableOpacity,
+	Alert,
+	ScrollView,
+	KeyboardAvoidingView,
+	Platform,
+	Keyboard,
+	Pressable,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,10 +17,10 @@ import { Colors, AppColors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  useCreateChild,
-  useUpdateChild,
-  useDeleteChild,
-  getGetChildrenByGuardianIdQueryKey,
+	useCreateChild,
+	useUpdateChild,
+	useDeleteChild,
+	getGetChildrenByGuardianIdQueryKey,
 } from "@skillspark/api-client";
 import { ChildProfileForm, MONTHS } from "@/components/ChildProfileForm";
 import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
@@ -32,239 +32,239 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 
 export default function ManageChildScreen() {
-  const router = useRouter();
-  const params = useLocalSearchParams();
-  const insets = useSafeAreaInsets();
-  const theme = Colors.light;
-  const { guardianId } = useAuthContext();
+	const router = useRouter();
+	const params = useLocalSearchParams();
+	const insets = useSafeAreaInsets();
+	const theme = Colors.light;
+	const { guardianId } = useAuthContext();
 
-  const { t: translate } = useTranslation();
-  const isEditing = !!params.id;
+	const { t: translate } = useTranslation();
+	const isEditing = !!params.id;
 
-  const [firstName, setFirstName] = useState(
-    params.name ? (params.name as string).split(" ")[0] : "",
-  );
-  const [lastName, setLastName] = useState(
-    params.name ? (params.name as string).split(" ").slice(1).join(" ") : "",
-  );
+	const [firstName, setFirstName] = useState(
+		params.name ? (params.name as string).split(" ")[0] : "",
+	);
+	const [lastName, setLastName] = useState(
+		params.name ? (params.name as string).split(" ").slice(1).join(" ") : "",
+	);
 
-  const initialMonthStr = params.birth_month
-    ? MONTHS[parseInt(params.birth_month as string) - 1]
-    : "";
+	const initialMonthStr = params.birth_month
+		? MONTHS[parseInt(params.birth_month as string) - 1]
+		: "";
 
-  const [birthMonth, setBirthMonth] = useState(initialMonthStr);
-  const [birthYear, setBirthYear] = useState(
-    (params.birth_year as string) || "",
-  );
-  const [schoolId, setSchoolId] = useState((params.school_id as string) || "");
+	const [birthMonth, setBirthMonth] = useState(initialMonthStr);
+	const [birthYear, setBirthYear] = useState(
+		(params.birth_year as string) || "",
+	);
+	const [schoolId, setSchoolId] = useState((params.school_id as string) || "");
 
-  const initialInterests = Array.isArray(params.interests)
-    ? params.interests
-    : params.interests
-      ? (params.interests as string)
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [];
-  const [interests, setInterests] = useState<string[]>(initialInterests);
+	const initialInterests = Array.isArray(params.interests)
+		? params.interests
+		: params.interests
+			? (params.interests as string)
+					.split(",")
+					.map((s) => s.trim())
+					.filter(Boolean)
+			: [];
+	const [interests, setInterests] = useState<string[]>(initialInterests);
 
-  const [avatarFace, setAvatarFace] = useState<string | null>(
-    (params.avatar_face as string) || null,
-  );
-  const [avatarBackground, setAvatarBackground] = useState(
-    (params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
-  );
+	const [avatarFace, setAvatarFace] = useState<string | null>(
+		(params.avatar_face as string) || null,
+	);
+	const [avatarBackground, setAvatarBackground] = useState(
+		(params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
+	);
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showMonthDrop, setShowMonthDrop] = useState(false);
-  const [showYearDrop, setShowYearDrop] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [showMonthDrop, setShowMonthDrop] = useState(false);
+	const [showYearDrop, setShowYearDrop] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const queryClient = useQueryClient();
-  const createChildMutation = useCreateChild();
-  const updateChildMutation = useUpdateChild();
-  const deleteChildMutation = useDeleteChild();
+	const queryClient = useQueryClient();
+	const createChildMutation = useCreateChild();
+	const updateChildMutation = useUpdateChild();
+	const deleteChildMutation = useDeleteChild();
 
-  if (!guardianId) {
-    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
-  }
+	if (!guardianId) {
+		return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+	}
 
-  const handleSave = async () => {
-    if (!firstName || !birthYear || !birthMonth || !schoolId) {
-      Alert.alert(
-        translate("common.error"),
-        translate("childProfile.requiredFieldsError"),
-      );
-      return;
-    }
-    const name = [firstName, lastName].filter(Boolean).join(" ");
-    setIsSubmitting(true);
-    try {
-      const childData = {
-        name,
-        birth_year: parseInt(birthYear, 10),
-        birth_month: MONTHS.indexOf(birthMonth) + 1,
-        guardian_id: guardianId,
-        school_id: schoolId,
-        interests,
-        avatar_face: avatarFace ?? undefined,
-        avatar_background: avatarBackground || DEFAULT_AVATAR_COLOR,
-      };
-      if (isEditing) {
-        await updateChildMutation.mutateAsync({
-          id: params.id as string,
-          data: childData,
-        });
-      } else {
-        await createChildMutation.mutateAsync({ data: childData });
-      }
-      await queryClient.invalidateQueries({
-        queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
-      });
-      router.back();
-    } catch (error) {
-      console.error(error);
-      Alert.alert(
-        translate("common.errorOccurred"),
-        translate("childProfile.saveError") + " " + JSON.stringify(error),
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+	const handleSave = async () => {
+		if (!firstName || !birthYear || !birthMonth || !schoolId) {
+			Alert.alert(
+				translate("common.error"),
+				translate("childProfile.requiredFieldsError"),
+			);
+			return;
+		}
+		const name = [firstName, lastName].filter(Boolean).join(" ");
+		setIsSubmitting(true);
+		try {
+			const childData = {
+				name,
+				birth_year: parseInt(birthYear, 10),
+				birth_month: MONTHS.indexOf(birthMonth) + 1,
+				guardian_id: guardianId,
+				school_id: schoolId,
+				interests,
+				avatar_face: avatarFace ?? undefined,
+				avatar_background: avatarBackground || DEFAULT_AVATAR_COLOR,
+			};
+			if (isEditing) {
+				await updateChildMutation.mutateAsync({
+					id: params.id as string,
+					data: childData,
+				});
+			} else {
+				await createChildMutation.mutateAsync({ data: childData });
+			}
+			await queryClient.invalidateQueries({
+				queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
+			});
+			router.back();
+		} catch (error) {
+			console.error(error);
+			Alert.alert(
+				translate("common.errorOccurred"),
+				translate("childProfile.saveError") + " " + JSON.stringify(error),
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
 
-  const handleAvatarPress = () => {
-    setPendingAvatarCallback(({ face, background }) => {
-      setAvatarFace(face);
-      setAvatarBackground(background);
-    });
-    const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
-    router.push({
-      pathname: "/(app)/(tabs)/family/avatar-picker",
-      params: {
-        avatarFace: avatarFace ?? "",
-        avatarBackground,
-        childName,
-      },
-    });
-  };
+	const handleAvatarPress = () => {
+		setPendingAvatarCallback(({ face, background }) => {
+			setAvatarFace(face);
+			setAvatarBackground(background);
+		});
+		const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
+		router.push({
+			pathname: "./(app)/(tabs)/family/avatar-picker",
+			params: {
+				avatarFace: avatarFace ?? "",
+				avatarBackground,
+				childName,
+			},
+		});
+	};
 
-  const handleDelete = () => {
-    Alert.alert(
-      translate("childProfile.deleteProfile"),
-      translate("childProfile.deleteConfirm"),
-      [
-        { text: translate("common.cancel"), style: "cancel" },
-        {
-          text: translate("payment.delete"),
-          style: "destructive",
-          onPress: async () => {
-            setIsSubmitting(true);
-            try {
-              await deleteChildMutation.mutateAsync({
-                id: params.id as string,
-              });
-              await queryClient.invalidateQueries({
-                queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
-              });
-              router.back();
-            } catch {
-              Alert.alert(
-                translate("common.errorOccurred"),
-                translate("childProfile.deleteError"),
-              );
-              setIsSubmitting(false);
-            }
-          },
-        },
-      ],
-    );
-  };
+	const handleDelete = () => {
+		Alert.alert(
+			translate("childProfile.deleteProfile"),
+			translate("childProfile.deleteConfirm"),
+			[
+				{ text: translate("common.cancel"), style: "cancel" },
+				{
+					text: translate("payment.delete"),
+					style: "destructive",
+					onPress: async () => {
+						setIsSubmitting(true);
+						try {
+							await deleteChildMutation.mutateAsync({
+								id: params.id as string,
+							});
+							await queryClient.invalidateQueries({
+								queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
+							});
+							router.back();
+						} catch {
+							Alert.alert(
+								translate("common.errorOccurred"),
+								translate("childProfile.deleteError"),
+							);
+							setIsSubmitting(false);
+						}
+					},
+				},
+			],
+		);
+	};
 
-  return (
-    <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
-      <Stack.Screen options={{ headerShown: false }} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-        keyboardVerticalOffset={0}
-      >
-        <ScrollView
-          contentContainerStyle={{
-            paddingHorizontal: 20,
-            paddingBottom: insets.bottom + 80,
-            paddingTop: 10,
-          }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Pressable onPress={Keyboard.dismiss}>
-            <View className="flex-row items-center justify-between mb-6">
-              <TouchableOpacity
-                onPress={() => router.back()}
-                className="w-8 h-8 justify-center items-start"
-              >
-                <IconSymbol name="chevron.left" size={24} color={theme.text} />
-              </TouchableOpacity>
-              <ThemedText className="text-xl text-center font-nunito-bold">
-                {translate("familyInformation.title")}
-              </ThemedText>
-              {isEditing ? (
-                <TouchableOpacity onPress={handleDelete}>
-                  <ThemedText
-                    className="font-nunito-semibold"
-                    style={{ color: AppColors.danger }}
-                  >
-                    {translate("payment.delete")}
-                  </ThemedText>
-                </TouchableOpacity>
-              ) : (
-                <View className="w-10" />
-              )}
-            </View>
-            <ThemedText className="text-[22px] font-nunito-semibold mb-5">
-              {isEditing
-                ? translate("childProfile.editTitle")
-                : translate("childProfile.createTitle")}
-            </ThemedText>
-            <ChildProfileForm
-              firstName={firstName}
-              setFirstName={setFirstName}
-              lastName={lastName}
-              setLastName={setLastName}
-              birthMonth={birthMonth}
-              setBirthMonth={setBirthMonth}
-              birthYear={birthYear}
-              setBirthYear={setBirthYear}
-              schoolId={schoolId}
-              setSchoolId={setSchoolId}
-              interests={interests}
-              setInterests={setInterests}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              showMonthDrop={showMonthDrop}
-              setShowMonthDrop={setShowMonthDrop}
-              showYearDrop={showYearDrop}
-              setShowYearDrop={setShowYearDrop}
-              avatarFace={avatarFace}
-              avatarBackground={avatarBackground}
-              onAvatarPress={handleAvatarPress}
-            />
-            <TouchableOpacity
-              className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
-              style={{ backgroundColor: theme.tint }}
-              onPress={handleSave}
-              disabled={isSubmitting}
-            >
-              <ThemedText className="text-white text-base font-nunito-semibold">
-                {isSubmitting
-                  ? translate("childProfile.saving")
-                  : translate("childProfile.saveChanges")}
-              </ThemedText>
-            </TouchableOpacity>
-          </Pressable>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </ThemedView>
-  );
+	return (
+		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+			<Stack.Screen options={{ headerShown: false }} />
+			<KeyboardAvoidingView
+				behavior={Platform.OS === "ios" ? "padding" : "height"}
+				className="flex-1"
+				keyboardVerticalOffset={0}
+			>
+				<ScrollView
+					contentContainerStyle={{
+						paddingHorizontal: 20,
+						paddingBottom: insets.bottom + 80,
+						paddingTop: 10,
+					}}
+					showsVerticalScrollIndicator={false}
+					keyboardShouldPersistTaps="handled"
+				>
+					<Pressable onPress={Keyboard.dismiss}>
+						<View className="flex-row items-center justify-between mb-6">
+							<TouchableOpacity
+								onPress={() => router.back()}
+								className="w-8 h-8 justify-center items-start"
+							>
+								<IconSymbol name="chevron.left" size={24} color={theme.text} />
+							</TouchableOpacity>
+							<ThemedText className="text-xl text-center font-nunito-bold">
+								{translate("familyInformation.title")}
+							</ThemedText>
+							{isEditing ? (
+								<TouchableOpacity onPress={handleDelete}>
+									<ThemedText
+										className="font-nunito-semibold"
+										style={{ color: AppColors.danger }}
+									>
+										{translate("payment.delete")}
+									</ThemedText>
+								</TouchableOpacity>
+							) : (
+								<View className="w-10" />
+							)}
+						</View>
+						<ThemedText className="text-[22px] font-nunito-semibold mb-5">
+							{isEditing
+								? translate("childProfile.editTitle")
+								: translate("childProfile.createTitle")}
+						</ThemedText>
+						<ChildProfileForm
+							firstName={firstName}
+							setFirstName={setFirstName}
+							lastName={lastName}
+							setLastName={setLastName}
+							birthMonth={birthMonth}
+							setBirthMonth={setBirthMonth}
+							birthYear={birthYear}
+							setBirthYear={setBirthYear}
+							schoolId={schoolId}
+							setSchoolId={setSchoolId}
+							interests={interests}
+							setInterests={setInterests}
+							searchQuery={searchQuery}
+							setSearchQuery={setSearchQuery}
+							showMonthDrop={showMonthDrop}
+							setShowMonthDrop={setShowMonthDrop}
+							showYearDrop={showYearDrop}
+							setShowYearDrop={setShowYearDrop}
+							avatarFace={avatarFace}
+							avatarBackground={avatarBackground}
+							onAvatarPress={handleAvatarPress}
+						/>
+						<TouchableOpacity
+							className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
+							style={{ backgroundColor: theme.tint }}
+							onPress={handleSave}
+							disabled={isSubmitting}
+						>
+							<ThemedText className="text-white text-base font-nunito-semibold">
+								{isSubmitting
+									? translate("childProfile.saving")
+									: translate("childProfile.saveChanges")}
+							</ThemedText>
+						</TouchableOpacity>
+					</Pressable>
+				</ScrollView>
+			</KeyboardAvoidingView>
+		</ThemedView>
+	);
 }

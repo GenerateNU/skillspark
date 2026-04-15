@@ -1,7 +1,5 @@
-import { AuthFormInput } from "@/components/AuthFormInput";
 import { Button } from "@/components/Button";
 import { ErrorMessage } from "@/components/ErrorMessage";
-import { ImageSelector } from "@/components/ImageSelector";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";

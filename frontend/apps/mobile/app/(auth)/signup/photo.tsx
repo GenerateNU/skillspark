@@ -3,13 +3,12 @@ import { ErrorMessage } from "@/components/ErrorMessage";
 import { ImageSelector } from "@/components/ImageSelector";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGuardian } from "@/hooks/use-guardian";
 
@@ -42,17 +41,6 @@ export default function PhotoScreen() {
 
 	return (
 		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
-			<TouchableOpacity
-				onPress={() => router.back()}
-				className="flex-row items-center px-5 py-3 gap-1"
-				hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-			>
-				<IconSymbol name="chevron.left" size={18} color="#11181C" />
-				<ThemedText className="text-base font-nunito">
-					{translate("onboarding.back")}
-				</ThemedText>
-			</TouchableOpacity>
-
 			<View className="px-6 pt-8 items-center">
 				<ThemedText
 					className="font-nunito-bold leading-[60px]"

@@ -6,6 +6,8 @@ import {
 	ScrollView,
 	KeyboardAvoidingView,
 	Platform,
+	Keyboard,
+	Pressable,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -21,6 +23,8 @@ import {
 	getGetChildrenByGuardianIdQueryKey,
 } from "@skillspark/api-client";
 import { ChildProfileForm, MONTHS } from "@/components/ChildProfileForm";
+import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
+import { setPendingAvatarCallback } from "@/constants/avatarPickerStore";
 import { useTranslation } from "react-i18next";
 import { useGuardian } from "@/hooks/use-guardian";
 
@@ -64,6 +68,13 @@ export default function AddChildScreen() {
 			: [];
 	const [interests, setInterests] = useState<string[]>(initialInterests);
 
+	const [avatarFace, setAvatarFace] = useState<string | null>(
+		(params.avatar_face as string) || null,
+	);
+	const [avatarBackground, setAvatarBackground] = useState(
+		(params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
+	);
+
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showMonthDrop, setShowMonthDrop] = useState(false);
 	const [showYearDrop, setShowYearDrop] = useState(false);
@@ -96,6 +107,8 @@ export default function AddChildScreen() {
 				guardian_id: guardianId,
 				school_id: schoolId,
 				interests,
+				avatar_face: avatarFace ?? undefined,
+				avatar_background: avatarBackground || DEFAULT_AVATAR_COLOR,
 			};
 			if (isEditing) {
 				await updateChildMutation.mutateAsync({
@@ -108,20 +121,33 @@ export default function AddChildScreen() {
 			await queryClient.invalidateQueries({
 				queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
 			});
-			if (isEditing) {
-				router.back();
-			} else {
-				router.push("/(auth)/signup/emergency-contact");
-			}
+			//router.push("./avatar-picker");
+			console.log("submitted");
 		} catch (error) {
 			console.error(error);
 			Alert.alert(
 				translate("common.errorOccurred"),
-				translate("childProfile.saveError"),
+				translate("childProfile.saveError") + " " + JSON.stringify(error),
 			);
 		} finally {
 			setIsSubmitting(false);
 		}
+	};
+
+	const handleAvatarPress = () => {
+		setPendingAvatarCallback(({ face, background }) => {
+			setAvatarFace(face);
+			setAvatarBackground(background);
+		});
+		const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
+		router.push({
+			pathname: "./avatar-picker",
+			params: {
+				avatarFace: avatarFace ?? "",
+				avatarBackground,
+				childName,
+			},
+		});
 	};
 
 	const handleDelete = () => {
@@ -167,75 +193,77 @@ export default function AddChildScreen() {
 				<ScrollView
 					contentContainerStyle={{
 						paddingHorizontal: 20,
-						paddingBottom: 40,
+						paddingBottom: insets.bottom + 80,
 						paddingTop: 10,
 					}}
 					showsVerticalScrollIndicator={false}
+					keyboardShouldPersistTaps="handled"
 				>
-					<View className="flex-row items-center justify-between mb-6">
+					<Pressable onPress={Keyboard.dismiss}>
+						<View className="flex-row items-center justify-between mb-6">
+							<TouchableOpacity
+								onPress={() => router.back()}
+								className="w-8 h-8 justify-center items-start"
+							>
+								<IconSymbol name="chevron.left" size={24} color={theme.text} />
+							</TouchableOpacity>
+							<ThemedText className="text-xl text-center font-nunito-bold">
+								{translate("familyInformation.title")}
+							</ThemedText>
+							{isEditing ? (
+								<TouchableOpacity onPress={handleDelete}>
+									<ThemedText
+										className="font-nunito-semibold"
+										style={{ color: AppColors.danger }}
+									>
+										{translate("payment.delete")}
+									</ThemedText>
+								</TouchableOpacity>
+							) : (
+								<View className="w-10" />
+							)}
+						</View>
+						<ThemedText className="text-[22px] font-nunito-semibold mb-5">
+							{isEditing
+								? translate("childProfile.editTitle")
+								: translate("childProfile.createTitle")}
+						</ThemedText>
+						<ChildProfileForm
+							firstName={firstName}
+							setFirstName={setFirstName}
+							lastName={lastName}
+							setLastName={setLastName}
+							birthMonth={birthMonth}
+							setBirthMonth={setBirthMonth}
+							birthYear={birthYear}
+							setBirthYear={setBirthYear}
+							schoolId={schoolId}
+							setSchoolId={setSchoolId}
+							interests={interests}
+							setInterests={setInterests}
+							searchQuery={searchQuery}
+							setSearchQuery={setSearchQuery}
+							showMonthDrop={showMonthDrop}
+							setShowMonthDrop={setShowMonthDrop}
+							showYearDrop={showYearDrop}
+							setShowYearDrop={setShowYearDrop}
+							avatarFace={avatarFace}
+							avatarBackground={avatarBackground}
+							onAvatarPress={handleAvatarPress}
+						/>
 						<TouchableOpacity
-							onPress={() => router.back()}
-							className="flex-row items-center px-5 py-3 gap-1"
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+							className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
+							style={{ backgroundColor: theme.tint }}
+							onPress={handleSave}
+							disabled={isSubmitting}
 						>
-							<IconSymbol name="chevron.left" size={18} color="#11181C" />
-							<ThemedText className="text-base font-nunito">
-								{translate("onboarding.back")}
+							<ThemedText className="text-white text-base font-nunito-semibold">
+								{isSubmitting
+									? translate("childProfile.saving")
+									: translate("childProfile.saveChanges")}
 							</ThemedText>
 						</TouchableOpacity>
-						<ThemedText className="text-xl text-center font-nunito-bold">
-							{translate("familyInformation.title")}
-						</ThemedText>
-						{isEditing ? (
-							<TouchableOpacity onPress={handleDelete}>
-								<ThemedText
-									className="font-nunito-semibold"
-									style={{ color: AppColors.danger }}
-								>
-									{translate("payment.delete")}
-								</ThemedText>
-							</TouchableOpacity>
-						) : (
-							<View className="w-10" />
-						)}
-					</View>
-					<ThemedText className="text-[22px] font-nunito-semibold mb-5">
-						{isEditing
-							? translate("childProfile.editTitle")
-							: translate("childProfile.createTitle")}
-					</ThemedText>
-					<ChildProfileForm
-						firstName={firstName}
-						setFirstName={setFirstName}
-						lastName={lastName}
-						setLastName={setLastName}
-						birthMonth={birthMonth}
-						setBirthMonth={setBirthMonth}
-						birthYear={birthYear}
-						setBirthYear={setBirthYear}
-						schoolId={schoolId}
-						setSchoolId={setSchoolId}
-						interests={interests}
-						setInterests={setInterests}
-						searchQuery={searchQuery}
-						setSearchQuery={setSearchQuery}
-						showMonthDrop={showMonthDrop}
-						setShowMonthDrop={setShowMonthDrop}
-						showYearDrop={showYearDrop}
-						setShowYearDrop={setShowYearDrop}
-					/>
-					<TouchableOpacity
-						className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
-						style={{ backgroundColor: theme.tint }}
-						onPress={handleSave}
-						disabled={isSubmitting}
-					>
-						<ThemedText className="text-white text-base font-nunito-semibold">
-							{isSubmitting
-								? translate("childProfile.saving")
-								: translate("childProfile.saveChanges")}
-						</ThemedText>
-					</TouchableOpacity>
+					</Pressable>
 				</ScrollView>
 			</KeyboardAvoidingView>
 		</ThemedView>
