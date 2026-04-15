@@ -35,15 +35,8 @@ interface QueryResult<T> {
 
 interface ReviewsScreenProps<
   TAggregate extends { status: number; data: unknown },
-  TReviews extends { status: number; data: unknown },
 > {
   useGetAggregate: (id: string) => QueryResult<TAggregate>;
-  useGetReviews: (
-    id: string,
-    options?: {
-      sortBy?: "most_recent" | "highest" | "lowest";
-    },
-  ) => QueryResult<TReviews>;
   /** When true, shows the rating smileys and write-a-review CTA */
   canReview?: boolean;
   /** Event occurrence ID, used to look up the guardian's registration */
@@ -55,16 +48,14 @@ interface ReviewsScreenProps<
 
 export default function ReviewsScreen<
   TAggregate extends { status: number; data: unknown },
-  TReviews extends { status: number; data: unknown },
 >({
   useGetAggregate,
-  useGetReviews,
   canReview = false,
   occurrenceId,
   eventName = "",
   eventLocation = "",
   eventImageUrl,
-}: ReviewsScreenProps<TAggregate, TReviews>) {
+}: ReviewsScreenProps<TAggregate>) {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const theme = Colors.light;
@@ -224,9 +215,9 @@ export default function ReviewsScreen<
           <FilterTabs
             value={sortBy}
             options={[
-              { label: "Most recent", value: "most_recent" },
-              { label: "Highest", value: "highest" },
-              { label: "Lowest", value: "lowest" },
+              { label: translate("review.mostRecent"), value: "most_recent" },
+              { label: translate("review.highest"), value: "highest" },
+              { label: translate("review.lowest"), value: "lowest" },
             ]}
             onChange={setSortBy}
           />
