@@ -16,6 +16,7 @@ func (r *ReviewRepository) GetEventReviewsForOrganization(
 	ctx context.Context,
 	id uuid.UUID,
 	pagination utils.Pagination,
+	AcceptLanguage string,
 	sortBy string,
 ) ([]models.SimpleReviewAggregate, error) {
 	baseQuery, err := schema.ReadSQLBaseScript("get_event_reviews_for_organization.sql", SqlReviewFiles)
@@ -62,8 +63,16 @@ func (r *ReviewRepository) GetEventReviewsForOrganization(
 			&event.CreatedAt,
 			&event.UpdatedAt,
 		)
-		event.Title = titleEN
-		event.Description = descriptionEN
+
+		switch AcceptLanguage {
+		case "th-TH":
+			event.Title = *titleTH
+			event.Description = *descriptionTH
+		case "en-US":
+			event.Title = titleEN
+			event.Description = descriptionEN
+		}
+
 		agg.Event = event
 		return agg, err
 	})

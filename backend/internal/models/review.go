@@ -123,10 +123,11 @@ type SimpleReviewAggregate struct {
 }
 
 type GetEventReviewsForOrganizationInput struct {
-	ID       uuid.UUID `path:"id"`
-	Page     int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
-	PageSize int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
-	SortBy   string    `query:"sort_by" default:"most_rated" enum:"most_rated,highest,lowest"`
+	ID             uuid.UUID `path:"id"`
+	Page           int       `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
+	PageSize       int       `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	SortBy         string    `query:"sort_by" default:"most_rated" enum:"most_rated,highest,lowest"`
 }
 
 type GetEventReviewsForOrganizationOutput struct {

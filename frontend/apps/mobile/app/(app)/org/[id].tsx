@@ -1,16 +1,4 @@
-import { RatingSmiley } from "@/components/RatingSmiley";
-import { ThemedText } from "@/components/themed-text";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { EMPTY_FACE_SVG } from "@/constants/avatarFaces";
-import { AppColors } from "@/constants/theme";
-import { useThemeColor } from "@/hooks/use-theme-color";
-import { useOrgLinks } from "@/hooks/useOrgLinks";
-import type { Location, Organization } from "@skillspark/api-client";
-import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
 import { Image } from "expo-image";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Pressable,
@@ -19,8 +7,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
+import type { Location, Organization } from "@skillspark/api-client";
 import { SvgXml } from "react-native-svg";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { ThemedText } from "@/components/themed-text";
+import { AppColors } from "@/constants/theme";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useOrgLinks } from "@/hooks/useOrgLinks";
+import { useTranslation } from "react-i18next";
+import { EMPTY_FACE_SVG } from "@/constants/avatarFaces";
+import { RatingSmiley } from "@/components/RatingSmiley";
 
 function OrgDetail({
   org,

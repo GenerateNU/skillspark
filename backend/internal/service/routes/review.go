@@ -207,6 +207,7 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 			ctx,
 			input.ID,
 			pagination,
+			input.AcceptLanguage,
 			input.SortBy,
 		)
 		if err != nil {

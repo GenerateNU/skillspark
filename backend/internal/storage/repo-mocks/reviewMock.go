@@ -88,10 +88,11 @@ func (m *MockReviewRepository) GetEventReviewsForOrganization(
 	ctx context.Context,
 	id uuid.UUID,
 	pagination utils.Pagination,
+	AcceptLanguage string,
 	sortBy string,
 ) ([]models.SimpleReviewAggregate, error) {
 
-	args := m.Called(ctx, id, pagination, sortBy)
+	args := m.Called(ctx, id, pagination, AcceptLanguage, sortBy)
 
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
