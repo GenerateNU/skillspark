@@ -1,21 +1,21 @@
+import { useGuardian } from "@/hooks/use-guardian";
+import i18n from "@/i18n";
 import {
+  createStripeCustomer,
   GuardianLoginOutputBody,
   GuardianSignUpOutputBody,
   loginGuardianResponse,
+  setCurrentLanguage,
   signupGuardianResponse,
+  updateGuardianResponse,
   useLoginGuardian,
   useSignupGuardian,
   useUpdateGuardian,
-  setCurrentLanguage,
-  updateGuardianResponse,
-  createStripeCustomer,
 } from "@skillspark/api-client";
-import * as SecureStore from "expo-secure-store";
-import { router } from "expo-router";
-import { createContext, useState, useEffect, ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGuardian } from "@/hooks/use-guardian";
-import i18n from "@/i18n";
+import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { createContext, ReactNode, useEffect, useState } from "react";
 
 interface AuthContextType {
   guardianId: string | null;
@@ -48,6 +48,8 @@ interface AuthContextType {
     username: string,
     profile_picture_s3_key?: string | undefined,
     expo_push_token?: string | undefined,
+    push_notifications?: boolean,
+    email_notifications?: boolean,
   ) => void;
 }
 
@@ -184,6 +186,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     username: string,
     profile_picture_s3_key?: string | undefined,
     expo_push_token?: string | undefined,
+    push_notifications?: boolean,
+    email_notifications?: boolean,
   ) => {
     updateFunc(
       {
@@ -195,6 +199,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           profile_picture_s3_key,
           username,
           expo_push_token,
+          push_notifications,
+          email_notifications,
         },
       },
       {

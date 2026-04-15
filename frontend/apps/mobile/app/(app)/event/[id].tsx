@@ -10,7 +10,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useGetEventOccurrencesByEventId, useGetReviewAggregate } from "@skillspark/api-client";
+import {
+  useGetEventOccurrencesByEventId,
+  useGetReviewAggregate,
+} from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
@@ -39,8 +42,7 @@ function EventOccurrenceDetail({
   const { data: aggregateResp } = useGetReviewAggregate(occurrence.event.id, {
     query: { enabled: !!occurrence.event.id },
   });
-  const aggregate =
-    aggregateResp?.status === 200 ? aggregateResp.data : null;
+  const aggregate = aggregateResp?.status === 200 ? aggregateResp.data : null;
   const avgRating = aggregate?.average_rating ?? 0;
   const totalReviews = aggregate?.total_reviews ?? 0;
   const ratingMatch = RATING_OPTIONS.find(
@@ -226,7 +228,10 @@ function EventOccurrenceDetail({
             })
           }
         >
-          <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardShadow}>
+          <View
+            className="mx-4 mb-4 rounded-2xl bg-white p-5"
+            style={cardShadow}
+          >
             {/* Title */}
             <Text
               className="mb-3 font-nunito-bold text-[18px]"
@@ -304,7 +309,11 @@ function EventOccurrenceDetail({
 
 export default function EventOccurrenceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: response, isLoading, error } = useGetEventOccurrencesByEventId(id);
+  const {
+    data: response,
+    isLoading,
+    error,
+  } = useGetEventOccurrencesByEventId(id);
   const { t: translate } = useTranslation();
 
   if (isLoading) {
@@ -315,7 +324,12 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  if (error || !response || response.status !== 200 || response.data.length === 0) {
+  if (
+    error ||
+    !response ||
+    response.status !== 200 ||
+    response.data.length === 0
+  ) {
     return (
       <View className="flex-1 items-center justify-center p-6">
         <Text

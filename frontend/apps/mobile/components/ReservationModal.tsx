@@ -95,7 +95,7 @@ export function ReservationModal({
               : translate("reservation.paymentFailed");
           setReservationError(message);
         },
-      }
+      },
     );
   }
 
@@ -117,7 +117,7 @@ export function ReservationModal({
     // handleClose intentionally omitted — state setters are stable and
     // onClose identity changing should not recreate the backdrop component.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   return (
@@ -177,7 +177,7 @@ export function ReservationModal({
                       selected={selectedChildId === child.id}
                       onPress={() =>
                         setSelectedChildId(
-                          selectedChildId === child.id ? null : child.id
+                          selectedChildId === child.id ? null : child.id,
                         )
                       }
                     />

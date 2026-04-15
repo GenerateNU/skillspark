@@ -31,7 +31,7 @@ export function StaticBackdrop({
         // Sheet just started closing — disappear immediately.
         opacity.value = 0;
       }
-    }
+    },
   );
 
   const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
