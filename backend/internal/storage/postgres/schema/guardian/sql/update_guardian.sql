@@ -1,6 +1,6 @@
 UPDATE guardian
 SET 
-    expo_push_token = $2,
+    expo_push_token = COALESCE($2, expo_push_token),
     push_notifications = COALESCE($3, push_notifications),
     email_notifications = COALESCE($4, email_notifications),
     updated_at = NOW()
