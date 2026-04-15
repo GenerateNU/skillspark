@@ -27,7 +27,7 @@ export default function CarouselCard({
         stackInterval: 0,
       }}
       renderItem={({ item }) => (
-        <View className="borderRadius: 24, overflow: 'hidden', flex: 1">
+        <View className="rounded-3xl overflow-hidden flex-1">
           <DiscoverBanner event={item} />
         </View>
       )}

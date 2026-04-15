@@ -1,29 +1,25 @@
 import { Image } from "expo-image";
+import { useState } from "react";
 import {
   ActivityIndicator,
+  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useGetEventOccurrencesById } from "@skillspark/api-client";
+import { useGetEventOccurrencesByEventId, useGetReviewAggregate } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
-import { StarRating } from "@/components/StarRating";
+import { RATING_OPTIONS } from "@/constants/ratings";
+import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { BookmarkButton } from "@/components/BookmarkButton";
-import { formatDuration } from "@/utils/format";
 import { useTranslation } from "react-i18next";
-import { ListItem } from "@/components/ListItem";
-import { AboutPage } from "@/components/AboutPage";
-
-function formatAddress(occurrence: EventOccurrence) {
-  const loc = occurrence.location;
-  const parts = [loc.address_line1, loc.district].filter(Boolean);
-  return parts.join(", ") || "Location";
-}
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { formatLocation } from "@/utils/format";
 
 function EventOccurrenceDetail({
   occurrence,
@@ -31,276 +27,284 @@ function EventOccurrenceDetail({
   occurrence: EventOccurrence;
 }) {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { t: translate } = useTranslation();
-  const duration = formatDuration(occurrence.start_time, occurrence.end_time, {
-    hr: translate("event.hr"),
-    min: translate("event.min"),
+  const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
+  const [aboutExpanded, setAboutExpanded] = useState(false);
+  const [aboutTruncated, setAboutTruncated] = useState(false);
+
+  const location = formatLocation(occurrence);
+  const categories = occurrence.event.category?.join(" / ") ?? "";
+  const orgId = occurrence.event.organization_id;
+
+  const { data: aggregateResp } = useGetReviewAggregate(occurrence.event.id, {
+    query: { enabled: !!occurrence.event.id },
   });
-  const address = formatAddress(occurrence);
+  const aggregate =
+    aggregateResp?.status === 200 ? aggregateResp.data : null;
+  const avgRating = aggregate?.average_rating ?? 0;
+  const totalReviews = aggregate?.total_reviews ?? 0;
+  const ratingMatch = RATING_OPTIONS.find(
+    (r) => r.rating === Math.round(avgRating),
+  );
+
+  const cardShadow = {
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  };
 
   return (
-    <View className="flex-1 bg-[#F4F6F8]">
+    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      {/* Header */}
       <View
-        className="flex-1 mx-3.5 rounded-[32px] overflow-hidden bg-white elevation-8"
-        style={{
-          marginTop: insets.top + 8,
-          marginBottom: insets.bottom - 20,
-          shadowColor: "#000",
-          shadowOpacity: 0.12,
-          shadowRadius: 20,
-        }}
+        className="flex-row items-center border-b px-4 pb-2.5 pt-3"
+        style={{ borderBottomColor: AppColors.divider }}
       >
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          contentContainerStyle={{ flexGrow: 1 }}
+        <TouchableOpacity
+          onPress={() => router.back()}
+          activeOpacity={0.7}
+          className="h-8 w-8 items-center justify-center"
         >
-          {/* Hero image */}
-          <View className="h-[250px] bg-[#1a1a1a]">
-            {occurrence.event.presigned_url ? (
-              <Image
-                source={{ uri: occurrence.event.presigned_url }}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="cover"
-              />
-            ) : (
-              <View className="flex-1 bg-[#C5C5C5]" />
-            )}
-            <TouchableOpacity
-              onPress={() => router.back()}
-              activeOpacity={0.7}
-              className="absolute top-4 left-4 z-10 flex-row items-center bg-white rounded-full px-4 py-2.5 elevation-10"
-              style={{
-                shadowColor: "#000",
-                shadowOpacity: 0.15,
-                shadowRadius: 8,
-              }}
-            >
-              <MaterialIcons
-                name="chevron-left"
-                size={20}
-                color={AppColors.primaryText}
-              />
-              <Text
-                className="text-[15px] font-medium"
-                style={{ color: AppColors.primaryText }}
-              >
-                {translate("event.back")}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <IconSymbol
+            name="chevron.left"
+            size={28}
+            color={AppColors.primaryText}
+          />
+        </TouchableOpacity>
+        <Text
+          className="flex-1 text-center text-[16px] font-nunito-bold"
+          style={{ color: AppColors.primaryText }}
+          numberOfLines={1}
+        >
+          {translate("org.class")}
+        </Text>
+        <View className="w-8" />
+      </View>
 
-          {/* Content card */}
-          <View
-            className="bg-white rounded-t-[28px] -mt-7 px-[22px] pb-6 elevation-2"
-            style={{
-              shadowColor: "#000",
-              shadowOpacity: 0.06,
-              shadowRadius: 12,
-            }}
-          >
-            {/* Drag handle */}
-            <View
-              className="w-[38px] h-1 rounded-sm self-center mt-3 mb-3.5"
-              style={{ backgroundColor: AppColors.borderLight }}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 24 }}
+      >
+        {/* Hero image */}
+        <View
+          className="h-[250px]"
+          style={{ backgroundColor: AppColors.imagePlaceholder }}
+        >
+          {occurrence.event.presigned_url ? (
+            <Image
+              source={{ uri: occurrence.event.presigned_url }}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="cover"
             />
-            <View className="absolute -top-[5px] left-2.5">
-              <BookmarkButton eventId={occurrence.event.id} />
-            </View>
+          ) : null}
+        </View>
+
+        {/* White content card overlapping image */}
+        <View className="bg-white rounded-t-[28px] -mt-7 px-[22px] pb-6">
+          {/* Drag handle */}
+          <View
+            className="w-[38px] h-1 rounded-sm self-center mt-3 mb-3.5"
+            style={{ backgroundColor: AppColors.borderLight }}
+          />
+
+          {/* Title row with bookmark */}
+          <View className="flex-row items-start justify-between mb-3">
             <Text
-              className="text-[28px] font-bold tracking-tight mb-2"
+              className="flex-1 mr-3 text-[26px] font-nunito-bold leading-8"
               style={{ color: AppColors.primaryText }}
             >
               {occurrence.event.title}
             </Text>
-            <View className="flex-row items-center gap-1.5 mb-3.5">
-              <MaterialIcons
-                name="location-on"
-                size={16}
-                color={AppColors.primaryText}
-              />
-              <Text
-                className="text-[13px] flex-1"
-                style={{ color: AppColors.secondaryText }}
-                numberOfLines={1}
-              >
-                {address}
-              </Text>
-              <StarRating size={17} />
-              <ListItem
-                label={translate("review.title")}
-                isLast
-                onPress={() =>
-                  router.push({
-                    pathname: `/event/[id]/reviews`,
-                    params: {
-                      id: occurrence.event.id,
-                      occurrenceId: occurrence.id,
-                      canReview: "true",
-                      eventName: occurrence.event.title,
-                      eventLocation: address,
-                      eventImageUrl: occurrence.event.presigned_url ?? "",
-                    },
-                  })
-                }
-              />
-            </View>
-            <AboutPage
-              description={occurrence.event.description}
-              links={occurrence.org_links ?? []}
-            />
-            <View className="flex-row items-center justify-between mt-2">
-              <View className="flex-row gap-2 flex-1 flex-wrap">
-                {occurrence.event.category?.map((cat) => (
-                  <View
-                    key={cat}
-                    className="border-[1.5px] rounded-full px-4 py-[7px]"
-                    style={{ borderColor: AppColors.borderLight }}
-                  >
-                    <Text
-                      className="text-[13px]"
-                      style={{ color: AppColors.secondaryText }}
-                    >
-                      {translate(`interests.${cat}`, { defaultValue: cat })}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-              <View className="items-end ml-3.5">
-                <Text
-                  className="text-xl font-bold"
-                  style={{ color: AppColors.primaryText }}
-                >
-                  {occurrence.price} THB
-                </Text>
-                <Text
-                  className="text-xs"
-                  style={{ color: AppColors.subtleText }}
-                >
-                  {translate("event.perSession")}
-                </Text>
-              </View>
-            </View>
+            <BookmarkButton eventId={occurrence.event.id} />
           </View>
 
-          {/* Divider */}
-          <View
-            className="border-b border-dashed"
-            style={{ borderColor: AppColors.borderLight }}
-          />
+          {/* Location */}
+          <View className="flex-row items-center gap-1.5 mb-2">
+            <MaterialIcons
+              name="location-on"
+              size={16}
+              color={AppColors.mutedText}
+            />
+            <Text
+              className="text-[14px] font-nunito"
+              style={{ color: AppColors.mutedText }}
+            >
+              {location}
+            </Text>
+          </View>
 
-          {/* Bottom section */}
-          <View
-            className="flex-1 bg-white px-[22px] pt-[22px] pb-7 elevation-2"
-            style={{
-              shadowColor: "#000",
-              shadowOpacity: 0.06,
-              shadowRadius: 12,
-            }}
+          {/* Category */}
+          {!!categories && (
+            <Text
+              className="text-[14px] font-nunito mb-2"
+              style={{ color: AppColors.mutedText }}
+            >
+              {categories}
+            </Text>
+          )}
+
+          {/* Bookings this week */}
+          <Text
+            className="text-[14px] font-nunito"
+            style={{ color: AppColors.primaryBlue }}
           >
-            <View className="flex-row items-center justify-between mb-[22px]">
+            {occurrence.curr_enrolled}+ {translate("event.bookingsThisWeek")}
+          </Text>
+        </View>
+
+        {/* About card */}
+        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardShadow}>
+          <Text
+            className="mb-2.5 text-[18px] font-nunito-bold"
+            style={{ color: AppColors.primaryText }}
+          >
+            {translate("event.about")}
+          </Text>
+          <Text
+            numberOfLines={aboutExpanded ? undefined : 4}
+            onTextLayout={(e) => {
+              if (!aboutExpanded)
+                setAboutTruncated(e.nativeEvent.lines.length >= 4);
+            }}
+            className={`text-sm leading-[22px] font-nunito ${aboutTruncated ? "mb-1" : "mb-4"}`}
+            style={{ color: AppColors.secondaryText }}
+          >
+            {occurrence.event.description}
+          </Text>
+          {aboutTruncated && (
+            <Pressable
+              onPress={() => setAboutExpanded((prev) => !prev)}
+              className="mb-4"
+            >
               <Text
-                className="text-[30px] font-bold tracking-tight"
+                className="text-[13px] font-semibold"
                 style={{ color: AppColors.primaryText }}
               >
-                {duration}
+                {aboutExpanded
+                  ? translate("event.seeLess")
+                  : translate("event.seeMore")}
               </Text>
-              <View className="flex-row items-center gap-[5px] bg-[#F3F4F6] rounded-full px-3 py-[7px]">
-                <MaterialIcons
-                  name="directions-walk"
-                  size={14}
-                  color={AppColors.secondaryText}
+            </Pressable>
+          )}
+          {hasLinks && (
+            <View className="flex-row flex-wrap gap-2.5">
+              {occurrence.org_links.map((link, index) => (
+                <Pressable
+                  key={index}
+                  onPress={() => openLink(link.href)}
+                  className="rounded-full px-5 py-2.5 items-center"
+                  style={{ backgroundColor: AppColors.borderLight }}
+                >
+                  <Text
+                    className="text-[13px] font-semibold"
+                    style={{ color: AppColors.primaryText }}
+                  >
+                    {link.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Reviews card */}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() =>
+            router.push({
+              pathname: "/event/[id]/reviews",
+              params: {
+                id: occurrence.event.id,
+                occurrenceId: occurrence.id,
+                canReview: "true",
+                eventName: occurrence.event.title,
+                eventLocation: location,
+                eventImageUrl: occurrence.event.presigned_url ?? "",
+              },
+            })
+          }
+        >
+          <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardShadow}>
+            {/* Title */}
+            <Text
+              className="mb-3 font-nunito-bold text-[18px]"
+              style={{ color: AppColors.primaryText }}
+            >
+              {translate("event.reviews")}
+            </Text>
+
+            {/* Aggregate rating */}
+            {totalReviews > 0 && ratingMatch ? (
+              <View className="flex-row items-center gap-2">
+                <Image
+                  source={ratingMatch.image}
+                  style={{ width: 22, height: 22 }}
                 />
                 <Text
-                  className="text-[13px]"
-                  style={{ color: AppColors.secondaryText }}
+                  className="text-[15px] font-nunito-bold"
+                  style={{ color: AppColors.primaryText }}
                 >
-                  8 {translate("event.minWalk")}
+                  {translate(ratingMatch.labelKey!)}
                 </Text>
-                <MaterialIcons
-                  name="arrow-forward"
-                  size={12}
-                  color={AppColors.subtleText}
-                />
-                <MaterialIcons
-                  name="directions-bus"
-                  size={16}
-                  color={AppColors.secondaryText}
-                />
+                <Text
+                  className="text-[13px] font-nunito"
+                  style={{ color: AppColors.subtleText }}
+                >
+                  ({totalReviews})
+                </Text>
               </View>
-            </View>
-            <View className="flex-row items-center justify-between">
-              <View>
-                <View className="flex-row items-center gap-3">
-                  <View
-                    className="w-4 h-4 rounded-full items-center justify-center"
-                    style={{ backgroundColor: AppColors.primaryText }}
-                  >
-                    <View className="w-1.5 h-1.5 rounded-full bg-white" />
-                  </View>
-                  <Text
-                    className="text-sm font-medium"
-                    style={{ color: AppColors.secondaryText }}
-                  >
-                    {translate("event.home")}
-                  </Text>
-                </View>
-                <View className="pl-1.5 py-0.5">
-                  <Text
-                    className="text-sm leading-[10px]"
-                    style={{ color: AppColors.subtleText }}
-                  >
-                    •
-                  </Text>
-                  <Text
-                    className="text-sm leading-[10px]"
-                    style={{ color: AppColors.subtleText }}
-                  >
-                    •
-                  </Text>
-                  <Text
-                    className="text-sm leading-[10px]"
-                    style={{ color: AppColors.subtleText }}
-                  >
-                    •
-                  </Text>
-                </View>
-                <View className="flex-row items-center gap-2.5">
-                  <MaterialIcons
-                    name="location-on"
-                    size={16}
-                    color={AppColors.secondaryText}
-                  />
-                  <Text
-                    className="text-sm font-medium"
-                    style={{ color: AppColors.secondaryText }}
-                  >
-                    {translate("event.location")}
-                  </Text>
-                </View>
-              </View>
-              <TouchableOpacity
-                onPress={() => {}}
-                activeOpacity={0.7}
-                className="rounded-2xl px-[26px] py-3.5"
-                style={{ backgroundColor: AppColors.primaryText }}
+            ) : (
+              <Text
+                className="text-[13px] font-nunito"
+                style={{ color: AppColors.subtleText }}
               >
-                <Text className="text-white text-[17px] font-bold">
-                  {translate("event.register")}
-                </Text>
-              </TouchableOpacity>
+                {translate("review.noReviews")}
+              </Text>
+            )}
+
+            {/* See more */}
+            <View className="mt-4 items-center">
+              <Text
+                className="text-[13px] font-nunito underline"
+                style={{ color: AppColors.primaryText }}
+              >
+                {translate("event.seeMoreReviews")}
+              </Text>
             </View>
           </View>
-        </ScrollView>
-      </View>
-    </View>
+        </TouchableOpacity>
+
+        {/* Reserve button */}
+        <View className="px-4 pb-2 pt-1">
+          <TouchableOpacity
+            activeOpacity={0.85}
+            className="w-full items-center rounded-full py-4"
+            style={{ backgroundColor: AppColors.checkboxSelected }}
+            onPress={() =>
+              router.push({
+                pathname: "/org/[id]/schedule",
+                params: {
+                  id: orgId,
+                  filterClass: occurrence.event.title,
+                },
+              })
+            }
+          >
+            <Text className="text-[17px] font-nunito-bold text-white">
+              {translate("event.reserve")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 export default function EventOccurrenceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: response, isLoading, error } = useGetEventOccurrencesById(id);
+  const { data: response, isLoading, error } = useGetEventOccurrencesByEventId(id);
   const { t: translate } = useTranslation();
 
   if (isLoading) {
@@ -311,7 +315,7 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  if (error || !response || response.status !== 200) {
+  if (error || !response || response.status !== 200 || response.data.length === 0) {
     return (
       <View className="flex-1 items-center justify-center p-6">
         <Text
@@ -324,5 +328,5 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  return <EventOccurrenceDetail occurrence={response.data} />;
+  return <EventOccurrenceDetail occurrence={response.data[0]} />;
 }

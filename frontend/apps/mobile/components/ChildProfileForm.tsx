@@ -42,8 +42,8 @@ export const MONTHS = [
   "December",
 ];
 
-export const YEARS = Array.from({ length: 20 }, (_, i) =>
-  String(new Date().getFullYear() - i),
+export const YEARS = Array.from({ length: 30 }, (_, i) =>
+  String(new Date().getFullYear() - i)
 );
 
 type DropdownLayout = { x: number; y: number; width: number };
@@ -216,12 +216,12 @@ export function ChildProfileForm({
 
   const toggleInterest = (item: string) => {
     setInterests((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item],
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
     );
   };
 
   const filteredOptions = INTEREST_OPTIONS.filter((o) =>
-    o.toLowerCase().includes(searchQuery.toLowerCase()),
+    o.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (

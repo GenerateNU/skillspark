@@ -132,3 +132,9 @@ type GetEventReviewsForOrganizationInput struct {
 type GetEventReviewsForOrganizationOutput struct {
 	Body []SimpleReviewAggregate `json:"body" doc:"List of review aggregates"`
 }
+
+type OrgReviewSummary struct {
+	TotalReviews  int                 `json:"total_reviews"`
+	AverageRating float64             `json:"average_rating"`
+	Breakdown     []ReviewRatingCount `json:"breakdown"`
+}

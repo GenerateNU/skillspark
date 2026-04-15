@@ -10,6 +10,7 @@
   "common": {
     "submit": "Submit",
     "cancel": "Cancel",
+    "close": "Close",
     "loading": "Loading...",
     "saving": "Saving...",
     "loadingMapData": "Loading Map Data...",
@@ -43,6 +44,7 @@
     "upcomingEvents": "upcoming events",
     "learnMore": "Learn More",
     "reserved": "Reserved",
+    "learnMore": "Learn More",
     "members": "members",
     "categories": {
       "technology": "technology",
@@ -253,7 +255,14 @@
     "notFound": "Event not found",
     "minWalk": "min",
     "hr": "hr",
-    "min": "min"
+    "min": "min",
+    "bookingsThisWeek": "Bookings this week",
+    "about": "About",
+    "reviews": "Reviews",
+    "more": "more",
+    "noReviews": "No reviews yet.",
+    "seeMoreReviews": "See more reviews",
+    "reserve": "Reserve"
   },
   "emergencyContact": {
     "manageTitle": "Manage Emergency Contact",
@@ -286,9 +295,13 @@
     "about": "About",
     "noDescription": "No description available.",
     "seeSchedule": "See Schedule",
+    "schedule": "Classes",
+    "class": "Class",
+    "noSchedule": "No upcoming classes for this organization.",
     "notFound": "Organization not found.",
     "bookingsThisWeek": "Bookings this week",
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "allClasses": "All Classes"
   },
   "interests": {
     "science": "Science",
@@ -307,5 +320,23 @@
     "username": "Username",
     "changeImage": "Change Image",
     "saveChanges": "Save Changes"
+  },
+  "occurrence": {
+    "smiles": "/ 5 Smiles",
+    "learnMore": "Learn more",
+    "reserve": "Reserve",
+    "ages": "Ages {{min}}",
+    "agesRange": "Ages {{min}} - {{max}}",
+    "classTime": "{{time}} Class"
+  },
+  "reservation": {
+    "paymentFailed": "Payment failed. Please try again or contact support.",
+    "completed": "Completed",
+    "selectChildLabel": "Select Child",
+    "noChildren": "No children found.",
+    "termsNote": "By clicking 'Pay Now', you authorize Skill Spark to charge your card for the total amount, plus applicable fees.",
+    "terms": "Terms & Conditions",
+    "payAndReserve": "Pay Now & Reserve",
+    "seeYouSoon": "See you soon!"
   }
 }

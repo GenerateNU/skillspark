@@ -5,7 +5,6 @@ import {
   signupGuardianResponse,
   useLoginGuardian,
   useSignupGuardian,
-  Guardian,
   useUpdateGuardian,
   setCurrentLanguage,
   updateGuardianResponse,
@@ -60,13 +59,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [guardianId, setGuardianId] = useState<string | null>(null);
   const [jwt, setJWT] = useState<string | null>(null);
   const [langPref, setLangPref] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const { mutate: loginFunc } = useLoginGuardian();
   const { mutate: signupFunc } = useSignupGuardian();
   const { mutate: updateFunc } = useUpdateGuardian();
 
-  let { guardian } = useGuardian(guardianId);
+  const { guardian } = useGuardian(guardianId);
 
   useEffect(() => {
     const checkAlreadyAuth = async () => {
@@ -199,8 +198,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       },
       {
-        onSuccess: async (resp: updateGuardianResponse) => {
-          guardian = resp.data as Guardian;
+        onSuccess: async (_resp: updateGuardianResponse) => {
           // refetch all getGuardian queries to show changes
           queryClient.invalidateQueries({
             queryKey: [`/api/v1/guardians/${id}`],
