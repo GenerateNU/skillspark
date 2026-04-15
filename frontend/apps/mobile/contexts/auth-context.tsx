@@ -56,8 +56,8 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [guardianId, setGuardianId] = useState<string | null>("88888888-8888-8888-8888-888888888888");
-  const [jwt, setJWT] = useState<string | null>("dev");
+  const [guardianId, setGuardianId] = useState<string | null>(null);
+  const [jwt, setJWT] = useState<string | null>(null);
   const [langPref, setLangPref] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();

@@ -15,7 +15,6 @@ import type { EventOccurrence } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
-import { RatingSmiley } from "@/components/RatingSmiley";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { useTranslation } from "react-i18next";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -26,14 +25,6 @@ function formatLocation(occurrence: EventOccurrence) {
   return parts.join(", ") || "Location";
 }
 
-const MOCK_REVIEW = {
-  avgRating: 4.5,
-  totalReviews: 140,
-  description:
-    "Absolutely love this! Quality is top-notch and it works exactly as described. Worth every penny.",
-  tags: ["Tag", "Tag", "Tag"],
-  timeAgo: "3d",
-};
 
 function EventOccurrenceDetail({
   occurrence,
@@ -237,70 +228,6 @@ function EventOccurrenceDetail({
             >
               {translate("event.reviews")}
             </Text>
-
-            {/* Rating + review row */}
-            <View className="flex-row gap-4">
-              {/* Left: score, smiley, count */}
-              <View className="items-center w-16">
-                <Text
-                  className="font-nunito-bold text-[42px] leading-[46px]"
-                  style={{ color: AppColors.primaryText }}
-                >
-                  {MOCK_REVIEW.avgRating.toFixed(1)}
-                </Text>
-                <RatingSmiley
-                  rating={Math.round(MOCK_REVIEW.avgRating)}
-                  width={40}
-                  height={40}
-                />
-                <Text
-                  className="font-nunito mt-1 text-[13px]"
-                  style={{ color: AppColors.subtleText }}
-                >
-                  ({MOCK_REVIEW.totalReviews})
-                </Text>
-              </View>
-
-              {/* Right: description, tags, footer */}
-              <View className="flex-1">
-                <Text
-                  className="text-sm leading-[20px] mb-2 font-nunito"
-                  style={{ color: AppColors.primaryText }}
-                >
-                  {MOCK_REVIEW.description}
-                </Text>
-                <View className="flex-row flex-wrap gap-1.5 mb-2">
-                  {MOCK_REVIEW.tags.map((tag, i) => (
-                    <View
-                      key={i}
-                      className="rounded-xl px-3 py-1"
-                      style={{ backgroundColor: "#E9D5FF" }}
-                    >
-                      <Text
-                        className="text-[12px] font-nunito"
-                        style={{ color: AppColors.secondaryText }}
-                      >
-                        {tag}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-                <View className="flex-row items-center justify-between">
-                  <Text
-                    className="text-[12px] font-nunito italic"
-                    style={{ color: AppColors.primaryText }}
-                  >
-                    {translate("review.anonymous")}
-                  </Text>
-                  <Text
-                    className="text-[12px] font-nunito"
-                    style={{ color: AppColors.mutedText }}
-                  >
-                    {MOCK_REVIEW.timeAgo}
-                  </Text>
-                </View>
-              </View>
-            </View>
 
             {/* See more */}
             <View className="mt-4 items-center">
