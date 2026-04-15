@@ -9,6 +9,7 @@ import (
 	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 func (r *ReviewRepository) GetEventReviewsForOrganization(
@@ -17,51 +18,37 @@ func (r *ReviewRepository) GetEventReviewsForOrganization(
 	pagination utils.Pagination,
 	sortBy string,
 ) ([]models.SimpleReviewAggregate, error) {
-
-	baseQuery, err := schema.ReadSQLBaseScript(
-		"get_event_reviews_for_organization.sql",
-		SqlReviewFiles,
-	)
+	baseQuery, err := schema.ReadSQLBaseScript("get_event_reviews_for_organization.sql", SqlReviewFiles)
 	if err != nil {
 		e := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &e
 	}
 
-	var orderBy string
-	switch sortBy {
-	case "most_rated":
-		orderBy = "total_reviews DESC"
-	case "highest":
-		orderBy = "average_rating DESC"
-	case "lowest":
-		orderBy = "average_rating ASC"
-	default:
+	orderBy := map[string]string{
+		"most_rated": "total_reviews DESC",
+		"highest":    "average_rating DESC",
+		"lowest":     "average_rating ASC",
+	}[sortBy]
+	if orderBy == "" {
 		orderBy = "total_reviews DESC"
 	}
 
-	query := fmt.Sprintf(baseQuery, orderBy)
-
-	rows, err := r.db.Query(ctx, query, id, pagination.Limit, pagination.GetOffset())
+	rows, err := r.db.Query(ctx, fmt.Sprintf(baseQuery, orderBy), id, pagination.Limit, pagination.GetOffset())
 	if err != nil {
 		e := errs.InternalServerError("Failed to get reviews: ", err.Error())
 		return nil, &e
 	}
-	defer rows.Close()
 
-	var results []models.SimpleReviewAggregate
-
-	for rows.Next() {
+	results, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (models.SimpleReviewAggregate, error) {
 		var agg models.SimpleReviewAggregate
-
 		var event models.Event
 		var titleEN, descriptionEN string
 		var titleTH, descriptionTH *string
 
-		err := rows.Scan(
+		err := row.Scan(
 			&agg.EventID,
 			&agg.TotalReviews,
 			&agg.AverageRating,
-
 			&event.ID,
 			&titleEN,
 			&titleTH,
@@ -75,20 +62,13 @@ func (r *ReviewRepository) GetEventReviewsForOrganization(
 			&event.CreatedAt,
 			&event.UpdatedAt,
 		)
-		if err != nil {
-			e := errs.InternalServerError("Failed to scan review aggregate row: ", err.Error())
-			return nil, &e
-		}
-
 		event.Title = titleEN
 		event.Description = descriptionEN
-
 		agg.Event = event
-		results = append(results, agg)
-	}
-
-	if rows.Err() != nil {
-		e := errs.InternalServerError("Row iteration error: ", rows.Err().Error())
+		return agg, err
+	})
+	if err != nil {
+		e := errs.InternalServerError("Failed to scan review aggregate rows: ", err.Error())
 		return nil, &e
 	}
 
