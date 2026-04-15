@@ -35,15 +35,8 @@ interface QueryResult<T> {
 
 interface ReviewsScreenProps<
   TAggregate extends { status: number; data: unknown },
-  TReviews extends { status: number; data: unknown },
 > {
   useGetAggregate: (id: string) => QueryResult<TAggregate>;
-  useGetReviews: (
-    id: string,
-    options?: {
-      sortBy?: "most_recent" | "highest" | "lowest";
-    },
-  ) => QueryResult<TReviews>;
   /** When true, shows the rating smileys and write-a-review CTA */
   canReview?: boolean;
   /** Event occurrence ID, used to look up the guardian's registration */
@@ -55,16 +48,14 @@ interface ReviewsScreenProps<
 
 export default function ReviewsScreen<
   TAggregate extends { status: number; data: unknown },
-  TReviews extends { status: number; data: unknown },
 >({
   useGetAggregate,
-  useGetReviews,
   canReview = false,
   occurrenceId,
   eventName = "",
   eventLocation = "",
   eventImageUrl,
-}: ReviewsScreenProps<TAggregate, TReviews>) {
+}: ReviewsScreenProps<TAggregate>) {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const theme = Colors.light;
