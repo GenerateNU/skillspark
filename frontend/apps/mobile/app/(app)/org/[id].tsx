@@ -20,6 +20,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { useTranslation } from "react-i18next";
 import { EMPTY_FACE_SVG } from "@/constants/avatarFaces";
+import { RatingSmiley } from "@/components/RatingSmiley";
 
 function OrgDetail({
   org,
@@ -109,14 +110,6 @@ function OrgDetail({
                   {location.district}, {location.province}
                 </Text>
               )}
-              <View className="flex-row items-center gap-1.5">
-                <Text
-                  className="text-[14px] font-nunito"
-                  style={{ color: AppColors.mutedText }}
-                >
-                  {org.review_summary?.total_reviews ?? 0}+ {translate("org.bookingsThisWeek")}
-                </Text>
-              </View>
             </View>
             <TouchableOpacity
               activeOpacity={0.7}
@@ -202,22 +195,17 @@ function OrgDetail({
             {translate("org.reviews")}
           </Text>
           {org.review_summary && org.review_summary.total_reviews > 0 ? (
-            <View className="flex-row items-center gap-4">
-              <Text className="text-[42px] font-nunito-bold leading-[46px]">
+            <View className="items-center">
+              <RatingSmiley rating={org.review_summary.average_rating} width={48} height={48} />
+              <Text className="text-[36px] font-nunito-bold leading-[44px] mt-2">
                 {org.review_summary.average_rating.toFixed(1)}
               </Text>
-              <View className="items-start">
-                <Image
-                  source={require("@/assets/images/faces.png")}
-                  className="h-10 w-[140px]"
-                />
-                <Text
-                  className="mt-1 text-[13px] font-nunito"
-                  style={{ color: AppColors.subtleText }}
-                >
-                  ({org.review_summary.total_reviews})
-                </Text>
-              </View>
+              <Text
+                className="text-[13px] font-nunito"
+                style={{ color: AppColors.subtleText }}
+              >
+                ({org.review_summary.total_reviews})
+              </Text>
             </View>
           ) : (
             <View className="flex-row items-center gap-3 py-4 justify-center">
