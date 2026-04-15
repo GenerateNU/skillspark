@@ -7,6 +7,10 @@
     "events": "กิจกรรม",
     "about": "เกี่ยวกับ"
   },
+  "eventCategories": {
+    "noEventsFound": "ไม่พบกิจกรรมในหมวดหมู่นี้",
+    "ages": "อายุ"
+  },
   "common": {
     "submit": "ส่ง",
     "cancel": "ยกเลิก",

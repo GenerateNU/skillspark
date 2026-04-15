@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(curl -X PATCH https://search-skillsparkdomain-dev-xxxx.us-east-2.es.amazonaws.com/_plugins/_security/api/rolesmapping/all_access -H 'Content-Type: application/json' -u your-master-username:your-master-password -d '[:*)"
-    ]
-  }
-}

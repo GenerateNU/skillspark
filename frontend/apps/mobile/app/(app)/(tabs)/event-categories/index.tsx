@@ -14,6 +14,7 @@ import { Colors, AppColors, FontSizes, FontFamilies } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { useGetAllEventOccurrences } from "@skillspark/api-client";
+import { useTranslation } from "react-i18next";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { EventCategoriesListItem } from "@/components/EventCategoriesListItem";
 
@@ -23,6 +24,7 @@ export default function EventCategoryScreen() {
   const insets = useSafeAreaInsets();
   const theme = Colors.light;
 
+  const { t: translate } = useTranslation();
   const category = params.category as string;
   const { lat: geoLocationLat, lng: geoLocationLong } = useGeolocation();
 
@@ -108,7 +110,7 @@ export default function EventCategoryScreen() {
             marginTop: 20,
           }}
         >
-          No events found for this category.
+          {translate("eventCategories.noEventsFound")}
         </Text>
       ) : (
         <ScrollView

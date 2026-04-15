@@ -7,6 +7,10 @@
     "events": "Events",
     "about": "About"
   },
+  "eventCategories": {
+    "noEventsFound": "No events found for this category.",
+    "ages": "Ages"
+  },
   "common": {
     "submit": "Submit",
     "cancel": "Cancel",
