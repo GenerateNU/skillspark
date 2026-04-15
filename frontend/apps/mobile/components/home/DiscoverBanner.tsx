@@ -82,10 +82,7 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
           </View>
 
           {/* See More button */}
-          <Pressable
-            onPress={() => router.push(`/event/${eventId}`)}
-            className="flex-row items-center bg-white rounded-full px-[14px] py-2 gap-1"
-          >
+          <View className="flex-row items-center bg-white rounded-full px-[14px] py-2 gap-1">
             <Text
               className="text-sm"
               style={{ fontFamily: FontFamilies.bold, color: AppColors.primaryText }}
@@ -97,7 +94,7 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
               size={12}
               color={AppColors.primaryText}
             />
-          </Pressable>
+          </View>
         </View>
       </View>
     </Pressable>
