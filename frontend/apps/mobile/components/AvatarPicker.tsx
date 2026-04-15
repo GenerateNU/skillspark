@@ -110,8 +110,7 @@ export function AvatarPicker({
             onPress={() => setActiveTab(tab)}
             className="flex-1 py-2 rounded-[10px] items-center"
             style={{
-              backgroundColor:
-                activeTab === tab ? "#8AA0CC" : "transparent",
+              backgroundColor: activeTab === tab ? "#8AA0CC" : "transparent",
             }}
           >
             <ThemedText

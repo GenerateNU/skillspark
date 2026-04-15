@@ -62,7 +62,7 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
                   userLocation.coords.latitude,
                   userLocation.coords.longitude,
                   loc.latitude,
-                  loc.longitude
+                  loc.longitude,
                 )
               : null;
           return <OrgCard key={loc.id} pin={loc} distance={distance} />;

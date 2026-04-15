@@ -1,13 +1,18 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useQueries } from "@tanstack/react-query";
+import { EventRatingCard } from "@/components/EventRatingCard";
+import { RatingAggregateCard } from "@/components/ReviewAggregate";
+import { FilterTabs } from "@/components/SortingButtons";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors } from "@/constants/theme";
 import {
+  useGetEventReviewsForOrganization,
   useGetReviewAggregateOrganization,
-  useGetEventOccurrencesByOrganizationId,
-  getGetReviewAggregateQueryOptions,
   type ReviewAggregate,
-  type Event,
 } from "@skillspark/api-client";
-import { useMemo, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   ScrollView,
@@ -15,14 +20,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTranslation } from "react-i18next";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { RatingAggregateCard } from "@/components/ReviewAggregate";
-import { FilterTabs } from "@/components/SortingButtons";
-import { EventRatingCard } from "@/components/EventRatingCard";
-import { Colors } from "@/constants/theme";
 
 type SortValue = "most_rated" | "highest" | "lowest";
 
@@ -39,31 +36,14 @@ export default function OrgReviewsPage() {
       query: { enabled: !!id },
     });
 
-  const { data: occurrencesResp, isLoading: occurrencesLoading } =
-    useGetEventOccurrencesByOrganizationId(id ?? "", {
-      query: { enabled: !!id },
-    });
+  const { data: eventReviewsResp, isLoading: eventReviewsLoading } =
+    useGetEventReviewsForOrganization(
+      id ?? "",
+      { sort_by: sortBy },
+      { query: { enabled: !!id } },
+    );
 
-  const uniqueEvents = useMemo(() => {
-    if (occurrencesResp?.status !== 200) return [];
-    const seen = new Set<string>();
-    const events: Event[] = [];
-    for (const occ of occurrencesResp.data) {
-      if (!seen.has(occ.event.id)) {
-        seen.add(occ.event.id);
-        events.push(occ.event);
-      }
-    }
-    return events;
-  }, [occurrencesResp]);
-
-  const eventAggregateQueries = useQueries({
-    queries: uniqueEvents.map((event) =>
-      getGetReviewAggregateQueryOptions(event.id),
-    ),
-  });
-
-  if (orgAggLoading || occurrencesLoading) {
+  if (orgAggLoading || eventReviewsLoading) {
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
@@ -76,31 +56,7 @@ export default function OrgReviewsPage() {
       ? (orgAggregateResp.data as ReviewAggregate)
       : null;
 
-  const eventItems = uniqueEvents.map((event, i) => {
-    const aggResp = eventAggregateQueries[i]?.data;
-    const aggregate =
-      aggResp?.status === 200 ? (aggResp.data as ReviewAggregate) : null;
-    return { event, aggregate };
-  });
-
-  const sorted = [...eventItems].sort((a, b) => {
-    if (sortBy === "most_rated") {
-      return (
-        (b.aggregate?.total_reviews ?? 0) - (a.aggregate?.total_reviews ?? 0)
-      );
-    }
-    if (sortBy === "highest") {
-      return (
-        (b.aggregate?.average_rating ?? 0) - (a.aggregate?.average_rating ?? 0)
-      );
-    }
-    if (sortBy === "lowest") {
-      return (
-        (a.aggregate?.average_rating ?? 0) - (b.aggregate?.average_rating ?? 0)
-      );
-    }
-    return 0;
-  });
+  const items = eventReviewsResp?.status === 200 ? eventReviewsResp.data : [];
 
   return (
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
@@ -125,6 +81,7 @@ export default function OrgReviewsPage() {
         {orgAggregate && <RatingAggregateCard aggregate={orgAggregate} />}
 
         <FilterTabs
+          value={sortBy}
           options={[
             { label: translate("review.mostRated"), value: "most_rated" },
             { label: translate("review.highest"), value: "highest" },
@@ -134,18 +91,18 @@ export default function OrgReviewsPage() {
         />
 
         <View className="px-5 gap-3 mt-2">
-          {sorted.map(({ event, aggregate }) => (
+          {items.map((item) => (
             <EventRatingCard
-              key={event.id}
-              event={event}
-              aggregate={aggregate}
+              key={item.event_id}
+              event={item.event}
+              aggregate={item}
               onPress={() =>
                 router.push({
                   pathname: "/event/[id]/reviews",
                   params: {
-                    id: event.id,
-                    eventName: event.title,
-                    eventImageUrl: event.presigned_url,
+                    id: item.event.id,
+                    eventName: item.event.title,
+                    eventImageUrl: item.event.presigned_url,
                   },
                 })
               }

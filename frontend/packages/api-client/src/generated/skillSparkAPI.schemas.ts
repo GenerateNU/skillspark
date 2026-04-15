@@ -258,6 +258,17 @@ export interface OrgLink {
   label: string;
 }
 
+export interface ReviewRatingCount {
+  rating: number;
+  review_count: number;
+}
+
+export interface OrgReviewSummary {
+  average_rating: number;
+  breakdown: ReviewRatingCount[];
+  total_reviews: number;
+}
+
 export interface Organization {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -269,9 +280,10 @@ export interface Organization {
   location_id?: string;
   name: string;
   pfp_s3_key?: string;
-  presigned_url: string;
+  presigned_url?: string;
+  review_summary?: OrgReviewSummary;
   stripe_account_activated: boolean;
-  stripe_account_id: string;
+  stripe_account_id?: string;
   updated_at: string;
 }
 
@@ -560,11 +572,13 @@ export interface Guardian {
   auth_id: string;
   created_at: string;
   email: string;
+  email_notifications: boolean;
   expo_push_token: string;
   id: string;
   language_preference: string;
   name: string;
   profile_picture_s3_key: string;
+  push_notifications: boolean;
   stripe_customer_id?: string;
   updated_at: string;
   user_id: string;
@@ -710,11 +724,6 @@ export interface Review {
   updated_at: string;
 }
 
-export interface ReviewRatingCount {
-  rating: number;
-  review_count: number;
-}
-
 export interface ReviewAggregate {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -740,6 +749,13 @@ export interface School {
   location_id: string;
   name: string;
   updated_at: string;
+}
+
+export interface SimpleReviewAggregate {
+  average_rating: number;
+  event: Event;
+  event_id: string;
+  total_reviews: number;
 }
 
 export interface UpdateChildInputBody {
@@ -830,6 +846,8 @@ export interface UpdateGuardianInputBody {
   readonly $schema?: string;
   /** Email of the guardian */
   email: string;
+  /** Global email notification settings */
+  email_notifications?: boolean;
   /** Expo push notification token */
   expo_push_token?: string;
   /** Language preference */
@@ -838,6 +856,8 @@ export interface UpdateGuardianInputBody {
   name: string;
   /** S3 key for profile picture */
   profile_picture_s3_key?: string;
+  /** Global push notification settings */
+  push_notifications?: boolean;
   /** Username of the guardian */
   username: string;
 }
@@ -871,6 +891,12 @@ export interface UpdateRegistrationPaymentStatusInputBody {
   readonly $schema?: string;
   /** New payment intent status from Stripe */
   payment_intent_status: string;
+}
+
+export interface UsernameExistsOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  exists: boolean;
 }
 
 export type GetAllEventOccurrencesParams = {
@@ -947,6 +973,30 @@ page?: number;
 limit?: number;
 };
 
+export type GetEventReviewsForOrganizationParams = {
+/**
+ * Page number (starts at 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+sort_by?: GetEventReviewsForOrganizationSortBy;
+};
+
+export type GetEventReviewsForOrganizationSortBy = typeof GetEventReviewsForOrganizationSortBy[keyof typeof GetEventReviewsForOrganizationSortBy];
+
+
+export const GetEventReviewsForOrganizationSortBy = {
+  most_rated: 'most_rated',
+  highest: 'highest',
+  lowest: 'lowest',
+} as const;
+
 export type ListOrganizationsParams = {
 /**
  * Page number (starts at 1)
@@ -1016,7 +1066,20 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
+/**
+ * Sort order for reviews
+ */
+sort_by?: GetReviewByEventIdSortBy;
 };
+
+export type GetReviewByEventIdSortBy = typeof GetReviewByEventIdSortBy[keyof typeof GetReviewByEventIdSortBy];
+
+
+export const GetReviewByEventIdSortBy = {
+  most_recent: 'most_recent',
+  highest: 'highest',
+  lowest: 'lowest',
+} as const;
 
 export type GetReviewByGuardianIdParams = {
 /**

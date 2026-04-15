@@ -28,6 +28,17 @@ func (h *Handler) GetOrganizationById(ctx context.Context, input *models.GetOrga
 
 	organization.PresignedURL = url
 
+	aggregate, httpErr := h.ReviewRepository.GetAggregateReviewsForOrganization(ctx, id)
+	if httpErr != nil {
+		return nil, httpErr
+	}
+
+	organization.ReviewSummary = &models.OrgReviewSummary{
+		TotalReviews:  aggregate.TotalReviews,
+		AverageRating: aggregate.AverageRating,
+		Breakdown:     aggregate.Breakdown,
+	}
+
 	return organization, nil
 }
 

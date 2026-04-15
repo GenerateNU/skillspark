@@ -1,11 +1,13 @@
 import {
   ActivityIndicator,
+  Modal,
+  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -18,15 +20,23 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
-import { OccurrenceCard } from "@/app/(app)/(tabs)/org/[id]/OccurrenceCard";
+import { OccurrenceCard } from "./OccurrenceCard";
 import { formatSectionDate } from "@/utils/format";
 
 export default function OrgScheduleScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, filterClass } = useLocalSearchParams<{
+    id: string;
+    filterClass?: string;
+  }>();
   const router = useRouter();
   const { t: translate } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
   const borderColor = useThemeColor({}, "borderColor");
+
+  const [selectedClass, setSelectedClass] = useState<string | null>(
+    filterClass ?? null,
+  );
+  const [filterVisible, setFilterVisible] = useState(false);
 
   const { data: occurrencesResp, isLoading: occurrencesLoading } =
     useGetEventOccurrencesByOrganizationId(id);
@@ -38,14 +48,27 @@ export default function OrgScheduleScreen() {
     return Array.isArray(d?.data) ? d!.data : [];
   }, [occurrencesResp]);
 
+  const classNames = useMemo(
+    () => [...new Set(occurrences.map((o) => o.event.title))].sort(),
+    [occurrences],
+  );
+
+  const filteredOccurrences = useMemo(
+    () =>
+      selectedClass
+        ? occurrences.filter((o) => o.event.title === selectedClass)
+        : occurrences,
+    [occurrences, selectedClass],
+  );
+
   const uniqueEventIds = useMemo(
     () => [...new Set(occurrences.map((o) => o.event.id))],
-    [occurrences]
+    [occurrences],
   );
 
   const reviewResults = useQueries({
     queries: uniqueEventIds.map((eventId) =>
-      getGetReviewAggregateQueryOptions(eventId)
+      getGetReviewAggregateQueryOptions(eventId),
     ),
   });
 
@@ -66,11 +89,11 @@ export default function OrgScheduleScreen() {
 
   const groupOccurrencesByDate = useCallback(
     (
-      occurrences: EventOccurrence[]
+      occurrences: EventOccurrence[],
     ): { label: string; items: EventOccurrence[] }[] => {
       const sorted = [...occurrences].sort(
         (a, b) =>
-          new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+          new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
       );
 
       const groups: Map<string, EventOccurrence[]> = new Map();
@@ -85,12 +108,12 @@ export default function OrgScheduleScreen() {
         items,
       }));
     },
-    []
+    [],
   );
 
-    const grouped = useMemo(
-    () => groupOccurrencesByDate(occurrences),
-    [occurrences]
+  const grouped = useMemo(
+    () => groupOccurrencesByDate(filteredOccurrences),
+    [filteredOccurrences, groupOccurrencesByDate],
   );
 
   return (
@@ -122,7 +145,19 @@ export default function OrgScheduleScreen() {
         >
           {translate("org.schedule")}
         </Text>
-        <View className="w-8" />
+        <TouchableOpacity
+          onPress={() => setFilterVisible(true)}
+          activeOpacity={0.7}
+          className="rounded-full px-4 py-1.5"
+          style={{ backgroundColor: AppColors.primaryText }}
+        >
+          <Text
+            className="text-[13px] font-nunito-bold"
+            style={{ color: AppColors.white }}
+          >
+            {translate("map.filter")}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {occurrencesLoading ? (
@@ -168,6 +203,111 @@ export default function OrgScheduleScreen() {
           ))}
         </ScrollView>
       )}
+
+      {/* Class filter modal */}
+      <Modal
+        visible={filterVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setFilterVisible(false)}
+      >
+        <Pressable
+          className="flex-1 items-center justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.3)" }}
+          onPress={() => setFilterVisible(false)}
+        >
+          <Pressable
+            className="mx-6 w-full rounded-2xl bg-white p-6"
+            style={{ maxWidth: 360 }}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text
+              className="mb-4 text-[22px] font-nunito-bold"
+              style={{ color: AppColors.primaryText }}
+            >
+              {translate("org.schedule")}
+            </Text>
+
+            {/* All Classes option */}
+            <TouchableOpacity
+              onPress={() => {
+                setSelectedClass(null);
+                setFilterVisible(false);
+              }}
+              activeOpacity={0.7}
+              className="flex-row items-center justify-between py-3 border-b"
+              style={{ borderBottomColor: AppColors.divider }}
+            >
+              <Text
+                className="text-[16px] font-nunito"
+                style={{ color: AppColors.primaryText }}
+              >
+                {translate("org.allClasses")}
+              </Text>
+              <View
+                className="w-6 h-6 rounded-full border-2 items-center justify-center"
+                style={{
+                  borderColor:
+                    selectedClass === null
+                      ? AppColors.primaryText
+                      : AppColors.borderLight,
+                }}
+              >
+                {selectedClass === null && (
+                  <View
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: AppColors.primaryText }}
+                  />
+                )}
+              </View>
+            </TouchableOpacity>
+
+            {/* Individual class options */}
+            {classNames.map((name, idx) => (
+              <TouchableOpacity
+                key={name}
+                onPress={() => {
+                  setSelectedClass(name);
+                  setFilterVisible(false);
+                }}
+                activeOpacity={0.7}
+                className="flex-row items-center justify-between py-3"
+                style={
+                  idx < classNames.length - 1
+                    ? {
+                        borderBottomWidth: 1,
+                        borderBottomColor: AppColors.divider,
+                      }
+                    : undefined
+                }
+              >
+                <Text
+                  className="text-[16px] font-nunito flex-1 mr-3"
+                  style={{ color: AppColors.primaryText }}
+                >
+                  {name}
+                </Text>
+                <View
+                  className="w-6 h-6 rounded-full border-2 items-center justify-center"
+                  style={{
+                    borderColor:
+                      selectedClass === name
+                        ? AppColors.primaryText
+                        : AppColors.borderLight,
+                  }}
+                >
+                  {selectedClass === name && (
+                    <View
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: AppColors.primaryText }}
+                    />
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))}
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
