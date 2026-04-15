@@ -271,17 +271,9 @@ export default function OrgScreen() {
     );
   }
 
-  const orgWithMockReviews = {
-    ...response.data,
-    review_summary: {
-      total_reviews: 34,
-      average_rating: 4.2,
-    },
-  };
-
   return (
     <OrgDetail
-      org={orgWithMockReviews}
+      org={response.data}
       location={
         locationResponse?.status === 200 ? locationResponse.data : undefined
       }
