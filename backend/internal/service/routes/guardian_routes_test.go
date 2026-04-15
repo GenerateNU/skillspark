@@ -20,7 +20,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"io"
 )
 
 func setupGuardianTestAPI(
@@ -167,13 +166,7 @@ func TestHumaValidation_UpdateGuardian(t *testing.T) {
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
 
-			// Add this temporarily
-
-			body, _ := io.ReadAll(resp.Body)
-			t.Logf("Response body: %s", string(body))
 			defer func() { _ = resp.Body.Close() }()
-
-			assert.Equal(t, tt.statusCode, resp.StatusCode)
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 			mockRepo.AssertExpectations(t)

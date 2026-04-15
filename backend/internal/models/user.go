@@ -14,8 +14,6 @@ type User struct {
 	ProfilePictureS3Key *string   `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
 	LanguagePreference  string    `json:"language_preference" db:"language_preference"`
 	AuthID              uuid.UUID `json:"auth_id" db:"auth_id"`
-	PushNotification    bool      `json:"push_notifications" db:"push_notifications"`
-	EmailNotification   bool      `json:"email_notifications" db:"email_notifications"`
 	CreatedAt           time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -46,8 +44,6 @@ type UpdateUserInput struct {
 		ProfilePictureS3Key *string    `json:"profile_picture_s3_key,omitempty" db:"profile_picture_s3_key" doc:"s3 key of the user's profile picture"`
 		LanguagePreference  *string    `json:"language_preference,omitempty" db:"language_preference" doc:"language preference of the user"`
 		AuthID              *uuid.UUID `json:"auth_id,omitempty" db:"auth_id" doc:"supabase auth id of the user"`
-		PushNotification    *bool      `json:"push_notifications" db:"push_notifications" doc:"global push notifications"`
-		EmailNotification   *bool      `json:"email_notifications" db:"email_notifications" doc:"global email notifications"`
 	}
 }
 
