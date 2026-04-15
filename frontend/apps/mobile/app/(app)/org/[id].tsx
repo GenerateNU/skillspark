@@ -217,18 +217,6 @@ function OrgDetail({
               <Text className="text-[16px] font-nunito">
                 {translate("review.firstReview")}
               </Text>
-              <View className="items-start">
-                <Image
-                  source={require("@/assets/images/faces.png")}
-                  className="h-10 w-[140px]"
-                />
-                <Text
-                  className="mt-1 text-[13px] font-nunito"
-                  style={{ color: AppColors.subtleText }}
-                >
-                  (140)
-                </Text>
-              </View>
             </View>
           )}
         </View>
