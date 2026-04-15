@@ -76,7 +76,9 @@
     "termsAndConditions": "ข้อกำหนดและเงื่อนไข",
     "privacyPolicy": "นโยบายความเป็นส่วนตัว",
     "logOut": "ออกจากระบบ",
-    "deleteAccount": "ลบบัญชี"
+    "deleteAccount": "ลบบัญชี",
+    "pushNotifications": "การแจ้งเตือนแบบพุช",
+    "emailNotifications": "การแจ้งเตือนทางอีเมล"
   },
   "privacyPolicy": {
     "lastUpdated": "อัปเดตล่าสุด: 4 เมษายน 2026",

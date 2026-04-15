@@ -36,6 +36,7 @@ type Notification struct {
 	ScheduledFor       time.Time          `json:"scheduled_for" db:"scheduled_for"`
 	SentAt             *time.Time         `json:"sent_at,omitempty" db:"sent_at"`
 	Status             NotificationStatus `json:"status" db:"status"`
+	GuardianID         *uuid.UUID         `json:"guardian_id,omitempty" db:"guardian_id"`
 	CreatedAt          time.Time          `json:"created_at" db:"created_at"`
 	UpdatedAt          time.Time          `json:"updated_at" db:"updated_at"`
 }
@@ -60,6 +61,7 @@ type CreateScheduledNotificationInput struct {
 	Body               string
 	Metadata           json.RawMessage
 	ScheduledFor       time.Time
+	GuardianID         *uuid.UUID
 }
 
 // SendNotificationInput is used internally to send an immediate notification

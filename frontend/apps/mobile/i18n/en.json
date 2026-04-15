@@ -77,7 +77,9 @@
     "termsAndConditions": "Terms and Conditions",
     "privacyPolicy": "Privacy Policy",
     "logOut": "Log Out",
-    "deleteAccount": "Delete Account"
+    "deleteAccount": "Delete Account",
+    "pushNotifications": "Push Notifications",
+    "emailNotifications": "Email Notifications"
   },
   "privacyPolicy": {
     "lastUpdated": "Last Updated: April 4, 2026",

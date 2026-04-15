@@ -1,12 +1,13 @@
 import {
-  useGetGuardianById,
   useGetChildrenByGuardianId,
   useGetEmergencyContactsByGuardianId,
+  useGetGuardianById,
 } from "@skillspark/api-client";
 
 export function useGuardian(guardianId: string | null) {
   const { data: guardianResponse, isLoading: guardianLoading } =
     useGetGuardianById(guardianId || "");
+
   const { data: childrenResponse, isLoading: childrenLoading } =
     useGetChildrenByGuardianId(guardianId || "");
   const { data: emergencycontactResponse, isLoading: emergencycontactLoading } =

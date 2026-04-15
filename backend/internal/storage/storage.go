@@ -70,6 +70,7 @@ type GuardianRepository interface {
 	UpdateGuardian(ctx context.Context, guardian *models.UpdateGuardianInput) (*models.Guardian, error)
 	SetStripeCustomerID(ctx context.Context, guardianID uuid.UUID, stripeCustomerID string) (*models.Guardian, error)
 	DeleteGuardian(ctx context.Context, id uuid.UUID, tx pgx.Tx) (*models.Guardian, error)
+	GetGuardianNotificationPreferences(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]models.GuardianNotificationPreferences, error)
 }
 
 type EventRepository interface {
