@@ -1,5 +1,11 @@
-import React from "react";
-import { View, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import React, { useRef, useState } from "react";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Modal,
+} from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, TAG_COLORS, Colors } from "@/constants/theme";
@@ -36,9 +42,85 @@ export const MONTHS = [
   "December",
 ];
 
-export const YEARS = Array.from({ length: 20 }, (_, i) =>
-  String(new Date().getFullYear() - i),
+export const YEARS = Array.from({ length: 30 }, (_, i) =>
+  String(new Date().getFullYear() - i)
 );
+
+type DropdownLayout = { x: number; y: number; width: number };
+
+type DropdownModalProps = {
+  visible: boolean;
+  onClose: () => void;
+  layout: DropdownLayout | null;
+  options: string[];
+  onSelect: (value: string) => void;
+};
+
+function DropdownModal({
+  visible,
+  onClose,
+  layout,
+  options,
+  onSelect,
+}: DropdownModalProps) {
+  const theme = Colors.light;
+  if (!layout) return null;
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      onRequestClose={onClose}
+    >
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        activeOpacity={1}
+        onPress={onClose}
+      >
+        <View
+          style={{
+            position: "absolute",
+            top: layout.y,
+            left: layout.x,
+            width: layout.width,
+            backgroundColor: theme.dropdownBg,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: theme.borderColor,
+            shadowColor: "#000",
+            shadowOpacity: 0.12,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 2 },
+            elevation: 8,
+            maxHeight: 220,
+            overflow: "hidden",
+          }}
+        >
+          <ScrollView bounces={false}>
+            {options.map((opt) => (
+              <TouchableOpacity
+                key={opt}
+                style={{
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#E5E7EB",
+                }}
+                onPress={() => {
+                  onSelect(opt);
+                  onClose();
+                }}
+              >
+                <ThemedText>{opt}</ThemedText>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
+}
 
 export type ChildProfileFormProps = {
   firstName: string;
@@ -90,17 +172,38 @@ export function ChildProfileForm({
   const theme = Colors.light;
   const { t: translate } = useTranslation();
 
+  const monthTriggerRef = useRef<View>(null);
+  const yearTriggerRef = useRef<View>(null);
+  const [monthDropLayout, setMonthDropLayout] = useState<DropdownLayout | null>(null);
+  const [yearDropLayout, setYearDropLayout] = useState<DropdownLayout | null>(null);
+
+  const openMonthDrop = () => {
+    monthTriggerRef.current?.measure((_fx: number, _fy: number, width: number, height: number, px: number, py: number) => {
+      setMonthDropLayout({ x: px, y: py + height + 4, width });
+      setShowMonthDrop(true);
+      setShowYearDrop(false);
+    });
+  };
+
+  const openYearDrop = () => {
+    yearTriggerRef.current?.measure((_fx: number, _fy: number, width: number, height: number, px: number, py: number) => {
+      setYearDropLayout({ x: px, y: py + height + 4, width });
+      setShowYearDrop(true);
+      setShowMonthDrop(false);
+    });
+  };
+
   const removeInterest = (tag: string) =>
     setInterests((prev) => prev.filter((i) => i !== tag));
 
   const toggleInterest = (item: string) => {
     setInterests((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item],
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
     );
   };
 
   const filteredOptions = INTEREST_OPTIONS.filter((o) =>
-    o.toLowerCase().includes(searchQuery.toLowerCase()),
+    o.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -159,110 +262,64 @@ export function ChildProfileForm({
         placeholder={translate("childProfile.lastName")}
         placeholderTextColor={AppColors.placeholderText}
       />
-      <View className="flex-row gap-3 mb-6 z-10">
-        {/* Month picker */}
-        <View className="flex-1 z-10">
-          <TouchableOpacity
-            className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6]"
-            onPress={() => {
-              setShowMonthDrop(!showMonthDrop);
-              setShowYearDrop(false);
-            }}
-          >
-            <ThemedText
-              className={birthMonth ? "" : "font-nunito text-[#9CA3AF]"}
+
+      {/* Month / Year row */}
+      <View className="flex-row gap-3 mb-6">
+        {/* Month trigger */}
+        <View className="flex-1">
+          <View ref={monthTriggerRef}>
+            <TouchableOpacity
+              className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6]"
+              onPress={openMonthDrop}
             >
-              {birthMonth || translate("childProfile.month")}
-            </ThemedText>
-            <IconSymbol
-              name="chevron.down"
-              size={16}
-              color={AppColors.mutedText}
-            />
-          </TouchableOpacity>
-          {showMonthDrop && (
-            <View
-              className="absolute left-0 right-0 top-[52px] rounded-[10px] border z-[100] elevation-5"
-              style={{
-                backgroundColor: theme.dropdownBg,
-                borderColor: theme.borderColor,
-                shadowColor: "#000",
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
-                shadowOffset: { width: 0, height: 2 },
-              }}
-            >
-              <ScrollView nestedScrollEnabled className="max-h-[180px]">
-                {MONTHS.map((m) => (
-                  <TouchableOpacity
-                    key={m}
-                    className="px-4 py-3 border-b border-b-[#E5E7EB]"
-                    onPress={() => {
-                      setBirthMonth(m);
-                      setShowMonthDrop(false);
-                    }}
-                  >
-                    <ThemedText>{m}</ThemedText>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          )}
+              <ThemedText className={birthMonth ? "" : "font-nunito text-[#9CA3AF]"}>
+                {birthMonth || translate("childProfile.month")}
+              </ThemedText>
+              <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
+            </TouchableOpacity>
+          </View>
         </View>
-        {/* Year picker */}
-        <View className="flex-1 z-10">
-          <TouchableOpacity
-            className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6]"
-            onPress={() => {
-              setShowYearDrop(!showYearDrop);
-              setShowMonthDrop(false);
-            }}
-          >
-            <ThemedText
-              className={birthYear ? "" : "font-nunito text-[#9CA3AF]"}
+
+        {/* Year trigger */}
+        <View className="flex-1">
+          <View ref={yearTriggerRef}>
+            <TouchableOpacity
+              className="rounded-[10px] px-4 py-[14px] flex-row items-center justify-between bg-[#F3F4F6]"
+              onPress={openYearDrop}
             >
-              {birthYear || translate("childProfile.year")}
-            </ThemedText>
-            <IconSymbol
-              name="chevron.down"
-              size={16}
-              color={AppColors.mutedText}
-            />
-          </TouchableOpacity>
-          {showYearDrop && (
-            <View
-              className="absolute left-0 right-0 top-[52px] rounded-[10px] border z-[100] elevation-5"
-              style={{
-                backgroundColor: theme.dropdownBg,
-                borderColor: theme.borderColor,
-                shadowColor: "#000",
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
-                shadowOffset: { width: 0, height: 2 },
-              }}
-            >
-              <ScrollView nestedScrollEnabled className="max-h-[180px]">
-                {YEARS.map((y) => (
-                  <TouchableOpacity
-                    key={y}
-                    className="px-4 py-3 border-b border-b-[#E5E7EB]"
-                    onPress={() => {
-                      setBirthYear(y);
-                      setShowYearDrop(false);
-                    }}
-                  >
-                    <ThemedText>{y}</ThemedText>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          )}
+              <ThemedText className={birthYear ? "" : "font-nunito text-[#9CA3AF]"}>
+                {birthYear || translate("childProfile.year")}
+              </ThemedText>
+              <IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
+
+      {/* Month dropdown modal */}
+      <DropdownModal
+        visible={showMonthDrop}
+        onClose={() => setShowMonthDrop(false)}
+        layout={monthDropLayout}
+        options={MONTHS}
+        onSelect={setBirthMonth}
+      />
+
+      {/* Year dropdown modal */}
+      <DropdownModal
+        visible={showYearDrop}
+        onClose={() => setShowYearDrop(false)}
+        layout={yearDropLayout}
+        options={YEARS}
+        onSelect={setBirthYear}
+      />
+
       <SchoolPicker value={schoolId} onChange={setSchoolId} />
+
       <ThemedText className="text-base font-nunito-semibold mb-3">
         {translate("familyInformation.interests")}
       </ThemedText>
+
       {interests.length > 0 && (
         <ScrollView
           horizontal
@@ -279,24 +336,19 @@ export function ChildProfileForm({
                 style={{ backgroundColor: color.bg, borderColor: color.border }}
                 onPress={() => removeInterest(tag)}
               >
-                <IconSymbol
-                  name="camera.filters"
-                  size={13}
-                  color={color.border}
-                />
+                <IconSymbol name="camera.filters" size={13} color={color.border} />
                 <ThemedText
                   className="text-xs font-nunito-medium"
                   style={{ color: color.text }}
                 >
-                  {translate(`interests.${tag}`, {
-                    defaultValue: capitalize(tag),
-                  })}
+                  {translate(`interests.${tag}`, { defaultValue: capitalize(tag) })}
                 </ThemedText>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
       )}
+
       <View className="border rounded-[10px] overflow-hidden mb-6 border-[#E5E7EB]">
         <View className="flex-row items-center px-4 py-3 gap-2">
           <TextInput
@@ -306,11 +358,7 @@ export function ChildProfileForm({
             placeholder={translate("childProfile.searchInterests")}
             placeholderTextColor={AppColors.placeholderText}
           />
-          <IconSymbol
-            name="magnifyingglass"
-            size={20}
-            color={AppColors.mutedText}
-          />
+          <IconSymbol name="magnifyingglass" size={20} color={AppColors.mutedText} />
         </View>
         <View className="h-px bg-[#E5E7EB]" />
         <View
@@ -329,9 +377,7 @@ export function ChildProfileForm({
                 onPress={() => toggleInterest(item)}
               >
                 <ThemedText className="text-base font-nunito">
-                  {translate(`interests.${item}`, {
-                    defaultValue: capitalize(item),
-                  })}
+                  {translate(`interests.${item}`, { defaultValue: capitalize(item) })}
                 </ThemedText>
                 <View
                   className="w-[22px] h-[22px] rounded-[4px] border-[1.5px] items-center justify-center"
