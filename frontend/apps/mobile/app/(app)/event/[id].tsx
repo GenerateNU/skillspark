@@ -11,7 +11,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetEventOccurrencesById } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors, FontFamilies } from "@/constants/theme";
+import { AppColors } from "@/constants/theme";
 import { RatingSmiley } from "@/components/RatingSmiley";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { useTranslation } from "react-i18next";
@@ -109,13 +109,8 @@ function EventOccurrenceDetail({
           {/* Title row with bookmark */}
           <View className="flex-row items-start justify-between mb-3">
             <Text
-              className="flex-1 mr-3"
-              style={{
-                fontSize: 26,
-                fontFamily: FontFamilies.bold,
-                color: AppColors.primaryText,
-                lineHeight: 32,
-              }}
+              className="flex-1 mr-3 text-[26px] font-nunito-bold leading-8"
+              style={{ color: AppColors.primaryText }}
             >
               {occurrence.event.title}
             </Text>
@@ -176,8 +171,8 @@ function EventOccurrenceDetail({
           <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardShadow}>
             {/* Title */}
             <Text
-              className="mb-3 font-nunito-bold"
-              style={{ fontSize: 18, color: AppColors.primaryText }}
+              className="mb-3 font-nunito-bold text-[18px]"
+              style={{ color: AppColors.primaryText }}
             >
               {translate("event.reviews")}
             </Text>
@@ -185,10 +180,10 @@ function EventOccurrenceDetail({
             {/* Rating + review row */}
             <View className="flex-row gap-4">
               {/* Left: score, smiley, count */}
-              <View className="items-center" style={{ width: 64 }}>
+              <View className="items-center w-16">
                 <Text
-                  className="font-nunito-bold"
-                  style={{ fontSize: 42, lineHeight: 46, color: AppColors.primaryText }}
+                  className="font-nunito-bold text-[42px] leading-[46px]"
+                  style={{ color: AppColors.primaryText }}
                 >
                   {MOCK_REVIEW.avgRating.toFixed(1)}
                 </Text>
@@ -198,8 +193,8 @@ function EventOccurrenceDetail({
                   height={40}
                 />
                 <Text
-                  className="font-nunito mt-1"
-                  style={{ fontSize: 13, color: AppColors.subtleText }}
+                  className="font-nunito mt-1 text-[13px]"
+                  style={{ color: AppColors.subtleText }}
                 >
                   ({MOCK_REVIEW.totalReviews})
                 </Text>
@@ -208,11 +203,8 @@ function EventOccurrenceDetail({
               {/* Right: description, tags, footer */}
               <View className="flex-1">
                 <Text
-                  className="text-sm leading-[20px] mb-2"
-                  style={{
-                    color: AppColors.primaryText,
-                    fontFamily: FontFamilies.regular,
-                  }}
+                  className="text-sm leading-[20px] mb-2 font-nunito"
+                  style={{ color: AppColors.primaryText }}
                 >
                   {MOCK_REVIEW.description}
                 </Text>
@@ -224,11 +216,8 @@ function EventOccurrenceDetail({
                       style={{ backgroundColor: "#E9D5FF" }}
                     >
                       <Text
-                        className="text-[12px]"
-                        style={{
-                          color: AppColors.secondaryText,
-                          fontFamily: FontFamilies.regular,
-                        }}
+                        className="text-[12px] font-nunito"
+                        style={{ color: AppColors.secondaryText }}
                       >
                         {tag}
                       </Text>
@@ -237,21 +226,14 @@ function EventOccurrenceDetail({
                 </View>
                 <View className="flex-row items-center justify-between">
                   <Text
-                    className="text-[12px]"
-                    style={{
-                      color: AppColors.primaryText,
-                      fontFamily: FontFamilies.regular,
-                      fontStyle: "italic",
-                    }}
+                    className="text-[12px] font-nunito italic"
+                    style={{ color: AppColors.primaryText }}
                   >
                     {translate("review.anonymous")}
                   </Text>
                   <Text
-                    className="text-[12px]"
-                    style={{
-                      color: AppColors.mutedText,
-                      fontFamily: FontFamilies.regular,
-                    }}
+                    className="text-[12px] font-nunito"
+                    style={{ color: AppColors.mutedText }}
                   >
                     {MOCK_REVIEW.timeAgo}
                   </Text>
@@ -262,11 +244,8 @@ function EventOccurrenceDetail({
             {/* See more */}
             <View className="mt-4 items-center">
               <Text
-                className="text-[13px] font-nunito"
-                style={{
-                  color: AppColors.primaryText,
-                  textDecorationLine: "underline",
-                }}
+                className="text-[13px] font-nunito underline"
+                style={{ color: AppColors.primaryText }}
               >
                 {translate("event.seeMoreReviews")}
               </Text>
