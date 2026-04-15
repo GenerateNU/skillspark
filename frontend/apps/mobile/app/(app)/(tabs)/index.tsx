@@ -151,7 +151,7 @@ export default function HomeScreen() {
     );
     return cats.size > 0
       ? Array.from(cats)
-      : ["Sport", "Arts", "Music", "Tech", "Activity", "Tutoring"];
+      : ["science", "technology", "soccer", "painting", "dance", "coding"];
   }, [allOccurrences]);
 
   const categoryEventMap = useMemo(() => {

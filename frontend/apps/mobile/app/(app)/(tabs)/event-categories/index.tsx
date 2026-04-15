@@ -22,6 +22,7 @@ export default function EventCategoryScreen() {
   const theme = Colors.light;
 
   const category = params.category as string;
+  console.log("[event-categories] category:", category);
   const { lat: geoLocationLat, lng: geoLocationLong } = useGeolocation();
 
   const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({

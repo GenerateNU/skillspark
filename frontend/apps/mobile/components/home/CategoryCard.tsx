@@ -5,12 +5,20 @@ import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { useRouter } from "expo-router";
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Sport: AppColors.blue,
-  Arts: AppColors.violet,
-  Music: AppColors.pink,
-  Tech: AppColors.emerald,
-  Activity: AppColors.amber,
-  Tutoring: AppColors.danger,
+  science: AppColors.emerald,
+  technology: AppColors.blue,
+  soccer: AppColors.amber,
+  painting: AppColors.violet,
+  dance: AppColors.pink,
+  coding: AppColors.danger,
+  basketball: AppColors.amber,
+  swimming: AppColors.blue,
+  "martial arts": AppColors.danger,
+  "vocal music": AppColors.pink,
+  "instrumental music": AppColors.pink,
+  theater: AppColors.violet,
+  drawing: AppColors.violet,
+  photography: AppColors.emerald,
 };
 
 
