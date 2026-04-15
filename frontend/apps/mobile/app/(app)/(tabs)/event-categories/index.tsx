@@ -4,7 +4,9 @@ import {
   TouchableOpacity,
   ScrollView,
   Text,
+  ActivityIndicator,
 } from "react-native";
+import { Image } from "expo-image";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/themed-view";
@@ -22,13 +24,13 @@ export default function EventCategoryScreen() {
   const theme = Colors.light;
 
   const category = params.category as string;
-  console.log("[event-categories] category:", category);
   const { lat: geoLocationLat, lng: geoLocationLong } = useGeolocation();
 
-  const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({
+  const { data: localizedOccurrencesResp, isLoading } = useGetAllEventOccurrences({
     category,
-    lat: geoLocationLat,
-    lng: geoLocationLong,
+    
+    lat: "13.7563",
+    lng: "100.5018",
     radius_km: 50,
     limit: 20,
     soldout: false,
@@ -43,32 +45,60 @@ export default function EventCategoryScreen() {
   }
 
   const occurrences = localizedOccurrencesResp?.status === 200 ? localizedOccurrencesResp.data : [];
+  const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
 
   return (
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Header */}
-      <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 }}>
+      <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 16, overflow: "hidden" }}>
+        {/* Background logos */}
+        <Image
+          source={require("@/assets/images/skillspark.png")}
+          style={{
+            position: "absolute",
+            right: -20,
+            top: -10,
+            width: 160,
+            height: 160,
+            opacity: 0.08,
+          }}
+          contentFit="contain"
+        />
+        <Image
+          source={require("@/assets/images/skillspark.png")}
+          style={{
+            position: "absolute",
+            left: -30,
+            top: 20,
+            width: 160,
+            height: 160,
+            opacity: 0.06,
+          }}
+          contentFit="contain"
+        />
         <TouchableOpacity
           onPress={() => router.back()}
-          className="w-8 h-8 justify-center items-start"
+          style={{ width: 32, height: 32, justifyContent: "center", alignItems: "flex-start" }}
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
         <Text
           style={{
             fontFamily: FontFamilies.bold,
-            fontSize: FontSizes.lg,
+            fontSize: 32,
             color: AppColors.primaryText,
-            marginTop: 8,
+            marginTop: 12,
           }}
         >
-          {category}
+          {displayCategory}
         </Text>
       </View>
 
-      {occurrences.length === 0 ? (
+      {isLoading ? (
+        <ActivityIndicator size="large" style={{ marginTop: 40 }} color={AppColors.primaryText} />
+      ) : occurrences.length === 0 ? (
         <Text
           style={{
             fontFamily: FontFamilies.bold,
@@ -89,7 +119,7 @@ export default function EventCategoryScreen() {
             <EventCategoriesListItem
               key={o.id}
               eventOccurrence={o}
-              onPress={() => router.push(`/event/${o.event.id}`)}
+              onPress={() => router.push({ pathname: "/event/[id]", params: { id: o.id, from: "event-categories", category } })}
             />
           ))}
         </ScrollView>

@@ -1,4 +1,5 @@
 import { Image } from "expo-image";
+import { useEventBackNavigation } from "@/hooks/use-event-back-navigation";
 import {
   ActivityIndicator,
   ScrollView,
@@ -27,12 +28,17 @@ function formatAddress(occurrence: EventOccurrence) {
 
 function EventOccurrenceDetail({
   occurrence,
+  from,
+  category,
 }: {
   occurrence: EventOccurrence;
+  from?: string;
+  category?: string;
 }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t: translate } = useTranslation();
+  const handleBack = useEventBackNavigation({ from, category });
   const duration = formatDuration(occurrence.start_time, occurrence.end_time, {
     hr: translate("event.hr"),
     min: translate("event.min"),
@@ -68,7 +74,7 @@ function EventOccurrenceDetail({
               <View className="flex-1 bg-[#C5C5C5]" />
             )}
             <TouchableOpacity
-              onPress={() => router.navigate("/")}
+              onPress={handleBack}
               activeOpacity={0.7}
               className="absolute top-4 left-4 z-10 flex-row items-center bg-white rounded-full px-4 py-2.5 elevation-10"
               style={{
@@ -299,7 +305,7 @@ function EventOccurrenceDetail({
 }
 
 export default function EventOccurrenceScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from, category } = useLocalSearchParams<{ id: string; from?: string; category?: string }>();
   const { data: response, isLoading, error } = useGetEventOccurrencesById(id);
   const { t: translate } = useTranslation();
 
@@ -324,5 +330,5 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  return <EventOccurrenceDetail occurrence={response.data} />;
+  return <EventOccurrenceDetail occurrence={response.data} from={from} category={category} />;
 }
