@@ -10,10 +10,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useGetEventOccurrencesByEventId } from "@skillspark/api-client";
+import { useGetEventOccurrencesByEventId, useGetReviewAggregate } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
+import { RATING_OPTIONS } from "@/constants/ratings";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { useTranslation } from "react-i18next";
@@ -40,6 +41,17 @@ function EventOccurrenceDetail({
   const location = formatLocation(occurrence);
   const categories = occurrence.event.category?.join(" / ") ?? "";
   const orgId = occurrence.event.organization_id;
+
+  const { data: aggregateResp } = useGetReviewAggregate(occurrence.event.id, {
+    query: { enabled: !!occurrence.event.id },
+  });
+  const aggregate =
+    aggregateResp?.status === 200 ? aggregateResp.data : null;
+  const avgRating = aggregate?.average_rating ?? 0;
+  const totalReviews = aggregate?.total_reviews ?? 0;
+  const ratingMatch = RATING_OPTIONS.find(
+    (r) => r.rating === Math.round(avgRating),
+  );
 
   const cardShadow = {
     shadowColor: "#000",
@@ -228,6 +240,35 @@ function EventOccurrenceDetail({
             >
               {translate("event.reviews")}
             </Text>
+
+            {/* Aggregate rating */}
+            {totalReviews > 0 && ratingMatch ? (
+              <View className="flex-row items-center gap-2">
+                <Image
+                  source={ratingMatch.image}
+                  style={{ width: 22, height: 22 }}
+                />
+                <Text
+                  className="text-[15px] font-nunito-bold"
+                  style={{ color: AppColors.primaryText }}
+                >
+                  {translate(ratingMatch.labelKey)}
+                </Text>
+                <Text
+                  className="text-[13px] font-nunito"
+                  style={{ color: AppColors.subtleText }}
+                >
+                  ({totalReviews})
+                </Text>
+              </View>
+            ) : (
+              <Text
+                className="text-[13px] font-nunito"
+                style={{ color: AppColors.subtleText }}
+              >
+                {translate("review.noReviews")}
+              </Text>
+            )}
 
             {/* See more */}
             <View className="mt-4 items-center">
