@@ -10,8 +10,7 @@ import {
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Colors, AppColors } from "@/constants/theme";
+import { AppColors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useTranslation } from "react-i18next";
 import { useAuthContext } from "@/hooks/use-auth-context";
@@ -24,14 +23,14 @@ import {
 	useDeleteEmergencyContact,
 	useUpdateEmergencyContact,
 } from "@skillspark/api-client";
-import { useGuardian } from "@/hooks/use-guardian";
+
+const BG = "#EDE8FF";
 
 // screen for adding an emergency contact
 export default function ManageEmergencyContactScreen() {
 	const router = useRouter();
 	const params = useLocalSearchParams();
 	const insets = useSafeAreaInsets();
-	const theme = Colors.light;
 
 	const { guardianId } = useAuthContext();
 
@@ -54,9 +53,7 @@ export default function ManageEmergencyContactScreen() {
 	const isValidPhoneNumber = (phoneNumber: string) => {
 		const phoneValidationRegex =
 			/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
-		const isValid = (str: string) => phoneValidationRegex.test(str);
-
-		return isValid(phoneNumber);
+		return phoneValidationRegex.test(phoneNumber);
 	};
 
 	const emergencyContactData = {
@@ -146,78 +143,110 @@ export default function ManageEmergencyContactScreen() {
 	};
 
 	return (
-		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
 			<Stack.Screen options={{ headerShown: false }} />
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
-				className="flex-1"
+				style={{ flex: 1 }}
 				keyboardVerticalOffset={0}
 			>
-				<ScrollView
-					contentContainerStyle={{
+				{/* Header row in lavender area */}
+				<View
+					style={{
+						flexDirection: "row",
+						alignItems: "center",
+						justifyContent: "space-between",
 						paddingHorizontal: 20,
-						paddingBottom: 40,
-						paddingTop: 10,
+						paddingVertical: 14,
 					}}
-					showsVerticalScrollIndicator={false}
 				>
-					<View className="flex-row items-center justify-between mb-6">
-						<TouchableOpacity
-							onPress={() => router.back()}
-							className="flex-row items-center px-5 py-3 gap-1"
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-						>
-							<IconSymbol name="chevron.left" size={18} color="#11181C" />
-							<ThemedText className="text-base font-nunito">
-								{translate("onboarding.back")}
-							</ThemedText>
-						</TouchableOpacity>
-						<ThemedText className="text-xl text-center font-nunito-bold mt-0.5">
-							{translate("profile.familyInformation")}
-						</ThemedText>
-						{isEditing ? (
-							<TouchableOpacity onPress={handleDelete}>
-								<ThemedText
-									className="font-nunito-semibold"
-									style={{ color: AppColors.danger }}
-								>
-									{translate("emergencyContact.deleteContact")}
-								</ThemedText>
-							</TouchableOpacity>
-						) : (
-							<View className="w-10" />
-						)}
-					</View>
-					<ThemedText className="text-[22px] font-nunito-semibold mb-5">
-						{isEditing
-							? translate("emergencyContact.editTitle")
-							: translate("emergencyContact.addTitle")}
-					</ThemedText>
-					<EmergencyContactForm
-						name={name}
-						setName={setName}
-						phoneNumber={phoneNumber}
-						setPhoneNumber={setPhoneNumber}
-					/>
 					<TouchableOpacity
-						className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
-						style={{ backgroundColor: "#1c1c1e" }}
-						onPress={handleSave}
-						disabled={isSubmitting}
+						onPress={() => router.back()}
+						style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+						hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 					>
-						<ThemedText
-							className="text-base font-nunito-semibold"
-							style={{ color: "#FFFFFF" }}
-						>
-							{isSubmitting
-								? translate("emergencyContact.saving")
-								: isEditing
-									? translate("emergencyContact.saveChanges")
-									: translate("emergencyContact.addContact")}
+						<IconSymbol name="chevron.left" size={18} color="#11181C" />
+						<ThemedText style={{ fontSize: 16, fontFamily: "NunitoSans_400Regular" }}>
+							{translate("onboarding.back")}
 						</ThemedText>
 					</TouchableOpacity>
+
+					<ThemedText style={{ fontSize: 18, fontFamily: "NunitoSans_700Bold" }}>
+						{translate("profile.familyInformation")}
+					</ThemedText>
+
+					{isEditing ? (
+						<TouchableOpacity onPress={handleDelete}>
+							<ThemedText style={{ fontFamily: "NunitoSans_600SemiBold", color: AppColors.danger }}>
+								{translate("emergencyContact.deleteContact")}
+							</ThemedText>
+						</TouchableOpacity>
+					) : (
+						<View style={{ width: 40 }} />
+					)}
+				</View>
+
+				{/* White card with form */}
+				<ScrollView
+					contentContainerStyle={{ flexGrow: 1 }}
+					keyboardShouldPersistTaps="handled"
+					showsVerticalScrollIndicator={false}
+				>
+					<View
+						style={{
+							flex: 1,
+							backgroundColor: "#FFFFFF",
+							borderTopLeftRadius: 28,
+							borderTopRightRadius: 28,
+							paddingHorizontal: 24,
+							paddingTop: 28,
+							paddingBottom: insets.bottom + 24,
+						}}
+					>
+						<ThemedText
+							style={{
+								fontSize: 20,
+								fontFamily: "NunitoSans_600SemiBold",
+								color: AppColors.primaryText,
+								marginBottom: 20,
+							}}
+						>
+							{isEditing
+								? translate("emergencyContact.editTitle")
+								: translate("emergencyContact.addTitle")}
+						</ThemedText>
+
+						<EmergencyContactForm
+							name={name}
+							setName={setName}
+							phoneNumber={phoneNumber}
+							setPhoneNumber={setPhoneNumber}
+						/>
+
+						<TouchableOpacity
+							style={{
+								backgroundColor: "#1C1C1E",
+								borderRadius: 24,
+								paddingVertical: 16,
+								alignItems: "center",
+								marginTop: 8,
+								opacity: isSubmitting ? 0.7 : 1,
+							}}
+							onPress={handleSave}
+							disabled={isSubmitting}
+							activeOpacity={0.8}
+						>
+							<ThemedText style={{ color: "#FFFFFF", fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}>
+								{isSubmitting
+									? translate("emergencyContact.saving")
+									: isEditing
+										? translate("emergencyContact.saveChanges")
+										: translate("emergencyContact.addContact")}
+							</ThemedText>
+						</TouchableOpacity>
+					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-		</ThemedView>
+		</View>
 	);
 }

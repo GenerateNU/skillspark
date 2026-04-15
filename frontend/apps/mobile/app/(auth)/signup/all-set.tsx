@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
-import { View, Image } from "react-native";
+import { View } from "react-native";
+import { JumpingCharacter } from "@/components/JumpingCharacter";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { useTranslation } from "react-i18next";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
+
+const BG = "#EDE8FF";
 
 // 7. done with onboarding
 export default function AllSetScreen() {
@@ -22,33 +24,47 @@ export default function AllSetScreen() {
 	}, [completeOnboarding]);
 
 	return (
-		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
-			<View className="px-6 pt-8 items-center">
+		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+			{/* Top section: title + character */}
+			<View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24 }}>
 				<ThemedText
-					className="font-nunito-bold leading-[60px]"
 					style={{
-						letterSpacing: -0.5,
+						fontFamily: "NunitoSans_700Bold",
 						fontSize: FontSizes.hero,
 						color: AppColors.primaryText,
+						letterSpacing: -0.5,
+						textAlign: "center",
+						marginBottom: 28,
 					}}
 				>
 					{translate("onboarding.allSet")}
 				</ThemedText>
+				<JumpingCharacter />
 			</View>
 
-			{/* need to add smiley here */}
-			<View className="items-center justify-center flex-1">
-				<Image
-					source={require("@/assets/images/great.png")}
-					className="w-36 h-36"
-				/>
-			</View>
-
-			<View className="px-6 items-center">
-				<ThemedText className="font-nunito">
+			{/* Bottom white card: status text */}
+			<View
+				style={{
+					backgroundColor: "#FFFFFF",
+					borderTopLeftRadius: 28,
+					borderTopRightRadius: 28,
+					paddingHorizontal: 24,
+					paddingTop: 28,
+					paddingBottom: insets.bottom + 24,
+					alignItems: "center",
+				}}
+			>
+				<ThemedText
+					style={{
+						fontSize: 15,
+						fontFamily: "NunitoSans_400Regular",
+						color: AppColors.mutedText,
+						textAlign: "center",
+					}}
+				>
 					{translate("onboarding.settingUp")}
 				</ThemedText>
 			</View>
-		</ThemedView>
+		</View>
 	);
 }

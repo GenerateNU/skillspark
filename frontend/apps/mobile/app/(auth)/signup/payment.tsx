@@ -3,15 +3,15 @@ import { View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors, AppColors } from "@/constants/theme";
+import { AppColors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
+
+const BG = "#EDE8FF";
 
 export default function PaymentScreen() {
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
-	const theme = Colors.light;
 	const { t: translate } = useTranslation();
 
 	const handleUpdateBilling = () => {
@@ -20,64 +20,138 @@ export default function PaymentScreen() {
 	const handleDelete = () => {};
 
 	return (
-		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
-			<View className="flex-row items-center justify-between px-5 py-[14px]">
+		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+			{/* Header row in lavender area */}
+			<View
+				style={{
+					flexDirection: "row",
+					alignItems: "center",
+					justifyContent: "space-between",
+					paddingHorizontal: 20,
+					paddingVertical: 14,
+				}}
+			>
 				<TouchableOpacity
 					onPress={() => router.back()}
-					className="flex-row items-center px-5 py-3 gap-1"
+					style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
 					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 				>
 					<IconSymbol name="chevron.left" size={18} color="#11181C" />
-					<ThemedText className="text-base font-nunito">
+					<ThemedText style={{ fontSize: 16, fontFamily: "NunitoSans_400Regular" }}>
 						{translate("onboarding.back")}
 					</ThemedText>
 				</TouchableOpacity>
-				<ThemedText className="text-xl text-center font-nunito-bold">
+
+				<ThemedText style={{ fontSize: 18, fontFamily: "NunitoSans_700Bold" }}>
 					{translate("payment.title")}
 				</ThemedText>
-				<View className="w-10" />
+
+				<View style={{ width: 40 }} />
 			</View>
-			<View className="px-5 pt-5">
-				<ThemedText className="text-[22px] font-nunito-bold mb-5">
+
+			{/* White card with billing content */}
+			<View
+				style={{
+					flex: 1,
+					backgroundColor: "#FFFFFF",
+					borderTopLeftRadius: 28,
+					borderTopRightRadius: 28,
+					paddingHorizontal: 24,
+					paddingTop: 28,
+					paddingBottom: insets.bottom + 24,
+				}}
+			>
+				<ThemedText
+					style={{
+						fontSize: 20,
+						fontFamily: "NunitoSans_700Bold",
+						color: AppColors.primaryText,
+						marginBottom: 24,
+					}}
+				>
 					{translate("payment.manageBilling")}
 				</ThemedText>
-				{/* TODO: Replace with real payment method data from billing API */}
-				<ThemedText className="text-base font-nunito mb-[6px]">
-					{translate("payment.creditCard")}
-				</ThemedText>
-				<ThemedText className="text-base font-nunito mb-[6px]">
-					{translate("payment.name")}
-				</ThemedText>
-				<ThemedText className="text-base font-nunito mb-8 tracking-widest">
-					**** **** **** XXXX
-				</ThemedText>
-				<View className="flex-row gap-4">
+
+				{/* Card info block */}
+				<View
+					style={{
+						backgroundColor: "#F9F9F9",
+						borderRadius: 16,
+						padding: 20,
+						marginBottom: 28,
+						borderWidth: 1,
+						borderColor: "#EBEBEB",
+					}}
+				>
+					{/* TODO: Replace with real payment method data from billing API */}
+					<ThemedText
+						style={{
+							fontSize: 13,
+							fontFamily: "NunitoSans_400Regular",
+							color: AppColors.mutedText,
+							marginBottom: 4,
+						}}
+					>
+						{translate("payment.creditCard")}
+					</ThemedText>
+					<ThemedText
+						style={{
+							fontSize: 15,
+							fontFamily: "NunitoSans_600SemiBold",
+							color: AppColors.primaryText,
+							marginBottom: 2,
+						}}
+					>
+						{translate("payment.name")}
+					</ThemedText>
+					<ThemedText
+						style={{
+							fontSize: 15,
+							fontFamily: "NunitoSans_400Regular",
+							color: AppColors.primaryText,
+							letterSpacing: 2,
+						}}
+					>
+						**** **** **** XXXX
+					</ThemedText>
+				</View>
+
+				{/* Action buttons */}
+				<View style={{ flexDirection: "row", gap: 12 }}>
 					<TouchableOpacity
-						className="flex-1 py-[14px] rounded-lg items-center justify-center"
-						style={{ backgroundColor: AppColors.primaryBlue }}
+						style={{
+							flex: 1,
+							backgroundColor: "#1C1C1E",
+							borderRadius: 24,
+							paddingVertical: 16,
+							alignItems: "center",
+						}}
 						onPress={handleUpdateBilling}
 						activeOpacity={0.8}
 					>
-						<ThemedText className="text-white text-[15px] font-nunito-semibold">
+						<ThemedText style={{ color: "#FFFFFF", fontSize: 15, fontFamily: "NunitoSans_600SemiBold" }}>
 							{translate("payment.updateBilling")}
 						</ThemedText>
 					</TouchableOpacity>
 
 					<TouchableOpacity
-						className="flex-1 py-[14px] rounded-lg border-[1.5px] items-center justify-center"
-						style={{ borderColor: theme.text }}
+						style={{
+							flex: 1,
+							borderRadius: 24,
+							paddingVertical: 16,
+							alignItems: "center",
+							borderWidth: 1.5,
+							borderColor: "#1C1C1E",
+						}}
 						onPress={handleDelete}
 						activeOpacity={0.8}
 					>
-						<ThemedText
-							className="text-[15px] font-nunito"
-							style={{ color: theme.text }}
-						>
+						<ThemedText style={{ color: "#1C1C1E", fontSize: 15, fontFamily: "NunitoSans_400Regular" }}>
 							{translate("payment.delete")}
 						</ThemedText>
 					</TouchableOpacity>
 				</View>
 			</View>
-		</ThemedView>
+		</View>
 	);
 }

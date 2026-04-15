@@ -17,7 +17,6 @@ export const LoginRedirect = () => {
 		} else if (!isAuthenticated && !hasAccount) {
 			router.replace("/(auth)/signup");
 		} else {
-			// isAuthenticated && !hasAccount: stale auth stored with no account — clear it
 			logout();
 		}
 	}, [isAuthenticated, isLoading, hasAccount, inOnboarding]);
