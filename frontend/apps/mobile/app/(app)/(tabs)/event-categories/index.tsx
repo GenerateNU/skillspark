@@ -39,11 +39,11 @@ export default function EventCategoryScreen() {
   });
 
   if (!category) {
-    return <ErrorScreen message="Illegal state: no category supplied" />;
+    return <ErrorScreen message={translate("eventCategories.noCategorySupplied")} />;
   }
 
   if (!geoLocationLat || !geoLocationLong) {
-    return <ErrorScreen message="Illegal state: no location found" />;
+    return <ErrorScreen message={translate("eventCategories.noLocationFound")} />;
   }
 
   const occurrences = localizedOccurrencesResp?.status === 200 ? localizedOccurrencesResp.data : [];

@@ -9,7 +9,9 @@
   },
   "eventCategories": {
     "noEventsFound": "ไม่พบกิจกรรมในหมวดหมู่นี้",
-    "ages": "อายุ"
+    "ages": "อายุ",
+    "noCategorySupplied": "ไม่สามารถโหลดได้: ไม่มีหมวดหมู่",
+    "noLocationFound": "ไม่สามารถโหลดได้: ไม่พบตำแหน่ง"
   },
   "common": {
     "submit": "ส่ง",

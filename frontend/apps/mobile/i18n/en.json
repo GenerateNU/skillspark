@@ -9,7 +9,9 @@
   },
   "eventCategories": {
     "noEventsFound": "No events found for this category.",
-    "ages": "Ages"
+    "ages": "Ages",
+    "noCategorySupplied": "Unable to load: no category supplied",
+    "noLocationFound": "Unable to load: no location found"
   },
   "common": {
     "submit": "Submit",

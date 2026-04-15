@@ -26,14 +26,7 @@ export function EventCategoriesListItem({
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.7}
-      className="flex-row items-center bg-white rounded-xl p-3 mb-3 gap-3"
-      style={{
-        shadowColor: "#000",
-        shadowOpacity: 0.08,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 2,
-      }}
+      className="flex-row items-center bg-white rounded-xl p-3 mb-3 gap-3 shadow-sm"
     >
       {event.presigned_url ? (
         <Image
