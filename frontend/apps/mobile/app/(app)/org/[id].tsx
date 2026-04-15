@@ -245,7 +245,7 @@ function OrgDetail({
         name={org.name}
         imageUrl={org.presigned_url ?? undefined}
         shareUrl={Linking.createURL(`org/${org.id}`)}
-        message={`Check out ${org.name} on SkillSpark and get a discount on your next class!`}
+        message={translate("share.defaultMessage", { name: org.name })}
       />
     </SafeAreaView>
   );

@@ -12,6 +12,16 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  runOnJS,
+} from "react-native-reanimated";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 const CIRCLE_BG = "#EFEFEF";
 
@@ -123,9 +133,35 @@ export function ShareModal({
   message,
 }: ShareModalProps) {
   const insets = useSafeAreaInsets();
-  const shareMessage = message ?? `Check out ${name} on SkillSpark!`;
+  const { t } = useTranslation();
+  const shareMessage = message ?? t("share.defaultMessage", { name });
   const fullText = `${shareMessage}\n${shareUrl}`;
   const appIcons = makeAppIcons(fullText, shareUrl);
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    if (visible) {
+      translateY.value = 0;
+    }
+  }, [visible]);
+
+  const panGesture = Gesture.Pan()
+    .onUpdate((e) => {
+      translateY.value = Math.max(0, e.translationY);
+    })
+    .onEnd((e) => {
+      if (e.translationY > 100 || e.velocityY > 500) {
+        translateY.value = withTiming(600, { duration: 250 }, () => {
+          runOnJS(onClose)();
+        });
+      } else {
+        translateY.value = withSpring(0, { damping: 20, stiffness: 200 });
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
 
   const handleShare = async () => {
     await Share.share({ message: fullText, url: shareUrl });
@@ -147,15 +183,19 @@ export function ShareModal({
         <Pressable style={{ flex: 1 }} onPress={onClose} />
 
         {/* Sheet */}
-        <View
-          style={{
-            height: "50%",
-            backgroundColor: "#fff",
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            paddingBottom: insets.bottom,
-            overflow: "hidden",
-          }}
+        <GestureDetector gesture={panGesture}>
+        <Animated.View
+          style={[
+            {
+              height: "50%",
+              backgroundColor: "#fff",
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              paddingBottom: insets.bottom,
+              overflow: "hidden",
+            },
+            animatedStyle,
+          ]}
         >
           {/* Grabber */}
           <View className="items-center pt-3 pb-2">
@@ -201,7 +241,7 @@ export function ShareModal({
                 color: AppColors.subtleText,
               }}
             >
-              4.5 Stars (140)
+              {t("share.starsRating")}
             </Text>
             <Text
               className="text-center mb-1"
@@ -213,15 +253,6 @@ export function ShareModal({
               }}
             >
               {shareMessage}
-            </Text>
-            <Text
-              style={{
-                fontFamily: FontFamilies.regular,
-                fontSize: 12,
-                color: AppColors.subtleText,
-              }}
-            >
-              Limitations apply, see attached
             </Text>
           </View>
 
@@ -236,14 +267,15 @@ export function ShareModal({
 
           {/* Copy link + Share */}
           <View className="flex-row justify-center gap-8 px-4">
-            <CircleIcon bg={CIRCLE_BG} label="Copy link" onPress={handleCopyUrl}>
+            <CircleIcon bg={CIRCLE_BG} label={t("share.copyLink")} onPress={handleCopyUrl}>
               <MaterialIcons name="link" size={22} color={AppColors.primaryText} />
             </CircleIcon>
-            <CircleIcon bg={CIRCLE_BG} label="Share" onPress={handleShare}>
+            <CircleIcon bg={CIRCLE_BG} label={t("share.share")} onPress={handleShare}>
               <MaterialIcons name="ios-share" size={22} color={AppColors.primaryText} />
             </CircleIcon>
           </View>
-        </View>
+        </Animated.View>
+        </GestureDetector>
       </View>
     </Modal>
   );

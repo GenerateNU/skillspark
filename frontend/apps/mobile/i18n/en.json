@@ -311,6 +311,13 @@
     "changeImage": "Change Image",
     "saveChanges": "Save Changes"
   },
+  "share": {
+    "copyLink": "Copy link",
+    "share": "Share",
+    "limitationsApply": "Limitations apply, see attached",
+    "starsRating": "4.5 Stars (140)",
+    "defaultMessage": "Check out {{name}} on SkillSpark!"
+  },
   "occurrence": {
     "smiles": "/ 5 Smiles",
     "learnMore": "Learn more",

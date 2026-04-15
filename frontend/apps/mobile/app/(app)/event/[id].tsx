@@ -310,7 +310,7 @@ function EventOccurrenceDetail({
         name={occurrence.event.title}
         imageUrl={occurrence.event.presigned_url ?? undefined}
         shareUrl={Linking.createURL(`event/${occurrence.id}`)}
-        message={`Check out "${occurrence.event.title}" on SkillSpark!`}
+        message={translate("share.defaultMessage", { name: occurrence.event.title })}
       />
     </View>
   );

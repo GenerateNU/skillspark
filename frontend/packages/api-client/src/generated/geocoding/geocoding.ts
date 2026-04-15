@@ -5,198 +5,152 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation } from "@tanstack/react-query";
+import {
+  useMutation
+} from '@tanstack/react-query';
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult,
-} from "@tanstack/react-query";
+  UseMutationResult
+} from '@tanstack/react-query';
 
 import type {
   ErrorModel,
   GeocodeAddressInputBody,
-  GeocodeAddressOutputBody,
-} from "../skillSparkAPI.schemas";
+  GeocodeAddressOutputBody
+} from '../skillSparkAPI.schemas';
 
-import { customInstance } from "../../apiClient";
+import { customInstance } from '../../apiClient';
 
 // https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
-type IfEquals<X, Y, A = X, B = never> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
+type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
+T,
+>() => T extends Y ? 1 : 2
+? A
+: B;
 
 type WritableKeys<T> = {
-  [P in keyof T]-?: IfEquals<
-    { [Q in P]: T[P] },
-    { -readonly [Q in P]: T[P] },
-    P
-  >;
+[P in keyof T]-?: IfEquals<
+  { [Q in P]: T[P] },
+  { -readonly [Q in P]: T[P] },
+  P
+>;
 }[keyof T];
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I,
-) => void
-  ? I
-  : never;
+type UnionToIntersection<U> =
+  (U extends any ? (k: U)=>void : never) extends ((k: infer I)=>void) ? I : never;
 type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
 
 type Writable<T> = Pick<T, WritableKeys<T>>;
-type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
-  ? {
-      [P in keyof Writable<T>]: T[P] extends object
-        ? NonReadonly<NonNullable<T[P]>>
-        : T[P];
-    }
-  : DistributeReadOnlyOverUnions<T>;
+type NonReadonly<T> = [T] extends [UnionToIntersection<T>] ? {
+  [P in keyof Writable<T>]: T[P] extends object
+    ? NonReadonly<NonNullable<T[P]>>
+    : T[P];
+} : DistributeReadOnlyOverUnions<T>;
+
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
 export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
-export type HTTPStatusCode4xx =
-  | 400
-  | 401
-  | 402
-  | 403
-  | 404
-  | 405
-  | 406
-  | 407
-  | 408
-  | 409
-  | 410
-  | 411
-  | 412
-  | 413
-  | 414
-  | 415
-  | 416
-  | 417
-  | 418
-  | 419
-  | 420
-  | 421
-  | 422
-  | 423
-  | 424
-  | 426
-  | 428
-  | 429
-  | 431
-  | 451;
+export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 419 | 420 | 421 | 422 | 423 | 424 | 426 | 428 | 429 | 431 | 451;
 export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
-export type HTTPStatusCodes =
-  | HTTPStatusCode1xx
-  | HTTPStatusCode2xx
-  | HTTPStatusCode3xx
-  | HTTPStatusCode4xx
-  | HTTPStatusCode5xx;
+export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
+
 
 /**
  * Validates a text address via OpenCage and returns its latitude and longitude.
  * @summary Geocode a text address
  */
 export type geocodeAddressResponse200 = {
-  data: GeocodeAddressOutputBody;
-  status: 200;
-};
+  data: GeocodeAddressOutputBody
+  status: 200
+}
 
 export type geocodeAddressResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
+  data: ErrorModel
+  status: Exclude<HTTPStatusCodes, 200>
+}
 
-export type geocodeAddressResponseSuccess = geocodeAddressResponse200 & {
+export type geocodeAddressResponseSuccess = (geocodeAddressResponse200) & {
   headers: Headers;
 };
-export type geocodeAddressResponseError = geocodeAddressResponseDefault & {
+export type geocodeAddressResponseError = (geocodeAddressResponseDefault) & {
   headers: Headers;
 };
 
-export type geocodeAddressResponse =
-  | geocodeAddressResponseSuccess
-  | geocodeAddressResponseError;
+export type geocodeAddressResponse = (geocodeAddressResponseSuccess | geocodeAddressResponseError)
 
 export const getGeocodeAddressUrl = () => {
-  return `/api/v1/geocode`;
-};
 
-export const geocodeAddress = async (
-  geocodeAddressInputBody: NonReadonly<GeocodeAddressInputBody>,
-  options?: RequestInit,
-): Promise<geocodeAddressResponse> => {
-  return customInstance<geocodeAddressResponse>(getGeocodeAddressUrl(), {
+
+  
+
+  return `/api/v1/geocode`
+}
+
+export const geocodeAddress = async (geocodeAddressInputBody: NonReadonly<GeocodeAddressInputBody>, options?: RequestInit): Promise<geocodeAddressResponse> => {
+  
+  return customInstance<geocodeAddressResponse>(getGeocodeAddressUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(geocodeAddressInputBody),
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      geocodeAddressInputBody,)
+  }
+);}
 
-export const getGeocodeAddressMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof geocodeAddress>>,
-    TError,
-    { data: NonReadonly<GeocodeAddressInputBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof geocodeAddress>>,
-  TError,
-  { data: NonReadonly<GeocodeAddressInputBody> },
-  TContext
-> => {
-  const mutationKey = ["geocodeAddress"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof geocodeAddress>>,
-    { data: NonReadonly<GeocodeAddressInputBody> }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return geocodeAddress(data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getGeocodeAddressMutationOptions = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof geocodeAddress>>, TError,{data: NonReadonly<GeocodeAddressInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof geocodeAddress>>, TError,{data: NonReadonly<GeocodeAddressInputBody>}, TContext> => {
 
-export type GeocodeAddressMutationResult = NonNullable<
-  Awaited<ReturnType<typeof geocodeAddress>>
->;
-export type GeocodeAddressMutationBody = NonReadonly<GeocodeAddressInputBody>;
-export type GeocodeAddressMutationError = ErrorModel;
+const mutationKey = ['geocodeAddress'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof geocodeAddress>>, {data: NonReadonly<GeocodeAddressInputBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  geocodeAddress(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GeocodeAddressMutationResult = NonNullable<Awaited<ReturnType<typeof geocodeAddress>>>
+    export type GeocodeAddressMutationBody = NonReadonly<GeocodeAddressInputBody>
+    export type GeocodeAddressMutationError = ErrorModel
+
+    /**
  * @summary Geocode a text address
  */
-export const useGeocodeAddress = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof geocodeAddress>>,
-      TError,
-      { data: NonReadonly<GeocodeAddressInputBody> },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof geocodeAddress>>,
-  TError,
-  { data: NonReadonly<GeocodeAddressInputBody> },
-  TContext
-> => {
-  return useMutation(getGeocodeAddressMutationOptions(options), queryClient);
-};
+export const useGeocodeAddress = <TError = ErrorModel,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof geocodeAddress>>, TError,{data: NonReadonly<GeocodeAddressInputBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof geocodeAddress>>,
+        TError,
+        {data: NonReadonly<GeocodeAddressInputBody>},
+        TContext
+      > => {
+      return useMutation(getGeocodeAddressMutationOptions(options), queryClient);
+    }
+    
