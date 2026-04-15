@@ -18,7 +18,6 @@ export default function ChildProfileScreen() {
 	const { t: translate } = useTranslation();
 	const insets = useSafeAreaInsets();
 	const [errorText, setErrorText] = useState("");
-	const { control } = useForm();
 
 	return (
 		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>

@@ -22,10 +22,7 @@ export default function OnboardingStackLayout() {
 					<Stack.Screen name="account" options={{ headerShown: false }} />
 					<Stack.Screen name="name" options={{ headerShown: false }} />
 					<Stack.Screen name="photo" options={{ headerShown: false }} />
-					<Stack.Screen
-						name="child-profile/index"
-						options={{ headerShown: false }}
-					/>
+					<Stack.Screen name="child-profile" options={{ headerShown: false }} />
 					<Stack.Screen
 						name="emergency-contact"
 						options={{ headerShown: false }}

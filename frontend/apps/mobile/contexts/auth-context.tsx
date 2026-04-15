@@ -182,11 +182,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		onError: (msg: string) => void,
 		onSuccess: () => void,
 	) => {
-		// entering onboarding — suppress redirects until completeOnboarding is called
+		// entering onboarding -> no redirects until onboarding is complete
 		setInOnboarding(true);
 		// reset for each new account during onboarding
 		setHasAccount(false);
-		SecureStore.deleteItemAsync("has_account");
+		SecureStore.setItemAsync("has_account", "false");
 		console.log(
 			"values: {",
 			name,
@@ -195,7 +195,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			password,
 			language_preference,
 			profile_picture_s3_key,
-			onSuccess,
 			"}",
 		);
 		signupFunc(

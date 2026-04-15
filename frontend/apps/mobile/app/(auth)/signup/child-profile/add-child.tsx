@@ -121,8 +121,7 @@ export default function AddChildScreen() {
 			await queryClient.invalidateQueries({
 				queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
 			});
-			//router.push("./avatar-picker");
-			console.log("submitted");
+			router.push("/(auth)/signup/emergency-contact");
 		} catch (error) {
 			console.error(error);
 			Alert.alert(
