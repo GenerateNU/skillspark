@@ -79,13 +79,7 @@ export default function HomeScreen() {
   const guardian = (guardianResp as unknown as { data: Guardian } | undefined)
     ?.data;
 
-  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences({
-    ...filters,
-    ...(filters.radius_km !== undefined && {
-      lat: geoLocationLat,
-      lng: geoLocationLong,
-    }),
-  });
+  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences({});
   const allOccurrences: EventOccurrence[] = useMemo(() => {
     const d = occurrencesResp as unknown as
       | { data: EventOccurrence[] }
