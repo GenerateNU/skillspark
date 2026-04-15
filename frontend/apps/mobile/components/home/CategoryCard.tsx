@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import { View, Text, Pressable } from "react-native";
 import { type EventOccurrence } from "@skillspark/api-client";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
+import { useRouter } from "expo-router";
 
 const CATEGORY_COLORS: Record<string, string> = {
   Sport: AppColors.blue,
@@ -12,6 +13,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   Tutoring: AppColors.danger,
 };
 
+
+
 export function CategoryCard({
   category,
   occurrence,
@@ -19,8 +22,10 @@ export function CategoryCard({
   category: string;
   occurrence?: EventOccurrence;
 }) {
+  const router = useRouter();
   return (
     <Pressable
+      onPress={() => router.push({ pathname: "/event-categories", params: { category } })}
       className="flex-1 m-[5px]"
       style={{
         shadowColor: "#000",

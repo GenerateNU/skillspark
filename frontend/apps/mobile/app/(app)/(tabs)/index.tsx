@@ -20,7 +20,7 @@ import {
   getTrendingEventOccurrences,
   useGetTrendingEventOccurrences,
 } from "@skillspark/api-client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useDebounce } from "use-debounce";
@@ -33,7 +33,7 @@ import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { TrendingCard } from "@/components/home/TrendingCard";
 
-import * as Location from "expo-location";
+import { useGeolocation } from "@/hooks/use-geolocation";
 import CarouselCard from "@/components/home/CarouselCard";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
@@ -44,22 +44,8 @@ export default function HomeScreen() {
   const [_debouncedSearch] = useDebounce(searchText, 300);
   const { width, height } = useWindowDimensions();
 
-  const [geoLocationLat, setGeoLocationLat] = useState<string | undefined>(
-    "13.7563",
-  );
-  const [geoLocationLong, setGeoLocationLong] = useState<string | undefined>(
-    "100.5018",
-  );
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") return;
-      const loc = await Location.getCurrentPositionAsync({});
-      setGeoLocationLat(String(loc.coords.latitude));
-      setGeoLocationLong(String(loc.coords.longitude));
-    })();
-  }, []);
+  const { lat: geoLocationLat, lng: geoLocationLong } = useGeolocation();
 
   const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({
     lat: geoLocationLat,
