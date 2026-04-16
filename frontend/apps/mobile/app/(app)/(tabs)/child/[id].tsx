@@ -22,7 +22,7 @@ import {
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
 import { formatAgeRange, filterFutureOccurrences, extractResponseData, formatAddress } from "@/utils/format";
-import { useGeoLocation } from "@/hooks/use-geo-location";
+import { useGeolocation } from "@/hooks/use-geolocation";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 import { TrendingCard } from "@/components/home/TrendingCard";
 import { SearchBar } from "@/components/SearchBar";
@@ -34,7 +34,7 @@ export default function ForChildScreen() {
   const { t: translate } = useTranslation();
   const [searchText, setSearchText] = useState("");
 
-  const { lat: geoLocationLat, lng: geoLocationLng } = useGeoLocation();
+  const { lat: geoLocationLat, lng: geoLocationLng } = useGeolocation();
 
   const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences();
   const allOccurrences: EventOccurrence[] = useMemo(
@@ -58,8 +58,13 @@ export default function ForChildScreen() {
   );
 
   const { data: trendingResp } = useGetTrendingEventOccurrences(
-    { lat: geoLocationLat, lng: geoLocationLng, radius: 50, max_returns: 5 },
-    { query: { enabled: true } },
+    {
+      lat: Number(geoLocationLat),
+      lng: Number(geoLocationLng),
+      radius: 50,
+      max_returns: 5,
+    },
+    { query: { enabled: !!geoLocationLat && !!geoLocationLng } },
   );
   const trendingEvents: EventOccurrence[] = useMemo(
     () => extractResponseData<EventOccurrence>(trendingResp),
@@ -173,8 +178,8 @@ export default function ForChildScreen() {
                   <TrendingCard
                     key={o.id}
                     occurrence={o}
-                    userLat={geoLocationLat}
-                    userLng={geoLocationLng}
+                    userLat={geoLocationLat ? Number(geoLocationLat) : undefined}
+                    userLng={geoLocationLng ? Number(geoLocationLng) : undefined}
                     style={{ marginRight: 14 }}
                   />
                 ))}
@@ -192,8 +197,8 @@ export default function ForChildScreen() {
                   <TrendingCard
                     key={o.id}
                     occurrence={o}
-                    userLat={geoLocationLat}
-                    userLng={geoLocationLng}
+                    userLat={geoLocationLat ? Number(geoLocationLat) : undefined}
+                    userLng={geoLocationLng ? Number(geoLocationLng) : undefined}
                     width="100%"
                   />
 

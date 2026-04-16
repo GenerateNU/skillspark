@@ -31,7 +31,7 @@ import { CategoryCard } from "@/components/home/CategoryCard";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { TrendingCard } from "@/components/home/TrendingCard";
-import { useGeoLocation } from "@/hooks/use-geo-location";
+import { useGeolocation } from "@/hooks/use-geolocation";
 import CarouselCard from "@/components/home/CarouselCard";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 import { SearchBar } from "@/components/SearchBar";
@@ -45,11 +45,11 @@ export default function HomeScreen() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
 
-  const { lat: geoLocationLat, lng: geoLocationLong } = useGeoLocation();
+  const { lat: geoLocationLat, lng: geoLocationLong } = useGeolocation();
 
   const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({
-    lat: String(geoLocationLat),
-    lng: String(geoLocationLong),
+    lat: geoLocationLat,
+    lng: geoLocationLong,
     radius_km: 50,
     limit: 5,
   });
@@ -93,8 +93,8 @@ export default function HomeScreen() {
 
   const { data: trendingResp } = useGetTrendingEventOccurrences(
     {
-      lat: geoLocationLat,
-      lng: geoLocationLong,
+      lat: Number(geoLocationLat),
+      lng: Number(geoLocationLong),
       radius: 50,
       max_returns: 5,
     },
