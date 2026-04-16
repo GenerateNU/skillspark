@@ -8,7 +8,7 @@ resource "aws_opensearch_domain" "skillspark_opensearch" {
 
   advanced_security_options {
     enabled                        = true
-    anonymous_auth_enabled         = true
+    anonymous_auth_enabled         = false
     internal_user_database_enabled = true
     master_user_options {
       master_user_name     = var.master_user
