@@ -10,7 +10,9 @@ export const LoginRedirect = () => {
   );
 
   useEffect(() => {
-    Linking.getInitialURL().then((url) => setInitialUrl(url ?? null));
+    Linking.getInitialURL()
+      .then((url) => setInitialUrl(url ?? null))
+      .catch(() => setInitialUrl(null));
   }, []);
 
   if (isLoading || initialUrl === undefined) {

@@ -2,7 +2,6 @@ import { Image } from "expo-image";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -20,12 +19,11 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
 import { RATING_OPTIONS } from "@/constants/ratings";
-import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { useTranslation } from "react-i18next";
 import { AboutPage } from "@/components/AboutPage";
 import { ShareModal } from "@/components/ShareModal";
-import { formatDuration, formatLocation } from "@/utils/format";
+import { formatLocation } from "@/utils/format";
 
 function EventOccurrenceDetail({
   occurrence,
@@ -35,18 +33,10 @@ function EventOccurrenceDetail({
   const router = useRouter();
   const { t: translate } = useTranslation();
   const [shareVisible, setShareVisible] = useState(false);
-  const [aboutExpanded, setAboutExpanded] = useState(false);
-  const [aboutTruncated, setAboutTruncated] = useState(false);
-  const duration = formatDuration(occurrence.start_time, occurrence.end_time, {
-    hr: translate("event.hr"),
-    min: translate("event.min"),
-  });
 
   const location = formatLocation(occurrence);
   const categories = occurrence.event.category?.join(" / ") ?? "";
   const orgId = occurrence.event.organization_id;
-
-  const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
 
   const { data: aggregateResp } = useGetReviewAggregate(occurrence.event.id, {
     query: { enabled: !!occurrence.event.id },
@@ -121,7 +111,7 @@ function EventOccurrenceDetail({
           />
 
           {/* Title row with bookmark + share */}
-          <View className="flex-row items-start justify-between mb-3">
+          <View className="flex-row items-start justify-between mb-1">
             <Text
               className="flex-1 mr-3 text-[26px] font-nunito-bold leading-8"
               style={{ color: AppColors.primaryText }}

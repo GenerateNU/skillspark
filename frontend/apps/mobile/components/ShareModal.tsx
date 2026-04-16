@@ -1,4 +1,4 @@
-import { Modal, Share, Linking, View, Text, Pressable } from "react-native";
+import { Modal, Share, Linking, View, Text, Pressable, Platform } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { CircleIcon } from "@/components/CircleIcon";
 import { Image } from "expo-image";
@@ -20,6 +20,11 @@ import { useTranslation } from "react-i18next";
 
 const CIRCLE_BG = "#EFEFEF";
 
+const MESSENGER_STORE_URL =
+  Platform.OS === "android"
+    ? "https://play.google.com/store/apps/details?id=com.facebook.orca"
+    : "https://apps.apple.com/us/app/messenger/id454638411";
+
 async function openMessenger(url: string) {
   const scheme = `fb-messenger://share?link=${encodeURIComponent(url)}`;
   try {
@@ -27,14 +32,10 @@ async function openMessenger(url: string) {
     if (supported) {
       await Linking.openURL(scheme);
     } else {
-      await Linking.openURL(
-        "https://apps.apple.com/us/app/messenger/id454638411",
-      );
+      await Linking.openURL(MESSENGER_STORE_URL);
     }
   } catch {
-    await Linking.openURL(
-      "https://apps.apple.com/us/app/messenger/id454638411",
-    );
+    await Linking.openURL(MESSENGER_STORE_URL);
   }
 }
 
@@ -43,7 +44,12 @@ function makeAppIcons(text: string, url: string) {
     {
       name: "Messages",
       bg: "#34C759",
-      onPress: () => Linking.openURL(`sms:?body=${encodeURIComponent(text)}`),
+      onPress: () => {
+        const smsUrl = Platform.OS === "ios"
+          ? `sms:&body=${encodeURIComponent(text)}`
+          : `sms:?body=${encodeURIComponent(text)}`;
+        Linking.openURL(smsUrl).catch(() => {});
+      },
       render: () => <IconSymbol name="message.fill" size={22} color="#fff" />,
     },
     {
@@ -183,7 +189,7 @@ export function ShareModal({
             {/* Text */}
             <View className="px-6 items-center mb-5">
               <Text
-                className="mb-0.5 text-center"
+                className="mb-3 text-center"
                 style={{
                   fontFamily: FontFamilies.bold,
                   fontSize: 20,
@@ -191,16 +197,6 @@ export function ShareModal({
                 }}
               >
                 {name}
-              </Text>
-              <Text
-                className="mb-3 text-center"
-                style={{
-                  fontFamily: FontFamilies.regular,
-                  fontSize: FontSizes.sm,
-                  color: AppColors.subtleText,
-                }}
-              >
-                {t("share.starsRating")}
               </Text>
               <Text
                 className="text-center mb-1"
@@ -247,8 +243,8 @@ export function ShareModal({
                 label={t("share.share")}
                 onPress={handleShare}
               >
-                <MaterialIcons
-                  name="ios-share"
+                <IconSymbol
+                  name="square.and.arrow.up"
                   size={22}
                   color={AppColors.primaryText}
                 />

@@ -2,6 +2,7 @@ import { Pressable, Text, View } from "react-native";
 import { useState } from "react";
 import type { OrgLink } from "@skillspark/api-client";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
+import { useTranslation } from "react-i18next";
 
 interface AboutPageProps {
   description: string;
@@ -10,13 +11,12 @@ interface AboutPageProps {
 
 export function AboutPage({ description, links }: AboutPageProps) {
   const { openLink, hasLinks } = useOrgLinks(links);
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [truncated, setTruncated] = useState(false);
 
   return (
     <View>
-      <Text className="text-lg font-bold text-gray-900 mb-2.5">About</Text>
-
       <Text
         numberOfLines={expanded ? undefined : 4}
         onTextLayout={(e) => {
@@ -30,7 +30,7 @@ export function AboutPage({ description, links }: AboutPageProps) {
       {truncated && (
         <Pressable onPress={() => setExpanded((p) => !p)} className="mb-4">
           <Text className="text-sm text-gray-900 font-semibold">
-            {expanded ? "See less" : "See more"}
+            {expanded ? t("event.seeLess") : t("event.seeMore")}
           </Text>
         </Pressable>
       )}

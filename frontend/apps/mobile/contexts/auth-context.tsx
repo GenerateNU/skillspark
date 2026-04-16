@@ -17,6 +17,7 @@ import {
 } from "@skillspark/api-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
+import * as Linking from "expo-linking";
 import * as SecureStore from "expo-secure-store";
 import { createContext, ReactNode, useEffect, useState } from "react";
 
@@ -125,7 +126,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setJWT(success.token);
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
           setGuardianId(success.guardian_id);
-          router.replace("/(app)/(tabs)");
+          const initialUrl = await Linking.getInitialURL().catch(() => null);
+          if (!initialUrl) {
+            router.replace("/(app)/(tabs)");
+          }
         },
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };
@@ -163,7 +167,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
           setGuardianId(success.guardian_id);
           await createStripeCustomer(success.guardian_id);
-          router.replace("/(app)/(tabs)");
+          const initialUrl = await Linking.getInitialURL().catch(() => null);
+          if (!initialUrl) {
+            router.replace("/(app)/(tabs)");
+          }
         },
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };
