@@ -120,7 +120,7 @@ export default function ForChildScreen() {
     : null;
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
       <View className="flex-row items-center px-5 pt-3 pb-4">
         <TouchableOpacity onPress={() => router.back()} className="mr-3">
           <IconSymbol
