@@ -33,5 +33,7 @@ provider "aws" {
 }
 
 provider "opensearch" {
-  url = var.opensearch_url
+  url               = var.opensearch_url
+  sign_aws_requests = true
+  aws_region        = var.aws_region
 }
