@@ -1,4 +1,4 @@
-resource "aws_opensearch_domain" "skillspark-opensearch" {
+resource "aws_opensearch_domain" "skillspark_opensearch" {
   domain_name    = var.opensearch_domain_name
   engine_version = var.opensearch_engine_version
 
@@ -8,7 +8,7 @@ resource "aws_opensearch_domain" "skillspark-opensearch" {
 
   advanced_security_options {
     enabled                        = true
-    anonymous_auth_enabled         = true
+    anonymous_auth_enabled         = false
     internal_user_database_enabled = true
     master_user_options {
       master_user_name     = var.master_user
