@@ -32,6 +32,7 @@ function EventOccurrenceDetail({
 }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
+  const handleBack = () => router.back();
   const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
 
   const location = formatLocation(occurrence);
@@ -54,7 +55,7 @@ function EventOccurrenceDetail({
         style={{ borderBottomColor: AppColors.divider }}
       >
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={handleBack}
           activeOpacity={0.7}
           className="h-8 w-8 items-center justify-center"
         >
@@ -266,7 +267,7 @@ function EventOccurrenceDetail({
 }
 
 export default function EventOccurrenceScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const {
     data: response,
     isLoading,

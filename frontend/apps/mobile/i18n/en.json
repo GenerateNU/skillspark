@@ -7,6 +7,12 @@
     "events": "Events",
     "about": "About"
   },
+  "eventCategories": {
+    "noEventsFound": "No events found for this category.",
+    "ages": "Ages",
+    "noCategorySupplied": "Unable to load: no category supplied",
+    "noLocationFound": "Unable to load: no location found"
+  },
   "common": {
     "submit": "Submit",
     "cancel": "Cancel",
@@ -45,16 +51,18 @@
     "trendingRightNow": "✦ Trending right now...",
     "basedOn": "Based on",
     "upcomingEvents": "upcoming events",
-    "learnMore": "Learn More",
     "reserved": "Reserved",
     "learnMore": "Learn More",
     "members": "members",
     "categories": {
-      "technology": "technology",
-      "art": "art",
-      "music": "music",
-      "math": "math",
-      "sports": "sports"
+      "technology": "Tech & Innovation",
+      "art": "Arts & Creative Expression",
+      "music": "Music & Performance",
+      "math": "Math",
+      "sports": "Sports & Physical Activities",
+      "languages": "Languages",
+      "academics": "Academics",
+      "lifeSkills": "Personal Development & Life Skills"
     }
   },
   "profile": {
