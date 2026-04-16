@@ -47,6 +47,8 @@
     "greeting": "สวัสดี, {{name}}",
     "discoverWeekly": "ค้นพบประจำสัปดาห์",
     "forYou": "สำหรับคุณ",
+    "forChild": "สำหรับ {{name}}",
+    "trendingRightNow": "✦ กำลังมาแรงตอนนี้...",
     "basedOn": "ตามจาก",
     "upcomingEvents": "กิจกรรมที่จะมาถึง",
     "reserved": "จองแล้ว",
@@ -297,7 +299,12 @@
     "sortBy": "เรียงตาม",
     "filter": "กรอง",
     "km": "กม.",
-    "stars": "ดาว"
+    "mi": "ไมล์",
+    "distanceAway": "ห่างออกไป {{distance}} กม.",
+    "stars": "ดาว",
+    "smiles": "/ 5 ยิ้ม",
+    "learnMore": "เรียนรู้เพิ่มเติม",
+    "members": "สมาชิก"
   },
   "org": {
     "about": "เกี่ยวกับ",
@@ -437,6 +444,7 @@
     "learnMore": "เรียนรู้เพิ่มเติม",
     "reserve": "จอง",
     "ages": "อายุ {{min}} ปี",
+    "agesOpen": "อายุ {{min}}+ ปี",
     "agesRange": "อายุ {{min}} - {{max}} ปี",
     "classTime": "คลาส {{time}}"
   },
