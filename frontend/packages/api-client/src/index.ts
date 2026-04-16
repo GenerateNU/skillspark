@@ -24,4 +24,5 @@ export * from "./generated/emergency-contacts/emergency-contacts";
 export * from "./generated/organizations/organizations";
 export * from "./generated/locations/locations";
 export * from "./generated/review/review";
+export * from "./generated/user/user";
 export * from "./generated/recommendations/recommendations";

@@ -3,6 +3,7 @@ import {
   View,
   ScrollView,
   Text,
+  Pressable,
   useWindowDimensions,
 } from "react-native";
 import {
@@ -19,7 +20,8 @@ import {
 import { useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { useDebounce } from "use-debounce";
+import { useFilters } from "@/hooks/use-filters";
+import { useRouter } from "expo-router";
 import { isWithinNext7Days, filterFutureOccurrences, extractResponseData } from "@/utils/format";
 import { DiscoverBanner } from "@/components/home/DiscoverBanner";
 import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
@@ -32,12 +34,13 @@ import { useGeoLocation } from "@/hooks/use-geo-location";
 import CarouselCard from "@/components/home/CarouselCard";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 import { SearchBar } from "@/components/SearchBar";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
-  const [searchText, setSearchText] = useState("");
-  const [_debouncedSearch] = useDebounce(searchText, 300);
+  const { filters, hasActiveFilters } = useFilters();
+  const router = useRouter();
   const { width, height } = useWindowDimensions();
 
   const { lat: geoLocationLat, lng: geoLocationLong } = useGeoLocation();
@@ -59,11 +62,13 @@ export default function HomeScreen() {
   const guardian = (guardianResp as unknown as { data: Guardian } | undefined)
     ?.data;
 
-  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences();
-  const allOccurrences: EventOccurrence[] = useMemo(
-    () => extractResponseData<EventOccurrence>(occurrencesResp),
-    [occurrencesResp],
-  );
+  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences({});
+  const allOccurrences: EventOccurrence[] = useMemo(() => {
+    const d = occurrencesResp as unknown as
+      | { data: EventOccurrence[] }
+      | undefined;
+    return Array.isArray(d?.data) ? d.data : [];
+  }, [occurrencesResp]);
 
   const { data: registrationsResp } = useGetRegistrationsByGuardianId(
     guardianId!,
@@ -190,12 +195,48 @@ export default function HomeScreen() {
       </View>
 
       {/* Search row */}
-      <SearchBar
-        value={searchText}
-        onChangeText={setSearchText}
-        placeholder={translate("dashboard.searchPlaceholder")}
-        style={{ marginBottom: 22 }}
-      />
+      <View className="px-5 mb-[22px]">
+        <View
+          className="flex-row items-center rounded-full px-4 py-[10px]"
+          style={{ backgroundColor: AppColors.surfaceGray }}
+        >
+          <IconSymbol
+            name="magnifyingglass"
+            size={18}
+            color={AppColors.subtleText}
+            style={{ marginRight: 8 }}
+          />
+          <Pressable
+            className="flex-1"
+            onPress={() => router.push("/(app)/search")}
+          >
+            <Text
+              style={{
+                fontFamily: "NunitoSans_400Regular",
+                fontSize: 14,
+                color: AppColors.placeholderText,
+              }}
+            >
+              {translate("dashboard.searchPlaceholder")}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/(app)/(tabs)/filters")}
+            className="w-9 h-9 rounded-full items-center justify-center"
+            style={{
+              backgroundColor: hasActiveFilters
+                ? AppColors.primaryBlue
+                : AppColors.primaryText,
+            }}
+          >
+            <IconSymbol
+              name="slider.horizontal.3"
+              size={16}
+              color={AppColors.white}
+            />
+          </Pressable>
+        </View>
+      </View>
 
       {/* Your Upcoming Classes — conditional */}
       {upcomingClasses.length > 0 && (
@@ -236,7 +277,11 @@ export default function HomeScreen() {
             </Text>
           </View>
           <CarouselCard
-            events={allLocalizedOccurrences.length > 0 ? allLocalizedOccurrences : futureOccurrences.slice(0, 5)}
+            events={
+              allLocalizedOccurrences.length > 0
+                ? allLocalizedOccurrences
+                : futureOccurrences.slice(0, 5)
+            }
             width={width}
             height={height}
           />

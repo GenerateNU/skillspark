@@ -380,8 +380,9 @@ func TestHandler_CreateRegistration(t *testing.T) {
 	}
 
 	validGuardian := &models.Guardian{
-		ID:               guardianID,
-		StripeCustomerID: &stripeCustomerID,
+		ID:                 guardianID,
+		StripeCustomerID:   &stripeCustomerID,
+		EmailNotifications: true,
 	}
 
 	validChild := &models.Child{

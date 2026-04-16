@@ -1287,6 +1287,14 @@ paths:
             default: 10
             minimum: 1
             maximum: 100
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: sort_by
           in: query
           explode: false
@@ -2695,6 +2703,32 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/user/{username}:
+    get:
+      tags:
+        - User
+      summary: Check if a username exists
+      description: Returns whether a user with the given username exists
+      operationId: username-exists
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsernameExistsOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
     AttachPaymentMethodInputBody:
@@ -3616,6 +3650,8 @@ components:
           format: date-time
         email:
           type: string
+        email_notifications:
+          type: boolean
         expo_push_token:
           type: string
         id:
@@ -3626,6 +3662,8 @@ components:
           type: string
         profile_picture_s3_key:
           type: string
+        push_notifications:
+          type: boolean
         stripe_customer_id:
           type: string
         updated_at:
@@ -3645,6 +3683,8 @@ components:
         - language_preference
         - auth_id
         - expo_push_token
+        - push_notifications
+        - email_notifications
         - created_at
         - updated_at
     GuardianLoginOutputBody:
@@ -4486,6 +4526,9 @@ components:
         email:
           type: string
           description: Email of the guardian
+        email_notifications:
+          type: boolean
+          description: Global email notification settings
         expo_push_token:
           type: string
           description: Expo push notification token
@@ -4498,6 +4541,9 @@ components:
         profile_picture_s3_key:
           type: string
           description: S3 key for profile picture
+        push_notifications:
+          type: boolean
+          description: Global push notification settings
         username:
           type: string
           description: Username of the guardian
@@ -4551,3 +4597,18 @@ components:
           description: New payment intent status from Stripe
       required:
         - payment_intent_status
+    UsernameExistsOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UsernameExistsOutputBody.json
+          readOnly: true
+        exists:
+          type: boolean
+      required:
+        - exists

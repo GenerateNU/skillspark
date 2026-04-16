@@ -37,6 +37,8 @@ func (r *GuardianRepository) DeleteGuardian(ctx context.Context, id uuid.UUID, t
 		&deletedGuardian.LanguagePreference,
 		&deletedGuardian.AuthID,
 		&deletedGuardian.StripeCustomerID,
+		&deletedGuardian.PushNotifications,
+		&deletedGuardian.EmailNotifications,
 		&deletedGuardian.CreatedAt,
 		&deletedGuardian.UpdatedAt,
 	)

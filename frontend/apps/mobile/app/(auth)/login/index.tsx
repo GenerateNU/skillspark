@@ -19,7 +19,11 @@ export default function LoginScreen() {
   const [errorText, setErrorText] = useState("");
   const { login } = useAuthContext();
 
-  const { control, handleSubmit } = useForm<LoginFormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
     defaultValues: {
       email: "",
       password: "",
@@ -48,6 +52,7 @@ export default function LoginScreen() {
         <AuthFormInput
           control={control}
           name="email"
+          error={errors.email}
           placeholder="Email"
           keyboardType="email-address"
           autoCapitalize="none"
@@ -55,6 +60,7 @@ export default function LoginScreen() {
         <AuthFormInput
           control={control}
           name="password"
+          error={errors.password}
           placeholder="Password"
           secureTextEntry={true}
         />

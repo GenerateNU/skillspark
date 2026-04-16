@@ -24,10 +24,17 @@ func (r *GuardianRepository) UpdateGuardian(ctx context.Context, guardian *model
 		return nil, &err
 	}
 
-	err = tx.QueryRow(ctx, guardianQuery, guardian.ID, guardian.Body.ExpoPushToken).Scan(
+	err = tx.QueryRow(ctx, guardianQuery,
+		guardian.ID,
+		guardian.Body.ExpoPushToken,
+		guardian.Body.PushNotifications,
+		guardian.Body.EmailNotifications,
+	).Scan(
 		&updatedGuardian.UserID,
 		&updatedGuardian.StripeCustomerID,
 		&updatedGuardian.ExpoPushToken,
+		&updatedGuardian.PushNotifications,
+		&updatedGuardian.EmailNotifications,
 		&updatedGuardian.CreatedAt,
 		&updatedGuardian.UpdatedAt,
 	)
