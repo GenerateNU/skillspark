@@ -2,6 +2,7 @@ import { RATING_OPTIONS } from "@/constants/ratings";
 import { AppColors } from "@/constants/theme";
 import { ReviewAggregate } from "@skillspark/api-client";
 import { useTranslation } from "react-i18next";
+import { Image, Text, View } from "react-native";
 
 export const NO_REVIEWS_IMAGE = require("@/assets/images/ratings/noreview.png");
 
