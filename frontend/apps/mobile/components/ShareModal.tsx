@@ -1,5 +1,6 @@
 import { Modal, Share, Linking, View, Text, Pressable } from "react-native";
 import * as Clipboard from "expo-clipboard";
+import { CircleIcon } from "@/components/CircleIcon";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -72,42 +73,6 @@ function makeAppIcons(text: string, url: string) {
   ];
 }
 
-function CircleIcon({
-  bg,
-  children,
-  label,
-  onPress,
-}: {
-  bg: string;
-  children: React.ReactNode;
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      className="items-center gap-1.5"
-      style={{ width: 64 }}
-    >
-      <View
-        className="w-[54px] h-[54px] rounded-full items-center justify-center"
-        style={{ backgroundColor: bg }}
-      >
-        {children}
-      </View>
-      <Text
-        numberOfLines={1}
-        style={{
-          fontFamily: FontFamilies.regular,
-          fontSize: 11,
-          color: AppColors.secondaryText,
-        }}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
 
 interface ShareModalProps {
   visible: boolean;

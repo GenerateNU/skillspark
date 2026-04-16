@@ -113,15 +113,6 @@ function OrgDetail({
                   {location.district}, {location.province}
                 </Text>
               )}
-              <View className="flex-row items-center gap-1.5">
-                <Text className="text-[14px]">🔥</Text>
-                <Text
-                  className="text-[14px] font-nunito"
-                  style={{ color: AppColors.mutedText }}
-                >
-                  100+ {translate("org.bookingsThisWeek")}
-                </Text>
-              </View>
             </View>
             <TouchableOpacity
               onPress={() => setShareVisible(true)}
