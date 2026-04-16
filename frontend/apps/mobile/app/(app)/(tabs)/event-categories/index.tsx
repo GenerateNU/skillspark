@@ -31,8 +31,8 @@ export default function EventCategoryScreen() {
   const { data: localizedOccurrencesResp, isLoading } = useGetAllEventOccurrences({
     category,
     
-    lat: "13.7563",
-    lng: "100.5018",
+    lat: geoLocationLat,
+    lng: geoLocationLong,
     radius_km: 50,
     limit: 20,
     soldout: false,
@@ -46,7 +46,12 @@ export default function EventCategoryScreen() {
     return <ErrorScreen message={translate("eventCategories.noLocationFound")} />;
   }
 
-  const occurrences = localizedOccurrencesResp?.status === 200 ? localizedOccurrencesResp.data : [];
+  // deduplicates events
+  const occurrences = localizedOccurrencesResp?.status === 200
+    ? localizedOccurrencesResp.data.filter(
+        (o, idx, arr) => arr.findIndex((x) => x.event.id === o.event.id) === idx
+      )
+    : [];
   const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
 
   return (
@@ -55,33 +60,18 @@ export default function EventCategoryScreen() {
 
       {/* Header */}
       <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 16, overflow: "hidden" }}>
-        {/* Background logos */}
         <Image
           source={require("@/assets/images/skillspark.png")}
-          style={{
-            position: "absolute",
-            right: -20,
-            top: -10,
-            width: 160,
-            height: 160,
-            opacity: 0.08,
-          }}
+          style={{ position: "absolute", right: -20, top: -10, width: 160, height: 160, opacity: 0.08 }}
           contentFit="contain"
         />
         <Image
           source={require("@/assets/images/skillspark.png")}
-          style={{
-            position: "absolute",
-            left: -30,
-            top: 20,
-            width: 160,
-            height: 160,
-            opacity: 0.06,
-          }}
+          style={{ position: "absolute", left: -30, top: 20, width: 160, height: 160, opacity: 0.06 }}
           contentFit="contain"
         />
         <TouchableOpacity
-          onPress={() => router.canGoBack() ? router.back() : router.navigate("/(app)/(tabs)")}
+          onPress={() => router.back()}
           style={{ width: 32, height: 32, justifyContent: "center", alignItems: "flex-start" }}
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />

@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { Image as RNImage, View, Pressable } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { AppColors } from "@/constants/theme";
@@ -20,18 +20,8 @@ const CATEGORY_URIS: Record<string, string> = Object.fromEntries(
   ]),
 );
 
-// Module-level XML content cache — survives remounts, persists for the app's lifetime
+// Module-level cache — survives remounts, persists for the app's lifetime
 const svgXmlCache = new Map<string, string>();
-
-// Eagerly fetch all SVG content when this module is first imported
-Object.values(CATEGORY_URIS).forEach((uri) => {
-  if (uri && !svgXmlCache.has(uri)) {
-    fetch(uri)
-      .then((r) => r.text())
-      .then((xml) => svgXmlCache.set(uri, xml))
-      .catch(() => {});
-  }
-});
 
 function useCategoryXml(uri: string | undefined): string | null {
   const [xml, setXml] = useState<string | null>(
@@ -63,13 +53,16 @@ export const CategoryCard = memo(function CategoryCard({
   category: string;
 }) {
   const router = useRouter();
-  const xml = useCategoryXml(CATEGORY_URIS[category]);
+  const uri = useMemo(() => CATEGORY_URIS[category], [category]);
+  const xml = useCategoryXml(uri);
+  const handlePress = useCallback(
+    () => router.push({ pathname: "/event-categories", params: { category } }),
+    [category, router],
+  );
 
   return (
     <Pressable
-      onPress={() =>
-        router.push({ pathname: "/event-categories", params: { category } })
-      }
+      onPress={handlePress}
       className="flex-1 m-[5px]"
       style={{
         shadowColor: "#000",
