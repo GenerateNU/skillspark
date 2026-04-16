@@ -11,7 +11,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   useGetEventOccurrencesByEventId,
-  useGetOrganization,
   useGetReviewAggregate,
 } from "@skillspark/api-client";
 import { ErrorScreen } from "@/components/ErrorScreen";
@@ -29,10 +28,8 @@ import { ExpandableText } from "@/components/ExpandableText";
 
 function EventOccurrenceDetail({
   occurrence,
-  org,
 }: {
   occurrence: EventOccurrence;
-  org: Organization | null;
 }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
@@ -40,18 +37,8 @@ function EventOccurrenceDetail({
   const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
 
   const location = formatLocation(occurrence);
-  const categories = (occurrence.event.category || [])
-    .map((elem) =>
-      //Capitalize the first char of every word
-      elem
-        .toLowerCase()
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ")
-    )
-    .join(" / ");
+  const categories = occurrence.event.category?.join(" / ") ?? "";
   const orgId = occurrence.event.organization_id;
-  const orgName = org?.name ?? "";
 
   const { data: aggregateResp } = useGetReviewAggregate(occurrence.event.id, {
     query: { enabled: !!occurrence.event.id },
@@ -121,10 +108,10 @@ function EventOccurrenceDetail({
           </View>
 
           {/* Location */}
-          <View className="flex-row items-center gap-1 mb-2">
+          <View className="flex-row items-center gap-1.5 mb-2">
             <MaterialIcons
               name="location-on"
-              size={22}
+              size={16}
               color={AppColors.mutedText}
             />
             <Text
@@ -137,38 +124,12 @@ function EventOccurrenceDetail({
 
           {/* Category */}
           {!!categories && (
-            <View className="flex-row gap-1">
-              <IconSymbol
-                name="star.fill"
-                size={22}
-                color={AppColors.mutedText}
-              />
-              <Text
-                className="text-[14px] font-nunito mb-2"
-                style={{ color: AppColors.mutedText }}
-              >
-                {categories}
-              </Text>
-            </View>
-          )}
-
-          {!!orgId && (
-            <TouchableOpacity
-              onPress={() => router.push(`../org/${orgId}`)}
-              className="flex-row items-center gap-1 mb-2"
+            <Text
+              className="text-[14px] font-nunito mb-2"
+              style={{ color: AppColors.mutedText }}
             >
-              <IconSymbol
-                name="person.fill"
-                size={22}
-                color={AppColors.mutedText}
-              />
-              <Text
-                className="text-[14px] font-nunito underline"
-                style={{ color: AppColors.mutedText }}
-              >
-                {orgName}
-              </Text>
-            </TouchableOpacity>
+              {categories}
+            </Text>
           )}
 
           {/* Bookings this week */}
@@ -181,10 +142,7 @@ function EventOccurrenceDetail({
         </View>
 
         {/* About card */}
-        <View
-          className="mx-4 mb-4 rounded-2xl bg-white p-5"
-          style={Shadows.card}
-        >
+        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={Shadows.card}>
           <Text
             className="mb-2.5 text-[18px] font-nunito-bold"
             style={{ color: AppColors.primaryText }}
@@ -318,16 +276,7 @@ export default function EventOccurrenceScreen() {
   } = useGetEventOccurrencesByEventId(id);
   const { t: translate } = useTranslation();
 
-  const occurrence = response?.status === 200 ? response.data[0] : null;
-  const orgId = occurrence?.event.organization_id;
-
-  const { data: orgResp, isLoading: orgLoading } = useGetOrganization(
-    orgId ?? "",
-    { query: { enabled: !!orgId } }
-  );
-  const org = orgResp?.status === 200 ? orgResp.data : null;
-
-  if (isLoading || orgLoading) {
+  if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
@@ -345,5 +294,5 @@ export default function EventOccurrenceScreen() {
     return <ErrorScreen message={translate("event.notFound")} />;
   }
 
-  return <EventOccurrenceDetail occurrence={occurrence} org={org} />;
+  return <EventOccurrenceDetail occurrence={response.data[0]} />;
 }

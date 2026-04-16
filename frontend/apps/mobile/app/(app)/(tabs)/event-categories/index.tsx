@@ -56,7 +56,7 @@ export default function EventCategoryScreen() {
     localizedOccurrencesResp?.status === 200
       ? localizedOccurrencesResp.data.filter(
           (o, idx, arr) =>
-            arr.findIndex((x) => x.event.id === o.event.id) === idx,
+            arr.findIndex((x) => x.event.id === o.event.id) === idx
         )
       : [];
   const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);

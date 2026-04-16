@@ -59,7 +59,7 @@ export const CategoryCard = memo(function CategoryCard({
   const source = useMemo(() => CATEGORY_SOURCES[category], [category]);
   const handlePress = useCallback(
     () => router.push({ pathname: "/event-categories", params: { category } }),
-    [category, router],
+    [category, router]
   );
 
   return (
