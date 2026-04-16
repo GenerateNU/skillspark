@@ -18,7 +18,8 @@ export function EventCategoriesListItem({
   const { t: translate } = useTranslation();
   const { location, event } = eventOccurrence;
   const organization = useGetOrganization(event.organization_id);
-  const orgName = organization.data?.status === 200 ? organization.data.data.name : "";
+  const orgName =
+    organization.data?.status === 200 ? organization.data.data.name : "";
   const address = `${location.address_line1}, ${location.district} ${location.postal_code}`;
   const ageRange = `${translate("eventCategories.ages")} ${event.age_range_min} - ${event.age_range_max}`;
 
@@ -35,22 +36,53 @@ export function EventCategoriesListItem({
           contentFit="cover"
         />
       ) : (
-        <View style={{ width: 90, height: 90, borderRadius: 8, backgroundColor: AppColors.categoryFallback }} />
+        <View
+          style={{
+            width: 90,
+            height: 90,
+            borderRadius: 8,
+            backgroundColor: AppColors.categoryFallback,
+          }}
+        />
       )}
 
       <View className="flex-1 gap-1">
-        <Text style={{ fontFamily: FontFamilies.bold, fontSize: FontSizes.base, color: AppColors.primaryText }}>
+        <Text
+          style={{
+            fontFamily: FontFamilies.bold,
+            fontSize: FontSizes.base,
+            color: AppColors.primaryText,
+          }}
+        >
           {event.title}
         </Text>
         {orgName ? (
-          <Text style={{ fontFamily: FontFamilies.regular, fontSize: FontSizes.sm, color: AppColors.mutedText }}>
+          <Text
+            style={{
+              fontFamily: FontFamilies.regular,
+              fontSize: FontSizes.sm,
+              color: AppColors.mutedText,
+            }}
+          >
             {orgName}
           </Text>
         ) : null}
-        <Text style={{ fontFamily: FontFamilies.regular, fontSize: FontSizes.sm, color: AppColors.mutedText }}>
+        <Text
+          style={{
+            fontFamily: FontFamilies.regular,
+            fontSize: FontSizes.sm,
+            color: AppColors.mutedText,
+          }}
+        >
           {ageRange}
         </Text>
-        <Text style={{ fontFamily: FontFamilies.regular, fontSize: FontSizes.sm, color: AppColors.mutedText }}>
+        <Text
+          style={{
+            fontFamily: FontFamilies.regular,
+            fontSize: FontSizes.sm,
+            color: AppColors.mutedText,
+          }}
+        >
           {address}
         </Text>
       </View>

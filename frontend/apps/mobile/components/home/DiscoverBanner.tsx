@@ -1,7 +1,10 @@
 import { Image } from "expo-image";
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import { type EventOccurrence, useGetReviewAggregate } from "@skillspark/api-client";
+import {
+  type EventOccurrence,
+  useGetReviewAggregate,
+} from "@skillspark/api-client";
 import { AppColors, FontFamilies } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { RATING_OPTIONS } from "@/constants/ratings";
@@ -18,10 +21,13 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
       refetchOnMount: false,
     },
   });
-  const aggregateData = aggregateResp?.status === 200 ? aggregateResp.data : null;
+  const aggregateData =
+    aggregateResp?.status === 200 ? aggregateResp.data : null;
   const avgRating = aggregateData?.average_rating ?? 0;
   const totalReviews = aggregateData?.total_reviews ?? 0;
-  const ratingMatch = RATING_OPTIONS.find((r) => r.rating === Math.round(avgRating));
+  const ratingMatch = RATING_OPTIONS.find(
+    (r) => r.rating === Math.round(avgRating),
+  );
 
   return (
     <Pressable
@@ -46,7 +52,6 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
       {/* Bottom overlay */}
       <View className="absolute bottom-0 left-0 right-0 bg-black/60 rounded-b-3xl px-4 pt-[14px] pb-[14px]">
         <View className="flex-row items-end justify-between">
-
           {/* Left: title + rating */}
           <View className="flex-1 mr-3">
             <Text
@@ -82,7 +87,10 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
           <View className="flex-row items-center bg-white rounded-full px-[14px] py-2 gap-1">
             <Text
               className="text-sm"
-              style={{ fontFamily: FontFamilies.bold, color: AppColors.primaryText }}
+              style={{
+                fontFamily: FontFamilies.bold,
+                color: AppColors.primaryText,
+              }}
             >
               See More
             </Text>

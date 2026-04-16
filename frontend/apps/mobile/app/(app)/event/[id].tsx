@@ -47,7 +47,7 @@ function EventOccurrenceDetail({
   const avgRating = aggregate?.average_rating ?? 0;
   const totalReviews = aggregate?.total_reviews ?? 0;
   const ratingMatch = RATING_OPTIONS.find(
-    (r) => r.rating === Math.round(avgRating)
+    (r) => r.rating === Math.round(avgRating),
   );
 
   const cardShadow = {

@@ -43,7 +43,6 @@ export default function HomeScreen() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
 
-
   const { lat: geoLocationLat, lng: geoLocationLong } = useGeolocation();
 
   const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({
@@ -152,8 +151,6 @@ export default function HomeScreen() {
       ? Array.from(cats)
       : ["science", "technology", "soccer", "painting", "dance", "coding"];
   }, [allOccurrences]);
-
-
 
   const firstName = guardian?.name?.split(" ")[0] ?? "there";
 
@@ -344,10 +341,7 @@ export default function HomeScreen() {
             {categoryPairs.map((pair, idx) => (
               <View key={idx} className="flex-row">
                 {pair.map((cat) => (
-                  <CategoryCard
-                    key={cat}
-                    category={cat}
-                  />
+                  <CategoryCard key={cat} category={cat} />
                 ))}
                 {pair.length === 1 && <View className="flex-1 m-[5px]" />}
               </View>

@@ -28,30 +28,37 @@ export default function EventCategoryScreen() {
   const category = params.category as string;
   const { lat: geoLocationLat, lng: geoLocationLong } = useGeolocation();
 
-  const { data: localizedOccurrencesResp, isLoading } = useGetAllEventOccurrences({
-    category,
-    
-    lat: geoLocationLat,
-    lng: geoLocationLong,
-    radius_km: 50,
-    limit: 20,
-    soldout: false,
-  });
+  const { data: localizedOccurrencesResp, isLoading } =
+    useGetAllEventOccurrences({
+      category,
+
+      lat: geoLocationLat,
+      lng: geoLocationLong,
+      radius_km: 50,
+      limit: 20,
+      soldout: false,
+    });
 
   if (!category) {
-    return <ErrorScreen message={translate("eventCategories.noCategorySupplied")} />;
+    return (
+      <ErrorScreen message={translate("eventCategories.noCategorySupplied")} />
+    );
   }
 
   if (!geoLocationLat || !geoLocationLong) {
-    return <ErrorScreen message={translate("eventCategories.noLocationFound")} />;
+    return (
+      <ErrorScreen message={translate("eventCategories.noLocationFound")} />
+    );
   }
 
   // deduplicates events
-  const occurrences = localizedOccurrencesResp?.status === 200
-    ? localizedOccurrencesResp.data.filter(
-        (o, idx, arr) => arr.findIndex((x) => x.event.id === o.event.id) === idx
-      )
-    : [];
+  const occurrences =
+    localizedOccurrencesResp?.status === 200
+      ? localizedOccurrencesResp.data.filter(
+          (o, idx, arr) =>
+            arr.findIndex((x) => x.event.id === o.event.id) === idx,
+        )
+      : [];
   const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
 
   return (
@@ -59,20 +66,46 @@ export default function EventCategoryScreen() {
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Header */}
-      <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 16, overflow: "hidden" }}>
+      <View
+        style={{
+          paddingHorizontal: 20,
+          paddingTop: 10,
+          paddingBottom: 16,
+          overflow: "hidden",
+        }}
+      >
         <Image
           source={require("@/assets/images/skillspark.png")}
-          style={{ position: "absolute", right: -20, top: -10, width: 160, height: 160, opacity: 0.08 }}
+          style={{
+            position: "absolute",
+            right: -20,
+            top: -10,
+            width: 160,
+            height: 160,
+            opacity: 0.08,
+          }}
           contentFit="contain"
         />
         <Image
           source={require("@/assets/images/skillspark.png")}
-          style={{ position: "absolute", left: -30, top: 20, width: 160, height: 160, opacity: 0.06 }}
+          style={{
+            position: "absolute",
+            left: -30,
+            top: 20,
+            width: 160,
+            height: 160,
+            opacity: 0.06,
+          }}
           contentFit="contain"
         />
         <TouchableOpacity
           onPress={() => router.back()}
-          style={{ width: 32, height: 32, justifyContent: "center", alignItems: "flex-start" }}
+          style={{
+            width: 32,
+            height: 32,
+            justifyContent: "center",
+            alignItems: "flex-start",
+          }}
         >
           <IconSymbol name="chevron.left" size={24} color={theme.text} />
         </TouchableOpacity>
@@ -89,7 +122,11 @@ export default function EventCategoryScreen() {
       </View>
 
       {isLoading ? (
-        <ActivityIndicator size="large" style={{ marginTop: 40 }} color={AppColors.primaryText} />
+        <ActivityIndicator
+          size="large"
+          style={{ marginTop: 40 }}
+          color={AppColors.primaryText}
+        />
       ) : occurrences.length === 0 ? (
         <Text
           style={{
@@ -111,7 +148,16 @@ export default function EventCategoryScreen() {
             <EventCategoriesListItem
               key={o.id}
               eventOccurrence={o}
-              onPress={() => router.push({ pathname: "/event/[id]", params: { id: o.event.id, from: "event-categories", category } })}
+              onPress={() =>
+                router.push({
+                  pathname: "/event/[id]",
+                  params: {
+                    id: o.event.id,
+                    from: "event-categories",
+                    category,
+                  },
+                })
+              }
             />
           ))}
         </ScrollView>
