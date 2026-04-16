@@ -284,8 +284,10 @@ function EventOccurrenceDetail({
         onClose={() => setShareVisible(false)}
         name={occurrence.event.title}
         imageUrl={occurrence.event.presigned_url ?? undefined}
-        shareUrl={Linking.createURL(`event/${occurrence.id}`)}
-        message={translate("share.eventMessage", { name: occurrence.event.title })}
+        shareUrl={Linking.createURL(`event/${occurrence.event.id}`)}
+        message={translate("share.defaultMessage", {
+          name: occurrence.event.title,
+        })}
       />
     </SafeAreaView>
   );
