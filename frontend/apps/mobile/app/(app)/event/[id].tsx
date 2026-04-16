@@ -1,6 +1,5 @@
 import { Image } from "expo-image";
 import { useState } from "react";
-import { useEventBackNavigation } from "@/hooks/use-event-back-navigation";
 import {
   ActivityIndicator,
   Pressable,
@@ -27,14 +26,12 @@ import { formatLocation } from "@/utils/format";
 
 function EventOccurrenceDetail({
   occurrence,
-  from,
 }: {
   occurrence: EventOccurrence;
-  from?: string;
 }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
-  const handleBack = useEventBackNavigation({ from });
+  const handleBack = () => router.back();
   const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [aboutTruncated, setAboutTruncated] = useState(false);
@@ -50,7 +47,7 @@ function EventOccurrenceDetail({
   const avgRating = aggregate?.average_rating ?? 0;
   const totalReviews = aggregate?.total_reviews ?? 0;
   const ratingMatch = RATING_OPTIONS.find(
-    (r) => r.rating === Math.round(avgRating),
+    (r) => r.rating === Math.round(avgRating)
   );
 
   const cardShadow = {
@@ -346,5 +343,5 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  return <EventOccurrenceDetail occurrence={response.data[0]} from={from} />;
+  return <EventOccurrenceDetail occurrence={response.data[0]} />;
 }
