@@ -7,7 +7,6 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
@@ -15,7 +14,8 @@ import type { Location, Organization } from "@skillspark/api-client";
 import { SvgXml } from "react-native-svg";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+import { AppColors, Shadows } from "@/constants/theme";
+import { ExpandableText } from "@/components/ExpandableText";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { useTranslation } from "react-i18next";
@@ -34,16 +34,6 @@ function OrgDetail({
 	const backgroundColor = useThemeColor({}, "background");
 	const borderColor = useThemeColor({}, "borderColor");
 	const { openLink, hasLinks } = useOrgLinks(org.links ?? []);
-	const [aboutExpanded, setAboutExpanded] = useState(false);
-	const [aboutTruncated, setAboutTruncated] = useState(false);
-
-	const cardStyle = {
-		shadowColor: "#000",
-		shadowOpacity: 0.08,
-		shadowRadius: 12,
-		shadowOffset: { width: 0, height: 2 },
-		elevation: 3,
-	};
 
 	return (
 		<SafeAreaView
@@ -132,38 +122,11 @@ function OrgDetail({
 				/>
 
 				{/* About card */}
-				<View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardStyle}>
+				<View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={Shadows.card}>
 					<Text className="mb-2.5 text-[18px] font-nunito-bold">
 						{translate("org.about")}
 					</Text>
-					<Text
-						numberOfLines={aboutExpanded ? undefined : 4}
-						onTextLayout={(e) => {
-							if (!aboutExpanded)
-								setAboutTruncated(e.nativeEvent.lines.length >= 4);
-						}}
-						className={`text-sm leading-[22px] ${
-							aboutTruncated ? "mb-1" : "mb-4"
-						}`}
-						style={{ color: AppColors.secondaryText }}
-					>
-						{org.about ?? ""}
-					</Text>
-					{aboutTruncated && (
-						<Pressable
-							onPress={() => setAboutExpanded((prev) => !prev)}
-							className="mb-4"
-						>
-							<Text
-								className="text-[13px] font-semibold"
-								style={{ color: AppColors.primaryText }}
-							>
-								{aboutExpanded
-									? translate("event.seeLess")
-									: translate("event.seeMore")}
-							</Text>
-						</Pressable>
-					)}
+					<ExpandableText text={org.about ?? ""} />
 					{hasLinks && (
 						<View className="flex-row flex-wrap gap-2.5">
 							{(org.links ?? []).map((link, index) => (
@@ -192,7 +155,7 @@ function OrgDetail({
 				>
 					<View
 						className="mx-4 mb-4 rounded-2xl bg-white p-5"
-						style={cardStyle}
+						style={Shadows.card}
 					>
 						<Text className="mb-4 text-[24px] font-nunito-bold">
 							{translate("org.reviews")}

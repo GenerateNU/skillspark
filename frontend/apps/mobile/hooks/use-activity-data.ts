@@ -10,6 +10,7 @@ import {
   type Review,
 } from "@skillspark/api-client";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import { extractResponseData, arrayToMap } from "@/utils/format";
 
 export function useActivityData() {
   const { guardianId } = useAuthContext();
@@ -24,27 +25,20 @@ export function useActivityData() {
   }, [registrationsResp]);
 
   const { data: occurrencesResp } = useGetAllEventOccurrences({ limit: 100 });
-  const eventOccurrencesMap: Record<string, EventOccurrence> = useMemo(() => {
-    const d = occurrencesResp as unknown as { data: EventOccurrence[] } | undefined;
-    const list = Array.isArray(d?.data) ? d.data : [];
-    const map: Record<string, EventOccurrence> = {};
-    list.forEach((o) => { map[o.id] = o; });
-    return map;
-  }, [occurrencesResp]);
+  const eventOccurrencesMap: Record<string, EventOccurrence> = useMemo(
+    () => arrayToMap(extractResponseData<EventOccurrence>(occurrencesResp)),
+    [occurrencesResp],
+  );
 
   const { data: childrenResp } = useGetChildrenByGuardianId(guardianId!, {
     query: { enabled: !!guardianId },
   });
-  const children: Child[] = useMemo(() => {
-    const d = childrenResp as unknown as { data: Child[] } | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [childrenResp]);
+  const children: Child[] = useMemo(
+    () => extractResponseData<Child>(childrenResp),
+    [childrenResp],
+  );
 
-  const childMap = useMemo(() => {
-    const map: Record<string, Child> = {};
-    children.forEach((c) => { map[c.id] = c; });
-    return map;
-  }, [children]);
+  const childMap = useMemo(() => arrayToMap(children), [children]);
 
   const { data: guardianReviewsResp } = useGetReviewByGuardianId(guardianId!, undefined, {
     query: { enabled: !!guardianId },

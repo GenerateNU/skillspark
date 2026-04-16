@@ -1,11 +1,11 @@
-import { Image } from "expo-image";
 import { View, Text, Pressable, Image as RNImage } from "react-native";
 import { useRouter } from "expo-router";
 import { type EventOccurrence, type ReviewAggregate, useGetReviewAggregate } from "@skillspark/api-client";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
-import { RATING_OPTIONS } from "@/constants/ratings";
 import { haversineDistance } from "@/utils/distance";
 import { formatAgeRange } from "@/utils/format";
+import { getRatingOption } from "@/utils/ratings";
+import { EventImage } from "@/components/EventImage";
 
 export function TrendingCard({
   occurrence,
@@ -40,12 +40,7 @@ export function TrendingCard({
   const reviewAggregate =
     reviewResp?.status === 200 ? (reviewResp.data as ReviewAggregate) : null;
 
-  const ratingOption =
-    reviewAggregate?.average_rating != null
-      ? (RATING_OPTIONS.find(
-          (r) => r.rating === Math.round(reviewAggregate.average_rating),
-        ) ?? RATING_OPTIONS.find((r) => r.rating === null)!)
-      : RATING_OPTIONS.find((r) => r.rating === null)!;
+  const ratingOption = getRatingOption(reviewAggregate?.average_rating);
 
   const reviewLabel =
     reviewAggregate?.average_rating != null
@@ -73,21 +68,10 @@ export function TrendingCard({
         }}
       >
         {/* Image */}
-        {occurrence.event.presigned_url ? (
-          <Image
-            source={{ uri: occurrence.event.presigned_url }}
-            style={{ width: 110, height: 140 }}
-            contentFit="cover"
-          />
-        ) : (
-          <View
-            style={{
-              width: 110,
-              height: 140,
-              backgroundColor: AppColors.divider,
-            }}
-          />
-        )}
+        <EventImage
+          uri={occurrence.event.presigned_url}
+          style={{ width: 110, height: 140 }}
+        />
 
         {/* Content */}
         <View

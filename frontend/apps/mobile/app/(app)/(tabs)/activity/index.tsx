@@ -2,9 +2,9 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Animated, Modal, PanResponder, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
+import { Animated, Modal, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -16,8 +16,10 @@ import {
 import { UpcomingRegistrationCard } from "@/components/UpcomingRegistrationCard";
 import { PastRegistrationCard } from "@/components/PastRegistrationCard";
 import { type ChildRegistration, type RegistrationCardData } from "@/components/RegistrationCard.types";
+import { ChildAvatarGroup } from "@/components/ChildAvatarGroup";
 import { ChildAvatar } from "@/components/ChildAvatar";
 import { useActivityData } from "@/hooks/use-activity-data";
+import { useDraggableBottomSheet } from "@/hooks/use-draggable-bottom-sheet";
 
 type toggleValue = "upcoming" | "past" | undefined
 
@@ -63,28 +65,15 @@ export default function ActivityScreen() {
 
   const [cancelTarget, setCancelTarget] = useState<ChildRegistration[] | null>(null);
   const [cancelSelections, setCancelSelections] = useState<Set<string>>(new Set());
-  const cancelSheetTranslateY = useRef(new Animated.Value(0)).current;
-
-  const cancelPanResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, gs) => gs.dy > 4,
-      onPanResponderMove: (_, gs) => {
-        if (gs.dy > 0) cancelSheetTranslateY.setValue(gs.dy);
-      },
-      onPanResponderRelease: (_, gs) => {
-        if (gs.dy > 100) {
-          setCancelTarget(null);
-        } else {
-          Animated.spring(cancelSheetTranslateY, { toValue: 0, useNativeDriver: true }).start();
-        }
-      },
-    })
-  ).current;
+  const {
+    panResponder: cancelPanResponder,
+    translateY: cancelSheetTranslateY,
+    reset: resetCancelSheet,
+  } = useDraggableBottomSheet(() => setCancelTarget(null));
 
   const getOnRemove = (childRegistrations: ChildRegistration[]) => () => {
     setCancelSelections(new Set(childRegistrations.map((cr) => cr.child.id)));
-    cancelSheetTranslateY.setValue(0);
+    resetCancelSheet();
     setCancelTarget(childRegistrations);
   };
 
@@ -198,29 +187,16 @@ export default function ActivityScreen() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<Set<string>>(new Set());
   const [pendingFilter, setPendingFilter] = useState<Set<string>>(new Set());
-  const sheetTranslateY = useRef(new Animated.Value(0)).current;
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, gs) => gs.dy > 4,
-      onPanResponderMove: (_, gs) => {
-        if (gs.dy > 0) sheetTranslateY.setValue(gs.dy);
-      },
-      onPanResponderRelease: (_, gs) => {
-        if (gs.dy > 100) {
-          setFilterOpen(false);
-        } else {
-          Animated.spring(sheetTranslateY, { toValue: 0, useNativeDriver: true }).start();
-        }
-      },
-    })
-  ).current;
+  const {
+    panResponder: filterPanResponder,
+    translateY: sheetTranslateY,
+    reset: resetFilterSheet,
+  } = useDraggableBottomSheet(() => setFilterOpen(false));
 
   const openFilter = () => {
     const allIds = new Set(children.map((c) => c.id));
     setPendingFilter(activeFilter.size === 0 ? allIds : new Set(activeFilter));
-    sheetTranslateY.setValue(0);
+    resetFilterSheet();
     setFilterOpen(true);
   };
 
@@ -270,17 +246,7 @@ export default function ActivityScreen() {
 
       {children.length > 0 && (
         <ThemedView className="w-11/12 self-center flex flex-row items-center justify-between py-3">
-          <View className="flex flex-row flex-wrap gap-1.5">
-            {children.map((child) => (
-              <ChildAvatar
-                key={child.id}
-                name={child.name}
-                avatarFace={child.avatar_face}
-                avatarBackground={child.avatar_background}
-                size={32}
-              />
-            ))}
-          </View>
+          <ChildAvatarGroup children={children} size={32} />
           <TouchableOpacity onPress={openFilter} activeOpacity={0.7}>
             <IconSymbol
               name="line.3.horizontal.decrease"
@@ -416,7 +382,7 @@ export default function ActivityScreen() {
             paddingTop: 12,
           }}
         >
-          <View {...panResponder.panHandlers} className="items-center pb-3">
+          <View {...filterPanResponder.panHandlers} className="items-center pb-3">
             <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: AppColors.borderLight }} />
           </View>
 

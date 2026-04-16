@@ -96,3 +96,9 @@ export function extractResponseData<T>(resp: unknown): T[] {
   const d = resp as { data: T[] } | undefined;
   return Array.isArray(d?.data) ? d!.data : [];
 }
+
+export function arrayToMap<T extends { id: string }>(arr: T[]): Record<string, T> {
+  const map: Record<string, T> = {};
+  arr.forEach((item) => { map[item.id] = item; });
+  return map;
+}

@@ -1,7 +1,7 @@
 import React from "react";
-import { View, TouchableOpacity } from "react-native";
+import { Text, View, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/themed-text";
-import { Colors } from "@/constants/theme";
+import { AppColors, Colors, FontSizes } from "@/constants/theme";
 
 type SectionHeaderProps = {
   title: string;
@@ -30,5 +30,17 @@ export function SectionHeader({
         </TouchableOpacity>
       )}
     </View>
+  );
+}
+
+/** Inline section title used between scroll sections (px-5 mb-3 layout). */
+export function HomeSectionHeader({ title }: { title: string }) {
+  return (
+    <Text
+      className="font-nunito-bold px-5 mb-3"
+      style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+    >
+      {title}
+    </Text>
   );
 }

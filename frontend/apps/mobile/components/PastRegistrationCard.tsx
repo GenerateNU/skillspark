@@ -1,9 +1,9 @@
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+import { AppColors, Shadows } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
 import { Image, TouchableOpacity, View } from "react-native";
 import { type RegistrationCardProps, formatTime, formatDate } from "@/components/RegistrationCard.types";
-import { ChildAvatar } from "@/components/ChildAvatar";
+import { ChildAvatarGroup } from "@/components/ChildAvatarGroup";
 
 export function PastRegistrationCard({ data }: RegistrationCardProps) {
   const { t } = useTranslation();
@@ -18,11 +18,7 @@ export function PastRegistrationCard({ data }: RegistrationCardProps) {
         borderWidth: 1,
         borderColor: AppColors.borderLight,
         backgroundColor: AppColors.white,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.06,
-        shadowRadius: 4,
-        elevation: 2,
+        ...Shadows.sm,
       }}
     >
       <View className="py-3 pl-3">
@@ -51,17 +47,11 @@ export function PastRegistrationCard({ data }: RegistrationCardProps) {
       </View>
 
       <View className="py-3 pr-3 items-end justify-between">
-        <View className="flex-row flex-wrap gap-1 justify-end" style={{ maxWidth: 80 }}>
-          {children.map((child) => (
-            <ChildAvatar
-              key={child.id}
-              name={child.name}
-              avatarFace={child.avatar_face}
-              avatarBackground={child.avatar_background}
-              size={28}
-            />
-          ))}
-        </View>
+        <ChildAvatarGroup
+          children={children}
+          size={28}
+          style={{ gap: 4, justifyContent: "flex-end", maxWidth: 80 }}
+        />
         {data.hasReviewed ? (
           <View className="px-4 py-2 rounded-full" style={{ backgroundColor: AppColors.borderLight }}>
             <ThemedText className="text-sm font-medium" style={{ color: AppColors.mutedText }}>

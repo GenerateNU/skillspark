@@ -23,6 +23,7 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { useFilters } from "@/hooks/use-filters";
 import { useRouter } from "expo-router";
 import { isWithinNext7Days, filterFutureOccurrences, extractResponseData } from "@/utils/format";
+import { HomeSectionHeader } from "@/components/SectionHeader";
 import { DiscoverBanner } from "@/components/home/DiscoverBanner";
 import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
 import { RecommendedCard } from "@/components/home/RecommendedCard";
@@ -63,12 +64,10 @@ export default function HomeScreen() {
     ?.data;
 
   const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences({});
-  const allOccurrences: EventOccurrence[] = useMemo(() => {
-    const d = occurrencesResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [occurrencesResp]);
+  const allOccurrences: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(occurrencesResp),
+    [occurrencesResp],
+  );
 
   const { data: registrationsResp } = useGetRegistrationsByGuardianId(
     guardianId!,
@@ -241,12 +240,7 @@ export default function HomeScreen() {
       {/* Your Upcoming Classes — conditional */}
       {upcomingClasses.length > 0 && (
         <View className="mb-6">
-          <Text
-            className="font-nunito-bold px-5 mb-3"
-            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-          >
-            Your Upcoming Classes
-          </Text>
+          <HomeSectionHeader title="Your Upcoming Classes" />
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -291,12 +285,7 @@ export default function HomeScreen() {
       {/* Trending In Your Area */}
       {trendingEvents && trendingEvents.length > 0 && (
         <View className="mb-6">
-          <Text
-            className="font-nunito-bold px-5 mb-3"
-            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-          >
-            Trending in Your Area
-          </Text>
+          <HomeSectionHeader title="Trending in Your Area" />
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -312,12 +301,7 @@ export default function HomeScreen() {
       {/* Recommended For... */}
       {childRecommendations.length > 0 && (
         <View className="mb-6">
-          <Text
-            className="font-nunito-bold px-5 mb-3"
-            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-          >
-            Recommended for...
-          </Text>
+          <HomeSectionHeader title="Recommended for..." />
           <View>
             {childRecommendations.map(({ child, occurrences }) => (
               <RecommendedCard
@@ -333,12 +317,7 @@ export default function HomeScreen() {
       {/* Explore by Category */}
       {categories.length > 0 && (
         <View className="mb-6">
-          <Text
-            className="font-nunito-bold px-5 mb-3"
-            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-          >
-            Explore by Category
-          </Text>
+          <HomeSectionHeader title="Explore by Category" />
           <View className="px-[15px]">
             {categoryPairs.map((pair, idx) => (
               <View key={idx} className="flex-row">

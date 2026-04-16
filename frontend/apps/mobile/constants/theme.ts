@@ -68,6 +68,25 @@ export const FontFamilies = {
   museoModerno: "MuseoModerno_700Bold",
 };
 
+export const Shadows = {
+  /** Elevated card shadow — used for detail page section cards */
+  card: {
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  /** Subtle card shadow — used for list/registration cards */
+  sm: {
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 2,
+  },
+};
+
 export const FontSizes = {
   xs: 11, // subtle/small labels (location, child name, small badges)
   sm: 12, // secondary text (date, time, age)

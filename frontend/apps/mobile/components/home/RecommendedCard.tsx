@@ -1,8 +1,9 @@
-import { Image, View, Text, Pressable } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { type Child, type EventOccurrence } from "@skillspark/api-client";
 import { ChildAvatar } from "@/components/ChildAvatar";
 import { AppColors } from "@/constants/theme";
+import { EventImage } from "@/components/EventImage";
 
 export function RecommendedCard({
   child,
@@ -53,29 +54,13 @@ export function RecommendedCard({
         <View
           className="absolute top-[15px] left-[40px] w-[100px] h-[100px] rounded-xl overflow-hidden rotate-[20deg]"
         >
-          {img1?.event.presigned_url ? (
-            <Image
-              source={{ uri: img1.event.presigned_url }}
-              className="w-full h-full"
-              resizeMode="cover"
-            />
-          ) : (
-            <View className="w-full h-full" style={{ backgroundColor: AppColors.imagePlaceholder }} />
-          )}
+          <EventImage uri={img1?.event.presigned_url} style={{ width: "100%", height: "100%" }} />
         </View>
         {img0 && (
           <View
             className="absolute top-0 left-0 w-[120px] h-[120px] rounded-xl overflow-hidden"
           >
-            {img0.event.presigned_url ? (
-              <Image
-                source={{ uri: img0.event.presigned_url }}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
-            ) : (
-              <View className="w-full h-full" style={{ backgroundColor: AppColors.imagePlaceholder }} />
-            )}
+            <EventImage uri={img0.event.presigned_url} style={{ width: "100%", height: "100%" }} />
           </View>
         )}
       </View>
