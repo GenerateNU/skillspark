@@ -1,42 +1,39 @@
-import {
-  ActivityIndicator,
-  View,
-  ScrollView,
-  Text,
-  Pressable,
-  useWindowDimensions,
-} from "react-native";
-import {
-  useGetAllEventOccurrences,
-  useGetGuardianById,
-  useGetRegistrationsByGuardianId,
-  useGetChildrenByGuardianId,
-  type EventOccurrence,
-  type Guardian,
-  type Registration,
-  type Child,
-  useGetTrendingEventOccurrences,
-} from "@skillspark/api-client";
-import { useMemo, useState } from "react";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
+import CarouselCard from "@/components/home/CarouselCard";
+import { CategoryCard } from "@/components/home/CategoryCard";
+import { RecommendedCard } from "@/components/home/RecommendedCard";
+import { TrendingCard } from "@/components/home/TrendingCard";
+import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
+import LogoBgWrapper from "@/components/LogoBgWrapper";
+import { ThemedText } from "@/components/themed-text";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useFilters } from "@/hooks/use-filters";
-import { useRouter } from "expo-router";
-import { isWithinNext7Days, filterFutureOccurrences, extractResponseData } from "@/utils/format";
-import { HomeSectionHeader } from "@/components/SectionHeader";
-import { DiscoverBanner } from "@/components/home/DiscoverBanner";
-import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
-import { RecommendedCard } from "@/components/home/RecommendedCard";
-import { CategoryCard } from "@/components/home/CategoryCard";
-import { ThemedText } from "@/components/themed-text";
-import { useTranslation } from "react-i18next";
-import { TrendingCard } from "@/components/home/TrendingCard";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import CarouselCard from "@/components/home/CarouselCard";
-import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
-import { SearchBar } from "@/components/SearchBar";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import LogoBgWrapper from "@/components/LogoBgWrapper";
+import { extractResponseData, filterFutureOccurrences, isWithinNext7Days } from "@/utils/format";
+import {
+  useGetAllEventOccurrences,
+  useGetChildrenByGuardianId,
+  useGetGuardianById,
+  useGetRegistrationsByGuardianId,
+  useGetTrendingEventOccurrences,
+  type Child,
+  type EventOccurrence,
+  type Guardian,
+  type Registration,
+} from "@skillspark/api-client";
+import { useRouter } from "expo-router";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
