@@ -10,7 +10,10 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { haversineDistance } from "@/utils/distance";
 import { RatingSmiley } from "@/components/RatingSmiley";
-import { useGetReviewAggregateOrganization, type ReviewAggregate } from "@skillspark/api-client";
+import {
+  useGetReviewAggregateOrganization,
+  type ReviewAggregate,
+} from "@skillspark/api-client";
 
 export interface LocationPin {
   id: string;

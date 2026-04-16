@@ -28,7 +28,9 @@ export function SoldOutToggle({ label, value, onToggle }: Props) {
           width: 46,
           height: 26,
           borderRadius: 13,
-          backgroundColor: value ? AppColors.primaryText : AppColors.borderLight,
+          backgroundColor: value
+            ? AppColors.primaryText
+            : AppColors.borderLight,
           justifyContent: "center",
           paddingHorizontal: 3,
         }}

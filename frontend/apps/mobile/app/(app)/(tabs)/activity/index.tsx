@@ -4,7 +4,15 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Animated, Modal, PanResponder, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  Animated,
+  Modal,
+  PanResponder,
+  Pressable,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -15,15 +23,18 @@ import {
 } from "@skillspark/api-client";
 import { UpcomingRegistrationCard } from "@/components/UpcomingRegistrationCard";
 import { PastRegistrationCard } from "@/components/PastRegistrationCard";
-import { type ChildRegistration, type RegistrationCardData } from "@/components/RegistrationCard.types";
+import {
+  type ChildRegistration,
+  type RegistrationCardData,
+} from "@/components/RegistrationCard.types";
 import { ChildAvatar } from "@/components/ChildAvatar";
 import { useActivityData } from "@/hooks/use-activity-data";
 
-type toggleValue = "upcoming" | "past" | undefined
+type toggleValue = "upcoming" | "past" | undefined;
 
 interface ToggleProps {
-  value: toggleValue
-  onChange: (newValue: toggleValue) => void
+  value: toggleValue;
+  onChange: (newValue: toggleValue) => void;
 }
 
 function Toggle({ value, onChange }: ToggleProps) {
@@ -53,16 +64,26 @@ export default function ActivityScreen() {
   const { t } = useTranslation();
   const [selection, setSelection] = useState<"upcoming" | "past">("upcoming");
 
-  const { guardianId, registrations, eventOccurrencesMap, children, childMap, reviewedEventIds } =
-    useActivityData();
+  const {
+    guardianId,
+    registrations,
+    eventOccurrencesMap,
+    children,
+    childMap,
+    reviewedEventIds,
+  } = useActivityData();
 
   const queryClient = useQueryClient();
   const { mutate: cancelRegistration } = useCancelRegistration();
 
   // ── Cancel sheet ─────────────────────────────────────────────────────────────
 
-  const [cancelTarget, setCancelTarget] = useState<ChildRegistration[] | null>(null);
-  const [cancelSelections, setCancelSelections] = useState<Set<string>>(new Set());
+  const [cancelTarget, setCancelTarget] = useState<ChildRegistration[] | null>(
+    null,
+  );
+  const [cancelSelections, setCancelSelections] = useState<Set<string>>(
+    new Set(),
+  );
   const cancelSheetTranslateY = useRef(new Animated.Value(0)).current;
 
   const cancelPanResponder = useRef(
@@ -76,10 +97,13 @@ export default function ActivityScreen() {
         if (gs.dy > 100) {
           setCancelTarget(null);
         } else {
-          Animated.spring(cancelSheetTranslateY, { toValue: 0, useNativeDriver: true }).start();
+          Animated.spring(cancelSheetTranslateY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
         }
       },
-    })
+    }),
   ).current;
 
   const getOnRemove = (childRegistrations: ChildRegistration[]) => () => {
@@ -98,7 +122,9 @@ export default function ActivityScreen() {
 
   const confirmCancellation = () => {
     if (!cancelTarget) return;
-    const toCancel = cancelTarget.filter((cr) => cancelSelections.has(cr.child.id));
+    const toCancel = cancelTarget.filter((cr) =>
+      cancelSelections.has(cr.child.id),
+    );
     if (toCancel.length === 0) {
       setCancelTarget(null);
       return;
@@ -107,7 +133,9 @@ export default function ActivityScreen() {
     setCancelTarget(null);
     const queryKey = getGetRegistrationsByGuardianIdQueryKey(guardianId!);
     queryClient.setQueryData(queryKey, (old: unknown) => {
-      const prev = old as { data: { registrations: Registration[] } } | undefined;
+      const prev = old as
+        | { data: { registrations: Registration[] } }
+        | undefined;
       if (!prev?.data?.registrations) return old;
       const idSet = new Set(registrationIds);
       return {
@@ -115,7 +143,7 @@ export default function ActivityScreen() {
         data: {
           ...prev.data,
           registrations: prev.data.registrations.map((r) =>
-            idSet.has(r.id) ? { ...r, status: "cancelled" } : r
+            idSet.has(r.id) ? { ...r, status: "cancelled" } : r,
           ),
         },
       };
@@ -127,8 +155,8 @@ export default function ActivityScreen() {
           onError: () => {
             queryClient.invalidateQueries({ queryKey });
           },
-        }
-      )
+        },
+      ),
     );
   };
 
@@ -145,7 +173,11 @@ export default function ActivityScreen() {
         if (!occurrence) return;
         const child = childMap[r.child_id];
         if (grouped[r.event_occurrence_id]) {
-          if (child) grouped[r.event_occurrence_id].childRegistrations.push({ child, registrationId: r.id });
+          if (child)
+            grouped[r.event_occurrence_id].childRegistrations.push({
+              child,
+              registrationId: r.id,
+            });
         } else {
           grouped[r.event_occurrence_id] = {
             event_id: occurrence.event.id,
@@ -211,10 +243,13 @@ export default function ActivityScreen() {
         if (gs.dy > 100) {
           setFilterOpen(false);
         } else {
-          Animated.spring(sheetTranslateY, { toValue: 0, useNativeDriver: true }).start();
+          Animated.spring(sheetTranslateY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
         }
       },
-    })
+    }),
   ).current;
 
   const openFilter = () => {
@@ -246,12 +281,13 @@ export default function ActivityScreen() {
 
   // ── Displayed list ───────────────────────────────────────────────────────────
 
-  const baseDisplayed = selection === "upcoming" ? upcomingRegistrations : pastRegistrations;
+  const baseDisplayed =
+    selection === "upcoming" ? upcomingRegistrations : pastRegistrations;
   const displayed =
     activeFilter.size === 0
       ? baseDisplayed
       : baseDisplayed.filter((reg) =>
-          reg.childRegistrations.some((cr) => activeFilter.has(cr.child.id))
+          reg.childRegistrations.some((cr) => activeFilter.has(cr.child.id)),
         );
 
   const toggleSelection = (newValue: toggleValue) => {
@@ -285,25 +321,38 @@ export default function ActivityScreen() {
             <IconSymbol
               name="line.3.horizontal.decrease"
               size={22}
-              color={filterActive ? AppColors.primaryText ?? "#7C3AED" : "black"}
+              color={
+                filterActive ? (AppColors.primaryText ?? "#7C3AED") : "black"
+              }
             />
           </TouchableOpacity>
         </ThemedView>
       )}
 
       <ScrollView
-        contentContainerStyle={{ alignItems: "center", paddingTop: 16, paddingBottom: 32 }}
+        contentContainerStyle={{
+          alignItems: "center",
+          paddingTop: 16,
+          paddingBottom: 32,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {displayed.length === 0 ? (
           <ThemedText className="mt-8" style={{ color: AppColors.mutedText }}>
-            {selection === "upcoming" ? t("activity.noUpcomingRegistrations") : t("activity.noPastRegistrations")}
+            {selection === "upcoming"
+              ? t("activity.noUpcomingRegistrations")
+              : t("activity.noPastRegistrations")}
           </ThemedText>
         ) : (
           displayed.map((reg) =>
-            selection === "upcoming"
-              ? <UpcomingRegistrationCard key={reg.event_occurrence_id} data={reg} />
-              : <PastRegistrationCard key={reg.event_occurrence_id} data={reg} />
+            selection === "upcoming" ? (
+              <UpcomingRegistrationCard
+                key={reg.event_occurrence_id}
+                data={reg}
+              />
+            ) : (
+              <PastRegistrationCard key={reg.event_occurrence_id} data={reg} />
+            ),
           )
         )}
       </ScrollView>
@@ -330,12 +379,27 @@ export default function ActivityScreen() {
             paddingTop: 12,
           }}
         >
-          <View {...cancelPanResponder.panHandlers} className="items-center pb-3">
-            <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: AppColors.borderLight }} />
+          <View
+            {...cancelPanResponder.panHandlers}
+            className="items-center pb-3"
+          >
+            <View
+              style={{
+                width: 36,
+                height: 4,
+                borderRadius: 2,
+                backgroundColor: AppColors.borderLight,
+              }}
+            />
           </View>
 
-          <ThemedText type="defaultSemiBold" className="text-lg mb-1">{t("activity.cancelTitle")}</ThemedText>
-          <ThemedText className="text-sm mb-5" style={{ color: AppColors.mutedText }}>
+          <ThemedText type="defaultSemiBold" className="text-lg mb-1">
+            {t("activity.cancelTitle")}
+          </ThemedText>
+          <ThemedText
+            className="text-sm mb-5"
+            style={{ color: AppColors.mutedText }}
+          >
             {t("activity.cancelSubtitle")}
           </ThemedText>
 
@@ -346,7 +410,10 @@ export default function ActivityScreen() {
                 key={cr.child.id}
                 onPress={() => toggleCancelSelection(cr.child.id)}
                 className="flex flex-row items-center justify-between py-3"
-                style={{ borderBottomWidth: 1, borderBottomColor: AppColors.borderLight }}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: AppColors.borderLight,
+                }}
               >
                 <View className="flex flex-row items-center gap-3">
                   <ChildAvatar
@@ -364,7 +431,14 @@ export default function ActivityScreen() {
                     backgroundColor: checked ? "#000" : "transparent",
                   }}
                 >
-                  {checked && <ThemedText lightColor="white" className="text-xs leading-none">✓</ThemedText>}
+                  {checked && (
+                    <ThemedText
+                      lightColor="white"
+                      className="text-xs leading-none"
+                    >
+                      ✓
+                    </ThemedText>
+                  )}
                 </View>
               </Pressable>
             );
@@ -377,17 +451,25 @@ export default function ActivityScreen() {
               className="flex-1 py-3 rounded-xl items-center"
               style={{ borderWidth: 1, borderColor: AppColors.borderLight }}
             >
-              <ThemedText className="font-medium">{t("activity.keep")}</ThemedText>
+              <ThemedText className="font-medium">
+                {t("activity.keep")}
+              </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={confirmCancellation}
               activeOpacity={0.7}
               className="flex-1 py-3 rounded-xl items-center"
-              style={{ backgroundColor: cancelSelections.size === 0 ? AppColors.borderLight : "#EF4444" }}
+              style={{
+                backgroundColor:
+                  cancelSelections.size === 0
+                    ? AppColors.borderLight
+                    : "#EF4444",
+              }}
               disabled={cancelSelections.size === 0}
             >
               <ThemedText lightColor="white" className="font-medium">
-                {t("activity.remove")}{cancelSelections.size > 0 ? ` (${cancelSelections.size})` : ""}
+                {t("activity.remove")}
+                {cancelSelections.size > 0 ? ` (${cancelSelections.size})` : ""}
               </ThemedText>
             </TouchableOpacity>
           </View>
@@ -417,12 +499,25 @@ export default function ActivityScreen() {
           }}
         >
           <View {...panResponder.panHandlers} className="items-center pb-3">
-            <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: AppColors.borderLight }} />
+            <View
+              style={{
+                width: 36,
+                height: 4,
+                borderRadius: 2,
+                backgroundColor: AppColors.borderLight,
+              }}
+            />
           </View>
 
           <View className="flex flex-row items-center gap-2 mb-5">
-            <IconSymbol name="line.3.horizontal.decrease" size={20} color="black" />
-            <ThemedText type="defaultSemiBold" className="text-lg">{t("activity.filterByChild")}</ThemedText>
+            <IconSymbol
+              name="line.3.horizontal.decrease"
+              size={20}
+              color="black"
+            />
+            <ThemedText type="defaultSemiBold" className="text-lg">
+              {t("activity.filterByChild")}
+            </ThemedText>
           </View>
 
           {children.map((child) => {
@@ -432,7 +527,10 @@ export default function ActivityScreen() {
                 key={child.id}
                 onPress={() => togglePending(child.id)}
                 className="flex flex-row items-center justify-between py-3"
-                style={{ borderBottomWidth: 1, borderBottomColor: AppColors.borderLight }}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: AppColors.borderLight,
+                }}
               >
                 <View className="flex flex-row items-center gap-3">
                   <ChildAvatar
@@ -450,7 +548,14 @@ export default function ActivityScreen() {
                     backgroundColor: checked ? "#000" : "transparent",
                   }}
                 >
-                  {checked && <ThemedText lightColor="white" className="text-xs leading-none">✓</ThemedText>}
+                  {checked && (
+                    <ThemedText
+                      lightColor="white"
+                      className="text-xs leading-none"
+                    >
+                      ✓
+                    </ThemedText>
+                  )}
                 </View>
               </Pressable>
             );
@@ -463,14 +568,18 @@ export default function ActivityScreen() {
               className="flex-1 py-3 rounded-xl items-center"
               style={{ borderWidth: 1, borderColor: AppColors.borderLight }}
             >
-              <ThemedText className="font-medium">{t("activity.reset")}</ThemedText>
+              <ThemedText className="font-medium">
+                {t("activity.reset")}
+              </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={applyFilter}
               activeOpacity={0.7}
               className="flex-1 py-3 rounded-xl items-center bg-black"
             >
-              <ThemedText lightColor="white" className="font-medium">{t("activity.apply")}</ThemedText>
+              <ThemedText lightColor="white" className="font-medium">
+                {t("activity.apply")}
+              </ThemedText>
             </TouchableOpacity>
           </View>
         </Animated.View>
