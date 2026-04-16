@@ -79,6 +79,7 @@ type EventRepository interface {
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 	GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID, AcceptLanguage string) ([]models.EventOccurrence, error)
 	GetEventByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.Event, error)
+	GetAllEvents(ctx context.Context, pagination utils.Pagination, AcceptLanguage string) ([]models.Event, error)
 }
 
 type ChildRepository interface {

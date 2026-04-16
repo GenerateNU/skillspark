@@ -136,6 +136,16 @@ type DeleteEventOutput struct {
 	} `json:"body"`
 }
 
+type GetAllEventsInput struct {
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	Page           int    `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
+	Limit          int    `query:"limit" minimum:"1" maximum:"100" default:"100" doc:"Number of items per page"`
+}
+
+type GetAllEventsOutput struct {
+	Body []Event `json:"body" doc:"List of all events in the database"`
+}
+
 // get by event id
 type GetEventOccurrencesByEventIDInput struct {
 	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`

@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { View, Text, Pressable } from "react-native";
-import { type EventOccurrence } from "@skillspark/api-client";
+import { type Event } from "@skillspark/api-client";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -14,10 +14,10 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export function CategoryCard({
   category,
-  occurrence,
+  event,
 }: {
   category: string;
-  occurrence?: EventOccurrence;
+  event?: Event;
 }) {
   return (
     <Pressable
@@ -31,9 +31,9 @@ export function CategoryCard({
       }}
     >
       <View className="h-[80px] rounded-[15px] overflow-hidden">
-        {occurrence?.event.presigned_url ? (
+        {event?.presigned_url ? (
           <Image
-            source={{ uri: occurrence.event.presigned_url }}
+            source={{ uri: event.presigned_url }}
             style={{ width: "100%", height: "100%" }}
             className="absolute inset-0 opacity-80"
             contentFit="cover"

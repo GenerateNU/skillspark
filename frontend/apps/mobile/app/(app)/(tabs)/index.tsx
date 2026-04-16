@@ -9,9 +9,11 @@ import {
 } from "react-native";
 import {
   useGetAllEventOccurrences,
+  useGetAllEvents,
   useGetGuardianById,
   useGetRegistrationsByGuardianId,
   useGetChildrenByGuardianId,
+  type Event,
   type EventOccurrence,
   type Guardian,
   type Registration,
@@ -24,7 +26,6 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { useFilters } from "@/hooks/use-filters";
 import { useRouter } from "expo-router";
 import { isWithinNext7Days } from "@/utils/format";
-import { DiscoverBanner } from "@/components/home/DiscoverBanner";
 import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
 import { RecommendedCard } from "@/components/home/RecommendedCard";
 import { CategoryCard } from "@/components/home/CategoryCard";
@@ -39,7 +40,7 @@ import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
-  const { filters, hasActiveFilters } = useFilters();
+  const { hasActiveFilters } = useFilters();
   const router = useRouter();
   const { width, height } = useWindowDimensions();
 
@@ -79,7 +80,15 @@ export default function HomeScreen() {
   const guardian = (guardianResp as unknown as { data: Guardian } | undefined)
     ?.data;
 
-  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences({});
+  // Events (templates) — used for discovery sections
+  const { data: eventsResp, isLoading } = useGetAllEvents();
+  const allEvents: Event[] = useMemo(() => {
+    const d = eventsResp as unknown as { data: Event[] } | undefined;
+    return Array.isArray(d?.data) ? d.data : [];
+  }, [eventsResp]);
+
+  // Occurrences — kept only for matching upcoming registered classes
+  const { data: occurrencesResp } = useGetAllEventOccurrences({});
   const allOccurrences: EventOccurrence[] = useMemo(() => {
     const d = occurrencesResp as unknown as
       | { data: EventOccurrence[] }
@@ -142,40 +151,33 @@ export default function HomeScreen() {
     return allOccurrences.filter((o) => upcomingIds.has(o.id));
   }, [registrations, allOccurrences]);
 
-  const futureOccurrences = useMemo(
-    () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
-    [allOccurrences],
-  );
-
   const childRecommendations = useMemo(() => {
-    const shuffled = [...futureOccurrences].sort(() => Math.random() - 0.5);
+    const shuffled = [...allEvents].sort(() => Math.random() - 0.5);
     return children
       .map((child, i) => ({
         child,
-        occurrence: shuffled[i % shuffled.length],
+        event: shuffled[i % shuffled.length],
       }))
-      .filter((r) => r.occurrence != null);
-  }, [children, futureOccurrences]);
+      .filter((r) => r.event != null);
+  }, [children, allEvents]);
 
   const categories = useMemo(() => {
     const cats = new Set<string>();
-    allOccurrences.forEach((o) =>
-      o.event.category?.forEach((c) => cats.add(c)),
-    );
+    allEvents.forEach((e) => e.category?.forEach((c) => cats.add(c)));
     return cats.size > 0
       ? Array.from(cats)
       : ["Sport", "Arts", "Music", "Tech", "Activity", "Tutoring"];
-  }, [allOccurrences]);
+  }, [allEvents]);
 
   const categoryEventMap = useMemo(() => {
-    const map: Record<string, EventOccurrence> = {};
-    allOccurrences.forEach((o) => {
-      o.event.category?.forEach((c) => {
-        if (!map[c] && o.event.presigned_url) map[c] = o;
+    const map: Record<string, Event> = {};
+    allEvents.forEach((e) => {
+      e.category?.forEach((c) => {
+        if (!map[c] && e.presigned_url) map[c] = e;
       });
     });
     return map;
-  }, [allOccurrences]);
+  }, [allEvents]);
 
   const firstName = guardian?.name?.split(" ")[0] ?? "there";
 
@@ -279,7 +281,7 @@ export default function HomeScreen() {
       )}
 
       {/* Discover Weekly */}
-      {futureOccurrences.length > 0 && (
+      {allEvents.length > 0 && (
         <View className="mb-6">
           <View className="flex-row items-center px-5 mb-3">
             <Text
@@ -298,8 +300,8 @@ export default function HomeScreen() {
           <CarouselCard
             events={
               allLocalizedOccurrences.length > 0
-                ? allLocalizedOccurrences
-                : futureOccurrences.slice(0, 5)
+                ? allLocalizedOccurrences.map((o) => o.event)
+                : allEvents.slice(0, 5)
             }
             width={width}
             height={height}
@@ -342,10 +344,10 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 20 }}
           >
-            {childRecommendations.map(({ child, occurrence }) => (
+            {childRecommendations.map(({ child, event }) => (
               <RecommendedCard
                 key={child.id}
-                occurrence={occurrence}
+                event={event}
                 childName={child.name.split(" ")[0]}
               />
             ))}
@@ -369,7 +371,7 @@ export default function HomeScreen() {
                   <CategoryCard
                     key={cat}
                     category={cat}
-                    occurrence={categoryEventMap[cat]}
+                    event={categoryEventMap[cat]}
                   />
                 ))}
                 {pair.length === 1 && <View className="flex-1 m-[5px]" />}

@@ -10,6 +10,7 @@ import (
 	"skillspark/internal/service/handler/event"
 	"skillspark/internal/storage"
 	translations "skillspark/internal/translation"
+	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 )
@@ -135,6 +136,36 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 			}{
 				Message: msg,
 			},
+		}, nil
+	})
+
+	// GET /api/v1/events
+	huma.Register(api, huma.Operation{
+		OperationID: "get-all-events",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/events",
+		Summary:     "Get all events",
+		Description: "Returns a paginated list of all events",
+		Tags:        []string{"Events"},
+	}, func(ctx context.Context, input *models.GetAllEventsInput) (*models.GetAllEventsOutput, error) {
+		pagination := utils.Pagination{
+			Page:  input.Page,
+			Limit: input.Limit,
+		}
+		if pagination.Page < 1 {
+			pagination.Page = 1
+		}
+		if pagination.Limit < 1 {
+			pagination.Limit = 100
+		}
+
+		events, err := eventHandler.GetAllEvents(ctx, pagination, input.AcceptLanguage)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetAllEventsOutput{
+			Body: events,
 		}, nil
 	})
 
