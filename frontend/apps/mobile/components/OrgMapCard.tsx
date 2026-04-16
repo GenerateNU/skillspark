@@ -96,9 +96,6 @@ export function OrgMapCard({ pin, userLocation }: OrgMapCardProps) {
           <ThemedText className="font-nunito-bold text-[18px] leading-snug">
             {pin.title}
           </ThemedText>
-          <ThemedText className="font-nunito text-sm text-[#6B7280]">
-            {pin.members} {translate("map.members")}
-          </ThemedText>
           {locationLine.length > 0 && (
             <ThemedText className="font-nunito text-sm text-[#6B7280]">
               {locationLine}
