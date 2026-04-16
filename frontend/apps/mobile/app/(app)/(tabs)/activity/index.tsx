@@ -29,6 +29,7 @@ import {
 } from "@/components/RegistrationCard.types";
 import { ChildAvatar } from "@/components/ChildAvatar";
 import { useActivityData } from "@/hooks/use-activity-data";
+import LogoBgWrapper from "@/components/LogoBgWrapper";
 
 type toggleValue = "upcoming" | "past" | undefined;
 
@@ -40,7 +41,7 @@ interface ToggleProps {
 function Toggle({ value, onChange }: ToggleProps) {
   const { t } = useTranslation();
   return (
-    <ThemedView className="w-11/12 border border-gray-200 rounded-md flex flex-row justify-between p-2 mt-2">
+    <View className="w-11/12 border bg-white border-gray-200 rounded-md flex flex-row justify-between p-2 mt-2">
       <Pressable
         className={`${value === "upcoming" ? "bg-gray-200" : ""} w-6/12 flex items-center rounded-md py-1.5`}
         onPress={() => onChange("upcoming")}
@@ -54,7 +55,7 @@ function Toggle({ value, onChange }: ToggleProps) {
       >
         <ThemedText>{t("activity.past")}</ThemedText>
       </Pressable>
-    </ThemedView>
+    </View>
   );
 }
 
@@ -296,294 +297,302 @@ export default function ActivityScreen() {
 
   return (
     <ThemedView className="w-full flex-1" style={{ paddingTop: insets.top }}>
-      <ThemedView className="w-full flex items-center border-b border-black/[0.5]">
-        <ThemedText className="py-3">{t("nav.activity")}</ThemedText>
-      </ThemedView>
+      <LogoBgWrapper>
+        <View className="w-full flex items-center">
+          <ThemedText className="py-3">{t("nav.activity")}</ThemedText>
+        </View>
 
-      <ThemedView className="w-full flex items-center">
-        <Toggle value={selection} onChange={toggleSelection} />
-      </ThemedView>
+        <View className="w-full flex items-center">
+          <Toggle value={selection} onChange={toggleSelection} />
+        </View>
 
-      {children.length > 0 && (
-        <ThemedView className="w-11/12 self-center flex flex-row items-center justify-between py-3">
-          <View className="flex flex-row flex-wrap gap-1.5">
-            {children.map((child) => (
-              <ChildAvatar
-                key={child.id}
-                name={child.name}
-                avatarFace={child.avatar_face}
-                avatarBackground={child.avatar_background}
-                size={32}
+        {children.length > 0 && (
+          <View className="w-11/12 self-center flex flex-row items-center justify-between py-3">
+            <View className="flex flex-row flex-wrap gap-1.5">
+              {children.map((child) => (
+                <ChildAvatar
+                  key={child.id}
+                  name={child.name}
+                  avatarFace={child.avatar_face}
+                  avatarBackground={child.avatar_background}
+                  size={32}
+                />
+              ))}
+            </View>
+            <TouchableOpacity onPress={openFilter} activeOpacity={0.7}>
+              <IconSymbol
+                name="line.3.horizontal.decrease"
+                size={22}
+                color={
+                  filterActive ? (AppColors.primaryText ?? "#7C3AED") : "black"
+                }
               />
-            ))}
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={openFilter} activeOpacity={0.7}>
-            <IconSymbol
-              name="line.3.horizontal.decrease"
-              size={22}
-              color={
-                filterActive ? (AppColors.primaryText ?? "#7C3AED") : "black"
-              }
-            />
-          </TouchableOpacity>
-        </ThemedView>
-      )}
-
-      <ScrollView
-        contentContainerStyle={{
-          alignItems: "center",
-          paddingTop: 16,
-          paddingBottom: 32,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        {displayed.length === 0 ? (
-          <ThemedText className="mt-8" style={{ color: AppColors.mutedText }}>
-            {selection === "upcoming"
-              ? t("activity.noUpcomingRegistrations")
-              : t("activity.noPastRegistrations")}
-          </ThemedText>
-        ) : (
-          displayed.map((reg) =>
-            selection === "upcoming" ? (
-              <UpcomingRegistrationCard
-                key={reg.event_occurrence_id}
-                data={reg}
-              />
-            ) : (
-              <PastRegistrationCard key={reg.event_occurrence_id} data={reg} />
-            ),
-          )
         )}
-      </ScrollView>
 
-      <Modal
-        visible={cancelTarget !== null}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setCancelTarget(null)}
-      >
-        <Pressable
-          className="flex-1"
-          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-          onPress={() => setCancelTarget(null)}
-        />
-        <Animated.View
-          style={{
-            transform: [{ translateY: cancelSheetTranslateY }],
-            backgroundColor: AppColors.white,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            paddingBottom: insets.bottom + 16,
-            paddingHorizontal: 24,
-            paddingTop: 12,
+        <ScrollView
+          contentContainerStyle={{
+            alignItems: "center",
+            paddingTop: 16,
+            paddingBottom: 32,
           }}
+          showsVerticalScrollIndicator={false}
         >
-          <View
-            {...cancelPanResponder.panHandlers}
-            className="items-center pb-3"
-          >
-            <View
-              style={{
-                width: 36,
-                height: 4,
-                borderRadius: 2,
-                backgroundColor: AppColors.borderLight,
-              }}
-            />
-          </View>
-
-          <ThemedText type="defaultSemiBold" className="text-lg mb-1">
-            {t("activity.cancelTitle")}
-          </ThemedText>
-          <ThemedText
-            className="text-sm mb-5"
-            style={{ color: AppColors.mutedText }}
-          >
-            {t("activity.cancelSubtitle")}
-          </ThemedText>
-
-          {(cancelTarget ?? []).map((cr) => {
-            const checked = cancelSelections.has(cr.child.id);
-            return (
-              <Pressable
-                key={cr.child.id}
-                onPress={() => toggleCancelSelection(cr.child.id)}
-                className="flex flex-row items-center justify-between py-3"
-                style={{
-                  borderBottomWidth: 1,
-                  borderBottomColor: AppColors.borderLight,
-                }}
-              >
-                <View className="flex flex-row items-center gap-3">
-                  <ChildAvatar
-                    name={cr.child.name}
-                    avatarFace={cr.child.avatar_face}
-                    avatarBackground={cr.child.avatar_background}
-                    size={36}
-                  />
-                  <ThemedText className="text-base">{cr.child.name}</ThemedText>
-                </View>
-                <View
-                  className="w-5 h-5 rounded border justify-center items-center"
-                  style={{
-                    borderColor: checked ? "#000" : AppColors.borderLight,
-                    backgroundColor: checked ? "#000" : "transparent",
-                  }}
-                >
-                  {checked && (
-                    <ThemedText
-                      lightColor="white"
-                      className="text-xs leading-none"
-                    >
-                      ✓
-                    </ThemedText>
-                  )}
-                </View>
-              </Pressable>
-            );
-          })}
-
-          <View className="flex flex-row gap-3 mt-5">
-            <TouchableOpacity
-              onPress={() => setCancelTarget(null)}
-              activeOpacity={0.7}
-              className="flex-1 py-3 rounded-xl items-center"
-              style={{ borderWidth: 1, borderColor: AppColors.borderLight }}
-            >
-              <ThemedText className="font-medium">
-                {t("activity.keep")}
-              </ThemedText>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={confirmCancellation}
-              activeOpacity={0.7}
-              className="flex-1 py-3 rounded-xl items-center"
-              style={{
-                backgroundColor:
-                  cancelSelections.size === 0
-                    ? AppColors.borderLight
-                    : "#EF4444",
-              }}
-              disabled={cancelSelections.size === 0}
-            >
-              <ThemedText lightColor="white" className="font-medium">
-                {t("activity.remove")}
-                {cancelSelections.size > 0 ? ` (${cancelSelections.size})` : ""}
-              </ThemedText>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-      </Modal>
-
-      <Modal
-        visible={filterOpen}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setFilterOpen(false)}
-      >
-        <Pressable
-          className="flex-1"
-          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-          onPress={() => setFilterOpen(false)}
-        />
-        <Animated.View
-          style={{
-            transform: [{ translateY: sheetTranslateY }],
-            backgroundColor: AppColors.white,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            paddingBottom: insets.bottom + 16,
-            paddingHorizontal: 24,
-            paddingTop: 12,
-          }}
-        >
-          <View {...panResponder.panHandlers} className="items-center pb-3">
-            <View
-              style={{
-                width: 36,
-                height: 4,
-                borderRadius: 2,
-                backgroundColor: AppColors.borderLight,
-              }}
-            />
-          </View>
-
-          <View className="flex flex-row items-center gap-2 mb-5">
-            <IconSymbol
-              name="line.3.horizontal.decrease"
-              size={20}
-              color="black"
-            />
-            <ThemedText type="defaultSemiBold" className="text-lg">
-              {t("activity.filterByChild")}
+          {displayed.length === 0 ? (
+            <ThemedText className="mt-8" style={{ color: AppColors.mutedText }}>
+              {selection === "upcoming"
+                ? t("activity.noUpcomingRegistrations")
+                : t("activity.noPastRegistrations")}
             </ThemedText>
-          </View>
+          ) : (
+            displayed.map((reg) =>
+              selection === "upcoming" ? (
+                <UpcomingRegistrationCard
+                  key={reg.event_occurrence_id}
+                  data={reg}
+                />
+              ) : (
+                <PastRegistrationCard
+                  key={reg.event_occurrence_id}
+                  data={reg}
+                />
+              ),
+            )
+          )}
+        </ScrollView>
 
-          {children.map((child) => {
-            const checked = pendingFilter.has(child.id);
-            return (
-              <Pressable
-                key={child.id}
-                onPress={() => togglePending(child.id)}
-                className="flex flex-row items-center justify-between py-3"
+        <Modal
+          visible={cancelTarget !== null}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setCancelTarget(null)}
+        >
+          <Pressable
+            className="flex-1"
+            style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+            onPress={() => setCancelTarget(null)}
+          />
+          <Animated.View
+            style={{
+              transform: [{ translateY: cancelSheetTranslateY }],
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              paddingBottom: insets.bottom + 16,
+              paddingHorizontal: 24,
+              paddingTop: 12,
+            }}
+          >
+            <View
+              {...cancelPanResponder.panHandlers}
+              className="items-center pb-3"
+            >
+              <View
                 style={{
-                  borderBottomWidth: 1,
-                  borderBottomColor: AppColors.borderLight,
+                  width: 36,
+                  height: 4,
+                  borderRadius: 2,
+                  backgroundColor: AppColors.borderLight,
                 }}
-              >
-                <View className="flex flex-row items-center gap-3">
-                  <ChildAvatar
-                    name={child.name}
-                    avatarFace={child.avatar_face}
-                    avatarBackground={child.avatar_background}
-                    size={36}
-                  />
-                  <ThemedText className="text-base">{child.name}</ThemedText>
-                </View>
-                <View
-                  className="w-5 h-5 rounded border justify-center items-center"
+              />
+            </View>
+
+            <ThemedText type="defaultSemiBold" className="text-lg mb-1">
+              {t("activity.cancelTitle")}
+            </ThemedText>
+            <ThemedText
+              className="text-sm mb-5"
+              style={{ color: AppColors.mutedText }}
+            >
+              {t("activity.cancelSubtitle")}
+            </ThemedText>
+
+            {(cancelTarget ?? []).map((cr) => {
+              const checked = cancelSelections.has(cr.child.id);
+              return (
+                <Pressable
+                  key={cr.child.id}
+                  onPress={() => toggleCancelSelection(cr.child.id)}
+                  className="flex flex-row items-center justify-between py-3"
                   style={{
-                    borderColor: checked ? "#000" : AppColors.borderLight,
-                    backgroundColor: checked ? "#000" : "transparent",
+                    borderBottomWidth: 1,
+                    borderBottomColor: AppColors.borderLight,
                   }}
                 >
-                  {checked && (
-                    <ThemedText
-                      lightColor="white"
-                      className="text-xs leading-none"
-                    >
-                      ✓
+                  <View className="flex flex-row items-center gap-3">
+                    <ChildAvatar
+                      name={cr.child.name}
+                      avatarFace={cr.child.avatar_face}
+                      avatarBackground={cr.child.avatar_background}
+                      size={36}
+                    />
+                    <ThemedText className="text-base">
+                      {cr.child.name}
                     </ThemedText>
-                  )}
-                </View>
-              </Pressable>
-            );
-          })}
+                  </View>
+                  <View
+                    className="w-5 h-5 rounded border justify-center items-center"
+                    style={{
+                      borderColor: checked ? "#000" : AppColors.borderLight,
+                      backgroundColor: checked ? "#000" : "transparent",
+                    }}
+                  >
+                    {checked && (
+                      <ThemedText
+                        lightColor="white"
+                        className="text-xs leading-none"
+                      >
+                        ✓
+                      </ThemedText>
+                    )}
+                  </View>
+                </Pressable>
+              );
+            })}
 
-          <View className="flex flex-row gap-3 mt-5">
-            <TouchableOpacity
-              onPress={resetFilter}
-              activeOpacity={0.7}
-              className="flex-1 py-3 rounded-xl items-center"
-              style={{ borderWidth: 1, borderColor: AppColors.borderLight }}
-            >
-              <ThemedText className="font-medium">
-                {t("activity.reset")}
+            <View className="flex flex-row gap-3 mt-5">
+              <TouchableOpacity
+                onPress={() => setCancelTarget(null)}
+                activeOpacity={0.7}
+                className="flex-1 py-3 rounded-xl items-center"
+                style={{ borderWidth: 1, borderColor: AppColors.borderLight }}
+              >
+                <ThemedText className="font-medium">
+                  {t("activity.keep")}
+                </ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmCancellation}
+                activeOpacity={0.7}
+                className="flex-1 py-3 rounded-xl items-center"
+                style={{
+                  backgroundColor:
+                    cancelSelections.size === 0
+                      ? AppColors.borderLight
+                      : "#EF4444",
+                }}
+                disabled={cancelSelections.size === 0}
+              >
+                <ThemedText lightColor="white" className="font-medium">
+                  {t("activity.remove")}
+                  {cancelSelections.size > 0
+                    ? ` (${cancelSelections.size})`
+                    : ""}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </Modal>
+
+        <Modal
+          visible={filterOpen}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setFilterOpen(false)}
+        >
+          <Pressable
+            className="flex-1"
+            style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+            onPress={() => setFilterOpen(false)}
+          />
+          <Animated.View
+            style={{
+              transform: [{ translateY: sheetTranslateY }],
+              backgroundColor: AppColors.white,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              paddingBottom: insets.bottom + 16,
+              paddingHorizontal: 24,
+              paddingTop: 12,
+            }}
+          >
+            <View {...panResponder.panHandlers} className="items-center pb-3">
+              <View
+                style={{
+                  width: 36,
+                  height: 4,
+                  borderRadius: 2,
+                  backgroundColor: AppColors.borderLight,
+                }}
+              />
+            </View>
+
+            <View className="flex flex-row items-center gap-2 mb-5">
+              <IconSymbol
+                name="line.3.horizontal.decrease"
+                size={20}
+                color="black"
+              />
+              <ThemedText type="defaultSemiBold" className="text-lg">
+                {t("activity.filterByChild")}
               </ThemedText>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={applyFilter}
-              activeOpacity={0.7}
-              className="flex-1 py-3 rounded-xl items-center bg-black"
-            >
-              <ThemedText lightColor="white" className="font-medium">
-                {t("activity.apply")}
-              </ThemedText>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-      </Modal>
+            </View>
+
+            {children.map((child) => {
+              const checked = pendingFilter.has(child.id);
+              return (
+                <Pressable
+                  key={child.id}
+                  onPress={() => togglePending(child.id)}
+                  className="flex flex-row items-center justify-between py-3"
+                  style={{
+                    borderBottomWidth: 1,
+                    borderBottomColor: AppColors.borderLight,
+                  }}
+                >
+                  <View className="flex flex-row items-center gap-3">
+                    <ChildAvatar
+                      name={child.name}
+                      avatarFace={child.avatar_face}
+                      avatarBackground={child.avatar_background}
+                      size={36}
+                    />
+                    <ThemedText className="text-base">{child.name}</ThemedText>
+                  </View>
+                  <View
+                    className="w-5 h-5 rounded border justify-center items-center"
+                    style={{
+                      borderColor: checked ? "#000" : AppColors.borderLight,
+                      backgroundColor: checked ? "#000" : "transparent",
+                    }}
+                  >
+                    {checked && (
+                      <ThemedText
+                        lightColor="white"
+                        className="text-xs leading-none"
+                      >
+                        ✓
+                      </ThemedText>
+                    )}
+                  </View>
+                </Pressable>
+              );
+            })}
+
+            <View className="flex flex-row gap-3 mt-5">
+              <TouchableOpacity
+                onPress={resetFilter}
+                activeOpacity={0.7}
+                className="flex-1 py-3 rounded-xl items-center"
+                style={{ borderWidth: 1, borderColor: AppColors.borderLight }}
+              >
+                <ThemedText className="font-medium">
+                  {t("activity.reset")}
+                </ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={applyFilter}
+                activeOpacity={0.7}
+                className="flex-1 py-3 rounded-xl items-center bg-black"
+              >
+                <ThemedText lightColor="white" className="font-medium">
+                  {t("activity.apply")}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </Modal>
+      </LogoBgWrapper>
     </ThemedView>
   );
 }
