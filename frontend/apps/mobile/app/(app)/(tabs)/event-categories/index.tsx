@@ -56,7 +56,7 @@ export default function EventCategoryScreen() {
     localizedOccurrencesResp?.status === 200
       ? localizedOccurrencesResp.data.filter(
           (o, idx, arr) =>
-            arr.findIndex((x) => x.event.id === o.event.id) === idx,
+            arr.findIndex((x) => x.event.id === o.event.id) === idx
         )
       : [];
   const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
@@ -74,30 +74,6 @@ export default function EventCategoryScreen() {
           overflow: "hidden",
         }}
       >
-        <Image
-          source={require("@/assets/images/skillspark.png")}
-          style={{
-            position: "absolute",
-            right: -20,
-            top: -10,
-            width: 160,
-            height: 160,
-            opacity: 0.08,
-          }}
-          contentFit="contain"
-        />
-        <Image
-          source={require("@/assets/images/skillspark.png")}
-          style={{
-            position: "absolute",
-            left: -30,
-            top: 20,
-            width: 160,
-            height: 160,
-            opacity: 0.06,
-          }}
-          contentFit="contain"
-        />
         <TouchableOpacity
           onPress={() => router.back()}
           style={{

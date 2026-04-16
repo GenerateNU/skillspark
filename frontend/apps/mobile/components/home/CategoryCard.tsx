@@ -1,51 +1,52 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { Image as RNImage, View, Pressable } from "react-native";
-import { SvgXml } from "react-native-svg";
+import { memo, useCallback, useMemo } from "react";
+import { View, Pressable } from "react-native";
 import { AppColors } from "@/constants/theme";
 import { useRouter } from "expo-router";
+import { Image } from "expo-image";
 
-const CATEGORY_URIS: Record<string, string> = Object.fromEntries(
-  Object.entries({
-    art: require("@/assets/images/art.svg"),
-    sports: require("@/assets/images/sports.svg"),
-    music: require("@/assets/images/music.svg"),
-    technology: require("@/assets/images/tech.svg"),
-    science: require("@/assets/images/study.svg"),
-    math: require("@/assets/images/math.svg"),
-    language: require("@/assets/images/talking.svg"),
-    other: require("@/assets/images/life_skills.svg"),
-  }).map(([cat, moduleId]) => [
-    cat,
-    RNImage.resolveAssetSource(moduleId as number).uri,
-  ]),
-);
+const sportsImage = require("@/assets/images/categories/sports-and-physical-activities.png");
+const artsAndCreativeImage = require("@/assets/images/categories/arts-and-creative-expression.png");
+const languagesImage = require("@/assets/images/categories/languages.png");
+const academicsImage = require("@/assets/images/categories/academics.png");
+const lifeSkillsImage = require("@/assets/images/categories/life-skills.png");
+const musicImage = require("@/assets/images/categories/music-and-performance.png");
+const mathImage = require("@/assets/images/categories/math.png");
+const techImage = require("@/assets/images/categories/tech-and-innovation.png");
 
-// Module-level cache — survives remounts, persists for the app's lifetime
-const svgXmlCache = new Map<string, string>();
-
-function useCategoryXml(uri: string | undefined): string | null {
-  const [xml, setXml] = useState<string | null>(
-    uri ? (svgXmlCache.get(uri) ?? null) : null,
-  );
-
-  useEffect(() => {
-    if (!uri) return;
-    const cached = svgXmlCache.get(uri);
-    if (cached) {
-      setXml(cached);
-      return;
-    }
-    fetch(uri)
-      .then((r) => r.text())
-      .then((text) => {
-        svgXmlCache.set(uri, text);
-        setXml(text);
-      })
-      .catch(() => {});
-  }, [uri]);
-
-  return xml;
-}
+const CATEGORY_SOURCES: Record<
+  string,
+  { uri: number; translationKey: string }
+> = {
+  "Sports & Physical Activities": {
+    uri: sportsImage,
+    translationKey: "dashboard.categories.sports",
+  },
+  "Arts & Creative Expression": {
+    uri: artsAndCreativeImage,
+    translationKey: "dashboard.categories.art",
+  },
+  Languages: {
+    uri: languagesImage,
+    translationKey: "dashboard.categories.languages",
+  },
+  Academics: {
+    uri: academicsImage,
+    translationKey: "dashboard.categories.academics",
+  },
+  "Personal Development & Life Skills": {
+    uri: lifeSkillsImage,
+    translationKey: "dashboard.categories.lifeSkills",
+  },
+  "Music & Performance": {
+    uri: musicImage,
+    translationKey: "dashboard.categories.music",
+  },
+  Math: { uri: mathImage, translationKey: "dashboard.categories.math" },
+  "Tech & Innovation": {
+    uri: techImage,
+    translationKey: "dashboard.categories.technology",
+  },
+};
 
 export const CategoryCard = memo(function CategoryCard({
   category,
@@ -53,11 +54,10 @@ export const CategoryCard = memo(function CategoryCard({
   category: string;
 }) {
   const router = useRouter();
-  const uri = useMemo(() => CATEGORY_URIS[category], [category]);
-  const xml = useCategoryXml(uri);
+  const source = useMemo(() => CATEGORY_SOURCES[category], [category]);
   const handlePress = useCallback(
     () => router.push({ pathname: "/event-categories", params: { category } }),
-    [category, router],
+    [category, router]
   );
 
   return (
@@ -73,8 +73,11 @@ export const CategoryCard = memo(function CategoryCard({
       }}
     >
       <View className="h-[80px] rounded-[15px] overflow-hidden">
-        {xml ? (
-          <SvgXml xml={xml} width="100%" height="100%" />
+        {source != null ? (
+          <Image
+            source={source.uri}
+            style={{ width: "100%", height: "100%" }}
+          />
         ) : (
           <View
             className="absolute inset-0"

@@ -56,7 +56,10 @@
       "art": "ศิลปะ",
       "music": "ดนตรี",
       "math": "คณิตศาสตร์",
-      "sports": "กีฬา"
+      "sports": "กีฬา",
+      "languages": "ภาษา",
+      "academics": "วิชาการ",
+      "lifeSkills": "ทักษะชีวิต"
     }
   },
   "profile": {

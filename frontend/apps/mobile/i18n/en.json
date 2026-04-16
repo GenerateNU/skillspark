@@ -48,7 +48,6 @@
     "forYou": "For You",
     "basedOn": "Based on",
     "upcomingEvents": "upcoming events",
-    "learnMore": "Learn More",
     "reserved": "Reserved",
     "learnMore": "Learn More",
     "members": "members",
@@ -57,7 +56,10 @@
       "art": "art",
       "music": "music",
       "math": "math",
-      "sports": "sports"
+      "sports": "sports",
+      "languages": "languages",
+      "academics": "academics",
+      "lifeSkills": "life skills"
     }
   },
   "profile": {
