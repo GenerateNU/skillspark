@@ -1,7 +1,5 @@
 import ReviewsScreen from "@/components/ReviewsScreen";
-import {
-  useGetReviewAggregate,
-} from "@skillspark/api-client";
+import { useGetReviewAggregate } from "@skillspark/api-client";
 import { useLocalSearchParams } from "expo-router";
 
 const useGetAggregate = (id: string) =>

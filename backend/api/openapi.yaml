@@ -4505,7 +4505,7 @@ components:
           maximum: 100
         price:
           type: integer
-          description: Price in lowest denomination of currency
+          description: Price in cents.
           format: int64
           minimum: 0
         start_time:
