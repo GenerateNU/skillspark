@@ -189,7 +189,7 @@ export default function ActivityScreen() {
             title: occurrence.event.title,
             childRegistrations: child ? [{ child, registrationId: r.id }] : [],
             location: occurrence.location.address_line1,
-            price: occurrence.price,
+            price: occurrence.price / 100,
             hasReviewed: false,
             onClickRemove: () => {},
             onClickReview: () => {},
