@@ -2,13 +2,13 @@ import { Button } from "@/components/Button";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { ImageSelector } from "@/components/ImageSelector";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
+import { AuthBackground } from "@/components/AuthBackground";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGuardian } from "@/hooks/use-guardian";
 
@@ -40,7 +40,8 @@ export default function PhotoScreen() {
 	};
 
 	return (
-		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+		<View style={{ flex: 1, paddingTop: insets.top }}>
+			<AuthBackground />
 			<View className="px-6 pt-8 items-center">
 				<ThemedText
 					className="font-nunito-bold leading-[60px]"
@@ -85,6 +86,6 @@ export default function PhotoScreen() {
 				/>
 				<ErrorMessage message={errorText} />
 			</View>
-		</ThemedView>
+		</View>
 	);
 }

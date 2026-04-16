@@ -1,13 +1,12 @@
 import React from "react";
 import { View, TouchableOpacity } from "react-native";
+import { AuthBackground } from "@/components/AuthBackground";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
-
-const BG = "#EDE8FF";
 
 export default function PaymentScreen() {
 	const router = useRouter();
@@ -20,7 +19,8 @@ export default function PaymentScreen() {
 	const handleDelete = () => {};
 
 	return (
-		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+		<View style={{ flex: 1, paddingTop: insets.top }}>
+			<AuthBackground />
 			{/* Header row in lavender area */}
 			<View
 				style={{

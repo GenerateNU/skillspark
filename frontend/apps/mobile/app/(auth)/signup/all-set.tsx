@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { AuthBackground } from "@/components/AuthBackground";
 import { JumpingCharacter } from "@/components/JumpingCharacter";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { AppColors } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
-
-const BG = "#EDE8FF";
 
 // 7. done with onboarding
 export default function AllSetScreen() {
@@ -24,7 +23,9 @@ export default function AllSetScreen() {
 	}, [completeOnboarding]);
 
 	return (
-		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+		<View style={StyleSheet.absoluteFill}>
+			<AuthBackground />
+			<View style={{ flex: 1, paddingTop: insets.top }}>
 			{/* Title */}
 			<View style={{ alignItems: "center", paddingHorizontal: 24, paddingTop: 40, paddingBottom: 20 }}>
 				<ThemedText
@@ -60,6 +61,7 @@ export default function AllSetScreen() {
 				>
 					{translate("onboarding.settingUp")}
 				</ThemedText>
+			</View>
 			</View>
 		</View>
 	);

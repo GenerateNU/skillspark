@@ -6,7 +6,9 @@ import {
 	ScrollView,
 	KeyboardAvoidingView,
 	Platform,
+	StyleSheet,
 } from "react-native";
+import { AuthBackground } from "@/components/AuthBackground";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
@@ -27,7 +29,6 @@ import {
 	useUpdateEmergencyContact,
 } from "@skillspark/api-client";
 
-const BG = "#EDE8FF";
 
 type EmergencyContactFormData = {
 	name: string;
@@ -156,7 +157,9 @@ export default function ManageEmergencyContactScreen() {
 	};
 
 	return (
-		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+		<View style={StyleSheet.absoluteFill}>
+			<AuthBackground />
+			<View style={{ flex: 1, paddingTop: insets.top }}>
 			<Stack.Screen options={{ headerShown: false }} />
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -259,6 +262,7 @@ export default function ManageEmergencyContactScreen() {
 						/>
 					</View>
 				)}
+			</View>
 			</View>
 		</View>
 	);

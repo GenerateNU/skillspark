@@ -6,9 +6,11 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
+	StyleSheet,
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { AuthBackground } from "@/components/AuthBackground";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@/components/ErrorMessage";
@@ -25,8 +27,6 @@ type LoginFormData = {
 	email: string;
 	password: string;
 };
-
-const BG = "#EDE8FF";
 
 export default function LoginScreen() {
 	const insets = useSafeAreaInsets();
@@ -55,7 +55,9 @@ export default function LoginScreen() {
 	};
 
 	return (
-		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+		<View style={StyleSheet.absoluteFill}>
+			<AuthBackground />
+			<View style={{ flex: 1, paddingTop: insets.top }}>
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				style={{ flex: 1 }}
@@ -169,6 +171,7 @@ export default function LoginScreen() {
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
+			</View>
 		</View>
 	);
 }

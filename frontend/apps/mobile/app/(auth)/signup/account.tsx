@@ -14,13 +14,13 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
+	StyleSheet,
 	TouchableOpacity,
 	View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthContext } from "@/hooks/use-auth-context";
-
-const BG = "#EDE8FF";
+import { AuthBackground } from "@/components/AuthBackground";
 
 // 2. email and password
 export default function AccountScreen() {
@@ -67,7 +67,9 @@ export default function AccountScreen() {
 	};
 
 	return (
-		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+		<View style={StyleSheet.absoluteFill}>
+			<AuthBackground />
+			<View style={{ flex: 1, paddingTop: insets.top }}>
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				style={{ flex: 1 }}
@@ -165,6 +167,7 @@ export default function AccountScreen() {
 					disabled={false}
 				/>
 				<ErrorMessage message={errorText} />
+			</View>
 			</View>
 		</View>
 	);

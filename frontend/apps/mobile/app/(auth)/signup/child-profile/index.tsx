@@ -1,4 +1,5 @@
 import { Button } from "@/components/Button";
+import { AuthBackground } from "@/components/AuthBackground";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontSizes } from "@/constants/theme";
@@ -11,8 +12,6 @@ import { useGuardian } from "@/hooks/use-guardian";
 import { ChildAvatar } from "@/components/ChildAvatar";
 import { MONTHS } from "@/components/ChildProfileForm";
 
-const BG = "#EDE8FF";
-
 // 4. set up your child's profile
 export default function ChildProfileScreen() {
 	const router = useRouter();
@@ -22,7 +21,8 @@ export default function ChildProfileScreen() {
 	const { children } = useGuardian(guardianId);
 
 	return (
-		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+		<View style={{ flex: 1, paddingTop: insets.top }}>
+			<AuthBackground />
 			{/* Back button */}
 			<TouchableOpacity
 				onPress={() => router.back()}

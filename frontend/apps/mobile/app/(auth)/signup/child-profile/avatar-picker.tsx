@@ -3,7 +3,7 @@ import { View, TouchableOpacity, ScrollView } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { AuthBackground } from "@/components/AuthBackground";
 import { Colors, AppColors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -40,7 +40,8 @@ export default function AvatarPickerScreen() {
 	};
 
 	return (
-		<ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
+		<View style={{ flex: 1, paddingTop: insets.top }}>
+			<AuthBackground />
 			<Stack.Screen options={{ headerShown: false }} />
 			<ScrollView
 				contentContainerStyle={{
@@ -138,6 +139,6 @@ export default function AvatarPickerScreen() {
 					</TouchableOpacity>
 				</View>
 			</ScrollView>
-		</ThemedView>
+		</View>
 	);
 }

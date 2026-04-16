@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { JumpingCharacter } from "@/components/JumpingCharacter";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -12,13 +12,13 @@ import { Button } from "@/components/Button";
 import { AppColors } from "@/constants/theme";
 import { useFormContext } from "react-hook-form";
 import { SignupFormData } from "@/constants/signup-types";
+import { AuthBackground } from "@/components/AuthBackground";
 
 const LANGUAGES = [
 	{ code: "en", label: "English", flag: "🇺🇸" },
 	{ code: "th", label: "Thai", flag: "🇹🇭" },
 ];
 
-const BG = "#EDE8FF";
 const DIVIDER = "#D1C8F0";
 
 export default function WelcomeScreen() {
@@ -40,7 +40,9 @@ export default function WelcomeScreen() {
 	};
 
 	return (
-		<View style={{ flex: 1, backgroundColor: BG, paddingTop: insets.top }}>
+		<View style={StyleSheet.absoluteFill}>
+			<AuthBackground />
+			<View style={{ flex: 1, paddingTop: insets.top }}>
 			<View style={{ height: 44, justifyContent: "center" }} />
 			{/* Title */}
 			<View
@@ -155,6 +157,7 @@ export default function WelcomeScreen() {
 					onPress={() => router.push("/(auth)/signup/name")}
 					disabled={false}
 				/>
+			</View>
 			</View>
 		</View>
 	);
