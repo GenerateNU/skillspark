@@ -141,19 +141,30 @@ function OrgDetail({
             <Text className="mb-2.5 text-[18px] font-nunito-bold">
               {translate("org.about")}
             </Text>
-            <Text
-              numberOfLines={aboutExpanded ? undefined : 4}
-              onTextLayout={(e) => {
-                if (!aboutExpanded)
-                  setAboutTruncated(e.nativeEvent.lines.length >= 4);
-              }}
-              className={`text-sm leading-[22px] ${
-                aboutTruncated ? "mb-1" : "mb-4"
-              }`}
-              style={{ color: AppColors.secondaryText }}
-            >
-              {org.about ?? ""}
-            </Text>
+            <View>
+              {/* Hidden text to measure true line count without numberOfLines cap */}
+              <Text
+                style={{ position: "absolute", opacity: 0, left: 0, right: 0 }}
+                onTextLayout={(e) =>
+                  setAboutTruncated(e.nativeEvent.lines.length > 4)
+                }
+                className="text-sm leading-[22px]"
+                pointerEvents="none"
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              >
+                {org.about ?? ""}
+              </Text>
+              <Text
+                numberOfLines={aboutExpanded ? undefined : 4}
+                className={`text-sm leading-[22px] ${
+                  aboutTruncated ? "mb-1" : "mb-4"
+                }`}
+                style={{ color: AppColors.secondaryText }}
+              >
+                {org.about ?? ""}
+              </Text>
+            </View>
             {aboutTruncated && (
               <Pressable
                 onPress={() => setAboutExpanded((prev) => !prev)}

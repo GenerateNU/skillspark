@@ -2887,8 +2887,8 @@ components:
           type: integer
           description: Birth year of the child
           format: int64
-          minimum: 2000
-          maximum: 2026
+          minimum: 1950
+          maximum: 2100
         guardian_id:
           type: string
           description: ID of the child's guardian
