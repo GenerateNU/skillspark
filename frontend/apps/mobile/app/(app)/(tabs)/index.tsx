@@ -76,7 +76,7 @@ export default function HomeScreen() {
     guardianId!,
     {
       query: { enabled: !!guardianId },
-    },
+    }
   );
   const registrations: Registration[] = useMemo(() => {
     const d = registrationsResp as unknown as
@@ -104,7 +104,7 @@ export default function HomeScreen() {
       query: {
         enabled: !!geoLocationLat && !!geoLocationLong,
       },
-    },
+    }
   );
 
   const trendingEvents: EventOccurrence[] = useMemo(() => {
@@ -120,16 +120,16 @@ export default function HomeScreen() {
         .filter(
           (r) =>
             r.status === "registered" &&
-            isWithinNext7Days(r.occurrence_start_time),
+            isWithinNext7Days(r.occurrence_start_time)
         )
-        .map((r) => r.event_occurrence_id),
+        .map((r) => r.event_occurrence_id)
     );
     return allOccurrences.filter((o) => upcomingIds.has(o.id));
   }, [registrations, allOccurrences]);
 
   const futureOccurrences = useMemo(
     () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
-    [allOccurrences],
+    [allOccurrences]
   );
 
   const childRecommendations = useMemo(() => {
@@ -142,15 +142,16 @@ export default function HomeScreen() {
       .filter((r) => r.occurrence != null);
   }, [children, futureOccurrences]);
 
-  const categories = useMemo(() => {
-    const cats = new Set<string>();
-    allOccurrences.forEach((o) =>
-      o.event.category?.forEach((c) => cats.add(c)),
-    );
-    return cats.size > 0
-      ? Array.from(cats)
-      : ["science", "technology", "soccer", "painting", "dance", "coding"];
-  }, [allOccurrences]);
+  const categories = [
+    "Sports & Physical Activities",
+    "Arts & Creative Expression",
+    "Languages",
+    "Academics",
+    "Personal Development & Life Skills",
+    "Music & Performance",
+    "Math",
+    "Tech & Innovation",
+  ];
 
   const firstName = guardian?.name?.split(" ")[0] ?? "there";
 

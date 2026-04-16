@@ -1,8 +1,9 @@
 import { memo, useCallback, useMemo } from "react";
-import { View, Pressable } from "react-native";
+import { View, Pressable, Text } from "react-native";
 import { AppColors } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
+import { useTranslation } from "react-i18next";
 
 const sportsImage = require("@/assets/images/categories/sports-and-physical-activities.png");
 const artsAndCreativeImage = require("@/assets/images/categories/arts-and-creative-expression.png");
@@ -54,6 +55,7 @@ export const CategoryCard = memo(function CategoryCard({
   category: string;
 }) {
   const router = useRouter();
+  const { t: translate } = useTranslation();
   const source = useMemo(() => CATEGORY_SOURCES[category], [category]);
   const handlePress = useCallback(
     () => router.push({ pathname: "/event-categories", params: { category } }),
@@ -84,6 +86,11 @@ export const CategoryCard = memo(function CategoryCard({
             style={{ backgroundColor: AppColors.categoryFallback }}
           />
         )}
+        <View className="absolute inset-0 justify-end p-3">
+          <Text className="text-white text-xs font-bold">
+            {source != null ? translate(source.translationKey) : category}
+          </Text>
+        </View>
       </View>
     </Pressable>
   );

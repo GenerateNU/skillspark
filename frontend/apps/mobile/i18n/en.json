@@ -52,14 +52,14 @@
     "learnMore": "Learn More",
     "members": "members",
     "categories": {
-      "technology": "technology",
-      "art": "art",
-      "music": "music",
-      "math": "math",
-      "sports": "sports",
-      "languages": "languages",
-      "academics": "academics",
-      "lifeSkills": "life skills"
+      "technology": "Tech & Innovation",
+      "art": "Arts & Creative Expression",
+      "music": "Music & Performance",
+      "math": "Math",
+      "sports": "Sports & Physical Activities",
+      "languages": "Languages",
+      "academics": "Academics",
+      "lifeSkills": "Personal Development & Life Skills"
     }
   },
   "profile": {
