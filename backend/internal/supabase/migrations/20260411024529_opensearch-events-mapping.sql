@@ -5,8 +5,17 @@ DECLARE
   _key  text;
   _body jsonb;
 BEGIN
-  SELECT decrypted_secret INTO _url FROM vault.decrypted_secrets WHERE name = 'edge_function_url' LIMIT 1;
-  SELECT decrypted_secret INTO _key FROM vault.decrypted_secrets WHERE name = 'edge_function_key' LIMIT 1;
+  BEGIN
+    SELECT decrypted_secret INTO _url FROM vault.decrypted_secrets WHERE name = 'edge_function_url' LIMIT 1;
+    SELECT decrypted_secret INTO _key FROM vault.decrypted_secrets WHERE name = 'edge_function_key' LIMIT 1;
+  EXCEPTION WHEN undefined_table THEN
+    -- vault schema not available (e.g. test environment) — skip sync
+    IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
+  END;
+
+  IF _url IS NULL OR _key IS NULL THEN
+    IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
+  END IF;
 
   IF TG_OP = 'DELETE' THEN
     _body := jsonb_build_object(
