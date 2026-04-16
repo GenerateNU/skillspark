@@ -63,7 +63,7 @@ export function OccurrenceCard({
 
   const ageRange = formatAgeRange(
     occurrence.event.age_range_min,
-    occurrence.event.age_range_max
+    occurrence.event.age_range_max,
   );
   const locationText = [
     occurrence.location?.district,
