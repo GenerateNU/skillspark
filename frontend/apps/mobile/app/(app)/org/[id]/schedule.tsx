@@ -1,13 +1,11 @@
 import {
   ActivityIndicator,
-  Modal,
-  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useCallback, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -22,6 +20,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
 import { OccurrenceCard } from "./OccurrenceCard";
 import { formatSectionDate } from "@/utils/format";
+import { useOrgScheduleFilters } from "@/hooks/use-org-schedule-filters";
 
 export default function OrgScheduleScreen() {
   const { id, filterClass } = useLocalSearchParams<{
@@ -32,11 +31,14 @@ export default function OrgScheduleScreen() {
   const { t: translate } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
   const borderColor = useThemeColor({}, "borderColor");
+  const { filters, setFilters, activeCount } = useOrgScheduleFilters(id);
 
-  const [selectedClass, setSelectedClass] = useState<string | null>(
-    filterClass ?? null,
-  );
-  const [filterVisible, setFilterVisible] = useState(false);
+  // Honour the filterClass URL param on first mount
+  useEffect(() => {
+    if (filterClass && !filters.class_name) {
+      setFilters({ ...filters, class_name: filterClass });
+    }
+  }, [filterClass, filters, setFilters]);
 
   const { data: occurrencesResp, isLoading: occurrencesLoading } =
     useGetEventOccurrencesByOrganizationId(id);
@@ -48,18 +50,52 @@ export default function OrgScheduleScreen() {
     return Array.isArray(d?.data) ? d!.data : [];
   }, [occurrencesResp]);
 
-  const classNames = useMemo(
-    () => [...new Set(occurrences.map((o) => o.event.title))].sort(),
-    [occurrences],
-  );
+  const filteredOccurrences = useMemo(() => {
+    const {
+      class_name,
+      min_start_minutes,
+      max_start_minutes,
+      min_duration,
+      max_duration,
+      min_price,
+      max_price,
+      min_age,
+      max_age,
+    } = filters;
 
-  const filteredOccurrences = useMemo(
-    () =>
-      selectedClass
-        ? occurrences.filter((o) => o.event.title === selectedClass)
-        : occurrences,
-    [occurrences, selectedClass],
-  );
+    return occurrences.filter((o) => {
+      if (class_name && o.event.title !== class_name) return false;
+
+      if (min_start_minutes !== undefined || max_start_minutes !== undefined) {
+        const d = new Date(o.start_time);
+        const mins = d.getHours() * 60 + d.getMinutes();
+        if (min_start_minutes !== undefined && mins < min_start_minutes)
+          return false;
+        if (max_start_minutes !== undefined && mins > max_start_minutes)
+          return false;
+      }
+
+      if (min_duration !== undefined || max_duration !== undefined) {
+        const durationMin =
+          (new Date(o.end_time).getTime() - new Date(o.start_time).getTime()) /
+          60000;
+        if (min_duration !== undefined && durationMin < min_duration)
+          return false;
+        if (max_duration !== undefined && durationMin > max_duration)
+          return false;
+      }
+
+      if (min_price !== undefined && o.price < min_price) return false;
+      if (max_price !== undefined && o.price > max_price) return false;
+
+      if (min_age !== undefined && o.event.age_range_max < min_age)
+        return false;
+      if (max_age !== undefined && o.event.age_range_min > max_age)
+        return false;
+
+      return true;
+    });
+  }, [occurrences, filters]);
 
   const uniqueEventIds = useMemo(
     () => [...new Set(occurrences.map((o) => o.event.id))],
@@ -87,34 +123,24 @@ export default function OrgScheduleScreen() {
     return map;
   }, [uniqueEventIds, reviewResults]);
 
-  const groupOccurrencesByDate = useCallback(
-    (
-      occurrences: EventOccurrence[],
-    ): { label: string; items: EventOccurrence[] }[] => {
-      const sorted = [...occurrences].sort(
-        (a, b) =>
-          new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
-      );
+  const grouped = useMemo(() => {
+    const sorted = [...filteredOccurrences].sort(
+      (a, b) =>
+        new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+    );
 
-      const groups: Map<string, EventOccurrence[]> = new Map();
-      for (const occ of sorted) {
-        const key = new Date(occ.start_time).toDateString();
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key)!.push(occ);
-      }
+    const groups = new Map<string, EventOccurrence[]>();
+    for (const occ of sorted) {
+      const key = new Date(occ.start_time).toDateString();
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(occ);
+    }
 
-      return Array.from(groups.entries()).map(([, items]) => ({
-        label: formatSectionDate(items[0].start_time),
-        items,
-      }));
-    },
-    [],
-  );
-
-  const grouped = useMemo(
-    () => groupOccurrencesByDate(filteredOccurrences),
-    [filteredOccurrences, groupOccurrencesByDate],
-  );
+    return Array.from(groups.entries()).map(([, items]) => ({
+      label: formatSectionDate(items[0].start_time),
+      items,
+    }));
+  }, [filteredOccurrences]);
 
   return (
     <SafeAreaView
@@ -146,9 +172,9 @@ export default function OrgScheduleScreen() {
           {translate("org.schedule")}
         </Text>
         <TouchableOpacity
-          onPress={() => setFilterVisible(true)}
+          onPress={() => router.push(`/org/${id}/filters`)}
           activeOpacity={0.7}
-          className="rounded-full px-4 py-1.5"
+          className="flex-row items-center gap-1.5 rounded-full px-4 py-1.5"
           style={{ backgroundColor: AppColors.primaryText }}
         >
           <Text
@@ -157,6 +183,22 @@ export default function OrgScheduleScreen() {
           >
             {translate("map.filter")}
           </Text>
+          {activeCount > 0 && (
+            <View
+              className="h-4 w-4 items-center justify-center rounded-full"
+              style={{ backgroundColor: AppColors.white }}
+            >
+              <Text
+                style={{
+                  fontFamily: FontFamilies.bold,
+                  fontSize: 10,
+                  color: AppColors.primaryText,
+                }}
+              >
+                {activeCount}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -203,111 +245,6 @@ export default function OrgScheduleScreen() {
           ))}
         </ScrollView>
       )}
-
-      {/* Class filter modal */}
-      <Modal
-        visible={filterVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setFilterVisible(false)}
-      >
-        <Pressable
-          className="flex-1 items-center justify-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.3)" }}
-          onPress={() => setFilterVisible(false)}
-        >
-          <Pressable
-            className="mx-6 w-full rounded-2xl bg-white p-6"
-            style={{ maxWidth: 360 }}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <Text
-              className="mb-4 text-[22px] font-nunito-bold"
-              style={{ color: AppColors.primaryText }}
-            >
-              {translate("org.schedule")}
-            </Text>
-
-            {/* All Classes option */}
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedClass(null);
-                setFilterVisible(false);
-              }}
-              activeOpacity={0.7}
-              className="flex-row items-center justify-between py-3 border-b"
-              style={{ borderBottomColor: AppColors.divider }}
-            >
-              <Text
-                className="text-[16px] font-nunito"
-                style={{ color: AppColors.primaryText }}
-              >
-                {translate("org.allClasses")}
-              </Text>
-              <View
-                className="w-6 h-6 rounded-full border-2 items-center justify-center"
-                style={{
-                  borderColor:
-                    selectedClass === null
-                      ? AppColors.primaryText
-                      : AppColors.borderLight,
-                }}
-              >
-                {selectedClass === null && (
-                  <View
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: AppColors.primaryText }}
-                  />
-                )}
-              </View>
-            </TouchableOpacity>
-
-            {/* Individual class options */}
-            {classNames.map((name, idx) => (
-              <TouchableOpacity
-                key={name}
-                onPress={() => {
-                  setSelectedClass(name);
-                  setFilterVisible(false);
-                }}
-                activeOpacity={0.7}
-                className="flex-row items-center justify-between py-3"
-                style={
-                  idx < classNames.length - 1
-                    ? {
-                        borderBottomWidth: 1,
-                        borderBottomColor: AppColors.divider,
-                      }
-                    : undefined
-                }
-              >
-                <Text
-                  className="text-[16px] font-nunito flex-1 mr-3"
-                  style={{ color: AppColors.primaryText }}
-                >
-                  {name}
-                </Text>
-                <View
-                  className="w-6 h-6 rounded-full border-2 items-center justify-center"
-                  style={{
-                    borderColor:
-                      selectedClass === name
-                        ? AppColors.primaryText
-                        : AppColors.borderLight,
-                  }}
-                >
-                  {selectedClass === name && (
-                    <View
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: AppColors.primaryText }}
-                    />
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </Pressable>
-        </Pressable>
-      </Modal>
     </SafeAreaView>
   );
 }
