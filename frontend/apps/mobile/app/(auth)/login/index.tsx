@@ -6,7 +6,6 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
-	StyleSheet,
 	TouchableOpacity,
 	View,
 } from "react-native";
@@ -20,7 +19,6 @@ import { AuthFormInput } from "@/components/AuthFormInput";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AppColors, FontSizes } from "@/constants/theme";
 import { JumpingCharacter } from "@/components/JumpingCharacter";
 
 type LoginFormData = {
@@ -55,12 +53,12 @@ export default function LoginScreen() {
 	};
 
 	return (
-		<View style={StyleSheet.absoluteFill}>
+		<View className="absolute inset-0">
 			<AuthBackground />
-			<View style={{ flex: 1, paddingTop: insets.top }}>
+			<View className="flex-1" style={{ paddingTop: insets.top }}>
 				<KeyboardAvoidingView
 					behavior={Platform.OS === "ios" ? "padding" : "height"}
-					style={{ flex: 1 }}
+					className="flex-1"
 				>
 					<ScrollView
 						contentContainerStyle={{
@@ -71,25 +69,15 @@ export default function LoginScreen() {
 						showsVerticalScrollIndicator={false}
 					>
 						{/* Back button — only shown when there is a previous screen to return to; space always reserved */}
-						<View style={{ height: 44, justifyContent: "center" }}>
+						<View className="h-11 justify-center">
 							{router.canGoBack() && (
 								<TouchableOpacity
 									onPress={() => router.back()}
-									style={{
-										flexDirection: "row",
-										alignItems: "center",
-										paddingHorizontal: 20,
-										gap: 4,
-									}}
+									className="flex-row items-center px-5 gap-1"
 									hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 								>
 									<IconSymbol name="chevron.left" size={18} color="#11181C" />
-									<ThemedText
-										style={{
-											fontSize: 16,
-											fontFamily: "NunitoSans_400Regular",
-										}}
-									>
+									<ThemedText className="text-base font-nunito">
 										{translate("onboarding.back")}
 									</ThemedText>
 								</TouchableOpacity>
@@ -97,38 +85,24 @@ export default function LoginScreen() {
 						</View>
 
 						{/* Title */}
-						<View
-							style={{
-								paddingHorizontal: 24,
-								paddingTop: 8,
-								alignItems: "center",
-							}}
-						>
+						<View className="px-6 pt-2 items-center">
 							<ThemedText
-								style={{
-									fontFamily: "NunitoSans_700Bold",
-									fontSize: FontSizes.hero,
-									lineHeight: 60,
-									color: AppColors.primaryText,
-									letterSpacing: -0.5,
-									textAlign: "center",
-								}}
+								className="font-nunito-bold leading-[60px] text-[#111] text-[30px] text-center"
+								style={{ letterSpacing: -0.5 }}
 							>
 								{translate("onboarding.signIn")}
 							</ThemedText>
 						</View>
 
 						{/* Character image */}
-						<View style={{ alignItems: "center", paddingVertical: 24 }}>
+						<View className="items-center py-6">
 							<JumpingCharacter />
 						</View>
 
 						{/* Form fields */}
-						<View style={{ paddingHorizontal: 24, gap: 24 }}>
-							<View style={{ gap: 8 }}>
-								<ThemedText
-									style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}
-								>
+						<View className="px-6 gap-6">
+							<View className="gap-2">
+								<ThemedText className="text-base font-nunito-semibold">
 									{translate("onboarding.email")}
 								</ThemedText>
 								<AuthFormInput
@@ -139,10 +113,8 @@ export default function LoginScreen() {
 								/>
 							</View>
 
-							<View style={{ gap: 8 }}>
-								<ThemedText
-									style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}
-								>
+							<View className="gap-2">
+								<ThemedText className="text-base font-nunito-semibold">
 									{translate("onboarding.password")}
 								</ThemedText>
 								<AuthFormInput
@@ -154,13 +126,7 @@ export default function LoginScreen() {
 						</View>
 
 						{/* Buttons */}
-						<View
-							style={{
-								paddingHorizontal: 24,
-								paddingTop: 32,
-								alignItems: "center",
-							}}
-						>
+						<View className="px-6 pt-8 items-center">
 							<Button
 								label={translate("onboarding.signUp")}
 								onPress={handleSubmit(onSubmit)}

@@ -2,7 +2,6 @@ import { Button } from "@/components/Button";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { ImageSelector } from "@/components/ImageSelector";
 import { ThemedText } from "@/components/themed-text";
-import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -40,16 +39,12 @@ export default function PhotoScreen() {
 	};
 
 	return (
-		<View style={{ flex: 1, paddingTop: insets.top }}>
+		<View className="flex-1" style={{ paddingTop: insets.top }}>
 			<AuthBackground />
 			<View className="px-6 pt-8 items-center">
 				<ThemedText
-					className="font-nunito-bold leading-[60px]"
-					style={{
-						letterSpacing: -0.5,
-						fontSize: FontSizes.hero,
-						color: AppColors.primaryText,
-					}}
+					className="font-nunito-bold leading-[60px] text-[30px] text-[#111] text-center"
+					style={{ letterSpacing: -0.5 }}
 				>
 					{translate("onboarding.addPhoto")}
 				</ThemedText>

@@ -4,7 +4,7 @@ import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { AuthBackground } from "@/components/AuthBackground";
-import { Colors, AppColors } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { AvatarPicker, DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
@@ -40,7 +40,7 @@ export default function AvatarPickerScreen() {
 	};
 
 	return (
-		<View style={{ flex: 1, paddingTop: insets.top }}>
+		<View className="flex-1" style={{ paddingTop: insets.top }}>
 			<AuthBackground />
 			<Stack.Screen options={{ headerShown: false }} />
 			<ScrollView
@@ -72,7 +72,7 @@ export default function AvatarPickerScreen() {
 
 				{/* Avatar preview with pencil overlay */}
 				<View className="items-center mb-5">
-					<View style={{ position: "relative" }}>
+					<View className="relative">
 						<ChildAvatar
 							name={childName}
 							avatarFace={face}
@@ -80,25 +80,13 @@ export default function AvatarPickerScreen() {
 							size={72}
 						/>
 						<View
-							style={{
-								position: "absolute",
-								bottom: 0,
-								right: 0,
-								width: 22,
-								height: 22,
-								borderRadius: 11,
-								backgroundColor: theme.text,
-								alignItems: "center",
-								justifyContent: "center",
-							}}
+							className="absolute bottom-0 right-0 w-[22px] h-[22px] rounded-full items-center justify-center"
+							style={{ backgroundColor: theme.text }}
 						>
 							<IconSymbol name="pencil" size={11} color={theme.background} />
 						</View>
 					</View>
-					<ThemedText
-						className="text-sm font-nunito-semibold mt-2"
-						style={{ color: AppColors.mutedText }}
-					>
+					<ThemedText className="text-sm font-nunito-semibold mt-2 text-[#6B7280]">
 						{translate("childProfile.changeProfilePicture", {
 							defaultValue: "Change Profile Picture",
 						})}

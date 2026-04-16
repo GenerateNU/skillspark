@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { AuthBackground } from "@/components/AuthBackground";
 import { JumpingCharacter } from "@/components/JumpingCharacter";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
-import { AppColors } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 
 // 7. done with onboarding
@@ -23,45 +22,35 @@ export default function AllSetScreen() {
 	}, [completeOnboarding]);
 
 	return (
-		<View style={StyleSheet.absoluteFill}>
+		<View className="absolute inset-0">
 			<AuthBackground />
-			<View style={{ flex: 1, paddingTop: insets.top }}>
-			{/* Title */}
-			<View style={{ alignItems: "center", paddingHorizontal: 24, paddingTop: 40, paddingBottom: 20 }}>
-				<ThemedText
-					style={{
-						fontFamily: "NunitoSans_700Bold",
-						fontSize: 30,
-						lineHeight: 38,
-						color: AppColors.primaryText,
-						letterSpacing: -0.5,
-						textAlign: "center",
-					}}
-					numberOfLines={1}
-					adjustsFontSizeToFit
-				>
-					{translate("onboarding.allSet")}
-				</ThemedText>
-			</View>
+			<View className="flex-1" style={{ paddingTop: insets.top }}>
+				{/* Title */}
+				<View className="items-center px-6 pt-10 pb-5">
+					<ThemedText
+						className="font-nunito-bold text-[30px] leading-[38px] text-[#111] text-center"
+						style={{ letterSpacing: -0.5 }}
+						numberOfLines={1}
+						adjustsFontSizeToFit
+					>
+						{translate("onboarding.allSet")}
+					</ThemedText>
+				</View>
 
-			{/* Character */}
-			<View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-				<JumpingCharacter />
-			</View>
+				{/* Character */}
+				<View className="flex-1 items-center justify-center">
+					<JumpingCharacter />
+				</View>
 
-			{/* Status text */}
-			<View style={{ paddingHorizontal: 24, paddingBottom: insets.bottom + 24, alignItems: "center" }}>
-				<ThemedText
-					style={{
-						fontSize: 15,
-						fontFamily: "NunitoSans_400Regular",
-						color: AppColors.mutedText,
-						textAlign: "center",
-					}}
+				{/* Status text */}
+				<View
+					className="px-6 items-center"
+					style={{ paddingBottom: insets.bottom + 24 }}
 				>
-					{translate("onboarding.settingUp")}
-				</ThemedText>
-			</View>
+					<ThemedText className="text-[15px] font-nunito text-[#6B7280] text-center">
+						{translate("onboarding.settingUp")}
+					</ThemedText>
+				</View>
 			</View>
 		</View>
 	);

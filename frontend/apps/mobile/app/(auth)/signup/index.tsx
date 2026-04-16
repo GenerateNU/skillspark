@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { JumpingCharacter } from "@/components/JumpingCharacter";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import { setCurrentLanguage } from "@skillspark/api-client";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { Button } from "@/components/Button";
-import { AppColors } from "@/constants/theme";
 import { useFormContext } from "react-hook-form";
 import { SignupFormData } from "@/constants/signup-types";
 import { AuthBackground } from "@/components/AuthBackground";
@@ -18,8 +17,6 @@ const LANGUAGES = [
 	{ code: "en", label: "English", flag: "🇺🇸" },
 	{ code: "th", label: "Thai", flag: "🇹🇭" },
 ];
-
-const DIVIDER = "#D1C8F0";
 
 export default function WelcomeScreen() {
 	const router = useRouter();
@@ -40,28 +37,15 @@ export default function WelcomeScreen() {
 	};
 
 	return (
-		<View style={StyleSheet.absoluteFill}>
+		<View className="absolute inset-0">
 			<AuthBackground />
-			<View style={{ flex: 1, paddingTop: insets.top }}>
-				<View style={{ height: 44, justifyContent: "center" }} />
+			<View className="flex-1" style={{ paddingTop: insets.top }}>
+				<View className="h-11" />
 				{/* Title */}
-				<View
-					style={{
-						alignItems: "center",
-						paddingHorizontal: 24,
-						paddingTop: 40,
-						paddingBottom: 20,
-					}}
-				>
+				<View className="items-center px-6 pt-10 pb-5">
 					<ThemedText
-						style={{
-							fontFamily: "NunitoSans_700Bold",
-							fontSize: 30,
-							lineHeight: 38,
-							color: AppColors.primaryText,
-							letterSpacing: -0.5,
-							textAlign: "center",
-						}}
+						className="font-nunito-bold text-[30px] leading-[38px] text-[#111] text-center"
+						style={{ letterSpacing: -0.5 }}
 						numberOfLines={1}
 						adjustsFontSizeToFit
 					>
@@ -70,30 +54,15 @@ export default function WelcomeScreen() {
 				</View>
 
 				{/* Character image */}
-				<View
-					style={{
-						alignItems: "center",
-						justifyContent: "center",
-						paddingVertical: 30,
-					}}
-				>
+				<View className="items-center justify-center py-[30px]">
 					<JumpingCharacter />
-					<ThemedText
-						style={{
-							fontFamily: "NunitoSans_600SemiBold",
-							fontSize: 16,
-							color: AppColors.secondaryText,
-							marginTop: 24,
-							marginBottom: 8,
-							textAlign: "center",
-						}}
-					>
+					<ThemedText className="font-nunito-semibold text-base text-[#374151] mt-6 mb-2 text-center">
 						{translate("onboarding.chooseLanguage")}
 					</ThemedText>
 				</View>
 
 				{/* Language section */}
-				<View style={{ paddingHorizontal: 24, flex: 1 }}>
+				<View className="px-6 flex-1">
 					<View>
 						{LANGUAGES.map((lang, index) => {
 							const isSelected = selected === lang.code;
@@ -102,24 +71,12 @@ export default function WelcomeScreen() {
 									<TouchableOpacity
 										onPress={() => updateLanguageData(lang.code)}
 										activeOpacity={0.6}
-										style={{
-											flexDirection: "row",
-											alignItems: "center",
-											gap: 14,
-											paddingVertical: 16,
-										}}
+										className="flex-row items-center gap-[14px] py-4"
 									>
-										<ThemedText style={{ fontSize: 30, lineHeight: 36 }}>
+										<ThemedText className="text-[30px] leading-9">
 											{lang.flag}
 										</ThemedText>
-										<ThemedText
-											style={{
-												flex: 1,
-												fontSize: 16,
-												fontFamily: "NunitoSans_400Regular",
-												color: AppColors.primaryText,
-											}}
-										>
+										<ThemedText className="flex-1 text-base font-nunito text-[#111]">
 											{translate(`settings.languages.${lang.code}`)}
 										</ThemedText>
 										<IconSymbol
@@ -129,13 +86,7 @@ export default function WelcomeScreen() {
 										/>
 									</TouchableOpacity>
 									{index < LANGUAGES.length - 1 && (
-										<View
-											style={{
-												height: 1,
-												backgroundColor: DIVIDER,
-												marginLeft: 50,
-											}}
-										/>
+										<View className="h-px bg-[#D1C8F0] ml-[50px]" />
 									)}
 								</React.Fragment>
 							);
@@ -145,12 +96,8 @@ export default function WelcomeScreen() {
 
 				{/* Submit button */}
 				<View
-					style={{
-						alignItems: "center",
-						paddingHorizontal: 24,
-						paddingBottom: insets.bottom + 56,
-						paddingTop: 16,
-					}}
+					className="items-center px-6 pt-4"
+					style={{ paddingBottom: insets.bottom + 56 }}
 				>
 					<Button
 						label={translate("common.submit")}

@@ -13,7 +13,7 @@ import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { AuthBackground } from "@/components/AuthBackground";
-import { Colors, AppColors } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -182,7 +182,7 @@ export default function AddChildScreen() {
 	};
 
 	return (
-		<View style={{ flex: 1, paddingTop: insets.top }}>
+		<View className="flex-1" style={{ paddingTop: insets.top }}>
 			<AuthBackground />
 			<Stack.Screen options={{ headerShown: false }} />
 			<KeyboardAvoidingView
@@ -212,10 +212,7 @@ export default function AddChildScreen() {
 							</ThemedText>
 							{isEditing ? (
 								<TouchableOpacity onPress={handleDelete}>
-									<ThemedText
-										className="font-nunito-semibold"
-										style={{ color: AppColors.danger }}
-									>
+									<ThemedText className="font-nunito-semibold text-[#EF4444]">
 										{translate("payment.delete")}
 									</ThemedText>
 								</TouchableOpacity>

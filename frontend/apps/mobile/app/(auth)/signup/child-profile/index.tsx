@@ -2,7 +2,7 @@ import { Button } from "@/components/Button";
 import { AuthBackground } from "@/components/AuthBackground";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors, FontSizes } from "@/constants/theme";
+import { AppColors } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
@@ -21,46 +21,25 @@ export default function ChildProfileScreen() {
 	const { children } = useGuardian(guardianId);
 
 	return (
-		<View style={{ flex: 1, paddingTop: insets.top }}>
+		<View className="flex-1" style={{ paddingTop: insets.top }}>
 			<AuthBackground />
 			{/* Back button */}
 			<TouchableOpacity
 				onPress={() => router.back()}
-				style={{
-					flexDirection: "row",
-					alignItems: "center",
-					paddingHorizontal: 20,
-					paddingVertical: 12,
-					gap: 4,
-				}}
+				className="flex-row items-center px-5 py-3 gap-1"
 				hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 			>
 				<IconSymbol name="chevron.left" size={18} color="#11181C" />
-				<ThemedText
-					style={{ fontSize: 16, fontFamily: "NunitoSans_400Regular" }}
-				>
+				<ThemedText className="text-base font-nunito">
 					{translate("onboarding.back")}
 				</ThemedText>
 			</TouchableOpacity>
 
 			{/* Title */}
-			<View
-				style={{
-					paddingHorizontal: 24,
-					paddingTop: 8,
-					paddingBottom: 24,
-					alignItems: "center",
-				}}
-			>
+			<View className="px-6 pt-2 pb-6 items-center">
 				<ThemedText
-					style={{
-						fontFamily: "NunitoSans_700Bold",
-						fontSize: FontSizes.hero,
-						lineHeight: 40,
-						color: AppColors.primaryText,
-						letterSpacing: -0.5,
-						textAlign: "center",
-					}}
+					className="font-nunito-bold leading-10 text-[#111] text-[30px] text-center"
+					style={{ letterSpacing: -0.5 }}
 				>
 					{translate("onboarding.setUpChild")}
 				</ThemedText>
@@ -68,7 +47,7 @@ export default function ChildProfileScreen() {
 
 			{/* Scrollable content */}
 			<ScrollView
-				style={{ flex: 1 }}
+				className="flex-1"
 				contentContainerStyle={{
 					paddingHorizontal: 24,
 					paddingBottom: 16,
@@ -79,7 +58,7 @@ export default function ChildProfileScreen() {
 				{/* Added children */}
 				{children.map((child: any) => (
 					<TouchableOpacity
-						className="shadow-sm"
+						className="shadow-sm flex-row items-center bg-white rounded-2xl py-3.5 px-4 gap-3"
 						key={child.id}
 						onPress={() =>
 							router.push({
@@ -97,15 +76,6 @@ export default function ChildProfileScreen() {
 							})
 						}
 						activeOpacity={0.75}
-						style={{
-							flexDirection: "row",
-							alignItems: "center",
-							backgroundColor: "#FFFFFF",
-							borderRadius: 16,
-							paddingVertical: 14,
-							paddingHorizontal: 16,
-							gap: 12,
-						}}
 					>
 						<View className="mr-2">
 							<ChildAvatar
@@ -116,16 +86,10 @@ export default function ChildProfileScreen() {
 							/>
 						</View>
 						<View className="flex-1">
-							<ThemedText
-								className="text-sm font-nunito-medium"
-								numberOfLines={1}
-							>
+							<ThemedText className="text-sm font-nunito-medium" numberOfLines={1}>
 								{child.name}
 							</ThemedText>
-							<ThemedText
-								className="text-[10px] font-nunito"
-								style={{ color: AppColors.mutedText }}
-							>
+							<ThemedText className="text-[10px] font-nunito text-[#6B7280]">
 								{[
 									child.birth_month ? MONTHS[child.birth_month - 1] : null,
 									child.birth_year,
@@ -144,45 +108,22 @@ export default function ChildProfileScreen() {
 
 				{/* Add a new child profile button */}
 				<TouchableOpacity
-					className="shadow-sm"
+					className="shadow-sm bg-white rounded-2xl py-5 items-center"
 					onPress={() => router.push("/(auth)/signup/child-profile/add-child")}
 					activeOpacity={0.7}
-					style={{
-						backgroundColor: "#FFFFFF",
-						borderRadius: 16,
-						paddingVertical: 20,
-						alignItems: "center",
-					}}
 				>
-					<Text
-						style={{
-							fontFamily: "NunitoSans_600SemiBold",
-							fontSize: 15,
-							color: AppColors.primaryText,
-						}}
-					>
+					<Text className="font-nunito-semibold text-[15px] text-[#111]">
 						{translate("onboarding.addNewChild")}
 					</Text>
-					<Text
-						style={{
-							fontFamily: "NunitoSans_400Regular",
-							fontSize: 22,
-							color: AppColors.primaryText,
-							lineHeight: 28,
-						}}
-					>
+					<Text className="font-nunito text-[22px] text-[#111] leading-7">
 						+
 					</Text>
 				</TouchableOpacity>
 			</ScrollView>
 
 			<View
-				style={{
-					alignItems: "center",
-					paddingHorizontal: 24,
-					paddingTop: 16,
-					paddingBottom: insets.bottom + 16,
-				}}
+				className="items-center px-6 pt-4"
+				style={{ paddingBottom: insets.bottom + 16 }}
 			>
 				<Button
 					label={translate("onboarding.continue")}

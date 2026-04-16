@@ -6,13 +6,11 @@ import {
 	ScrollView,
 	KeyboardAvoidingView,
 	Platform,
-	StyleSheet,
 } from "react-native";
 import { AuthBackground } from "@/components/AuthBackground";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
-import { AppColors, FontSizes } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useTranslation } from "react-i18next";
 import { useAuthContext } from "@/hooks/use-auth-context";
@@ -157,112 +155,96 @@ export default function ManageEmergencyContactScreen() {
 	};
 
 	return (
-		<View style={StyleSheet.absoluteFill}>
+		<View className="absolute inset-0">
 			<AuthBackground />
-			<View style={{ flex: 1, paddingTop: insets.top }}>
-			<Stack.Screen options={{ headerShown: false }} />
-			<KeyboardAvoidingView
-				behavior={Platform.OS === "ios" ? "padding" : "height"}
-				style={{ flex: 1 }}
-			>
-				<ScrollView
-					contentContainerStyle={{ flexGrow: 1 }}
-					keyboardShouldPersistTaps="handled"
-					showsVerticalScrollIndicator={false}
+			<View className="flex-1" style={{ paddingTop: insets.top }}>
+				<Stack.Screen options={{ headerShown: false }} />
+				<KeyboardAvoidingView
+					behavior={Platform.OS === "ios" ? "padding" : "height"}
+					className="flex-1"
 				>
-					{/* Back button */}
-					<TouchableOpacity
-						onPress={() => router.back()}
-						style={{
-							flexDirection: "row",
-							alignItems: "center",
-							paddingHorizontal: 20,
-							paddingVertical: 12,
-							gap: 4,
-						}}
-						hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+					<ScrollView
+						contentContainerStyle={{ flexGrow: 1 }}
+						keyboardShouldPersistTaps="handled"
+						showsVerticalScrollIndicator={false}
 					>
-						<IconSymbol name="chevron.left" size={18} color="#11181C" />
-						<ThemedText style={{ fontSize: 16, fontFamily: "NunitoSans_400Regular" }}>
-							{translate("onboarding.back")}
-						</ThemedText>
-					</TouchableOpacity>
-
-					{/* Title */}
-					<View style={{ paddingHorizontal: 24, paddingTop: 8, alignItems: "center" }}>
-						<ThemedText
-							style={{
-								fontFamily: "NunitoSans_700Bold",
-								fontSize: FontSizes.hero,
-								lineHeight: 60,
-								color: AppColors.primaryText,
-								letterSpacing: -0.5,
-								textAlign: "center",
-							}}
+						{/* Back button */}
+						<TouchableOpacity
+							onPress={() => router.back()}
+							className="flex-row items-center px-5 py-3 gap-1"
+							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 						>
-							{isEditing
-								? translate("emergencyContact.editTitle")
-								: translate("emergencyContact.addTitle")}
-						</ThemedText>
-					</View>
-
-					{/* Form fields */}
-					<View style={{ paddingHorizontal: 24, gap: 24, paddingTop: 80 }}>
-						<View style={{ gap: 8 }}>
-							<ThemedText style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}>
-								{translate("emergencyContact.name")}
+							<IconSymbol name="chevron.left" size={18} color="#11181C" />
+							<ThemedText className="text-base font-nunito">
+								{translate("onboarding.back")}
 							</ThemedText>
-							<AuthFormInput
-								control={control}
-								name="name"
-								autoCapitalize="words"
-							/>
+						</TouchableOpacity>
+
+						{/* Title */}
+						<View className="px-6 pt-2 items-center">
+							<ThemedText
+								className="font-nunito-bold leading-[60px] text-[#111] text-[30px] text-center"
+								style={{ letterSpacing: -0.5 }}
+							>
+								{isEditing
+									? translate("emergencyContact.editTitle")
+									: translate("emergencyContact.addTitle")}
+							</ThemedText>
 						</View>
 
-						<View style={{ gap: 8 }}>
-							<ThemedText style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}>
-								{translate("emergencyContact.phoneNumber")}
-							</ThemedText>
-							<AuthFormInput
-								control={control}
-								name="phone_number"
-								keyboardType="phone-pad"
-								autoCapitalize="none"
+						{/* Form fields */}
+						<View className="px-6 gap-6 pt-20">
+							<View className="gap-2">
+								<ThemedText className="text-base font-nunito-semibold">
+									{translate("emergencyContact.name")}
+								</ThemedText>
+								<AuthFormInput
+									control={control}
+									name="name"
+									autoCapitalize="words"
+								/>
+							</View>
+
+							<View className="gap-2">
+								<ThemedText className="text-base font-nunito-semibold">
+									{translate("emergencyContact.phoneNumber")}
+								</ThemedText>
+								<AuthFormInput
+									control={control}
+									name="phone_number"
+									keyboardType="phone-pad"
+									autoCapitalize="none"
+								/>
+							</View>
+						</View>
+					</ScrollView>
+				</KeyboardAvoidingView>
+
+				{/* Buttons pinned to bottom */}
+				<View
+					className="items-center px-6 pt-4"
+					style={{ paddingBottom: insets.bottom + 56 }}
+				>
+					<Button
+						label={
+							isSubmitting
+								? translate("emergencyContact.saving")
+								: isEditing
+									? translate("emergencyContact.saveChanges")
+									: translate("emergencyContact.addContact")
+						}
+						onPress={handleSave}
+						disabled={isSubmitting}
+					/>
+					{isEditing && (
+						<View className="mt-3">
+							<PageRedirectButton
+								label={translate("emergencyContact.deleteContact")}
+								onPress={handleDelete}
 							/>
 						</View>
-					</View>
-				</ScrollView>
-			</KeyboardAvoidingView>
-
-			{/* Buttons pinned to bottom */}
-			<View
-				style={{
-					alignItems: "center",
-					paddingHorizontal: 24,
-					paddingTop: 16,
-					paddingBottom: insets.bottom + 56,
-				}}
-			>
-				<Button
-					label={
-						isSubmitting
-							? translate("emergencyContact.saving")
-							: isEditing
-								? translate("emergencyContact.saveChanges")
-								: translate("emergencyContact.addContact")
-					}
-					onPress={handleSave}
-					disabled={isSubmitting}
-				/>
-				{isEditing && (
-					<View style={{ marginTop: 12 }}>
-						<PageRedirectButton
-							label={translate("emergencyContact.deleteContact")}
-							onPress={handleDelete}
-						/>
-					</View>
-				)}
-			</View>
+					)}
+				</View>
 			</View>
 		</View>
 	);
