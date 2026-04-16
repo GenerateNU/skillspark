@@ -8,6 +8,7 @@ import {
   formatTime,
 } from "@/components/RegistrationCard.types";
 import { ChildAvatar } from "@/components/ChildAvatar";
+import { ChildAvatarGroup } from "@/components/ChildAvatarGroup";
 
 export function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
   const { t } = useTranslation();

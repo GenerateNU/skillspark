@@ -326,11 +326,11 @@ export default function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 20 }}
             >
-              {childRecommendations.map(({ child, occurrence }) => (
+              {childRecommendations.map(({ child, occurrences }) => (
                 <RecommendedCard
                   key={child.id}
-                  occurrence={occurrence}
-                  childName={child.name.split(" ")[0]}
+                  child={child}
+                  occurrences={occurrences}
                 />
               ))}
             </ScrollView>

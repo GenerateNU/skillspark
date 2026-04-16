@@ -2,7 +2,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Animated,
@@ -106,6 +106,8 @@ export default function ActivityScreen() {
       },
     }),
   ).current;
+
+  const resetCancelSheet = () => cancelSheetTranslateY.setValue(0);
 
   const getOnRemove = (childRegistrations: ChildRegistration[]) => () => {
     setCancelSelections(new Set(childRegistrations.map((cr) => cr.child.id)));
@@ -252,6 +254,8 @@ export default function ActivityScreen() {
       },
     }),
   ).current;
+
+  const resetFilterSheet = () => sheetTranslateY.setValue(0);
 
   const openFilter = () => {
     const allIds = new Set(children.map((c) => c.id));
