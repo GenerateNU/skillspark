@@ -14,6 +14,7 @@ import {
   useGetOrganization,
   useGetReviewAggregate,
 } from "@skillspark/api-client";
+import { ErrorScreen } from "@/components/ErrorScreen";
 import type { EventOccurrence, Organization } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, Shadows } from "@/constants/theme";
@@ -334,17 +335,14 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  if (error || !occurrence) {
-    return (
-      <View className="flex-1 items-center justify-center p-6">
-        <Text
-          className="text-base font-semibold"
-          style={{ color: AppColors.danger }}
-        >
-          {translate("event.notFound")}
-        </Text>
-      </View>
-    );
+  if (
+    error ||
+    !response ||
+    response.status !== 200 ||
+    response.data.length === 0 ||
+    !occurrence
+  ) {
+    return <ErrorScreen message={translate("event.notFound")} />;
   }
 
   return <EventOccurrenceDetail occurrence={occurrence} org={org} />;

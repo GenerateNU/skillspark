@@ -13,6 +13,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
 import type { Location, Organization } from "@skillspark/api-client";
 import { SvgXml } from "react-native-svg";
+import { ErrorScreen } from "@/components/ErrorScreen";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { AppColors, Shadows } from "@/constants/theme";
@@ -274,7 +275,7 @@ export default function OrgScreen() {
       query: {
         enabled: response?.status === 200 && !!response.data.location_id,
       },
-    },
+    }
   );
 
   if (isLoading) {
@@ -286,13 +287,7 @@ export default function OrgScreen() {
   }
 
   if (error || !response || response.status !== 200) {
-    return (
-      <View className="flex-1 items-center justify-center p-6">
-        <Text className="text-base font-semibold text-red-500">
-          {translate("org.notFound")}
-        </Text>
-      </View>
-    );
+    return <ErrorScreen message={translate("org.notFound")} />;
   }
 
   return (

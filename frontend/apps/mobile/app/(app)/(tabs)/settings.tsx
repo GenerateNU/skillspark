@@ -1,3 +1,4 @@
+import { ErrorScreen } from "@/components/ErrorScreen";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -54,7 +55,7 @@ export default function SettingsScreen() {
       guardian.profile_picture_s3_key,
       guardian.expo_push_token,
       value,
-      emailEnabled,
+      emailEnabled
     );
   };
 
@@ -72,7 +73,7 @@ export default function SettingsScreen() {
       guardian.profile_picture_s3_key,
       guardian.expo_push_token,
       pushEnabled,
-      value,
+      value
     );
   };
 

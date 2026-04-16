@@ -448,6 +448,13 @@
     "agesRange": "อายุ {{min}} - {{max}} ปี",
     "classTime": "คลาส {{time}}"
   },
+  "errorScreen": {
+    "title": "อุ๊ย!",
+    "subtitle": "เกิดข้อผิดพลาดขึ้น",
+    "backToSafety": "กลับสู่หน้าหลัก",
+    "showDetails": "แสดงรายละเอียด",
+    "hideDetails": "ซ่อนรายละเอียด"
+  },
   "reservation": {
     "paymentFailed": "ชำระเงินไม่สำเร็จ กรุณาลองอีกครั้งหรือติดต่อฝ่ายสนับสนุน",
     "completed": "เสร็จสิ้น",

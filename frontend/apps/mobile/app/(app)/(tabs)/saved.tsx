@@ -56,14 +56,7 @@ export default function SavedScreen() {
 
   if (error) {
     return (
-      <View className="flex-1 items-center justify-center p-4">
-        <ThemedText className="text-red-500 font-semibold">
-          {translate("common.errorLoadingEvents")}
-        </ThemedText>
-        <ThemedText>
-          {error.detail || translate("common.errorOccurred")}
-        </ThemedText>
-      </View>
+      <ErrorScreen message={error.detail || translate("common.errorOccurred")} />
     );
   }
 
