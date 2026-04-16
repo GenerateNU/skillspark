@@ -3,6 +3,7 @@ package repomocks
 import (
 	"context"
 	"skillspark/internal/models"
+	"skillspark/internal/utils"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -60,4 +61,16 @@ func (m *MockEventRepository) GetEventByID(ctx context.Context, id uuid.UUID, ac
 		return nil, args.Get(1).(error)
 	}
 	return args.Get(0).(*models.Event), nil
+}
+
+func (m *MockEventRepository) GetAllEvents(ctx context.Context, pagination utils.Pagination, AcceptLanguage string) ([]models.Event, error) {
+	args := m.Called(ctx, pagination, AcceptLanguage)
+	events := args.Get(0)
+	if events == nil {
+		if args.Get(1) == nil {
+			return nil, nil
+		}
+		return nil, args.Get(1).(error)
+	}
+	return events.([]models.Event), nil
 }
