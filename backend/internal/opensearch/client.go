@@ -45,10 +45,22 @@ func (c *Client) FuzzySearch(ctx context.Context, query string, acceptLanguage s
 		"from": from,
 		"size": size,
 		"query": map[string]any{
-			"multi_match": map[string]any{
-				"query":     query,
-				"fields":    []string{titleField + "^2", descField, "category"},
-				"fuzziness": "AUTO",
+			"bool": map[string]any{
+				"should": []any{
+					map[string]any{
+						"multi_match": map[string]any{
+							"query":     query,
+							"fields":    []string{titleField + "^2", descField},
+							"fuzziness": "AUTO",
+						},
+					},
+					map[string]any{
+						"term": map[string]any{
+							"category": query,
+						},
+					},
+				},
+				"minimum_should_match": 1,
 			},
 		},
 	}
@@ -67,14 +79,15 @@ func (c *Client) FuzzySearch(ctx context.Context, query string, acceptLanguage s
 	}
 
 	type osEvent struct {
-		ID            string   `json:"id"`
-		TitleEN       string   `json:"title_en"`
-		TitleTH       string   `json:"title_th"`
-		DescriptionEN string   `json:"description_en"`
-		DescriptionTH string   `json:"description_th"`
-		Category      []string `json:"category"`
-		AgeRangeMin   *int     `json:"age_range_min"`
-		AgeRangeMax   *int     `json:"age_range_max"`
+		ID                string   `json:"id"`
+		TitleEN           string   `json:"title_en"`
+		TitleTH           string   `json:"title_th"`
+		DescriptionEN     string   `json:"description_en"`
+		DescriptionTH     string   `json:"description_th"`
+		Category          []string `json:"category"`
+		HeaderImageS3Key  *string  `json:"header_image_s3_key"`
+		AgeRangeMin       *int     `json:"age_range_min"`
+		AgeRangeMax       *int     `json:"age_range_max"`
 	}
 
 	events := make([]models.Event, 0)
@@ -85,19 +98,20 @@ func (c *Client) FuzzySearch(ctx context.Context, query string, acceptLanguage s
 		}
 		id, err := uuid.Parse(src.ID)
 		if err != nil {
-			return nil, fmt.Errorf("opensearch: invalid event id: %w", err)
+			continue
 		}
 		title, description := src.TitleEN, src.DescriptionEN
 		if acceptLanguage == "th-TH" && src.TitleTH != "" {
 			title, description = src.TitleTH, src.DescriptionTH
 		}
 		events = append(events, models.Event{
-			ID:          id,
-			Title:       title,
-			Description: description,
-			Category:    src.Category,
-			AgeRangeMin: src.AgeRangeMin,
-			AgeRangeMax: src.AgeRangeMax,
+			ID:               id,
+			Title:            title,
+			Description:      description,
+			Category:         src.Category,
+			HeaderImageS3Key: src.HeaderImageS3Key,
+			AgeRangeMin:      src.AgeRangeMin,
+			AgeRangeMax:      src.AgeRangeMax,
 		})
 	}
 	return events, nil

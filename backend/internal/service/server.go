@@ -184,6 +184,6 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetupGeocodingRoutes(api, geocodingService)
 	routes.SetupEmergencyContactRoutes(api, repo)
 	routes.SetupRecommendationRoutes(api, repo, s3Client)
-	routes.SetupSearchRoutes(api, osClient)
+	routes.SetupSearchRoutes(api, osClient, s3Client)
 	return nil
 }

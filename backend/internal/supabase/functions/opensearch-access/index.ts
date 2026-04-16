@@ -17,7 +17,7 @@ async function upsert(id: string, doc: Record<string, unknown>) {
     body: JSON.stringify(doc),
   });
   if (!res.ok) {
-    throw new Error(`OpenSearch upsert failed: ${await res.text()}`);
+    throw new Error(`OpenSearch upsert failed (${res.status}): ${await res.text()}`);
   }
 }
 
@@ -27,11 +27,34 @@ async function remove(id: string) {
     headers: { "Authorization": authHeader },
   });
   if (!res.ok && res.status !== 404) {
-    throw new Error(`OpenSearch delete failed: ${await res.text()}`);
+    throw new Error(`OpenSearch delete failed (${res.status}): ${await res.text()}`);
   }
 }
 
+async function checkConnection(): Promise<boolean> {
+  const res = await fetch(`${OPENSEARCH_URL}/_cluster/health`, {
+    headers: { "Authorization": authHeader },
+  });
+  return res.ok;
+}
+
 Deno.serve(async (req) => {
+  // Health/connection check
+  if (req.method === "GET") {
+    try {
+      const healthy = await checkConnection();
+      return new Response(
+        JSON.stringify({ connected: healthy, index: INDEX }),
+        { status: healthy ? 200 : 503, headers: { "Content-Type": "application/json" } },
+      );
+    } catch (err) {
+      return new Response(JSON.stringify({ connected: false, error: String(err) }), {
+        status: 503,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
   try {
     const payload = await req.json();
     const { type, record, old_record } = payload;
@@ -40,12 +63,15 @@ Deno.serve(async (req) => {
       case "INSERT":
       case "UPDATE":
         await upsert(record.id, {
-          id:               record.id,
-          title_en:         record.title_en,
-          title_th:         record.title_th,
-          description_en:   record.description_en,
-          description_th:   record.description_th,
-          category:         record.category,
+          id:                   record.id,
+          title_en:             record.title_en,
+          title_th:             record.title_th,
+          description_en:       record.description_en,
+          description_th:       record.description_th,
+          category:             record.category,
+          header_image_s3_key:  record.header_image_s3_key,
+          age_range_min:        record.age_range_min,
+          age_range_max:        record.age_range_max,
         });
         break;
 

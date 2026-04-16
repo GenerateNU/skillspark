@@ -3,27 +3,40 @@ RETURNS TRIGGER AS $$
 DECLARE
   _url  text;
   _key  text;
+  _body jsonb;
 BEGIN
   SELECT decrypted_secret INTO _url FROM vault.decrypted_secrets WHERE name = 'edge_function_url' LIMIT 1;
   SELECT decrypted_secret INTO _key FROM vault.decrypted_secrets WHERE name = 'edge_function_key' LIMIT 1;
 
-  BEGIN
+  IF TG_OP = 'DELETE' THEN
+    _body := jsonb_build_object(
+      'type',       TG_OP,
+      'record',     row_to_json(OLD),
+      'old_record', row_to_json(OLD)
+    );
     PERFORM net.http_post(
       url     := _url,
-      headers := jsonb_build_object(
-        'Content-Type',  'application/json',
-        'Authorization', _key
-      ),
-      body    := jsonb_build_object(
-        'type',       TG_OP,
-        'record',     row_to_json(NEW),
-        'old_record', row_to_json(OLD)
-      )
+      headers := jsonb_build_object('Content-Type', 'application/json', 'Authorization', _key),
+      body    := _body
     );
-  EXCEPTION WHEN OTHERS THEN
-    NULL;
-  END;
-  RETURN NEW;
+    RETURN OLD;
+  ELSE
+    _body := jsonb_build_object(
+      'type',       TG_OP,
+      'record',     row_to_json(NEW),
+      'old_record', row_to_json(OLD)
+    );
+    BEGIN
+      PERFORM net.http_post(
+        url     := _url,
+        headers := jsonb_build_object('Content-Type', 'application/json', 'Authorization', _key),
+        body    := _body
+      );
+    EXCEPTION WHEN OTHERS THEN
+      NULL;
+    END;
+    RETURN NEW;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
