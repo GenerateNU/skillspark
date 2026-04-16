@@ -350,7 +350,8 @@ export default function HomeScreen() {
               </View>
             ))}
           </View>
-        )}
+        </View>
+      )}
       </LogoBgWrapper>
     </ScrollView>
   );

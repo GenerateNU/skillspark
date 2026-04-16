@@ -136,7 +136,8 @@ export default function OrgScheduleScreen() {
       groups.get(key)!.push(occ);
     }
 
-    return Array.from(groups.entries()).map(([, items]) => ({
+    return Array.from(groups.entries()).map(([dateKey, items]) => ({
+      key: dateKey,
       label: formatSectionDate(items[0].start_time),
       items,
     }));
@@ -223,7 +224,7 @@ export default function OrgScheduleScreen() {
           contentContainerStyle={{ paddingBottom: 32, paddingTop: 16 }}
         >
           {grouped.map((group) => (
-            <View key={group.label} className="mb-4">
+            <View key={group.key} className="mb-4">
               <Text
                 className="px-4 pb-3"
                 style={{
