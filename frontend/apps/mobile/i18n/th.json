@@ -322,6 +322,8 @@
     "price": "ราคา",
     "ageRange": "ช่วงอายุ",
     "showSoldOut": "แสดงที่เต็มแล้ว",
+    "startTime": "เวลาเริ่มต้น",
+    "showResults": "แสดงผลลัพธ์",
     "any": "ทั้งหมด",
     "upTo": "ไม่เกิน {{value}}",
     "orMore": "{{value}} ขึ้นไป",
