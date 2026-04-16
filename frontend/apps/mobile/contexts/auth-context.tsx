@@ -11,6 +11,9 @@ import {
   useLoginGuardian,
   useSignupGuardian,
   useUpdateGuardian,
+  usernameExists as checkUsernameExists,
+  usernameExistsResponseError,
+  UsernameExistsOutputBody,
 } from "@skillspark/api-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -51,6 +54,10 @@ interface AuthContextType {
     push_notifications?: boolean,
     email_notifications?: boolean,
   ) => void;
+  usernameExists: (
+    username: string,
+    onError: (msg: string) => void,
+  ) => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -220,6 +227,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const usernameExists = async (
+    username: string,
+    onError: (msg: string) => void,
+  ) => {
+    try {
+      const resp = await checkUsernameExists(username);
+      const data = resp.data as UsernameExistsOutputBody;
+      if (data.exists) {
+        onError("Username is taken.");
+        return false;
+      }
+      return true;
+    } catch (err) {
+      const typedErr = err as usernameExistsResponseError;
+      onError(typedErr.data?.detail ?? "An unexpected error occurred.");
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -232,6 +258,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signup,
         logout,
         update,
+        usernameExists,
       }}
     >
       {children}
