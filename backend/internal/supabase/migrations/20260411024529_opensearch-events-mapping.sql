@@ -15,7 +15,7 @@ BEGIN
       )
     );
   EXCEPTION WHEN OTHERS THEN
-    NULL;
+    RAISE WARNING 'notify_opensearch failed for operation %, SQLSTATE %, error: %', TG_OP, SQLSTATE, SQLERRM;
   END;
   RETURN NEW;
 END;
