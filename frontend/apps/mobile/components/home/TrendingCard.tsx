@@ -1,8 +1,9 @@
-import { View, Text, Pressable, Image as RNImage, type StyleProp, type ViewStyle } from "react-native";
+import { View, Text, Pressable, type StyleProp, type ViewStyle } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { type EventOccurrence, type ReviewAggregate, useGetReviewAggregate } from "@skillspark/api-client";
-import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
+import { AppColors } from "@/constants/theme";
 import { haversineDistance } from "@/utils/distance";
 import { formatAgeRange } from "@/utils/format";
 import { getRatingOption } from "@/utils/ratings";
@@ -54,16 +55,11 @@ export function TrendingCard({
   return (
     <Pressable
       onPress={() => router.push(`/event/${occurrence.event.id}`)}
+      className="mb-2 h-[140px] flex-row rounded-2xl border overflow-hidden"
       style={[{
         width,
-        height: 140,
-        marginBottom: 8,
-        flexDirection: "row",
         backgroundColor: AppColors.white,
-        borderRadius: 16,
-        borderWidth: 1,
         borderColor: AppColors.savedBackground,
-        overflow: "hidden",
         shadowColor: "#000",
         shadowOpacity: 0.08,
         shadowRadius: 4,
@@ -78,31 +74,21 @@ export function TrendingCard({
       />
 
       {/* Content */}
-      <View
-        style={{ flex: 1, padding: 12, justifyContent: "center", gap: 4 }}
-      >
+      <View className="flex-1 p-3 justify-center gap-1">
         <Text
-          style={{
-            fontFamily: FontFamilies.bold,
-            fontSize: 16,
-            color: AppColors.primaryText,
-          }}
+          className="font-nunito-bold text-base"
+          style={{ color: AppColors.primaryText }}
           numberOfLines={2}
         >
           {occurrence.event.title}
         </Text>
 
         {/* Smiley rating */}
-        <View
-          style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
-        >
-          <RNImage source={ratingOption.image} style={{ width: 18, height: 18 }} />
+        <View className="flex-row items-center gap-1.5">
+          <Image source={ratingOption.image} style={{ width: 18, height: 18 }} />
           <Text
-            style={{
-              fontFamily: FontFamilies.regular,
-              fontSize: FontSizes.sm,
-              color: AppColors.mutedText,
-            }}
+            className="font-nunito text-[12px]"
+            style={{ color: AppColors.mutedText }}
           >
             {reviewLabel}
           </Text>
@@ -110,11 +96,8 @@ export function TrendingCard({
 
         {ageLabel && (
           <Text
-            style={{
-              fontFamily: FontFamilies.regular,
-              fontSize: FontSizes.sm,
-              color: AppColors.mutedText,
-            }}
+            className="font-nunito text-[12px]"
+            style={{ color: AppColors.mutedText }}
           >
             {ageLabel}
           </Text>
@@ -122,11 +105,8 @@ export function TrendingCard({
 
         {distance != null && (
           <Text
-            style={{
-              fontFamily: FontFamilies.regular,
-              fontSize: FontSizes.sm,
-              color: AppColors.mutedText,
-            }}
+            className="font-nunito text-[12px]"
+            style={{ color: AppColors.mutedText }}
           >
             {distance.toFixed(1)} {t("map.km")} {t("map.away")}
           </Text>
