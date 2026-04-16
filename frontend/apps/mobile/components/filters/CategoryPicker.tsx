@@ -14,22 +14,35 @@ type Props = {
   onSelect: (idx: number) => void;
 };
 
-export function CategoryPicker({ label, categoryLabels, activeIndex, onSelect }: Props) {
+export function CategoryPicker({
+  label,
+  categoryLabels,
+  activeIndex,
+  onSelect,
+}: Props) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
-  const visibleLabels = expanded ? categoryLabels : categoryLabels.slice(0, COLLAPSED_COUNT);
-  const visibleActiveIndex = expanded ? activeIndex : activeIndex < COLLAPSED_COUNT ? activeIndex : -1;
+  const visibleLabels = expanded
+    ? categoryLabels
+    : categoryLabels.slice(0, COLLAPSED_COUNT);
+  const visibleActiveIndex = expanded
+    ? activeIndex
+    : activeIndex < COLLAPSED_COUNT
+      ? activeIndex
+      : -1;
 
   return (
     <View>
-       <Text
-      style={{
-        fontFamily: FontFamilies.bold,
-        fontSize: FontSizes.lg,
-        color: AppColors.primaryText,
-      }}
-    >{label}</Text>
+      <Text
+        style={{
+          fontFamily: FontFamilies.bold,
+          fontSize: FontSizes.lg,
+          color: AppColors.primaryText,
+        }}
+      >
+        {label}
+      </Text>
       <PillRow
         options={visibleLabels}
         activeIndex={visibleActiveIndex}

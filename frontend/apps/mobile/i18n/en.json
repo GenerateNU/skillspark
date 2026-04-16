@@ -38,6 +38,7 @@
   "dashboard": {
     "title": "My Dashboard",
     "searchPlaceholder": "Search for a class",
+    "greeting": "Hello, {{name}}",
     "discoverWeekly": "Discover Weekly",
     "forYou": "For You",
     "basedOn": "Based on",
@@ -324,6 +325,8 @@
     "price": "Price",
     "ageRange": "Age Range",
     "showSoldOut": "Show sold out",
+    "startTime": "Start Time",
+    "showResults": "Show Results",
     "any": "Any",
     "upTo": "Up to {{value}}",
     "orMore": "{{value}} +",

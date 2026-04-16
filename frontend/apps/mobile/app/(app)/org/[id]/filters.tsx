@@ -1,6 +1,3 @@
-import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
-import { useFilters } from "@/hooks/use-filters";
-import { useRouter } from "expo-router";
 import {
   Pressable,
   ScrollView,
@@ -9,22 +6,38 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useMemo } from "react";
+import {
+  useGetEventOccurrencesByOrganizationId,
+  type EventOccurrence,
+} from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { SliderCard } from "@/components/filters/SliderCard";
-import { DateRangePicker } from "@/components/filters/DateRangePicker";
-import { CategoryPicker } from "@/components/filters/CategoryPicker";
-import { SoldOutToggle } from "@/components/filters/SoldOutToggle";
+import { useOrgScheduleFilters } from "@/hooks/use-org-schedule-filters";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import { CATEGORY_KEYS } from "@/constants/eventCategories";
 
-const DISTANCE_MAX = 50;
+const START_TIME_MAX = 1380; // 11:00 PM in minutes from midnight
 const DURATION_MAX = 180; // minutes
-const PRICE_MAX = 2000;
+const PRICE_MAX = 200000; // cents ($2000)
 const AGE_MAX = 18;
 
-function distanceLabel(km: number) {
-  return km >= DISTANCE_MAX ? `${DISTANCE_MAX}+ km` : `${km} km`;
+function formatMinutes(totalMinutes: number): string {
+  const h = Math.floor(totalMinutes / 60) % 24;
+  const m = totalMinutes % 60;
+  const ampm = h < 12 ? "AM" : "PM";
+  const displayH = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  return `${displayH}:${m.toString().padStart(2, "0")} ${ampm}`;
+}
+
+function timeRangeLabel(lo: number, hi: number, t: TFunction): string {
+  if (lo === 0 && hi >= START_TIME_MAX) return t("filters.any");
+  if (lo === 0) return t("filters.upTo", { value: formatMinutes(hi) });
+  if (hi >= START_TIME_MAX)
+    return t("filters.orMore", { value: formatMinutes(lo) });
+  return `${formatMinutes(lo)} – ${formatMinutes(hi)}`;
 }
 
 function durationLabel(min: number) {
@@ -43,12 +56,16 @@ function durationRangeLabel(lo: number, hi: number, t: TFunction) {
   return `${durationLabel(lo)} – ${durationLabel(hi)}`;
 }
 
+function priceLabel(cents: number): string {
+  const amount = cents / 100;
+  return `$${amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2)}`;
+}
+
 function priceRangeLabel(lo: number, hi: number, t: TFunction) {
   if (lo === 0 && hi >= PRICE_MAX) return t("filters.any");
-  if (hi >= PRICE_MAX)
-    return t("filters.orMore", { value: `฿${lo.toLocaleString()}` });
-  if (lo === 0) return t("filters.upTo", { value: `฿${hi.toLocaleString()}` });
-  return `฿${lo.toLocaleString()} – ฿${hi.toLocaleString()}`;
+  if (hi >= PRICE_MAX) return t("filters.orMore", { value: priceLabel(lo) });
+  if (lo === 0) return t("filters.upTo", { value: priceLabel(hi) });
+  return `${priceLabel(lo)} – ${priceLabel(hi)}`;
 }
 
 function ageRangeLabel(lo: number, hi: number, t: TFunction) {
@@ -58,20 +75,26 @@ function ageRangeLabel(lo: number, hi: number, t: TFunction) {
   return `${lo} – ${hi}y`;
 }
 
-export default function FiltersScreen() {
+export default function OrgScheduleFiltersScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { filters, setFilters, clearFilters } = useFilters();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { filters, setFilters, clearFilters } = useOrgScheduleFilters(id);
   const { t } = useTranslation();
 
-  const categoryLabels: string[] = t("filters.categories", {
-    returnObjects: true,
-  }) as string[];
+  const { data: occurrencesResp } = useGetEventOccurrencesByOrganizationId(id);
+  const classNames = useMemo(() => {
+    const d = occurrencesResp as unknown as
+      | { data: EventOccurrence[] }
+      | undefined;
+    const occs = Array.isArray(d?.data) ? d!.data : [];
+    return [...new Set(occs.map((o) => o.event.title))].sort();
+  }, [occurrencesResp]);
 
-  const categoryIdx = filters.category
-    ? CATEGORY_KEYS.indexOf(filters.category)
-    : -1;
-  const distanceKm = filters.radius_km ?? DISTANCE_MAX;
+  const startTimeRange: [number, number] = [
+    filters.min_start_minutes ?? 0,
+    filters.max_start_minutes ?? START_TIME_MAX,
+  ];
   const durationRange: [number, number] = [
     filters.min_duration ?? 0,
     filters.max_duration ?? DURATION_MAX,
@@ -84,12 +107,10 @@ export default function FiltersScreen() {
     filters.min_age ?? 0,
     filters.max_age ?? AGE_MAX,
   ];
-  const soldOut = filters.soldout ?? false;
-  const startDate = filters.min_date ? new Date(filters.min_date) : undefined;
-  const endDate = filters.max_date ? new Date(filters.max_date) : undefined;
 
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+      {/* Header */}
       <View
         className="flex-row items-center justify-between px-5 py-4"
         style={{ borderBottomWidth: 1, borderBottomColor: AppColors.divider }}
@@ -144,38 +165,23 @@ export default function FiltersScreen() {
         contentContainerStyle={{ paddingTop: 20, paddingBottom: 32 }}
         keyboardShouldPersistTaps="handled"
       >
-        <CategoryPicker
-          label={t("filters.category")}
-          categoryLabels={categoryLabels}
-          activeIndex={categoryIdx}
-          onSelect={(idx) =>
-            setFilters({
-              ...filters,
-              category: categoryIdx === idx ? undefined : CATEGORY_KEYS[idx],
-            })
-          }
-        />
-
-        <View
-          className="my-5 h-px"
-          style={{ backgroundColor: AppColors.divider }}
-        />
-
         <SliderCard
-          label={t("filters.distance")}
-          valueLabel={distanceLabel(distanceKm)}
-          value={distanceKm}
+          label={t("filters.startTime")}
+          valueLabel={timeRangeLabel(startTimeRange[0], startTimeRange[1], t)}
+          value={startTimeRange}
           onValueChange={(val) =>
             setFilters({
               ...filters,
-              radius_km: val[0] < DISTANCE_MAX ? val[0] : undefined,
+              min_start_minutes: val[0] > 0 ? Math.round(val[0]) : undefined,
+              max_start_minutes:
+                val[1] < START_TIME_MAX ? Math.round(val[1]) : undefined,
             })
           }
           min={0}
-          max={DISTANCE_MAX}
-          step={5}
-          minLabel="0 km"
-          maxLabel={`${DISTANCE_MAX}+ km`}
+          max={START_TIME_MAX}
+          step={30}
+          minLabel="12:00 AM"
+          maxLabel="11:00 PM"
         />
 
         <View className="h-4" />
@@ -214,9 +220,9 @@ export default function FiltersScreen() {
           }
           min={0}
           max={PRICE_MAX}
-          step={100}
-          minLabel="฿0"
-          maxLabel={`฿${PRICE_MAX.toLocaleString()}+`}
+          step={5000}
+          minLabel="$0"
+          maxLabel={`$${PRICE_MAX / 100}+`}
         />
 
         <View className="h-4" />
@@ -244,33 +250,104 @@ export default function FiltersScreen() {
           style={{ backgroundColor: AppColors.divider }}
         />
 
-        <DateRangePicker
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(start, end) =>
-            setFilters({
-              ...filters,
-              min_date: start?.toISOString(),
-              max_date: end?.toISOString(),
-            })
-          }
-        />
+        {/* Class filter */}
+        <Text
+          style={{
+            fontFamily: FontFamilies.bold,
+            fontSize: FontSizes.lg,
+            color: AppColors.primaryText,
+            marginBottom: 12,
+          }}
+        >
+          {t("org.class")}
+        </Text>
 
-        <View
-          className="my-5 h-px"
-          style={{ backgroundColor: AppColors.divider }}
-        />
+        {/* All Classes option */}
+        <TouchableOpacity
+          onPress={() => setFilters({ ...filters, class_name: undefined })}
+          activeOpacity={0.7}
+          className="flex-row items-center justify-between py-3 border-b"
+          style={{ borderBottomColor: AppColors.divider }}
+        >
+          <Text
+            style={{
+              fontFamily: FontFamilies.regular,
+              fontSize: FontSizes.base,
+              color: AppColors.primaryText,
+            }}
+          >
+            {t("org.allClasses")}
+          </Text>
+          <View
+            className="w-6 h-6 rounded-full border-2 items-center justify-center"
+            style={{
+              borderColor: !filters.class_name
+                ? AppColors.primaryText
+                : AppColors.borderLight,
+            }}
+          >
+            {!filters.class_name && (
+              <View
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: AppColors.primaryText }}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
 
-        <SoldOutToggle
-          label={t("filters.showSoldOut")}
-          value={soldOut}
-          onToggle={() =>
-            setFilters({ ...filters, soldout: soldOut ? undefined : true })
-          }
-        />
+        {/* Individual class options */}
+        {classNames.map((name, idx) => (
+          <TouchableOpacity
+            key={name}
+            onPress={() =>
+              setFilters({
+                ...filters,
+                class_name: filters.class_name === name ? undefined : name,
+              })
+            }
+            activeOpacity={0.7}
+            className="flex-row items-center justify-between py-3"
+            style={
+              idx < classNames.length - 1
+                ? {
+                    borderBottomWidth: 1,
+                    borderBottomColor: AppColors.divider,
+                  }
+                : undefined
+            }
+          >
+            <Text
+              style={{
+                fontFamily: FontFamilies.regular,
+                fontSize: FontSizes.base,
+                color: AppColors.primaryText,
+                flex: 1,
+                marginRight: 12,
+              }}
+            >
+              {name}
+            </Text>
+            <View
+              className="w-6 h-6 rounded-full border-2 items-center justify-center"
+              style={{
+                borderColor:
+                  filters.class_name === name
+                    ? AppColors.primaryText
+                    : AppColors.borderLight,
+              }}
+            >
+              {filters.class_name === name && (
+                <View
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: AppColors.primaryText }}
+                />
+              )}
+            </View>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
 
-      {/* Search button */}
+      {/* Show results button */}
       <View
         className="px-5 pt-4"
         style={{
@@ -280,10 +357,7 @@ export default function FiltersScreen() {
         }}
       >
         <TouchableOpacity
-          onPress={() => {
-            setFilters({ ...filters, search: undefined });
-            router.push("/(app)/search");
-          }}
+          onPress={() => router.back()}
           className="rounded-2xl py-4 items-center"
           style={{ backgroundColor: AppColors.primaryText }}
           activeOpacity={0.8}
@@ -295,7 +369,7 @@ export default function FiltersScreen() {
               color: AppColors.white,
             }}
           >
-            {t("filters.search")}
+            {t("filters.showResults")}
           </Text>
         </TouchableOpacity>
       </View>

@@ -3,8 +3,11 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, Shadows } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
 import { Image, TouchableOpacity, View } from "react-native";
-import { type RegistrationCardProps, formatTime } from "@/components/RegistrationCard.types";
-import { ChildAvatarGroup } from "@/components/ChildAvatarGroup";
+import {
+  type RegistrationCardProps,
+  formatTime,
+} from "@/components/RegistrationCard.types";
+import { ChildAvatar } from "@/components/ChildAvatar";
 
 export function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
   const { t } = useTranslation();
@@ -44,7 +47,10 @@ export function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
               ? "0" + data.start_time.getDate().toString()
               : data.start_time.getDate().toString()}
           </ThemedText>
-          <ThemedText type="subtitle" className=" font-semibold tracking-widest ">
+          <ThemedText
+            type="subtitle"
+            className=" font-semibold tracking-widest "
+          >
             {data.start_time.toLocaleString("default", { month: "short" })}
           </ThemedText>
         </View>

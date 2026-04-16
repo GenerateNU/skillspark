@@ -14,9 +14,12 @@ import { extractResponseData, arrayToMap } from "@/utils/format";
 
 export function useActivityData() {
   const { guardianId } = useAuthContext();
-  const { data: registrationsResp } = useGetRegistrationsByGuardianId(guardianId!, {
-    query: { enabled: !!guardianId },
-  });
+  const { data: registrationsResp } = useGetRegistrationsByGuardianId(
+    guardianId!,
+    {
+      query: { enabled: !!guardianId },
+    },
+  );
   const registrations: Registration[] = useMemo(() => {
     const d = registrationsResp as unknown as
       | { data: { registrations: Registration[] } }
@@ -25,10 +28,17 @@ export function useActivityData() {
   }, [registrationsResp]);
 
   const { data: occurrencesResp } = useGetAllEventOccurrences({ limit: 100 });
-  const eventOccurrencesMap: Record<string, EventOccurrence> = useMemo(
-    () => arrayToMap(extractResponseData<EventOccurrence>(occurrencesResp)),
-    [occurrencesResp],
-  );
+  const eventOccurrencesMap: Record<string, EventOccurrence> = useMemo(() => {
+    const d = occurrencesResp as unknown as
+      | { data: EventOccurrence[] }
+      | undefined;
+    const list = Array.isArray(d?.data) ? d.data : [];
+    const map: Record<string, EventOccurrence> = {};
+    list.forEach((o) => {
+      map[o.id] = o;
+    });
+    return map;
+  }, [occurrencesResp]);
 
   const { data: childrenResp } = useGetChildrenByGuardianId(guardianId!, {
     query: { enabled: !!guardianId },
@@ -38,14 +48,26 @@ export function useActivityData() {
     [childrenResp],
   );
 
-  const childMap = useMemo(() => arrayToMap(children), [children]);
+  const childMap = useMemo(() => {
+    const map: Record<string, Child> = {};
+    children.forEach((c) => {
+      map[c.id] = c;
+    });
+    return map;
+  }, [children]);
 
-  const { data: guardianReviewsResp } = useGetReviewByGuardianId(guardianId!, undefined, {
-    query: { enabled: !!guardianId },
-  });
+  const { data: guardianReviewsResp } = useGetReviewByGuardianId(
+    guardianId!,
+    undefined,
+    {
+      query: { enabled: !!guardianId },
+    },
+  );
   const reviewedEventIds = useMemo(() => {
     const list =
-      guardianReviewsResp?.status === 200 ? (guardianReviewsResp.data as Review[]) : [];
+      guardianReviewsResp?.status === 200
+        ? (guardianReviewsResp.data as Review[])
+        : [];
     return new Set(list.map((r) => r.event_id));
   }, [guardianReviewsResp]);
 

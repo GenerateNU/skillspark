@@ -12,6 +12,7 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { NoProfilePic } from "@/components/NoProfilePic";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
+import LogoBgWrapper from "@/components/LogoBgWrapper";
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -43,100 +44,102 @@ export default function ProfileScreen() {
 
   return (
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-        className="pt-[10px]"
-        contentContainerStyle={{
-          paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
-        }}
-      >
-        <View className="items-center mb-5 mt-[5px]">
-          <View
-            className="w-[72px] h-[72px] rounded-full items-center justify-center mb-[10px] overflow-hidden"
-            style={{ backgroundColor: listBackgroundColor }}
-          >
-            {profilePic && (
-              <Image
-                source={{ uri: profilePic }}
-                style={{ width: "100%", height: "100%" }}
-                resizeMode="cover"
-              />
-            )}
-            {!profilePic && <NoProfilePic width={72} height={72} />}
-          </View>
-          <ThemedText className="text-xl leading-6 mb-[2px] text-center font-nunito-semibold">
-            {guardian?.name}
-          </ThemedText>
-          <ThemedText className="text-sm text-[#6B7280] leading-[18px] text-center mb-[2px] font-nunito">
-            @{guardian?.username}
-          </ThemedText>
-          <ThemedText className="text-sm text-[#6B7280] leading-[18px] text-center font-nunito">
-            {translate("profile.contact")}
-          </ThemedText>
-        </View>
-        <View className="px-5 mb-4">
-          <ThemedText className="text-base mb-2 font-nunito-semibold">
-            {translate("profile.family")}
-          </ThemedText>
-          <View className="flex-row flex-wrap justify-between gap-[10px]">
-            {children.length > 0 ? (
-              children.map((child: any) => (
-                <FamilyCard
-                  key={child.id}
-                  name={child.name}
-                  date={translate("profile.born", { year: child.birth_year })}
-                  avatarFace={child.avatar_face}
-                  avatarBackground={child.avatar_background}
+      <LogoBgWrapper>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          className="pt-[10px]"
+          contentContainerStyle={{
+            paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+          }}
+        >
+          <View className="items-center mb-5 mt-[5px]">
+            <View
+              className="w-[72px] h-[72px] rounded-full items-center justify-center mb-[10px] overflow-hidden"
+              style={{ backgroundColor: listBackgroundColor }}
+            >
+              {profilePic && (
+                <Image
+                  source={{ uri: profilePic }}
+                  style={{ width: "100%", height: "100%" }}
+                  resizeMode="cover"
                 />
-              ))
-            ) : (
-              <ThemedText className="text-[#999] p-2.5">
-                {translate("common.noChildrenFound")}
-              </ThemedText>
-            )}
+              )}
+              {!profilePic && <NoProfilePic width={72} height={72} />}
+            </View>
+            <ThemedText className="text-xl leading-6 mb-[2px] text-center font-nunito-semibold">
+              {guardian?.name}
+            </ThemedText>
+            <ThemedText className="text-sm text-[#6B7280] leading-[18px] text-center mb-[2px] font-nunito">
+              @{guardian?.username}
+            </ThemedText>
+            <ThemedText className="text-sm text-[#6B7280] leading-[18px] text-center font-nunito">
+              {translate("profile.contact")}
+            </ThemedText>
           </View>
-        </View>
-        <View className="px-5 mb-4">
-          <ThemedText className="text-base mb-2 font-nunito-semibold">
-            {translate("profile.myBookings")}
-          </ThemedText>
-          <View
-            className="rounded-xl overflow-hidden border"
-            style={{ backgroundColor: listBackgroundColor, borderColor }}
-          >
-            <ListItem
-              label={translate("profile.saved")}
-              isLast
-              onPress={() => router.push("/saved")}
-            />
+          <View className="px-5 mb-4">
+            <ThemedText className="text-base mb-2 font-nunito-semibold">
+              {translate("profile.family")}
+            </ThemedText>
+            <View className="flex-row flex-wrap justify-between gap-[10px]">
+              {children.length > 0 ? (
+                children.map((child: any) => (
+                  <FamilyCard
+                    key={child.id}
+                    name={child.name}
+                    date={translate("profile.born", { year: child.birth_year })}
+                    avatarFace={child.avatar_face}
+                    avatarBackground={child.avatar_background}
+                  />
+                ))
+              ) : (
+                <ThemedText className="text-[#999] p-2.5">
+                  {translate("common.noChildrenFound")}
+                </ThemedText>
+              )}
+            </View>
           </View>
-        </View>
-        <View className="px-5 mb-4">
-          <ThemedText className="text-base mb-2 font-nunito-semibold">
-            {translate("profile.preferences")}
-          </ThemedText>
-          <View
-            className="rounded-xl overflow-hidden border"
-            style={{ backgroundColor: listBackgroundColor, borderColor }}
-          >
-            <ListItem
-              label={translate("profile.payment")}
-              onPress={() => router.push("/payment")}
-            />
-            <ListItem
-              label={translate("profile.familyInformation")}
-              onPress={() => router.replace("/family")}
-            />
-            <ListItem
-              label={translate("profile.settings")}
-              isLast
-              onPress={() => router.push("/settings")}
-            />
+          <View className="px-5 mb-4">
+            <ThemedText className="text-base mb-2 font-nunito-semibold">
+              {translate("profile.myBookings")}
+            </ThemedText>
+            <View
+              className="rounded-xl overflow-hidden border"
+              style={{ backgroundColor: listBackgroundColor, borderColor }}
+            >
+              <ListItem
+                label={translate("profile.saved")}
+                isLast
+                onPress={() => router.push("/saved")}
+              />
+            </View>
           </View>
-        </View>
-        <View className="h-5" />
-      </ScrollView>
+          <View className="px-5 mb-4">
+            <ThemedText className="text-base mb-2 font-nunito-semibold">
+              {translate("profile.preferences")}
+            </ThemedText>
+            <View
+              className="rounded-xl overflow-hidden border"
+              style={{ backgroundColor: listBackgroundColor, borderColor }}
+            >
+              <ListItem
+                label={translate("profile.payment")}
+                onPress={() => router.push("/payment")}
+              />
+              <ListItem
+                label={translate("profile.familyInformation")}
+                onPress={() => router.replace("/family")}
+              />
+              <ListItem
+                label={translate("profile.settings")}
+                isLast
+                onPress={() => router.push("/settings")}
+              />
+            </View>
+          </View>
+          <View className="h-5" />
+        </ScrollView>
+      </LogoBgWrapper>
     </ThemedView>
   );
 }
