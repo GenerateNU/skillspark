@@ -46,6 +46,9 @@ export const AppColors = {
   imagePlaceholder: "#D9D9D9",
   ratingPill: "#E69BF040",
   cardOverlay: "rgba(0,0,0,0.42)",
+  violetPastel: "#DDD6FE",
+  bluePastel: "#D9E4F5",
+  slateBlue: "#8494C8",
 };
 
 /** Tag color palette shared across interest tag components */

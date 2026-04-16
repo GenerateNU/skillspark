@@ -325,6 +325,7 @@
     "learnMore": "เรียนรู้เพิ่มเติม",
     "reserve": "จอง",
     "ages": "อายุ {{min}} ปี",
+    "agesOpen": "อายุ {{min}}+ ปี",
     "agesRange": "อายุ {{min}} - {{max}} ปี",
     "classTime": "คลาส {{time}}"
   },

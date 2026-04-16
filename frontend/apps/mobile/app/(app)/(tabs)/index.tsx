@@ -17,10 +17,9 @@ import {
   type Guardian,
   type Registration,
   type Child,
-  getTrendingEventOccurrences,
   useGetTrendingEventOccurrences,
 } from "@skillspark/api-client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useDebounce } from "use-debounce";
@@ -32,8 +31,7 @@ import { CategoryCard } from "@/components/home/CategoryCard";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { TrendingCard } from "@/components/home/TrendingCard";
-
-import * as Location from "expo-location";
+import { useGeoLocation } from "@/hooks/use-geo-location";
 import CarouselCard from "@/components/home/CarouselCard";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
@@ -44,26 +42,11 @@ export default function HomeScreen() {
   const [_debouncedSearch] = useDebounce(searchText, 300);
   const { width, height } = useWindowDimensions();
 
-  const [geoLocationLat, setGeoLocationLat] = useState<string | undefined>(
-    "13.7563",
-  );
-  const [geoLocationLong, setGeoLocationLong] = useState<string | undefined>(
-    "100.5018",
-  );
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") return;
-      const loc = await Location.getCurrentPositionAsync({});
-      setGeoLocationLat(String(loc.coords.latitude));
-      setGeoLocationLong(String(loc.coords.longitude));
-    })();
-  }, []);
+  const { lat: geoLocationLat, lng: geoLocationLong } = useGeoLocation();
 
   const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({
-    lat: geoLocationLat,
-    lng: geoLocationLong,
+    lat: String(geoLocationLat),
+    lng: String(geoLocationLong),
     radius_km: 50,
     limit: 5,
   });
@@ -111,15 +94,13 @@ export default function HomeScreen() {
 
   const { data: trendingResp } = useGetTrendingEventOccurrences(
     {
-      lat: Number(geoLocationLat),
-      lng: Number(geoLocationLong),
+      lat: geoLocationLat,
+      lng: geoLocationLong,
       radius: 50,
       max_returns: 5,
     },
     {
-      query: {
-        enabled: !!geoLocationLat && !!geoLocationLong,
-      },
+      query: { enabled: true },
     },
   );
 
@@ -151,11 +132,13 @@ export default function HomeScreen() {
   const childRecommendations = useMemo(() => {
     const shuffled = [...futureOccurrences].sort(() => Math.random() - 0.5);
     return children
-      .map((child, i) => ({
-        child,
-        occurrence: shuffled[i % shuffled.length],
-      }))
-      .filter((r) => r.occurrence != null);
+      .map((child, i) => {
+        const start = i * 3;
+        const slice = shuffled.slice(start, start + 3);
+        const occurrences = slice.length > 0 ? slice : shuffled.slice(0, 3);
+        return { child, occurrences };
+      })
+      .filter((r) => r.occurrences.length > 0);
   }, [children, futureOccurrences]);
 
   const categories = useMemo(() => {
@@ -323,19 +306,15 @@ export default function HomeScreen() {
           >
             Recommended for...
           </Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20 }}
-          >
-            {childRecommendations.map(({ child, occurrence }) => (
+          <View>
+            {childRecommendations.map(({ child, occurrences }) => (
               <RecommendedCard
                 key={child.id}
-                occurrence={occurrence}
-                childName={child.name.split(" ")[0]}
+                child={child}
+                occurrences={occurrences}
               />
             ))}
-          </ScrollView>
+          </View>
         </View>
       )}
 

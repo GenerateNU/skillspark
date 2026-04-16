@@ -68,8 +68,9 @@ export function formatPrice(cents: number, currency: string): string {
   return `$${amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2)}`;
 }
 
-export function formatAgeRange(min: number, max: number): string {
+export function formatAgeRange(min: number | null | undefined, max: number | null | undefined): string {
   if (!min && !max) return "";
+  if (!max) return i18n.t("occurrence.agesOpen", { min });
   if (min === max) return i18n.t("occurrence.ages", { min });
   return i18n.t("occurrence.agesRange", { min, max });
 }

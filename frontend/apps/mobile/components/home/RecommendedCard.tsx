@@ -1,9 +1,8 @@
 import { Image, View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import { SvgXml } from "react-native-svg";
 import { type Child, type EventOccurrence } from "@skillspark/api-client";
-import { GLASSES_FACE_SVG, getSvgWithColor } from "@/constants/avatarFaces";
-import { DEFAULT_AVATAR_COLOR } from "@/constants/avatarColors";
+import { ChildAvatar } from "@/components/ChildAvatar";
+import { AppColors } from "@/constants/theme";
 
 export function RecommendedCard({
   child,
@@ -14,7 +13,6 @@ export function RecommendedCard({
 }) {
   const router = useRouter();
   const firstName = child.name.split(" ")[0];
-  const bgColor = child.avatar_background ?? DEFAULT_AVATAR_COLOR;
   const titles = occurrences.map((o) => o.event.title);
   const summaryText =
     titles.length > 2
@@ -34,21 +32,23 @@ export function RecommendedCard({
       className="mx-5 mb-3 rounded-2xl p-4 flex-row bg-white shadow-sm"
     >
       <View className="flex-1 pr-3">
-        <Text className="mb-2 font-nunito-bold text-xl text-[#111]">
+        <Text className="mb-2 font-nunito-bold text-xl" style={{ color: AppColors.primaryText }}>
           {firstName}
         </Text>
-        <SvgXml
-          xml={getSvgWithColor(GLASSES_FACE_SVG, bgColor)}
-          width={38}
-          height={38}
+        <ChildAvatar
+          name={child.name}
+          avatarFace={child.avatar_face}
+          avatarBackground={child.avatar_background}
+          size={38}
         />
-        <Text className="mt-2 font-nunito text-[12px] text-[#6B7280]">
+        <Text className="mt-2 font-nunito text-[12px]" style={{ color: AppColors.mutedText }}>
           {summaryText}
         </Text>
       </View>
       <View className="w-[160px] h-[130px]">
         <View
-          className="absolute top-[30px] left-[60px] w-[95px] h-[95px] rounded-xl bg-[#DDD6FE] rotate-[35deg]"
+          className="absolute top-[30px] left-[60px] w-[95px] h-[95px] rounded-xl rotate-[35deg]"
+          style={{ backgroundColor: AppColors.violetPastel }}
         />
         <View
           className="absolute top-[15px] left-[40px] w-[100px] h-[100px] rounded-xl overflow-hidden rotate-[20deg]"
@@ -60,7 +60,7 @@ export function RecommendedCard({
               resizeMode="cover"
             />
           ) : (
-            <View className="w-full h-full bg-[#D9D9D9]" />
+            <View className="w-full h-full" style={{ backgroundColor: AppColors.imagePlaceholder }} />
           )}
         </View>
         {img0 && (
@@ -74,7 +74,7 @@ export function RecommendedCard({
                 resizeMode="cover"
               />
             ) : (
-              <View className="w-full h-full bg-[#D9D9D9]" />
+              <View className="w-full h-full" style={{ backgroundColor: AppColors.imagePlaceholder }} />
             )}
           </View>
         )}

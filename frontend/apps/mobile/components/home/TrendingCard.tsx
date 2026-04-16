@@ -1,12 +1,41 @@
 import { Image } from "expo-image";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Image as RNImage } from "react-native";
 import { useRouter } from "expo-router";
 import { type EventOccurrence } from "@skillspark/api-client";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
-import { StarRating } from "@/components/StarRating";
+import { RATING_OPTIONS } from "@/constants/ratings";
 
-export function TrendingCard({ occurrence }: { occurrence: EventOccurrence }) {
+function haversineKm(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+const noReviewImage = RATING_OPTIONS.find((r) => r.rating === null)!.image;
+
+export function TrendingCard({
+  occurrence,
+  userLat,
+  userLng,
+  width = 300,
+}: {
+  occurrence: EventOccurrence;
+  userLat?: number;
+  userLng?: number;
+  width?: number | "100%";
+}) {
   const router = useRouter();
+
   const ageLabel =
     occurrence.event.age_range_min != null
       ? `Ages ${occurrence.event.age_range_min}${
@@ -15,60 +44,109 @@ export function TrendingCard({ occurrence }: { occurrence: EventOccurrence }) {
             : "+"
         }`
       : null;
+
+  const distance =
+    userLat != null &&
+    userLng != null &&
+    occurrence.location?.latitude != null &&
+    occurrence.location?.longitude != null
+      ? haversineKm(
+          userLat,
+          userLng,
+          occurrence.location.latitude,
+          occurrence.location.longitude,
+        )
+      : null;
+
   return (
-    <View className="mr-[14px] pb-2">
-      {/* Card */}
+    <View style={{ marginRight: width === "100%" ? 0 : 14, paddingBottom: 8 }}>
       <Pressable
         onPress={() => router.push(`/event/${occurrence.event.id}`)}
-        className="w-[218px] h-[121px] rounded-[12px] border flex-row items-center py-[6px] px-2 gap-2"
         style={{
+          width,
+          height: 140,
+          flexDirection: "row",
           backgroundColor: AppColors.white,
+          borderRadius: 16,
+          borderWidth: 1,
           borderColor: AppColors.savedBackground,
+          overflow: "hidden",
           shadowColor: "#000",
-          shadowOpacity: 0.1,
-          shadowRadius: 3,
-          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.08,
+          shadowRadius: 4,
+          shadowOffset: { width: 0, height: 2 },
           elevation: 2,
         }}
       >
         {/* Image */}
-        <View className="w-[88px] h-[88px] rounded-[12px] overflow-hidden shrink-0">
-          {occurrence.event.presigned_url ? (
-            <Image
-              source={{ uri: occurrence.event.presigned_url }}
-              style={{ width: "100%", height: "100%" }}
-              contentFit="cover"
-            />
-          ) : (
-            <View
-              className="w-[88px] h-[88px]"
-              style={{ backgroundColor: AppColors.divider }}
-            />
-          )}
-        </View>
+        {occurrence.event.presigned_url ? (
+          <Image
+            source={{ uri: occurrence.event.presigned_url }}
+            style={{ width: 110, height: 140 }}
+            contentFit="cover"
+          />
+        ) : (
+          <View
+            style={{
+              width: 110,
+              height: 140,
+              backgroundColor: AppColors.divider,
+            }}
+          />
+        )}
 
-        {/* Text */}
-        <View className="flex-1 gap-1">
+        {/* Content */}
+        <View
+          style={{ flex: 1, padding: 12, justifyContent: "center", gap: 4 }}
+        >
           <Text
             style={{
               fontFamily: FontFamilies.bold,
-              fontSize: FontSizes.base,
+              fontSize: 16,
               color: AppColors.primaryText,
             }}
             numberOfLines={2}
           >
             {occurrence.event.title}
           </Text>
-          <StarRating size={12} rating={0} />
+
+          {/* Smiley rating */}
+          <View
+            style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+          >
+            <RNImage source={noReviewImage} style={{ width: 18, height: 18 }} />
+            <Text
+              style={{
+                fontFamily: FontFamilies.regular,
+                fontSize: FontSizes.sm,
+                color: AppColors.mutedText,
+              }}
+            >
+              No reviews yet
+            </Text>
+          </View>
+
           {ageLabel && (
             <Text
               style={{
+                fontFamily: FontFamilies.regular,
                 fontSize: FontSizes.sm,
                 color: AppColors.mutedText,
-                fontFamily: FontFamilies.regular,
               }}
             >
               {ageLabel}
+            </Text>
+          )}
+
+          {distance != null && (
+            <Text
+              style={{
+                fontFamily: FontFamilies.regular,
+                fontSize: FontSizes.sm,
+                color: AppColors.mutedText,
+              }}
+            >
+              {distance.toFixed(1)} km away
             </Text>
           )}
         </View>

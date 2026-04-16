@@ -326,6 +326,7 @@
     "learnMore": "Learn more",
     "reserve": "Reserve",
     "ages": "Ages {{min}}",
+    "agesOpen": "Ages {{min}}+",
     "agesRange": "Ages {{min}} - {{max}}",
     "classTime": "{{time}} Class"
   },
