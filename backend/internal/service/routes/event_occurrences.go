@@ -92,12 +92,24 @@ func mapToDBFilters(input *models.GetAllEventOccurrencesInput) models.GetAllEven
 		filters.MaxAge = &input.MaxAge
 	}
 
+	if input.Category != "" {
+		filters.Category = &input.Category
+	}
+
+	if input.SoldOut {
+		filters.SoldOut = &input.SoldOut
+	}
+
 	if !input.MinDate.IsZero() {
 		filters.MinDate = &input.MinDate
 	}
 
 	if !input.MaxDate.IsZero() {
 		filters.MaxDate = &input.MaxDate
+	}
+
+	if input.Category != "" {
+		filters.Category = &input.Category
 	}
 
 	return filters
@@ -129,6 +141,24 @@ func SetupEventOccurrencesRoutes(api huma.API, repo *storage.Repository, s3Clien
 		}
 
 		return &models.GetAllEventOccurrencesOutput{
+			Body: eventOccurrences,
+		}, nil
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-trending-event-occurrences",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/trending/event-occurrences",
+		Summary:     "Get the top 5 trending event occurrences",
+		Description: "Returns a list of trending event occurrences in the user's location",
+		Tags:        []string{"Event Occurrences"},
+	}, func(ctx context.Context, input *models.GetTrendingEventOccurrencesInput) (*models.GetTrendingEventOccurrencesOutput, error) {
+		eventOccurrences, err := eventOccurrenceHandler.GetTrendingEventOccurrences(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetTrendingEventOccurrencesOutput{
 			Body: eventOccurrences,
 		}, nil
 	})

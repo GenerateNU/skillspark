@@ -2,7 +2,14 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { router } from "expo-router";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import {
+  BlurEvent,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TextInputChangeEvent,
+  View,
+} from "react-native";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { Controller, useForm } from "react-hook-form";
 import { ErrorMessage } from "@/components/ErrorMessage";
@@ -22,8 +29,16 @@ type SignupFormData = {
 
 export default function SignupScreen() {
   const [errorText, setErrorText] = useState("");
-  const { signup } = useAuthContext();
-  const { control, handleSubmit } = useForm<SignupFormData>({
+  const [cannotSubmit, setCannotSubmit] = useState(false);
+  const { signup, usernameExists } = useAuthContext();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+    setError,
+    clearErrors,
+  } = useForm<SignupFormData>({
     defaultValues: {
       name: "",
       email: "",
@@ -56,6 +71,27 @@ export default function SignupScreen() {
     }
   };
 
+  const onClickOut = async () => {
+    let username = getValues("username");
+    if (!username) {
+      setCannotSubmit(false);
+      setErrorText("");
+      return;
+    }
+    const result = await usernameExists(username, setErrorText);
+    if (!result) {
+      setError("username", {
+        type: "manual",
+        message: "Username is taken.",
+      });
+      setCannotSubmit(true);
+    } else {
+      clearErrors("username");
+      setErrorText("");
+      setCannotSubmit(false);
+    }
+  };
+
   const handleGoToLogIn = () => {
     router.push("/(auth)/login");
   };
@@ -77,12 +113,14 @@ export default function SignupScreen() {
             <AuthFormInput
               control={control}
               name="name"
+              error={errors.name}
               placeholder="Full Name"
               autoCapitalize="none"
             />
             <AuthFormInput
               control={control}
               name="email"
+              error={errors.email}
               placeholder="Email"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -90,12 +128,15 @@ export default function SignupScreen() {
             <AuthFormInput
               control={control}
               name="username"
+              error={errors.username}
               placeholder="Username"
               autoCapitalize="none"
+              onBlur={(e) => onClickOut()}
             />
             <AuthFormInput
               control={control}
               name="password"
+              error={errors.password}
               placeholder="Password"
               secureTextEntry={true}
             />
@@ -114,7 +155,11 @@ export default function SignupScreen() {
                 />
               )}
             />
-            <Button label="Sign Up" onPress={handleSubmit(onSubmit)} />
+            <Button
+              label="Sign Up"
+              onPress={handleSubmit(onSubmit)}
+              disabled={cannotSubmit}
+            />
             <PageRedirectButton
               label="Already have an account? Log in"
               onPress={handleGoToLogIn}

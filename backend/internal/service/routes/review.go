@@ -25,18 +25,9 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		Tags:        []string{"Review"},
 	}, func(ctx context.Context, input *models.GetReviewsByGuardianIDInput) (*models.ReviewsOutput, error) {
 
-		page := input.Page
-		if page == 0 {
-			page = 1
-		}
-		limit := input.PageSize
-		if limit == 0 {
-			limit = 10
-		}
-
 		pagination := utils.Pagination{
-			Page:  page,
-			Limit: limit,
+			Page:  input.Page,
+			Limit: input.PageSize,
 		}
 
 		reviews, err := reviewHandler.GetReviewsByGuardianID(ctx, input.ID, input.AcceptLanguage, pagination)
@@ -58,21 +49,12 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		Tags:        []string{"Review"},
 	}, func(ctx context.Context, input *models.GetReviewsByEventIDInput) (*models.ReviewsOutput, error) {
 
-		page := input.Page
-		if page == 0 {
-			page = 1
-		}
-		limit := input.PageSize
-		if limit == 0 {
-			limit = 10
-		}
-
 		pagination := utils.Pagination{
-			Page:  page,
-			Limit: limit,
+			Page:  input.Page,
+			Limit: input.PageSize,
 		}
 
-		reviews, err := reviewHandler.GetReviewsByEventID(ctx, input.ID, input.AcceptLanguage, pagination)
+		reviews, err := reviewHandler.GetReviewsByEventID(ctx, input.ID, input.AcceptLanguage, pagination, input.SortBy)
 		if err != nil {
 			return nil, err
 		}
@@ -91,18 +73,9 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 		Tags:        []string{"Review"},
 	}, func(ctx context.Context, input *models.GetReviewsByOrganizationIDInput) (*models.ReviewsOutput, error) {
 
-		page := input.Page
-		if page == 0 {
-			page = 1
-		}
-		limit := input.PageSize
-		if limit == 0 {
-			limit = 10
-		}
-
 		pagination := utils.Pagination{
-			Page:  page,
-			Limit: limit,
+			Page:  input.Page,
+			Limit: input.PageSize,
 		}
 
 		reviews, err := reviewHandler.GetReviewsByOrganizationID(ctx, input.ID, input.AcceptLanguage, pagination)
@@ -195,6 +168,36 @@ func SetUpReviewRoutes(api huma.API, repo *storage.Repository, translateClient t
 
 		return &models.ReviewsAggregateOutput{
 			Body: *aggregate,
+		}, nil
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-event-reviews-for-organization",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/organization/event-reviews/{id}",
+		Summary:     "Get event review aggregates for an organization",
+		Description: "Returns review aggregates (total reviews + average rating) for all events in an organization",
+		Tags:        []string{"Review"},
+	}, func(ctx context.Context, input *models.GetEventReviewsForOrganizationInput) (*models.GetEventReviewsForOrganizationOutput, error) {
+
+		pagination := utils.Pagination{
+			Page:  input.Page,
+			Limit: input.PageSize,
+		}
+
+		result, err := reviewHandler.GetEventReviewsForOrganization(
+			ctx,
+			input.ID,
+			pagination,
+			input.AcceptLanguage,
+			input.SortBy,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetEventReviewsForOrganizationOutput{
+			Body: result,
 		}, nil
 	})
 

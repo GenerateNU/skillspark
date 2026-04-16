@@ -1253,6 +1253,74 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/organization/event-reviews/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get event review aggregates for an organization
+      description: Returns review aggregates (total reviews + average rating) for all events in an organization
+      operationId: get-event-reviews-for-organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: page_size
+          in: query
+          description: Number of items per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of items per page
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: sort_by
+          in: query
+          explode: false
+          schema:
+            type: string
+            default: most_rated
+            enum:
+              - most_rated
+              - highest
+              - lowest
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of review aggregates
+                items:
+                  $ref: '#/components/schemas/SimpleReviewAggregate'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/organizations:
     get:
       tags:
@@ -2004,6 +2072,18 @@ paths:
             default: 10
             minimum: 1
             maximum: 100
+        - name: sort_by
+          in: query
+          description: Sort order for reviews
+          explode: false
+          schema:
+            type: string
+            description: Sort order for reviews
+            default: most_recent
+            enum:
+              - most_recent
+              - highest
+              - lowest
       responses:
         "200":
           description: OK
@@ -2472,6 +2552,28 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/stripe/detach:
+    delete:
+      tags:
+        - Payments
+      summary: Detach a payment method from a guardian
+      description: Detaches a Stripe payment method from a guardian's customer account
+      operationId: detach-guardian-payment-method
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DetachPaymentMethodInputBody'
+        required: true
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/stripe/login/{organization_id}:
     post:
       tags:
@@ -2591,6 +2693,102 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/trending/event-occurrences:
+    get:
+      tags:
+        - Event Occurrences
+      summary: Get the top 5 trending event occurrences
+      description: Returns a list of trending event occurrences in the user's location
+      operationId: get-trending-event-occurrences
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: lat
+          in: query
+          description: The user's latitude
+          required: true
+          explode: false
+          schema:
+            type: number
+            description: The user's latitude
+            format: double
+        - name: lng
+          in: query
+          description: The user's longitude
+          required: true
+          explode: false
+          schema:
+            type: number
+            description: The user's longitude
+            format: double
+        - name: max_returns
+          in: query
+          description: the maximum number of returns
+          explode: false
+          schema:
+            type: integer
+            description: the maximum number of returns
+            format: int64
+            default: 5
+            minimum: 1
+        - name: radius
+          in: query
+          description: the distance away from the user a returned event can be in km
+          explode: false
+          schema:
+            type: integer
+            description: the distance away from the user a returned event can be in km
+            format: int64
+            default: 50
+            minimum: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of trending in the user's area
+                items:
+                  $ref: '#/components/schemas/EventOccurrence'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/user/{username}:
+    get:
+      tags:
+        - User
+      summary: Check if a username exists
+      description: Returns whether a user with the given username exists
+      operationId: username-exists
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsernameExistsOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
 components:
   schemas:
     AttachPaymentMethodInputBody:
@@ -2679,6 +2877,10 @@ components:
           examples:
             - http://localhost:8080/schemas/Child.json
           readOnly: true
+        avatar_background:
+          type: string
+        avatar_face:
+          type: string
         birth_month:
           type: integer
           format: int64
@@ -2714,6 +2916,8 @@ components:
         - birth_year
         - interests
         - guardian_id
+        - avatar_face
+        - avatar_background
         - created_at
         - updated_at
     CreateChildInputBody:
@@ -2727,6 +2931,12 @@ components:
           examples:
             - http://localhost:8080/schemas/CreateChildInputBody.json
           readOnly: true
+        avatar_background:
+          type: string
+          description: Background color hex for the child's avatar
+        avatar_face:
+          type: string
+          description: Avatar face identifier for the child's profile picture
         birth_month:
           type: integer
           description: Birth month of the child
@@ -3140,6 +3350,26 @@ components:
           description: Success message
       required:
         - message
+    DetachPaymentMethodInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/DetachPaymentMethodInputBody.json
+          readOnly: true
+        guardian_id:
+          type: string
+          description: Guardian ID
+        payment_method_id:
+          type: string
+          description: Payment Method ID
+      required:
+        - payment_method_id
+        - guardian_id
     EmergencyContact:
       type: object
       additionalProperties: false
@@ -3480,6 +3710,8 @@ components:
           format: date-time
         email:
           type: string
+        email_notifications:
+          type: boolean
         expo_push_token:
           type: string
         id:
@@ -3490,6 +3722,8 @@ components:
           type: string
         profile_picture_s3_key:
           type: string
+        push_notifications:
+          type: boolean
         stripe_customer_id:
           type: string
         updated_at:
@@ -3509,6 +3743,8 @@ components:
         - language_preference
         - auth_id
         - expo_push_token
+        - push_notifications
+        - email_notifications
         - created_at
         - updated_at
     GuardianLoginOutputBody:
@@ -3815,6 +4051,24 @@ components:
       required:
         - href
         - label
+    OrgReviewSummary:
+      type: object
+      additionalProperties: false
+      properties:
+        average_rating:
+          type: number
+          format: double
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewRatingCount'
+        total_reviews:
+          type: integer
+          format: int64
+      required:
+        - total_reviews
+        - average_rating
+        - breakdown
     Organization:
       type: object
       additionalProperties: false
@@ -3847,6 +4101,8 @@ components:
           type: string
         presigned_url:
           type: string
+        review_summary:
+          $ref: '#/components/schemas/OrgReviewSummary'
         stripe_account_activated:
           type: boolean
           default: false
@@ -3860,10 +4116,8 @@ components:
         - name
         - active
         - links
-        - presigned_url
         - created_at
         - updated_at
-        - stripe_account_id
         - stripe_account_activated
     PatchManagerInputBody:
       type: object
@@ -4181,6 +4435,25 @@ components:
         - location_id
         - created_at
         - updated_at
+    SimpleReviewAggregate:
+      type: object
+      additionalProperties: false
+      properties:
+        average_rating:
+          type: number
+          format: double
+        event:
+          $ref: '#/components/schemas/Event'
+        event_id:
+          type: string
+        total_reviews:
+          type: integer
+          format: int64
+      required:
+        - event_id
+        - total_reviews
+        - average_rating
+        - event
     UpdateChildInputBody:
       type: object
       additionalProperties: false
@@ -4192,6 +4465,12 @@ components:
           examples:
             - http://localhost:8080/schemas/UpdateChildInputBody.json
           readOnly: true
+        avatar_background:
+          type: string
+          description: Background color hex for the child's avatar
+        avatar_face:
+          type: string
+          description: Avatar face identifier for the child's profile picture
         birth_month:
           type: integer
           description: Birth month of the child
@@ -4307,6 +4586,9 @@ components:
         email:
           type: string
           description: Email of the guardian
+        email_notifications:
+          type: boolean
+          description: Global email notification settings
         expo_push_token:
           type: string
           description: Expo push notification token
@@ -4319,6 +4601,9 @@ components:
         profile_picture_s3_key:
           type: string
           description: S3 key for profile picture
+        push_notifications:
+          type: boolean
+          description: Global push notification settings
         username:
           type: string
           description: Username of the guardian
@@ -4372,3 +4657,18 @@ components:
           description: New payment intent status from Stripe
       required:
         - payment_intent_status
+    UsernameExistsOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/UsernameExistsOutputBody.json
+          readOnly: true
+        exists:
+          type: boolean
+      required:
+        - exists

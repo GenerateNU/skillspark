@@ -11,23 +11,23 @@ import SignUp from "./signup/signup.tsx";
 import ProtectedRoute from "./protected-route.tsx";
 
 createRoot(document.getElementById("root")!).render(
-	<QueryClientProvider client={queryClient}>
-		<BrowserRouter>
-			<AuthProvider>
-				<Routes>
-					<Route path="/login" element={<Login />} />
-					<Route path="/signup" element={<SignUp />} />
-					<Route
-						path="/"
-						element={
-							<ProtectedRoute>
-								<App />
-							</ProtectedRoute>
-						}
-					/>
-					<Route path="/admin/*" element={<Admin />} />
-				</Routes>
-			</AuthProvider>
-		</BrowserRouter>
-	</QueryClientProvider>,
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <App />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/admin/*" element={<Admin />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  </QueryClientProvider>,
 );

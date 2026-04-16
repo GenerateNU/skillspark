@@ -133,6 +133,7 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	routes.SetupAuthRoutes(humaAPI, repo, config)
 	routes.SetupOrganizationRoutes(humaAPI, repo, s3Client)
 	routes.SetupManagerRoutes(humaAPI, repo, config)
+	routes.SetupUserRoutes(humaAPI, repo)
 
 	// Apply auth middleware — only affects routes registered after this point
 	if !config.TestMode {
@@ -155,6 +156,7 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	routes.SetupWebhookRoutes(app, repo,
 		os.Getenv("STRIPE_WEBHOOK_SECRET"),
 		os.Getenv("STRIPE_ACCOUNT_WEBHOOK_SECRET"),
+		newStripeClient,
 	)
 
 	return app, humaAPI, nil

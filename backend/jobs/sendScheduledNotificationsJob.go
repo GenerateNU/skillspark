@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"log"
 	"log/slog"
 	"skillspark/internal/models"
@@ -31,8 +32,50 @@ func (j *JobScheduler) SendScheduledNotificationsJob() {
 
 	slog.Info("Found pending notifications", "count", len(notifications))
 
+	// Collect unique guardian IDs from notifications that have one
+	seen := make(map[uuid.UUID]bool)
+	guardianIDs := make([]uuid.UUID, 0)
+	for _, n := range notifications {
+		if n.GuardianID != nil && !seen[*n.GuardianID] {
+			guardianIDs = append(guardianIDs, *n.GuardianID)
+			seen[*n.GuardianID] = true
+		}
+	}
+
+	// Bulk-fetch notification preferences for all relevant guardians
+	var guardianPrefs map[uuid.UUID]models.GuardianNotificationPreferences
+	if len(guardianIDs) > 0 {
+		guardianPrefs, err = j.repo.Guardian.GetGuardianNotificationPreferences(ctx, guardianIDs)
+		if err != nil {
+			slog.Error("Failed to get guardian notification preferences", "error", err)
+			return
+		}
+	}
+
 	// Process each notification
 	for _, notification := range notifications {
+		// Check guardian's notification preferences before sending
+		if notification.GuardianID != nil {
+			if prefs, ok := guardianPrefs[*notification.GuardianID]; ok {
+				if notification.NotificationType == models.NotificationTypeEmail && !prefs.EmailNotifications {
+					slog.Info("Skipping notification: guardian has email notifications disabled", "id", notification.ID, "guardian_id", *notification.GuardianID)
+					_, updateErr := j.repo.Notification.UpdateNotificationStatus(ctx, notification.ID, models.NotificationStatusSent)
+					if updateErr != nil {
+						slog.Error("Failed to update skipped notification status", "id", notification.ID, "error", updateErr)
+					}
+					continue
+				}
+				if notification.NotificationType == models.NotificationTypePush && !prefs.PushNotifications {
+					slog.Info("Skipping notification: guardian has push notifications disabled", "id", notification.ID, "guardian_id", *notification.GuardianID)
+					_, updateErr := j.repo.Notification.UpdateNotificationStatus(ctx, notification.ID, models.NotificationStatusSent)
+					if updateErr != nil {
+						slog.Error("Failed to update skipped notification status", "id", notification.ID, "error", updateErr)
+					}
+					continue
+				}
+			}
+		}
+
 		if err := j.processNotification(ctx, notification); err != nil {
 			slog.Error("Failed to process notification", "id", notification.ID, "error", err)
 			// Update status to failed
