@@ -138,6 +138,7 @@ func TestGetReviewsByEventID(t *testing.T) {
 			eventID,       // uuid
 			"en-US",       // AcceptLanguage
 			mock.Anything, // utils.Pagination
+			"most_recent",
 		).
 		Return([]models.Review{}, nil)
 

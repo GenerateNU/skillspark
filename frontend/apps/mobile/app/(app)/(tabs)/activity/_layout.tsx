@@ -1,9 +1,9 @@
 import { Stack } from "expo-router";
 
-export default function EventLayout() {
+export default function ActivityLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="[id]" />
+      <Stack.Screen name="index" />
     </Stack>
   );
 }

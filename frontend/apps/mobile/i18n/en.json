@@ -10,7 +10,9 @@
   "common": {
     "submit": "Submit",
     "cancel": "Cancel",
+    "close": "Close",
     "loading": "Loading...",
+    "saving": "Saving...",
     "loadingMapData": "Loading Map Data...",
     "loadingEvents": "Loading events...",
     "errorLoadingEvents": "Error loading events",
@@ -42,6 +44,7 @@
     "upcomingEvents": "upcoming events",
     "learnMore": "Learn More",
     "reserved": "Reserved",
+    "learnMore": "Learn More",
     "members": "members",
     "categories": {
       "technology": "technology",
@@ -74,7 +77,9 @@
     "termsAndConditions": "Terms and Conditions",
     "privacyPolicy": "Privacy Policy",
     "logOut": "Log Out",
-    "deleteAccount": "Delete Account"
+    "deleteAccount": "Delete Account",
+    "pushNotifications": "Push Notifications",
+    "emailNotifications": "Email Notifications"
   },
   "privacyPolicy": {
     "lastUpdated": "Last Updated: April 4, 2026",
@@ -127,9 +132,18 @@
     "title": "Payment",
     "manageBilling": "Manage Billing",
     "creditCard": "Credit Card",
+    "expires": "Expires",
     "name": "Name",
+    "save": "Save",
+    "noCard": "No Card Registered",
     "updateBilling": "Update Billing",
-    "delete": "Delete"
+    "delete": "Delete",
+    "deleteModal": {
+      "title": "Delete?",
+      "description": "Are you sure you want to delete this payment method?",
+      "confirm": "Confirm",
+      "deleting": "Deleting..."
+    }
   },
   "familyInformation": {
     "title": "Family Information",
@@ -180,6 +194,7 @@
     "writeReview": "Write a review",
     "firstReview": "Be the first to review!",
     "mostRecent": "Most recent",
+    "mostRated": "Most Rated",
     "highest": "Highest",
     "lowest": "Lowest",
     "reviews": "reviews",
@@ -242,7 +257,14 @@
     "notFound": "Event not found",
     "minWalk": "min",
     "hr": "hr",
-    "min": "min"
+    "min": "min",
+    "bookingsThisWeek": "Bookings this week",
+    "about": "About",
+    "reviews": "Reviews",
+    "more": "more",
+    "noReviews": "No reviews yet.",
+    "seeMoreReviews": "See more reviews",
+    "reserve": "Reserve"
   },
   "emergencyContact": {
     "manageTitle": "Manage Emergency Contact",
@@ -272,9 +294,13 @@
     "about": "About",
     "noDescription": "No description available.",
     "seeSchedule": "See Schedule",
+    "schedule": "Classes",
+    "class": "Class",
+    "noSchedule": "No upcoming classes for this organization.",
     "notFound": "Organization not found.",
     "bookingsThisWeek": "Bookings this week",
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "allClasses": "All Classes"
   },
   "interests": {
     "science": "Science",
@@ -286,6 +312,107 @@
     "language": "Language",
     "other": "Other"
   },
+  "filters": {
+    "title": "Filters",
+    "back": "Back",
+    "reset": "Reset",
+    "search": "Search",
+    "category": "Category",
+    "distance": "Distance",
+    "duration": "Duration",
+    "price": "Price",
+    "ageRange": "Age Range",
+    "showSoldOut": "Show sold out",
+    "any": "Any",
+    "upTo": "Up to {{value}}",
+    "orMore": "{{value}} +",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "categories": [
+      "Science",
+      "Math",
+      "Music",
+      "Art",
+      "Sports",
+      "Technology",
+      "Language",
+      "Other",
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "Astronomy",
+      "Earth Science",
+      "Data Science",
+      "Robotics",
+      "Engineering",
+      "Statistics",
+      "Coding",
+      "Painting",
+      "Drawing",
+      "Sculpture",
+      "Photography",
+      "Filmmaking",
+      "Graphic Design",
+      "Fashion",
+      "Crafts",
+      "Creative Writing",
+      "Instrumental Music",
+      "Vocal Music",
+      "Theater",
+      "Acting",
+      "Dance",
+      "Improv",
+      "Soccer",
+      "Basketball",
+      "Tennis",
+      "Swimming",
+      "Martial Arts",
+      "Yoga",
+      "Fitness",
+      "Running",
+      "Hiking",
+      "Cycling",
+      "Language Learning",
+      "Linguistics",
+      "History"
+    ]
+  },
+  "calendar": {
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "days": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+    "clearDates": "Clear dates",
+    "any": "Any",
+    "from": "From {{date}}"
+  },
+  "activity": {
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "noUpcomingRegistrations": "No upcoming registrations.",
+    "noPastRegistrations": "No past registrations.",
+    "filterByChild": "Filter by child",
+    "reset": "Reset",
+    "apply": "Apply",
+    "cancelTitle": "Cancel Registration",
+    "cancelSubtitle": "Select which children to remove from this event.",
+    "keep": "Keep",
+    "remove": "Remove",
+    "reviewed": "Reviewed!",
+    "review": "Review",
+    "payment": "Payment: {{price}}"
+  },
   "editProfile": {
     "title": "Family Information",
     "subtitle": "Edit Profile",
@@ -293,5 +420,23 @@
     "username": "Username",
     "changeImage": "Change Image",
     "saveChanges": "Save Changes"
+  },
+  "occurrence": {
+    "smiles": "/ 5 Smiles",
+    "learnMore": "Learn more",
+    "reserve": "Reserve",
+    "ages": "Ages {{min}}",
+    "agesRange": "Ages {{min}} - {{max}}",
+    "classTime": "{{time}} Class"
+  },
+  "reservation": {
+    "paymentFailed": "Payment failed. Please try again or contact support.",
+    "completed": "Completed",
+    "selectChildLabel": "Select Child",
+    "noChildren": "No children found.",
+    "termsNote": "By clicking 'Pay Now', you authorize Skill Spark to charge your card for the total amount, plus applicable fees.",
+    "terms": "Terms & Conditions",
+    "payAndReserve": "Pay Now & Reserve",
+    "seeYouSoon": "See you soon!"
   }
 }
