@@ -1,7 +1,5 @@
-import { Image } from "expo-image";
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -26,8 +24,8 @@ import { formatAgeRange, filterFutureOccurrences, extractResponseData, formatAdd
 import { useGeoLocation } from "@/hooks/use-geo-location";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 import { TrendingCard } from "@/components/home/TrendingCard";
-import { ChildAvatar } from "@/components/ChildAvatar";
 import { SearchBar } from "@/components/SearchBar";
+import { FeaturedOccurrenceCard } from "@/components/FeaturedOccurrenceCard";
 
 export default function ForChildScreen() {
   const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
@@ -149,65 +147,14 @@ export default function ForChildScreen() {
           contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
         >
           {featuredOccurrence && (
-            <View className="mx-5 mb-5 rounded-3xl p-4" style={{ backgroundColor: AppColors.bluePastel }}>
-              <View className="flex-row items-center gap-2 mb-3">
-                <Text className="font-nunito-bold text-base text-[#111]">
-                  ✦ Trending right now...
-                </Text>
-              </View>
-              <Pressable
-                onPress={() =>
-                  router.push(`/event/${featuredOccurrence.event.id}`)
-                }
-                className="bg-white rounded-2xl p-3 flex-row items-center gap-3"
-              >
-                {featuredOccurrence.event.presigned_url ? (
-                  <Image
-                    source={{ uri: featuredOccurrence.event.presigned_url }}
-                    className="w-[110px] h-[80px] rounded-xl"
-                    contentFit="cover"
-                  />
-                ) : (
-                  <View className="w-[110px] h-[80px] rounded-xl bg-[#D9D9D9]" />
-                )}
-                <View className="flex-1 gap-0.5">
-                  <Text className="font-nunito-bold text-base text-[#111]" numberOfLines={1}>
-                    {featuredOccurrence.event.title}
-                  </Text>
-                  {!!orgName && (
-                    <Text className="font-nunito text-xs text-gray-500">
-                      {orgName}
-                    </Text>
-                  )}
-                  {!!featuredAgeLabel && (
-                    <Text className="font-nunito text-xs text-gray-500">
-                      {featuredAgeLabel}
-                    </Text>
-                  )}
-                  {!!featuredAddress && (
-                    <Text className="font-nunito text-xs text-gray-500" numberOfLines={2}>
-                      {featuredAddress}
-                    </Text>
-                  )}
-                </View>
-                <View className="items-end justify-between self-stretch gap-2">
-                  <View className="flex-row items-center bg-gray-100 rounded-full px-2 py-1 gap-1">
-                    <ChildAvatar
-                      name={name ?? ""}
-                      avatarFace={child?.avatar_face}
-                      avatarBackground={child?.avatar_background}
-                      size={20}
-                    />
-                    <Text className="font-nunito-semibold text-xs text-[#111]">
-                      {name}
-                    </Text>
-                  </View>
-                  <View className="w-9 h-9 rounded-full items-center justify-center" style={{ backgroundColor: AppColors.slateBlue }}>
-                    <IconSymbol name="chevron.right" size={14} color="white" />
-                  </View>
-                </View>
-              </Pressable>
-            </View>
+            <FeaturedOccurrenceCard
+              occurrence={featuredOccurrence}
+              orgName={orgName}
+              ageLabel={featuredAgeLabel}
+              address={featuredAddress}
+              childName={name ?? ""}
+              child={child}
+            />
           )}
           {matchedCategories.map((cat) => (
             <View key={cat} className="mb-5">
@@ -226,6 +173,7 @@ export default function ForChildScreen() {
                     occurrence={o}
                     userLat={geoLocationLat}
                     userLng={geoLocationLng}
+                    style={{ marginRight: 14 }}
                   />
                 ))}
               </ScrollView>
@@ -246,6 +194,7 @@ export default function ForChildScreen() {
                     userLng={geoLocationLng}
                     width="100%"
                   />
+
                 ))}
               </View>
             </View>

@@ -292,7 +292,7 @@ export default function HomeScreen() {
             contentContainerStyle={{ paddingHorizontal: 20 }}
           >
             {trendingEvents.map((o) => (
-              <TrendingCard key={o.id} occurrence={o} />
+              <TrendingCard key={o.id} occurrence={o} style={{ marginRight: 14 }} />
             ))}
           </ScrollView>
         </View>
