@@ -28,4 +28,8 @@ export const formatTime = (d: Date) =>
   d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
 export const formatDate = (d: Date) =>
-  d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
+  d.toLocaleDateString([], {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
