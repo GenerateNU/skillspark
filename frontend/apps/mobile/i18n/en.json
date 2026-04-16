@@ -431,6 +431,13 @@
     "agesRange": "Ages {{min}} - {{max}}",
     "classTime": "{{time}} Class"
   },
+  "errorScreen": {
+    "title": "Uh Oh!",
+    "subtitle": "You ran into an error",
+    "backToSafety": "Back to safety",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details"
+  },
   "reservation": {
     "paymentFailed": "Payment failed. Please try again or contact support.",
     "completed": "Completed",

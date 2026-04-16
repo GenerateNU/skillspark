@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { View, TouchableOpacity, Text } from "react-native";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { SvgXml } from "react-native-svg";
 import { ThemedText } from "./themed-text";
 import { IconSymbol } from "./ui/icon-symbol";
@@ -16,15 +17,16 @@ const superSadSvg = `<svg width="192" height="192" viewBox="0 0 192 192" fill="n
 
 export const ErrorScreen = ({ message }: ErrorScreenProps) => {
   const router = useRouter();
+  const { t: translate } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
   return (
     <View className="flex-1 items-center justify-center bg-white">
       <ThemedText type="title" className="text-black text-center mb-2">
-        Uh Oh!
+        {translate("errorScreen.title")}
       </ThemedText>
       <ThemedText className="text-black font-semibold text-center mb-12">
-        You ran into an error
+        {translate("errorScreen.subtitle")}
       </ThemedText>
 
       <SvgXml xml={superSadSvg} width={220} height={220} />
@@ -37,7 +39,7 @@ export const ErrorScreen = ({ message }: ErrorScreenProps) => {
           className="bg-black rounded-full py-4 items-center"
         >
           <Text className="text-white text-base font-medium">
-            Back to safety
+            {translate("errorScreen.backToSafety")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -49,7 +51,7 @@ export const ErrorScreen = ({ message }: ErrorScreenProps) => {
             className="flex-row items-center justify-center gap-1"
           >
             <Text className="text-gray-500 text-sm">
-              {expanded ? "Hide details" : "Show details"}
+              {expanded ? translate("errorScreen.hideDetails") : translate("errorScreen.showDetails")}
             </Text>
             <IconSymbol
               name={expanded ? "chevron.up" : "chevron.down"}
