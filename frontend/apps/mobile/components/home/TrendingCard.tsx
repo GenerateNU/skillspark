@@ -1,13 +1,11 @@
 import { Image } from "expo-image";
 import { View, Text, Pressable, Image as RNImage } from "react-native";
 import { useRouter } from "expo-router";
-import { type EventOccurrence } from "@skillspark/api-client";
+import { type EventOccurrence, type ReviewAggregate, useGetReviewAggregate } from "@skillspark/api-client";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { RATING_OPTIONS } from "@/constants/ratings";
 import { haversineDistance } from "@/utils/distance";
 import { formatAgeRange } from "@/utils/format";
-
-const noReviewImage = RATING_OPTIONS.find((r) => r.rating === null)!.image;
 
 export function TrendingCard({
   occurrence,
@@ -37,6 +35,22 @@ export function TrendingCard({
           occurrence.location.longitude,
         )
       : null;
+
+  const { data: reviewResp } = useGetReviewAggregate(occurrence.event.id);
+  const reviewAggregate =
+    reviewResp?.status === 200 ? (reviewResp.data as ReviewAggregate) : null;
+
+  const ratingOption =
+    reviewAggregate?.average_rating != null
+      ? (RATING_OPTIONS.find(
+          (r) => r.rating === Math.round(reviewAggregate.average_rating),
+        ) ?? RATING_OPTIONS.find((r) => r.rating === null)!)
+      : RATING_OPTIONS.find((r) => r.rating === null)!;
+
+  const reviewLabel =
+    reviewAggregate?.average_rating != null
+      ? `${reviewAggregate.average_rating.toFixed(1)} / 5 Smiles`
+      : "No reviews yet";
 
   return (
     <View style={{ marginRight: width === "100%" ? 0 : 14, paddingBottom: 8 }}>
@@ -94,7 +108,7 @@ export function TrendingCard({
           <View
             style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
           >
-            <RNImage source={noReviewImage} style={{ width: 18, height: 18 }} />
+            <RNImage source={ratingOption.image} style={{ width: 18, height: 18 }} />
             <Text
               style={{
                 fontFamily: FontFamilies.regular,
@@ -102,7 +116,7 @@ export function TrendingCard({
                 color: AppColors.mutedText,
               }}
             >
-              No reviews yet
+              {reviewLabel}
             </Text>
           </View>
 
