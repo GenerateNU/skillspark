@@ -61,7 +61,7 @@ export function LeaveReviewModal({
 
   function toggleCategory(value: string) {
     setSelectedCategories((prev) =>
-      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value],
     );
   }
 
@@ -87,6 +87,9 @@ export function LeaveReviewModal({
           });
           queryClient.invalidateQueries({
             queryKey: [`/api/v1/review/event_aggregate/${eventId}`],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [`/api/v1/review/guardian/${guardianId}`],
           });
           setStep("done");
         },

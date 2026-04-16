@@ -83,7 +83,7 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 		return nil, err
 	}
 
-	if h.NotificationService != nil {
+	if h.NotificationService != nil && guardian.EmailNotifications {
 		subject := "Registration Confirmed"
 		body := fmt.Sprintf(
 			"Your child has been successfully registered for %s on %s.",
@@ -92,7 +92,7 @@ func (h *Handler) CreateRegistration(ctx context.Context, input *models.CreateRe
 		)
 		if notifErr := h.NotificationService.SendNotification(ctx, &models.SendNotificationInput{
 			NotificationType: models.NotificationTypeEmail,
-			RecipientEmail:   &guardian.Email, // this is where you hardcode email to test
+			RecipientEmail:   &guardian.Email,
 			Subject:          &subject,
 			Body:             body,
 		}); notifErr != nil {

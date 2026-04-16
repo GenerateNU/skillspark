@@ -30,6 +30,8 @@ func (r *GuardianRepository) SetStripeCustomerID(
 		&updatedGuardian.ID,
 		&updatedGuardian.UserID,
 		&updatedGuardian.StripeCustomerID,
+		&updatedGuardian.PushNotifications,
+		&updatedGuardian.EmailNotifications,
 		&updatedGuardian.CreatedAt,
 		&updatedGuardian.UpdatedAt,
 	)

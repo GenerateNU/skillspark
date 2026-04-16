@@ -1,12 +1,14 @@
 import { View, Text } from "react-native";
-import { AppColors } from "@/constants/theme";
+import { AppColors, FontFamilies } from "@/constants/theme";
 
 export function StarRating({
   rating = 4,
   size = 13,
+  filledColor = AppColors.starFilled,
 }: {
   rating?: number;
   size?: number;
+  filledColor?: string;
 }) {
   return (
     <View style={{ flexDirection: "row", gap: 1 }}>
@@ -15,7 +17,8 @@ export function StarRating({
           key={i}
           style={{
             fontSize: size,
-            color: i < rating ? AppColors.starFilled : AppColors.borderLight,
+            fontFamily: FontFamilies.regular,
+            color: i < rating ? filledColor : AppColors.borderLight,
           }}
         >
           ★

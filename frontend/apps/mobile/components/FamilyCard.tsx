@@ -1,33 +1,41 @@
 import React from "react";
-import { View, useColorScheme } from "react-native";
+import { View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { Colors, AppColors } from "@/constants/theme";
+import { ChildAvatar } from "@/components/ChildAvatar";
 
 type FamilyCardProps = {
-  initials: string;
   name: string;
   date: string;
+  avatarFace?: string | null;
+  avatarBackground?: string | null;
 };
 
-export function FamilyCard({ initials, name, date }: FamilyCardProps) {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+export function FamilyCard({
+  name,
+  date,
+  avatarFace,
+  avatarBackground,
+}: FamilyCardProps) {
+  const theme = Colors.light;
 
   return (
     <View
       className="w-[48%] rounded-xl p-[10px] flex-row items-center"
       style={{ backgroundColor: theme.inputBg }}
     >
-      <View
-        className="w-8 h-8 rounded-2xl border items-center justify-center mr-2"
-        style={{ borderColor: theme.borderColor }}
-      >
-        <ThemedText className="text-xs font-nunito-semibold">
-          {initials}
-        </ThemedText>
+      <View className="mr-2">
+        <ChildAvatar
+          name={name}
+          avatarFace={avatarFace}
+          avatarBackground={avatarBackground}
+          size={32}
+        />
       </View>
-      <View>
-        <ThemedText className="text-sm font-nunito-medium">{name}</ThemedText>
+      <View className="flex-1">
+        <ThemedText className="text-sm font-nunito-medium" numberOfLines={1}>
+          {name}
+        </ThemedText>
         <ThemedText
           className="text-[10px] font-nunito"
           style={{ color: AppColors.mutedText }}

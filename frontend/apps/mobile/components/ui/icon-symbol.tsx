@@ -36,6 +36,7 @@ const MAPPING = {
   "star.fill": "star",
   bookmark: "bookmark",
   "bookmark.fill": "bookmark",
+  "square.and.arrow.up": "ios-share",
   "location.fill": "place",
   "record.circle": "radio-button-on",
   "slider.horizontal.3": "tune",

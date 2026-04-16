@@ -7,26 +7,26 @@ import (
 )
 
 type User struct {
-	ID                  uuid.UUID  `json:"id" db:"id"`
-	Name                string     `json:"name" db:"name"`
-	Email               string     `json:"email" db:"email"`
-	Username            string     `json:"username" db:"username"`
-	ProfilePictureS3Key *string    `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
-	LanguagePreference  string     `json:"language_preference" db:"language_preference"`
-	AuthID              uuid.UUID  `json:"auth_id" db:"auth_id"`
-	CreatedAt           time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt           time.Time  `json:"updated_at" db:"updated_at"`
+	ID                  uuid.UUID `json:"id" db:"id"`
+	Name                string    `json:"name" db:"name"`
+	Email               string    `json:"email" db:"email"`
+	Username            string    `json:"username" db:"username"`
+	ProfilePictureS3Key *string   `json:"profile_picture_s3_key" db:"profile_picture_s3_key"`
+	LanguagePreference  string    `json:"language_preference" db:"language_preference"`
+	AuthID              uuid.UUID `json:"auth_id" db:"auth_id"`
+	CreatedAt           time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt           time.Time `json:"updated_at" db:"updated_at"`
 }
 
 // Create
 type CreateUserInput struct {
 	Body struct {
-		Name                string     `json:"name" db:"name" doc:"name of the user"`
-		Email               string     `json:"email" db:"email" doc:"email of the user"`
-		Username            string     `json:"username" db:"username" doc:"username of the user"`
-		ProfilePictureS3Key *string    `json:"profile_picture_s3_key,omitempty" db:"profile_picture_s3_key" doc:"s3 key of the user's profile picture"`
-		LanguagePreference  string     `json:"language_preference" db:"language_preference" doc:"language preference of the user"`
-		AuthID              uuid.UUID  `json:"auth_id" db:"auth_id" doc:"supabase auth id of the user"`
+		Name                string    `json:"name" db:"name" doc:"name of the user"`
+		Email               string    `json:"email" db:"email" doc:"email of the user"`
+		Username            string    `json:"username" db:"username" doc:"username of the user"`
+		ProfilePictureS3Key *string   `json:"profile_picture_s3_key,omitempty" db:"profile_picture_s3_key" doc:"s3 key of the user's profile picture"`
+		LanguagePreference  string    `json:"language_preference" db:"language_preference" doc:"language preference of the user"`
+		AuthID              uuid.UUID `json:"auth_id" db:"auth_id" doc:"supabase auth id of the user"`
 	}
 }
 
@@ -67,4 +67,15 @@ type DeleteUserInput struct {
 
 type DeleteUserOutput struct {
 	Body *User `json:"body"`
+}
+
+// Username exists check
+type UsernameExistsInput struct {
+	Username string `path:"username"`
+}
+
+type UsernameExistsOutput struct {
+	Body struct {
+		Exists bool `json:"exists"`
+	}
 }

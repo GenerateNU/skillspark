@@ -1,21 +1,24 @@
+import { useGuardian } from "@/hooks/use-guardian";
+import i18n from "@/i18n";
 import {
+  createStripeCustomer,
   GuardianLoginOutputBody,
   GuardianSignUpOutputBody,
   loginGuardianResponse,
+  setCurrentLanguage,
   signupGuardianResponse,
+  updateGuardianResponse,
   useLoginGuardian,
   useSignupGuardian,
-  Guardian,
   useUpdateGuardian,
-  setCurrentLanguage,
-  updateGuardianResponse,
+  usernameExists as checkUsernameExists,
+  usernameExistsResponseError,
+  UsernameExistsOutputBody,
 } from "@skillspark/api-client";
-import * as SecureStore from "expo-secure-store";
-import { router } from "expo-router";
-import { createContext, useState, useEffect, ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGuardian } from "@/hooks/use-guardian";
-import i18n from "@/i18n";
+import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { createContext, ReactNode, useEffect, useState } from "react";
 
 interface AuthContextType {
   guardianId: string | null;
@@ -48,7 +51,13 @@ interface AuthContextType {
     username: string,
     profile_picture_s3_key?: string | undefined,
     expo_push_token?: string | undefined,
+    push_notifications?: boolean,
+    email_notifications?: boolean,
   ) => void;
+  usernameExists: (
+    username: string,
+    onError: (msg: string) => void,
+  ) => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -59,13 +68,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [guardianId, setGuardianId] = useState<string | null>(null);
   const [jwt, setJWT] = useState<string | null>(null);
   const [langPref, setLangPref] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const { mutate: loginFunc } = useLoginGuardian();
   const { mutate: signupFunc } = useSignupGuardian();
   const { mutate: updateFunc } = useUpdateGuardian();
 
-  let { guardian } = useGuardian(guardianId);
+  const { guardian } = useGuardian(guardianId);
 
   useEffect(() => {
     const checkAlreadyAuth = async () => {
@@ -153,6 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setJWT(success.token);
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
           setGuardianId(success.guardian_id);
+          await createStripeCustomer(success.guardian_id);
           router.replace("/(app)/(tabs)");
         },
         onError: (err) => {
@@ -183,6 +193,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     username: string,
     profile_picture_s3_key?: string | undefined,
     expo_push_token?: string | undefined,
+    push_notifications?: boolean,
+    email_notifications?: boolean,
   ) => {
     updateFunc(
       {
@@ -194,11 +206,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           profile_picture_s3_key,
           username,
           expo_push_token,
+          push_notifications,
+          email_notifications,
         },
       },
       {
-        onSuccess: async (resp: updateGuardianResponse) => {
-          guardian = resp.data as Guardian;
+        onSuccess: async (_resp: updateGuardianResponse) => {
           // refetch all getGuardian queries to show changes
           queryClient.invalidateQueries({
             queryKey: [`/api/v1/guardians/${id}`],
@@ -213,6 +226,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const usernameExists = async (
+    username: string,
+    onError: (msg: string) => void,
+  ) => {
+    try {
+      const resp = await checkUsernameExists(username);
+      const data = resp.data as UsernameExistsOutputBody;
+      if (data.exists) {
+        onError("Username is taken.");
+        return false;
+      }
+      return true;
+    } catch (err) {
+      const typedErr = err as usernameExistsResponseError;
+      onError(typedErr.data?.detail ?? "An unexpected error occurred.");
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -225,6 +257,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signup,
         logout,
         update,
+        usernameExists,
       }}
     >
       {children}
