@@ -18,8 +18,6 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { createContext, useState, useEffect, ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGuardian } from "@/hooks/use-guardian";
-import i18n from "@/i18n";
 import { useTranslation } from "react-i18next";
 
 interface AuthContextType {
@@ -298,6 +296,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			onError(typedErr.data?.detail ?? "An unexpected error occurred.");
 			return false;
 		}
+	};
+
+	const setLanguage = async (language: string) => {
+		await i18n.changeLanguage(language);
+		setCurrentLanguage(language);
+		await SecureStore.setItemAsync("language_preference", language);
+		setLangPref(language);
+		queryClient.invalidateQueries({ refetchType: "all" });
 	};
 
 	return (

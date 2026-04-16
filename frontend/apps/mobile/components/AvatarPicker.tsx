@@ -99,7 +99,7 @@ export function AvatarPicker({
 			{/* Tab switcher */}
 			<View
 				className="flex-row p-1.5 gap-1.5"
-				style={{ backgroundColor: isDark ? "#1c1c1e" : "#F3F4F6" }}
+				style={{ backgroundColor: "#F3F4F6" }}
 			>
 				{(["Colors", "Avatar"] as Tab[]).map((tab) => (
 					<TouchableOpacity
