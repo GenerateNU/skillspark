@@ -298,6 +298,7 @@
     "filter": "กรอง",
     "km": "กม.",
     "mi": "ไมล์",
+    "distanceAway": "ห่างออกไป {{distance}} กม.",
     "stars": "ดาว",
     "smiles": "/ 5 ยิ้ม",
     "learnMore": "เรียนรู้เพิ่มเติม",

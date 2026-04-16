@@ -55,16 +55,11 @@ export function OrgMapCard({ pin, userLocation }: OrgMapCardProps) {
           pin.longitude,
         )
       : null;
-  const distanceMi = distanceKm != null ? distanceKm * 0.621371 : null;
 
-  const locationLine = [
-    pin.district,
-    distanceMi != null
-      ? `${distanceMi.toFixed(1)} ${translate("map.mi")}`
-      : null,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const distanceLine =
+    distanceKm != null
+      ? translate("map.distanceAway", { distance: distanceKm.toFixed(1) })
+      : null;
 
   // Position card just above the floating tab bar pill
   const cardBottom = Math.max(insets.bottom, 8) + 92;
@@ -99,9 +94,14 @@ export function OrgMapCard({ pin, userLocation }: OrgMapCardProps) {
           <ThemedText className="font-nunito-bold text-[18px] leading-snug">
             {pin.title}
           </ThemedText>
-          {locationLine.length > 0 && (
+          {pin.district != null && pin.district.length > 0 && (
             <ThemedText className="font-nunito text-sm text-[#6B7280]">
-              {locationLine}
+              {pin.district}
+            </ThemedText>
+          )}
+          {distanceLine != null && (
+            <ThemedText className="font-nunito text-sm text-[#6B7280]">
+              {distanceLine}
             </ThemedText>
           )}
           {avgRating != null && (

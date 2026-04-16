@@ -298,6 +298,7 @@
     "filter": "Filter",
     "km": "km",
     "mi": "mi",
+    "distanceAway": "{{distance}} km away",
     "stars": "Stars",
     "smiles": "/ 5 Smiles",
     "learnMore": "Learn more",
