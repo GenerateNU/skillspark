@@ -299,8 +299,12 @@
     "sortBy": "Sort by",
     "filter": "Filter",
     "km": "km",
-    "away": "away",
-    "stars": "Stars"
+    "mi": "mi",
+    "distanceAway": "{{distance}} km away",
+    "stars": "Stars",
+    "smiles": "/ 5 Smiles",
+    "learnMore": "Learn more",
+    "members": "Members"
   },
   "org": {
     "about": "About",

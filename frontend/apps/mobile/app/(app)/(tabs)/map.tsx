@@ -23,6 +23,7 @@ export interface LocationPin {
   rating: number;
   members: number;
   image?: string;
+  district?: string;
 }
 
 export default function MapScreen() {
@@ -56,7 +57,8 @@ export default function MapScreen() {
           longitude: location.longitude,
           rating: org.review_summary?.average_rating ?? 0,
           members: 0,
-          image: org.pfp_s3_key,
+          image: org.presigned_url,
+          district: location.district,
         };
       })
       .filter(Boolean) as LocationPin[];
