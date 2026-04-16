@@ -61,7 +61,7 @@ func TestHumaValidation_CreateChild(t *testing.T) {
 				"name":        "Test Child",
 				"school_id":   "20000000-0000-0000-0000-000000000001",
 				"birth_month": 5,
-				"birth_year":  2040,
+				"birth_year":  2400,
 				"guardian_id": "11111111-1111-1111-1111-111111111111",
 				"interests":   []string{"math"},
 			},
