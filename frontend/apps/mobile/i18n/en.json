@@ -41,6 +41,8 @@
     "greeting": "Hello, {{name}}",
     "discoverWeekly": "Discover Weekly",
     "forYou": "For You",
+    "forChild": "For {{name}}",
+    "trendingRightNow": "✦ Trending right now...",
     "basedOn": "Based on",
     "upcomingEvents": "upcoming events",
     "learnMore": "Learn More",

@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   useGetAllEventOccurrences,
   useGetTrendingEventOccurrences,
@@ -30,6 +31,7 @@ import { FeaturedOccurrenceCard } from "@/components/FeaturedOccurrenceCard";
 export default function ForChildScreen() {
   const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
   const router = useRouter();
+  const { t: translate } = useTranslation();
   const [searchText, setSearchText] = useState("");
 
   const { lat: geoLocationLat, lng: geoLocationLng } = useGeoLocation();
@@ -128,13 +130,13 @@ export default function ForChildScreen() {
           />
         </TouchableOpacity>
         <Text className="font-nunito-bold text-[22px]" style={{ color: AppColors.primaryText }}>
-          For {name}
+          {translate("dashboard.forChild", { name })}
         </Text>
       </View>
       <SearchBar
         value={searchText}
         onChangeText={setSearchText}
-        placeholder="Search a class"
+        placeholder={translate("dashboard.searchPlaceholder")}
         style={{ marginBottom: 16 }}
       />
       {isLoading ? (

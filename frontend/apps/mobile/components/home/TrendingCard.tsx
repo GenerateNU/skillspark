@@ -49,8 +49,8 @@ export function TrendingCard({
 
   const reviewLabel =
     reviewAggregate?.average_rating != null
-      ? `${reviewAggregate.average_rating.toFixed(1)} / 5 Smiles`
-      : "No reviews yet";
+      ? `${reviewAggregate.average_rating.toFixed(1)} ${t("occurrence.smiles")}`
+      : t("event.noReviews");
 
   return (
     <Pressable
