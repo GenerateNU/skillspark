@@ -111,14 +111,8 @@ function EventOccurrenceDetail({
           />
 
           {/* Title row with bookmark + share */}
-          <View className="flex-row items-start justify-between mb-1">
-            <Text
-              className="flex-1 mr-3 text-[26px] font-nunito-bold leading-8"
-              style={{ color: AppColors.primaryText }}
-            >
-              {occurrence.event.title}
-            </Text>
-            <View className="items-center">
+          <View className="mb-1">
+            <View className="absolute top-0 right-0 items-center z-10">
               <TouchableOpacity
                 onPress={() => setShareVisible(true)}
                 activeOpacity={0.7}
@@ -131,6 +125,12 @@ function EventOccurrenceDetail({
               </TouchableOpacity>
               <BookmarkButton eventId={occurrence.event.id} />
             </View>
+            <Text
+              className="mr-10 text-[26px] font-nunito-bold leading-8"
+              style={{ color: AppColors.primaryText }}
+            >
+              {occurrence.event.title}
+            </Text>
           </View>
 
           {/* Location */}
