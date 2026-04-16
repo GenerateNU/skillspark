@@ -1,10 +1,7 @@
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import {
   ActivityIndicator,
   View,
-  TextInput,
   ScrollView,
-  Pressable,
   Text,
   useWindowDimensions,
 } from "react-native";
@@ -23,7 +20,7 @@ import { useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useDebounce } from "use-debounce";
-import { isWithinNext7Days } from "@/utils/format";
+import { isWithinNext7Days, filterFutureOccurrences, extractResponseData } from "@/utils/format";
 import { DiscoverBanner } from "@/components/home/DiscoverBanner";
 import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
 import { RecommendedCard } from "@/components/home/RecommendedCard";
@@ -34,6 +31,7 @@ import { TrendingCard } from "@/components/home/TrendingCard";
 import { useGeoLocation } from "@/hooks/use-geo-location";
 import CarouselCard from "@/components/home/CarouselCard";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
+import { SearchBar } from "@/components/SearchBar";
 
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
@@ -50,12 +48,10 @@ export default function HomeScreen() {
     radius_km: 50,
     limit: 5,
   });
-  const allLocalizedOccurrences: EventOccurrence[] = useMemo(() => {
-    const d = localizedOccurrencesResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [localizedOccurrencesResp]);
+  const allLocalizedOccurrences: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(localizedOccurrencesResp),
+    [localizedOccurrencesResp],
+  );
 
   const { data: guardianResp } = useGetGuardianById(guardianId!, {
     query: { enabled: !!guardianId },
@@ -64,12 +60,10 @@ export default function HomeScreen() {
     ?.data;
 
   const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences();
-  const allOccurrences: EventOccurrence[] = useMemo(() => {
-    const d = occurrencesResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [occurrencesResp]);
+  const allOccurrences: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(occurrencesResp),
+    [occurrencesResp],
+  );
 
   const { data: registrationsResp } = useGetRegistrationsByGuardianId(
     guardianId!,
@@ -87,10 +81,10 @@ export default function HomeScreen() {
   const { data: childrenResp } = useGetChildrenByGuardianId(guardianId!, {
     query: { enabled: !!guardianId },
   });
-  const children: Child[] = useMemo(() => {
-    const d = childrenResp as unknown as { data: Child[] } | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [childrenResp]);
+  const children: Child[] = useMemo(
+    () => extractResponseData<Child>(childrenResp),
+    [childrenResp],
+  );
 
   const { data: trendingResp } = useGetTrendingEventOccurrences(
     {
@@ -104,12 +98,10 @@ export default function HomeScreen() {
     },
   );
 
-  const trendingEvents: EventOccurrence[] = useMemo(() => {
-    const d = trendingResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [trendingResp]);
+  const trendingEvents: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(trendingResp),
+    [trendingResp],
+  );
 
   const upcomingClasses = useMemo(() => {
     const upcomingIds = new Set(
@@ -125,7 +117,7 @@ export default function HomeScreen() {
   }, [registrations, allOccurrences]);
 
   const futureOccurrences = useMemo(
-    () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
+    () => filterFutureOccurrences(allOccurrences),
     [allOccurrences],
   );
 
@@ -198,37 +190,12 @@ export default function HomeScreen() {
       </View>
 
       {/* Search row */}
-      <View className="px-5 mb-[22px]">
-        <View
-          className="flex-row items-center rounded-full px-4 py-[10px]"
-          style={{ backgroundColor: AppColors.surfaceGray }}
-        >
-          <IconSymbol
-            name="magnifyingglass"
-            size={18}
-            color={AppColors.subtleText}
-            style={{ marginRight: 8 }}
-          />
-          <TextInput
-            className="flex-1 text-sm font-nunito"
-            style={{ color: AppColors.primaryText }}
-            placeholder={translate("dashboard.searchPlaceholder")}
-            placeholderTextColor={AppColors.placeholderText}
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-          <Pressable
-            className="w-9 h-9 rounded-full items-center justify-center"
-            style={{ backgroundColor: AppColors.primaryText }}
-          >
-            <IconSymbol
-              name="slider.horizontal.3"
-              size={16}
-              color={AppColors.white}
-            />
-          </Pressable>
-        </View>
-      </View>
+      <SearchBar
+        value={searchText}
+        onChangeText={setSearchText}
+        placeholder={translate("dashboard.searchPlaceholder")}
+        style={{ marginBottom: 22 }}
+      />
 
       {/* Your Upcoming Classes — conditional */}
       {upcomingClasses.length > 0 && (

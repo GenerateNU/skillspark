@@ -21,7 +21,7 @@ import { AppColors, FontFamilies } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
 import { OccurrenceCard } from "./OccurrenceCard";
-import { formatSectionDate } from "@/utils/format";
+import { formatSectionDate, extractResponseData } from "@/utils/format";
 
 export default function OrgScheduleScreen() {
   const { id, filterClass } = useLocalSearchParams<{
@@ -41,12 +41,10 @@ export default function OrgScheduleScreen() {
   const { data: occurrencesResp, isLoading: occurrencesLoading } =
     useGetEventOccurrencesByOrganizationId(id);
 
-  const occurrences = useMemo(() => {
-    const d = occurrencesResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d!.data : [];
-  }, [occurrencesResp]);
+  const occurrences = useMemo(
+    () => extractResponseData<EventOccurrence>(occurrencesResp),
+    [occurrencesResp],
+  );
 
   const classNames = useMemo(
     () => [...new Set(occurrences.map((o) => o.event.title))].sort(),

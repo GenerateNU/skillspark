@@ -4,22 +4,8 @@ import { useRouter } from "expo-router";
 import { type EventOccurrence } from "@skillspark/api-client";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { RATING_OPTIONS } from "@/constants/ratings";
-
-function haversineKm(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number,
-): number {
-  const R = 6371;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
+import { haversineDistance } from "@/utils/distance";
+import { formatAgeRange } from "@/utils/format";
 
 const noReviewImage = RATING_OPTIONS.find((r) => r.rating === null)!.image;
 
@@ -37,20 +23,14 @@ export function TrendingCard({
   const router = useRouter();
 
   const ageLabel =
-    occurrence.event.age_range_min != null
-      ? `Ages ${occurrence.event.age_range_min}${
-          occurrence.event.age_range_max != null
-            ? ` - ${occurrence.event.age_range_max}`
-            : "+"
-        }`
-      : null;
+    formatAgeRange(occurrence.event.age_range_min, occurrence.event.age_range_max) || null;
 
   const distance =
     userLat != null &&
     userLng != null &&
     occurrence.location?.latitude != null &&
     occurrence.location?.longitude != null
-      ? haversineKm(
+      ? haversineDistance(
           userLat,
           userLng,
           occurrence.location.latitude,

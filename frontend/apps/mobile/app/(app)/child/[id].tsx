@@ -4,7 +4,6 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -23,11 +22,12 @@ import {
 } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
-import { formatAgeRange } from "@/utils/format";
+import { formatAgeRange, filterFutureOccurrences, extractResponseData, formatAddress } from "@/utils/format";
 import { useGeoLocation } from "@/hooks/use-geo-location";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 import { TrendingCard } from "@/components/home/TrendingCard";
 import { ChildAvatar } from "@/components/ChildAvatar";
+import { SearchBar } from "@/components/SearchBar";
 
 export default function ForChildScreen() {
   const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
@@ -37,15 +37,13 @@ export default function ForChildScreen() {
   const { lat: geoLocationLat, lng: geoLocationLng } = useGeoLocation();
 
   const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences();
-  const allOccurrences: EventOccurrence[] = useMemo(() => {
-    const d = occurrencesResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [occurrencesResp]);
+  const allOccurrences: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(occurrencesResp),
+    [occurrencesResp],
+  );
 
   const futureOccurrences = useMemo(
-    () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
+    () => filterFutureOccurrences(allOccurrences),
     [allOccurrences],
   );
 
@@ -63,12 +61,10 @@ export default function ForChildScreen() {
     { lat: geoLocationLat, lng: geoLocationLng, radius: 50, max_returns: 5 },
     { query: { enabled: true } },
   );
-  const trendingEvents: EventOccurrence[] = useMemo(() => {
-    const d = trendingResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [trendingResp]);
+  const trendingEvents: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(trendingResp),
+    [trendingResp],
+  );
 
   const featuredOccurrence =
     trendingEvents[0] ?? futureOccurrences[0] ?? null;
@@ -117,15 +113,7 @@ export default function ForChildScreen() {
     [filteredOccurrences, matchedEventIds],
   );
 
-  const featuredAddress = featuredOccurrence
-    ? [
-        featuredOccurrence.location?.address_line1,
-        featuredOccurrence.location?.address_line2,
-        featuredOccurrence.location?.district,
-      ]
-        .filter(Boolean)
-        .join(", ")
-    : null;
+  const featuredAddress = featuredOccurrence ? formatAddress(featuredOccurrence) || null : null;
 
   const featuredAgeLabel = featuredOccurrence
     ? formatAgeRange(featuredOccurrence.event.age_range_min, featuredOccurrence.event.age_range_max) || null
@@ -145,28 +133,12 @@ export default function ForChildScreen() {
           For {name}
         </Text>
       </View>
-      <View className="px-5 mb-4">
-        <View className="flex-row items-center rounded-full px-4 py-[10px]" style={{ backgroundColor: AppColors.surfaceGray }}>
-          <View className="mr-2">
-            <IconSymbol name="magnifyingglass" size={18} color={AppColors.subtleText} />
-          </View>
-          <TextInput
-            className="flex-1 text-sm font-nunito"
-            style={{ color: AppColors.primaryText }}
-            placeholder="Search a class"
-            placeholderTextColor={AppColors.placeholderText}
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-          <Pressable className="w-9 h-9 rounded-full items-center justify-center" style={{ backgroundColor: AppColors.primaryText }}>
-            <IconSymbol
-              name="slider.horizontal.3"
-              size={16}
-              color={AppColors.white}
-            />
-          </Pressable>
-        </View>
-      </View>
+      <SearchBar
+        value={searchText}
+        onChangeText={setSearchText}
+        placeholder="Search a class"
+        style={{ marginBottom: 16 }}
+      />
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" />

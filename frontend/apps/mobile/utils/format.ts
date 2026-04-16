@@ -80,3 +80,19 @@ export function formatLocation(occurrence: EventOccurrence): string {
   const parts = [loc.district, loc.province].filter(Boolean);
   return parts.join(", ") || "Location";
 }
+
+export function formatAddress(occurrence: EventOccurrence): string {
+  const loc = occurrence.location;
+  const parts = [loc?.address_line1, loc?.address_line2, loc?.district].filter(Boolean);
+  return parts.join(", ");
+}
+
+export function filterFutureOccurrences(occurrences: EventOccurrence[]): EventOccurrence[] {
+  const now = new Date();
+  return occurrences.filter((o) => new Date(o.start_time) > now);
+}
+
+export function extractResponseData<T>(resp: unknown): T[] {
+  const d = resp as { data: T[] } | undefined;
+  return Array.isArray(d?.data) ? d!.data : [];
+}
