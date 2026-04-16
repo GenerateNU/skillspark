@@ -31,8 +31,6 @@ export function SavedEventCard({
 }: SavedEventCardProps) {
   const { t: translate } = useTranslation();
 
-  console.log(event)
-
   return (
     <Pressable
       onPress={() => router.push(`/event/${event.id}`)} //TODO: fix event details to be either event or occurrence based on design

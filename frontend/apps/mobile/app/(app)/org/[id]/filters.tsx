@@ -1,15 +1,3 @@
-import { SliderCard } from "@/components/filters/SliderCard";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
-import { useOrgScheduleFilters } from "@/hooks/use-org-schedule-filters";
-import {
-  useGetEventOccurrencesByOrganizationId,
-  type EventOccurrence,
-} from "@skillspark/api-client";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { TFunction } from "i18next";
-import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import {
   Pressable,
   ScrollView,
@@ -18,6 +6,18 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useMemo } from "react";
+import {
+  useGetEventOccurrencesByOrganizationId,
+  type EventOccurrence,
+} from "@skillspark/api-client";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
+import { SliderCard } from "@/components/filters/SliderCard";
+import { useOrgScheduleFilters } from "@/hooks/use-org-schedule-filters";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 
 const START_TIME_MAX = 1380; // 11:00 PM in minutes from midnight
 const DURATION_MAX = 180; // minutes
