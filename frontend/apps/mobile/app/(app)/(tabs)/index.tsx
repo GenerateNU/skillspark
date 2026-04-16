@@ -18,7 +18,7 @@ import {
   type Child,
   useGetTrendingEventOccurrences,
 } from "@skillspark/api-client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useFilters } from "@/hooks/use-filters";
@@ -32,7 +32,7 @@ import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { TrendingCard } from "@/components/home/TrendingCard";
 
-import * as Location from "expo-location";
+import { useGeolocation } from "@/hooks/use-geolocation";
 import CarouselCard from "@/components/home/CarouselCard";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 import LogoBgWrapper from "@/components/LogoBgWrapper";
@@ -44,22 +44,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
 
-  const [geoLocationLat, setGeoLocationLat] = useState<string | undefined>(
-    "13.7563"
-  );
-  const [geoLocationLong, setGeoLocationLong] = useState<string | undefined>(
-    "100.5018"
-  );
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") return;
-      const loc = await Location.getCurrentPositionAsync({});
-      setGeoLocationLat(String(loc.coords.latitude));
-      setGeoLocationLong(String(loc.coords.longitude));
-    })();
-  }, []);
+  const { lat: geoLocationLat, lng: geoLocationLong } = useGeolocation();
 
   const { data: localizedOccurrencesResp } = useGetAllEventOccurrences({
     lat: geoLocationLat,
@@ -158,25 +143,16 @@ export default function HomeScreen() {
       .filter((r) => r.occurrence != null);
   }, [children, futureOccurrences]);
 
-  const categories = useMemo(() => {
-    const cats = new Set<string>();
-    allOccurrences.forEach((o) =>
-      o.event.category?.forEach((c) => cats.add(c))
-    );
-    return cats.size > 0
-      ? Array.from(cats)
-      : ["Sport", "Arts", "Music", "Tech", "Activity", "Tutoring"];
-  }, [allOccurrences]);
-
-  const categoryEventMap = useMemo(() => {
-    const map: Record<string, EventOccurrence> = {};
-    allOccurrences.forEach((o) => {
-      o.event.category?.forEach((c) => {
-        if (!map[c] && o.event.presigned_url) map[c] = o;
-      });
-    });
-    return map;
-  }, [allOccurrences]);
+  const categories = [
+    "Sports & Physical Activities",
+    "Arts & Creative Expression",
+    "Languages",
+    "Academics",
+    "Personal Development & Life Skills",
+    "Music & Performance",
+    "Math",
+    "Tech & Innovation",
+  ];
 
   const firstName = guardian?.name?.split(" ")[0] ?? "there";
 
@@ -355,29 +331,24 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Explore by Category */}
-        {categories.length > 0 && (
-          <View className="mb-6">
-            <Text
-              className="font-nunito-bold px-5 mb-3"
-              style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-            >
-              Explore by Category
-            </Text>
-            <View className="px-[15px]">
-              {categoryPairs.map((pair, idx) => (
-                <View key={idx} className="flex-row">
-                  {pair.map((cat) => (
-                    <CategoryCard
-                      key={cat}
-                      category={cat}
-                      occurrence={categoryEventMap[cat]}
-                    />
-                  ))}
-                  {pair.length === 1 && <View className="flex-1 m-[5px]" />}
-                </View>
-              ))}
-            </View>
+      {/* Explore by Category */}
+      {categories.length > 0 && (
+        <View className="mb-6">
+          <Text
+            className="font-nunito-bold px-5 mb-3"
+            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+          >
+            Explore by Category
+          </Text>
+          <View className="px-[15px]">
+            {categoryPairs.map((pair, idx) => (
+              <View key={idx} className="flex-row">
+                {pair.map((cat) => (
+                  <CategoryCard key={cat} category={cat} />
+                ))}
+                {pair.length === 1 && <View className="flex-1 m-[5px]" />}
+              </View>
+            ))}
           </View>
         )}
       </LogoBgWrapper>
