@@ -1,8 +1,10 @@
+import { ErrorScreen } from "@/components/ErrorScreen";
 import { SavedEventCard } from "@/components/SavedEventCard";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
+import { useAuthContext } from "@/hooks/use-auth-context";
 import {
   getGetSavedByGuardianIdQueryKey,
   Saved,
@@ -12,6 +14,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -20,9 +23,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAuthContext } from "@/hooks/use-auth-context";
-import { ErrorScreen } from "@/components/ErrorScreen";
-import { useTranslation } from "react-i18next";
 
 export default function SavedScreen() {
   const insets = useSafeAreaInsets();

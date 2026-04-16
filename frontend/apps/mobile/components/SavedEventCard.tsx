@@ -1,10 +1,12 @@
-import { Event } from "@skillspark/api-client";
-import React from "react";
-import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
-import { router } from "expo-router";
-import { AppColors, TAG_COLORS } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { AppColors, TAG_COLORS } from "@/constants/theme";
+import { Event } from "@skillspark/api-client";
+import { router } from "expo-router";
+import React from "react";
 import { useTranslation } from "react-i18next";
+
+import { Image } from "expo-image";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 
 interface BookmarkIconProps {
   onPress?: () => void;
@@ -28,6 +30,9 @@ export function SavedEventCard({
   onBookmarkPress,
 }: SavedEventCardProps) {
   const { t: translate } = useTranslation();
+
+  console.log(event)
+
   return (
     <Pressable
       onPress={() => router.push(`/event/${event.id}`)} //TODO: fix event details to be either event or occurrence based on design
@@ -47,7 +52,8 @@ export function SavedEventCard({
         {event.presigned_url && (
           <Image
             source={{ uri: event.presigned_url }}
-            style={{ width: "100%", height: "100%" }}
+            style={{ width: 80, height: 80 }}
+            contentFit="cover"
           />
         )}
       </View>
