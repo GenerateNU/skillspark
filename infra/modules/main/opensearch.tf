@@ -48,8 +48,6 @@ resource "opensearch_index" "event_index" {
     "description_en": { "type": "text" },
     "description_th": { "type": "text" },
     "category":       { "type": "keyword" },
-    "age_range_min":  { "type": "integer" },
-    "age_range_max":  { "type": "integer" }
   }
 }
 EOF

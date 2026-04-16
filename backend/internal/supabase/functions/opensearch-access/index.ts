@@ -46,8 +46,6 @@ Deno.serve(async (req) => {
           description_en:   record.description_en,
           description_th:   record.description_th,
           category:         record.category,
-          age_range_min:    record.age_range_min,
-          age_range_max:    record.age_range_max,
         });
         break;
 

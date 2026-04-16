@@ -14,6 +14,7 @@ backend/.vscode/
 .next/
 
 backend/.env
+backend/internal/supabase/functions/.env
 
 backend/internal/supabase/.branches/
 backend/internal/supabase/.temp/

@@ -1,12 +1,18 @@
 CREATE OR REPLACE FUNCTION notify_opensearch()
 RETURNS TRIGGER AS $$
+DECLARE
+  _url  text;
+  _key  text;
 BEGIN
+  SELECT decrypted_secret INTO _url FROM vault.decrypted_secrets WHERE name = 'edge_function_url' LIMIT 1;
+  SELECT decrypted_secret INTO _key FROM vault.decrypted_secrets WHERE name = 'edge_function_key' LIMIT 1;
+
   BEGIN
     PERFORM net.http_post(
-      url     := current_setting('app.settings.edge_function_url'),
+      url     := _url,
       headers := jsonb_build_object(
         'Content-Type',  'application/json',
-        'Authorization', current_setting('app.settings.edge_function_key')
+        'Authorization', _key
       ),
       body    := jsonb_build_object(
         'type',       TG_OP,
