@@ -38,6 +38,7 @@
   "dashboard": {
     "title": "แดชบอร์ดของฉัน",
     "searchPlaceholder": "ค้นหาคลาส",
+    "greeting": "สวัสดี, {{name}}",
     "discoverWeekly": "ค้นพบประจำสัปดาห์",
     "forYou": "สำหรับคุณ",
     "basedOn": "ตามจาก",
