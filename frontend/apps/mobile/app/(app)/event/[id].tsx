@@ -15,6 +15,7 @@ import {
   useGetReviewAggregate,
 } from "@skillspark/api-client";
 import type { EventOccurrence } from "@skillspark/api-client";
+import { ErrorScreen } from "@/components/ErrorScreen";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
 import { RATING_OPTIONS } from "@/constants/ratings";
@@ -330,16 +331,7 @@ export default function EventOccurrenceScreen() {
     response.status !== 200 ||
     response.data.length === 0
   ) {
-    return (
-      <View className="flex-1 items-center justify-center p-6">
-        <Text
-          className="text-base font-semibold"
-          style={{ color: AppColors.danger }}
-        >
-          {translate("event.notFound")}
-        </Text>
-      </View>
-    );
+    return <ErrorScreen message={translate("event.notFound")} />;
   }
 
   return <EventOccurrenceDetail occurrence={response.data[0]} />;
