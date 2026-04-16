@@ -69,7 +69,7 @@ export default function ManageEmergencyContactScreen() {
     if (!name || !phoneNumber) {
       Alert.alert(
         translate("common.error"),
-        translate("childProfile.requiredFieldsError"),
+        translate("emergencyContact.requiredFieldsError"),
       );
       return;
     }
@@ -101,7 +101,7 @@ export default function ManageEmergencyContactScreen() {
     } catch (error) {
       Alert.alert(
         translate("common.errorOccurred"),
-        translate("childProfile.saveError"),
+        translate("emergencyContact.saveError"),
       );
     } finally {
       setIsSubmitting(false);
@@ -110,8 +110,8 @@ export default function ManageEmergencyContactScreen() {
 
   const handleDelete = () => {
     Alert.alert(
-      translate("childProfile.deleteProfile"),
-      translate("childProfile.deleteConfirm"),
+      translate("emergencyContact.deleteContact"),
+      translate("emergencyContact.deleteConfirm"),
       [
         { text: translate("common.cancel"), style: "cancel" },
         {
@@ -131,7 +131,7 @@ export default function ManageEmergencyContactScreen() {
             } catch {
               Alert.alert(
                 translate("common.errorOccurred"),
-                translate("childProfile.deleteError"),
+                translate("emergencyContact.deleteError"),
               );
               setIsSubmitting(false);
             }
