@@ -5,7 +5,7 @@ import { RATING_OPTIONS } from "@/constants/ratings";
 import { AppColors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
 
-export const NO_REVIEWS_IMAGE = require("@/assets/images/noreview.png");
+export const NO_REVIEWS_IMAGE = require("@/assets/images/ratings/noreview.png");
 
 export function RatingAggregateCard({
   aggregate,
@@ -33,7 +33,7 @@ export function RatingAggregateCard({
         ) : (
           (() => {
             const match = RATING_OPTIONS.find(
-              (r) => r.rating === Math.round(avg),
+              (r) => r.rating === Math.round(avg)
             );
             return (
               <View className="flex-row items-center gap-3 mb-1">

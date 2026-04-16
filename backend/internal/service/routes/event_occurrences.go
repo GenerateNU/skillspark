@@ -108,6 +108,10 @@ func mapToDBFilters(input *models.GetAllEventOccurrencesInput) models.GetAllEven
 		filters.MaxDate = &input.MaxDate
 	}
 
+	if input.Category != "" {
+		filters.Category = &input.Category
+	}
+
 	return filters
 }
 

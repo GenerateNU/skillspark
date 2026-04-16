@@ -140,25 +140,16 @@ export default function HomeScreen() {
       .filter((r) => r.occurrences.length > 0);
   }, [children, futureOccurrences]);
 
-  const categories = useMemo(() => {
-    const cats = new Set<string>();
-    allOccurrences.forEach((o) =>
-      o.event.category?.forEach((c) => cats.add(c))
-    );
-    return cats.size > 0
-      ? Array.from(cats)
-      : ["Sport", "Arts", "Music", "Tech", "Activity", "Tutoring"];
-  }, [allOccurrences]);
-
-  const categoryEventMap = useMemo(() => {
-    const map: Record<string, EventOccurrence> = {};
-    allOccurrences.forEach((o) => {
-      o.event.category?.forEach((c) => {
-        if (!map[c] && o.event.presigned_url) map[c] = o;
-      });
-    });
-    return map;
-  }, [allOccurrences]);
+  const categories = [
+    "Sports & Physical Activities",
+    "Arts & Creative Expression",
+    "Languages",
+    "Academics",
+    "Personal Development & Life Skills",
+    "Music & Performance",
+    "Math",
+    "Tech & Innovation",
+  ];
 
   const firstName = guardian?.name?.split(" ")[0] ?? "there";
 
@@ -337,29 +328,24 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Explore by Category */}
-        {categories.length > 0 && (
-          <View className="mb-6">
-            <Text
-              className="font-nunito-bold px-5 mb-3"
-              style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-            >
-              Explore by Category
-            </Text>
-            <View className="px-[15px]">
-              {categoryPairs.map((pair, idx) => (
-                <View key={idx} className="flex-row">
-                  {pair.map((cat) => (
-                    <CategoryCard
-                      key={cat}
-                      category={cat}
-                      occurrence={categoryEventMap[cat]}
-                    />
-                  ))}
-                  {pair.length === 1 && <View className="flex-1 m-[5px]" />}
-                </View>
-              ))}
-            </View>
+      {/* Explore by Category */}
+      {categories.length > 0 && (
+        <View className="mb-6">
+          <Text
+            className="font-nunito-bold px-5 mb-3"
+            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+          >
+            Explore by Category
+          </Text>
+          <View className="px-[15px]">
+            {categoryPairs.map((pair, idx) => (
+              <View key={idx} className="flex-row">
+                {pair.map((cat) => (
+                  <CategoryCard key={cat} category={cat} />
+                ))}
+                {pair.length === 1 && <View className="flex-1 m-[5px]" />}
+              </View>
+            ))}
           </View>
         )}
       </LogoBgWrapper>

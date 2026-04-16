@@ -1,26 +1,70 @@
+import { memo, useCallback, useMemo } from "react";
+import { View, Pressable, Text } from "react-native";
+import { AppColors } from "@/constants/theme";
+import { useRouter } from "expo-router";
 import { Image } from "expo-image";
-import { View, Text, Pressable } from "react-native";
-import { type EventOccurrence } from "@skillspark/api-client";
-import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
+import { useTranslation } from "react-i18next";
 
-const CATEGORY_COLORS: Record<string, string> = {
-  Sport: AppColors.blue,
-  Arts: AppColors.violet,
-  Music: AppColors.pink,
-  Tech: AppColors.emerald,
-  Activity: AppColors.amber,
-  Tutoring: AppColors.danger,
+const sportsImage = require("@/assets/images/categories/sports-and-physical-activities.png");
+const artsAndCreativeImage = require("@/assets/images/categories/arts-and-creative-expression.png");
+const languagesImage = require("@/assets/images/categories/languages.png");
+const academicsImage = require("@/assets/images/categories/academics.png");
+const lifeSkillsImage = require("@/assets/images/categories/life-skills.png");
+const musicImage = require("@/assets/images/categories/music-and-performance.png");
+const mathImage = require("@/assets/images/categories/math.png");
+const techImage = require("@/assets/images/categories/tech-and-innovation.png");
+
+const CATEGORY_SOURCES: Record<
+  string,
+  { uri: number; translationKey: string }
+> = {
+  "Sports & Physical Activities": {
+    uri: sportsImage,
+    translationKey: "dashboard.categories.sports",
+  },
+  "Arts & Creative Expression": {
+    uri: artsAndCreativeImage,
+    translationKey: "dashboard.categories.art",
+  },
+  Languages: {
+    uri: languagesImage,
+    translationKey: "dashboard.categories.languages",
+  },
+  Academics: {
+    uri: academicsImage,
+    translationKey: "dashboard.categories.academics",
+  },
+  "Personal Development & Life Skills": {
+    uri: lifeSkillsImage,
+    translationKey: "dashboard.categories.lifeSkills",
+  },
+  "Music & Performance": {
+    uri: musicImage,
+    translationKey: "dashboard.categories.music",
+  },
+  Math: { uri: mathImage, translationKey: "dashboard.categories.math" },
+  "Tech & Innovation": {
+    uri: techImage,
+    translationKey: "dashboard.categories.technology",
+  },
 };
 
-export function CategoryCard({
+export const CategoryCard = memo(function CategoryCard({
   category,
-  occurrence,
 }: {
   category: string;
-  occurrence?: EventOccurrence;
 }) {
+  const router = useRouter();
+  const { t: translate } = useTranslation();
+  const source = useMemo(() => CATEGORY_SOURCES[category], [category]);
+  const handlePress = useCallback(
+    () => router.push({ pathname: "/event-categories", params: { category } }),
+    [category, router]
+  );
+
   return (
     <Pressable
+      onPress={handlePress}
       className="flex-1 m-[5px]"
       style={{
         shadowColor: "#000",
@@ -31,37 +75,23 @@ export function CategoryCard({
       }}
     >
       <View className="h-[80px] rounded-[15px] overflow-hidden">
-        {occurrence?.event.presigned_url ? (
+        {source != null ? (
           <Image
-            source={{ uri: occurrence.event.presigned_url }}
+            source={source.uri}
             style={{ width: "100%", height: "100%" }}
-            className="absolute inset-0 opacity-80"
-            contentFit="cover"
           />
         ) : (
           <View
             className="absolute inset-0"
-            style={{
-              backgroundColor:
-                CATEGORY_COLORS[category] ?? AppColors.categoryFallback,
-            }}
+            style={{ backgroundColor: AppColors.categoryFallback }}
           />
         )}
-        <View
-          className="absolute bottom-0 left-0 right-0 h-[55%] justify-end px-3 pb-[10px]"
-          style={{ backgroundColor: AppColors.cardOverlay }}
-        >
-          <Text
-            style={{
-              color: AppColors.white,
-              fontFamily: FontFamilies.bold,
-              fontSize: FontSizes.base,
-            }}
-          >
-            {category}
+        <View className="absolute inset-0 justify-end p-3">
+          <Text className="text-white text-xs font-bold">
+            {source != null ? translate(source.translationKey) : category}
           </Text>
         </View>
       </View>
     </Pressable>
   );
-}
+});
