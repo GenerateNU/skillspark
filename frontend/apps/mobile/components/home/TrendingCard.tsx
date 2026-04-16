@@ -1,5 +1,6 @@
 import { View, Text, Pressable, Image as RNImage } from "react-native";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { type EventOccurrence, type ReviewAggregate, useGetReviewAggregate } from "@skillspark/api-client";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { haversineDistance } from "@/utils/distance";
@@ -19,6 +20,7 @@ export function TrendingCard({
   width?: number | "100%";
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const ageLabel =
     formatAgeRange(occurrence.event.age_range_min, occurrence.event.age_range_max) || null;
@@ -124,7 +126,7 @@ export function TrendingCard({
                 color: AppColors.mutedText,
               }}
             >
-              {distance.toFixed(1)} km away
+              {distance.toFixed(1)} {t("map.km")} {t("map.away")}
             </Text>
           )}
         </View>
