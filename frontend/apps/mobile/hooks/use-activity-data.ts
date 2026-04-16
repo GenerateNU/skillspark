@@ -10,6 +10,7 @@ import {
   type Review,
 } from "@skillspark/api-client";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import { extractResponseData, arrayToMap } from "@/utils/format";
 
 export function useActivityData() {
   const { guardianId } = useAuthContext();
@@ -42,10 +43,10 @@ export function useActivityData() {
   const { data: childrenResp } = useGetChildrenByGuardianId(guardianId!, {
     query: { enabled: !!guardianId },
   });
-  const children: Child[] = useMemo(() => {
-    const d = childrenResp as unknown as { data: Child[] } | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [childrenResp]);
+  const children: Child[] = useMemo(
+    () => extractResponseData<Child>(childrenResp),
+    [childrenResp],
+  );
 
   const childMap = useMemo(() => {
     const map: Record<string, Child> = {};

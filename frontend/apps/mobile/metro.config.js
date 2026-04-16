@@ -8,6 +8,8 @@ const repoRoot = path.resolve(monorepoRoot, "..");
 
 const config = getDefaultConfig(projectRoot);
 
+config.resolver.assetExts = [...(config.resolver.assetExts ?? []), "svg"];
+
 // Watch both the frontend monorepo and the repo root, because bun may hoist
 // packages into the repo root's node_modules/.bun store.
 config.watchFolders = [monorepoRoot, repoRoot];
