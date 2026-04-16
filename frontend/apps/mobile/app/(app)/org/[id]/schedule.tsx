@@ -19,7 +19,7 @@ import { AppColors, FontFamilies } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
 import { OccurrenceCard } from "./OccurrenceCard";
-import { formatSectionDate } from "@/utils/format";
+import { formatSectionDate, formatSectionMonth } from "@/utils/format";
 import { useOrgScheduleFilters } from "@/hooks/use-org-schedule-filters";
 
 export default function OrgScheduleScreen() {
@@ -88,8 +88,10 @@ export default function OrgScheduleScreen() {
       if (min_price !== undefined && o.price < min_price) return false;
       if (max_price !== undefined && o.price > max_price) return false;
 
-      if (min_age !== undefined && o.event.age_range_max < min_age) return false;
-      if (max_age !== undefined && o.event.age_range_min > max_age) return false;
+      if (min_age !== undefined && o.event.age_range_max < min_age)
+        return false;
+      if (max_age !== undefined && o.event.age_range_min > max_age)
+        return false;
 
       return true;
     });
@@ -97,12 +99,12 @@ export default function OrgScheduleScreen() {
 
   const uniqueEventIds = useMemo(
     () => [...new Set(occurrences.map((o) => o.event.id))],
-    [occurrences],
+    [occurrences]
   );
 
   const reviewResults = useQueries({
     queries: uniqueEventIds.map((eventId) =>
-      getGetReviewAggregateQueryOptions(eventId),
+      getGetReviewAggregateQueryOptions(eventId)
     ),
   });
 
@@ -124,7 +126,7 @@ export default function OrgScheduleScreen() {
   const grouped = useMemo(() => {
     const sorted = [...filteredOccurrences].sort(
       (a, b) =>
-        new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+        new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
     );
 
     const groups = new Map<string, EventOccurrence[]>();
@@ -135,6 +137,7 @@ export default function OrgScheduleScreen() {
     }
 
     return Array.from(groups.entries()).map(([, items]) => ({
+      month: formatSectionMonth(items[0].start_time),
       label: formatSectionDate(items[0].start_time),
       items,
     }));
@@ -163,12 +166,14 @@ export default function OrgScheduleScreen() {
           />
         </TouchableOpacity>
         <Text
-          className="flex-1 text-center text-[16px] font-nunito-bold"
+          className="absolute inset-x-0 text-center text-[16px] font-nunito-bold"
           style={{ color: AppColors.primaryText }}
           numberOfLines={1}
+          pointerEvents="none"
         >
           {translate("org.schedule")}
         </Text>
+        <View className="flex-1 items-end">
         <TouchableOpacity
           onPress={() => router.push(`/org/${id}/filters`)}
           activeOpacity={0.7}
@@ -183,7 +188,7 @@ export default function OrgScheduleScreen() {
           </Text>
           {activeCount > 0 && (
             <View
-              className="h-4 w-4 items-center justify-center rounded-full"
+              className="h-[18px] w-[18px] items-center justify-center rounded-full"
               style={{ backgroundColor: AppColors.white }}
             >
               <Text
@@ -198,6 +203,7 @@ export default function OrgScheduleScreen() {
             </View>
           )}
         </TouchableOpacity>
+        </View>
       </View>
 
       {occurrencesLoading ? (
@@ -222,16 +228,29 @@ export default function OrgScheduleScreen() {
         >
           {grouped.map((group) => (
             <View key={group.label} className="mb-4">
-              <Text
-                className="px-4 pb-3"
-                style={{
-                  fontFamily: FontFamilies.bold,
-                  fontSize: 22,
-                  color: AppColors.primaryText,
-                }}
-              >
-                {group.label}
-              </Text>
+              <View className="px-4 pb-3">
+                <Text
+                  style={{
+                    fontFamily: FontFamilies.regular,
+                    fontSize: 11,
+                    color: AppColors.primaryText,
+                    opacity: 0.6,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  {group.month}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: FontFamilies.bold,
+                    fontSize: 22,
+                    color: AppColors.primaryText,
+                  }}
+                >
+                  {group.label}
+                </Text>
+              </View>
               {group.items.map((occ) => (
                 <OccurrenceCard
                   key={occ.id}
