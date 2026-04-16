@@ -119,7 +119,7 @@ variable "event_shards" {
 variable "event_replicas" {
   description = "replicas to use for events index"
   type        = integer
-  default     = 3
+  default     = 0
 }
 
 
