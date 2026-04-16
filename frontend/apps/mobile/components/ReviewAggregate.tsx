@@ -33,7 +33,7 @@ export function RatingAggregateCard({
         ) : (
           (() => {
             const match = RATING_OPTIONS.find(
-              (r) => r.rating === Math.round(avg)
+              (r) => r.rating === Math.round(avg),
             );
             return (
               <View className="flex-row items-center gap-3 mb-1">

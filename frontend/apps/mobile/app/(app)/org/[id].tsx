@@ -143,8 +143,7 @@ function OrgDetail({
             <Text
               numberOfLines={aboutExpanded ? undefined : 4}
               onTextLayout={(e) => {
-                if (!aboutExpanded)
-                  setAboutTruncated(e.nativeEvent.lines.length >= 4);
+                setAboutTruncated(e.nativeEvent.lines.length >= 4);
               }}
               className={`text-sm leading-[22px] ${
                 aboutTruncated ? "mb-1" : "mb-4"

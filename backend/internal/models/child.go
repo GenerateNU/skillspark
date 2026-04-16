@@ -11,7 +11,7 @@ type CreateChildInput struct {
 		Name             string    `json:"name" db:"name" doc:"Name of the child" minLength:"1" maxLength:"200"`
 		SchoolID         uuid.UUID `json:"school_id" db:"school_id" doc:"ID of the school the child goes to"`
 		BirthMonth       int       `json:"birth_month" db:"birth_month" doc:"Birth month of the child" minimum:"1" maximum:"12"`
-		BirthYear        int       `json:"birth_year" db:"birth_year" doc:"Birth year of the child" minimum:"2000" maximum:"2026"` // NOTE: uses current year, but could also be in the future
+		BirthYear        int       `json:"birth_year" db:"birth_year" doc:"Birth year of the child" minimum:"1950" maximum:"2100"` // NOTE: uses current year, but could also be in the future
 		Interests        []string  `json:"interests" db:"interests" doc:"Interests of the child"`
 		GuardianID       uuid.UUID `json:"guardian_id" db:"guardian_id" doc:"ID of the child's guardian"`
 		AvatarFace       *string   `json:"avatar_face,omitempty" db:"avatar_face" doc:"Avatar face identifier for the child's profile picture"`

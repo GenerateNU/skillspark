@@ -18,13 +18,12 @@ import {
   type Child,
   useGetTrendingEventOccurrences,
 } from "@skillspark/api-client";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useFilters } from "@/hooks/use-filters";
 import { useRouter } from "expo-router";
 import { isWithinNext7Days } from "@/utils/format";
-import { DiscoverBanner } from "@/components/home/DiscoverBanner";
 import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
 import { RecommendedCard } from "@/components/home/RecommendedCard";
 import { CategoryCard } from "@/components/home/CategoryCard";
@@ -40,7 +39,7 @@ import LogoBgWrapper from "@/components/LogoBgWrapper";
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
-  const { filters, hasActiveFilters } = useFilters();
+  const { hasActiveFilters } = useFilters();
   const router = useRouter();
   const { width, height } = useWindowDimensions();
 
@@ -350,6 +349,7 @@ export default function HomeScreen() {
               </View>
             ))}
           </View>
+        </View>
         )}
       </LogoBgWrapper>
     </ScrollView>

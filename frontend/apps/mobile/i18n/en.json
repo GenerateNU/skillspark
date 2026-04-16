@@ -178,7 +178,7 @@
     "noSchoolsFound": "No schools found",
     "deleteProfile": "Delete Profile",
     "deleteConfirm": "Are you sure you want to remove this child profile?",
-    "requiredFieldsError": "Please fill in all required fields (Name, Birth Date, School ID)",
+    "requiredFieldsError": "Please fill in all required fields (Name, Birth Date, School)",
     "saveError": "Failed to save. Please try again.",
     "deleteError": "Failed to delete.",
     "changeProfilePicture": "Change Profile Picture",
