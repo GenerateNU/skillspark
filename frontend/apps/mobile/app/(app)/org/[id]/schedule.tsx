@@ -88,8 +88,10 @@ export default function OrgScheduleScreen() {
       if (min_price !== undefined && o.price < min_price) return false;
       if (max_price !== undefined && o.price > max_price) return false;
 
-      if (min_age !== undefined && o.event.age_range_max < min_age) return false;
-      if (max_age !== undefined && o.event.age_range_min > max_age) return false;
+      if (min_age !== undefined && o.event.age_range_max < min_age)
+        return false;
+      if (max_age !== undefined && o.event.age_range_min > max_age)
+        return false;
 
       return true;
     });

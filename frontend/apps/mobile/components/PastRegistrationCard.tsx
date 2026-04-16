@@ -2,7 +2,11 @@ import { ThemedText } from "@/components/themed-text";
 import { AppColors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
 import { Image, TouchableOpacity, View } from "react-native";
-import { type RegistrationCardProps, formatTime, formatDate } from "@/components/RegistrationCard.types";
+import {
+  type RegistrationCardProps,
+  formatTime,
+  formatDate,
+} from "@/components/RegistrationCard.types";
 import { ChildAvatar } from "@/components/ChildAvatar";
 
 export function PastRegistrationCard({ data }: RegistrationCardProps) {
@@ -38,10 +42,16 @@ export function PastRegistrationCard({ data }: RegistrationCardProps) {
           {data.title}
         </ThemedText>
         <View>
-          <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
+          <ThemedText
+            className="text-sm"
+            style={{ color: AppColors.mutedText }}
+          >
             {formatDate(data.start_time)}
           </ThemedText>
-          <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
+          <ThemedText
+            className="text-sm"
+            style={{ color: AppColors.mutedText }}
+          >
             {formatTime(data.start_time)} – {formatTime(data.end_time)}
           </ThemedText>
         </View>
@@ -51,7 +61,10 @@ export function PastRegistrationCard({ data }: RegistrationCardProps) {
       </View>
 
       <View className="py-3 pr-3 items-end justify-between">
-        <View className="flex-row flex-wrap gap-1 justify-end" style={{ maxWidth: 80 }}>
+        <View
+          className="flex-row flex-wrap gap-1 justify-end"
+          style={{ maxWidth: 80 }}
+        >
           {children.map((child) => (
             <ChildAvatar
               key={child.id}
@@ -63,8 +76,14 @@ export function PastRegistrationCard({ data }: RegistrationCardProps) {
           ))}
         </View>
         {data.hasReviewed ? (
-          <View className="px-4 py-2 rounded-full" style={{ backgroundColor: AppColors.borderLight }}>
-            <ThemedText className="text-sm font-medium" style={{ color: AppColors.mutedText }}>
+          <View
+            className="px-4 py-2 rounded-full"
+            style={{ backgroundColor: AppColors.borderLight }}
+          >
+            <ThemedText
+              className="text-sm font-medium"
+              style={{ color: AppColors.mutedText }}
+            >
               {t("activity.reviewed")}
             </ThemedText>
           </View>

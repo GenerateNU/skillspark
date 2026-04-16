@@ -80,10 +80,10 @@ export default function ActivityScreen() {
   // ── Cancel sheet ─────────────────────────────────────────────────────────────
 
   const [cancelTarget, setCancelTarget] = useState<ChildRegistration[] | null>(
-    null
+    null,
   );
   const [cancelSelections, setCancelSelections] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const cancelSheetTranslateY = useRef(new Animated.Value(0)).current;
 
@@ -104,7 +104,7 @@ export default function ActivityScreen() {
           }).start();
         }
       },
-    })
+    }),
   ).current;
 
   const getOnRemove = (childRegistrations: ChildRegistration[]) => () => {
@@ -124,7 +124,7 @@ export default function ActivityScreen() {
   const confirmCancellation = () => {
     if (!cancelTarget) return;
     const toCancel = cancelTarget.filter((cr) =>
-      cancelSelections.has(cr.child.id)
+      cancelSelections.has(cr.child.id),
     );
     if (toCancel.length === 0) {
       setCancelTarget(null);
@@ -144,7 +144,7 @@ export default function ActivityScreen() {
         data: {
           ...prev.data,
           registrations: prev.data.registrations.map((r) =>
-            idSet.has(r.id) ? { ...r, status: "cancelled" } : r
+            idSet.has(r.id) ? { ...r, status: "cancelled" } : r,
           ),
         },
       };
@@ -156,8 +156,8 @@ export default function ActivityScreen() {
           onError: () => {
             queryClient.invalidateQueries({ queryKey });
           },
-        }
-      )
+        },
+      ),
     );
   };
 
@@ -250,7 +250,7 @@ export default function ActivityScreen() {
           }).start();
         }
       },
-    })
+    }),
   ).current;
 
   const openFilter = () => {
@@ -288,7 +288,7 @@ export default function ActivityScreen() {
     activeFilter.size === 0
       ? baseDisplayed
       : baseDisplayed.filter((reg) =>
-          reg.childRegistrations.some((cr) => activeFilter.has(cr.child.id))
+          reg.childRegistrations.some((cr) => activeFilter.has(cr.child.id)),
         );
 
   const toggleSelection = (newValue: toggleValue) => {
@@ -357,7 +357,7 @@ export default function ActivityScreen() {
                   key={reg.event_occurrence_id}
                   data={reg}
                 />
-              )
+              ),
             )
           )}
         </ScrollView>

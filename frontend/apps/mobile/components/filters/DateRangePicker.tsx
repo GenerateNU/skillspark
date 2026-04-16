@@ -31,30 +31,50 @@ function endOfDay(d: Date): Date {
 
 export function DateRangePicker({ startDate, endDate, onChange }: Props) {
   const { t } = useTranslation();
-  const months: string[] = t("calendar.months", { returnObjects: true }) as string[];
-  const dayNames: string[] = t("calendar.days", { returnObjects: true }) as string[];
+  const months: string[] = t("calendar.months", {
+    returnObjects: true,
+  }) as string[];
+  const dayNames: string[] = t("calendar.days", {
+    returnObjects: true,
+  }) as string[];
 
   const today = startOfDay(new Date());
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
 
   function prevMonth() {
-    if (viewMonth === 0) { setViewYear((y) => y - 1); setViewMonth(11); }
-    else setViewMonth((m) => m - 1);
+    if (viewMonth === 0) {
+      setViewYear((y) => y - 1);
+      setViewMonth(11);
+    } else setViewMonth((m) => m - 1);
   }
 
   function nextMonth() {
-    if (viewMonth === 11) { setViewYear((y) => y + 1); setViewMonth(0); }
-    else setViewMonth((m) => m + 1);
+    if (viewMonth === 11) {
+      setViewYear((y) => y + 1);
+      setViewMonth(0);
+    } else setViewMonth((m) => m + 1);
   }
 
   function handlePress(day: Date) {
     const d = startOfDay(day);
     if (d < today) return;
-    if (startDate && endDate) { onChange(d, undefined); return; }
-    if (!startDate) { onChange(d, undefined); return; }
-    if (sameDay(d, startDate)) { onChange(undefined, undefined); return; }
-    if (d < startDate) { onChange(d, undefined); return; }
+    if (startDate && endDate) {
+      onChange(d, undefined);
+      return;
+    }
+    if (!startDate) {
+      onChange(d, undefined);
+      return;
+    }
+    if (sameDay(d, startDate)) {
+      onChange(undefined, undefined);
+      return;
+    }
+    if (d < startDate) {
+      onChange(d, undefined);
+      return;
+    }
     onChange(startDate, endOfDay(day));
   }
 
@@ -63,7 +83,10 @@ export function DateRangePicker({ startDate, endDate, onChange }: Props) {
 
   const cells: (Date | null)[] = [
     ...Array<null>(firstDOW).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => new Date(viewYear, viewMonth, i + 1)),
+    ...Array.from(
+      { length: daysInMonth },
+      (_, i) => new Date(viewYear, viewMonth, i + 1),
+    ),
   ];
   while (cells.length % 7 !== 0) cells.push(null);
 
@@ -144,7 +167,9 @@ export function DateRangePicker({ startDate, endDate, onChange }: Props) {
                 <View
                   className="w-full h-9 items-center justify-center"
                   style={{
-                    backgroundColor: isInRange ? "rgba(26,26,26,0.1)" : "transparent",
+                    backgroundColor: isInRange
+                      ? "rgba(26,26,26,0.1)"
+                      : "transparent",
                   }}
                 >
                   {/* Right-half tint on start cell */}
@@ -178,9 +203,11 @@ export function DateRangePicker({ startDate, endDate, onChange }: Props) {
                       className="font-nunito-semibold text-[12px]"
                       style={{
                         color:
-                          isStart || isEnd ? "#fff"
-                          : isPast ? "#9CA3AF"
-                          : "#111",
+                          isStart || isEnd
+                            ? "#fff"
+                            : isPast
+                              ? "#9CA3AF"
+                              : "#111",
                       }}
                     >
                       {day.getDate()}
