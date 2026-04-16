@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -38,8 +38,7 @@ export default function OrgScheduleScreen() {
     if (filterClass && !filters.class_name) {
       setFilters({ ...filters, class_name: filterClass });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterClass]);
+  }, [filterClass, filters, setFilters]);
 
   const { data: occurrencesResp, isLoading: occurrencesLoading } =
     useGetEventOccurrencesByOrganizationId(id);
@@ -52,68 +51,48 @@ export default function OrgScheduleScreen() {
   }, [occurrencesResp]);
 
   const filteredOccurrences = useMemo(() => {
-    let result = occurrences;
+    const {
+      class_name,
+      min_start_minutes,
+      max_start_minutes,
+      min_duration,
+      max_duration,
+      min_price,
+      max_price,
+      min_age,
+      max_age,
+    } = filters;
 
-    if (filters.class_name) {
-      result = result.filter((o) => o.event.title === filters.class_name);
-    }
-    if (filters.min_start_minutes !== undefined) {
-      result = result.filter((o) => {
+    return occurrences.filter((o) => {
+      if (class_name && o.event.title !== class_name) return false;
+
+      if (min_start_minutes !== undefined || max_start_minutes !== undefined) {
         const d = new Date(o.start_time);
         const mins = d.getHours() * 60 + d.getMinutes();
-        return mins >= filters.min_start_minutes!;
-      });
-    }
-    if (filters.max_start_minutes !== undefined) {
-      result = result.filter((o) => {
-        const d = new Date(o.start_time);
-        const mins = d.getHours() * 60 + d.getMinutes();
-        return mins <= filters.max_start_minutes!;
-      });
-    }
-    if (
-      filters.min_duration !== undefined ||
-      filters.max_duration !== undefined
-    ) {
-      result = result.filter((o) => {
+        if (min_start_minutes !== undefined && mins < min_start_minutes)
+          return false;
+        if (max_start_minutes !== undefined && mins > max_start_minutes)
+          return false;
+      }
+
+      if (min_duration !== undefined || max_duration !== undefined) {
         const durationMin =
-          (new Date(o.end_time).getTime() -
-            new Date(o.start_time).getTime()) /
+          (new Date(o.end_time).getTime() - new Date(o.start_time).getTime()) /
           60000;
-        if (
-          filters.min_duration !== undefined &&
-          durationMin < filters.min_duration
-        )
+        if (min_duration !== undefined && durationMin < min_duration)
           return false;
-        if (
-          filters.max_duration !== undefined &&
-          durationMin > filters.max_duration
-        )
+        if (max_duration !== undefined && durationMin > max_duration)
           return false;
-        return true;
-      });
-    }
-    if (filters.min_price !== undefined || filters.max_price !== undefined) {
-      result = result.filter((o) => {
-        if (filters.min_price !== undefined && o.price < filters.min_price)
-          return false;
-        if (filters.max_price !== undefined && o.price > filters.max_price)
-          return false;
-        return true;
-      });
-    }
-    if (filters.min_age !== undefined) {
-      result = result.filter(
-        (o) => o.event.age_range_max >= filters.min_age!,
-      );
-    }
-    if (filters.max_age !== undefined) {
-      result = result.filter(
-        (o) => o.event.age_range_min <= filters.max_age!,
-      );
-    }
+      }
 
-    return result;
+      if (min_price !== undefined && o.price < min_price) return false;
+      if (max_price !== undefined && o.price > max_price) return false;
+
+      if (min_age !== undefined && o.event.age_range_max < min_age) return false;
+      if (max_age !== undefined && o.event.age_range_min > max_age) return false;
+
+      return true;
+    });
   }, [occurrences, filters]);
 
   const uniqueEventIds = useMemo(
@@ -142,34 +121,24 @@ export default function OrgScheduleScreen() {
     return map;
   }, [uniqueEventIds, reviewResults]);
 
-  const groupOccurrencesByDate = useCallback(
-    (
-      occs: EventOccurrence[],
-    ): { label: string; items: EventOccurrence[] }[] => {
-      const sorted = [...occs].sort(
-        (a, b) =>
-          new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
-      );
+  const grouped = useMemo(() => {
+    const sorted = [...filteredOccurrences].sort(
+      (a, b) =>
+        new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+    );
 
-      const groups: Map<string, EventOccurrence[]> = new Map();
-      for (const occ of sorted) {
-        const key = new Date(occ.start_time).toDateString();
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key)!.push(occ);
-      }
+    const groups = new Map<string, EventOccurrence[]>();
+    for (const occ of sorted) {
+      const key = new Date(occ.start_time).toDateString();
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(occ);
+    }
 
-      return Array.from(groups.entries()).map(([, items]) => ({
-        label: formatSectionDate(items[0].start_time),
-        items,
-      }));
-    },
-    [],
-  );
-
-  const grouped = useMemo(
-    () => groupOccurrencesByDate(filteredOccurrences),
-    [filteredOccurrences, groupOccurrencesByDate],
-  );
+    return Array.from(groups.entries()).map(([, items]) => ({
+      label: formatSectionDate(items[0].start_time),
+      items,
+    }));
+  }, [filteredOccurrences]);
 
   return (
     <SafeAreaView
@@ -201,7 +170,7 @@ export default function OrgScheduleScreen() {
           {translate("org.schedule")}
         </Text>
         <TouchableOpacity
-          onPress={() => router.push(`/org/${id}/filters` as never)}
+          onPress={() => router.push(`/org/${id}/filters`)}
           activeOpacity={0.7}
           className="flex-row items-center gap-1.5 rounded-full px-4 py-1.5"
           style={{ backgroundColor: AppColors.primaryText }}
