@@ -13,7 +13,8 @@ import {
   useGetEventOccurrencesByEventId,
   useGetReviewAggregate,
 } from "@skillspark/api-client";
-import type { EventOccurrence } from "@skillspark/api-client";
+import { ErrorScreen } from "@/components/ErrorScreen";
+import type { EventOccurrence, Organization } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, Shadows } from "@/constants/theme";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
@@ -287,18 +288,10 @@ export default function EventOccurrenceScreen() {
     error ||
     !response ||
     response.status !== 200 ||
-    response.data.length === 0
+    response.data.length === 0 ||
+    !occurrence
   ) {
-    return (
-      <View className="flex-1 items-center justify-center p-6">
-        <Text
-          className="text-base font-semibold"
-          style={{ color: AppColors.danger }}
-        >
-          {translate("event.notFound")}
-        </Text>
-      </View>
-    );
+    return <ErrorScreen message={translate("event.notFound")} />;
   }
 
   return <EventOccurrenceDetail occurrence={response.data[0]} />;
