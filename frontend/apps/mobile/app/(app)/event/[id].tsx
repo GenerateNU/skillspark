@@ -12,9 +12,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   useGetEventOccurrencesByEventId,
+  useGetOrganization,
   useGetReviewAggregate,
 } from "@skillspark/api-client";
-import type { EventOccurrence } from "@skillspark/api-client";
+import type { EventOccurrence, Organization } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
 import { RATING_OPTIONS } from "@/constants/ratings";
@@ -26,8 +27,10 @@ import { formatLocation } from "@/utils/format";
 
 function EventOccurrenceDetail({
   occurrence,
+  org,
 }: {
   occurrence: EventOccurrence;
+  org: Organization | null;
 }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
@@ -36,8 +39,18 @@ function EventOccurrenceDetail({
   const [aboutTruncated, setAboutTruncated] = useState(false);
 
   const location = formatLocation(occurrence);
-  const categories = occurrence.event.category?.join(" / ") ?? "";
+  const categories = (occurrence.event.category || [])
+    .map((elem) =>
+      //Capitalize the first char of every word
+      elem
+        .toLowerCase()
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ")
+    )
+    .join(" / ");
   const orgId = occurrence.event.organization_id;
+  const orgName = org?.name ?? "";
 
   const { data: aggregateResp } = useGetReviewAggregate(occurrence.event.id, {
     query: { enabled: !!occurrence.event.id },
@@ -46,7 +59,7 @@ function EventOccurrenceDetail({
   const avgRating = aggregate?.average_rating ?? 0;
   const totalReviews = aggregate?.total_reviews ?? 0;
   const ratingMatch = RATING_OPTIONS.find(
-    (r) => r.rating === Math.round(avgRating),
+    (r) => r.rating === Math.round(avgRating)
   );
 
   const cardShadow = {
@@ -123,10 +136,10 @@ function EventOccurrenceDetail({
           </View>
 
           {/* Location */}
-          <View className="flex-row items-center gap-1.5 mb-2">
+          <View className="flex-row items-center gap-1 mb-2">
             <MaterialIcons
               name="location-on"
-              size={16}
+              size={22}
               color={AppColors.mutedText}
             />
             <Text
@@ -139,12 +152,38 @@ function EventOccurrenceDetail({
 
           {/* Category */}
           {!!categories && (
-            <Text
-              className="text-[14px] font-nunito mb-2"
-              style={{ color: AppColors.mutedText }}
+            <View className="flex-row gap-1">
+              <IconSymbol
+                name="star.fill"
+                size={22}
+                color={AppColors.mutedText}
+              />
+              <Text
+                className="text-[14px] font-nunito mb-2"
+                style={{ color: AppColors.mutedText }}
+              >
+                {categories}
+              </Text>
+            </View>
+          )}
+
+          {!!orgId && (
+            <TouchableOpacity
+              onPress={() => router.push(`../org/${orgId}`)}
+              className="flex-row items-center gap-1 mb-2"
             >
-              {categories}
-            </Text>
+              <IconSymbol
+                name="person.fill"
+                size={22}
+                color={AppColors.mutedText}
+              />
+              <Text
+                className="text-[14px] font-nunito underline"
+                style={{ color: AppColors.mutedText }}
+              >
+                {orgName}
+              </Text>
+            </TouchableOpacity>
           )}
 
           {/* Bookings this week */}
@@ -316,7 +355,16 @@ export default function EventOccurrenceScreen() {
   } = useGetEventOccurrencesByEventId(id);
   const { t: translate } = useTranslation();
 
-  if (isLoading) {
+  const occurrence = response?.status === 200 ? response.data[0] : null;
+  const orgId = occurrence?.event.organization_id;
+
+  const { data: orgResp, isLoading: orgLoading } = useGetOrganization(
+    orgId ?? "",
+    { query: { enabled: !!orgId } }
+  );
+  const org = orgResp?.status === 200 ? orgResp.data : null;
+
+  if (isLoading || orgLoading) {
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
@@ -324,12 +372,7 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  if (
-    error ||
-    !response ||
-    response.status !== 200 ||
-    response.data.length === 0
-  ) {
+  if (error || !occurrence) {
     return (
       <View className="flex-1 items-center justify-center p-6">
         <Text
@@ -342,5 +385,5 @@ export default function EventOccurrenceScreen() {
     );
   }
 
-  return <EventOccurrenceDetail occurrence={response.data[0]} />;
+  return <EventOccurrenceDetail occurrence={occurrence} org={org} />;
 }
