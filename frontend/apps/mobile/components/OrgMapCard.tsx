@@ -1,12 +1,19 @@
 import React from "react";
 import { View, TouchableOpacity, Text } from "react-native";
+import { Image } from "expo-image";
+import type { LocationObject } from "expo-location";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
-import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
+import { haversineDistance } from "@/utils/distance";
+import { RatingSmiley } from "@/components/RatingSmiley";
+import {
+  useGetReviewAggregateOrganization,
+  type ReviewAggregate,
+} from "@skillspark/api-client";
 
 export interface LocationPin {
   id: string;
@@ -17,69 +24,107 @@ export interface LocationPin {
   rating: number;
   members: number;
   image?: string;
+  district?: string;
 }
 
 interface OrgMapCardProps {
   pin: LocationPin;
+  userLocation: LocationObject | null;
 }
 
-export function OrgMapCard({ pin }: OrgMapCardProps) {
-  const placeholderColor = useThemeColor({ light: "#D0D0D0" }, "background");
+export function OrgMapCard({ pin, userLocation }: OrgMapCardProps) {
   const router = useRouter();
   const { t: translate } = useTranslation();
+  const insets = useSafeAreaInsets();
+
+  const { data: aggregateResp } = useGetReviewAggregateOrganization(pin.id, {
+    query: { enabled: !!pin.id },
+  });
+  const aggregate =
+    aggregateResp?.status === 200
+      ? (aggregateResp.data as ReviewAggregate)
+      : null;
+  const avgRating = aggregate != null ? aggregate.average_rating : null;
+
+  const distanceKm =
+    userLocation != null
+      ? haversineDistance(
+          userLocation.coords.latitude,
+          userLocation.coords.longitude,
+          pin.latitude,
+          pin.longitude,
+        )
+      : null;
+
+  const distanceLine =
+    distanceKm != null
+      ? translate("map.distanceAway", { distance: distanceKm.toFixed(1) })
+      : null;
+
+  // Position card just above the floating tab bar pill
+  const cardBottom = Math.max(insets.bottom, 8) + 92;
 
   return (
     <ThemedView
-      className="absolute bottom-0 left-0 right-0 rounded-t-[25px] p-5 elevation-10"
+      className="absolute left-4 right-4 rounded-3xl p-4"
       style={{
-        paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+        bottom: cardBottom,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 8,
       }}
     >
-      <View className="mb-5 flex-row">
-        <View
-          className="mr-[15px] h-[90px] w-[90px] items-center justify-center rounded-[10px]"
-          style={{ backgroundColor: placeholderColor }}
-        >
-          <IconSymbol name="photo" size={28} color="#888" />
+      <View className="mb-3 flex-row">
+        <View className="mr-3 h-[72px] w-[72px] overflow-hidden rounded-2xl bg-[#D9D9D9]">
+          {pin.image ? (
+            <Image
+              source={{ uri: pin.image }}
+              className="h-full w-full"
+              contentFit="cover"
+            />
+          ) : (
+            <View className="flex-1 items-center justify-center">
+              <IconSymbol name="photo" size={26} color="#6B7280" />
+            </View>
+          )}
         </View>
-        <View className="flex-1 justify-center">
-          <ThemedText type="subtitle" className="mb-1 font-bold">
+        <View className="flex-1 justify-center gap-[2px]">
+          <ThemedText className="font-nunito-bold text-[18px] leading-snug">
             {pin.title}
           </ThemedText>
-          <ThemedText className="mb-[6px] text-sm text-[#888]">
-            {pin.members} {translate("dashboard.members")}
-          </ThemedText>
-          <View className="mb-2 flex-row items-center">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <IconSymbol
-                key={star}
-                name="star.fill"
-                size={16}
-                color={star <= Math.round(pin.rating) ? "#FFC107" : "#555"}
+          {pin.district != null && pin.district.length > 0 && (
+            <ThemedText className="font-nunito text-sm text-[#6B7280]">
+              {pin.district}
+            </ThemedText>
+          )}
+          {distanceLine != null && (
+            <ThemedText className="font-nunito text-sm text-[#6B7280]">
+              {distanceLine}
+            </ThemedText>
+          )}
+          {avgRating != null && (
+            <View className="flex-row items-center gap-1">
+              <RatingSmiley
+                rating={aggregate!.total_reviews > 0 ? avgRating : null}
+                width={16}
+                height={16}
               />
-            ))}
-          </View>
-          <ThemedText
-            numberOfLines={2}
-            className="text-sm leading-5 text-[#888]"
-          >
-            {pin.description}
-          </ThemedText>
+              <ThemedText className="font-nunito text-sm text-[#6B7280]">
+                {avgRating.toFixed(1)} {translate("map.smiles")}
+              </ThemedText>
+            </View>
+          )}
         </View>
       </View>
       <TouchableOpacity
-        className="w-full items-center rounded-xl bg-[#333] py-[15px]"
-        activeOpacity={1}
-        onPress={() => {
-          router.push(`/org/${pin.id}`);
-        }}
+        className="w-full items-center rounded-xl bg-[#1C1C1E] py-[13px]"
+        activeOpacity={0.85}
+        onPress={() => router.push(`/org/${pin.id}`)}
       >
-        <Text className="font-nunito-semibold text-[18px] text-white">
-          {translate("dashboard.learnMore")}
+        <Text className="font-nunito-semibold text-base text-white">
+          {translate("map.learnMore")}
         </Text>
       </TouchableOpacity>
     </ThemedView>
