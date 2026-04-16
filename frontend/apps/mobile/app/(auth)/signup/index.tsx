@@ -43,121 +43,121 @@ export default function WelcomeScreen() {
 		<View style={StyleSheet.absoluteFill}>
 			<AuthBackground />
 			<View style={{ flex: 1, paddingTop: insets.top }}>
-			<View style={{ height: 44, justifyContent: "center" }} />
-			{/* Title */}
-			<View
-				style={{
-					alignItems: "center",
-					paddingHorizontal: 24,
-					paddingTop: 40,
-					paddingBottom: 20,
-				}}
-			>
-				<ThemedText
+				<View style={{ height: 44, justifyContent: "center" }} />
+				{/* Title */}
+				<View
 					style={{
-						fontFamily: "NunitoSans_700Bold",
-						fontSize: 30,
-						lineHeight: 38,
-						color: AppColors.primaryText,
-						letterSpacing: -0.5,
-						textAlign: "center",
-					}}
-					numberOfLines={1}
-					adjustsFontSizeToFit
-				>
-					{translate("onboarding.welcome")}
-				</ThemedText>
-			</View>
-
-			{/* Character image */}
-			<View
-				style={{
-					alignItems: "center",
-					justifyContent: "center",
-					paddingVertical: 30,
-				}}
-			>
-				<JumpingCharacter />
-				<ThemedText
-					style={{
-						fontFamily: "NunitoSans_600SemiBold",
-						fontSize: 16,
-						color: AppColors.secondaryText,
-						marginTop: 24,
-						marginBottom: 8,
-						textAlign: "center",
+						alignItems: "center",
+						paddingHorizontal: 24,
+						paddingTop: 40,
+						paddingBottom: 20,
 					}}
 				>
-					{translate("onboarding.chooseLanguage")}
-				</ThemedText>
-			</View>
+					<ThemedText
+						style={{
+							fontFamily: "NunitoSans_700Bold",
+							fontSize: 30,
+							lineHeight: 38,
+							color: AppColors.primaryText,
+							letterSpacing: -0.5,
+							textAlign: "center",
+						}}
+						numberOfLines={1}
+						adjustsFontSizeToFit
+					>
+						{translate("onboarding.welcome")}
+					</ThemedText>
+				</View>
 
-			{/* Language section */}
-			<View style={{ paddingHorizontal: 24, flex: 1 }}>
-				<View>
-					{LANGUAGES.map((lang, index) => {
-						const isSelected = selected === lang.code;
-						return (
-							<React.Fragment key={lang.code}>
-								<TouchableOpacity
-									onPress={() => updateLanguageData(lang.code)}
-									activeOpacity={0.6}
-									style={{
-										flexDirection: "row",
-										alignItems: "center",
-										gap: 14,
-										paddingVertical: 16,
-									}}
-								>
-									<ThemedText style={{ fontSize: 30, lineHeight: 36 }}>
-										{lang.flag}
-									</ThemedText>
-									<ThemedText
+				{/* Character image */}
+				<View
+					style={{
+						alignItems: "center",
+						justifyContent: "center",
+						paddingVertical: 30,
+					}}
+				>
+					<JumpingCharacter />
+					<ThemedText
+						style={{
+							fontFamily: "NunitoSans_600SemiBold",
+							fontSize: 16,
+							color: AppColors.secondaryText,
+							marginTop: 24,
+							marginBottom: 8,
+							textAlign: "center",
+						}}
+					>
+						{translate("onboarding.chooseLanguage")}
+					</ThemedText>
+				</View>
+
+				{/* Language section */}
+				<View style={{ paddingHorizontal: 24, flex: 1 }}>
+					<View>
+						{LANGUAGES.map((lang, index) => {
+							const isSelected = selected === lang.code;
+							return (
+								<React.Fragment key={lang.code}>
+									<TouchableOpacity
+										onPress={() => updateLanguageData(lang.code)}
+										activeOpacity={0.6}
 										style={{
-											flex: 1,
-											fontSize: 16,
-											fontFamily: "NunitoSans_400Regular",
-											color: AppColors.primaryText,
+											flexDirection: "row",
+											alignItems: "center",
+											gap: 14,
+											paddingVertical: 16,
 										}}
 									>
-										{translate(`settings.languages.${lang.code}`)}
-									</ThemedText>
-									<IconSymbol
-										name={isSelected ? "checkmark.circle.fill" : "circle"}
-										size={24}
-										color={isSelected ? "#1C1C1E" : "#C7C7CC"}
-									/>
-								</TouchableOpacity>
-								{index < LANGUAGES.length - 1 && (
-									<View
-										style={{
-											height: 1,
-											backgroundColor: DIVIDER,
-											marginLeft: 50,
-										}}
-									/>
-								)}
-							</React.Fragment>
-						);
-					})}
+										<ThemedText style={{ fontSize: 30, lineHeight: 36 }}>
+											{lang.flag}
+										</ThemedText>
+										<ThemedText
+											style={{
+												flex: 1,
+												fontSize: 16,
+												fontFamily: "NunitoSans_400Regular",
+												color: AppColors.primaryText,
+											}}
+										>
+											{translate(`settings.languages.${lang.code}`)}
+										</ThemedText>
+										<IconSymbol
+											name={isSelected ? "checkmark.circle.fill" : "circle"}
+											size={24}
+											color={isSelected ? "#1C1C1E" : "#C7C7CC"}
+										/>
+									</TouchableOpacity>
+									{index < LANGUAGES.length - 1 && (
+										<View
+											style={{
+												height: 1,
+												backgroundColor: DIVIDER,
+												marginLeft: 50,
+											}}
+										/>
+									)}
+								</React.Fragment>
+							);
+						})}
+					</View>
 				</View>
-			</View>
 
-			{/* Submit button */}
-			<View
-				style={{
-					alignItems: "center",
-					paddingHorizontal: 24,
-					paddingBottom: insets.bottom + 56,
-					paddingTop: 16,
-				}}
-			>
-				<Button
-					label={translate("common.submit")}
-					onPress={() => router.push("/(auth)/signup/name")}
-					disabled={false}
-				/>
-			</View>
+				{/* Submit button */}
+				<View
+					style={{
+						alignItems: "center",
+						paddingHorizontal: 24,
+						paddingBottom: insets.bottom + 56,
+						paddingTop: 16,
+					}}
+				>
+					<Button
+						label={translate("common.submit")}
+						onPress={() => router.push("/(auth)/signup/name")}
+						disabled={false}
+					/>
+				</View>
 			</View>
 		</View>
 	);

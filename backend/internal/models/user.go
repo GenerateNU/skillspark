@@ -68,3 +68,14 @@ type DeleteUserInput struct {
 type DeleteUserOutput struct {
 	Body *User `json:"body"`
 }
+
+// Username exists check
+type UsernameExistsInput struct {
+	Username string `path:"username"`
+}
+
+type UsernameExistsOutput struct {
+	Body struct {
+		Exists bool `json:"exists"`
+	}
+}

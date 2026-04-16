@@ -1,15 +1,19 @@
+import { useGuardian } from "@/hooks/use-guardian";
+import i18n from "@/i18n";
 import {
+	createStripeCustomer,
 	GuardianLoginOutputBody,
 	GuardianSignUpOutputBody,
 	loginGuardianResponse,
+	setCurrentLanguage,
 	signupGuardianResponse,
+	updateGuardianResponse,
 	useLoginGuardian,
 	useSignupGuardian,
-	Guardian,
 	useUpdateGuardian,
-	setCurrentLanguage,
-	updateGuardianResponse,
-	createStripeCustomer,
+	usernameExists as checkUsernameExists,
+	usernameExistsResponseError,
+	UsernameExistsOutputBody,
 } from "@skillspark/api-client";
 import * as SecureStore from "expo-secure-store";
 import { createContext, useState, useEffect, ReactNode } from "react";
@@ -53,7 +57,13 @@ interface AuthContextType {
 		username: string,
 		profile_picture_s3_key?: string | undefined,
 		expo_push_token?: string | undefined,
+		push_notifications?: boolean,
+		email_notifications?: boolean,
 	) => void;
+	usernameExists: (
+		username: string,
+		onError: (msg: string) => void,
+	) => Promise<boolean>;
 	setLanguage: (language: string) => void;
 	setInOnboarding: (value: boolean) => void;
 	completeOnboarding: () => Promise<void>;
@@ -67,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [guardianId, setGuardianId] = useState<string | null>(null);
 	const [jwt, setJWT] = useState<string | null>(null);
 	const [langPref, setLangPref] = useState<string | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
+	const [isLoading, setIsLoading] = useState(false);
 	const [hasAccount, setHasAccount] = useState(false);
 	const [inOnboarding, setInOnboarding] = useState(false);
 	const queryClient = useQueryClient();
@@ -76,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const { mutate: updateFunc } = useUpdateGuardian();
 	const { t: translate } = useTranslation();
 
-	let { guardian, hasError } = useGuardian(guardianId);
+	const { guardian, hasError } = useGuardian(guardianId);
 
 	const logout = async () => {
 		await SecureStore.deleteItemAsync("token");
@@ -238,6 +248,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		username: string,
 		profile_picture_s3_key?: string | undefined,
 		expo_push_token?: string | undefined,
+		push_notifications?: boolean,
+		email_notifications?: boolean,
 	) => {
 		updateFunc(
 			{
@@ -249,11 +261,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					profile_picture_s3_key,
 					username,
 					expo_push_token,
+					push_notifications,
+					email_notifications,
 				},
 			},
 			{
-				onSuccess: async (resp: updateGuardianResponse) => {
-					guardian = resp.data as Guardian;
+				onSuccess: async (_resp: updateGuardianResponse) => {
 					// refetch all getGuardian queries to show changes
 					queryClient.invalidateQueries({
 						queryKey: [`/api/v1/guardians/${id}`],
@@ -262,18 +275,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				},
 				onError: (err) => {
 					const fail = err as unknown as { data?: { message?: string } };
-					onError(fail.data?.message ?? translate("common.errorOccurred"));
+					onError(fail.data?.message ?? "An unexpected error occurred");
 				},
 			},
 		);
 	};
 
-	const setLanguage = async (language: string) => {
-		await i18n.changeLanguage(language);
-		setCurrentLanguage(language);
-		await SecureStore.setItemAsync("language_preference", language);
-		setLangPref(language);
-		queryClient.invalidateQueries({ refetchType: "all" });
+	const usernameExists = async (
+		username: string,
+		onError: (msg: string) => void,
+	) => {
+		try {
+			const resp = await checkUsernameExists(username);
+			const data = resp.data as UsernameExistsOutputBody;
+			if (data.exists) {
+				onError("Username is taken.");
+				return false;
+			}
+			return true;
+		} catch (err) {
+			const typedErr = err as usernameExistsResponseError;
+			onError(typedErr.data?.detail ?? "An unexpected error occurred.");
+			return false;
+		}
 	};
 
 	return (
@@ -290,6 +314,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				signup,
 				logout,
 				update,
+				usernameExists,
 				setLanguage,
 				setInOnboarding,
 				completeOnboarding,

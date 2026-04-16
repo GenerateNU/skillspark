@@ -12,12 +12,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
 import type { Location, Organization } from "@skillspark/api-client";
+import { SvgXml } from "react-native-svg";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
 import { AppColors } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { useTranslation } from "react-i18next";
+import { EMPTY_FACE_SVG } from "@/constants/avatarFaces";
+import { RatingSmiley } from "@/components/RatingSmiley";
+import LogoBgWrapper from "@/components/LogoBgWrapper";
 
 function OrgDetail({
   org,
@@ -91,148 +95,158 @@ function OrgDetail({
             </View>
           )}
         </View>
-
-        {/* Org info */}
-        <View className="px-4 pb-4 pt-4">
-          <View className="flex-row items-start justify-between">
-            <View className="mr-3 flex-1">
-              <Text className="mb-1 text-[24px] font-nunito-bold">
-                {org.name}
-              </Text>
-              {location && (
-                <Text
-                  className="mb-1 text-[14px] font-nunito"
-                  style={{ color: AppColors.mutedText }}
-                >
-                  {location.district}, {location.province}
+        <LogoBgWrapper>
+          {/* Org info */}
+          <View className="px-4 pb-4 pt-4">
+            <View className="flex-row items-start justify-between">
+              <View className="mr-3 flex-1">
+                <Text className="mb-1 text-[24px] font-nunito-bold">
+                  {org.name}
                 </Text>
-              )}
-              <View className="flex-row items-center gap-1.5">
-                <Text className="text-[14px]">🔥</Text>
-                <Text
-                  className="text-[14px] font-nunito"
-                  style={{ color: AppColors.mutedText }}
-                >
-                  100+ {translate("org.bookingsThisWeek")}
-                </Text>
+                {location && (
+                  <Text
+                    className="mb-1 text-[14px] font-nunito"
+                    style={{ color: AppColors.mutedText }}
+                  >
+                    {location.district}, {location.province}
+                  </Text>
+                )}
               </View>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                className="mt-1 h-9 w-9 items-center justify-center rounded-full border-2"
+                style={{ borderColor: AppColors.borderLight }}
+              >
+                <IconSymbol
+                  name="square.and.arrow.up"
+                  size={18}
+                  color={AppColors.secondaryText}
+                />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              className="mt-1 h-9 w-9 items-center justify-center rounded-full border-2"
-              style={{ borderColor: AppColors.borderLight }}
+          </View>
+
+          {/* Divider */}
+          <View
+            className="mx-4 mb-5 border-b"
+            style={{ borderColor: AppColors.divider }}
+          />
+
+          {/* About card */}
+          <View
+            className="mx-4 mb-4 rounded-2xl bg-white p-5"
+            style={cardStyle}
+          >
+            <Text className="mb-2.5 text-[18px] font-nunito-bold">
+              {translate("org.about")}
+            </Text>
+            <Text
+              numberOfLines={aboutExpanded ? undefined : 4}
+              onTextLayout={(e) => {
+                if (!aboutExpanded)
+                  setAboutTruncated(e.nativeEvent.lines.length >= 4);
+              }}
+              className={`text-sm leading-[22px] ${
+                aboutTruncated ? "mb-1" : "mb-4"
+              }`}
+              style={{ color: AppColors.secondaryText }}
             >
-              <IconSymbol
-                name="square.and.arrow.up"
-                size={18}
-                color={AppColors.secondaryText}
-              />
+              {org.about ?? ""}
+            </Text>
+            {aboutTruncated && (
+              <Pressable
+                onPress={() => setAboutExpanded((prev) => !prev)}
+                className="mb-4"
+              >
+                <Text
+                  className="text-[13px] font-semibold"
+                  style={{ color: AppColors.primaryText }}
+                >
+                  {aboutExpanded
+                    ? translate("event.seeLess")
+                    : translate("event.seeMore")}
+                </Text>
+              </Pressable>
+            )}
+            {hasLinks && (
+              <View className="flex-row flex-wrap gap-2.5">
+                {(org.links ?? []).map((link, index) => (
+                  <Pressable
+                    key={index}
+                    onPress={() => openLink(link.href)}
+                    className="rounded-full px-5 py-2.5 items-center"
+                    style={{ backgroundColor: AppColors.borderLight }}
+                  >
+                    <Text
+                      className="text-[13px] font-semibold"
+                      style={{ color: AppColors.primaryText }}
+                    >
+                      {link.label}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
+          </View>
+
+          {/* Rating card */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.push(`/org/${org.id}/reviews`)}
+          >
+            <View
+              className="mx-4 mb-4 rounded-2xl bg-white p-5"
+              style={cardStyle}
+            >
+              <Text className="mb-4 text-[24px] font-nunito-bold">
+                {translate("org.reviews")}
+              </Text>
+              {org.review_summary && org.review_summary.total_reviews > 0 ? (
+                <View className="flex-row items-center justify-center">
+                  <View className="flex-1 items-center">
+                    <RatingSmiley
+                      rating={org.review_summary.average_rating}
+                      width={80}
+                      height={80}
+                    />
+                  </View>
+                  <View className="flex-1 items-center">
+                    <Text className="text-[36px] font-nunito-bold leading-[44px]">
+                      {org.review_summary.average_rating.toFixed(1)}
+                    </Text>
+                    <Text
+                      className="text-[13px] font-nunito"
+                      style={{ color: AppColors.subtleText }}
+                    >
+                      ({org.review_summary.total_reviews})
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                <View className="flex-row items-center gap-3 py-4 justify-center">
+                  <SvgXml xml={EMPTY_FACE_SVG} width={36} height={36} />
+                  <Text className="text-[16px] font-nunito">
+                    {translate("review.firstReview")}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+
+          {/* See Schedule CTA */}
+          <View className="px-4 pb-6 pt-1">
+            <TouchableOpacity
+              activeOpacity={0.85}
+              className="w-full items-center rounded-full py-4"
+              style={{ backgroundColor: "#000000" }}
+              onPress={() => router.push(`/org/${org.id}/schedule`)}
+            >
+              <Text className="text-[17px] font-nunito-bold text-white">
+                {translate("org.seeSchedule")}
+              </Text>
             </TouchableOpacity>
           </View>
-        </View>
-
-        {/* Divider */}
-        <View
-          className="mx-4 mb-5 border-b border-dashed"
-          style={{ borderColor: AppColors.divider }}
-        />
-
-        {/* About card */}
-        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardStyle}>
-          <Text className="mb-2.5 text-[18px] font-nunito-bold">
-            {translate("org.about")}
-          </Text>
-          <Text
-            numberOfLines={aboutExpanded ? undefined : 4}
-            onTextLayout={(e) => {
-              if (!aboutExpanded)
-                setAboutTruncated(e.nativeEvent.lines.length >= 4);
-            }}
-            className={`text-sm leading-[22px] ${
-              aboutTruncated ? "mb-1" : "mb-4"
-            }`}
-            style={{ color: AppColors.secondaryText }}
-          >
-            {org.about ?? ""}
-          </Text>
-          {aboutTruncated && (
-            <Pressable
-              onPress={() => setAboutExpanded((prev) => !prev)}
-              className="mb-4"
-            >
-              <Text
-                className="text-[13px] font-semibold"
-                style={{ color: AppColors.primaryText }}
-              >
-                {aboutExpanded
-                  ? translate("event.seeLess")
-                  : translate("event.seeMore")}
-              </Text>
-            </Pressable>
-          )}
-          {hasLinks && (
-            <View className="flex-row flex-wrap gap-2.5">
-              {(org.links ?? []).map((link, index) => (
-                <Pressable
-                  key={index}
-                  onPress={() => openLink(link.href)}
-                  className="rounded-full px-5 py-2.5 items-center"
-                  style={{ backgroundColor: AppColors.borderLight }}
-                >
-                  <Text
-                    className="text-[13px] font-semibold"
-                    style={{ color: AppColors.primaryText }}
-                  >
-                    {link.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
-        </View>
-
-        {/* Rating card */}
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => router.push(`/org/${org.id}/reviews`)}
-        >
-        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardStyle}>
-          <Text className="mb-3 text-[18px] font-nunito-bold">
-            {translate("org.reviews")}
-          </Text>
-          <View className="flex-row items-center gap-4">
-            <Text className="text-[42px] font-nunito-bold leading-[46px]">
-              4.5
-            </Text>
-            <View className="items-start">
-              <Image
-                source={require("@/assets/images/faces.png")}
-                className="h-10 w-[140px]"
-              />
-              <Text
-                className="mt-1 text-[13px] font-nunito"
-                style={{ color: AppColors.subtleText }}
-              >
-                (140)
-              </Text>
-            </View>
-          </View>
-        </View>
-        </TouchableOpacity>
-
-        {/* See Schedule CTA */}
-        <View className="px-4 pb-6 pt-1">
-          <TouchableOpacity
-            activeOpacity={0.85}
-            className="w-full items-center rounded-full py-4"
-            style={{ backgroundColor: "#000000" }}
-            onPress={() => router.push(`/org/${org.id}/schedule`)}
-          >
-            <Text className="text-[17px] font-nunito-bold text-white">
-              {translate("org.seeSchedule")}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        </LogoBgWrapper>
       </ScrollView>
     </SafeAreaView>
   );
@@ -243,12 +257,12 @@ export default function OrgScreen() {
   const { data: response, isLoading, error } = useGetOrganization(id);
   const { t: translate } = useTranslation();
   const { data: locationResponse } = useGetLocationById(
-    response?.status === 200 ? response.data.location_id ?? "" : "",
+    response?.status === 200 ? (response.data.location_id ?? "") : "",
     {
       query: {
         enabled: response?.status === 200 && !!response.data.location_id,
       },
-    }
+    },
   );
 
   if (isLoading) {

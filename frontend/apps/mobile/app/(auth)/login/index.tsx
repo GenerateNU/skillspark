@@ -58,119 +58,122 @@ export default function LoginScreen() {
 		<View style={StyleSheet.absoluteFill}>
 			<AuthBackground />
 			<View style={{ flex: 1, paddingTop: insets.top }}>
-			<KeyboardAvoidingView
-				behavior={Platform.OS === "ios" ? "padding" : "height"}
-				style={{ flex: 1 }}
-			>
-				<ScrollView
-					contentContainerStyle={{
-						flexGrow: 1,
-						paddingBottom: insets.bottom + 24,
-					}}
-					keyboardShouldPersistTaps="handled"
-					showsVerticalScrollIndicator={false}
+				<KeyboardAvoidingView
+					behavior={Platform.OS === "ios" ? "padding" : "height"}
+					style={{ flex: 1 }}
 				>
-					{/* Back button — only shown when there is a previous screen to return to; space always reserved */}
-					<View style={{ height: 44, justifyContent: "center" }}>
-						{router.canGoBack() && (
-							<TouchableOpacity
-								onPress={() => router.back()}
-								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									paddingHorizontal: 20,
-									gap: 4,
-								}}
-								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-							>
-								<IconSymbol name="chevron.left" size={18} color="#11181C" />
-								<ThemedText
-									style={{ fontSize: 16, fontFamily: "NunitoSans_400Regular" }}
-								>
-									{translate("onboarding.back")}
-								</ThemedText>
-							</TouchableOpacity>
-						)}
-					</View>
-
-					{/* Title */}
-					<View
-						style={{
-							paddingHorizontal: 24,
-							paddingTop: 8,
-							alignItems: "center",
+					<ScrollView
+						contentContainerStyle={{
+							flexGrow: 1,
+							paddingBottom: insets.bottom + 24,
 						}}
+						keyboardShouldPersistTaps="handled"
+						showsVerticalScrollIndicator={false}
 					>
-						<ThemedText
+						{/* Back button — only shown when there is a previous screen to return to; space always reserved */}
+						<View style={{ height: 44, justifyContent: "center" }}>
+							{router.canGoBack() && (
+								<TouchableOpacity
+									onPress={() => router.back()}
+									style={{
+										flexDirection: "row",
+										alignItems: "center",
+										paddingHorizontal: 20,
+										gap: 4,
+									}}
+									hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+								>
+									<IconSymbol name="chevron.left" size={18} color="#11181C" />
+									<ThemedText
+										style={{
+											fontSize: 16,
+											fontFamily: "NunitoSans_400Regular",
+										}}
+									>
+										{translate("onboarding.back")}
+									</ThemedText>
+								</TouchableOpacity>
+							)}
+						</View>
+
+						{/* Title */}
+						<View
 							style={{
-								fontFamily: "NunitoSans_700Bold",
-								fontSize: FontSizes.hero,
-								lineHeight: 60,
-								color: AppColors.primaryText,
-								letterSpacing: -0.5,
-								textAlign: "center",
+								paddingHorizontal: 24,
+								paddingTop: 8,
+								alignItems: "center",
 							}}
 						>
-							{translate("onboarding.signIn")}
-						</ThemedText>
-					</View>
-
-					{/* Character image */}
-					<View style={{ alignItems: "center", paddingVertical: 24 }}>
-						<JumpingCharacter />
-					</View>
-
-					{/* Form fields */}
-					<View style={{ paddingHorizontal: 24, gap: 24 }}>
-						<View style={{ gap: 8 }}>
 							<ThemedText
-								style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}
+								style={{
+									fontFamily: "NunitoSans_700Bold",
+									fontSize: FontSizes.hero,
+									lineHeight: 60,
+									color: AppColors.primaryText,
+									letterSpacing: -0.5,
+									textAlign: "center",
+								}}
 							>
-								{translate("onboarding.email")}
+								{translate("onboarding.signIn")}
 							</ThemedText>
-							<AuthFormInput
-								control={control}
-								name="email"
-								keyboardType="email-address"
-								autoCapitalize="none"
-							/>
 						</View>
 
-						<View style={{ gap: 8 }}>
-							<ThemedText
-								style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}
-							>
-								{translate("onboarding.password")}
-							</ThemedText>
-							<AuthFormInput
-								control={control}
-								name="password"
-								secureTextEntry
-							/>
+						{/* Character image */}
+						<View style={{ alignItems: "center", paddingVertical: 24 }}>
+							<JumpingCharacter />
 						</View>
-					</View>
 
-					{/* Buttons */}
-					<View
-						style={{
-							paddingHorizontal: 24,
-							paddingTop: 32,
-							alignItems: "center",
-						}}
-					>
-						<Button
-							label={translate("onboarding.signUp")}
-							onPress={handleSubmit(onSubmit)}
-							disabled={false}
-						/>
-						<PageRedirectButton
-							label={translate("onboarding.dontHaveAccount")}
-							onPress={() => router.navigate("/(auth)/signup/name")}
-						/>
-						<ErrorMessage message={errorText} />
-					</View>
-				</ScrollView>
-			</KeyboardAvoidingView>
+						{/* Form fields */}
+						<View style={{ paddingHorizontal: 24, gap: 24 }}>
+							<View style={{ gap: 8 }}>
+								<ThemedText
+									style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}
+								>
+									{translate("onboarding.email")}
+								</ThemedText>
+								<AuthFormInput
+									control={control}
+									name="email"
+									keyboardType="email-address"
+									autoCapitalize="none"
+								/>
+							</View>
+
+							<View style={{ gap: 8 }}>
+								<ThemedText
+									style={{ fontSize: 16, fontFamily: "NunitoSans_600SemiBold" }}
+								>
+									{translate("onboarding.password")}
+								</ThemedText>
+								<AuthFormInput
+									control={control}
+									name="password"
+									secureTextEntry
+								/>
+							</View>
+						</View>
+
+						{/* Buttons */}
+						<View
+							style={{
+								paddingHorizontal: 24,
+								paddingTop: 32,
+								alignItems: "center",
+							}}
+						>
+							<Button
+								label={translate("onboarding.signUp")}
+								onPress={handleSubmit(onSubmit)}
+								disabled={false}
+							/>
+							<PageRedirectButton
+								label={translate("onboarding.dontHaveAccount")}
+								onPress={() => router.navigate("/(auth)/signup/name")}
+							/>
+							<ErrorMessage message={errorText} />
+						</View>
+					</ScrollView>
+				</KeyboardAvoidingView>
 			</View>
 		</View>
 	);

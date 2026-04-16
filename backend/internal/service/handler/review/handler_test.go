@@ -333,7 +333,7 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 					Return(&models.Event{ID: uuid.MustParse("10000000-0000-0000-0000-000000000001")}, nil)
 
 				// Reviews returned
-				reviewRepo.On("GetReviewsByEventID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000001"), "en-US", mock.AnythingOfType("utils.Pagination")).
+				reviewRepo.On("GetReviewsByEventID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000001"), "en-US", mock.AnythingOfType("utils.Pagination"), "most_recent").
 					Return([]models.Review{
 						{
 							ID:             uuid.MustParse("20000000-0000-0000-0000-000000000001"),
@@ -376,7 +376,7 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 				eventRepo.On("GetEventByID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000002"), "en-US").
 					Return(&models.Event{ID: uuid.MustParse("10000000-0000-0000-0000-000000000002")}, nil)
 
-				reviewRepo.On("GetReviewsByEventID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000002"), "en-US", mock.AnythingOfType("utils.Pagination")).
+				reviewRepo.On("GetReviewsByEventID", mock.Anything, uuid.MustParse("10000000-0000-0000-0000-000000000002"), "en-US", mock.AnythingOfType("utils.Pagination"), "most_recent").
 					Return(nil, errs.BadRequest("cannot fetch reviews"))
 			},
 			wantReviews: nil,
@@ -399,7 +399,7 @@ func TestHandler_GetReviewsByEventID(t *testing.T) {
 			}
 
 			pagination := utils.Pagination{Page: 1, Limit: 10}
-			reviews, err := handler.GetReviewsByEventID(context.Background(), tt.eventID, tt.acceptLanguage, pagination)
+			reviews, err := handler.GetReviewsByEventID(context.Background(), tt.eventID, tt.acceptLanguage, pagination, "most_recent")
 
 			if tt.wantErr {
 				assert.Error(t, err)

@@ -2,7 +2,6 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import {
   ActivityIndicator,
   View,
-  TextInput,
   ScrollView,
   Pressable,
   Text,
@@ -17,13 +16,13 @@ import {
   type Guardian,
   type Registration,
   type Child,
-  getTrendingEventOccurrences,
   useGetTrendingEventOccurrences,
 } from "@skillspark/api-client";
 import { useEffect, useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { useDebounce } from "use-debounce";
+import { useFilters } from "@/hooks/use-filters";
+import { useRouter } from "expo-router";
 import { isWithinNext7Days } from "@/utils/format";
 import { DiscoverBanner } from "@/components/home/DiscoverBanner";
 import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
@@ -36,19 +35,20 @@ import { TrendingCard } from "@/components/home/TrendingCard";
 import * as Location from "expo-location";
 import CarouselCard from "@/components/home/CarouselCard";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
+import LogoBgWrapper from "@/components/LogoBgWrapper";
 
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
-  const [searchText, setSearchText] = useState("");
-  const [_debouncedSearch] = useDebounce(searchText, 300);
+  const { filters, hasActiveFilters } = useFilters();
+  const router = useRouter();
   const { width, height } = useWindowDimensions();
 
   const [geoLocationLat, setGeoLocationLat] = useState<string | undefined>(
-    "13.7563",
+    "13.7563"
   );
   const [geoLocationLong, setGeoLocationLong] = useState<string | undefined>(
-    "100.5018",
+    "100.5018"
   );
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function HomeScreen() {
   const guardian = (guardianResp as unknown as { data: Guardian } | undefined)
     ?.data;
 
-  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences();
+  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences({});
   const allOccurrences: EventOccurrence[] = useMemo(() => {
     const d = occurrencesResp as unknown as
       | { data: EventOccurrence[] }
@@ -92,7 +92,7 @@ export default function HomeScreen() {
     guardianId!,
     {
       query: { enabled: !!guardianId },
-    },
+    }
   );
   const registrations: Registration[] = useMemo(() => {
     const d = registrationsResp as unknown as
@@ -120,7 +120,7 @@ export default function HomeScreen() {
       query: {
         enabled: !!geoLocationLat && !!geoLocationLong,
       },
-    },
+    }
   );
 
   const trendingEvents: EventOccurrence[] = useMemo(() => {
@@ -136,16 +136,16 @@ export default function HomeScreen() {
         .filter(
           (r) =>
             r.status === "registered" &&
-            isWithinNext7Days(r.occurrence_start_time),
+            isWithinNext7Days(r.occurrence_start_time)
         )
-        .map((r) => r.event_occurrence_id),
+        .map((r) => r.event_occurrence_id)
     );
     return allOccurrences.filter((o) => upcomingIds.has(o.id));
   }, [registrations, allOccurrences]);
 
   const futureOccurrences = useMemo(
     () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
-    [allOccurrences],
+    [allOccurrences]
   );
 
   const childRecommendations = useMemo(() => {
@@ -161,7 +161,7 @@ export default function HomeScreen() {
   const categories = useMemo(() => {
     const cats = new Set<string>();
     allOccurrences.forEach((o) =>
-      o.event.category?.forEach((c) => cats.add(c)),
+      o.event.category?.forEach((c) => cats.add(c))
     );
     return cats.size > 0
       ? Array.from(cats)
@@ -200,170 +200,187 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
     >
-      {/* Header */}
-      <View className="px-5 pt-14 pb-4">
-        <Text
-          className="font-nunito-bold"
-          style={{
-            letterSpacing: -0.5,
-            fontSize: FontSizes.hero,
-            color: AppColors.primaryText,
-          }}
-        >
-          Hello, {firstName}
-        </Text>
-      </View>
+      <LogoBgWrapper verticalOffset={0}>
+        {/* Header */}
+        <View className="px-5 pt-28 pb-4">
+          <Text
+            className="font-nunito-bold"
+            style={{
+              letterSpacing: -0.5,
+              fontSize: FontSizes.hero,
+              color: AppColors.primaryText,
+            }}
+          >
+            {translate("dashboard.greeting", { name: firstName })}
+          </Text>
+        </View>
 
-      {/* Search row */}
-      <View className="px-5 mb-[22px]">
-        <View
-          className="flex-row items-center rounded-full px-4 py-[10px]"
-          style={{ backgroundColor: AppColors.surfaceGray }}
-        >
-          <IconSymbol
-            name="magnifyingglass"
-            size={18}
-            color={AppColors.subtleText}
-            style={{ marginRight: 8 }}
-          />
-          <TextInput
-            className="flex-1 text-sm font-nunito"
-            style={{ color: AppColors.primaryText }}
-            placeholder={translate("dashboard.searchPlaceholder")}
-            placeholderTextColor={AppColors.placeholderText}
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-          <Pressable
-            className="w-9 h-9 rounded-full items-center justify-center"
-            style={{ backgroundColor: AppColors.primaryText }}
+        {/* Search row */}
+        <View className="px-5 mb-[22px]">
+          <View
+            className="flex-row items-center rounded-full px-4 py-[10px]"
+            style={{ backgroundColor: AppColors.surfaceGray }}
           >
             <IconSymbol
-              name="slider.horizontal.3"
-              size={16}
-              color={AppColors.white}
+              name="magnifyingglass"
+              size={18}
+              color={AppColors.subtleText}
+              style={{ marginRight: 8 }}
             />
-          </Pressable>
-        </View>
-      </View>
-
-      {/* Your Upcoming Classes — conditional */}
-      {upcomingClasses.length > 0 && (
-        <View className="mb-6">
-          <Text
-            className="font-nunito-bold px-5 mb-3"
-            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-          >
-            Your Upcoming Classes
-          </Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20 }}
-          >
-            {upcomingClasses.map((o) => (
-              <UpcomingClassCard key={o.id} occurrence={o} />
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      {/* Discover Weekly */}
-      {futureOccurrences.length > 0 && (
-        <View className="mb-6">
-          <View className="flex-row items-center px-5 mb-3">
-            <Text
-              className="mr-1.5 font-nunito"
-              style={{ color: AppColors.purple, fontSize: FontSizes.md }}
+            <Pressable
+              className="flex-1"
+              onPress={() => router.push("/(app)/search")}
             >
-              ✦
-            </Text>
+              <Text
+                style={{
+                  fontFamily: "NunitoSans_400Regular",
+                  fontSize: 14,
+                  color: AppColors.placeholderText,
+                }}
+              >
+                {translate("dashboard.searchPlaceholder")}
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => router.push("/(app)/(tabs)/filters")}
+              className="w-9 h-9 rounded-full items-center justify-center"
+              style={{
+                backgroundColor: hasActiveFilters
+                  ? AppColors.primaryBlue
+                  : AppColors.primaryText,
+              }}
+            >
+              <IconSymbol
+                name="slider.horizontal.3"
+                size={16}
+                color={AppColors.white}
+              />
+            </Pressable>
+          </View>
+        </View>
+
+        {/* Your Upcoming Classes — conditional */}
+        {upcomingClasses.length > 0 && (
+          <View className="mb-6">
             <Text
-              className="font-nunito-bold"
+              className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              {translate("dashboard.discoverWeekly")}
+              Your Upcoming Classes
             </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 20 }}
+            >
+              {upcomingClasses.map((o) => (
+                <UpcomingClassCard key={o.id} occurrence={o} />
+              ))}
+            </ScrollView>
           </View>
-          <CarouselCard
-            events={allLocalizedOccurrences}
-            width={width}
-            height={height}
-          />
-        </View>
-      )}
+        )}
 
-      {/* Trending In Your Area */}
-      {trendingEvents && trendingEvents.length > 0 && (
-        <View className="mb-6">
-          <Text
-            className="font-nunito-bold px-5 mb-3"
-            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-          >
-            Trending in Your Area
-          </Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20 }}
-          >
-            {trendingEvents.map((o) => (
-              <TrendingCard key={o.id} occurrence={o} />
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      {/* Recommended For... */}
-      {childRecommendations.length > 0 && (
-        <View className="mb-6">
-          <Text
-            className="font-nunito-bold px-5 mb-3"
-            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-          >
-            Recommended for...
-          </Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20 }}
-          >
-            {childRecommendations.map(({ child, occurrence }) => (
-              <RecommendedCard
-                key={child.id}
-                occurrence={occurrence}
-                childName={child.name.split(" ")[0]}
-              />
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      {/* Explore by Category */}
-      {categories.length > 0 && (
-        <View className="mb-6">
-          <Text
-            className="font-nunito-bold px-5 mb-3"
-            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-          >
-            Explore by Category
-          </Text>
-          <View className="px-[15px]">
-            {categoryPairs.map((pair, idx) => (
-              <View key={idx} className="flex-row">
-                {pair.map((cat) => (
-                  <CategoryCard
-                    key={cat}
-                    category={cat}
-                    occurrence={categoryEventMap[cat]}
-                  />
-                ))}
-                {pair.length === 1 && <View className="flex-1 m-[5px]" />}
-              </View>
-            ))}
+        {/* Discover Weekly */}
+        {futureOccurrences.length > 0 && (
+          <View className="mb-6">
+            <View className="flex-row items-center px-5 mb-3">
+              <Text
+                className="mr-1.5 font-nunito"
+                style={{ color: AppColors.purple, fontSize: FontSizes.md }}
+              >
+                ✦
+              </Text>
+              <Text
+                className="font-nunito-bold"
+                style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+              >
+                {translate("dashboard.discoverWeekly")}
+              </Text>
+            </View>
+            <CarouselCard
+              events={
+                allLocalizedOccurrences.length > 0
+                  ? allLocalizedOccurrences
+                  : futureOccurrences.slice(0, 5)
+              }
+              width={width}
+              height={height}
+            />
           </View>
-        </View>
-      )}
+        )}
+
+        {/* Trending In Your Area */}
+        {trendingEvents && trendingEvents.length > 0 && (
+          <View className="mb-6">
+            <Text
+              className="font-nunito-bold px-5 mb-3"
+              style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+            >
+              Trending in Your Area
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 20 }}
+            >
+              {trendingEvents.map((o) => (
+                <TrendingCard key={o.id} occurrence={o} />
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Recommended For... */}
+        {childRecommendations.length > 0 && (
+          <View className="mb-6">
+            <Text
+              className="font-nunito-bold px-5 mb-3"
+              style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+            >
+              Recommended for...
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 20 }}
+            >
+              {childRecommendations.map(({ child, occurrence }) => (
+                <RecommendedCard
+                  key={child.id}
+                  occurrence={occurrence}
+                  childName={child.name.split(" ")[0]}
+                />
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Explore by Category */}
+        {categories.length > 0 && (
+          <View className="mb-6">
+            <Text
+              className="font-nunito-bold px-5 mb-3"
+              style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+            >
+              Explore by Category
+            </Text>
+            <View className="px-[15px]">
+              {categoryPairs.map((pair, idx) => (
+                <View key={idx} className="flex-row">
+                  {pair.map((cat) => (
+                    <CategoryCard
+                      key={cat}
+                      category={cat}
+                      occurrence={categoryEventMap[cat]}
+                    />
+                  ))}
+                  {pair.length === 1 && <View className="flex-1 m-[5px]" />}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+      </LogoBgWrapper>
     </ScrollView>
   );
 }
