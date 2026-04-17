@@ -541,6 +541,12 @@
     "allSet": "You're All Set!",
     "settingUp": "Setting up your profile now...",
     "passwordMismatch": "Both passwords must match",
+    "passwordInvalid": "Password does not meet all requirements",
+    "passwordReqLength": "At least 8 characters",
+    "passwordReqUppercase": "At least one uppercase letter",
+    "passwordReqLowercase": "At least one lowercase letter",
+    "passwordReqNumber": "At least one number",
+    "passwordReqSpecial": "At least one special character",
     "signUp": "Sign Up"
   },
   "auth": {
