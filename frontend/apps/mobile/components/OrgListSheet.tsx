@@ -14,6 +14,7 @@ import { SliderCard } from "@/components/filters/SliderCard";
 import { useFilters } from "@/hooks/use-filters";
 import { useOrgMapFilters, type OrgSortOption } from "@/hooks/use-org-map-filters";
 import { useRouter } from "expo-router";
+import { TFunction } from "i18next";
 
 // Index 0 = handle strip above the floating nav bar (~120 px tall)
 // Index 1 = full list view with filters
@@ -156,7 +157,7 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
             >
               <SliderCard
                 label={t("filters.distance")}
-                valueLabel={distanceLabelFn(distanceKm)}
+                valueLabel={distanceLabelFn(distanceKm, t)}
                 value={distanceKm}
                 onValueChange={(val) =>
                   setFilters({
@@ -167,8 +168,8 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
                 min={0}
                 max={DISTANCE_MAX}
                 step={5}
-                minLabel="0 km"
-                maxLabel={`${DISTANCE_MAX}+ km`}
+                minLabel={`0 ${t("map.km")}`}
+                maxLabel={t("filters.orMore", { value: `${DISTANCE_MAX} ${t("map.km")}` })}
               />
             </View>
           )}
@@ -184,6 +185,7 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
                 valueLabel={durationRangeLabelFn(
                   durationRange[0],
                   durationRange[1],
+                  t,
                 )}
                 value={durationRange}
                 onValueChange={(val) =>
@@ -198,7 +200,7 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
                 max={DURATION_MAX}
                 step={15}
                 minLabel="0"
-                maxLabel={`${DURATION_MAX / 60}h+`}
+                maxLabel={t("filters.orMore", { value: `${DURATION_MAX / 60}h` })}
               />
             </View>
           )}
@@ -279,8 +281,11 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
   );
 }
 
-function distanceLabelFn(km: number) {
-  return km >= DISTANCE_MAX ? `${DISTANCE_MAX}+ km` : `${km} km`;
+function distanceLabelFn(km: number, t: TFunction) {
+  const unit = t("map.km");
+  return km >= DISTANCE_MAX
+    ? t("filters.orMore", { value: `${DISTANCE_MAX} ${unit}` })
+    : `${km} ${unit}`;
 }
 
 function durationLabelFn(min: number) {
@@ -291,11 +296,12 @@ function durationLabelFn(min: number) {
   return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
-function durationRangeLabelFn(lo: number, hi: number) {
-  if (lo === 0 && hi >= DURATION_MAX) return "Any";
-  if (hi >= DURATION_MAX) return `${durationLabelFn(lo)}+`;
-  if (lo === 0) return `<= ${durationLabelFn(hi)}`;
-  return `${durationLabelFn(lo)} - ${durationLabelFn(hi)}`;
+function durationRangeLabelFn(lo: number, hi: number, t: TFunction) {
+  if (lo === 0 && hi >= DURATION_MAX) return t("filters.any");
+  if (hi >= DURATION_MAX)
+    return t("filters.orMore", { value: durationLabelFn(lo) });
+  if (lo === 0) return t("filters.upTo", { value: durationLabelFn(hi) });
+  return `${durationLabelFn(lo)} \u2013 ${durationLabelFn(hi)}`;
 }
 
 interface FilterPillProps {

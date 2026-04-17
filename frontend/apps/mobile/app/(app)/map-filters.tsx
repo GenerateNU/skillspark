@@ -10,17 +10,21 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { SliderCard } from "@/components/filters/SliderCard";
 import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 
 const DISTANCE_MAX = 50;
 const DURATION_MAX = 180;
 
-const SORT_OPTIONS: { key: OrgSortOption; label: string }[] = [
-  { key: "distance", label: "Distance" },
-  { key: "rating", label: "Rating" },
+const SORT_OPTIONS: { key: OrgSortOption }[] = [
+  { key: "distance" },
+  { key: "rating" },
 ];
 
-function distanceLabel(km: number) {
-  return km >= DISTANCE_MAX ? `${DISTANCE_MAX}+ km` : `${km} km`;
+function distanceLabel(km: number, t: TFunction) {
+  const unit = t("map.km");
+  return km >= DISTANCE_MAX
+    ? t("filters.orMore", { value: `${DISTANCE_MAX} ${unit}` })
+    : `${km} ${unit}`;
 }
 
 function durationLabel(min: number) {
@@ -31,10 +35,11 @@ function durationLabel(min: number) {
   return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
-function durationRangeLabel(lo: number, hi: number) {
-  if (lo === 0 && hi >= DURATION_MAX) return "Any";
-  if (hi >= DURATION_MAX) return `${durationLabel(lo)}+`;
-  if (lo === 0) return `≤ ${durationLabel(hi)}`;
+function durationRangeLabel(lo: number, hi: number, t: TFunction) {
+  if (lo === 0 && hi >= DURATION_MAX) return t("filters.any");
+  if (hi >= DURATION_MAX)
+    return t("filters.orMore", { value: durationLabel(lo) });
+  if (lo === 0) return t("filters.upTo", { value: durationLabel(hi) });
   return `${durationLabel(lo)} – ${durationLabel(hi)}`;
 }
 
@@ -60,6 +65,8 @@ export default function MapFiltersScreen() {
     clearFilters();
     clearMapFilters();
   }
+
+  const km = t("map.km");
 
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
@@ -121,7 +128,7 @@ export default function MapFiltersScreen() {
         {/* Distance */}
         <SliderCard
           label={t("filters.distance")}
-          valueLabel={distanceLabel(distanceKm)}
+          valueLabel={distanceLabel(distanceKm, t)}
           value={distanceKm}
           onValueChange={(val) =>
             setFilters({
@@ -132,8 +139,8 @@ export default function MapFiltersScreen() {
           min={0}
           max={DISTANCE_MAX}
           step={5}
-          minLabel="0 km"
-          maxLabel={`${DISTANCE_MAX}+ km`}
+          minLabel={`0 ${km}`}
+          maxLabel={t("filters.orMore", { value: `${DISTANCE_MAX} ${km}` })}
         />
 
         <View className="h-4" />
@@ -141,7 +148,7 @@ export default function MapFiltersScreen() {
         {/* Duration */}
         <SliderCard
           label={t("filters.duration")}
-          valueLabel={durationRangeLabel(durationRange[0], durationRange[1])}
+          valueLabel={durationRangeLabel(durationRange[0], durationRange[1], t)}
           value={durationRange}
           onValueChange={(val) =>
             setFilters({
@@ -155,7 +162,7 @@ export default function MapFiltersScreen() {
           max={DURATION_MAX}
           step={15}
           minLabel="0"
-          maxLabel={`${DURATION_MAX / 60}h+`}
+          maxLabel={t("filters.orMore", { value: `${DURATION_MAX / 60}h` })}
         />
 
         <View
@@ -193,8 +200,7 @@ export default function MapFiltersScreen() {
                 style={{
                   fontFamily: FontFamilies.semiBold,
                   fontSize: FontSizes.sm,
-                  color:
-                    sortBy === opt.key ? "#fff" : AppColors.primaryText,
+                  color: sortBy === opt.key ? "#fff" : AppColors.primaryText,
                 }}
               >
                 {t(`map.sort_${opt.key}`)}
@@ -204,7 +210,7 @@ export default function MapFiltersScreen() {
         </View>
       </ScrollView>
 
-      {/* Show results button — goes back to the map, filters apply automatically */}
+      {/* Show results — goes back to the map, filters apply automatically */}
       <View
         className="px-5 pt-4"
         style={{
