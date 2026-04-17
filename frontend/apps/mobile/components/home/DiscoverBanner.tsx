@@ -1,10 +1,7 @@
 import { Image } from "expo-image";
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import {
-  type Event,
-  useGetReviewAggregate,
-} from "@skillspark/api-client";
+import { type Event, useGetReviewAggregate } from "@skillspark/api-client";
 import { AppColors, FontFamilies } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { RATING_OPTIONS } from "@/constants/ratings";

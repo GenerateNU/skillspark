@@ -202,7 +202,6 @@ function EventOccurrenceDetail({
             description={occurrence.event.description}
             links={occurrence.org_links ?? []}
           />
-          
         </View>
 
         {/* Reviews card */}

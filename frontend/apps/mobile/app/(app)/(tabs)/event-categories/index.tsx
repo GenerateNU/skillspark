@@ -24,7 +24,8 @@ const CATEGORY_DB_VALUES: Record<string, string> = {
   "Arts & Creative Expression":
     "art,painting,drawing,sculpture,photography,filmmaking,graphic design,fashion,crafts,creative writing",
   Languages: "language,language learning,linguistics",
-  Academics: "science,physics,chemistry,biology,astronomy,earth science,history",
+  Academics:
+    "science,physics,chemistry,biology,astronomy,earth science,history",
   "Personal Development & Life Skills": "other",
   "Music & Performance":
     "music,instrumental music,vocal music,theater,acting,dance,improv",
@@ -76,8 +77,7 @@ export default function EventCategoryScreen() {
             arr.findIndex((x) => x.event.id === o.event.id) === idx,
         )
       : [];
-  const displayCategory =
-    category.charAt(0).toUpperCase() + category.slice(1);
+  const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
 
   return (
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>

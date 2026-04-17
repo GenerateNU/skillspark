@@ -320,11 +320,7 @@ export default function HomeScreen() {
               contentContainerStyle={{ paddingHorizontal: 20 }}
             >
               {childRecommendations.map(({ child, events }) => (
-                <RecommendedCard
-                  key={child.id}
-                  child={child}
-                  events={events}
-                />
+                <RecommendedCard key={child.id} child={child} events={events} />
               ))}
             </ScrollView>
           </View>

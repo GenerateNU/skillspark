@@ -57,16 +57,18 @@ export function RecommendedCard({
           className="absolute top-[30px] left-[60px] w-[95px] h-[95px] rounded-xl rotate-[35deg]"
           style={{ backgroundColor: AppColors.violetPastel }}
         />
-        <View
-          className="absolute top-[15px] left-[40px] w-[100px] h-[100px] rounded-xl overflow-hidden rotate-[20deg]"
-        >
-          <EventImage uri={img1?.presigned_url} style={{ width: "100%", height: "100%" }} />
+        <View className="absolute top-[15px] left-[40px] w-[100px] h-[100px] rounded-xl overflow-hidden rotate-[20deg]">
+          <EventImage
+            uri={img1?.presigned_url}
+            style={{ width: "100%", height: "100%" }}
+          />
         </View>
         {img0 && (
-          <View
-            className="absolute top-0 left-0 w-[120px] h-[120px] rounded-xl overflow-hidden"
-          >
-            <EventImage uri={img0.presigned_url} style={{ width: "100%", height: "100%" }} />
+          <View className="absolute top-0 left-0 w-[120px] h-[120px] rounded-xl overflow-hidden">
+            <EventImage
+              uri={img0.presigned_url}
+              style={{ width: "100%", height: "100%" }}
+            />
           </View>
         )}
       </View>
