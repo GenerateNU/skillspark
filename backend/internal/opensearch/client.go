@@ -79,15 +79,15 @@ func (c *Client) FuzzySearch(ctx context.Context, query string, acceptLanguage s
 	}
 
 	type osEvent struct {
-		ID                string   `json:"id"`
-		TitleEN           string   `json:"title_en"`
-		TitleTH           string   `json:"title_th"`
-		DescriptionEN     string   `json:"description_en"`
-		DescriptionTH     string   `json:"description_th"`
-		Category          []string `json:"category"`
-		HeaderImageS3Key  *string  `json:"header_image_s3_key"`
-		AgeRangeMin       *int     `json:"age_range_min"`
-		AgeRangeMax       *int     `json:"age_range_max"`
+		ID               string   `json:"id"`
+		TitleEN          string   `json:"title_en"`
+		TitleTH          string   `json:"title_th"`
+		DescriptionEN    string   `json:"description_en"`
+		DescriptionTH    string   `json:"description_th"`
+		Category         []string `json:"category"`
+		HeaderImageS3Key *string  `json:"header_image_s3_key"`
+		AgeRangeMin      *int     `json:"age_range_min"`
+		AgeRangeMax      *int     `json:"age_range_max"`
 	}
 
 	events := make([]models.Event, 0)

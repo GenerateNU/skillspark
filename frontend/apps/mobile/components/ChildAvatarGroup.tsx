@@ -10,7 +10,11 @@ interface ChildAvatarGroupProps {
 }
 
 /** Renders a row of child avatars. Defaults to flex-row with wrap and a 6px gap. */
-export function ChildAvatarGroup({ children, size = 32, style }: ChildAvatarGroupProps) {
+export function ChildAvatarGroup({
+  children,
+  size = 32,
+  style,
+}: ChildAvatarGroupProps) {
   return (
     <View style={[{ flexDirection: "row", flexWrap: "wrap", gap: 6 }, style]}>
       {children.map((child) => (

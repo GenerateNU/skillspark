@@ -17,6 +17,7 @@ import {
 } from "@skillspark/api-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
+import * as Linking from "expo-linking";
 import * as SecureStore from "expo-secure-store";
 import { createContext, ReactNode, useEffect, useState } from "react";
 

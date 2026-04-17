@@ -37,7 +37,11 @@ export function SearchBar({
           className="w-9 h-9 rounded-full items-center justify-center"
           style={{ backgroundColor: AppColors.primaryText }}
         >
-          <IconSymbol name="slider.horizontal.3" size={16} color={AppColors.white} />
+          <IconSymbol
+            name="slider.horizontal.3"
+            size={16}
+            color={AppColors.white}
+          />
         </Pressable>
       </View>
     </View>

@@ -20,7 +20,8 @@ import type {
 
 import type {
   ErrorModel,
-  UsernameExistsOutputBody,
+  Event,
+  SearchEventsParams,
 } from "../skillSparkAPI.schemas";
 
 import { customInstance } from "../../apiClient";
@@ -70,103 +71,106 @@ export type HTTPStatusCodes =
   | HTTPStatusCode5xx;
 
 /**
- * Returns whether a user with the given username exists
- * @summary Check if a username exists
+ * Returns events matching the search query using fuzzy full-text search
+ * @summary Fuzzy search events
  */
-export type usernameExistsResponse200 = {
-  data: UsernameExistsOutputBody;
+export type searchEventsResponse200 = {
+  data: Event[];
   status: 200;
 };
 
-export type usernameExistsResponseDefault = {
+export type searchEventsResponseDefault = {
   data: ErrorModel;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type usernameExistsResponseSuccess = usernameExistsResponse200 & {
+export type searchEventsResponseSuccess = searchEventsResponse200 & {
   headers: Headers;
 };
-export type usernameExistsResponseError = usernameExistsResponseDefault & {
+export type searchEventsResponseError = searchEventsResponseDefault & {
   headers: Headers;
 };
 
-export type usernameExistsResponse =
-  | usernameExistsResponseSuccess
-  | usernameExistsResponseError;
+export type searchEventsResponse =
+  | searchEventsResponseSuccess
+  | searchEventsResponseError;
 
-export const getUsernameExistsUrl = (username: string) => {
-  return `/api/v1/user/${username}`;
+export const getSearchEventsUrl = (params?: SearchEventsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/search/events?${stringifiedParams}`
+    : `/api/v1/search/events`;
 };
 
-export const usernameExists = async (
-  username: string,
+export const searchEvents = async (
+  params?: SearchEventsParams,
   options?: RequestInit,
-): Promise<usernameExistsResponse> => {
-  return customInstance<usernameExistsResponse>(
-    getUsernameExistsUrl(username),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
+): Promise<searchEventsResponse> => {
+  return customInstance<searchEventsResponse>(getSearchEventsUrl(params), {
+    ...options,
+    method: "GET",
+  });
 };
 
-export const getUsernameExistsQueryKey = (username: string) => {
-  return [`/api/v1/user/${username}`] as const;
+export const getSearchEventsQueryKey = (params?: SearchEventsParams) => {
+  return [`/api/v1/search/events`, ...(params ? [params] : [])] as const;
 };
 
-export const getUsernameExistsQueryOptions = <
-  TData = Awaited<ReturnType<typeof usernameExists>>,
+export const getSearchEventsQueryOptions = <
+  TData = Awaited<ReturnType<typeof searchEvents>>,
   TError = ErrorModel,
 >(
-  username: string,
+  params?: SearchEventsParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof usernameExists>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof searchEvents>>, TError, TData>
     >;
     request?: SecondParameter<typeof customInstance>;
   },
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getUsernameExistsQueryKey(username);
+  const queryKey = queryOptions?.queryKey ?? getSearchEventsQueryKey(params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof usernameExists>>> = ({
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof searchEvents>>> = ({
     signal,
-  }) => usernameExists(username, { signal, ...requestOptions });
+  }) => searchEvents(params, { signal, ...requestOptions });
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!username,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof usernameExists>>,
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof searchEvents>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type UsernameExistsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof usernameExists>>
+export type SearchEventsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof searchEvents>>
 >;
-export type UsernameExistsQueryError = ErrorModel;
+export type SearchEventsQueryError = ErrorModel;
 
-export function useUsernameExists<
-  TData = Awaited<ReturnType<typeof usernameExists>>,
+export function useSearchEvents<
+  TData = Awaited<ReturnType<typeof searchEvents>>,
   TError = ErrorModel,
 >(
-  username: string,
+  params: undefined | SearchEventsParams,
   options: {
     query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof usernameExists>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof searchEvents>>, TError, TData>
     > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof usernameExists>>,
+          Awaited<ReturnType<typeof searchEvents>>,
           TError,
-          Awaited<ReturnType<typeof usernameExists>>
+          Awaited<ReturnType<typeof searchEvents>>
         >,
         "initialData"
       >;
@@ -176,20 +180,20 @@ export function useUsernameExists<
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
-export function useUsernameExists<
-  TData = Awaited<ReturnType<typeof usernameExists>>,
+export function useSearchEvents<
+  TData = Awaited<ReturnType<typeof searchEvents>>,
   TError = ErrorModel,
 >(
-  username: string,
+  params?: SearchEventsParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof usernameExists>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof searchEvents>>, TError, TData>
     > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof usernameExists>>,
+          Awaited<ReturnType<typeof searchEvents>>,
           TError,
-          Awaited<ReturnType<typeof usernameExists>>
+          Awaited<ReturnType<typeof searchEvents>>
         >,
         "initialData"
       >;
@@ -199,14 +203,14 @@ export function useUsernameExists<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
-export function useUsernameExists<
-  TData = Awaited<ReturnType<typeof usernameExists>>,
+export function useSearchEvents<
+  TData = Awaited<ReturnType<typeof searchEvents>>,
   TError = ErrorModel,
 >(
-  username: string,
+  params?: SearchEventsParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof usernameExists>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof searchEvents>>, TError, TData>
     >;
     request?: SecondParameter<typeof customInstance>;
   },
@@ -215,17 +219,17 @@ export function useUsernameExists<
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 /**
- * @summary Check if a username exists
+ * @summary Fuzzy search events
  */
 
-export function useUsernameExists<
-  TData = Awaited<ReturnType<typeof usernameExists>>,
+export function useSearchEvents<
+  TData = Awaited<ReturnType<typeof searchEvents>>,
   TError = ErrorModel,
 >(
-  username: string,
+  params?: SearchEventsParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof usernameExists>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof searchEvents>>, TError, TData>
     >;
     request?: SecondParameter<typeof customInstance>;
   },
@@ -233,7 +237,7 @@ export function useUsernameExists<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getUsernameExistsQueryOptions(username, options);
+  const queryOptions = getSearchEventsQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
