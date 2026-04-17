@@ -17,8 +17,8 @@ func (j *JobScheduler) CapturePaymentsJob() {
 	ctx := context.Background()
 
 	now := time.Now()
-	startWindow := now.Add(7 * 3 * 24 * time.Hour)
-	endWindow := now.Add(9 * 7 * 25 * time.Hour)
+	startWindow := now.Add(-24 * time.Hour)
+	endWindow := now
 
 	registrations, err := j.repo.Registration.GetRegistrationsForCapture(ctx, startWindow, endWindow)
 	if err != nil {
@@ -33,7 +33,11 @@ func (j *JobScheduler) CapturePaymentsJob() {
 
 		stripeOutput, err := j.stripeClient.CapturePaymentIntent(ctx, stripeInput)
 		if err != nil {
-			log.Printf("Failed to capture payment for registration %s: %v", registration.ID, err)
+			log.Printf("Failed to capture payment for registration %s, cancelling registration: %v", registration.ID, err)
+			_, cancelErr := j.repo.Registration.CancelRegistration(ctx, &models.CancelRegistrationInput{ID: registration.ID})
+			if cancelErr != nil {
+				log.Printf("Failed to cancel registration %s after capture failure: %v", registration.ID, cancelErr)
+			}
 			continue
 		}
 		if stripeOutput == nil {

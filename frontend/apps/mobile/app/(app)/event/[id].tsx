@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import * as Linking from "expo-linking";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -16,16 +17,19 @@ import {
 } from "@skillspark/api-client";
 import type { EventOccurrence, Organization } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { RATING_OPTIONS } from "@/constants/ratings";
 import { AppColors, Shadows } from "@/constants/theme";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { useTranslation } from "react-i18next";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { AboutPage } from "@/components/AboutPage";
+import { ShareModal } from "@/components/ShareModal";
 import { formatLocation } from "@/utils/format";
 import { getRatingOption } from "@/utils/ratings";
 import { EventImage } from "@/components/EventImage";
 import { ExpandableText } from "@/components/ExpandableText";
 import { ErrorScreen } from "@/components/ErrorScreen";
+import { useState } from "react";
 
 function EventOccurrenceDetail({
   occurrence,
@@ -36,6 +40,7 @@ function EventOccurrenceDetail({
 }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
+  const [shareVisible, setShareVisible] = useState(false);
   const handleBack = () => router.back();
   const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
 
@@ -47,7 +52,7 @@ function EventOccurrenceDetail({
         .toLowerCase()
         .split(" ")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ")
+        .join(" "),
     )
     .join(" / ");
   const orgId = occurrence.event.organization_id;
@@ -109,24 +114,32 @@ function EventOccurrenceDetail({
             style={{ backgroundColor: AppColors.borderLight }}
           />
 
-          {/* Title row with bookmark */}
-          <View className="flex-row items-start justify-between mb-3">
+          {/* Title row with bookmark + share */}
+          <View className="mb-1">
+            <View className="absolute top-0 right-0 items-center z-10">
+              <TouchableOpacity
+                onPress={() => setShareVisible(true)}
+                activeOpacity={0.7}
+              >
+                <IconSymbol
+                  name="square.and.arrow.up"
+                  size={28}
+                  color={AppColors.primaryText}
+                />
+              </TouchableOpacity>
+              <BookmarkButton eventId={occurrence.event.id} />
+            </View>
             <Text
-              className="flex-1 mr-3 text-[26px] font-nunito-bold leading-8"
+              className="mr-10 text-[26px] font-nunito-bold leading-8"
               style={{ color: AppColors.primaryText }}
             >
               {occurrence.event.title}
             </Text>
-            <BookmarkButton eventId={occurrence.event.id} />
           </View>
 
           {/* Location */}
           <View className="flex-row items-center gap-1 mb-2">
-            <MaterialIcons
-              name="location-on"
-              size={22}
-              color={AppColors.mutedText}
-            />
+            <IconSymbol name="location" size={22} color={AppColors.mutedText} />
             <Text
               className="text-[14px] font-nunito"
               style={{ color: AppColors.mutedText }}
@@ -185,12 +198,10 @@ function EventOccurrenceDetail({
           className="mx-4 mb-4 rounded-2xl bg-white p-5"
           style={Shadows.card}
         >
-          <Text
-            className="mb-2.5 text-[18px] font-nunito-bold"
-            style={{ color: AppColors.primaryText }}
-          >
-            {translate("event.about")}
-          </Text>
+          <AboutPage
+            description={occurrence.event.description}
+            links={occurrence.org_links ?? []}
+          />
           <ExpandableText text={occurrence.event.description ?? ""} />
           {hasLinks && (
             <View className="flex-row flex-wrap gap-2.5">
@@ -234,7 +245,6 @@ function EventOccurrenceDetail({
             className="mx-4 mb-4 rounded-2xl bg-white p-5"
             style={Shadows.card}
           >
-            {/* Title */}
             <Text
               className="mb-3 font-nunito-bold text-[18px]"
               style={{ color: AppColors.primaryText }}
@@ -270,8 +280,6 @@ function EventOccurrenceDetail({
                 {translate("review.noReviews")}
               </Text>
             )}
-
-            {/* See more */}
             <View className="mt-4 items-center">
               <Text
                 className="text-[13px] font-nunito underline"
@@ -305,6 +313,17 @@ function EventOccurrenceDetail({
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <ShareModal
+        visible={shareVisible}
+        onClose={() => setShareVisible(false)}
+        name={occurrence.event.title}
+        imageUrl={occurrence.event.presigned_url ?? undefined}
+        shareUrl={Linking.createURL(`event/${occurrence.event.id}`)}
+        message={translate("share.defaultMessage", {
+          name: occurrence.event.title,
+        })}
+      />
     </SafeAreaView>
   );
 }
@@ -323,7 +342,7 @@ export default function EventOccurrenceScreen() {
 
   const { data: orgResp, isLoading: orgLoading } = useGetOrganization(
     orgId ?? "",
-    { query: { enabled: !!orgId } }
+    { query: { enabled: !!orgId } },
   );
   const org = orgResp?.status === 200 ? orgResp.data : null;
 

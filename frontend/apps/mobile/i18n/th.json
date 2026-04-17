@@ -5,7 +5,8 @@
     "activity": "กิจกรรม",
     "profile": "โปรไฟล์",
     "events": "กิจกรรม",
-    "about": "เกี่ยวกับ"
+    "about": "เกี่ยวกับ",
+    "manageChild": "จัดการเด็ก"
   },
   "eventCategories": {
     "noEventsFound": "ไม่พบกิจกรรมในหมวดหมู่นี้",
@@ -54,6 +55,10 @@
     "reserved": "จองแล้ว",
     "learnMore": "ดูเพิ่มเติม",
     "members": "สมาชิก",
+    "upcomingClasses": "คลาสที่กำลังจะมาถึง",
+    "trendingInYourArea": "กำลังมาแรงในพื้นที่ของคุณ",
+    "recommendedFor": "แนะนำสำหรับ...",
+    "exploreByCategory": "สำรวจตามหมวดหมู่",
     "categories": {
       "technology": "เทคโนโลยีและนวัตกรรม",
       "art": "ศิลปะและการแสดงออกเชิงสร้างสรรค์",
@@ -439,6 +444,19 @@
     "changeImage": "เปลี่ยนรูปภาพ",
     "saveChanges": "บันทึกการเปลี่ยนแปลง"
   },
+  "share": {
+    "copyLink": "คัดลอกลิงก์",
+    "share": "แชร์",
+    "limitationsApply": "มีเงื่อนไข ดูรายละเอียดที่แนบมา",
+    "starsRating": "4.5 ดาว (140)",
+    "defaultMessage": "ไปดู {{name}} บน SkillSpark เลย!",
+    "apps": {
+      "messages": "ข้อความ",
+      "messenger": "Messenger",
+      "line": "Line",
+      "whatsapp": "WhatsApp"
+    }
+  },
   "occurrence": {
     "smiles": "/ 5 รอยยิ้ม",
     "learnMore": "เรียนรู้เพิ่มเติม",
@@ -464,5 +482,36 @@
     "terms": "ข้อกำหนดและเงื่อนไข",
     "payAndReserve": "ชำระเงินและจอง",
     "seeYouSoon": "พบกันเร็วๆ นี้!"
+  },
+  "auth": {
+    "logIn": "เข้าสู่ระบบ",
+    "signUp": "สมัครสมาชิก",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน",
+    "fullName": "ชื่อ-นามสกุล",
+    "username": "ชื่อผู้ใช้",
+    "selectLanguage": "เลือกภาษา...",
+    "languageEnglish": "อังกฤษ",
+    "languageThai": "ไทย",
+    "dontHaveAccount": "ยังไม่มีบัญชี? สมัครสมาชิก",
+    "alreadyHaveAccount": "มีบัญชีแล้ว? เข้าสู่ระบบ",
+    "missingEmailOrPassword": "กรุณากรอกอีเมลและรหัสผ่าน",
+    "missingRequiredField": "กรุณากรอกข้อมูลที่จำเป็น",
+    "usernameTaken": "ชื่อผู้ใช้นี้ถูกใช้ไปแล้ว",
+    "unexpectedError": "เกิดข้อผิดพลาดที่ไม่คาดคิด"
+  },
+  "search": {
+    "placeholder": "ค้นหากิจกรรม...",
+    "noResults": "ไม่พบผลลัพธ์",
+    "tryDifferent": "ลองค้นหาด้วยคำอื่นหรือปรับตัวกรอง"
+  },
+  "payment_errors": {
+    "failedToFetch": "ไม่สามารถดึงข้อมูลวิธีการชำระเงินได้",
+    "failedToDelete": "ไม่สามารถลบวิธีการชำระเงินได้",
+    "notAuthenticated": "ยังไม่ได้เข้าสู่ระบบ",
+    "failedToCreateIntent": "ไม่สามารถสร้าง setup intent ได้",
+    "failedToConfirm": "ยืนยันวิธีการชำระเงินไม่สำเร็จ กรุณาลองอีกครั้ง",
+    "stripeNotAvailable": "Stripe ไม่พร้อมใช้งานใน Expo Go กรุณาใช้ development build เพื่อจัดการวิธีการชำระเงิน",
+    "unexpectedError": "เกิดข้อผิดพลาดที่ไม่คาดคิด"
   }
 }

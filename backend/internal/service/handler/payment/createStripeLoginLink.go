@@ -11,7 +11,7 @@ func (h *Handler) CreateOrgLoginLink(
 	input *models.CreateOrgLoginLinkInput,
 ) (*models.CreateOrgLoginLinkOutput, error) {
 
-	org, err := h.OrganizationRepository.GetOrganizationByID(ctx, input.OrganizationID)
+	org, err := h.OrganizationRepository.GetOrganizationByID(ctx, input.OrganizationID, "en-US")
 	if err != nil {
 		return nil, err
 	}

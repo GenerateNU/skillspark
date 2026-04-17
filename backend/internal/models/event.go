@@ -164,6 +164,5 @@ type GetEventOccurrencesByEventIDInput struct {
 }
 
 type GetEventOccurrencesByEventIDOutput struct {
-	AcceptLanguage string            `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
-	Body           []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
+	Body []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
 }

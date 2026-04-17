@@ -41,11 +41,11 @@ type SchoolRepository interface {
 }
 
 type OrganizationRepository interface {
-	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, error)
-	GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, error)
-	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, error)
-	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, error)
-	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error)
+	CreateOrganization(ctx context.Context, org *models.CreateOrganizationDBInput, PfpS3Key *string) (*models.Organization, error)
+	GetOrganizationByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.Organization, error)
+	GetAllOrganizations(ctx context.Context, pagination utils.Pagination, AcceptLanguage string) ([]models.Organization, error)
+	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationDBInput, PfpS3Key *string) (*models.Organization, error)
+	DeleteOrganization(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.Organization, error)
 	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID, AcceptLanguage string) ([]models.EventOccurrence, error)
 	SetStripeAccountID(ctx context.Context, orgID uuid.UUID, stripeAccountID string) (*models.Organization, error)
 	SetStripeAccountStatus(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error)
@@ -100,13 +100,15 @@ type EventOccurrenceRepository interface {
 }
 
 type RegistrationRepository interface {
-	CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error)
+	CreateRegistration(ctx context.Context, input *models.CreateRegistrationData) (*models.CreateRegistrationOutput, error)
+	CreatePayment(ctx context.Context, input *models.CreatePaymentData) error
 	GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput, tx *pgx.Tx) (*models.GetRegistrationByIDOutput, error)
 	GetRegistrationByPaymentIntentID(ctx context.Context, paymentIntentID string, AcceptLanguage string) (*models.Registration, error)
 	GetRegistrationsByChildID(ctx context.Context, input *models.GetRegistrationsByChildIDInput) (*models.GetRegistrationsByChildIDOutput, error)
 	GetRegistrationsByGuardianID(ctx context.Context, input *models.GetRegistrationsByGuardianIDInput) (*models.GetRegistrationsByGuardianIDOutput, error)
 	GetRegistrationsByEventOccurrenceID(ctx context.Context, input *models.GetRegistrationsByEventOccurrenceIDInput) (*models.GetRegistrationsByEventOccurrenceIDOutput, error)
 	GetRegistrationsForCapture(ctx context.Context, startWindow time.Time, endWindow time.Time) ([]models.Registration, error)
+	GetRegistrationsForPaymentCreation(ctx context.Context) ([]models.RegistrationForPayment, error)
 	UpdateRegistration(ctx context.Context, input *models.UpdateRegistrationInput) (*models.UpdateRegistrationOutput, error)
 	CancelRegistration(ctx context.Context, input *models.CancelRegistrationInput) (*models.CancelRegistrationOutput, error)
 	UpdateRegistrationPaymentStatus(ctx context.Context, input *models.UpdateRegistrationPaymentStatusInput) (*models.UpdateRegistrationPaymentStatusOutput, error)

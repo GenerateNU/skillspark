@@ -21,6 +21,8 @@ import { ExpandableText } from "@/components/ExpandableText";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { useTranslation } from "react-i18next";
+import * as Linking from "expo-linking";
+import { ShareModal } from "@/components/ShareModal";
 import { EMPTY_FACE_SVG } from "@/constants/avatarFaces";
 import { RatingSmiley } from "@/components/RatingSmiley";
 import LogoBgWrapper from "@/components/LogoBgWrapper";
@@ -39,6 +41,7 @@ function OrgDetail({
   const { openLink, hasLinks } = useOrgLinks(org.links ?? []);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [aboutTruncated, setAboutTruncated] = useState(false);
+  const [shareVisible, setShareVisible] = useState(false);
 
   const cardStyle = {
     shadowColor: "#000",
@@ -97,6 +100,7 @@ function OrgDetail({
             </View>
           )}
         </View>
+
         <LogoBgWrapper>
           {/* Org info */}
           <View className="px-4 pb-4 pt-4">
@@ -115,6 +119,7 @@ function OrgDetail({
                 )}
               </View>
               <TouchableOpacity
+                onPress={() => setShareVisible(true)}
                 activeOpacity={0.7}
                 className="mt-1 h-9 w-9 items-center justify-center rounded-full border-2"
                 style={{ borderColor: AppColors.borderLight }}
@@ -130,7 +135,7 @@ function OrgDetail({
 
           {/* Divider */}
           <View
-            className="mx-4 mb-5 border-b"
+            className="mx-4 mb-5 border-b border-dashed"
             style={{ borderColor: AppColors.divider }}
           />
 
@@ -248,6 +253,15 @@ function OrgDetail({
               </Text>
             </TouchableOpacity>
           </View>
+
+          <ShareModal
+            visible={shareVisible}
+            onClose={() => setShareVisible(false)}
+            name={org.name}
+            imageUrl={org.presigned_url ?? undefined}
+            shareUrl={Linking.createURL(`org/${org.id}`)}
+            message={translate("share.defaultMessage", { name: org.name })}
+          />
         </LogoBgWrapper>
       </ScrollView>
     </SafeAreaView>
@@ -264,7 +278,7 @@ export default function OrgScreen() {
       query: {
         enabled: response?.status === 200 && !!response.data.location_id,
       },
-    }
+    },
   );
 
   if (isLoading) {

@@ -25,20 +25,12 @@ func TestGetAggregateReviews(t *testing.T) {
 	child := child.CreateTestChild(t, ctx, testDB)
 	eo := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 
-	input := &models.CreateRegistrationWithPaymentData{}
-	input.ChildID = child.ID
-	input.GuardianID = child.GuardianID
-	input.EventOccurrenceID = eo.ID
-	input.Status = models.RegistrationStatusRegistered
-	input.StripePaymentIntentID = "pi_test_123"
-	input.StripeCustomerID = "cus_test_123"
-	input.OrgStripeAccountID = "acct_test_123"
-	input.StripePaymentMethodID = "pm_test_123"
-	input.TotalAmount = 10000
-	input.ProviderAmount = 8500
-	input.PlatformFeeAmount = 1500
-	input.Currency = "thb"
-	input.PaymentIntentStatus = "requires_capture"
+	input := &models.CreateRegistrationData{
+		ChildID:           child.ID,
+		GuardianID:        child.GuardianID,
+		EventOccurrenceID: eo.ID,
+		Status:            models.RegistrationStatusRegistered,
+	}
 
 	regOutput, _ := regRepo.CreateRegistration(ctx, input)
 
@@ -105,20 +97,12 @@ func TestGetAggregateReviews_AllSameRating(t *testing.T) {
 	child := child.CreateTestChild(t, ctx, testDB)
 	eo := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 
-	input := &models.CreateRegistrationWithPaymentData{}
-	input.ChildID = child.ID
-	input.GuardianID = child.GuardianID
-	input.EventOccurrenceID = eo.ID
-	input.Status = models.RegistrationStatusRegistered
-	input.StripePaymentIntentID = "pi_test_123"
-	input.StripeCustomerID = "cus_test_123"
-	input.OrgStripeAccountID = "acct_test_123"
-	input.StripePaymentMethodID = "pm_test_123"
-	input.TotalAmount = 10000
-	input.ProviderAmount = 8500
-	input.PlatformFeeAmount = 1500
-	input.Currency = "thb"
-	input.PaymentIntentStatus = "requires_capture"
+	input := &models.CreateRegistrationData{
+		ChildID:           child.ID,
+		GuardianID:        child.GuardianID,
+		EventOccurrenceID: eo.ID,
+		Status:            models.RegistrationStatusRegistered,
+	}
 
 	regOutput, _ := regRepo.CreateRegistration(ctx, input)
 	descriptionTH := "รีวิวทดสอบ"

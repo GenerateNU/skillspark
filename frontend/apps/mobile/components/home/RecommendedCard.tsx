@@ -33,7 +33,10 @@ export function RecommendedCard({
       className="mx-5 mb-3 rounded-2xl p-4 flex-row bg-white shadow-sm"
     >
       <View className="flex-1 pr-3">
-        <Text className="mb-2 font-nunito-bold text-xl" style={{ color: AppColors.primaryText }}>
+        <Text
+          className="mb-2 font-nunito-bold text-xl"
+          style={{ color: AppColors.primaryText }}
+        >
           {firstName}
         </Text>
         <ChildAvatar
@@ -42,7 +45,10 @@ export function RecommendedCard({
           avatarBackground={child.avatar_background}
           size={38}
         />
-        <Text className="mt-2 font-nunito text-[12px]" style={{ color: AppColors.mutedText }}>
+        <Text
+          className="mt-2 font-nunito text-[12px]"
+          style={{ color: AppColors.mutedText }}
+        >
           {summaryText}
         </Text>
       </View>

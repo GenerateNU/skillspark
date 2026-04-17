@@ -132,11 +132,51 @@ func TestCapturePaymentsJob_StripeCaptureFailure(t *testing.T) {
 	mockStripeClient.On("CapturePaymentIntent", mock.Anything, mock.AnythingOfType("*models.CapturePaymentIntentInput")).
 		Return(nil, assert.AnError)
 
+	mockRegRepo.On("CancelRegistration", mock.Anything, mock.MatchedBy(func(input *models.CancelRegistrationInput) bool {
+		return input.ID == reg.ID
+	})).Return(&models.CancelRegistrationOutput{}, nil)
+
 	scheduler.CapturePaymentsJob()
 
 	mockRegRepo.AssertExpectations(t)
 	mockStripeClient.AssertExpectations(t)
 	mockRegRepo.AssertNotCalled(t, "UpdateRegistrationPaymentStatus")
+}
+
+func TestCapturePaymentsJob_StripeCaptureFailure_CancelError(t *testing.T) {
+	mockRegRepo := new(repomocks.MockRegistrationRepository)
+	mockStripeClient := new(stripemocks.MockStripeClient)
+	mockRepo := &storage.Repository{
+		Registration: mockRegRepo,
+	}
+
+	scheduler := &JobScheduler{
+		repo:         mockRepo,
+		stripeClient: mockStripeClient,
+	}
+
+	reg := models.Registration{
+		ID:                    uuid.New(),
+		StripePaymentIntentID: "pi_test_fail",
+		OrgStripeAccountID:    "acct_test_123",
+		PaymentIntentStatus:   "requires_capture",
+		Status:                models.RegistrationStatusRegistered,
+	}
+
+	mockRegRepo.On("GetRegistrationsForCapture", mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
+		Return([]models.Registration{reg}, nil)
+
+	mockStripeClient.On("CapturePaymentIntent", mock.Anything, mock.AnythingOfType("*models.CapturePaymentIntentInput")).
+		Return(nil, assert.AnError)
+
+	mockRegRepo.On("CancelRegistration", mock.Anything, mock.AnythingOfType("*models.CancelRegistrationInput")).
+		Return(nil, assert.AnError)
+
+	// Should not panic even when both capture and cancel fail
+	scheduler.CapturePaymentsJob()
+
+	mockRegRepo.AssertExpectations(t)
+	mockStripeClient.AssertExpectations(t)
 }
 
 func TestCapturePaymentsJob_DatabaseUpdateFailure(t *testing.T) {
