@@ -1,7 +1,6 @@
 import { useGetAllEvents, type Event } from "@skillspark/api-client";
-import { useSearchEvents, type Event } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -15,6 +14,7 @@ import { useDebounce } from "use-debounce";
 import { useTranslation } from "react-i18next";
 import { SearchResultCard } from "@/components/home/SearchResultCard";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useFilters } from "@/hooks/use-filters";
 import { AppColors } from "@/constants/theme";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
@@ -35,17 +35,10 @@ export default function SearchScreen() {
     max_age: filters.max_age,
   });
 
-
-  const { data: resp, isLoading, error } = useSearchEvents(
-    { q: debouncedSearch, limit: 5 },
-    { query: { enabled: !!debouncedSearch } }
-  );
-
   const results: Event[] = useMemo(() => {
     const d = resp as unknown as { data: Event[] } | undefined;
     return Array.isArray(d?.data) ? d.data : [];
   }, [resp]);
-
 
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
@@ -103,12 +96,6 @@ export default function SearchScreen() {
             gap: 12,
           }}
           renderItem={({ item }) => <SearchResultCard event={item} />}
-          // placeholder - we will change the SearchCard to accomodate event data instead
-          renderItem={({ item }) => (
-            <Text className="font-nunito text-sm text-[#111] p-3">
-              {item.title}
-            </Text>
-          )}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         />
