@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useResetPassword } from "@skillspark/api-client";
 
@@ -43,11 +43,11 @@ export default function ResetPassword() {
   const navigate = useNavigate();
   const { mutate: resetPasswordFunc, isPending } = useResetPassword();
 
-  const { register, handleSubmit, watch } = useForm<ResetPasswordFormData>({
+  const { register, handleSubmit, control } = useForm<ResetPasswordFormData>({
     defaultValues: { newPassword: "", confirmPassword: "" },
   });
 
-  const newPassword = watch("newPassword");
+  const newPassword = useWatch({ control, name: "newPassword" });
 
   useEffect(() => {
     // Supabase appends access_token in the URL hash fragment after redirect
