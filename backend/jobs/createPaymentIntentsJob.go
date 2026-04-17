@@ -27,6 +27,10 @@ func (j *JobScheduler) CreatePaymentIntentsJob() {
 			log.Printf("CreatePaymentIntentsJob: failed to get guardian %s for registration %s: %v", reg.GuardianID, reg.ID, err)
 			continue
 		}
+		if guardian == nil {
+			log.Printf("CreatePaymentIntentsJob: nil guardian for registration %s, skipping", reg.ID)
+			continue
+		}
 		if guardian.StripeCustomerID == nil {
 			log.Printf("CreatePaymentIntentsJob: guardian %s has no Stripe customer ID, skipping registration %s", reg.GuardianID, reg.ID)
 			continue
@@ -35,6 +39,10 @@ func (j *JobScheduler) CreatePaymentIntentsJob() {
 		paymentMethods, err := j.stripeClient.GetPaymentMethodsByCustomerID(ctx, *guardian.StripeCustomerID)
 		if err != nil {
 			log.Printf("CreatePaymentIntentsJob: failed to get payment methods for guardian %s: %v", reg.GuardianID, err)
+			continue
+		}
+		if paymentMethods == nil {
+			log.Printf("CreatePaymentIntentsJob: nil payment methods response for guardian %s, skipping registration %s", reg.GuardianID, reg.ID)
 			continue
 		}
 		if len(paymentMethods.Body.PaymentMethods) == 0 {
@@ -48,10 +56,18 @@ func (j *JobScheduler) CreatePaymentIntentsJob() {
 			log.Printf("CreatePaymentIntentsJob: failed to get event occurrence %s for registration %s: %v", reg.EventOccurrenceID, reg.ID, err)
 			continue
 		}
+		if eventOccurrence == nil {
+			log.Printf("CreatePaymentIntentsJob: nil event occurrence %s for registration %s, skipping", reg.EventOccurrenceID, reg.ID)
+			continue
+		}
 
 		org, err := j.repo.Organization.GetOrganizationByID(ctx, eventOccurrence.Event.OrganizationID)
 		if err != nil {
 			log.Printf("CreatePaymentIntentsJob: failed to get organization for registration %s: %v", reg.ID, err)
+			continue
+		}
+		if org == nil {
+			log.Printf("CreatePaymentIntentsJob: nil organization for registration %s, skipping", reg.ID)
 			continue
 		}
 		if org.StripeAccountID == nil {
@@ -71,6 +87,10 @@ func (j *JobScheduler) CreatePaymentIntentsJob() {
 		paymentIntent, err := j.stripeClient.CreatePaymentIntent(ctx, &piInput)
 		if err != nil {
 			log.Printf("CreatePaymentIntentsJob: failed to create payment intent for registration %s: %v", reg.ID, err)
+			continue
+		}
+		if paymentIntent == nil {
+			log.Printf("CreatePaymentIntentsJob: nil payment intent response for registration %s, skipping", reg.ID)
 			continue
 		}
 
