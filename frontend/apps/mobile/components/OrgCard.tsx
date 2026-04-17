@@ -57,7 +57,7 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
           {pin.image ? (
             <Image
               source={{ uri: pin.image }}
-              style={{ width: "100%", height: "100%" }}
+              style={{ width: 120, height: 120 }}
               contentFit="cover"
             />
           ) : (
