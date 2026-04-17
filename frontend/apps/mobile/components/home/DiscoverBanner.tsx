@@ -27,10 +27,7 @@ export function DiscoverBanner({ event }: { event: Event }) {
   );
 
   return (
-    <Pressable
-      onPress={() => router.push(`/event/${eventId}`)}
-      className="flex-1 rounded-3xl overflow-hidden bg-[#1a1a1a]"
-    >
+    <View className="flex-1 rounded-3xl overflow-hidden bg-[#1a1a1a]">
       {/* Background image */}
       {event.presigned_url ? (
         <Image
@@ -81,7 +78,10 @@ export function DiscoverBanner({ event }: { event: Event }) {
           </View>
 
           {/* See More button */}
-          <View className="flex-row items-center bg-white rounded-full px-[14px] py-2 gap-1">
+          <Pressable
+            onPress={() => router.push(`/event/${eventId}`)}
+            className="flex-row items-center bg-white rounded-full px-[14px] py-2 gap-1"
+          >
             <Text
               className="text-sm"
               style={{
@@ -96,9 +96,9 @@ export function DiscoverBanner({ event }: { event: Event }) {
               size={12}
               color={AppColors.primaryText}
             />
-          </View>
+          </Pressable>
         </View>
       </View>
-    </Pressable>
+    </View>
   );
 }
