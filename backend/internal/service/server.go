@@ -76,6 +76,7 @@ func InitApp(config config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	// osClient is nil when OPENSEARCH_URL is not set (local dev without OpenSearch)
 
 	app, humaAPI, err := SetupApp(config, repo, s3Client, translateClient, newStripeClient, *notifService, osClient)
 	if err != nil {
@@ -185,6 +186,6 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetupGeocodingRoutes(api, geocodingService)
 	routes.SetupEmergencyContactRoutes(api, repo)
 	routes.SetupRecommendationRoutes(api, repo, s3Client)
-	routes.SetupSearchRoutes(api, osClient, s3Client)
+	routes.SetupSearchRoutes(api, osClient, s3Client, repo.Event)
 	return nil
 }
