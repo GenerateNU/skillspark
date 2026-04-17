@@ -114,3 +114,28 @@ type SupabaseError struct {
 func (e *SupabaseError) Error() string {
 	return e.Message
 }
+
+type ForgotPasswordInput struct {
+	Body struct {
+		Email string `json:"email" doc:"Email address to send reset instructions to" required:"true"`
+	}
+}
+
+type ForgotPasswordOutput struct {
+	Body struct {
+		Message string `json:"message"`
+	}
+}
+
+type ResetPasswordInput struct {
+	Body struct {
+		AccessToken string `json:"access_token" doc:"Access token from password reset email" required:"true"`
+		NewPassword string `json:"new_password" doc:"New password" required:"true"`
+	}
+}
+
+type ResetPasswordOutput struct {
+	Body struct {
+		Message string `json:"message"`
+	}
+}

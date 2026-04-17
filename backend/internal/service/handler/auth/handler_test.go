@@ -127,7 +127,7 @@ func TestHandler_GuardianLogin(t *testing.T) {
 				ServiceRoleKey: "mock-key",
 			}
 
-			handler := NewHandler(cfg, mockUserRepo, mockGuardianRepo, mockManagerRepo)
+			handler := NewHandler(cfg, config.Application{}, mockUserRepo, mockGuardianRepo, mockManagerRepo)
 			ctx := context.Background()
 
 			output, err := handler.GuardianLogin(ctx, tt.input)
@@ -210,7 +210,7 @@ func TestHandler_ManagerLogin(t *testing.T) {
 			tt.mockSetup(mockManagerRepo)
 
 			cfg := config.Supabase{URL: "http://mock", ServiceRoleKey: "key"}
-			handler := NewHandler(cfg, mockUserRepo, mockGuardianRepo, mockManagerRepo)
+			handler := NewHandler(cfg, config.Application{}, mockUserRepo, mockGuardianRepo, mockManagerRepo)
 
 			output, err := handler.ManagerLogin(context.Background(), tt.input)
 
@@ -283,7 +283,7 @@ func TestHandler_GuardianSignUp(t *testing.T) {
 			tt.mockSetup(mockGuardianRepo, mockUserRepo)
 
 			cfg := config.Supabase{URL: "http://mock", ServiceRoleKey: "key"}
-			handler := NewHandler(cfg, mockUserRepo, mockGuardianRepo, mockManagerRepo)
+			handler := NewHandler(cfg, config.Application{}, mockUserRepo, mockGuardianRepo, mockManagerRepo)
 
 			output, err := handler.GuardianSignUp(context.Background(), tt.input)
 
@@ -362,7 +362,7 @@ func TestHandler_ManagerSignUp(t *testing.T) {
 			tt.mockSetup(mockManagerRepo, mockUserRepo)
 
 			cfg := config.Supabase{URL: "http://mock", ServiceRoleKey: "key"}
-			handler := NewHandler(cfg, mockUserRepo, mockGuardianRepo, mockManagerRepo)
+			handler := NewHandler(cfg, config.Application{}, mockUserRepo, mockGuardianRepo, mockManagerRepo)
 
 			output, err := handler.ManagerSignUp(context.Background(), tt.input)
 

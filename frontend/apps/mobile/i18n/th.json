@@ -547,7 +547,14 @@
     "passwordReqLowercase": "อย่างน้อยหนึ่งตัวพิมพ์เล็ก",
     "passwordReqNumber": "อย่างน้อยหนึ่งตัวเลข",
     "passwordReqSpecial": "อย่างน้อยหนึ่งอักขระพิเศษ",
-    "signUp": "สมัครสมาชิก"
+    "signUp": "สมัครสมาชิก",
+    "forgotPasswordTitle": "ลืมรหัสผ่าน",
+    "forgotPasswordSubtitle": "ป้อนอีเมลของคุณ แล้วเราจะส่งคำแนะนำการรีเซ็ตให้คุณ",
+    "sendResetLink": "ส่งลิงก์รีเซ็ต",
+    "checkYourEmail": "ตรวจสอบอีเมลของคุณ",
+    "resetEmailSent": "หากอีเมลนั้นถูกลงทะเบียนไว้ คุณจะได้รับคำแนะนำในการรีเซ็ตในไม่ช้า",
+    "backToSignIn": "กลับไปลงชื่อเข้าใช้",
+    "sending": "กำลังส่ง..."
   },
   "auth": {
     "logIn": "เข้าสู่ระบบ",

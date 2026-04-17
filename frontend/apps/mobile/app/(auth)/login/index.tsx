@@ -130,7 +130,7 @@ export default function LoginScreen() {
                 {/* Forgot Password link */}
                 <TouchableOpacity
                   className="self-end"
-                  onPress={() => {}}
+                  onPress={() => router.push("/(auth)/forgot-password")}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <ThemedText className="text-base font-nunito underline text-[#111]">

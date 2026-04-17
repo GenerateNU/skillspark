@@ -8,6 +8,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./constants/query-client.ts";
 import Admin from "./admin/admin.tsx";
 import SignUp from "./signup/signup.tsx";
+import ForgotPassword from "./forgot-password/forgot-password.tsx";
+import ResetPassword from "./reset-password/reset-password.tsx";
 import ProtectedRoute from "./protected-route.tsx";
 
 createRoot(document.getElementById("root")!).render(
@@ -17,6 +19,8 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/"
             element={

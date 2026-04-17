@@ -7,16 +7,18 @@ import (
 
 type Handler struct {
 	config             config.Supabase
+	appConfig          config.Application
 	userRepository     storage.UserRepository
 	guardianRepository storage.GuardianRepository
 	managerRepository  storage.ManagerRepository
 }
 
-func NewHandler(config config.Supabase, userRepository storage.UserRepository, guardianRepository storage.GuardianRepository, managerRepository storage.ManagerRepository) *Handler {
+func NewHandler(supabaseCfg config.Supabase, appCfg config.Application, userRepository storage.UserRepository, guardianRepository storage.GuardianRepository, managerRepository storage.ManagerRepository) *Handler {
 	return &Handler{
-		config,
-		userRepository,
-		guardianRepository,
-		managerRepository,
+		config:             supabaseCfg,
+		appConfig:          appCfg,
+		userRepository:     userRepository,
+		guardianRepository: guardianRepository,
+		managerRepository:  managerRepository,
 	}
 }

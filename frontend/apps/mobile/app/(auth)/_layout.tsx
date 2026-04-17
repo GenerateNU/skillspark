@@ -10,6 +10,7 @@ export default function AuthStackLayout() {
       <Stack>
         <Stack.Screen name="login/index" options={{ headerShown: false }} />
         <Stack.Screen name="signup" options={{ headerShown: false }} />
+        <Stack.Screen name="forgot-password/index" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </QueryClientProvider>

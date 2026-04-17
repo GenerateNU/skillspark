@@ -69,6 +69,8 @@ func AuthMiddleware(api huma.API, cfg *config.Supabase) func(ctx huma.Context, n
 		"/api/v1/auth/signup/manager":  true,
 		"/api/v1/auth/login/guardian":  true,
 		"/api/v1/auth/login/manager":   true,
+		"/api/v1/auth/forgot-password": true,
+		"/api/v1/auth/reset-password":  true,
 		"/api/v1/health":               true,
 	}
 
