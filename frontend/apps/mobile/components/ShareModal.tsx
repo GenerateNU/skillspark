@@ -47,7 +47,6 @@ async function openMessenger(url: string) {
   }
 }
 
-
 interface ShareModalProps {
   visible: boolean;
   onClose: () => void;

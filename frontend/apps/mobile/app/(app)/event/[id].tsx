@@ -139,11 +139,7 @@ function EventOccurrenceDetail({
 
           {/* Location */}
           <View className="flex-row items-center gap-1 mb-2">
-            <IconSymbol
-              name="location"
-              size={22}
-              color={AppColors.mutedText}
-            />
+            <IconSymbol name="location" size={22} color={AppColors.mutedText} />
             <Text
               className="text-[14px] font-nunito"
               style={{ color: AppColors.mutedText }}
