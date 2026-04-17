@@ -1,8 +1,4 @@
-import {
-  useGetAllEvents,
-  useSearchEvents,
-  type Event,
-} from "@skillspark/api-client";
+import { getAllEvents, searchEvents, type Event } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
@@ -21,6 +17,9 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useFilters } from "@/hooks/use-filters";
 import { AppColors } from "@/constants/theme";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
+import { useInfiniteQuery } from "@tanstack/react-query";
+
+const PAGE_SIZE = 20;
 
 export default function SearchScreen() {
   const router = useRouter();
@@ -35,26 +34,66 @@ export default function SearchScreen() {
   const hasQuery = debouncedSearch.trim().length > 0;
 
   // Fuzzy OpenSearch — only when there is a search query
-  const { data: searchResp, isLoading: searchLoading } = useSearchEvents(
-    { q: debouncedSearch },
-    { query: { enabled: hasQuery } },
-  );
+  const {
+    data: searchData,
+    isLoading: searchLoading,
+    fetchNextPage: fetchNextSearchPage,
+    hasNextPage: hasNextSearch,
+    isFetchingNextPage: isFetchingNextSearch,
+  } = useInfiniteQuery({
+    queryKey: ["search", "events", debouncedSearch],
+    queryFn: ({ pageParam }) =>
+      searchEvents({ q: debouncedSearch, page: pageParam, limit: PAGE_SIZE }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const items = lastPage.data;
+      if (Array.isArray(items) && items.length === PAGE_SIZE) {
+        return allPages.length + 1;
+      }
+      return undefined;
+    },
+    enabled: hasQuery,
+  });
 
   // Postgres filtered fetch — only when there is no search query
-  const { data: allEventsResp, isLoading: allEventsLoading } = useGetAllEvents(
-    {
-      category: filters.category,
-      min_age: filters.min_age,
-      max_age: filters.max_age,
+  const {
+    data: allEventsData,
+    isLoading: allEventsLoading,
+    fetchNextPage: fetchNextAllPage,
+    hasNextPage: hasNextAll,
+    isFetchingNextPage: isFetchingNextAll,
+  } = useInfiniteQuery({
+    queryKey: ["events", "all", filters.category, filters.min_age, filters.max_age],
+    queryFn: ({ pageParam }) =>
+      getAllEvents({
+        category: filters.category,
+        min_age: filters.min_age,
+        max_age: filters.max_age,
+        page: pageParam,
+        limit: PAGE_SIZE,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const items = lastPage.data;
+      if (Array.isArray(items) && items.length === PAGE_SIZE) {
+        return allPages.length + 1;
+      }
+      return undefined;
     },
-    { query: { enabled: !hasQuery } },
-  );
+    enabled: !hasQuery,
+  });
 
   const isLoading = hasQuery ? searchLoading : allEventsLoading;
+  const fetchNextPage = hasQuery ? fetchNextSearchPage : fetchNextAllPage;
+  const hasNextPage = hasQuery ? hasNextSearch : hasNextAll;
+  const isFetchingNextPage = hasQuery ? isFetchingNextSearch : isFetchingNextAll;
 
   const results: Event[] = useMemo(() => {
     if (hasQuery) {
-      const raw = searchResp?.status === 200 ? searchResp.data : [];
+      const raw =
+        searchData?.pages.flatMap((page) =>
+          Array.isArray(page.data) ? (page.data as Event[]) : [],
+        ) ?? [];
 
       // Client-side apply active filters on top of fuzzy results
       return raw.filter((event) => {
@@ -78,9 +117,12 @@ export default function SearchScreen() {
       });
     }
 
-    const d = allEventsResp as unknown as { data: Event[] } | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [hasQuery, searchResp, allEventsResp, filters]);
+    return (
+      allEventsData?.pages.flatMap((page) =>
+        Array.isArray(page.data) ? (page.data as Event[]) : [],
+      ) ?? []
+    );
+  }, [hasQuery, searchData, allEventsData, filters]);
 
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
@@ -140,6 +182,19 @@ export default function SearchScreen() {
           renderItem={({ item }) => <SearchResultCard event={item} />}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) {
+              fetchNextPage();
+            }
+          }}
+          onEndReachedThreshold={0.3}
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <View className="py-4 items-center">
+                <ActivityIndicator size="small" />
+              </View>
+            ) : null
+          }
         />
       )}
     </View>

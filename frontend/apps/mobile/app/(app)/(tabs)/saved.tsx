@@ -7,11 +7,11 @@ import {
   getGetSavedByGuardianIdQueryKey,
   Saved,
   useDeleteSaved,
-  useGetSavedByGuardianId,
 } from "@skillspark/api-client";
+import { useInfiniteSavedByGuardianId } from "@/hooks/use-infinite-saved";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -33,13 +33,23 @@ export default function SavedScreen() {
   const { t: translate } = useTranslation();
 
   const {
-    data: response,
+    data,
     isLoading,
     error,
-  } = useGetSavedByGuardianId(guardianId!, undefined, {
-    query: { enabled: !!guardianId },
-  });
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteSavedByGuardianId(guardianId ?? undefined);
+
   const deleteSavedMutation = useDeleteSaved();
+
+  const savedEvents: Saved[] = useMemo(
+    () =>
+      data?.pages.flatMap((page) =>
+        Array.isArray(page.data) ? (page.data as Saved[]) : [],
+      ) ?? [],
+    [data],
+  );
 
   if (!guardianId) {
     return <ErrorScreen message={translate("common.noGuardianId")} />;
@@ -57,23 +67,13 @@ export default function SavedScreen() {
   if (error) {
     return (
       <ErrorScreen
-        message={error.detail || translate("common.errorOccurred")}
+        message={
+          (error as { detail?: string }).detail ??
+          translate("common.errorOccurred")
+        }
       />
     );
   }
-
-  if (!response || !Array.isArray(response.data)) {
-    return (
-      <View className="flex-1 items-center justify-center p-4">
-        <ThemedText>{translate("common.noEventsAvailable")}</ThemedText>
-      </View>
-    );
-  }
-
-  const savedEvents: Saved[] =
-    response.status === 200 && Array.isArray(response.data)
-      ? response.data
-      : [];
 
   const handleDeleteSaved = (savedId: string) => {
     Alert.alert(
@@ -137,6 +137,19 @@ export default function SavedScreen() {
             )}
             contentContainerStyle={{ paddingTop: 10, paddingBottom: 20 }}
             showsVerticalScrollIndicator={false}
+            onEndReached={() => {
+              if (hasNextPage && !isFetchingNextPage) {
+                fetchNextPage();
+              }
+            }}
+            onEndReachedThreshold={0.3}
+            ListFooterComponent={
+              isFetchingNextPage ? (
+                <View className="py-4 items-center">
+                  <ActivityIndicator size="small" />
+                </View>
+              ) : null
+            }
           />
         )}
       </ThemedView>
