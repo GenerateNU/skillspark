@@ -322,6 +322,9 @@
     "filterDistance": "Distance",
     "sortBy": "Sort by",
     "filter": "Filter",
+    "sort_distance": "Distance",
+    "sort_rating": "Rating",
+    "sort_members": "Members",
     "km": "km",
     "mi": "mi",
     "distanceAway": "{{distance}} km away",
@@ -480,6 +483,7 @@
     "smiles": "/ 5 Smiles",
     "learnMore": "Learn more",
     "reserve": "Reserve",
+    "cancel": "Cancel Registration",
     "ages": "Ages {{min}}",
     "agesOpen": "Ages {{min}}+",
     "agesRange": "Ages {{min}} - {{max}}",
@@ -500,6 +504,7 @@
     "termsNote": "By clicking 'Pay Now', you authorize Skill Spark to charge your card for the total amount, plus applicable fees.",
     "terms": "Terms & Conditions",
     "payAndReserve": "Pay Now & Reserve",
+    "termsAgree": "I agree to the Terms & Conditions",
     "seeYouSoon": "See you soon!"
   },
   "onboarding": {

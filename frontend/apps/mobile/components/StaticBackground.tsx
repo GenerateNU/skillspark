@@ -24,11 +24,11 @@ export function StaticBackdrop({
     () => animatedIndex.value,
     (current, previous) => {
       if (previous === null) return;
-      if (current > -1 && previous <= -1) {
-        // Sheet just started opening — appear immediately.
+      if (current >= 0 && previous < 0) {
+        // Sheet returned to open position — appear immediately.
         opacity.value = 1;
-      } else if (current < previous && current < 0) {
-        // Sheet just started closing — disappear immediately.
+      } else if (current < previous && current < -0.3) {
+        // Sheet has moved past 30% toward dismissal — disappear immediately.
         opacity.value = 0;
       }
     },

@@ -1,4 +1,4 @@
-import { TouchableOpacity } from "react-native";
+import { StyleProp, TouchableOpacity, ViewStyle } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useCreateSaved,
@@ -20,12 +20,18 @@ interface BookmarkButtonProps {
   // Controlled mode: pass these to skip the internal fetch
   isBookmarked?: boolean;
   savedEntryId?: string;
+  iconSize?: number;
+  className?: string;
+  style?: StyleProp<ViewStyle>;
 }
 
 export function BookmarkButton({
   eventId,
   isBookmarked: isBookmarkedProp,
   savedEntryId,
+  iconSize = 40,
+  className,
+  style,
 }: BookmarkButtonProps) {
   const queryClient = useQueryClient();
   const { guardianId } = useAuthContext();
@@ -115,10 +121,12 @@ export function BookmarkButton({
       onPress={handlePress}
       activeOpacity={0.7}
       disabled={isPending}
+      className={className}
+      style={style}
     >
       <MaterialIcons
         name={isBookmarked ? "bookmark" : "bookmark-border"}
-        size={40}
+        size={iconSize}
         color={isPending ? AppColors.placeholderText : AppColors.primaryText}
       />
     </TouchableOpacity>
