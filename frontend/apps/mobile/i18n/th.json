@@ -36,7 +36,8 @@
     "noEmergencyContactsAdded": "ยังไม่มีผู้ติดต่อฉุกเฉิน",
     "error": "ข้อผิดพลาด",
     "locationDenied": "การเข้าถึงตำแหน่งที่ตั้งถูกปฏิเสธ กรุณาเปิดใช้งานในการตั้งค่า",
-    "openSettings": "เปิดการตั้งค่า"
+    "openSettings": "เปิดการตั้งค่า",
+    "save": "บันทึก"
   },
   "home": {
     "title": "ยินดีต้อนรับ",
@@ -159,7 +160,11 @@
       "description": "คุณแน่ใจหรือไม่ว่าต้องการลบวิธีการชำระเงินนี้?",
       "confirm": "ยืนยัน",
       "deleting": "กำลังลบ..."
-    }
+    },
+    "cardNumber": "หมายเลขบัตร",
+    "cvv": "CVV",
+    "zipCode": "รหัสไปรษณีย์",
+    "finish": "เสร็จสิ้น"
   },
   "familyInformation": {
     "title": "ข้อมูลครอบครัว",
@@ -190,7 +195,21 @@
     "deleteError": "ลบไม่สำเร็จ",
     "changeProfilePicture": "เปลี่ยนรูปโปรไฟล์",
     "avatarTabColors": "สี",
-    "avatarTabAvatar": "อวตาร"
+    "avatarTabAvatar": "อวตาร",
+    "addInterestsHint": "เพิ่มความสนใจบางอย่าง คุณสามารถเปลี่ยนได้ภายหลัง",
+    "birthMonth": "เดือนเกิด",
+    "birthYear": "ปีเกิด",
+    "interests": {
+      "sports": "กีฬา/ร่างกาย",
+      "music": "ดนตรีและการแสดง",
+      "language": "ภาษา",
+      "other": "ทักษะชีวิตส่วนตัว",
+      "math": "วิชาการ",
+      "technology": "เทคโนโลยีและนวัตกรรม",
+      "science": "การเรียนพิเศษกลุ่มเล็ก",
+      "art": "ศิลปะ/การแสดงออกเชิงสร้างสรรค์"
+    },
+    "setProfilePicture": "ตั้งรูปโปรไฟล์ให้บุตรหลานของคุณ"
   },
   "saved": {
     "title": "ที่บันทึกไว้",
@@ -208,6 +227,7 @@
     "noReviews": "ไม่มีความคิดเห็น",
     "tapToReview": "แตะเพื่อรีวิว",
     "writeReview": "เขียนรีวิว",
+    "firstReview": "เป็นคนแรกที่รีวิว!",
     "mostRecent": "ล่าสุด",
     "mostRated": "ได้รับการประเมินมากที่สุด",
     "highest": "สูงสุด",
@@ -482,6 +502,47 @@
     "payAndReserve": "ชำระเงินและจอง",
     "seeYouSoon": "พบกันเร็วๆ นี้!"
   },
+  "onboarding": {
+    "welcome": "ยินดีต้อนรับสู่ SkillSpark!",
+    "chooseLanguage": "เลือกภาษาของคุณ",
+    "back": "ย้อนกลับ",
+    "continue": "ดำเนินการต่อ",
+    "makeAccount": "สร้างบัญชีของคุณ",
+    "email": "อีเมล",
+    "emailOrUsername": "อีเมล/ชื่อผู้ใช้",
+    "forgotPassword": "ลืมรหัสผ่าน?",
+    "password": "รหัสผ่าน",
+    "confirmPassword": "ยืนยันรหัสผ่าน",
+    "createAccount": "สร้างบัญชี",
+    "alreadyHaveAccount": "มีบัญชีอยู่แล้วใช่ไหม? เข้าสู่ระบบ",
+    "signIn": "เข้าสู่ระบบ",
+    "dontHaveAccount": "ยังไม่มีบัญชีใช่ไหม? สมัครสมาชิก",
+    "enterPhoneNumber": "กรอกหมายเลขโทรศัพท์ของคุณ",
+    "cellPhone": "โทรศัพท์มือถือ",
+    "whatName": "คุณชื่ออะไร?",
+    "name": "ชื่อ",
+    "username": "ชื่อผู้ใช้",
+    "cropAndSubmit": "ครอบตัดและส่งรูปภาพของคุณ",
+    "addPhoto": "เพิ่มรูปโปรไฟล์ของคุณ",
+    "choosePhoto": "เลือกรูปภาพ",
+    "personalize": "อัปโหลดรูปภาพเพื่อปรับแต่งโปรไฟล์ของคุณ",
+    "skip": "ข้ามไปก่อน",
+    "cancel": "ยกเลิก",
+    "save": "บันทึก",
+    "setUpChild": "ตั้งค่าโปรไฟล์สำหรับบุตรหลาน",
+    "addNewChild": "เพิ่มโปรไฟล์บุตรหลานใหม่",
+    "addEmergencyContact": "เพิ่มผู้ติดต่อฉุกเฉิน",
+    "contactNumber": "เบอร์ติดต่อ",
+    "paymentInformation": "ข้อมูลการชำระเงิน",
+    "cardNumber": "หมายเลขบัตร",
+    "cvv": "CVV",
+    "zipCode": "รหัสไปรษณีย์",
+    "finish": "เสร็จสิ้น",
+    "allSet": "ทุกอย่างเรียบร้อยแล้ว!",
+    "settingUp": "กำลังตั้งค่าโปรไฟล์ของคุณ...",
+    "passwordMismatch": "รหัสผ่านทั้งสองต้องตรงกัน",
+    "signUp": "สมัครสมาชิก"
+  },
   "auth": {
     "logIn": "เข้าสู่ระบบ",
     "signUp": "สมัครสมาชิก",
@@ -503,6 +564,20 @@
     "placeholder": "ค้นหากิจกรรม...",
     "noResults": "ไม่พบผลลัพธ์",
     "tryDifferent": "ลองค้นหาด้วยคำอื่นหรือปรับตัวกรอง"
+  },
+  "months": {
+    "january": "มกราคม",
+    "february": "กุมภาพันธ์",
+    "march": "มีนาคม",
+    "april": "เมษายน",
+    "may": "พฤษภาคม",
+    "june": "มิถุนายน",
+    "july": "กรกฎาคม",
+    "august": "สิงหาคม",
+    "september": "กันยายน",
+    "october": "ตุลาคม",
+    "november": "พฤศจิกายน",
+    "december": "ธันวาคม"
   },
   "payment_errors": {
     "failedToFetch": "ไม่สามารถดึงข้อมูลวิธีการชำระเงินได้",

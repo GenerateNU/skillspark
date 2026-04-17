@@ -6,7 +6,7 @@ import {
 } from "@skillspark/api-client";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useColorScheme, View, TouchableOpacity, Text } from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
 import { ThemedText } from "./themed-text";
 import { ErrorMessage } from "./ErrorMessage";
 import { useAuthContext } from "@/hooks/use-auth-context";
@@ -53,8 +53,7 @@ const CardFormInner = ({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { confirmSetupIntent } = useStripe();
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors["light"];
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
   const { guardian } = useGuardian(guardianId);

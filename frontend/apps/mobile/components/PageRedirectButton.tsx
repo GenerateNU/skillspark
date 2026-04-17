@@ -1,5 +1,6 @@
 import { AppColors } from "@/constants/theme";
 import { TouchableOpacity, Text } from "react-native";
+import { ThemedText } from "./themed-text";
 
 interface PageRedirectButtonProps {
   label: string;
@@ -16,12 +17,9 @@ export const PageRedirectButton = ({
       onPress={onPress}
       activeOpacity={0.5}
     >
-      <Text
-        className="text-base font-medium"
-        style={{ color: AppColors.primaryBlue }}
-      >
+      <ThemedText className="text-base font-nunito-bold underline">
         {label}
-      </Text>
+      </ThemedText>
     </TouchableOpacity>
   );
 };
