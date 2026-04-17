@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Platform } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useTranslation } from "react-i18next";
 import { ThemedText } from "@/components/themed-text";
@@ -9,8 +9,10 @@ import type { LocationPin } from "@/components/SkillSparkMap";
 import type { LocationObject } from "expo-location";
 import { haversineDistance } from "@/utils/distance";
 import { OrgCard } from "@/components/OrgCard";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
-const SNAP_POINTS = [60, "65%"];
+// Minimum snap must be above the floating nav bar (~88–114 px depending on device)
+const SNAP_POINTS = [140, "65%"];
 
 interface OrgListSheetProps {
   locations: LocationPin[];
@@ -19,7 +21,6 @@ interface OrgListSheetProps {
 
 export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
   const { t: translate } = useTranslation();
-  const bgColor = useThemeColor({}, "background");
   const borderColor = useThemeColor({}, "borderColor");
 
   return (
@@ -27,7 +28,7 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
       index={0}
       snapPoints={SNAP_POINTS}
       enableDynamicSizing={false}
-      backgroundStyle={{ backgroundColor: bgColor }}
+      backgroundStyle={{ backgroundColor: "#fff" }}
       handleIndicatorStyle={{ backgroundColor: AppColors.borderLight }}
     >
       <View
@@ -39,8 +40,7 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
         <FilterPill label={`${translate("map.sortBy")} ▾`} />
         <View className="flex-1" />
         <TouchableOpacity
-          className="rounded-full px-4 py-2"
-          style={{ backgroundColor: AppColors.checkboxSelected }}
+          className="rounded-full bg-[#1C1C1E] px-4 py-2"
         >
           <Text className="font-nunito-semibold text-sm text-white">
             {translate("map.filter")}
@@ -52,7 +52,7 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 16,
-          paddingBottom: Platform.OS === "ios" ? 40 : 24,
+          paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
         }}
       >
         {locations.map((loc) => {

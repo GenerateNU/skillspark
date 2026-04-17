@@ -30,6 +30,7 @@ import {
 import { ChildAvatar } from "@/components/ChildAvatar";
 import { useActivityData } from "@/hooks/use-activity-data";
 import LogoBgWrapper from "@/components/LogoBgWrapper";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 type toggleValue = "upcoming" | "past" | undefined;
 
@@ -339,7 +340,7 @@ export default function ActivityScreen() {
           contentContainerStyle={{
             alignItems: "center",
             paddingTop: 16,
-            paddingBottom: 32,
+            paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
           }}
           showsVerticalScrollIndicator={false}
         >
