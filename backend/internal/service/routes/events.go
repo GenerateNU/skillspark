@@ -159,6 +159,10 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 			pagination.Limit = 100
 		}
 
+		if input.MinAge != 0 && input.MaxAge != 0 && input.MinAge > input.MaxAge {
+			return nil, huma.Error400BadRequest("min_age cannot be larger than max_age")
+		}
+
 		var filters models.GetAllEventsFilter
 		if input.Search != "" {
 			filters.Search = &input.Search
