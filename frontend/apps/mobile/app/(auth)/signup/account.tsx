@@ -4,7 +4,7 @@ import { Button } from "@/components/Button";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useRouter } from "expo-router";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { SignupFormData } from "@/constants/signup-types";
 import {
@@ -20,25 +20,43 @@ import { AuthBackground } from "@/components/AuthBackground";
 import { JumpingCharacter } from "@/components/JumpingCharacter";
 import { PageRedirectButton } from "@/components/PageRedirectButton";
 
+// Matches the backend validatePasswordStrength rules exactly
+const PASSWORD_RULES = [
+  { key: "length",    check: (p: string) => p.length >= 8,                          i18nKey: "onboarding.passwordReqLength" },
+  { key: "upper",     check: (p: string) => /[A-Z]/.test(p),                        i18nKey: "onboarding.passwordReqUppercase" },
+  { key: "lower",     check: (p: string) => /[a-z]/.test(p),                        i18nKey: "onboarding.passwordReqLowercase" },
+  { key: "number",    check: (p: string) => /[0-9]/.test(p),                        i18nKey: "onboarding.passwordReqNumber" },
+  { key: "special",   check: (p: string) => /[!@#~$%^&*()+|_.,;<>?/{}\\-]/.test(p), i18nKey: "onboarding.passwordReqSpecial" },
+];
+
 export default function AccountScreen() {
   const router = useRouter();
   const { t: translate } = useTranslation();
   const insets = useSafeAreaInsets();
   const { getValues, control } = useFormContext<SignupFormData>();
+  const password = useWatch({ control, name: "password" }) ?? "";
 
   const handleCreateAccount = () => {
     const email = getValues("email");
-    const password = getValues("password");
+    const pw = getValues("password");
     const confirmPassword = getValues("confirm_password");
 
-    if (!email || !password || !confirmPassword) {
+    if (!email || !pw || !confirmPassword) {
       Alert.alert(
         translate("common.error"),
         translate("childProfile.requiredFieldsError"),
       );
       return;
     }
-    if (password !== confirmPassword) {
+    const failed = PASSWORD_RULES.filter((r) => !r.check(pw));
+    if (failed.length > 0) {
+      Alert.alert(
+        translate("onboarding.passwordInvalid"),
+        failed.map((r) => `• ${translate(r.i18nKey)}`).join("\n"),
+      );
+      return;
+    }
+    if (pw !== confirmPassword) {
       Alert.alert(
         translate("common.error"),
         translate("onboarding.passwordMismatch"),
@@ -116,6 +134,28 @@ export default function AccountScreen() {
                     name="password"
                     secureTextEntry
                   />
+                  {password.length > 0 && (
+                    <View className="gap-1 mt-1">
+                      {PASSWORD_RULES.map((rule) => {
+                        const met = rule.check(password);
+                        return (
+                          <View key={rule.key} className="flex-row items-center gap-1.5">
+                            <IconSymbol
+                              name={met ? "checkmark.circle.fill" : "xmark.circle"}
+                              size={14}
+                              color={met ? "#22C55E" : "#9CA3AF"}
+                            />
+                            <ThemedText
+                              className="text-xs font-nunito"
+                              style={{ color: met ? "#22C55E" : "#9CA3AF" }}
+                            >
+                              {translate(rule.i18nKey)}
+                            </ThemedText>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  )}
                 </View>
 
                 <View className="gap-2">

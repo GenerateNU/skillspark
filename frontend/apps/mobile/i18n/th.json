@@ -541,6 +541,12 @@
     "allSet": "ทุกอย่างเรียบร้อยแล้ว!",
     "settingUp": "กำลังตั้งค่าโปรไฟล์ของคุณ...",
     "passwordMismatch": "รหัสผ่านทั้งสองต้องตรงกัน",
+    "passwordInvalid": "รหัสผ่านไม่ตรงตามข้อกำหนด",
+    "passwordReqLength": "อย่างน้อย 8 ตัวอักษร",
+    "passwordReqUppercase": "อย่างน้อยหนึ่งตัวพิมพ์ใหญ่",
+    "passwordReqLowercase": "อย่างน้อยหนึ่งตัวพิมพ์เล็ก",
+    "passwordReqNumber": "อย่างน้อยหนึ่งตัวเลข",
+    "passwordReqSpecial": "อย่างน้อยหนึ่งอักขระพิเศษ",
     "signUp": "สมัครสมาชิก"
   },
   "auth": {
