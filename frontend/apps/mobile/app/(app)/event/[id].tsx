@@ -97,24 +97,6 @@ function EventOccurrenceDetail({
         )
       : null;
 
-  const { data: reviewsResp } = useGetReviewByEventId(
-    occurrence.event.id,
-    { page: 1, page_size: 5, sort_by: "highest" },
-    { query: { enabled: !!occurrence.event.id && totalReviews > 0 } },
-  );
-  const rawReviews =
-    reviewsResp?.status === 200 ? (reviewsResp.data as Review[]) : [];
-  const previewReview =
-    rawReviews.length > 0
-      ? rawReviews.reduce<Review>(
-          (best, r) =>
-            Math.abs(r.rating - avgRating) < Math.abs(best.rating - avgRating)
-              ? r
-              : best,
-          rawReviews[0],
-        )
-      : null;
-
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       {/* Header */}
