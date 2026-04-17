@@ -1,8 +1,18 @@
-import { View, Text, Pressable, type StyleProp, type ViewStyle } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { type EventOccurrence, type ReviewAggregate, useGetReviewAggregate } from "@skillspark/api-client";
+import {
+  type EventOccurrence,
+  type ReviewAggregate,
+  useGetReviewAggregate,
+} from "@skillspark/api-client";
 import { AppColors } from "@/constants/theme";
 import { haversineDistance } from "@/utils/distance";
 import { formatAgeRange } from "@/utils/format";
@@ -26,7 +36,10 @@ export function TrendingCard({
   const { t } = useTranslation();
 
   const ageLabel =
-    formatAgeRange(occurrence.event.age_range_min, occurrence.event.age_range_max) || null;
+    formatAgeRange(
+      occurrence.event.age_range_min,
+      occurrence.event.age_range_max,
+    ) || null;
 
   const distance =
     userLat != null &&
@@ -56,16 +69,19 @@ export function TrendingCard({
     <Pressable
       onPress={() => router.push(`/event/${occurrence.event.id}`)}
       className="mb-2 h-[140px] flex-row rounded-2xl border overflow-hidden"
-      style={[{
-        width,
-        backgroundColor: AppColors.white,
-        borderColor: AppColors.savedBackground,
-        shadowColor: "#000",
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 2,
-      }, style]}
+      style={[
+        {
+          width,
+          backgroundColor: AppColors.white,
+          borderColor: AppColors.savedBackground,
+          shadowColor: "#000",
+          shadowOpacity: 0.08,
+          shadowRadius: 4,
+          shadowOffset: { width: 0, height: 2 },
+          elevation: 2,
+        },
+        style,
+      ]}
     >
       {/* Image */}
       <EventImage
@@ -85,7 +101,10 @@ export function TrendingCard({
 
         {/* Smiley rating */}
         <View className="flex-row items-center gap-1.5">
-          <Image source={ratingOption.image} style={{ width: 18, height: 18 }} />
+          <Image
+            source={ratingOption.image}
+            style={{ width: 18, height: 18 }}
+          />
           <Text
             className="font-nunito text-[12px]"
             style={{ color: AppColors.mutedText }}

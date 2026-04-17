@@ -56,7 +56,9 @@ export default function SavedScreen() {
 
   if (error) {
     return (
-      <ErrorScreen message={error.detail || translate("common.errorOccurred")} />
+      <ErrorScreen
+        message={error.detail || translate("common.errorOccurred")}
+      />
     );
   }
 

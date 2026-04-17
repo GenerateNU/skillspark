@@ -264,7 +264,7 @@ export default function OrgScreen() {
       query: {
         enabled: response?.status === 200 && !!response.data.location_id,
       },
-    }
+    },
   );
 
   if (isLoading) {

@@ -157,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       {
         onSuccess: async (resp: signupGuardianResponse) => {
-          console.log('success!');
+          console.log("success!");
           const success = resp.data as GuardianSignUpOutputBody;
           await SecureStore.setItemAsync("token", success.token);
           setJWT(success.token);

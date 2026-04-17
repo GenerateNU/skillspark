@@ -16,12 +16,22 @@ type Props = {
   child: Child | undefined;
 };
 
-export function FeaturedOccurrenceCard({ occurrence, orgName, ageLabel, address, childName, child }: Props) {
+export function FeaturedOccurrenceCard({
+  occurrence,
+  orgName,
+  ageLabel,
+  address,
+  childName,
+  child,
+}: Props) {
   const router = useRouter();
   const { t: translate } = useTranslation();
 
   return (
-    <View className="mx-5 mb-5 rounded-3xl p-4" style={{ backgroundColor: AppColors.bluePastel }}>
+    <View
+      className="mx-5 mb-5 rounded-3xl p-4"
+      style={{ backgroundColor: AppColors.bluePastel }}
+    >
       <View className="flex-row items-center gap-2 mb-3">
         <Text className="font-nunito-bold text-base text-[#111]">
           {translate("dashboard.trendingRightNow")}
@@ -41,17 +51,25 @@ export function FeaturedOccurrenceCard({ occurrence, orgName, ageLabel, address,
           <View className="w-[110px] h-[80px] rounded-xl bg-[#D9D9D9]" />
         )}
         <View className="flex-1 gap-0.5">
-          <Text className="font-nunito-bold text-base text-[#111]" numberOfLines={1}>
+          <Text
+            className="font-nunito-bold text-base text-[#111]"
+            numberOfLines={1}
+          >
             {occurrence.event.title}
           </Text>
           {!!orgName && (
             <Text className="font-nunito text-xs text-gray-500">{orgName}</Text>
           )}
           {!!ageLabel && (
-            <Text className="font-nunito text-xs text-gray-500">{ageLabel}</Text>
+            <Text className="font-nunito text-xs text-gray-500">
+              {ageLabel}
+            </Text>
           )}
           {!!address && (
-            <Text className="font-nunito text-xs text-gray-500" numberOfLines={2}>
+            <Text
+              className="font-nunito text-xs text-gray-500"
+              numberOfLines={2}
+            >
               {address}
             </Text>
           )}

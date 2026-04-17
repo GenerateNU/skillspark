@@ -26,3 +26,4 @@ export * from "./generated/locations/locations";
 export * from "./generated/review/review";
 export * from "./generated/user/user";
 export * from "./generated/recommendations/recommendations";
+export * from "./generated/search/search";
