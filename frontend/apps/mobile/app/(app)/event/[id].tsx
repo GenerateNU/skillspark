@@ -16,7 +16,11 @@ import {
   useGetReviewAggregate,
   useGetReviewByEventId,
 } from "@skillspark/api-client";
-import type { EventOccurrence, Organization, Review } from "@skillspark/api-client";
+import type {
+  EventOccurrence,
+  Organization,
+  Review,
+} from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { RATING_OPTIONS } from "@/constants/ratings";
 import { AppColors, Shadows } from "@/constants/theme";
@@ -54,7 +58,7 @@ function EventOccurrenceDetail({
         .toLowerCase()
         .split(" ")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" "),
+        .join(" ")
     )
     .join(" / ");
   const orgId = occurrence.event.organization_id;
@@ -82,7 +86,7 @@ function EventOccurrenceDetail({
   const { data: reviewsResp } = useGetReviewByEventId(
     occurrence.event.id,
     { page: 1, page_size: 5, sort_by: "highest" },
-    { query: { enabled: !!occurrence.event.id && totalReviews > 0 } },
+    { query: { enabled: !!occurrence.event.id && totalReviews > 0 } }
   );
   const rawReviews =
     reviewsResp?.status === 200 ? (reviewsResp.data as Review[]) : [];
@@ -93,25 +97,7 @@ function EventOccurrenceDetail({
             Math.abs(r.rating - avgRating) < Math.abs(best.rating - avgRating)
               ? r
               : best,
-          rawReviews[0],
-        )
-      : null;
-
-  const { data: reviewsResp } = useGetReviewByEventId(
-    occurrence.event.id,
-    { page: 1, page_size: 5, sort_by: "highest" },
-    { query: { enabled: !!occurrence.event.id && totalReviews > 0 } },
-  );
-  const rawReviews =
-    reviewsResp?.status === 200 ? (reviewsResp.data as Review[]) : [];
-  const previewReview =
-    rawReviews.length > 0
-      ? rawReviews.reduce<Review>(
-          (best, r) =>
-            Math.abs(r.rating - avgRating) < Math.abs(best.rating - avgRating)
-              ? r
-              : best,
-          rawReviews[0],
+          rawReviews[0]
         )
       : null;
 
@@ -154,13 +140,10 @@ function EventOccurrenceDetail({
             style={{ width: "100%", height: "100%" }}
           />
         </View>
-
         {/* White content card overlapping image */}
-        <View className="bg-white -mt-7 px-[22px] pb-6">
+        <LogoBgWrapper className="bg-white -mt-7 px-[22px] pb-6">
           {/* Drag handle */}
-          <View
-            className="w-[38px] h-1 rounded-sm self-center mt-3 mb-3.5"
-          />
+          <View className="w-[38px] h-1 rounded-sm self-center mt-3 mb-3.5" />
 
           {/* Title row with bookmark + share */}
           <View className="mb-1">
@@ -191,7 +174,7 @@ function EventOccurrenceDetail({
               {occurrence.event.title}
             </Text>
           </View>
-<LogoBgWrapper>
+
           {/* Location */}
           <View className="flex-row items-center gap-1 mb-2">
             <IconSymbol name="location" size={22} color={AppColors.mutedText} />
@@ -251,10 +234,7 @@ function EventOccurrenceDetail({
               </Text>
             </TouchableOpacity>
           )}
-          </LogoBgWrapper>
-        </View>
-
-        
+        </LogoBgWrapper>
         {/* About card */}
         <View
           className="mx-4 mb-4 rounded-2xl bg-white p-5"
@@ -265,7 +245,6 @@ function EventOccurrenceDetail({
             links={occurrence.org_links ?? []}
           />
         </View>
-
         {/* Reviews card */}
         <TouchableOpacity
           activeOpacity={0.8}
@@ -300,7 +279,11 @@ function EventOccurrenceDetail({
                 <View className="items-center">
                   <Text
                     className="font-nunito-bold"
-                    style={{ color: AppColors.primaryText, fontSize: 40, lineHeight: 48 }}
+                    style={{
+                      color: AppColors.primaryText,
+                      fontSize: 40,
+                      lineHeight: 48,
+                    }}
                   >
                     {avgRating % 1 === 0
                       ? avgRating.toFixed(0)
@@ -348,7 +331,6 @@ function EventOccurrenceDetail({
             </View>
           </View>
         </TouchableOpacity>
-
         {/* Reserve button */}
         <View className="px-4 pb-2 pt-1">
           <TouchableOpacity
@@ -369,8 +351,6 @@ function EventOccurrenceDetail({
             </Text>
           </TouchableOpacity>
         </View>
-        
-        
       </ScrollView>
 
       <ShareModal
@@ -401,7 +381,7 @@ export default function EventOccurrenceScreen() {
 
   const { data: orgResp, isLoading: orgLoading } = useGetOrganization(
     orgId ?? "",
-    { query: { enabled: !!orgId } },
+    { query: { enabled: !!orgId } }
   );
   const org = orgResp?.status === 200 ? orgResp.data : null;
 

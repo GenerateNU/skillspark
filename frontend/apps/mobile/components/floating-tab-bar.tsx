@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconSymbol } from "@/components/ui/icon-symbol";
 
-const TAB_WIDTH = 68;
+const TAB_WIDTH = 80;
 const TAB_HEIGHT = 52;
 const PILL_PADDING = 8;
 const GAP = 4;
@@ -48,11 +48,11 @@ export function FloatingTabBar({ state, descriptors, navigation }: Props) {
   if (HIDDEN_ROUTES.includes(activeRouteName)) return null;
 
   const visibleRoutes = state.routes.filter((r) =>
-    VISIBLE_TABS.includes(r.name),
+    VISIBLE_TABS.includes(r.name)
   );
 
   const activeIndex = visibleRoutes.findIndex(
-    (r) => r.name === state.routes[state.index]?.name,
+    (r) => r.name === state.routes[state.index]?.name
   );
 
   const lastActiveIndexRef = useRef(Math.max(activeIndex, 0));
@@ -63,13 +63,15 @@ export function FloatingTabBar({ state, descriptors, navigation }: Props) {
     activeIndex !== -1 ? activeIndex : lastActiveIndexRef.current;
 
   const translateX = useSharedValue(
-    PILL_PADDING + effectiveActiveIndex * (TAB_WIDTH + GAP),
+    PILL_PADDING +
+      effectiveActiveIndex * (TAB_WIDTH + GAP) -
+      effectiveActiveIndex * 20
   );
 
   useEffect(() => {
     translateX.value = withSpring(
-      PILL_PADDING + effectiveActiveIndex * (TAB_WIDTH + GAP),
-      { damping: 28, stiffness: 350, mass: 0.8 },
+      PILL_PADDING + effectiveActiveIndex * (TAB_WIDTH + GAP - 1),
+      { damping: 28, stiffness: 350, mass: 0.8 }
     );
   }, [effectiveActiveIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -152,8 +154,9 @@ export function FloatingTabBar({ state, descriptors, navigation }: Props) {
               />
               {/* Always rendered so icon position stays consistent across all tabs */}
               <Animated.Text
+                numberOfLines={1}
                 style={{
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: "600",
                   color: "#1a1a1a",
                   letterSpacing: 0.1,
