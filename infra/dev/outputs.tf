@@ -48,3 +48,8 @@ output "backend_secret_access_key" {
   value       = aws_iam_access_key.backend.secret
   sensitive   = true
 }
+
+output "opensearch_url" {
+  description = "url for opensearch domain"
+  value = "https://${aws_opensearch_domain.skillspark-opensearch.endpoint}"
+}

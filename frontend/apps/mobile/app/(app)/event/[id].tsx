@@ -11,9 +11,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   useGetEventOccurrencesByEventId,
+  useGetOrganization,
   useGetReviewAggregate,
 } from "@skillspark/api-client";
-import type { EventOccurrence } from "@skillspark/api-client";
+import type { EventOccurrence, Organization } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, Shadows } from "@/constants/theme";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
@@ -24,11 +25,14 @@ import { formatLocation } from "@/utils/format";
 import { getRatingOption } from "@/utils/ratings";
 import { EventImage } from "@/components/EventImage";
 import { ExpandableText } from "@/components/ExpandableText";
+import { ErrorScreen } from "@/components/ErrorScreen";
 
 function EventOccurrenceDetail({
   occurrence,
+  org,
 }: {
   occurrence: EventOccurrence;
+  org: Organization | null;
 }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
@@ -36,8 +40,18 @@ function EventOccurrenceDetail({
   const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
 
   const location = formatLocation(occurrence);
-  const categories = occurrence.event.category?.join(" / ") ?? "";
+  const categories = (occurrence.event.category || [])
+    .map((elem) =>
+      //Capitalize the first char of every word
+      elem
+        .toLowerCase()
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ")
+    )
+    .join(" / ");
   const orgId = occurrence.event.organization_id;
+  const orgName = org?.name ?? "";
 
   const { data: aggregateResp } = useGetReviewAggregate(occurrence.event.id, {
     query: { enabled: !!occurrence.event.id },
@@ -107,10 +121,10 @@ function EventOccurrenceDetail({
           </View>
 
           {/* Location */}
-          <View className="flex-row items-center gap-1.5 mb-2">
+          <View className="flex-row items-center gap-1 mb-2">
             <MaterialIcons
               name="location-on"
-              size={16}
+              size={22}
               color={AppColors.mutedText}
             />
             <Text
@@ -123,12 +137,38 @@ function EventOccurrenceDetail({
 
           {/* Category */}
           {!!categories && (
-            <Text
-              className="text-[14px] font-nunito mb-2"
-              style={{ color: AppColors.mutedText }}
+            <View className="flex-row gap-1">
+              <IconSymbol
+                name="star.fill"
+                size={22}
+                color={AppColors.mutedText}
+              />
+              <Text
+                className="text-[14px] font-nunito mb-2"
+                style={{ color: AppColors.mutedText }}
+              >
+                {categories}
+              </Text>
+            </View>
+          )}
+
+          {!!orgId && (
+            <TouchableOpacity
+              onPress={() => router.push(`../org/${orgId}`)}
+              className="flex-row items-center gap-1 mb-2"
             >
-              {categories}
-            </Text>
+              <IconSymbol
+                name="person.fill"
+                size={22}
+                color={AppColors.mutedText}
+              />
+              <Text
+                className="text-[14px] font-nunito underline"
+                style={{ color: AppColors.mutedText }}
+              >
+                {orgName}
+              </Text>
+            </TouchableOpacity>
           )}
 
           {/* Bookings this week */}
@@ -141,7 +181,10 @@ function EventOccurrenceDetail({
         </View>
 
         {/* About card */}
-        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={Shadows.card}>
+        <View
+          className="mx-4 mb-4 rounded-2xl bg-white p-5"
+          style={Shadows.card}
+        >
           <Text
             className="mb-2.5 text-[18px] font-nunito-bold"
             style={{ color: AppColors.primaryText }}
@@ -267,7 +310,7 @@ function EventOccurrenceDetail({
 }
 
 export default function EventOccurrenceScreen() {
-  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const {
     data: response,
     isLoading,
@@ -275,7 +318,16 @@ export default function EventOccurrenceScreen() {
   } = useGetEventOccurrencesByEventId(id);
   const { t: translate } = useTranslation();
 
-  if (isLoading) {
+  const occurrence = response?.status === 200 ? response.data[0] : null;
+  const orgId = occurrence?.event.organization_id;
+
+  const { data: orgResp, isLoading: orgLoading } = useGetOrganization(
+    orgId ?? "",
+    { query: { enabled: !!orgId } }
+  );
+  const org = orgResp?.status === 200 ? orgResp.data : null;
+
+  if (isLoading || orgLoading) {
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
@@ -287,19 +339,11 @@ export default function EventOccurrenceScreen() {
     error ||
     !response ||
     response.status !== 200 ||
-    response.data.length === 0
+    response.data.length === 0 ||
+    !occurrence
   ) {
-    return (
-      <View className="flex-1 items-center justify-center p-6">
-        <Text
-          className="text-base font-semibold"
-          style={{ color: AppColors.danger }}
-        >
-          {translate("event.notFound")}
-        </Text>
-      </View>
-    );
+    return <ErrorScreen message={translate("event.notFound")} />;
   }
 
-  return <EventOccurrenceDetail occurrence={response.data[0]} />;
+  return <EventOccurrenceDetail occurrence={occurrence} org={org} />;
 }

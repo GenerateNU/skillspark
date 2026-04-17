@@ -1,6 +1,14 @@
+import { CategoryPicker } from "@/components/filters/CategoryPicker";
+import { DateRangePicker } from "@/components/filters/DateRangePicker";
+import { SliderCard } from "@/components/filters/SliderCard";
+import { SoldOutToggle } from "@/components/filters/SoldOutToggle";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { CATEGORY_KEYS } from "@/constants/eventCategories";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { useFilters } from "@/hooks/use-filters";
 import { useRouter } from "expo-router";
+import { TFunction } from "i18next";
+import { useTranslation } from "react-i18next";
 import {
   Pressable,
   ScrollView,
@@ -9,18 +17,10 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { SliderCard } from "@/components/filters/SliderCard";
-import { DateRangePicker } from "@/components/filters/DateRangePicker";
-import { CategoryPicker } from "@/components/filters/CategoryPicker";
-import { SoldOutToggle } from "@/components/filters/SoldOutToggle";
-import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
-import { CATEGORY_KEYS } from "@/constants/eventCategories";
 
 const DISTANCE_MAX = 50;
 const DURATION_MAX = 180; // minutes
-const PRICE_MAX = 2000;
+const PRICE_MAX = 200000; // 2000 in cents, since backend is in cents
 const AGE_MAX = 18;
 
 function distanceLabel(km: number) {
@@ -43,12 +43,16 @@ function durationRangeLabel(lo: number, hi: number, t: TFunction) {
   return `${durationLabel(lo)} – ${durationLabel(hi)}`;
 }
 
+function priceLabel(cents: number): string {
+  const amount = cents / 100;
+  return `$${amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2)}`;
+}
+
 function priceRangeLabel(lo: number, hi: number, t: TFunction) {
   if (lo === 0 && hi >= PRICE_MAX) return t("filters.any");
-  if (hi >= PRICE_MAX)
-    return t("filters.orMore", { value: `฿${lo.toLocaleString()}` });
-  if (lo === 0) return t("filters.upTo", { value: `฿${hi.toLocaleString()}` });
-  return `฿${lo.toLocaleString()} – ฿${hi.toLocaleString()}`;
+  if (hi >= PRICE_MAX) return t("filters.orMore", { value: priceLabel(lo) });
+  if (lo === 0) return t("filters.upTo", { value: priceLabel(hi) });
+  return `${priceLabel(lo)} – ${priceLabel(hi)}`;
 }
 
 function ageRangeLabel(lo: number, hi: number, t: TFunction) {
@@ -215,8 +219,8 @@ export default function FiltersScreen() {
           min={0}
           max={PRICE_MAX}
           step={100}
-          minLabel="฿0"
-          maxLabel={`฿${PRICE_MAX.toLocaleString()}+`}
+          minLabel={priceLabel(0)}
+          maxLabel={`${priceLabel(PRICE_MAX)}+`}
         />
 
         <View className="h-4" />

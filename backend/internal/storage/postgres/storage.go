@@ -14,8 +14,6 @@ import (
 
 // Establishes a sustained connection to the PostgreSQL database using pooling.
 func ConnectDatabase(ctx context.Context, dbConfig config.DB) (*pgxpool.Pool, error) {
-	log.Printf("Pool config - MaxConns: %d, MinConns: %d, MaxLifetime: %d",
-		dbConfig.MaxOpenConns, dbConfig.MaxIdleConns, dbConfig.ConnMaxLifetime)
 
 	poolConfig, err := pgxpool.ParseConfig(dbConfig.Connection())
 	if err != nil {

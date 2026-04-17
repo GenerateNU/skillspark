@@ -8,4 +8,5 @@ type Config struct {
 	TestMode    bool
 	S3          S3
 	SQS         SQS
+	OpenSearch  OpenSearch
 }

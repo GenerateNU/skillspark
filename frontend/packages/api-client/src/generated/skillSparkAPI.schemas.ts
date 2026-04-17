@@ -833,7 +833,7 @@ export interface UpdateEventOccurrenceInputBody {
    */
   max_attendees?: number;
   /**
-   * Price in lowest denomination of currency
+   * Price in cents.
    * @minimum 0
    */
   price?: number;
