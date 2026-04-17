@@ -129,14 +129,7 @@ export default function ReviewsScreen<
   }
 
   if (aggregateError || reviewsQuery.error) {
-    return (
-      <View className="flex-1 items-center justify-center p-4">
-        <ThemedText className="text-red-500 font-semibold">
-          {translate("common.errorLoadingEvents")}
-        </ThemedText>
-        <ThemedText>{translate("common.errorOccurred")}</ThemedText>
-      </View>
-    );
+    return <ErrorScreen message={translate("common.errorOccurred")} />;
   }
 
   if (!aggregateResponse || aggregateResponse.status !== 200) {

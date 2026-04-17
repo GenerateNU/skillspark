@@ -46,6 +46,9 @@ export const AppColors = {
   imagePlaceholder: "#D9D9D9",
   ratingPill: "#E69BF040",
   cardOverlay: "rgba(0,0,0,0.42)",
+  violetPastel: "#DDD6FE",
+  bluePastel: "#D9E4F5",
+  slateBlue: "#8494C8",
 };
 
 /** Tag color palette shared across interest tag components */
@@ -63,6 +66,25 @@ export const FontFamilies = {
   semiBold: "NunitoSans_600SemiBold",
   bold: "NunitoSans_700Bold",
   museoModerno: "MuseoModerno_700Bold",
+};
+
+export const Shadows = {
+  /** Elevated card shadow — used for detail page section cards */
+  card: {
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  /** Subtle card shadow — used for list/registration cards */
+  sm: {
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 2,
+  },
 };
 
 export const FontSizes = {

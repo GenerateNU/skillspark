@@ -1,5 +1,5 @@
-import { Image } from "expo-image";
 import { View, Text, Pressable } from "react-native";
+import { EventImage } from "@/components/EventImage";
 import { useRouter } from "expo-router";
 import { type EventOccurrence } from "@skillspark/api-client";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
@@ -56,21 +56,7 @@ export function SearchResultCard({
           flexShrink: 0,
         }}
       >
-        {occurrence.event.presigned_url ? (
-          <Image
-            source={{ uri: occurrence.event.presigned_url }}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="cover"
-          />
-        ) : (
-          <View
-            style={{
-              width: 94,
-              height: 94,
-              backgroundColor: AppColors.imagePlaceholder,
-            }}
-          />
-        )}
+        <EventImage uri={occurrence.event.presigned_url} style={{ width: "100%", height: "100%" }} />
       </View>
 
       {/* Text */}

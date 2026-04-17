@@ -1,41 +1,39 @@
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
+import CarouselCard from "@/components/home/CarouselCard";
+import { CategoryCard } from "@/components/home/CategoryCard";
+import { RecommendedCard } from "@/components/home/RecommendedCard";
+import { TrendingCard } from "@/components/home/TrendingCard";
+import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
+import LogoBgWrapper from "@/components/LogoBgWrapper";
+import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import {
-  ActivityIndicator,
-  View,
-  ScrollView,
-  Pressable,
-  Text,
-  useWindowDimensions,
-} from "react-native";
-import {
-  useGetAllEventOccurrences,
-  useGetGuardianById,
-  useGetRegistrationsByGuardianId,
-  useGetChildrenByGuardianId,
-  type EventOccurrence,
-  type Guardian,
-  type Registration,
-  type Child,
-  useGetTrendingEventOccurrences,
-} from "@skillspark/api-client";
-import { useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useFilters } from "@/hooks/use-filters";
-import { useRouter } from "expo-router";
-import { isWithinNext7Days } from "@/utils/format";
-import { DiscoverBanner } from "@/components/home/DiscoverBanner";
-import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
-import { RecommendedCard } from "@/components/home/RecommendedCard";
-import { CategoryCard } from "@/components/home/CategoryCard";
-import { ThemedText } from "@/components/themed-text";
-import { useTranslation } from "react-i18next";
-import { TrendingCard } from "@/components/home/TrendingCard";
-
 import { useGeolocation } from "@/hooks/use-geolocation";
-import CarouselCard from "@/components/home/CarouselCard";
-import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
-import LogoBgWrapper from "@/components/LogoBgWrapper";
+import { extractResponseData, filterFutureOccurrences, isWithinNext7Days } from "@/utils/format";
+import {
+  useGetAllEventOccurrences,
+  useGetChildrenByGuardianId,
+  useGetGuardianById,
+  useGetRegistrationsByGuardianId,
+  useGetTrendingEventOccurrences,
+  type Child,
+  type EventOccurrence,
+  type Guardian,
+  type Registration,
+} from "@skillspark/api-client";
+import { useRouter } from "expo-router";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
@@ -52,12 +50,10 @@ export default function HomeScreen() {
     radius_km: 50,
     limit: 5,
   });
-  const allLocalizedOccurrences: EventOccurrence[] = useMemo(() => {
-    const d = localizedOccurrencesResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [localizedOccurrencesResp]);
+  const allLocalizedOccurrences: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(localizedOccurrencesResp),
+    [localizedOccurrencesResp],
+  );
 
   const { data: guardianResp } = useGetGuardianById(guardianId!, {
     query: { enabled: !!guardianId },
@@ -66,12 +62,10 @@ export default function HomeScreen() {
     ?.data;
 
   const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences({});
-  const allOccurrences: EventOccurrence[] = useMemo(() => {
-    const d = occurrencesResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [occurrencesResp]);
+  const allOccurrences: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(occurrencesResp),
+    [occurrencesResp],
+  );
 
   const { data: registrationsResp } = useGetRegistrationsByGuardianId(
     guardianId!,
@@ -89,10 +83,10 @@ export default function HomeScreen() {
   const { data: childrenResp } = useGetChildrenByGuardianId(guardianId!, {
     query: { enabled: !!guardianId },
   });
-  const children: Child[] = useMemo(() => {
-    const d = childrenResp as unknown as { data: Child[] } | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [childrenResp]);
+  const children: Child[] = useMemo(
+    () => extractResponseData<Child>(childrenResp),
+    [childrenResp],
+  );
 
   const { data: trendingResp } = useGetTrendingEventOccurrences(
     {
@@ -108,12 +102,10 @@ export default function HomeScreen() {
     }
   );
 
-  const trendingEvents: EventOccurrence[] = useMemo(() => {
-    const d = trendingResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [trendingResp]);
+  const trendingEvents: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(trendingResp),
+    [trendingResp],
+  );
 
   const upcomingClasses = useMemo(() => {
     const upcomingIds = new Set(
@@ -129,18 +121,20 @@ export default function HomeScreen() {
   }, [registrations, allOccurrences]);
 
   const futureOccurrences = useMemo(
-    () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
-    [allOccurrences]
+    () => filterFutureOccurrences(allOccurrences),
+    [allOccurrences],
   );
 
   const childRecommendations = useMemo(() => {
     const shuffled = [...futureOccurrences].sort(() => Math.random() - 0.5);
     return children
-      .map((child, i) => ({
-        child,
-        occurrence: shuffled[i % shuffled.length],
-      }))
-      .filter((r) => r.occurrence != null);
+      .map((child, i) => {
+        const start = i * 3;
+        const slice = shuffled.slice(start, start + 3);
+        const occurrences = slice.length > 0 ? slice : shuffled.slice(0, 3);
+        return { child, occurrences };
+      })
+      .filter((r) => r.occurrences.length > 0);
   }, [children, futureOccurrences]);
 
   const categories = [
@@ -320,11 +314,11 @@ export default function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 20 }}
             >
-              {childRecommendations.map(({ child, occurrence }) => (
+              {childRecommendations.map(({ child, occurrences }) => (
                 <RecommendedCard
                   key={child.id}
-                  occurrence={occurrence}
-                  childName={child.name.split(" ")[0]}
+                  child={child}
+                  occurrences={occurrences}
                 />
               ))}
             </ScrollView>
@@ -350,7 +344,7 @@ export default function HomeScreen() {
               </View>
             ))}
           </View>
-        )}
+        </View>)}
       </LogoBgWrapper>
     </ScrollView>
   );

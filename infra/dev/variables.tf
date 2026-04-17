@@ -29,3 +29,10 @@ variable "expo_access_token" {
   sensitive   = true
   default     = ""
 }
+
+# update this once first apply is ran to grab the opensearch url output !!
+variable "opensearch_url" {
+  description = "opensearch domain url"
+  type        = string
+  default     = "http://localhost:9200"
+}
