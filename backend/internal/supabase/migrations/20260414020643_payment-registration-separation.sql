@@ -1,7 +1,7 @@
 -- Create payment table to separate payment concerns from registration
 CREATE TABLE IF NOT EXISTS payment (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    registration_id UUID NOT NULL REFERENCES registration(id) ON DELETE CASCADE,
+    registration_id UUID NOT NULL UNIQUE REFERENCES registration(id) ON DELETE CASCADE,
     stripe_payment_intent_id VARCHAR(255) UNIQUE,
     stripe_customer_id VARCHAR(255),
     stripe_payment_method_id VARCHAR(255),
