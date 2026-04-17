@@ -1,4 +1,8 @@
-import { useGetAllEvents, type Event } from "@skillspark/api-client";
+import {
+  useGetAllEvents,
+  useSearchEvents,
+  type Event,
+} from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
@@ -26,19 +30,58 @@ export default function SearchScreen() {
   const { t: translate } = useTranslation();
 
   const [searchText, setSearchText] = useState(q ?? "");
-  const [debouncedSearch] = useDebounce(searchText.toLowerCase(), 300);
+  const [debouncedSearch] = useDebounce(searchText, 300);
 
-  const { data: resp, isLoading } = useGetAllEvents({
-    search: debouncedSearch || undefined,
-    category: filters.category,
-    min_age: filters.min_age,
-    max_age: filters.max_age,
-  });
+  const hasQuery = debouncedSearch.trim().length > 0;
+
+  // Fuzzy OpenSearch — only when there is a search query
+  const { data: searchResp, isLoading: searchLoading } = useSearchEvents(
+    { q: debouncedSearch },
+    { query: { enabled: hasQuery } },
+  );
+
+  // Postgres filtered fetch — only when there is no search query
+  const { data: allEventsResp, isLoading: allEventsLoading } = useGetAllEvents(
+    {
+      category: filters.category,
+      min_age: filters.min_age,
+      max_age: filters.max_age,
+    },
+    { query: { enabled: !hasQuery } },
+  );
+
+  const isLoading = hasQuery ? searchLoading : allEventsLoading;
 
   const results: Event[] = useMemo(() => {
-    const d = resp as unknown as { data: Event[] } | undefined;
+    if (hasQuery) {
+      const raw =
+        searchResp?.status === 200 ? searchResp.data : [];
+
+      // Client-side apply active filters on top of fuzzy results
+      return raw.filter((event) => {
+        if (filters.category) {
+          const dbCats = filters.category.split(",");
+          if (!event.category?.some((c) => dbCats.includes(c))) return false;
+        }
+        if (
+          filters.min_age != null &&
+          event.age_range_max != null &&
+          event.age_range_max < filters.min_age
+        )
+          return false;
+        if (
+          filters.max_age != null &&
+          event.age_range_min != null &&
+          event.age_range_min > filters.max_age
+        )
+          return false;
+        return true;
+      });
+    }
+
+    const d = allEventsResp as unknown as { data: Event[] } | undefined;
     return Array.isArray(d?.data) ? d.data : [];
-  }, [resp]);
+  }, [hasQuery, searchResp, allEventsResp, filters]);
 
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
