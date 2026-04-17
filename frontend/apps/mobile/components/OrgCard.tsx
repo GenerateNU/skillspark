@@ -20,13 +20,6 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
   const router = useRouter();
   const borderColor = useThemeColor({}, "borderColor");
 
-  const locationLine = [
-    pin.district && pin.district.length > 0 ? pin.district : null,
-    distance !== null ? `${distance.toFixed(1)} km` : null,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
   return (
     <View className="py-4 border-b" style={{ borderBottomColor: borderColor }}>
       {/* Top row: text + image */}
@@ -40,9 +33,14 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
               {pin.members} {translate("dashboard.members")}
             </ThemedText>
           )}
-          {locationLine.length > 0 && (
+          {pin.district && pin.district.length > 0 && (
             <ThemedText className="font-nunito text-[13px] leading-[19px] text-[#6B7280]">
-              {locationLine}
+              {pin.district}
+            </ThemedText>
+          )}
+          {distance !== null && (
+            <ThemedText className="font-nunito text-[13px] leading-[19px] text-[#6B7280]">
+              {distance.toFixed(1)} km
             </ThemedText>
           )}
           {pin.description != null && pin.description.length > 0 && (
