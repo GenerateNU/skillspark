@@ -15,6 +15,8 @@ func TestStripeClient_RefundPayment(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
+	stripeAccountID := getSeededOrgStripeAccountID(t)
+	stripeCustomerID := getSeededGuardianStripeCustomerID(t)
 	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
@@ -24,8 +26,8 @@ func TestStripeClient_RefundPayment(t *testing.T) {
 		createInput := &models.CreatePaymentIntentInput{}
 		createInput.Body.Amount = 10000
 		createInput.Body.Currency = "usd"
-		createInput.Body.GuardianStripeID = testStripeCustomerID
-		createInput.Body.OrgStripeID = testStripeAccountID
+		createInput.Body.GuardianStripeID = stripeCustomerID
+		createInput.Body.OrgStripeID = stripeAccountID
 		createInput.Body.PaymentMethodID = "pm_card_visa"
 
 		created, err := client.CreatePaymentIntent(ctx, createInput)
@@ -74,8 +76,8 @@ func TestStripeClient_RefundPayment(t *testing.T) {
 		createInput := &models.CreatePaymentIntentInput{}
 		createInput.Body.Amount = 10000
 		createInput.Body.Currency = "usd"
-		createInput.Body.GuardianStripeID = testStripeCustomerID
-		createInput.Body.OrgStripeID = testStripeAccountID
+		createInput.Body.GuardianStripeID = stripeCustomerID
+		createInput.Body.OrgStripeID = stripeAccountID
 		createInput.Body.PaymentMethodID = "pm_card_visa"
 
 		created, err := client.CreatePaymentIntent(ctx, createInput)

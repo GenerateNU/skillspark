@@ -1,30 +1,31 @@
-WITH cancelled_registration AS (
-    UPDATE registration r
+WITH cancelled_reg AS (
+    UPDATE registration
     SET
-        status                = COALESCE($2::registration_status, 'cancelled'),
-        cancelled_at          = NOW(),
-        payment_intent_status = COALESCE($3::payment_intent_status, r.payment_intent_status),
+        status       = COALESCE($2::registration_status, 'cancelled'),
+        cancelled_at = NOW(),
+        updated_at   = NOW()
+    WHERE id = $1
+    RETURNING id, child_id, guardian_id, event_occurrence_id, status, cancelled_at, created_at, updated_at
+),
+updated_payment AS (
+    UPDATE payment p
+    SET
+        payment_intent_status = COALESCE($3::payment_intent_status, p.payment_intent_status),
         updated_at            = NOW()
-    WHERE r.id = $1
+    FROM cancelled_reg cr
+    WHERE p.registration_id = cr.id
     RETURNING
-        r.id,
-        r.child_id,
-        r.guardian_id,
-        r.event_occurrence_id,
-        r.status,
-        r.stripe_payment_intent_id,
-        r.stripe_customer_id,
-        r.org_stripe_account_id,
-        r.stripe_payment_method_id,
-        r.total_amount,
-        r.provider_amount,
-        r.platform_fee_amount,
-        r.currency,
-        r.payment_intent_status,
-        r.paid_at,
-        r.cancelled_at,
-        r.created_at,
-        r.updated_at
+        p.registration_id,
+        p.stripe_payment_intent_id,
+        p.stripe_customer_id,
+        p.org_stripe_account_id,
+        p.stripe_payment_method_id,
+        p.total_amount,
+        p.provider_amount,
+        p.platform_fee_amount,
+        p.currency,
+        p.payment_intent_status,
+        p.paid_at
 )
 SELECT
     cr.id,
@@ -32,22 +33,23 @@ SELECT
     cr.guardian_id,
     cr.event_occurrence_id,
     cr.status,
-    cr.stripe_payment_intent_id,
-    cr.stripe_customer_id,
-    cr.org_stripe_account_id,
-    cr.stripe_payment_method_id,
-    cr.total_amount,
-    cr.provider_amount,
-    cr.platform_fee_amount,
-    cr.currency,
-    cr.payment_intent_status,
-    cr.paid_at,
+    up.stripe_payment_intent_id,
+    up.stripe_customer_id,
+    up.org_stripe_account_id,
+    up.stripe_payment_method_id,
+    up.total_amount,
+    up.provider_amount,
+    up.platform_fee_amount,
+    up.currency,
+    up.payment_intent_status,
+    up.paid_at,
     cr.cancelled_at,
     cr.created_at,
     cr.updated_at,
     e.title_en,
     e.title_th,
     eo.start_time AS occurrence_start_time
-FROM cancelled_registration cr
+FROM cancelled_reg cr
+LEFT JOIN updated_payment up ON up.registration_id = cr.id
 JOIN event_occurrence eo ON eo.id = cr.event_occurrence_id
 JOIN event e ON e.id = eo.event_id;

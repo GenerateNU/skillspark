@@ -99,7 +99,8 @@ type EventOccurrenceRepository interface {
 }
 
 type RegistrationRepository interface {
-	CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error)
+	CreateRegistration(ctx context.Context, input *models.CreateRegistrationData) (*models.CreateRegistrationOutput, error)
+	CreatePayment(ctx context.Context, input *models.CreatePaymentData) error
 	GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput, tx *pgx.Tx) (*models.GetRegistrationByIDOutput, error)
 	GetRegistrationByPaymentIntentID(ctx context.Context, paymentIntentID string, AcceptLanguage string) (*models.Registration, error)
 	GetRegistrationsByChildID(ctx context.Context, input *models.GetRegistrationsByChildIDInput) (*models.GetRegistrationsByChildIDOutput, error)

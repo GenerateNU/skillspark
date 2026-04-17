@@ -1,33 +1,15 @@
 WITH updated AS (
     UPDATE registration
     SET
-        child_id = $1,
-        guardian_id = $2,
+        child_id           = $1,
+        guardian_id        = $2,
         event_occurrence_id = $3,
-        status = $4,
-        updated_at = NOW()
+        status             = $4,
+        updated_at         = NOW()
     WHERE id = $5
-    RETURNING 
-        id, 
-        child_id, 
-        guardian_id, 
-        event_occurrence_id, 
-        status, 
-        created_at, 
-        updated_at,
-        stripe_customer_id,
-        org_stripe_account_id,
-        currency,
-        payment_intent_status,
-        cancelled_at,
-        stripe_payment_intent_id,
-        total_amount,
-        provider_amount,
-        platform_fee_amount,
-        paid_at,
-        stripe_payment_method_id
+    RETURNING id, child_id, guardian_id, event_occurrence_id, status, cancelled_at, created_at, updated_at
 )
-SELECT 
+SELECT
     u.id,
     u.child_id,
     u.guardian_id,
@@ -35,20 +17,21 @@ SELECT
     u.status,
     u.created_at,
     u.updated_at,
-    u.stripe_customer_id,
-    u.org_stripe_account_id,
-    u.currency,
-    u.payment_intent_status,
+    COALESCE(p.stripe_customer_id, '') AS stripe_customer_id,
+    COALESCE(p.org_stripe_account_id, '') AS org_stripe_account_id,
+    COALESCE(p.currency, '') AS currency,
+    COALESCE(p.payment_intent_status::text, '') AS payment_intent_status,
     u.cancelled_at,
-    u.stripe_payment_intent_id,
-    u.total_amount,
-    u.provider_amount,
-    u.platform_fee_amount,
-    u.paid_at,
-    u.stripe_payment_method_id,
+    COALESCE(p.stripe_payment_intent_id, '') AS stripe_payment_intent_id,
+    COALESCE(p.total_amount, 0) AS total_amount,
+    COALESCE(p.provider_amount, 0) AS provider_amount,
+    COALESCE(p.platform_fee_amount, 0) AS platform_fee_amount,
+    p.paid_at,
+    COALESCE(p.stripe_payment_method_id, '') AS stripe_payment_method_id,
     e.title_en,
     e.title_th,
     eo.start_time AS occurrence_start_time
 FROM updated u
+LEFT JOIN payment p ON p.registration_id = u.id
 JOIN event_occurrence eo ON u.event_occurrence_id = eo.id
 JOIN event e ON eo.event_id = e.id;

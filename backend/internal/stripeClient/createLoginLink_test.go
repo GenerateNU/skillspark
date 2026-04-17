@@ -14,11 +14,12 @@ func TestStripeClient_CreateLoginLink(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
+	stripeAccountID := getSeededOrgStripeAccountID(t)
 	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates login link for onboarded account", func(t *testing.T) {
-		loginURL, err := client.CreateLoginLink(ctx, testStripeAccountID)
+		loginURL, err := client.CreateLoginLink(ctx, stripeAccountID)
 
 		require.NoError(t, err)
 		assert.NotEmpty(t, loginURL)
@@ -29,11 +30,11 @@ func TestStripeClient_CreateLoginLink(t *testing.T) {
 	})
 
 	t.Run("Can create multiple login links for same account", func(t *testing.T) {
-		loginURL1, err := client.CreateLoginLink(ctx, testStripeAccountID)
+		loginURL1, err := client.CreateLoginLink(ctx, stripeAccountID)
 		require.NoError(t, err)
 		assert.NotEmpty(t, loginURL1)
 
-		loginURL2, err := client.CreateLoginLink(ctx, testStripeAccountID)
+		loginURL2, err := client.CreateLoginLink(ctx, stripeAccountID)
 		require.NoError(t, err)
 		assert.NotEmpty(t, loginURL2)
 

@@ -93,6 +93,17 @@ func SetupRegistrationRoutes(api huma.API, repo *storage.Repository, sc stripeCl
 	})
 
 	huma.Register(api, huma.Operation{
+		OperationID: "create-payment-intent",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/registrations/{registration_id}/payment",
+		Summary:     "Create a payment intent for a registration",
+		Description: "Creates a Stripe payment intent and stores the payment record for an existing registration",
+		Tags:        []string{"Registrations"},
+	}, func(ctx context.Context, input *models.CreatePaymentForRegistrationInput) (*models.CreatePaymentForRegistrationOutput, error) {
+		return registrationHandler.CreatePaymentIntent(ctx, input)
+	})
+
+	huma.Register(api, huma.Operation{
 		OperationID: "update-registration-payment-status",
 		Method:      http.MethodPatch,
 		Path:        "/api/v1/registrations/{id}/payment-status",
