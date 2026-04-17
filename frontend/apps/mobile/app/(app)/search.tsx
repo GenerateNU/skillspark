@@ -27,17 +27,19 @@ export default function SearchScreen() {
   const [searchText, setSearchText] = useState(q ?? "");
   const [debouncedSearch] = useDebounce(searchText.toLowerCase(), 300);
 
-
-  const { data: resp, isLoading, error } = useSearchEvents(
+  const {
+    data: resp,
+    isLoading,
+    error,
+  } = useSearchEvents(
     { q: debouncedSearch, limit: 5 },
-    { query: { enabled: !!debouncedSearch } }
+    { query: { enabled: !!debouncedSearch } },
   );
 
   const results: Event[] = useMemo(() => {
     const d = resp as unknown as { data: Event[] } | undefined;
     return Array.isArray(d?.data) ? d.data : [];
   }, [resp]);
-
 
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>

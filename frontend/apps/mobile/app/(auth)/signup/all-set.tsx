@@ -17,49 +17,53 @@ const ALL_SET_SVG = `<svg width="192" height="192" viewBox="0 0 192 192" fill="n
 
 // 7. done with onboarding
 export default function AllSetScreen() {
-	const { t: translate } = useTranslation();
-	const insets = useSafeAreaInsets();
-	const { completeOnboarding } = useAuthContext();
-	const router = useRouter();
+  const { t: translate } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const { completeOnboarding } = useAuthContext();
+  const router = useRouter();
 
-	const handleContinue = async () => {
-		await completeOnboarding();
-		router.replace("/(app)/(tabs)");
-	};
+  const handleContinue = async () => {
+    await completeOnboarding();
+    router.replace("/(app)/(tabs)");
+  };
 
-	return (
-		<View className="absolute inset-0">
-			<AuthBackground />
-			<View className="flex-1" style={{ paddingTop: insets.top }}>
-				{/* Title */}
-				<View className="items-center px-6 pt-10 pb-5">
-					<ThemedText
-						className="font-nunito-bold text-[#111] text-center"
-						style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}
-						numberOfLines={1}
-						adjustsFontSizeToFit
-					>
-						{translate("onboarding.allSet")}
-					</ThemedText>
-				</View>
+  return (
+    <View className="absolute inset-0">
+      <AuthBackground />
+      <View className="flex-1" style={{ paddingTop: insets.top }}>
+        {/* Title */}
+        <View className="items-center px-6 pt-10 pb-5">
+          <ThemedText
+            className="font-nunito-bold text-[#111] text-center"
+            style={{
+              fontSize: FontSizes.hero,
+              lineHeight: FontSizes.hero + 8,
+              letterSpacing: -0.5,
+            }}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            {translate("onboarding.allSet")}
+          </ThemedText>
+        </View>
 
-				{/* Character */}
-				<View className="flex-1 items-center justify-center">
-					<SvgXml xml={ALL_SET_SVG} width={192} height={192} />
-				</View>
+        {/* Character */}
+        <View className="flex-1 items-center justify-center">
+          <SvgXml xml={ALL_SET_SVG} width={192} height={192} />
+        </View>
 
-				{/* Continue button */}
-				<View
-					className="px-6 items-center"
-					style={{ paddingBottom: insets.bottom + 24 }}
-				>
-					<Button
-						label={translate("onboarding.continue")}
-						onPress={handleContinue}
-						disabled={false}
-					/>
-				</View>
-			</View>
-		</View>
-	);
+        {/* Continue button */}
+        <View
+          className="px-6 items-center"
+          style={{ paddingBottom: insets.bottom + 24 }}
+        >
+          <Button
+            label={translate("onboarding.continue")}
+            onPress={handleContinue}
+            disabled={false}
+          />
+        </View>
+      </View>
+    </View>
+  );
 }

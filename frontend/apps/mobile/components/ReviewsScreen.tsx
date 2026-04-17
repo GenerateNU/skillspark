@@ -68,11 +68,11 @@ export default function ReviewsScreen<
 
   const [modalVisible, setModalVisible] = useState(false);
   const [initialRating, setInitialRating] = useState<number | undefined>(
-    undefined
+    undefined,
   );
 
   const [sortBy, setSortBy] = useState<"most_recent" | "highest" | "lowest">(
-    "most_recent"
+    "most_recent",
   );
 
   const {
@@ -87,7 +87,7 @@ export default function ReviewsScreen<
 
   const { data: registrationsResp } = useGetRegistrationsByGuardianId(
     guardianId ?? "",
-    { query: { enabled: canReview && !!guardianId && !!occurrenceId } }
+    { query: { enabled: canReview && !!guardianId && !!occurrenceId } },
   );
   const registration = useMemo(() => {
     const list =
@@ -95,14 +95,15 @@ export default function ReviewsScreen<
         ? registrationsResp.data.registrations
         : [];
     return list.find(
-      (r) => r.event_occurrence_id === occurrenceId && r.status === "registered"
+      (r) =>
+        r.event_occurrence_id === occurrenceId && r.status === "registered",
     );
   }, [registrationsResp, occurrenceId]);
 
   const { data: guardianReviewsResp } = useGetReviewByGuardianId(
     guardianId ?? "",
     undefined,
-    { query: { enabled: canReview && !!guardianId && !!id } }
+    { query: { enabled: canReview && !!guardianId && !!id } },
   );
   const hasAlreadyReviewed = useMemo(() => {
     const list =

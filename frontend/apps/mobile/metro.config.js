@@ -15,9 +15,9 @@ config.resolver.assetExts = [...(config.resolver.assetExts ?? []), "svg"];
 config.watchFolders = [monorepoRoot, repoRoot];
 
 config.resolver.nodeModulesPaths = [
-	path.resolve(projectRoot, "node_modules"),
-	path.resolve(monorepoRoot, "node_modules"),
-	path.resolve(repoRoot, "node_modules"),
+  path.resolve(projectRoot, "node_modules"),
+  path.resolve(monorepoRoot, "node_modules"),
+  path.resolve(repoRoot, "node_modules"),
 ];
 
 // Apply NativeWind first so its resolver is in place, then wrap it.
@@ -33,38 +33,38 @@ const nativeWindConfig = withNativeWind(config, { input: "./global.css" });
 // causes every JSX file to import react-native-css-interop/jsx-dev-runtime.
 // If two versions coexist the style registry is split and className has no effect.
 const DEDUPLICATED_PACKAGES = [
-	"react",
-	"react-native",
-	"react-native-css-interop",
-	"react-native-safe-area-context",
-	"react-native-screens",
-	"react-native-reanimated",
-	"react-native-gesture-handler",
-	"@tanstack/react-query",
-	"@tanstack/query-core",
+  "react",
+  "react-native",
+  "react-native-css-interop",
+  "react-native-safe-area-context",
+  "react-native-screens",
+  "react-native-reanimated",
+  "react-native-gesture-handler",
+  "@tanstack/react-query",
+  "@tanstack/query-core",
 ];
 
 function getDeduplicatedPackage(moduleName) {
-	return DEDUPLICATED_PACKAGES.find(
-		(pkg) => moduleName === pkg || moduleName.startsWith(pkg + "/"),
-	);
+  return DEDUPLICATED_PACKAGES.find(
+    (pkg) => moduleName === pkg || moduleName.startsWith(pkg + "/"),
+  );
 }
 
 const nativeWindResolver = nativeWindConfig.resolver.resolveRequest;
 
 nativeWindConfig.resolver.resolveRequest = (context, moduleName, platform) => {
-	if (getDeduplicatedPackage(moduleName)) {
-		try {
-			const resolved = require.resolve(moduleName, { paths: [projectRoot] });
-			return { filePath: resolved, type: "sourceFile" };
-		} catch {
-			// fall through to normal resolution if subpath can't be resolved via Node
-		}
-	}
-	if (nativeWindResolver) {
-		return nativeWindResolver(context, moduleName, platform);
-	}
-	return context.resolveRequest(context, moduleName, platform);
+  if (getDeduplicatedPackage(moduleName)) {
+    try {
+      const resolved = require.resolve(moduleName, { paths: [projectRoot] });
+      return { filePath: resolved, type: "sourceFile" };
+    } catch {
+      // fall through to normal resolution if subpath can't be resolved via Node
+    }
+  }
+  if (nativeWindResolver) {
+    return nativeWindResolver(context, moduleName, platform);
+  }
+  return context.resolveRequest(context, moduleName, platform);
 };
 
 module.exports = nativeWindConfig;

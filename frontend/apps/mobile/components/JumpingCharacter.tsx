@@ -26,10 +26,13 @@ const JUMPING_SVG = `<svg width="208" height="158" viewBox="0 0 208 158" fill="n
 </svg>`;
 
 interface JumpingCharacterProps {
-	width?: number;
-	height?: number;
+  width?: number;
+  height?: number;
 }
 
-export function JumpingCharacter({ width = 180, height = 137 }: JumpingCharacterProps) {
-	return <SvgXml xml={JUMPING_SVG} width={width} height={height} />;
+export function JumpingCharacter({
+  width = 180,
+  height = 137,
+}: JumpingCharacterProps) {
+  return <SvgXml xml={JUMPING_SVG} width={width} height={height} />;
 }

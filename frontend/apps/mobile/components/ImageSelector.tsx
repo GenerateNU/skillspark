@@ -54,7 +54,8 @@ export const ImageSelector = ({
             resizeMode="cover"
           />
         )}
-        {!image && (placeholder ?? <NoProfilePic width={width} height={height} />)}
+        {!image &&
+          (placeholder ?? <NoProfilePic width={width} height={height} />)}
       </View>
       <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
         {translate("editProfile.changeImage")}

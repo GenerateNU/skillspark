@@ -18,130 +18,142 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getGetChildrenByGuardianIdQueryKey } from "@skillspark/api-client";
 
 export default function EditChildPictureScreen() {
-	const router = useRouter();
-	const params = useLocalSearchParams();
-	const insets = useSafeAreaInsets();
-	const theme = Colors.light;
-	const { guardianId } = useAuthContext();
-	const { t: translate } = useTranslation();
-	const queryClient = useQueryClient();
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
+  const theme = Colors.light;
+  const { guardianId } = useAuthContext();
+  const { t: translate } = useTranslation();
+  const queryClient = useQueryClient();
 
-	const [firstName] = useState(
-		params.name ? (params.name as string).split(" ")[0] : "",
-	);
-	const [lastName] = useState(
-		params.name ? (params.name as string).split(" ").slice(1).join(" ") : "",
-	);
-	const [avatarFace, setAvatarFace] = useState<string | null>(
-		(params.avatar_face as string) || null,
-	);
-	const [avatarBackground, setAvatarBackground] = useState(
-		(params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
-	);
-	const [isSaving, setIsSaving] = useState(false);
+  const [firstName] = useState(
+    params.name ? (params.name as string).split(" ")[0] : "",
+  );
+  const [lastName] = useState(
+    params.name ? (params.name as string).split(" ").slice(1).join(" ") : "",
+  );
+  const [avatarFace, setAvatarFace] = useState<string | null>(
+    (params.avatar_face as string) || null,
+  );
+  const [avatarBackground, setAvatarBackground] = useState(
+    (params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
+  );
+  const [isSaving, setIsSaving] = useState(false);
 
-	const updateChildMutation = useUpdateChild();
+  const updateChildMutation = useUpdateChild();
 
-	if (!guardianId) {
-		return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
-	}
+  if (!guardianId) {
+    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+  }
 
-	const childId = params.childId as string | undefined;
+  const childId = params.childId as string | undefined;
 
-	const handleAvatarPress = () => {
-		setPendingAvatarCallback(({ face, background }) => {
-			setAvatarFace(face);
-			setAvatarBackground(background);
-		});
-		const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
-		router.push({
-			pathname: "./avatar-picker",
-			params: { avatarFace: avatarFace ?? "", avatarBackground, childName },
-		});
-	};
+  const handleAvatarPress = () => {
+    setPendingAvatarCallback(({ face, background }) => {
+      setAvatarFace(face);
+      setAvatarBackground(background);
+    });
+    const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
+    router.push({
+      pathname: "./avatar-picker",
+      params: { avatarFace: avatarFace ?? "", avatarBackground, childName },
+    });
+  };
 
-	const handleSave = async () => {
-		if (!childId) {
-			// No ID to update — just navigate
-			router.push("/(auth)/signup/child-profile");
-			return;
-		}
-		setIsSaving(true);
-		try {
-			await updateChildMutation.mutateAsync({
-				id: childId,
-				data: {
-					avatar_face: avatarFace ?? undefined,
-					avatar_background: avatarBackground,
-				},
-			});
-			await queryClient.invalidateQueries({
-				queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
-			});
-			router.push("/(auth)/signup/child-profile");
-		} catch {
-			Alert.alert(
-				translate("common.errorOccurred"),
-				translate("childProfile.saveError"),
-			);
-		} finally {
-			setIsSaving(false);
-		}
-	};
+  const handleSave = async () => {
+    if (!childId) {
+      // No ID to update — just navigate
+      router.push("/(auth)/signup/child-profile");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await updateChildMutation.mutateAsync({
+        id: childId,
+        data: {
+          avatar_face: avatarFace ?? undefined,
+          avatar_background: avatarBackground,
+        },
+      });
+      await queryClient.invalidateQueries({
+        queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
+      });
+      router.push("/(auth)/signup/child-profile");
+    } catch {
+      Alert.alert(
+        translate("common.errorOccurred"),
+        translate("childProfile.saveError"),
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-	const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
+  const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
 
-	return (
-		<View className="flex-1" style={{ paddingTop: insets.top }}>
-			<AuthBackground />
-			<Stack.Screen options={{ headerShown: false }} />
+  return (
+    <View className="flex-1" style={{ paddingTop: insets.top }}>
+      <AuthBackground />
+      <Stack.Screen options={{ headerShown: false }} />
 
-			{/* Back button */}
-			<TouchableOpacity
-				onPress={() => router.back()}
-				className="flex-row items-center px-5 py-3 gap-1"
-				hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-			>
-				<IconSymbol name="chevron.left" size={18} color={theme.text} />
-				<ThemedText className="text-base font-nunito">
-					{translate("onboarding.back")}
-				</ThemedText>
-			</TouchableOpacity>
+      {/* Back button */}
+      <TouchableOpacity
+        onPress={() => router.back()}
+        className="flex-row items-center px-5 py-3 gap-1"
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <IconSymbol name="chevron.left" size={18} color={theme.text} />
+        <ThemedText className="text-base font-nunito">
+          {translate("onboarding.back")}
+        </ThemedText>
+      </TouchableOpacity>
 
-			{/* Title */}
-			<View className="px-6 pt-2">
-				<ThemedText className="font-nunito-bold text-[#111]" style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}>
-					{translate("childProfile.setProfilePicture", {
-						defaultValue: "Set your child's profile picture",
-					})}
-				</ThemedText>
-			</View>
+      {/* Title */}
+      <View className="px-6 pt-2">
+        <ThemedText
+          className="font-nunito-bold text-[#111]"
+          style={{
+            fontSize: FontSizes.hero,
+            lineHeight: FontSizes.hero + 8,
+            letterSpacing: -0.5,
+          }}
+        >
+          {translate("childProfile.setProfilePicture", {
+            defaultValue: "Set your child's profile picture",
+          })}
+        </ThemedText>
+      </View>
 
-			{/* Avatar — centred in remaining space */}
-			<View className="flex-1 items-center justify-center">
-				<TouchableOpacity onPress={handleAvatarPress} activeOpacity={0.8}>
-					<View className="relative">
-						<ChildAvatar
-							name={childName}
-							avatarFace={avatarFace}
-							avatarBackground={avatarBackground || DEFAULT_AVATAR_COLOR}
-							size={160}
-						/>
-						<View className="absolute -top-2 -right-2 w-11 h-11 rounded-full bg-white shadow items-center justify-center">
-							<IconSymbol name="pencil" size={18} color={theme.text} />
-						</View>
-					</View>
-				</TouchableOpacity>
-			</View>
+      {/* Avatar — centred in remaining space */}
+      <View className="flex-1 items-center justify-center">
+        <TouchableOpacity onPress={handleAvatarPress} activeOpacity={0.8}>
+          <View className="relative">
+            <ChildAvatar
+              name={childName}
+              avatarFace={avatarFace}
+              avatarBackground={avatarBackground || DEFAULT_AVATAR_COLOR}
+              size={160}
+            />
+            <View className="absolute -top-2 -right-2 w-11 h-11 rounded-full bg-white shadow items-center justify-center">
+              <IconSymbol name="pencil" size={18} color={theme.text} />
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
 
-			{/* Save button */}
-			<View className="px-6 items-center" style={{ paddingBottom: insets.bottom + 16 }}>
-				<Button
-					label={isSaving ? translate("common.saving") : translate("onboarding.save")}
-					onPress={handleSave}
-					disabled={isSaving}
-				/>
-			</View>
-		</View>
-	);
+      {/* Save button */}
+      <View
+        className="px-6 items-center"
+        style={{ paddingBottom: insets.bottom + 16 }}
+      >
+        <Button
+          label={
+            isSaving ? translate("common.saving") : translate("onboarding.save")
+          }
+          onPress={handleSave}
+          disabled={isSaving}
+        />
+      </View>
+    </View>
+  );
 }
