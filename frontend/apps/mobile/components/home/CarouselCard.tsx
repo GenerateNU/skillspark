@@ -60,7 +60,9 @@ export default function CarouselCard({
               height: 6,
               borderRadius: 3,
               backgroundColor:
-                i === currentIndex ? AppColors.primaryText : AppColors.surfaceGray,
+                i === currentIndex
+                  ? AppColors.primaryText
+                  : AppColors.surfaceGray,
             }}
           />
         ))}

@@ -4198,14 +4198,22 @@ components:
         created_at:
           type: string
           format: date-time
+        district:
+          type: string
         id:
           type: string
+        latitude:
+          type: number
+          format: double
         links:
           type: array
           items:
             $ref: '#/components/schemas/OrgLink'
         location_id:
           type: string
+        longitude:
+          type: number
+          format: double
         name:
           type: string
         pfp_s3_key:

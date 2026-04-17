@@ -54,8 +54,7 @@ export default function SearchScreen() {
 
   const results: Event[] = useMemo(() => {
     if (hasQuery) {
-      const raw =
-        searchResp?.status === 200 ? searchResp.data : [];
+      const raw = searchResp?.status === 200 ? searchResp.data : [];
 
       // Client-side apply active filters on top of fuzzy results
       return raw.filter((event) => {
