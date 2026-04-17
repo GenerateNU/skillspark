@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
@@ -22,13 +23,16 @@ import (
 
 func setupSavedTestAPI(
 	savedRepo *repomocks.MockSavedRepository,
+	guardianRepo *repomocks.MockGuardianRepository,
+	s3Client s3_client.S3Interface,
 ) (*fiber.App, huma.API) {
 	app := fiber.New()
 	api := humafiber.New(app, huma.DefaultConfig("Test Schools API", "1.0.0"))
 	repo := &storage.Repository{
-		Saved: savedRepo,
+		Saved:    savedRepo,
+		Guardian: guardianRepo,
 	}
-	routes.SetUpSavedRoutes(api, repo)
+	routes.SetUpSavedRoutes(api, repo, s3Client)
 	return app, api
 }
 
@@ -36,6 +40,15 @@ func TestGetSavedByGuardianID_Success(t *testing.T) {
 	t.Parallel()
 
 	mockRepo := new(repomocks.MockSavedRepository)
+	mockGuardianRepo := new(repomocks.MockGuardianRepository)
+
+	mockGuardianRepo.On(
+		"GetGuardianByID",
+		mock.Anything,
+		mock.AnythingOfType("uuid.UUID"),
+	).Return(&models.Guardian{
+		ID: uuid.New(),
+	}, nil)
 
 	guardianID := uuid.New()
 	now := time.Now()
@@ -74,7 +87,16 @@ func TestGetSavedByGuardianID_Success(t *testing.T) {
 		mock.AnythingOfType("string"),
 	).Return(expectedSaved, nil)
 
-	app, _ := setupSavedTestAPI(mockRepo)
+	mockS3 := createMockS3Client()
+
+	mockS3.On(
+		"GeneratePresignedURL",
+		mock.Anything,
+		mock.Anything,
+		mock.Anything,
+	).Return("https://mock-url.com/image.jpg", nil)
+
+	app, _ := setupSavedTestAPI(mockRepo, mockGuardianRepo, mockS3)
 
 	req, err := http.NewRequest(
 		http.MethodGet,
@@ -104,6 +126,15 @@ func TestGetSavedByGuardianID_WithPagination(t *testing.T) {
 	t.Parallel()
 
 	mockRepo := new(repomocks.MockSavedRepository)
+	mockGuardianRepo := new(repomocks.MockGuardianRepository)
+
+	mockGuardianRepo.On(
+		"GetGuardianByID",
+		mock.Anything,
+		mock.AnythingOfType("uuid.UUID"),
+	).Return(&models.Guardian{
+		ID: uuid.New(),
+	}, nil)
 
 	guardianID := uuid.New()
 
@@ -145,7 +176,16 @@ func TestGetSavedByGuardianID_WithPagination(t *testing.T) {
 		mock.AnythingOfType("string"),
 	).Return(expectedSaved, nil)
 
-	app, _ := setupSavedTestAPI(mockRepo)
+	mockS3 := createMockS3Client()
+
+	mockS3.On(
+		"GeneratePresignedURL",
+		mock.Anything,
+		mock.Anything,
+		mock.Anything,
+	).Return("https://mock-url.com/image.jpg", nil)
+
+	app, _ := setupSavedTestAPI(mockRepo, mockGuardianRepo, mockS3)
 
 	req, err := http.NewRequest(
 		http.MethodGet,
@@ -173,6 +213,15 @@ func TestDeleteSaved_Success(t *testing.T) {
 	t.Parallel()
 
 	mockRepo := new(repomocks.MockSavedRepository)
+	mockGuardianRepo := new(repomocks.MockGuardianRepository)
+
+	mockGuardianRepo.On(
+		"GetGuardianByID",
+		mock.Anything,
+		mock.AnythingOfType("uuid.UUID"),
+	).Return(&models.Guardian{
+		ID: uuid.New(),
+	}, nil)
 
 	savedID := uuid.New()
 
@@ -182,7 +231,16 @@ func TestDeleteSaved_Success(t *testing.T) {
 		savedID,
 	).Return(nil)
 
-	app, _ := setupSavedTestAPI(mockRepo)
+	mockS3 := createMockS3Client()
+
+	mockS3.On(
+		"GeneratePresignedURL",
+		mock.Anything,
+		mock.Anything,
+		mock.Anything,
+	).Return("https://mock-url.com/image.jpg", nil)
+
+	app, _ := setupSavedTestAPI(mockRepo, mockGuardianRepo, mockS3)
 
 	req, err := http.NewRequest(
 		http.MethodDelete,
@@ -213,6 +271,15 @@ func TestCreateSaved_Success(t *testing.T) {
 	t.Parallel()
 
 	mockRepo := new(repomocks.MockSavedRepository)
+	mockGuardianRepo := new(repomocks.MockGuardianRepository)
+
+	mockGuardianRepo.On(
+		"GetGuardianByID",
+		mock.Anything,
+		mock.AnythingOfType("uuid.UUID"),
+	).Return(&models.Guardian{
+		ID: uuid.New(),
+	}, nil)
 
 	guardianID := uuid.New()
 	eventID := uuid.New()
@@ -255,7 +322,16 @@ func TestCreateSaved_Success(t *testing.T) {
 		mock.Anything,
 	).Return(expectedSaved, nil)
 
-	app, _ := setupSavedTestAPI(mockRepo)
+	mockS3 := createMockS3Client()
+
+	mockS3.On(
+		"GeneratePresignedURL",
+		mock.Anything,
+		mock.Anything,
+		mock.Anything,
+	).Return("https://mock-url.com/image.jpg", nil)
+
+	app, _ := setupSavedTestAPI(mockRepo, mockGuardianRepo, mockS3)
 
 	body, _ := json.Marshal(input.Body)
 

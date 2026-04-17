@@ -221,8 +221,8 @@ export default function OrgScheduleFiltersScreen() {
           min={0}
           max={PRICE_MAX}
           step={5000}
-          minLabel="$0"
-          maxLabel={`$${PRICE_MAX / 100}+`}
+          minLabel={priceLabel(0)}
+          maxLabel={`${priceLabel(PRICE_MAX)}+`}
         />
 
         <View className="h-4" />

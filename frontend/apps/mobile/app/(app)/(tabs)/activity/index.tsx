@@ -107,9 +107,11 @@ export default function ActivityScreen() {
     }),
   ).current;
 
+  const resetCancelSheet = () => cancelSheetTranslateY.setValue(0);
+
   const getOnRemove = (childRegistrations: ChildRegistration[]) => () => {
     setCancelSelections(new Set(childRegistrations.map((cr) => cr.child.id)));
-    cancelSheetTranslateY.setValue(0);
+    resetCancelSheet();
     setCancelTarget(childRegistrations);
   };
 
@@ -189,7 +191,7 @@ export default function ActivityScreen() {
             title: occurrence.event.title,
             childRegistrations: child ? [{ child, registrationId: r.id }] : [],
             location: occurrence.location.address_line1,
-            price: occurrence.price,
+            price: occurrence.price / 100,
             hasReviewed: false,
             onClickRemove: () => {},
             onClickReview: () => {},
@@ -253,10 +255,12 @@ export default function ActivityScreen() {
     }),
   ).current;
 
+  const resetFilterSheet = () => sheetTranslateY.setValue(0);
+
   const openFilter = () => {
     const allIds = new Set(children.map((c) => c.id));
     setPendingFilter(activeFilter.size === 0 ? allIds : new Set(activeFilter));
-    sheetTranslateY.setValue(0);
+    resetFilterSheet();
     setFilterOpen(true);
   };
 
