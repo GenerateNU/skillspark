@@ -81,7 +81,7 @@ export function OrgMapCard({ pin, userLocation }: OrgMapCardProps) {
           {pin.image ? (
             <Image
               source={{ uri: pin.image }}
-              className="h-[72px] w-[72px]"
+              style={{height: 72, width: 72}}
               contentFit="cover"
             />
           ) : (
