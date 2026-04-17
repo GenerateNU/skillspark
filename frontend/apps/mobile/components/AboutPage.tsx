@@ -11,7 +11,7 @@ interface AboutPageProps {
 
 export function AboutPage({ description, links }: AboutPageProps) {
   const { openLink, hasLinks } = useOrgLinks(links);
-  const { t } = useTranslation();
+  const {t: translate} = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [truncated, setTruncated] = useState(false);
 
@@ -30,7 +30,7 @@ export function AboutPage({ description, links }: AboutPageProps) {
       {truncated && (
         <Pressable onPress={() => setExpanded((p) => !p)} className="mb-4">
           <Text className="text-sm text-gray-900 font-semibold">
-            {expanded ? t("event.seeLess") : t("event.seeMore")}
+            {expanded ? translate("event.seeLess") : translate("event.seeMore")}
           </Text>
         </Pressable>
       )}
