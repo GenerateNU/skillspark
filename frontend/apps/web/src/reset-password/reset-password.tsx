@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useResetPassword } from "@skillspark/api-client";
@@ -37,8 +37,17 @@ const PASSWORD_RULES = [
 ];
 
 export default function ResetPassword() {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [errorText, setErrorText] = useState("");
+  // Extract token from URL on initial render
+  const hash = typeof window !== "undefined" ? window.location.hash : "";
+  const params = new URLSearchParams(hash.replace("#", "?"));
+  const token = params.get("access_token");
+  const type = params.get("type");
+  const isValidToken = token && type === "recovery";
+
+  const [accessToken] = useState<string | null>(isValidToken ? token : null);
+  const [errorText, setErrorText] = useState(
+    isValidToken ? "" : "Invalid or expired reset link. Please request a new one."
+  );
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
   const { mutate: resetPasswordFunc, isPending } = useResetPassword();
@@ -48,20 +57,6 @@ export default function ResetPassword() {
   });
 
   const newPassword = useWatch({ control, name: "newPassword" });
-
-  useEffect(() => {
-    // Supabase appends access_token in the URL hash fragment after redirect
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.replace("#", "?"));
-    const token = params.get("access_token");
-    const type = params.get("type");
-
-    if (token && type === "recovery") {
-      setAccessToken(token);
-    } else {
-      setErrorText("Invalid or expired reset link. Please request a new one.");
-    }
-  }, []);
 
   const onSubmit = (formData: ResetPasswordFormData) => {
     if (!accessToken) {
