@@ -20,6 +20,7 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { EmergencyContactListItem } from "@/components/EmergencyContactListItem";
 import { NoProfilePic } from "@/components/NoProfilePic";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 export default function FamilyListScreen() {
   const router = useRouter();
@@ -95,6 +96,7 @@ export default function FamilyListScreen() {
       <ScrollView
         className="px-[20px] pt-[12px]"
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
       >
         <TouchableOpacity
           className="flex-row items-start py-4 gap-3"
@@ -199,7 +201,6 @@ export default function FamilyListScreen() {
             )}
           </React.Fragment>
         ))}
-        <View className="h-10" />
       </ScrollView>
     </ThemedView>
   );

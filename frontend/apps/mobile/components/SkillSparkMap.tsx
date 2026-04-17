@@ -62,6 +62,7 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
           </Marker>
         ))}
       </MapView>
+
       {selectedPin ? (
         <OrgMapCard pin={selectedPin} userLocation={userLocation} />
       ) : (

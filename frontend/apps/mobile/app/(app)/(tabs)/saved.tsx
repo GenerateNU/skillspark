@@ -22,6 +22,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { useTranslation } from "react-i18next";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 export default function SavedScreen() {
   const insets = useSafeAreaInsets();
@@ -134,7 +135,7 @@ export default function SavedScreen() {
                 onBookmarkPress={() => handleDeleteSaved(item.id)}
               />
             )}
-            contentContainerStyle={{ paddingTop: 10, paddingBottom: 20 }}
+            contentContainerStyle={{ paddingTop: 10, paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
             showsVerticalScrollIndicator={false}
             onEndReached={() => {
               if (hasNextPage && !isFetchingNextPage) {

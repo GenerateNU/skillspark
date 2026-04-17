@@ -17,6 +17,7 @@ import { useGetAllEventOccurrences } from "@skillspark/api-client";
 import { useTranslation } from "react-i18next";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { EventCategoriesListItem } from "@/components/EventCategoriesListItem";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 const CATEGORY_DB_VALUES: Record<string, string> = {
   "Sports & Physical Activities":
@@ -135,7 +136,7 @@ export default function EventCategoryScreen() {
         </Text>
       ) : (
         <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
           showsVerticalScrollIndicator={false}
         >
           {occurrences.map((o) => (
