@@ -62,11 +62,10 @@ export default function ManageEmergencyContactScreen() {
 	};
 
 	const handleSave = async () => {
-		const name = [firstName, lastName].filter(Boolean).join(" ");
-		if (!name || !phoneNumber) {
+		if (!firstName || !phoneNumber) {
 			Alert.alert(
 				translate("common.error"),
-				translate("childProfile.requiredFieldsError"),
+				translate("emergencyContact.requiredFieldsError"),
 			);
 			return;
 		}
@@ -78,26 +77,39 @@ export default function ManageEmergencyContactScreen() {
 			return;
 		}
 		setIsSubmitting(true);
+		const name = [firstName, lastName].filter(Boolean).join(" ");
 		try {
-			const emergencyContactData = { guardian_id: guardianId, name, phone_number: phoneNumber };
+			const emergencyContactData = {
+				guardian_id: guardianId,
+				name,
+				phone_number: phoneNumber,
+			};
+
 			if (isEditing) {
 				await updateEmergencyContactMutation.mutateAsync({
 					id: params.id as string,
 					data: emergencyContactData,
 				});
 			} else {
-				await createEmergencyContactMutation.mutateAsync({ data: emergencyContactData });
+				await createEmergencyContactMutation.mutateAsync({
+					data: emergencyContactData,
+				});
 			}
+
 			await queryClient.invalidateQueries({
 				queryKey: getGetEmergencyContactsByGuardianIdQueryKey(guardianId),
 			});
+
 			if (isEditing) {
 				router.back();
 			} else {
 				router.push("/(auth)/signup/payment");
 			}
 		} catch {
-			Alert.alert(translate("common.errorOccurred"), translate("childProfile.saveError"));
+			Alert.alert(
+				translate("common.errorOccurred"),
+				translate("emergencyContact.saveError"),
+			);
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -105,8 +117,8 @@ export default function ManageEmergencyContactScreen() {
 
 	const handleDelete = () => {
 		Alert.alert(
-			translate("childProfile.deleteProfile"),
-			translate("childProfile.deleteConfirm"),
+			translate("emergencyContact.deleteProfile"),
+			translate("emergencyContact.deleteConfirm"),
 			[
 				{ text: translate("common.cancel"), style: "cancel" },
 				{
@@ -119,13 +131,14 @@ export default function ManageEmergencyContactScreen() {
 								id: params.id as string,
 							});
 							await queryClient.invalidateQueries({
-								queryKey: getGetEmergencyContactsByGuardianIdQueryKey(guardianId),
+								queryKey:
+									getGetEmergencyContactsByGuardianIdQueryKey(guardianId),
 							});
 							router.back();
 						} catch {
 							Alert.alert(
 								translate("common.errorOccurred"),
-								translate("childProfile.deleteError"),
+								translate("emergencyContact.deleteError"),
 							);
 							setIsSubmitting(false);
 						}
@@ -164,7 +177,14 @@ export default function ManageEmergencyContactScreen() {
 
 							{/* Title */}
 							<View className="px-6 pt-2 pb-10 items-center">
-								<ThemedText className="font-nunito-bold text-[#111] text-center" style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}>
+								<ThemedText
+									className="font-nunito-bold text-[#111] text-center"
+									style={{
+										fontSize: FontSizes.hero,
+										lineHeight: FontSizes.hero + 8,
+										letterSpacing: -0.5,
+									}}
+								>
 									{isEditing
 										? translate("emergencyContact.editTitle")
 										: translate("emergencyContact.addTitle")}
@@ -182,6 +202,9 @@ export default function ManageEmergencyContactScreen() {
 										value={firstName}
 										onChangeText={setFirstName}
 										autoCapitalize="words"
+										autoCorrect={false}
+										textContentType="givenName"
+										autoComplete="name-given"
 										placeholderTextColor={AppColors.placeholderText}
 									/>
 								</View>
@@ -195,13 +218,16 @@ export default function ManageEmergencyContactScreen() {
 										value={lastName}
 										onChangeText={setLastName}
 										autoCapitalize="words"
+										autoCorrect={false}
+										textContentType="familyName"
+										autoComplete="name-family"
 										placeholderTextColor={AppColors.placeholderText}
 									/>
 								</View>
 
 								<View className="gap-1">
 									<ThemedText className="font-nunito-semibold text-base text-[#111]">
-										{translate("emergencyContact.phoneNumber")}
+										{translate("onboarding.contactNumber")}
 									</ThemedText>
 									<TextInput
 										className="border border-[#E5E7EB] rounded-[10px] px-4 py-[14px] bg-white text-base font-nunito text-[#11181C]"
@@ -209,6 +235,9 @@ export default function ManageEmergencyContactScreen() {
 										onChangeText={setPhoneNumber}
 										keyboardType="phone-pad"
 										autoCapitalize="none"
+										autoCorrect={false}
+										textContentType="telephoneNumber"
+										autoComplete="tel"
 										placeholderTextColor={AppColors.placeholderText}
 									/>
 								</View>
@@ -227,8 +256,8 @@ export default function ManageEmergencyContactScreen() {
 							isSubmitting
 								? translate("emergencyContact.saving")
 								: isEditing
-									? translate("emergencyContact.saveChanges")
-									: translate("onboarding.continue", { defaultValue: "Continue" })
+								? translate("emergencyContact.saveChanges")
+								: translate("onboarding.continue", { defaultValue: "Continue" })
 						}
 						onPress={handleSave}
 						disabled={isSubmitting}

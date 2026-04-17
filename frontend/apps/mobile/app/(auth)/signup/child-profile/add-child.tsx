@@ -33,11 +33,36 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { Button } from "@/components/Button";
 
+// Display labels shown in the UI (matching Figma)
 const INTEREST_ROWS = [
 	["Sports/Physical", "Music & Performance", "Languages"],
 	["Personal Life Skills", "Academics", "Tech & Innovation"],
 	["Small Group Tutoring", "Art/Creative Expression"],
 ];
+
+// Maps display labels to valid Postgres category enum values
+const DISPLAY_TO_VALUE: Record<string, string> = {
+	"Sports/Physical": "sports",
+	"Music & Performance": "music",
+	"Languages": "language",
+	"Personal Life Skills": "other",
+	"Academics": "math",
+	"Tech & Innovation": "technology",
+	"Small Group Tutoring": "science",
+	"Art/Creative Expression": "art",
+};
+
+// Maps enum values back to display labels
+const VALUE_TO_DISPLAY: Record<string, string> = {
+	sports: "Sports/Physical",
+	music: "Music & Performance",
+	language: "Languages",
+	other: "Personal Life Skills",
+	math: "Academics",
+	technology: "Tech & Innovation",
+	science: "Small Group Tutoring",
+	art: "Art/Creative Expression",
+};
 
 const YEARS = Array.from({ length: 30 }, (_, i) =>
 	String(new Date().getFullYear() - i),
@@ -114,11 +139,13 @@ export default function AddChildScreen() {
 	const [birthYear, setBirthYear] = useState((params.birth_year as string) || "");
 	const [schoolId, setSchoolId] = useState((params.school_id as string) || "");
 
-	const initialInterests = Array.isArray(params.interests)
+	// Stored values are backend enum strings — convert to display labels for the UI
+	const rawInterests = Array.isArray(params.interests)
 		? params.interests
 		: params.interests
 			? (params.interests as string).split(",").map((s) => s.trim()).filter(Boolean)
 			: [];
+	const initialInterests = rawInterests.map((v) => VALUE_TO_DISPLAY[v] ?? v);
 	const [interests, setInterests] = useState<string[]>(initialInterests);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -194,21 +221,29 @@ export default function AddChildScreen() {
 				birth_month: MONTHS.indexOf(birthMonth) + 1,
 				guardian_id: guardianId,
 				school_id: schoolId,
-				interests,
+				interests: interests.map((label) => DISPLAY_TO_VALUE[label] ?? label),
 				avatar_face: (params.avatar_face as string) || undefined,
 				avatar_background: (params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
 			};
+			let childId: string;
 			if (isEditing) {
 				await updateChildMutation.mutateAsync({ id: params.id as string, data: childData });
+				childId = params.id as string;
 			} else {
-				await createChildMutation.mutateAsync({ data: childData });
+				const result = await createChildMutation.mutateAsync({ data: childData });
+				childId = (result.data as any).id as string;
 			}
 			await queryClient.invalidateQueries({
 				queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
 			});
 			router.push({
 				pathname: "./edit-pic",
-				params: { name },
+				params: {
+					name,
+					childId,
+					avatar_face: (params.avatar_face as string) || "",
+					avatar_background: (params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
+				},
 			});
 		} catch (error) {
 			Alert.alert(

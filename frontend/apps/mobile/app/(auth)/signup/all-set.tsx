@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FontSizes } from "@/constants/theme";
 import { View } from "react-native";
 import { AuthBackground } from "@/components/AuthBackground";
 import { SvgXml } from "react-native-svg";
+import { Button } from "@/components/Button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { useTranslation } from "react-i18next";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import { useRouter } from "expo-router";
 
 const ALL_SET_SVG = `<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="191.7" height="191.7" rx="95.85" fill="#B0F19B"/>
@@ -18,14 +20,12 @@ export default function AllSetScreen() {
 	const { t: translate } = useTranslation();
 	const insets = useSafeAreaInsets();
 	const { completeOnboarding } = useAuthContext();
+	const router = useRouter();
 
-	useEffect(() => {
-		const timer = setTimeout(async () => {
-			await completeOnboarding();
-			// LoginRedirect handles navigation once hasAccount=true and inOnboarding=false
-		}, 2500);
-		return () => clearTimeout(timer);
-	}, [completeOnboarding]);
+	const handleContinue = async () => {
+		await completeOnboarding();
+		router.replace("/(app)/(tabs)");
+	};
 
 	return (
 		<View className="absolute inset-0">
@@ -48,14 +48,16 @@ export default function AllSetScreen() {
 					<SvgXml xml={ALL_SET_SVG} width={192} height={192} />
 				</View>
 
-				{/* Status text */}
+				{/* Continue button */}
 				<View
 					className="px-6 items-center"
 					style={{ paddingBottom: insets.bottom + 24 }}
 				>
-					<ThemedText className="text-[15px] font-nunito text-[#6B7280] text-center">
-						{translate("onboarding.settingUp")}
-					</ThemedText>
+					<Button
+						label={translate("onboarding.continue")}
+						onPress={handleContinue}
+						disabled={false}
+					/>
 				</View>
 			</View>
 		</View>

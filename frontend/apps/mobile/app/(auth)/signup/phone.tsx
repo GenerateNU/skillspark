@@ -17,35 +17,23 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthBackground } from "@/components/AuthBackground";
-import { JumpingCharacter } from "@/components/JumpingCharacter";
-import { PageRedirectButton } from "@/components/PageRedirectButton";
 
-export default function AccountScreen() {
+export default function PhoneScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
 	const insets = useSafeAreaInsets();
-	const { getValues, control } = useFormContext<SignupFormData>();
+	const { control, getValues } = useFormContext<SignupFormData>();
 
-	const handleCreateAccount = () => {
-		const email = getValues("email");
-		const password = getValues("password");
-		const confirmPassword = getValues("confirm_password");
-
-		if (!email || !password || !confirmPassword) {
+	const handleContinue = () => {
+		const phone = getValues("phone_number");
+		if (!phone) {
 			Alert.alert(
 				translate("common.error"),
 				translate("childProfile.requiredFieldsError"),
 			);
 			return;
 		}
-		if (password !== confirmPassword) {
-			Alert.alert(
-				translate("common.error"),
-				translate("onboarding.passwordMismatch"),
-			);
-			return;
-		}
-		router.push("/(auth)/signup/phone");
+		router.push("/(auth)/signup/name");
 	};
 
 	return (
@@ -74,77 +62,42 @@ export default function AccountScreen() {
 						</TouchableOpacity>
 
 						{/* Title */}
-						<View className="px-6 pt-4 pb-2 items-center">
+						<View className="px-6 pt-10 pb-5 items-center">
 							<ThemedText
 								className="font-nunito-bold text-[#111] text-center"
 								style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}
 							>
-								{translate("onboarding.makeAccount")}
+								{translate("onboarding.enterPhoneNumber")}
 							</ThemedText>
 						</View>
 
-						{/* Character mascot */}
-						<View className="items-center py-4">
-							<JumpingCharacter width={180} height={140} />
-						</View>
-
-						{/* Form fields */}
+						{/* Form field */}
 						<View className="flex-1 justify-center px-6">
-							<View className="gap-6">
-								<View className="gap-2">
-									<ThemedText className="text-base font-nunito-semibold">
-										{translate("onboarding.email")}
-									</ThemedText>
-									<AuthFormInput
-										control={control}
-										name="email"
-										keyboardType="email-address"
-										autoCapitalize="none"
-									/>
-								</View>
-
-								<View className="gap-2">
-									<ThemedText className="text-base font-nunito-semibold">
-										{translate("onboarding.password")}
-									</ThemedText>
-									<AuthFormInput
-										control={control}
-										name="password"
-										secureTextEntry
-									/>
-								</View>
-
-								<View className="gap-2">
-									<ThemedText className="text-base font-nunito-semibold">
-										{translate("onboarding.confirmPassword")}
-									</ThemedText>
-									<AuthFormInput
-										control={control}
-										name="confirm_password"
-										secureTextEntry
-									/>
-								</View>
+							<View className="gap-2">
+								<ThemedText className="text-base font-nunito-semibold">
+									{translate("onboarding.cellPhone")}
+								</ThemedText>
+								<AuthFormInput
+									control={control}
+									name="phone_number"
+									keyboardType="phone-pad"
+									autoCapitalize="none"
+								/>
 							</View>
 						</View>
 					</ScrollView>
 				</KeyboardAvoidingView>
 
-				{/* Buttons pinned to bottom */}
+				{/* Button pinned to bottom */}
 				<View
 					className="items-center px-6 pt-4"
 					style={{ paddingBottom: insets.bottom + 16 }}
 				>
 					<Button
-						label={translate("onboarding.createAccount")}
-						onPress={handleCreateAccount}
+						label={translate("onboarding.continue")}
+						onPress={handleContinue}
 						disabled={false}
 					/>
-					<View className="items-center justify-center" style={{ height: 48 }}>
-						<PageRedirectButton
-							label={translate("onboarding.alreadyHaveAccount")}
-							onPress={() => router.navigate("/(auth)/login")}
-						/>
-					</View>
 				</View>
 			</View>
 		</View>

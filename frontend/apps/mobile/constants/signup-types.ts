@@ -3,8 +3,10 @@ export type SignupFormData = {
 	email: string;
 	password: string;
 	confirm_password: string;
-	name: string;
+	first_name: string;
+	last_name: string;
 	username: string;
+	phone_number: string;
 	profile_picture_s3_key: string | undefined;
 };
 
@@ -13,7 +15,9 @@ export const signupFormDefaultValues: SignupFormData = {
 	email: "",
 	password: "",
 	confirm_password: "",
-	name: "",
+	first_name: "",
+	last_name: "",
 	username: "",
+	phone_number: "",
 	profile_picture_s3_key: undefined,
 };

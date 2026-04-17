@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, Alert } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
@@ -13,6 +13,9 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { ChildAvatar } from "@/components/ChildAvatar";
 import { Button } from "@/components/Button";
+import { useUpdateChild } from "@skillspark/api-client";
+import { useQueryClient } from "@tanstack/react-query";
+import { getGetChildrenByGuardianIdQueryKey } from "@skillspark/api-client";
 
 export default function EditChildPictureScreen() {
 	const router = useRouter();
@@ -21,6 +24,7 @@ export default function EditChildPictureScreen() {
 	const theme = Colors.light;
 	const { guardianId } = useAuthContext();
 	const { t: translate } = useTranslation();
+	const queryClient = useQueryClient();
 
 	const [firstName] = useState(
 		params.name ? (params.name as string).split(" ")[0] : "",
@@ -34,10 +38,15 @@ export default function EditChildPictureScreen() {
 	const [avatarBackground, setAvatarBackground] = useState(
 		(params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
 	);
+	const [isSaving, setIsSaving] = useState(false);
+
+	const updateChildMutation = useUpdateChild();
 
 	if (!guardianId) {
 		return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
 	}
+
+	const childId = params.childId as string | undefined;
 
 	const handleAvatarPress = () => {
 		setPendingAvatarCallback(({ face, background }) => {
@@ -49,6 +58,35 @@ export default function EditChildPictureScreen() {
 			pathname: "./avatar-picker",
 			params: { avatarFace: avatarFace ?? "", avatarBackground, childName },
 		});
+	};
+
+	const handleSave = async () => {
+		if (!childId) {
+			// No ID to update — just navigate
+			router.push("/(auth)/signup/child-profile");
+			return;
+		}
+		setIsSaving(true);
+		try {
+			await updateChildMutation.mutateAsync({
+				id: childId,
+				data: {
+					avatar_face: avatarFace ?? undefined,
+					avatar_background: avatarBackground,
+				},
+			});
+			await queryClient.invalidateQueries({
+				queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
+			});
+			router.push("/(auth)/signup/child-profile");
+		} catch {
+			Alert.alert(
+				translate("common.errorOccurred"),
+				translate("childProfile.saveError"),
+			);
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
@@ -99,9 +137,9 @@ export default function EditChildPictureScreen() {
 			{/* Save button */}
 			<View className="px-6 items-center" style={{ paddingBottom: insets.bottom + 16 }}>
 				<Button
-					label={translate("onboarding.save")}
-					onPress={() => router.push("/(auth)/signup/child-profile")}
-					disabled={false}
+					label={isSaving ? translate("common.saving") : translate("onboarding.save")}
+					onPress={handleSave}
+					disabled={isSaving}
 				/>
 			</View>
 		</View>

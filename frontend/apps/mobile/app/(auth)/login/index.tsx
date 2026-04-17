@@ -69,7 +69,7 @@ export default function LoginScreen() {
 						keyboardShouldPersistTaps="handled"
 						showsVerticalScrollIndicator={false}
 					>
-						{/* Back button — only shown when there is a previous screen to return to; space always reserved */}
+						{/* Back button — space always reserved */}
 						<View className="h-11 justify-center">
 							{router.canGoBack() && (
 								<TouchableOpacity
@@ -108,7 +108,7 @@ export default function LoginScreen() {
 						<View className="px-6 gap-6">
 							<View className="gap-2">
 								<ThemedText className="text-base font-nunito-semibold">
-									{translate("onboarding.email")}
+									{translate("onboarding.emailOrUsername")}
 								</ThemedText>
 								<AuthFormInput
 									control={control}
@@ -127,19 +127,29 @@ export default function LoginScreen() {
 									name="password"
 									secureTextEntry
 								/>
+								{/* Forgot Password link */}
+								<TouchableOpacity
+									className="self-end"
+									onPress={() => {}}
+									hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+								>
+									<ThemedText className="text-base font-nunito underline text-[#111]">
+										{translate("onboarding.forgotPassword")}
+									</ThemedText>
+								</TouchableOpacity>
 							</View>
 						</View>
 
 						{/* Buttons */}
 						<View className="px-6 pt-8 items-center">
 							<Button
-								label={translate("onboarding.signUp")}
+								label={translate("onboarding.signIn")}
 								onPress={handleSubmit(onSubmit)}
 								disabled={false}
 							/>
 							<PageRedirectButton
 								label={translate("onboarding.dontHaveAccount")}
-								onPress={() => router.navigate("/(auth)/signup/name")}
+								onPress={() => router.navigate("/(auth)/signup")}
 							/>
 							<ErrorMessage message={errorText} />
 						</View>

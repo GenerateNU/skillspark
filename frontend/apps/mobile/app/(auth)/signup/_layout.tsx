@@ -20,6 +20,7 @@ export default function OnboardingStackLayout() {
 				<Stack>
 					<Stack.Screen name="index" options={{ headerShown: false }} />
 					<Stack.Screen name="account" options={{ headerShown: false }} />
+					<Stack.Screen name="phone" options={{ headerShown: false }} />
 					<Stack.Screen name="name" options={{ headerShown: false }} />
 					<Stack.Screen name="photo" options={{ headerShown: false }} />
 					<Stack.Screen name="child-profile" options={{ headerShown: false }} />

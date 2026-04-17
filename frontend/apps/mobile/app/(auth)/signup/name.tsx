@@ -16,21 +16,21 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { JumpingCharacter } from "@/components/JumpingCharacter";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { PageRedirectButton } from "@/components/PageRedirectButton";
 import { AuthBackground } from "@/components/AuthBackground";
 
-// 1. name and username
 export default function NameScreen() {
 	const router = useRouter();
 	const { t: translate } = useTranslation();
 	const insets = useSafeAreaInsets();
 	const { control, getValues } = useFormContext<SignupFormData>();
-	const { usernameExists } = useAuthContext();
+	const { usernameExists, signup } = useAuthContext();
 
 	const handleContinue = async () => {
-		if (!getValues("name") || !getValues("username")) {
+		const firstName = getValues("first_name");
+		const username = getValues("username");
+
+		if (!firstName || !username) {
 			Alert.alert(
 				translate("common.error"),
 				translate("childProfile.requiredFieldsError"),
@@ -38,12 +38,24 @@ export default function NameScreen() {
 			return;
 		}
 
-		const isAvailable = await usernameExists(getValues("username"), (msg) => {
+		const isAvailable = await usernameExists(username, (msg) => {
 			Alert.alert(translate("common.error"), msg);
 		});
 		if (!isAvailable) return;
 
-		router.push("/(auth)/signup/account");
+		const lastName = getValues("last_name");
+		const name = [firstName, lastName].filter(Boolean).join(" ");
+
+		signup(
+			name,
+			getValues("email"),
+			username,
+			getValues("password"),
+			getValues("language_preference"),
+			undefined,
+			(msg) => Alert.alert(translate("common.error"), msg),
+			() => router.push("/(auth)/signup/photo"),
+		);
 	};
 
 	return (
@@ -81,22 +93,28 @@ export default function NameScreen() {
 							</ThemedText>
 						</View>
 
-						{/* Character image */}
-						<View className="items-center justify-center pt-2 pb-4">
-							<JumpingCharacter width={210} height={160} />
-						</View>
-
 						{/* Form fields */}
 						<View className="flex-1 justify-center px-6">
 							<View className="gap-6">
 								<View className="gap-2">
 									<ThemedText className="text-base font-nunito-semibold">
-										{translate("onboarding.name")}
+										{translate("childProfile.firstName")}
 									</ThemedText>
 									<AuthFormInput
 										control={control}
-										name="name"
-										autoCapitalize="none"
+										name="first_name"
+										autoCapitalize="words"
+									/>
+								</View>
+
+								<View className="gap-2">
+									<ThemedText className="text-base font-nunito-semibold">
+										{translate("childProfile.lastName")}
+									</ThemedText>
+									<AuthFormInput
+										control={control}
+										name="last_name"
+										autoCapitalize="words"
 									/>
 								</View>
 
@@ -115,21 +133,16 @@ export default function NameScreen() {
 					</ScrollView>
 				</KeyboardAvoidingView>
 
-				{/* Buttons pinned to bottom */}
-				<View className="px-6" style={{ paddingBottom: insets.bottom }}>
-					<View className="items-center pt-4">
-						<Button
-							label={translate("onboarding.continue")}
-							onPress={handleContinue}
-							disabled={false}
-						/>
-					</View>
-					<View className="items-center justify-center" style={{ height: 48 }}>
-						<PageRedirectButton
-							label={translate("onboarding.alreadyHaveAccount")}
-							onPress={() => router.navigate("/(auth)/login")}
-						/>
-					</View>
+				{/* Button pinned to bottom */}
+				<View
+					className="items-center px-6 pt-4"
+					style={{ paddingBottom: insets.bottom + 16 }}
+				>
+					<Button
+						label={translate("onboarding.continue")}
+						onPress={handleContinue}
+						disabled={false}
+					/>
 				</View>
 			</View>
 		</View>

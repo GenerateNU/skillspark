@@ -103,7 +103,7 @@ export default function WelcomeScreen() {
 				>
 					<Button
 						label={translate("common.submit")}
-						onPress={() => router.push("/(auth)/signup/name")}
+						onPress={() => router.push("/(auth)/signup/account")}
 						disabled={false}
 					/>
 				</View>
