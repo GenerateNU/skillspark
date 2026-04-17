@@ -294,6 +294,32 @@ export interface CreateOrgStripeAccountOutputBody {
   account: Organization;
 }
 
+export interface CreatePaymentForRegistrationInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Stripe payment method ID to charge */
+  payment_method_id: string;
+}
+
+export interface CreatePaymentForRegistrationOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Client secret for frontend to confirm payment */
+  client_secret: string;
+  /** Currency code */
+  currency: string;
+  /** Stripe payment intent ID */
+  payment_intent_id: string;
+  /** Platform fee in cents */
+  platform_fee_amount: number;
+  /** Amount provider receives in cents */
+  provider_amount: number;
+  /** Payment intent status */
+  status: string;
+  /** Total amount in cents */
+  total_amount: number;
+}
+
 /**
  * Initial status of the registration
  */
@@ -314,8 +340,6 @@ export interface CreateRegistrationInputBody {
   event_occurrence_id: string;
   /** ID of the guardian registering the child */
   guardian_id: string;
-  /** Stripe payment method ID to use */
-  payment_method_id: string;
   /** Initial status of the registration */
   status: CreateRegistrationInputBodyStatus;
 }

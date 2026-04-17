@@ -23,6 +23,8 @@ import type {
 
 import type {
   CancelRegistrationOutputBody,
+  CreatePaymentForRegistrationInputBody,
+  CreatePaymentForRegistrationOutputBody,
   CreateRegistrationInputBody,
   ErrorModel,
   GetRegistrationsByChildIDOutputBody,
@@ -768,6 +770,138 @@ export const useUpdateRegistrationPaymentStatus = <
 > => {
   return useMutation(
     getUpdateRegistrationPaymentStatusMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * Creates a Stripe payment intent and stores the payment record for an existing registration
+ * @summary Create a payment intent for a registration
+ */
+export type createPaymentIntentResponse200 = {
+  data: CreatePaymentForRegistrationOutputBody;
+  status: 200;
+};
+
+export type createPaymentIntentResponseDefault = {
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type createPaymentIntentResponseSuccess =
+  createPaymentIntentResponse200 & {
+    headers: Headers;
+  };
+export type createPaymentIntentResponseError =
+  createPaymentIntentResponseDefault & {
+    headers: Headers;
+  };
+
+export type createPaymentIntentResponse =
+  | createPaymentIntentResponseSuccess
+  | createPaymentIntentResponseError;
+
+export const getCreatePaymentIntentUrl = (registrationId: string) => {
+  return `/api/v1/registrations/${registrationId}/payment`;
+};
+
+export const createPaymentIntent = async (
+  registrationId: string,
+  createPaymentForRegistrationInputBody: NonReadonly<CreatePaymentForRegistrationInputBody>,
+  options?: RequestInit,
+): Promise<createPaymentIntentResponse> => {
+  return customInstance<createPaymentIntentResponse>(
+    getCreatePaymentIntentUrl(registrationId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createPaymentForRegistrationInputBody),
+    },
+  );
+};
+
+export const getCreatePaymentIntentMutationOptions = <
+  TError = ErrorModel,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createPaymentIntent>>,
+    TError,
+    {
+      registrationId: string;
+      data: NonReadonly<CreatePaymentForRegistrationInputBody>;
+    },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createPaymentIntent>>,
+  TError,
+  {
+    registrationId: string;
+    data: NonReadonly<CreatePaymentForRegistrationInputBody>;
+  },
+  TContext
+> => {
+  const mutationKey = ["createPaymentIntent"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createPaymentIntent>>,
+    {
+      registrationId: string;
+      data: NonReadonly<CreatePaymentForRegistrationInputBody>;
+    }
+  > = (props) => {
+    const { registrationId, data } = props ?? {};
+
+    return createPaymentIntent(registrationId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreatePaymentIntentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createPaymentIntent>>
+>;
+export type CreatePaymentIntentMutationBody =
+  NonReadonly<CreatePaymentForRegistrationInputBody>;
+export type CreatePaymentIntentMutationError = ErrorModel;
+
+/**
+ * @summary Create a payment intent for a registration
+ */
+export const useCreatePaymentIntent = <TError = ErrorModel, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createPaymentIntent>>,
+      TError,
+      {
+        registrationId: string;
+        data: NonReadonly<CreatePaymentForRegistrationInputBody>;
+      },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createPaymentIntent>>,
+  TError,
+  {
+    registrationId: string;
+    data: NonReadonly<CreatePaymentForRegistrationInputBody>;
+  },
+  TContext
+> => {
+  return useMutation(
+    getCreatePaymentIntentMutationOptions(options),
     queryClient,
   );
 };

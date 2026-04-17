@@ -29,6 +29,12 @@ type Registration struct {
 	OccurrenceStartTime   time.Time          `json:"occurrence_start_time" db:"occurrence_start_time" doc:"Start time of the event occurrence"`
 }
 
+type RegistrationForPayment struct {
+	ID                uuid.UUID
+	GuardianID        uuid.UUID
+	EventOccurrenceID uuid.UUID
+}
+
 type RegistrationStatus string
 
 const (
@@ -46,26 +52,18 @@ type CreateRegistrationInput struct {
 		ChildID           uuid.UUID          `json:"child_id" doc:"ID of the child to register" format:"uuid" required:"true"`
 		GuardianID        uuid.UUID          `json:"guardian_id" doc:"ID of the guardian registering the child" format:"uuid" required:"true"`
 		EventOccurrenceID uuid.UUID          `json:"event_occurrence_id" doc:"ID of the event occurrence to register for" format:"uuid" required:"true"`
-		PaymentMethodID   *string            `json:"payment_method_id" doc:"Stripe payment method ID to use"`
 		Status            RegistrationStatus `json:"status" doc:"Initial status of the registration" default:"registered" enum:"registered,cancelled"`
 	} `json:"body"`
 }
 
-type CreateRegistrationWithPaymentData struct {
-	AcceptLanguage        string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
-	ChildID               uuid.UUID
-	GuardianID            uuid.UUID
-	EventOccurrenceID     uuid.UUID
-	Status                RegistrationStatus
-	StripePaymentIntentID string
-	StripeCustomerID      string
-	OrgStripeAccountID    string
-	StripePaymentMethodID string
-	TotalAmount           int
-	ProviderAmount        int
-	PlatformFeeAmount     int
-	Currency              string
-	PaymentIntentStatus   string
+// CreateRegistrationData is the internal storage input for creating a registration record.
+// Payment is handled separately via CreatePaymentData.
+type CreateRegistrationData struct {
+	AcceptLanguage    string
+	ChildID           uuid.UUID
+	GuardianID        uuid.UUID
+	EventOccurrenceID uuid.UUID
+	Status            RegistrationStatus
 }
 
 type CreateRegistrationOutput struct {
