@@ -648,6 +648,88 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
   /api/v1/events:
+    get:
+      tags:
+        - Events
+      summary: Get all events
+      description: Returns a paginated list of all events
+      operationId: get-all-events
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of items per page
+            format: int64
+            default: 100
+            minimum: 1
+            maximum: 100
+        - name: search
+          in: query
+          description: Search by title or description
+          explode: false
+          schema:
+            type: string
+            description: Search by title or description
+        - name: category
+          in: query
+          description: Comma-separated list of category values
+          explode: false
+          schema:
+            type: string
+            description: Comma-separated list of category values
+        - name: min_age
+          in: query
+          description: Minimum age for the event
+          explode: false
+          schema:
+            type: integer
+            description: Minimum age for the event
+            format: int64
+        - name: max_age
+          in: query
+          description: Maximum age for the event
+          explode: false
+          schema:
+            type: integer
+            description: Maximum age for the event
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of all events in the database
+                items:
+                  $ref: '#/components/schemas/Event'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
     post:
       tags:
         - Events
@@ -4116,14 +4198,22 @@ components:
         created_at:
           type: string
           format: date-time
+        district:
+          type: string
         id:
           type: string
+        latitude:
+          type: number
+          format: double
         links:
           type: array
           items:
             $ref: '#/components/schemas/OrgLink'
         location_id:
           type: string
+        longitude:
+          type: number
+          format: double
         name:
           type: string
         pfp_s3_key:
