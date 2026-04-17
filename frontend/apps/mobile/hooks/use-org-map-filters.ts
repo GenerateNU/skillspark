@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-export type OrgSortOption = "distance" | "rating" | "members";
+export type OrgSortOption = "distance" | "rating";
 
 interface OrgMapFilters {
   sort_by?: OrgSortOption;

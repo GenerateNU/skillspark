@@ -28,11 +28,6 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
           <ThemedText className="font-nunito-bold text-[17px] leading-[22px]">
             {pin.title}
           </ThemedText>
-          {pin.members > 0 && (
-            <ThemedText className="font-nunito text-[13px] leading-[19px] text-[#6B7280]">
-              {pin.members} {translate("dashboard.members")}
-            </ThemedText>
-          )}
           {pin.district && pin.district.length > 0 && (
             <ThemedText className="font-nunito text-[13px] leading-[19px] text-[#6B7280]">
               {pin.district}
