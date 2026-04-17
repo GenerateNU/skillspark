@@ -14,12 +14,12 @@ export function useInfiniteReviewsByEventId(
 ) {
   return useInfiniteQuery({
     queryKey: ["reviews", "event", "infinite", eventId, sortBy],
-    queryFn: ({ pageParam }) =>
-      getReviewByEventId(eventId!, {
-        page: pageParam,
-        page_size: PAGE_SIZE,
-        sort_by: sortBy,
-      }),
+    queryFn: ({ pageParam, signal }) =>
+      getReviewByEventId(
+        eventId!,
+        { page: pageParam, page_size: PAGE_SIZE, sort_by: sortBy },
+        { signal },
+      ),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const items = lastPage.data;
@@ -38,12 +38,12 @@ export function useInfiniteEventReviewsForOrganization(
 ) {
   return useInfiniteQuery({
     queryKey: ["reviews", "org", "infinite", orgId, sortBy],
-    queryFn: ({ pageParam }) =>
-      getEventReviewsForOrganization(orgId!, {
-        page: pageParam,
-        page_size: PAGE_SIZE,
-        sort_by: sortBy,
-      }),
+    queryFn: ({ pageParam, signal }) =>
+      getEventReviewsForOrganization(
+        orgId!,
+        { page: pageParam, page_size: PAGE_SIZE, sort_by: sortBy },
+        { signal },
+      ),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const items = lastPage.data;

@@ -3,14 +3,18 @@ import { getSavedByGuardianId } from "@skillspark/api-client";
 
 const PAGE_SIZE = 10;
 
+export const infiniteSavedQueryKey = (guardianId: string | undefined) =>
+  ["saved", "infinite", guardianId] as const;
+
 export function useInfiniteSavedByGuardianId(guardianId: string | undefined) {
   return useInfiniteQuery({
-    queryKey: ["saved", "infinite", guardianId],
-    queryFn: ({ pageParam }) =>
-      getSavedByGuardianId(guardianId!, {
-        page: pageParam,
-        page_size: PAGE_SIZE,
-      }),
+    queryKey: infiniteSavedQueryKey(guardianId),
+    queryFn: ({ pageParam, signal }) =>
+      getSavedByGuardianId(
+        guardianId!,
+        { page: pageParam, page_size: PAGE_SIZE },
+        { signal },
+      ),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const items = lastPage.data;

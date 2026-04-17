@@ -3,12 +3,11 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
+import { Saved, useDeleteSaved } from "@skillspark/api-client";
 import {
-  getGetSavedByGuardianIdQueryKey,
-  Saved,
-  useDeleteSaved,
-} from "@skillspark/api-client";
-import { useInfiniteSavedByGuardianId } from "@/hooks/use-infinite-saved";
+  useInfiniteSavedByGuardianId,
+  infiniteSavedQueryKey,
+} from "@/hooks/use-infinite-saved";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
@@ -90,7 +89,7 @@ export default function SavedScreen() {
               {
                 onSuccess: () => {
                   queryClient.invalidateQueries({
-                    queryKey: getGetSavedByGuardianIdQueryKey(guardianId),
+                    queryKey: infiniteSavedQueryKey(guardianId),
                   });
                 },
                 onError: (err) =>

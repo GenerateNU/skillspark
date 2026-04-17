@@ -25,6 +25,7 @@ export default function HomePage() {
     });
 
   const fetchPage = useCallback(async (pageNum: number, replace: boolean) => {
+    setIsError(false);
     if (replace) {
       setLoading(true);
     } else {
@@ -64,7 +65,7 @@ export default function HomePage() {
     if (!sentinel) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasMore && !isFetchingMore && !loading) {
+        if (entry.isIntersecting && hasMore && !isFetchingMore && !loading && !isError) {
           setPage((prev) => prev + 1);
         }
       },
@@ -72,7 +73,7 @@ export default function HomePage() {
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasMore, isFetchingMore, loading]);
+  }, [hasMore, isFetchingMore, loading, isError]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -124,7 +125,7 @@ export default function HomePage() {
             </p>
           </div>
         )}
-        {!loading && organizations.length > 0 && (
+        {!loading && !isError && organizations.length > 0 && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {organizations.map(function (org: Organization) {

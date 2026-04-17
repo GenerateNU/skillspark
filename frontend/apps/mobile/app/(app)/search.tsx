@@ -42,8 +42,8 @@ export default function SearchScreen() {
     isFetchingNextPage: isFetchingNextSearch,
   } = useInfiniteQuery({
     queryKey: ["search", "events", debouncedSearch],
-    queryFn: ({ pageParam }) =>
-      searchEvents({ q: debouncedSearch, page: pageParam, limit: PAGE_SIZE }),
+    queryFn: ({ pageParam, signal }) =>
+      searchEvents({ q: debouncedSearch, page: pageParam, limit: PAGE_SIZE }, { signal }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const items = lastPage.data;
@@ -64,14 +64,17 @@ export default function SearchScreen() {
     isFetchingNextPage: isFetchingNextAll,
   } = useInfiniteQuery({
     queryKey: ["events", "all", filters.category, filters.min_age, filters.max_age],
-    queryFn: ({ pageParam }) =>
-      getAllEvents({
-        category: filters.category,
-        min_age: filters.min_age,
-        max_age: filters.max_age,
-        page: pageParam,
-        limit: PAGE_SIZE,
-      }),
+    queryFn: ({ pageParam, signal }) =>
+      getAllEvents(
+        {
+          category: filters.category,
+          min_age: filters.min_age,
+          max_age: filters.max_age,
+          page: pageParam,
+          limit: PAGE_SIZE,
+        },
+        { signal },
+      ),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const items = lastPage.data;
