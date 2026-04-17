@@ -22,7 +22,7 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
 
   const locationLine = [
     pin.district && pin.district.length > 0 ? pin.district : null,
-    distance !== null ? `${distance.toFixed(1)} mi` : null,
+    distance !== null ? `${distance.toFixed(1)} km` : null,
   ]
     .filter(Boolean)
     .join(" ");
@@ -57,7 +57,7 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
             <View className="flex-row items-center gap-[5px] mt-[2px]">
               <RatingSmiley rating={pin.rating} width={14} height={14} />
               <ThemedText className="font-nunito text-[13px] text-[#6B7280]">
-                {pin.rating.toFixed(1)} / 5 {translate("map.smiles")}
+                {pin.rating.toFixed(1)} {translate("map.smiles")}
               </ThemedText>
             </View>
           )}
