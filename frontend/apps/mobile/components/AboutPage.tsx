@@ -11,7 +11,7 @@ interface AboutPageProps {
 
 export function AboutPage({ description, links }: AboutPageProps) {
   const { openLink, hasLinks } = useOrgLinks(links);
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [truncated, setTruncated] = useState(false);
 

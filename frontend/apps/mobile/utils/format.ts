@@ -68,7 +68,10 @@ export function formatPrice(cents: number, currency: string): string {
   return `$${amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2)}`;
 }
 
-export function formatAgeRange(min: number | null | undefined, max: number | null | undefined): string {
+export function formatAgeRange(
+  min: number | null | undefined,
+  max: number | null | undefined,
+): string {
   if (!min && !max) return "";
   if (!max) return i18n.t("occurrence.agesOpen", { min });
   if (min === max) return i18n.t("occurrence.ages", { min });
@@ -83,11 +86,15 @@ export function formatLocation(occurrence: EventOccurrence): string {
 
 export function formatAddress(occurrence: EventOccurrence): string {
   const loc = occurrence.location;
-  const parts = [loc?.address_line1, loc?.address_line2, loc?.district].filter(Boolean);
+  const parts = [loc?.address_line1, loc?.address_line2, loc?.district].filter(
+    Boolean,
+  );
   return parts.join(", ");
 }
 
-export function filterFutureOccurrences(occurrences: EventOccurrence[]): EventOccurrence[] {
+export function filterFutureOccurrences(
+  occurrences: EventOccurrence[],
+): EventOccurrence[] {
   const now = new Date();
   return occurrences.filter((o) => new Date(o.start_time) > now);
 }
@@ -97,8 +104,12 @@ export function extractResponseData<T>(resp: unknown): T[] {
   return Array.isArray(d?.data) ? d!.data : [];
 }
 
-export function arrayToMap<T extends { id: string }>(arr: T[]): Record<string, T> {
+export function arrayToMap<T extends { id: string }>(
+  arr: T[],
+): Record<string, T> {
   const map: Record<string, T> = {};
-  arr.forEach((item) => { map[item.id] = item; });
+  arr.forEach((item) => {
+    map[item.id] = item;
+  });
   return map;
 }

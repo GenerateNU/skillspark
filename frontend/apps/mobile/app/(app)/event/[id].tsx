@@ -53,7 +53,7 @@ function EventOccurrenceDetail({
         .toLowerCase()
         .split(" ")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ")
+        .join(" "),
     )
     .join(" / ");
   const orgId = occurrence.event.organization_id;
@@ -353,7 +353,7 @@ export default function EventOccurrenceScreen() {
 
   const { data: orgResp, isLoading: orgLoading } = useGetOrganization(
     orgId ?? "",
-    { query: { enabled: !!orgId } }
+    { query: { enabled: !!orgId } },
   );
   const org = orgResp?.status === 200 ? orgResp.data : null;
 

@@ -1,4 +1,12 @@
-import { Modal, Share, Linking, View, Text, Pressable, Platform } from "react-native";
+import {
+  Modal,
+  Share,
+  Linking,
+  View,
+  Text,
+  Pressable,
+  Platform,
+} from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { CircleIcon } from "@/components/CircleIcon";
 import { Image } from "expo-image";
@@ -45,9 +53,10 @@ function makeAppIcons(text: string, url: string) {
       name: "Messages",
       bg: "#34C759",
       onPress: () => {
-        const smsUrl = Platform.OS === "ios"
-          ? `sms:&body=${encodeURIComponent(text)}`
-          : `sms:?body=${encodeURIComponent(text)}`;
+        const smsUrl =
+          Platform.OS === "ios"
+            ? `sms:&body=${encodeURIComponent(text)}`
+            : `sms:?body=${encodeURIComponent(text)}`;
         Linking.openURL(smsUrl).catch(() => {});
       },
       render: () => <IconSymbol name="message.fill" size={22} color="#fff" />,
@@ -78,7 +87,6 @@ function makeAppIcons(text: string, url: string) {
     },
   ];
 }
-
 
 interface ShareModalProps {
   visible: boolean;

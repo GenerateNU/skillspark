@@ -357,7 +357,10 @@ export default function ActivityScreen() {
                   data={reg}
                 />
               ) : (
-                <PastRegistrationCard key={reg.event_occurrence_id} data={reg} />
+                <PastRegistrationCard
+                  key={reg.event_occurrence_id}
+                  data={reg}
+                />
               ),
             )
           )}
@@ -427,7 +430,9 @@ export default function ActivityScreen() {
                       avatarBackground={cr.child.avatar_background}
                       size={36}
                     />
-                    <ThemedText className="text-base">{cr.child.name}</ThemedText>
+                    <ThemedText className="text-base">
+                      {cr.child.name}
+                    </ThemedText>
                   </View>
                   <View
                     className="w-5 h-5 rounded border justify-center items-center"
@@ -474,7 +479,9 @@ export default function ActivityScreen() {
               >
                 <ThemedText lightColor="white" className="font-medium">
                   {t("activity.remove")}
-                  {cancelSelections.size > 0 ? ` (${cancelSelections.size})` : ""}
+                  {cancelSelections.size > 0
+                    ? ` (${cancelSelections.size})`
+                    : ""}
                 </ThemedText>
               </TouchableOpacity>
             </View>

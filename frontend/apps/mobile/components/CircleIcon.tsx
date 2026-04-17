@@ -13,7 +13,11 @@ export function CircleIcon({
   onPress: () => void;
 }) {
   return (
-    <Pressable onPress={onPress} className="items-center gap-1.5" style={{ width: 64 }}>
+    <Pressable
+      onPress={onPress}
+      className="items-center gap-1.5"
+      style={{ width: 64 }}
+    >
       <View
         className="w-[54px] h-[54px] rounded-full items-center justify-center"
         style={{ backgroundColor: bg }}

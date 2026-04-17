@@ -56,7 +56,10 @@ export function SearchResultCard({
           flexShrink: 0,
         }}
       >
-        <EventImage uri={occurrence.event.presigned_url} style={{ width: "100%", height: "100%" }} />
+        <EventImage
+          uri={occurrence.event.presigned_url}
+          style={{ width: "100%", height: "100%" }}
+        />
       </View>
 
       {/* Text */}
