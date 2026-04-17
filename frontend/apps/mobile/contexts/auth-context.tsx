@@ -126,10 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setJWT(success.token);
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
           setGuardianId(success.guardian_id);
-          const initialUrl = await Linking.getInitialURL().catch(() => null);
-          if (!initialUrl) {
-            router.replace("/(app)/(tabs)");
-          }
+          router.replace("/(app)/(tabs)");
         },
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };
@@ -167,10 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
           setGuardianId(success.guardian_id);
           await createStripeCustomer(success.guardian_id);
-          const initialUrl = await Linking.getInitialURL().catch(() => null);
-          if (!initialUrl) {
-            router.replace("/(app)/(tabs)");
-          }
+          router.replace("/(app)/(tabs)");
         },
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };

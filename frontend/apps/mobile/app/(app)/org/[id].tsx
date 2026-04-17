@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Image } from "expo-image";
 import {
   ActivityIndicator,
@@ -7,15 +8,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
 import type { Location, Organization } from "@skillspark/api-client";
 import { SvgXml } from "react-native-svg";
+import { ErrorScreen } from "@/components/ErrorScreen";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+import { AppColors, Shadows } from "@/constants/theme";
+import { ExpandableText } from "@/components/ExpandableText";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { useTranslation } from "react-i18next";
@@ -23,6 +25,7 @@ import * as Linking from "expo-linking";
 import { ShareModal } from "@/components/ShareModal";
 import { EMPTY_FACE_SVG } from "@/constants/avatarFaces";
 import { RatingSmiley } from "@/components/RatingSmiley";
+import LogoBgWrapper from "@/components/LogoBgWrapper";
 
 function OrgDetail({
   org,
@@ -98,163 +101,168 @@ function OrgDetail({
           )}
         </View>
 
-        {/* Org info */}
-        <View className="px-4 pb-4 pt-4">
-          <View className="flex-row items-start justify-between">
-            <View className="mr-3 flex-1">
-              <Text className="mb-1 text-[24px] font-nunito-bold">
-                {org.name}
-              </Text>
-              {location && (
-                <Text
-                  className="mb-1 text-[14px] font-nunito"
-                  style={{ color: AppColors.mutedText }}
-                >
-                  {location.district}, {location.province}
+        <LogoBgWrapper>
+          {/* Org info */}
+          <View className="px-4 pb-4 pt-4">
+            <View className="flex-row items-start justify-between">
+              <View className="mr-3 flex-1">
+                <Text className="mb-1 text-[24px] font-nunito-bold">
+                  {org.name}
                 </Text>
-              )}
-            </View>
-            <TouchableOpacity
-              onPress={() => setShareVisible(true)}
-              activeOpacity={0.7}
-              className="mt-1 h-9 w-9 items-center justify-center rounded-full border-2"
-              style={{ borderColor: AppColors.borderLight }}
-            >
-              <IconSymbol
-                name="square.and.arrow.up"
-                size={18}
-                color={AppColors.secondaryText}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Divider */}
-        <View
-          className="mx-4 mb-5 border-b border-dashed"
-          style={{ borderColor: AppColors.divider }}
-        />
-
-        {/* About card */}
-        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardStyle}>
-          <Text className="mb-2.5 text-[18px] font-nunito-bold">
-            {translate("org.about")}
-          </Text>
-          <Text
-            numberOfLines={aboutExpanded ? undefined : 4}
-            onTextLayout={(e) => {
-              if (!aboutExpanded)
-                setAboutTruncated(e.nativeEvent.lines.length >= 4);
-            }}
-            className={`text-sm leading-[22px] ${
-              aboutTruncated ? "mb-1" : "mb-4"
-            }`}
-            style={{ color: AppColors.secondaryText }}
-          >
-            {org.about ?? ""}
-          </Text>
-          {aboutTruncated && (
-            <Pressable
-              onPress={() => setAboutExpanded((prev) => !prev)}
-              className="mb-4"
-            >
-              <Text
-                className="text-[13px] font-semibold"
-                style={{ color: AppColors.primaryText }}
-              >
-                {aboutExpanded
-                  ? translate("event.seeLess")
-                  : translate("event.seeMore")}
-              </Text>
-            </Pressable>
-          )}
-          {hasLinks && (
-            <View className="flex-row flex-wrap gap-2.5">
-              {(org.links ?? []).map((link, index) => (
-                <Pressable
-                  key={index}
-                  onPress={() => openLink(link.href)}
-                  className="rounded-full px-5 py-2.5 items-center"
-                  style={{ backgroundColor: AppColors.borderLight }}
-                >
+                {location && (
                   <Text
-                    className="text-[13px] font-semibold"
-                    style={{ color: AppColors.primaryText }}
+                    className="mb-1 text-[14px] font-nunito"
+                    style={{ color: AppColors.mutedText }}
                   >
-                    {link.label}
+                    {location.district}, {location.province}
                   </Text>
-                </Pressable>
-              ))}
+                )}
+              </View>
+              <TouchableOpacity
+                onPress={() => setShareVisible(true)}
+                activeOpacity={0.7}
+                className="mt-1 h-9 w-9 items-center justify-center rounded-full border-2"
+                style={{ borderColor: AppColors.borderLight }}
+              >
+                <IconSymbol
+                  name="square.and.arrow.up"
+                  size={18}
+                  color={AppColors.secondaryText}
+                />
+              </TouchableOpacity>
             </View>
-          )}
-        </View>
+          </View>
 
-        {/* Rating card */}
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => router.push(`/org/${org.id}/reviews`)}
-        >
+          {/* Divider */}
+          <View
+            className="mx-4 mb-5 border-b border-dashed"
+            style={{ borderColor: AppColors.divider }}
+          />
+
+          {/* About card */}
           <View
             className="mx-4 mb-4 rounded-2xl bg-white p-5"
             style={cardStyle}
           >
-            <Text className="mb-4 text-[24px] font-nunito-bold">
-              {translate("org.reviews")}
+            <Text className="mb-2.5 text-[18px] font-nunito-bold">
+              {translate("org.about")}
             </Text>
-            {org.review_summary && org.review_summary.total_reviews > 0 ? (
-              <View className="flex-row items-center justify-center">
-                <View className="flex-1 items-center">
-                  <RatingSmiley
-                    rating={org.review_summary.average_rating}
-                    width={80}
-                    height={80}
-                  />
-                </View>
-                <View className="flex-1 items-center">
-                  <Text className="text-[36px] font-nunito-bold leading-[44px]">
-                    {org.review_summary.average_rating.toFixed(1)}
-                  </Text>
-                  <Text
-                    className="text-[13px] font-nunito"
-                    style={{ color: AppColors.subtleText }}
-                  >
-                    ({org.review_summary.total_reviews})
-                  </Text>
-                </View>
-              </View>
-            ) : (
-              <View className="flex-row items-center gap-3 py-4 justify-center">
-                <SvgXml xml={EMPTY_FACE_SVG} width={36} height={36} />
-                <Text className="text-[16px] font-nunito">
-                  {translate("review.firstReview")}
+            <Text
+              numberOfLines={aboutExpanded ? undefined : 4}
+              onTextLayout={(e) => {
+                if (!aboutExpanded)
+                  setAboutTruncated(e.nativeEvent.lines.length >= 4);
+              }}
+              className={`text-sm leading-[22px] ${
+                aboutTruncated ? "mb-1" : "mb-4"
+              }`}
+              style={{ color: AppColors.secondaryText }}
+            >
+              {org.about ?? ""}
+            </Text>
+            {aboutTruncated && (
+              <Pressable
+                onPress={() => setAboutExpanded((prev) => !prev)}
+                className="mb-4"
+              >
+                <Text
+                  className="text-[13px] font-semibold"
+                  style={{ color: AppColors.primaryText }}
+                >
+                  {aboutExpanded
+                    ? translate("event.seeLess")
+                    : translate("event.seeMore")}
                 </Text>
+              </Pressable>
+            )}
+            {hasLinks && (
+              <View className="flex-row flex-wrap gap-2.5">
+                {(org.links ?? []).map((link, index) => (
+                  <Pressable
+                    key={index}
+                    onPress={() => openLink(link.href)}
+                    className="rounded-full px-5 py-2.5 items-center"
+                    style={{ backgroundColor: AppColors.borderLight }}
+                  >
+                    <Text
+                      className="text-[13px] font-semibold"
+                      style={{ color: AppColors.primaryText }}
+                    >
+                      {link.label}
+                    </Text>
+                  </Pressable>
+                ))}
               </View>
             )}
           </View>
-        </TouchableOpacity>
 
-        {/* See Schedule CTA */}
-        <View className="px-4 pb-6 pt-1">
+          {/* Rating card */}
           <TouchableOpacity
-            activeOpacity={0.85}
-            className="w-full items-center rounded-full py-4"
-            style={{ backgroundColor: "#000000" }}
-            onPress={() => router.push(`/org/${org.id}/schedule`)}
+            activeOpacity={0.8}
+            onPress={() => router.push(`/org/${org.id}/reviews`)}
           >
-            <Text className="text-[17px] font-nunito-bold text-white">
-              {translate("org.seeSchedule")}
-            </Text>
+            <View
+              className="mx-4 mb-4 rounded-2xl bg-white p-5"
+              style={cardStyle}
+            >
+              <Text className="mb-4 text-[24px] font-nunito-bold">
+                {translate("org.reviews")}
+              </Text>
+              {org.review_summary && org.review_summary.total_reviews > 0 ? (
+                <View className="flex-row items-center justify-center">
+                  <View className="flex-1 items-center">
+                    <RatingSmiley
+                      rating={org.review_summary.average_rating}
+                      width={80}
+                      height={80}
+                    />
+                  </View>
+                  <View className="flex-1 items-center">
+                    <Text className="text-[36px] font-nunito-bold leading-[44px]">
+                      {org.review_summary.average_rating.toFixed(1)}
+                    </Text>
+                    <Text
+                      className="text-[13px] font-nunito"
+                      style={{ color: AppColors.subtleText }}
+                    >
+                      ({org.review_summary.total_reviews})
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                <View className="flex-row items-center gap-3 py-4 justify-center">
+                  <SvgXml xml={EMPTY_FACE_SVG} width={36} height={36} />
+                  <Text className="text-[16px] font-nunito">
+                    {translate("review.firstReview")}
+                  </Text>
+                </View>
+              )}
+            </View>
           </TouchableOpacity>
-        </View>
 
-        <ShareModal
-          visible={shareVisible}
-          onClose={() => setShareVisible(false)}
-          name={org.name}
-          imageUrl={org.presigned_url ?? undefined}
-          shareUrl={Linking.createURL(`org/${org.id}`)}
-          message={translate("share.defaultMessage", { name: org.name })}
-        />
+          {/* See Schedule CTA */}
+          <View className="px-4 pb-6 pt-1">
+            <TouchableOpacity
+              activeOpacity={0.85}
+              className="w-full items-center rounded-full py-4"
+              style={{ backgroundColor: "#000000" }}
+              onPress={() => router.push(`/org/${org.id}/schedule`)}
+            >
+              <Text className="text-[17px] font-nunito-bold text-white">
+                {translate("org.seeSchedule")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <ShareModal
+            visible={shareVisible}
+            onClose={() => setShareVisible(false)}
+            name={org.name}
+            imageUrl={org.presigned_url ?? undefined}
+            shareUrl={Linking.createURL(`org/${org.id}`)}
+            message={translate("share.defaultMessage", { name: org.name })}
+          />
+        </LogoBgWrapper>
       </ScrollView>
     </SafeAreaView>
   );
@@ -282,13 +290,7 @@ export default function OrgScreen() {
   }
 
   if (error || !response || response.status !== 200) {
-    return (
-      <View className="flex-1 items-center justify-center p-6">
-        <Text className="text-base font-semibold text-red-500">
-          {translate("org.notFound")}
-        </Text>
-      </View>
-    );
+    return <ErrorScreen message={translate("org.notFound")} />;
   }
 
   return (

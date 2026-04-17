@@ -17,5 +17,11 @@
   "workspaces": [
     "frontend/apps/*",
     "frontend/packages/*"
-  ]
+  ],
+  "dependencies": {
+    "nativewind": "^4.2.3",
+    "react-native-reanimated": "^4.3.0",
+    "react-native-safe-area-context": "^5.7.0",
+    "tailwindcss": "^4.2.2"
+  }
 }

@@ -30,6 +30,7 @@ const MAPPING = {
   "person.circle": "account-circle",
   "camera.filters": "tune",
   "chevron.down": "expand-more",
+  "chevron.up": "expand-less",
   magnifyingglass: "search",
   "checkmark.circle.fill": "check-circle",
   circle: "radio-button-unchecked",

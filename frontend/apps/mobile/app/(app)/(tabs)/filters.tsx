@@ -1,3 +1,4 @@
+import { CATEGORY_KEYS } from "@/constants/eventCategories";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { useFilters } from "@/hooks/use-filters";
 import { useRouter } from "expo-router";
@@ -16,11 +17,10 @@ import { CategoryPicker } from "@/components/filters/CategoryPicker";
 import { SoldOutToggle } from "@/components/filters/SoldOutToggle";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import { CATEGORY_KEYS } from "@/constants/eventCategories";
 
 const DISTANCE_MAX = 50;
 const DURATION_MAX = 180; // minutes
-const PRICE_MAX = 2000;
+const PRICE_MAX = 200000; // 2000 in cents, since backend is in cents
 const AGE_MAX = 18;
 
 function distanceLabel(km: number) {
@@ -41,6 +41,11 @@ function durationRangeLabel(lo: number, hi: number, t: TFunction) {
     return t("filters.orMore", { value: durationLabel(lo) });
   if (lo === 0) return t("filters.upTo", { value: durationLabel(hi) });
   return `${durationLabel(lo)} – ${durationLabel(hi)}`;
+}
+
+function priceLabel(cents: number): string {
+  const amount = cents / 100;
+  return `$${amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2)}`;
 }
 
 function priceRangeLabel(lo: number, hi: number, t: TFunction) {
@@ -215,8 +220,8 @@ export default function FiltersScreen() {
           min={0}
           max={PRICE_MAX}
           step={100}
-          minLabel="฿0"
-          maxLabel={`฿${PRICE_MAX.toLocaleString()}+`}
+          minLabel={priceLabel(0)}
+          maxLabel={`${priceLabel(PRICE_MAX)}+`}
         />
 
         <View className="h-4" />

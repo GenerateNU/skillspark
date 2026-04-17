@@ -7,6 +7,12 @@
     "events": "กิจกรรม",
     "about": "เกี่ยวกับ"
   },
+  "eventCategories": {
+    "noEventsFound": "ไม่พบกิจกรรมในหมวดหมู่นี้",
+    "ages": "อายุ",
+    "noCategorySupplied": "ไม่สามารถโหลดได้: ไม่มีหมวดหมู่",
+    "noLocationFound": "ไม่สามารถโหลดได้: ไม่พบตำแหน่ง"
+  },
   "common": {
     "submit": "ส่ง",
     "cancel": "ยกเลิก",
@@ -38,19 +44,25 @@
   "dashboard": {
     "title": "แดชบอร์ดของฉัน",
     "searchPlaceholder": "ค้นหาคลาส",
+    "greeting": "สวัสดี, {{name}}",
     "discoverWeekly": "ค้นพบประจำสัปดาห์",
     "forYou": "สำหรับคุณ",
+    "forChild": "สำหรับ {{name}}",
+    "trendingRightNow": "✦ กำลังมาแรงตอนนี้...",
     "basedOn": "ตามจาก",
     "upcomingEvents": "กิจกรรมที่จะมาถึง",
     "reserved": "จองแล้ว",
     "learnMore": "ดูเพิ่มเติม",
     "members": "สมาชิก",
     "categories": {
-      "technology": "เทคโนโลยี",
-      "art": "ศิลปะ",
-      "music": "ดนตรี",
+      "technology": "เทคโนโลยีและนวัตกรรม",
+      "art": "ศิลปะและการแสดงออกเชิงสร้างสรรค์",
+      "music": "ดนตรีและการแสดง",
       "math": "คณิตศาสตร์",
-      "sports": "กีฬา"
+      "sports": "กีฬาและกิจกรรมทางกาย",
+      "languages": "ภาษา",
+      "academics": "วิชาการ",
+      "lifeSkills": "การพัฒนาตนเองและทักษะชีวิต"
     }
   },
   "profile": {
@@ -287,7 +299,12 @@
     "sortBy": "เรียงตาม",
     "filter": "กรอง",
     "km": "กม.",
-    "stars": "ดาว"
+    "mi": "ไมล์",
+    "distanceAway": "ห่างออกไป {{distance}} กม.",
+    "stars": "ดาว",
+    "smiles": "/ 5 ยิ้ม",
+    "learnMore": "เรียนรู้เพิ่มเติม",
+    "members": "สมาชิก"
   },
   "org": {
     "about": "เกี่ยวกับ",
@@ -322,6 +339,8 @@
     "price": "ราคา",
     "ageRange": "ช่วงอายุ",
     "showSoldOut": "แสดงที่เต็มแล้ว",
+    "startTime": "เวลาเริ่มต้น",
+    "showResults": "แสดงผลลัพธ์",
     "any": "ทั้งหมด",
     "upTo": "ไม่เกิน {{value}}",
     "orMore": "{{value}} ขึ้นไป",
@@ -432,8 +451,16 @@
     "learnMore": "เรียนรู้เพิ่มเติม",
     "reserve": "จอง",
     "ages": "อายุ {{min}} ปี",
+    "agesOpen": "อายุ {{min}}+ ปี",
     "agesRange": "อายุ {{min}} - {{max}} ปี",
     "classTime": "คลาส {{time}}"
+  },
+  "errorScreen": {
+    "title": "อุ๊ย!",
+    "subtitle": "เกิดข้อผิดพลาดขึ้น",
+    "backToSafety": "กลับสู่หน้าหลัก",
+    "showDetails": "แสดงรายละเอียด",
+    "hideDetails": "ซ่อนรายละเอียด"
   },
   "reservation": {
     "paymentFailed": "ชำระเงินไม่สำเร็จ กรุณาลองอีกครั้งหรือติดต่อฝ่ายสนับสนุน",

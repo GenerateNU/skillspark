@@ -33,6 +33,9 @@ export default function TabLayout() {
       <Tabs.Screen name="payment" options={{ href: null }} />
       <Tabs.Screen name="saved" options={{ href: null }} />
       <Tabs.Screen name="filters" options={{ href: null }} />
+      <Tabs.Screen name="event/[id]" options={{ href: null }} />
+      <Tabs.Screen name="child/[id]" options={{ href: null }} />
+      <Tabs.Screen name="event-categories" options={{ href: null }} />
     </Tabs>
   );
 }

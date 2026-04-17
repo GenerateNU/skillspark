@@ -7,6 +7,12 @@
     "events": "Events",
     "about": "About"
   },
+  "eventCategories": {
+    "noEventsFound": "No events found for this category.",
+    "ages": "Ages",
+    "noCategorySupplied": "Unable to load: no category supplied",
+    "noLocationFound": "Unable to load: no location found"
+  },
   "common": {
     "submit": "Submit",
     "cancel": "Cancel",
@@ -38,19 +44,24 @@
   "dashboard": {
     "title": "My Dashboard",
     "searchPlaceholder": "Search for a class",
+    "greeting": "Hello, {{name}}",
     "discoverWeekly": "Discover Weekly",
     "forYou": "For You",
+    "forChild": "For {{name}}",
+    "trendingRightNow": "✦ Trending right now...",
     "basedOn": "Based on",
     "upcomingEvents": "upcoming events",
-    "learnMore": "Learn More",
     "reserved": "Reserved",
     "members": "members",
     "categories": {
-      "technology": "technology",
-      "art": "art",
-      "music": "music",
-      "math": "math",
-      "sports": "sports"
+      "technology": "Tech & Innovation",
+      "art": "Arts & Creative Expression",
+      "music": "Music & Performance",
+      "math": "Math",
+      "sports": "Sports & Physical Activities",
+      "languages": "Languages",
+      "academics": "Academics",
+      "lifeSkills": "Personal Development & Life Skills"
     }
   },
   "profile": {
@@ -287,7 +298,12 @@
     "sortBy": "Sort by",
     "filter": "Filter",
     "km": "km",
-    "stars": "Stars"
+    "mi": "mi",
+    "distanceAway": "{{distance}} km away",
+    "stars": "Stars",
+    "smiles": "/ 5 Smiles",
+    "learnMore": "Learn more",
+    "members": "Members"
   },
   "org": {
     "about": "About",
@@ -322,6 +338,8 @@
     "price": "Price",
     "ageRange": "Age Range",
     "showSoldOut": "Show sold out",
+    "startTime": "Start Time",
+    "showResults": "Show Results",
     "any": "Any",
     "upTo": "Up to {{value}}",
     "orMore": "{{value}} +",
@@ -432,8 +450,16 @@
     "learnMore": "Learn more",
     "reserve": "Reserve",
     "ages": "Ages {{min}}",
+    "agesOpen": "Ages {{min}}+",
     "agesRange": "Ages {{min}} - {{max}}",
     "classTime": "{{time}} Class"
+  },
+  "errorScreen": {
+    "title": "Uh Oh!",
+    "subtitle": "You ran into an error",
+    "backToSafety": "Back to safety",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details"
   },
   "reservation": {
     "paymentFailed": "Payment failed. Please try again or contact support.",
