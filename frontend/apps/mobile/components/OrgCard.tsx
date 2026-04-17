@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -53,7 +54,15 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
           className="h-[120px] w-[120px] items-center justify-center overflow-hidden rounded-2xl"
           style={{ backgroundColor: AppColors.imagePlaceholder }}
         >
-          <IconSymbol name="photo" size={32} color={AppColors.mutedText} />
+          {pin.image ? (
+            <Image
+              source={{ uri: pin.image }}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="cover"
+            />
+          ) : (
+            <IconSymbol name="photo" size={32} color={AppColors.mutedText} />
+          )}
         </View>
       </View>
     </View>
