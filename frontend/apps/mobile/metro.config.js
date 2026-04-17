@@ -34,10 +34,12 @@ const nativeWindConfig = withNativeWind(config, { input: "./global.css" });
 // If two versions coexist the style registry is split and className has no effect.
 const DEDUPLICATED_PACKAGES = [
   "react",
+  "react-native",
   "react-native-css-interop",
   "react-native-safe-area-context",
   "react-native-screens",
   "react-native-reanimated",
+  "react-native-gesture-handler",
   "@tanstack/react-query",
   "@tanstack/query-core",
 ];

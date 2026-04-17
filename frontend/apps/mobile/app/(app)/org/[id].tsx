@@ -233,7 +233,7 @@ function OrgDetail({
                 <View className="flex-row items-center gap-3 py-4 justify-center">
                   <SvgXml xml={EMPTY_FACE_SVG} width={36} height={36} />
                   <Text className="text-[16px] font-nunito">
-                    {translate("review.firstReview")}
+                    {translate("review.noReviews")}
                   </Text>
                 </View>
               )}
