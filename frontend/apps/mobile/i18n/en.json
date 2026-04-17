@@ -190,7 +190,20 @@
     "deleteError": "Failed to delete.",
     "changeProfilePicture": "Change Profile Picture",
     "avatarTabColors": "Colors",
-    "avatarTabAvatar": "Avatar"
+    "avatarTabAvatar": "Avatar",
+    "addInterestsHint": "Add some interests. You can always change these later.",
+    "birthMonth": "Birth Month",
+    "birthYear": "Birth Year",
+    "interests": {
+      "sports": "Sports/Physical",
+      "music": "Music & Performance",
+      "language": "Languages",
+      "other": "Personal Life Skills",
+      "math": "Academics",
+      "technology": "Tech & Innovation",
+      "science": "Small Group Tutoring",
+      "art": "Art/Creative Expression"
+    }
   },
   "saved": {
     "title": "Saved",

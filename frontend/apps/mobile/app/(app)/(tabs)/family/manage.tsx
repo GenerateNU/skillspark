@@ -140,7 +140,7 @@ export default function ManageChildScreen() {
     });
     const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
     router.push({
-      pathname: "./(app)/(tabs)/family/avatar-picker",
+      pathname: "/(app)/(tabs)/family/avatar-picker",
       params: {
         avatarFace: avatarFace ?? "",
         avatarBackground,

@@ -18,7 +18,7 @@ export const NoProfilePic = ({ width, height }: NoProfilePicProps) => {
       }}
     >
       <IconSymbol
-        name="square.and.arrow.up"
+        name="person"
         size={width / 1.5}
         color={AppColors.mutedText}
       />

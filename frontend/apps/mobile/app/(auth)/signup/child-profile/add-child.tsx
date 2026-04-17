@@ -33,36 +33,12 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { Button } from "@/components/Button";
 
-// Display labels shown in the UI (matching Figma)
+// Enum values grouped into rows for display
 const INTEREST_ROWS = [
-  ["Sports/Physical", "Music & Performance", "Languages"],
-  ["Personal Life Skills", "Academics", "Tech & Innovation"],
-  ["Small Group Tutoring", "Art/Creative Expression"],
+  ["sports", "music", "language"],
+  ["other", "math", "technology"],
+  ["science", "art"],
 ];
-
-// Maps display labels to valid Postgres category enum values
-const DISPLAY_TO_VALUE: Record<string, string> = {
-  "Sports/Physical": "sports",
-  "Music & Performance": "music",
-  Languages: "language",
-  "Personal Life Skills": "other",
-  Academics: "math",
-  "Tech & Innovation": "technology",
-  "Small Group Tutoring": "science",
-  "Art/Creative Expression": "art",
-};
-
-// Maps enum values back to display labels
-const VALUE_TO_DISPLAY: Record<string, string> = {
-  sports: "Sports/Physical",
-  music: "Music & Performance",
-  language: "Languages",
-  other: "Personal Life Skills",
-  math: "Academics",
-  technology: "Tech & Innovation",
-  science: "Small Group Tutoring",
-  art: "Art/Creative Expression",
-};
 
 const YEARS = Array.from({ length: 30 }, (_, i) =>
   String(new Date().getFullYear() - i),
@@ -158,8 +134,7 @@ export default function AddChildScreen() {
           .map((s) => s.trim())
           .filter(Boolean)
       : [];
-  const initialInterests = rawInterests.map((v) => VALUE_TO_DISPLAY[v] ?? v);
-  const [interests, setInterests] = useState<string[]>(initialInterests);
+  const [interests, setInterests] = useState<string[]>(rawInterests);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [showMonthDrop, setShowMonthDrop] = useState(false);
@@ -241,7 +216,7 @@ export default function AddChildScreen() {
         birth_month: MONTHS.indexOf(birthMonth) + 1,
         guardian_id: guardianId,
         school_id: schoolId,
-        interests: interests.map((label) => DISPLAY_TO_VALUE[label] ?? label),
+        interests,
         avatar_face: (params.avatar_face as string) || undefined,
         avatar_background:
           (params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
@@ -487,7 +462,7 @@ export default function AddChildScreen() {
                         }}
                       >
                         <ThemedText className="text-sm font-nunito text-[#11181C]">
-                          {item}
+                          {translate(`childProfile.interests.${item}`)}
                         </ThemedText>
                       </TouchableOpacity>
                     );

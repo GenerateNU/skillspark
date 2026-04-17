@@ -190,7 +190,20 @@
     "deleteError": "ลบไม่สำเร็จ",
     "changeProfilePicture": "เปลี่ยนรูปโปรไฟล์",
     "avatarTabColors": "สี",
-    "avatarTabAvatar": "อวตาร"
+    "avatarTabAvatar": "อวตาร",
+    "addInterestsHint": "เพิ่มความสนใจบางอย่าง คุณสามารถเปลี่ยนได้ภายหลัง",
+    "birthMonth": "เดือนเกิด",
+    "birthYear": "ปีเกิด",
+    "interests": {
+      "sports": "กีฬา/ร่างกาย",
+      "music": "ดนตรีและการแสดง",
+      "language": "ภาษา",
+      "other": "ทักษะชีวิตส่วนตัว",
+      "math": "วิชาการ",
+      "technology": "เทคโนโลยีและนวัตกรรม",
+      "science": "การเรียนพิเศษกลุ่มเล็ก",
+      "art": "ศิลปะ/การแสดงออกเชิงสร้างสรรค์"
+    }
   },
   "saved": {
     "title": "ที่บันทึกไว้",

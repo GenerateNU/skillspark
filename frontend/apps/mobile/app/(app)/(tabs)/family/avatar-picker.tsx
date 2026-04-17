@@ -32,7 +32,7 @@ export default function AvatarPickerScreen() {
 
   const handleSave = () => {
     resolvePendingAvatarCallback({ face, background });
-    router.push("/(auth)/signup/emergency-contact");
+    router.back();
   };
 
   const handleCancel = () => {
