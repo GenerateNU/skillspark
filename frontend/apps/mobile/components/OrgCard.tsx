@@ -58,14 +58,13 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
 
         {/* Image */}
         <View
-          className="w-[100px] h-[100px] overflow-hidden rounded-lg"
-          style={{ backgroundColor: AppColors.imagePlaceholder }}
+          style={{ backgroundColor: AppColors.imagePlaceholder, width: 100, height: 100, overflow: "hidden", borderRadius: 8 }}
         >
           {pin.image ? (
             <Image
               source={{ uri: pin.image }}
-              className="h-full w-full"
               contentFit="cover"
+              style={{ width: "100%", height: "100%" }}
             />
           ) : (
             <View className="flex-1 items-center justify-center">
