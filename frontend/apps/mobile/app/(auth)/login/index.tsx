@@ -1,4 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
+import { FontSizes } from "@/constants/theme";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -87,8 +88,8 @@ export default function LoginScreen() {
 						{/* Title */}
 						<View className="px-6 pt-2 items-center">
 							<ThemedText
-								className="font-nunito-bold leading-[60px] text-[#111] text-[30px] text-center"
-								style={{ letterSpacing: -0.5 }}
+								className="font-nunito-bold text-[#111] text-center"
+								style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}
 							>
 								{translate("onboarding.signIn")}
 							</ThemedText>

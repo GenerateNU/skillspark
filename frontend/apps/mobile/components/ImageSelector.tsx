@@ -15,6 +15,7 @@ interface ImageSelectorProps extends TouchableOpacityProps {
   image: string | undefined;
   width: number;
   height: number;
+  placeholder?: React.ReactNode;
 }
 
 export const ImageSelector = ({
@@ -22,6 +23,7 @@ export const ImageSelector = ({
   image,
   width,
   height,
+  placeholder,
   ...props
 }: ImageSelectorProps) => {
   const theme = Colors.light;
@@ -52,7 +54,7 @@ export const ImageSelector = ({
             resizeMode="cover"
           />
         )}
-        {!image && <NoProfilePic width={width} height={height} />}
+        {!image && (placeholder ?? <NoProfilePic width={width} height={height} />)}
       </View>
       <ThemedText className="text-sm" style={{ color: AppColors.mutedText }}>
         {translate("editProfile.changeImage")}

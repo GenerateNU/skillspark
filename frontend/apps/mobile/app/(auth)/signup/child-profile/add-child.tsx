@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
 	View,
+	TextInput,
 	TouchableOpacity,
 	Alert,
 	ScrollView,
@@ -8,12 +9,13 @@ import {
 	Platform,
 	Keyboard,
 	Pressable,
+	Modal,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { AuthBackground } from "@/components/AuthBackground";
-import { Colors } from "@/constants/theme";
+import { AppColors, Colors, FontSizes } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -21,15 +23,74 @@ import {
 	useUpdateChild,
 	useDeleteChild,
 	getGetChildrenByGuardianIdQueryKey,
+	useGetAllSchools,
+	type School,
 } from "@skillspark/api-client";
-import { ChildProfileForm, MONTHS } from "@/components/ChildProfileForm";
+import { MONTHS } from "@/components/ChildProfileForm";
 import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
-import { setPendingAvatarCallback } from "@/constants/avatarPickerStore";
 import { useTranslation } from "react-i18next";
-import { useGuardian } from "@/hooks/use-guardian";
-
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
+import { Button } from "@/components/Button";
+
+const INTEREST_ROWS = [
+	["Sports/Physical", "Music & Performance", "Languages"],
+	["Personal Life Skills", "Academics", "Tech & Innovation"],
+	["Small Group Tutoring", "Art/Creative Expression"],
+];
+
+const YEARS = Array.from({ length: 30 }, (_, i) =>
+	String(new Date().getFullYear() - i),
+);
+
+type DropdownLayout = { x: number; y: number; width: number };
+
+function DropdownModal({
+	visible,
+	onClose,
+	layout,
+	options,
+	onSelect,
+}: {
+	visible: boolean;
+	onClose: () => void;
+	layout: DropdownLayout | null;
+	options: string[];
+	onSelect: (v: string) => void;
+}) {
+	if (!layout) return null;
+	return (
+		<Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
+			<TouchableOpacity className="flex-1" activeOpacity={1} onPress={onClose}>
+				<View
+					className="absolute bg-white rounded-[10px] border border-[#E5E7EB] max-h-[220px] overflow-hidden"
+					style={{
+						top: layout.y,
+						left: layout.x,
+						width: layout.width,
+						shadowColor: "#000",
+						shadowOpacity: 0.12,
+						shadowRadius: 8,
+						shadowOffset: { width: 0, height: 2 },
+						elevation: 8,
+					}}
+				>
+					<ScrollView bounces={false}>
+						{options.map((opt) => (
+							<TouchableOpacity
+								key={opt}
+								className="px-4 py-3 border-b border-b-[#E5E7EB]"
+								onPress={() => { onSelect(opt); onClose(); }}
+							>
+								<ThemedText>{opt}</ThemedText>
+							</TouchableOpacity>
+						))}
+					</ScrollView>
+				</View>
+			</TouchableOpacity>
+		</Modal>
+	);
+}
 
 export default function AddChildScreen() {
 	const router = useRouter();
@@ -37,7 +98,6 @@ export default function AddChildScreen() {
 	const insets = useSafeAreaInsets();
 	const theme = Colors.light;
 	const { guardianId } = useAuthContext();
-
 	const { t: translate } = useTranslation();
 	const isEditing = !!params.id;
 
@@ -47,38 +107,34 @@ export default function AddChildScreen() {
 	const [lastName, setLastName] = useState(
 		params.name ? (params.name as string).split(" ").slice(1).join(" ") : "",
 	);
-
 	const initialMonthStr = params.birth_month
 		? MONTHS[parseInt(params.birth_month as string) - 1]
 		: "";
-
 	const [birthMonth, setBirthMonth] = useState(initialMonthStr);
-	const [birthYear, setBirthYear] = useState(
-		(params.birth_year as string) || "",
-	);
+	const [birthYear, setBirthYear] = useState((params.birth_year as string) || "");
 	const [schoolId, setSchoolId] = useState((params.school_id as string) || "");
 
 	const initialInterests = Array.isArray(params.interests)
 		? params.interests
 		: params.interests
-			? (params.interests as string)
-					.split(",")
-					.map((s) => s.trim())
-					.filter(Boolean)
+			? (params.interests as string).split(",").map((s) => s.trim()).filter(Boolean)
 			: [];
 	const [interests, setInterests] = useState<string[]>(initialInterests);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const [avatarFace, setAvatarFace] = useState<string | null>(
-		(params.avatar_face as string) || null,
-	);
-	const [avatarBackground, setAvatarBackground] = useState(
-		(params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
-	);
-
-	const [searchQuery, setSearchQuery] = useState("");
 	const [showMonthDrop, setShowMonthDrop] = useState(false);
 	const [showYearDrop, setShowYearDrop] = useState(false);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [showSchoolDrop, setShowSchoolDrop] = useState(false);
+	const [monthDropLayout, setMonthDropLayout] = useState<DropdownLayout | null>(null);
+	const [yearDropLayout, setYearDropLayout] = useState<DropdownLayout | null>(null);
+	const [schoolDropLayout, setSchoolDropLayout] = useState<DropdownLayout | null>(null);
+	const monthTriggerRef = useRef<View>(null);
+	const yearTriggerRef = useRef<View>(null);
+	const schoolTriggerRef = useRef<View>(null);
+
+	const { data: schoolsData, isLoading: schoolsLoading } = useGetAllSchools();
+	const schools: School[] = Array.isArray(schoolsData?.data) ? schoolsData.data : [];
+	const selectedSchool = schools.find((s) => s.id === schoolId);
 
 	const queryClient = useQueryClient();
 	const createChildMutation = useCreateChild();
@@ -88,6 +144,38 @@ export default function AddChildScreen() {
 	if (!guardianId) {
 		return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
 	}
+
+	const openMonthDrop = () => {
+		monthTriggerRef.current?.measure((_fx, _fy, width, height, px, py) => {
+			setMonthDropLayout({ x: px, y: py + height + 4, width });
+			setShowMonthDrop(true);
+			setShowYearDrop(false);
+			setShowSchoolDrop(false);
+		});
+	};
+
+	const openYearDrop = () => {
+		yearTriggerRef.current?.measure((_fx, _fy, width, height, px, py) => {
+			setYearDropLayout({ x: px, y: py + height + 4, width });
+			setShowYearDrop(true);
+			setShowMonthDrop(false);
+			setShowSchoolDrop(false);
+		});
+	};
+
+	const openSchoolDrop = () => {
+		schoolTriggerRef.current?.measure((_fx, _fy, width, height, px, py) => {
+			setSchoolDropLayout({ x: px, y: py + height + 4, width });
+			setShowSchoolDrop(true);
+			setShowMonthDrop(false);
+			setShowYearDrop(false);
+		});
+	};
+
+	const toggleInterest = (item: string) =>
+		setInterests((prev) =>
+			prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item],
+		);
 
 	const handleSave = async () => {
 		if (!firstName || !birthYear || !birthMonth || !schoolId) {
@@ -107,23 +195,22 @@ export default function AddChildScreen() {
 				guardian_id: guardianId,
 				school_id: schoolId,
 				interests,
-				avatar_face: avatarFace ?? undefined,
-				avatar_background: avatarBackground || DEFAULT_AVATAR_COLOR,
+				avatar_face: (params.avatar_face as string) || undefined,
+				avatar_background: (params.avatar_background as string) || DEFAULT_AVATAR_COLOR,
 			};
 			if (isEditing) {
-				await updateChildMutation.mutateAsync({
-					id: params.id as string,
-					data: childData,
-				});
+				await updateChildMutation.mutateAsync({ id: params.id as string, data: childData });
 			} else {
 				await createChildMutation.mutateAsync({ data: childData });
 			}
 			await queryClient.invalidateQueries({
 				queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
 			});
-			router.push("/(auth)/signup/emergency-contact");
+			router.push({
+				pathname: "./edit-pic",
+				params: { name },
+			});
 		} catch (error) {
-			console.error(error);
 			Alert.alert(
 				translate("common.errorOccurred"),
 				translate("childProfile.saveError") + " " + JSON.stringify(error),
@@ -131,22 +218,6 @@ export default function AddChildScreen() {
 		} finally {
 			setIsSubmitting(false);
 		}
-	};
-
-	const handleAvatarPress = () => {
-		setPendingAvatarCallback(({ face, background }) => {
-			setAvatarFace(face);
-			setAvatarBackground(background);
-		});
-		const childName = [firstName, lastName].filter(Boolean).join(" ") || "?";
-		router.push({
-			pathname: "./avatar-picker",
-			params: {
-				avatarFace: avatarFace ?? "",
-				avatarBackground,
-				childName,
-			},
-		});
 	};
 
 	const handleDelete = () => {
@@ -161,18 +232,13 @@ export default function AddChildScreen() {
 					onPress: async () => {
 						setIsSubmitting(true);
 						try {
-							await deleteChildMutation.mutateAsync({
-								id: params.id as string,
-							});
+							await deleteChildMutation.mutateAsync({ id: params.id as string });
 							await queryClient.invalidateQueries({
 								queryKey: getGetChildrenByGuardianIdQueryKey(guardianId),
 							});
 							router.back();
 						} catch {
-							Alert.alert(
-								translate("common.errorOccurred"),
-								translate("childProfile.deleteError"),
-							);
+							Alert.alert(translate("common.errorOccurred"), translate("childProfile.deleteError"));
 							setIsSubmitting(false);
 						}
 					},
@@ -192,77 +258,189 @@ export default function AddChildScreen() {
 			>
 				<ScrollView
 					contentContainerStyle={{
-						paddingHorizontal: 20,
-						paddingBottom: insets.bottom + 80,
+						paddingHorizontal: 24,
+						paddingBottom: insets.bottom + 32,
 						paddingTop: 10,
 					}}
 					showsVerticalScrollIndicator={false}
 					keyboardShouldPersistTaps="handled"
 				>
 					<Pressable onPress={Keyboard.dismiss}>
+						{/* Header */}
 						<View className="flex-row items-center justify-between mb-6">
 							<TouchableOpacity
 								onPress={() => router.back()}
-								className="w-8 h-8 justify-center items-start"
+								className="flex-row items-center gap-1"
+								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 							>
-								<IconSymbol name="chevron.left" size={24} color={theme.text} />
+								<IconSymbol name="chevron.left" size={18} color={theme.text} />
+								<ThemedText className="text-base font-nunito">
+									{translate("onboarding.back")}
+								</ThemedText>
 							</TouchableOpacity>
-							<ThemedText className="text-xl text-center font-nunito-bold">
-								{translate("familyInformation.title")}
-							</ThemedText>
-							{isEditing ? (
+							{isEditing && (
 								<TouchableOpacity onPress={handleDelete}>
 									<ThemedText className="font-nunito-semibold text-[#EF4444]">
 										{translate("payment.delete")}
 									</ThemedText>
 								</TouchableOpacity>
-							) : (
-								<View className="w-10" />
 							)}
 						</View>
-						<ThemedText className="text-[22px] font-nunito-semibold mb-5">
-							{isEditing
-								? translate("childProfile.editTitle")
-								: translate("childProfile.createTitle")}
-						</ThemedText>
-						<ChildProfileForm
-							firstName={firstName}
-							setFirstName={setFirstName}
-							lastName={lastName}
-							setLastName={setLastName}
-							birthMonth={birthMonth}
-							setBirthMonth={setBirthMonth}
-							birthYear={birthYear}
-							setBirthYear={setBirthYear}
-							schoolId={schoolId}
-							setSchoolId={setSchoolId}
-							interests={interests}
-							setInterests={setInterests}
-							searchQuery={searchQuery}
-							setSearchQuery={setSearchQuery}
-							showMonthDrop={showMonthDrop}
-							setShowMonthDrop={setShowMonthDrop}
-							showYearDrop={showYearDrop}
-							setShowYearDrop={setShowYearDrop}
-							avatarFace={avatarFace}
-							avatarBackground={avatarBackground}
-							onAvatarPress={handleAvatarPress}
-						/>
-						<TouchableOpacity
-							className={`py-4 rounded-xl items-center justify-center ${isSubmitting ? "opacity-70" : "opacity-100"}`}
-							style={{ backgroundColor: theme.tint }}
-							onPress={handleSave}
-							disabled={isSubmitting}
+
+						{/* Title */}
+						<ThemedText
+							className="font-nunito-bold text-[#111] text-center mb-8"
+							style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}
 						>
-							<ThemedText className="text-white text-base font-nunito-semibold">
-								{isSubmitting
-									? translate("childProfile.saving")
-									: translate("childProfile.saveChanges")}
-							</ThemedText>
-						</TouchableOpacity>
+							{translate("onboarding.setUpChild")}
+						</ThemedText>
+
+						{/* First Name */}
+						<ThemedText className="font-nunito-semibold text-base text-[#111] mb-1">
+							{translate("childProfile.firstName")}
+						</ThemedText>
+						<TextInput
+							className="border border-black rounded-2xl px-4 h-[54px] bg-white text-base font-nunito text-[#11181C] mb-4"
+							value={firstName}
+							onChangeText={setFirstName}
+							placeholderTextColor={AppColors.placeholderText}
+						/>
+
+						{/* Last Name */}
+						<ThemedText className="font-nunito-semibold text-base text-[#111] mb-1">
+							{translate("childProfile.lastName")}
+						</ThemedText>
+						<TextInput
+							className="border border-black rounded-2xl px-4 h-[54px] bg-white text-base font-nunito text-[#11181C] mb-4"
+							value={lastName}
+							onChangeText={setLastName}
+							placeholderTextColor={AppColors.placeholderText}
+						/>
+
+						{/* Birth Month + Year */}
+						<View className="flex-row gap-3 mb-4">
+							<View className="flex-1">
+								<ThemedText className="font-nunito-semibold text-base text-[#111] mb-1">
+									{translate("childProfile.birthMonth", { defaultValue: "Birth Month" })}
+								</ThemedText>
+								<View ref={monthTriggerRef}>
+									<TouchableOpacity
+										className="border border-black rounded-2xl px-4 h-[54px] bg-white flex-row items-center"
+										onPress={openMonthDrop}
+									>
+										<ThemedText className="text-base font-nunito" style={{ color: theme.text }}>
+											{birthMonth}
+										</ThemedText>
+									</TouchableOpacity>
+								</View>
+							</View>
+							<View className="flex-1">
+								<ThemedText className="font-nunito-semibold text-base text-[#111] mb-1">
+									{translate("childProfile.birthYear", { defaultValue: "Birth Year" })}
+								</ThemedText>
+								<View ref={yearTriggerRef}>
+									<TouchableOpacity
+										className="border border-black rounded-2xl px-4 h-[54px] bg-white flex-row items-center"
+										onPress={openYearDrop}
+									>
+										<ThemedText className="text-base font-nunito" style={{ color: theme.text }}>
+											{birthYear}
+										</ThemedText>
+									</TouchableOpacity>
+								</View>
+							</View>
+						</View>
+
+						{/* School */}
+						<ThemedText className="font-nunito-semibold text-base text-[#111] mb-1">
+							{translate("childProfile.selectSchool", { defaultValue: "School" })}
+						</ThemedText>
+						<View ref={schoolTriggerRef} className="mb-8">
+							<TouchableOpacity
+								className="border border-black rounded-2xl px-4 h-[54px] bg-white flex-row items-center justify-between"
+								onPress={openSchoolDrop}
+								disabled={schoolsLoading}
+							>
+								<ThemedText
+									className="text-base font-nunito"
+									style={{ color: selectedSchool ? theme.text : AppColors.placeholderText }}
+								>
+									{schoolsLoading ? translate("childProfile.loadingSchools") : selectedSchool?.name ?? ""}
+								</ThemedText>
+								<IconSymbol name="chevron.down" size={16} color={AppColors.mutedText} />
+							</TouchableOpacity>
+						</View>
+
+						{/* Interests */}
+						<ThemedText className="font-nunito text-base text-center text-[#111] leading-6 mb-5">
+							{translate("childProfile.addInterestsHint", {
+								defaultValue: "Add some interests. You can always change these later.",
+							})}
+						</ThemedText>
+						<View className="gap-2 mb-8">
+							{INTEREST_ROWS.map((row, rowIndex) => (
+								<View key={rowIndex} className="flex-row justify-center gap-2">
+									{row.map((item) => {
+										const selected = interests.includes(item);
+										return (
+											<TouchableOpacity
+												key={item}
+												onPress={() => toggleInterest(item)}
+												className="border rounded-full px-[14px] py-[5px]"
+												style={{
+													borderColor: selected ? "#7BAFD4" : "#000",
+													backgroundColor: selected ? "#D9E4F5" : "#fff",
+												}}
+											>
+												<ThemedText className="text-sm font-nunito text-[#11181C]">
+													{item}
+												</ThemedText>
+											</TouchableOpacity>
+										);
+									})}
+								</View>
+							))}
+						</View>
+
+						<View className="items-center">
+							<Button
+								label={
+									isSubmitting
+										? translate("childProfile.saving")
+										: translate("onboarding.submit", { defaultValue: "Submit" })
+								}
+								onPress={handleSave}
+								disabled={isSubmitting}
+							/>
+						</View>
 					</Pressable>
 				</ScrollView>
 			</KeyboardAvoidingView>
+
+			<DropdownModal
+				visible={showMonthDrop}
+				onClose={() => setShowMonthDrop(false)}
+				layout={monthDropLayout}
+				options={MONTHS}
+				onSelect={setBirthMonth}
+			/>
+			<DropdownModal
+				visible={showYearDrop}
+				onClose={() => setShowYearDrop(false)}
+				layout={yearDropLayout}
+				options={YEARS}
+				onSelect={setBirthYear}
+			/>
+			<DropdownModal
+				visible={showSchoolDrop}
+				onClose={() => setShowSchoolDrop(false)}
+				layout={schoolDropLayout}
+				options={schools.map((s) => s.name)}
+				onSelect={(name) => {
+					const school = schools.find((s) => s.name === name);
+					if (school) setSchoolId(school.id);
+				}}
+			/>
 		</View>
 	);
 }

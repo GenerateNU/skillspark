@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { FontSizes } from "@/constants/theme";
+import { View, TouchableOpacity, Text } from "react-native";
 import { JumpingCharacter } from "@/components/JumpingCharacter";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -44,8 +45,8 @@ export default function WelcomeScreen() {
 				{/* Title */}
 				<View className="items-center px-6 pt-10 pb-5">
 					<ThemedText
-						className="font-nunito-bold text-[30px] leading-[38px] text-[#111] text-center"
-						style={{ letterSpacing: -0.5 }}
+						className="font-nunito-bold text-[#111] text-center"
+						style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}
 						numberOfLines={1}
 						adjustsFontSizeToFit
 					>
@@ -54,40 +55,37 @@ export default function WelcomeScreen() {
 				</View>
 
 				{/* Character image */}
-				<View className="items-center justify-center py-[30px]">
-					<JumpingCharacter />
-					<ThemedText className="font-nunito-semibold text-base text-[#374151] mt-6 mb-2 text-center">
+				<View className="items-center justify-center pt-2 pb-4">
+					<JumpingCharacter width={210} height={160} />
+					<ThemedText className="font-nunito-semibold text-xl text-[#374151] mt-6 mb-2 text-center">
 						{translate("onboarding.chooseLanguage")}
 					</ThemedText>
 				</View>
 
 				{/* Language section */}
-				<View className="px-6 flex-1">
+				<View className="px-6 flex-1 justify-center">
 					<View>
-						{LANGUAGES.map((lang, index) => {
+						{LANGUAGES.map((lang) => {
 							const isSelected = selected === lang.code;
 							return (
 								<React.Fragment key={lang.code}>
 									<TouchableOpacity
 										onPress={() => updateLanguageData(lang.code)}
 										activeOpacity={0.6}
-										className="flex-row items-center gap-[14px] py-4"
+										className="flex-row items-center gap-[14px] py-6"
 									>
-										<ThemedText className="text-[30px] leading-9">
+										<Text className="text-[30px] leading-[38px]">
 											{lang.flag}
-										</ThemedText>
-										<ThemedText className="flex-1 text-base font-nunito text-[#111]">
+										</Text>
+										<Text className="flex-1 font-nunito text-xl text-[#111]">
 											{translate(`settings.languages.${lang.code}`)}
-										</ThemedText>
+										</Text>
 										<IconSymbol
 											name={isSelected ? "checkmark.circle.fill" : "circle"}
 											size={24}
-											color={isSelected ? "#1C1C1E" : "#C7C7CC"}
+											color="#1C1C1E"
 										/>
 									</TouchableOpacity>
-									{index < LANGUAGES.length - 1 && (
-										<View className="h-px bg-[#D1C8F0] ml-[50px]" />
-									)}
 								</React.Fragment>
 							);
 						})}
@@ -97,7 +95,7 @@ export default function WelcomeScreen() {
 				{/* Submit button */}
 				<View
 					className="items-center px-6 pt-4"
-					style={{ paddingBottom: insets.bottom + 56 }}
+					style={{ paddingBottom: insets.bottom + 48 }}
 				>
 					<Button
 						label={translate("common.submit")}

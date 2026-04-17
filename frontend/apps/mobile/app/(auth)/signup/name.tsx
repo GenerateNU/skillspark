@@ -1,4 +1,5 @@
 import { AuthFormInput } from "@/components/AuthFormInput";
+import { FontSizes } from "@/constants/theme";
 import { Button } from "@/components/Button";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -71,58 +72,59 @@ export default function NameScreen() {
 						</TouchableOpacity>
 
 						{/* Title */}
-						<View className="px-6 pt-2 items-center">
+						<View className="px-6 pt-10 pb-5 items-center">
 							<ThemedText
-								className="font-nunito-bold leading-[60px] text-[#111] text-[30px] text-center"
-								style={{ letterSpacing: -0.5 }}
+								className="font-nunito-bold text-[#111] text-center"
+								style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}
 							>
 								{translate("onboarding.whatName")}
 							</ThemedText>
 						</View>
 
 						{/* Character image */}
-						<View className="flex-1 items-center justify-center py-6">
-							<JumpingCharacter />
+						<View className="items-center justify-center pt-2 pb-4">
+							<JumpingCharacter width={210} height={160} />
 						</View>
 
 						{/* Form fields */}
-						<View className="px-6 gap-6">
-							<View className="gap-2">
-								<ThemedText className="text-base font-nunito-semibold">
-									{translate("onboarding.name")}
-								</ThemedText>
-								<AuthFormInput
-									control={control}
-									name="name"
-									autoCapitalize="none"
-								/>
-							</View>
+						<View className="flex-1 justify-center px-6">
+							<View className="gap-6">
+								<View className="gap-2">
+									<ThemedText className="text-base font-nunito-semibold">
+										{translate("onboarding.name")}
+									</ThemedText>
+									<AuthFormInput
+										control={control}
+										name="name"
+										autoCapitalize="none"
+									/>
+								</View>
 
-							<View className="gap-2">
-								<ThemedText className="text-base font-nunito-semibold">
-									{translate("onboarding.username")}
-								</ThemedText>
-								<AuthFormInput
-									control={control}
-									name="username"
-									autoCapitalize="none"
-								/>
+								<View className="gap-2">
+									<ThemedText className="text-base font-nunito-semibold">
+										{translate("onboarding.username")}
+									</ThemedText>
+									<AuthFormInput
+										control={control}
+										name="username"
+										autoCapitalize="none"
+									/>
+								</View>
 							</View>
 						</View>
 					</ScrollView>
 				</KeyboardAvoidingView>
 
 				{/* Buttons pinned to bottom */}
-				<View
-					className="items-center px-6 pt-4"
-					style={{ paddingBottom: insets.bottom + 4 }}
-				>
-					<Button
-						label={translate("onboarding.continue")}
-						onPress={handleContinue}
-						disabled={false}
-					/>
-					<View className="mt-3">
+				<View className="px-6" style={{ paddingBottom: insets.bottom }}>
+					<View className="items-center pt-4">
+						<Button
+							label={translate("onboarding.continue")}
+							onPress={handleContinue}
+							disabled={false}
+						/>
+					</View>
+					<View className="items-center justify-center" style={{ height: 48 }}>
 						<PageRedirectButton
 							label={translate("onboarding.alreadyHaveAccount")}
 							onPress={() => router.navigate("/(auth)/login")}

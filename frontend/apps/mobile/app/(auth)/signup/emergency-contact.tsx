@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import {
 	View,
+	TextInput,
 	TouchableOpacity,
 	Alert,
 	ScrollView,
 	KeyboardAvoidingView,
 	Platform,
+	Keyboard,
+	Pressable,
 } from "react-native";
 import { AuthBackground } from "@/components/AuthBackground";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
@@ -16,9 +19,7 @@ import { useTranslation } from "react-i18next";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { Button } from "@/components/Button";
-import { AuthFormInput } from "@/components/AuthFormInput";
-import { PageRedirectButton } from "@/components/PageRedirectButton";
-import { useForm } from "react-hook-form";
+import { AppColors, Colors, FontSizes } from "@/constants/theme";
 import { queryClient } from "@/constants/query-client";
 import {
 	getGetEmergencyContactsByGuardianIdQueryKey,
@@ -27,34 +28,28 @@ import {
 	useUpdateEmergencyContact,
 } from "@skillspark/api-client";
 
-
-type EmergencyContactFormData = {
-	name: string;
-	phone_number: string;
-};
-
-// screen for adding an emergency contact
 export default function ManageEmergencyContactScreen() {
 	const router = useRouter();
 	const params = useLocalSearchParams();
 	const insets = useSafeAreaInsets();
-
+	const theme = Colors.light;
 	const { guardianId } = useAuthContext();
-
-	const createEmergencyContactMutation = useCreateEmergencyContact();
-	const updateEmergencyContactMutation = useUpdateEmergencyContact();
-	const deleteEmergencyContactMutation = useDeleteEmergencyContact();
-
 	const { t: translate } = useTranslation();
 	const isEditing = !!params.id;
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const { control, getValues } = useForm<EmergencyContactFormData>({
-		defaultValues: {
-			name: (params.name as string) || "",
-			phone_number: (params.phone_number as string) || "",
-		},
-	});
+	const existingName = (params.name as string) || "";
+	const [firstName, setFirstName] = useState(existingName.split(" ")[0] ?? "");
+	const [lastName, setLastName] = useState(
+		existingName.split(" ").slice(1).join(" ") ?? "",
+	);
+	const [phoneNumber, setPhoneNumber] = useState(
+		(params.phone_number as string) || "",
+	);
+
+	const createEmergencyContactMutation = useCreateEmergencyContact();
+	const updateEmergencyContactMutation = useUpdateEmergencyContact();
+	const deleteEmergencyContactMutation = useDeleteEmergencyContact();
 
 	if (!guardianId) {
 		return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
@@ -67,41 +62,31 @@ export default function ManageEmergencyContactScreen() {
 	};
 
 	const handleSave = async () => {
-		const name = getValues("name");
-		const phone_number = getValues("phone_number");
-
-		if (!name || !phone_number) {
+		const name = [firstName, lastName].filter(Boolean).join(" ");
+		if (!name || !phoneNumber) {
 			Alert.alert(
 				translate("common.error"),
 				translate("childProfile.requiredFieldsError"),
 			);
 			return;
 		}
-
-		if (!isValidPhoneNumber(phone_number)) {
+		if (!isValidPhoneNumber(phoneNumber)) {
 			Alert.alert(
 				translate("common.error"),
 				translate("emergencyContact.invalidPhoneNumber"),
 			);
 			return;
 		}
-
 		setIsSubmitting(true);
 		try {
-			const emergencyContactData = {
-				guardian_id: guardianId,
-				name,
-				phone_number,
-			};
+			const emergencyContactData = { guardian_id: guardianId, name, phone_number: phoneNumber };
 			if (isEditing) {
 				await updateEmergencyContactMutation.mutateAsync({
 					id: params.id as string,
 					data: emergencyContactData,
 				});
 			} else {
-				await createEmergencyContactMutation.mutateAsync({
-					data: emergencyContactData,
-				});
+				await createEmergencyContactMutation.mutateAsync({ data: emergencyContactData });
 			}
 			await queryClient.invalidateQueries({
 				queryKey: getGetEmergencyContactsByGuardianIdQueryKey(guardianId),
@@ -111,11 +96,8 @@ export default function ManageEmergencyContactScreen() {
 			} else {
 				router.push("/(auth)/signup/payment");
 			}
-		} catch (error) {
-			Alert.alert(
-				translate("common.errorOccurred"),
-				translate("childProfile.saveError"),
-			);
+		} catch {
+			Alert.alert(translate("common.errorOccurred"), translate("childProfile.saveError"));
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -137,8 +119,7 @@ export default function ManageEmergencyContactScreen() {
 								id: params.id as string,
 							});
 							await queryClient.invalidateQueries({
-								queryKey:
-									getGetEmergencyContactsByGuardianIdQueryKey(guardianId),
+								queryKey: getGetEmergencyContactsByGuardianIdQueryKey(guardianId),
 							});
 							router.back();
 						} catch {
@@ -168,62 +149,78 @@ export default function ManageEmergencyContactScreen() {
 						keyboardShouldPersistTaps="handled"
 						showsVerticalScrollIndicator={false}
 					>
-						{/* Back button */}
-						<TouchableOpacity
-							onPress={() => router.back()}
-							className="flex-row items-center px-5 py-3 gap-1"
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-						>
-							<IconSymbol name="chevron.left" size={18} color="#11181C" />
-							<ThemedText className="text-base font-nunito">
-								{translate("onboarding.back")}
-							</ThemedText>
-						</TouchableOpacity>
-
-						{/* Title */}
-						<View className="px-6 pt-2 items-center">
-							<ThemedText
-								className="font-nunito-bold leading-[60px] text-[#111] text-[30px] text-center"
-								style={{ letterSpacing: -0.5 }}
+						<Pressable onPress={Keyboard.dismiss}>
+							{/* Back button */}
+							<TouchableOpacity
+								onPress={() => router.back()}
+								className="flex-row items-center px-5 py-3 gap-1"
+								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 							>
-								{isEditing
-									? translate("emergencyContact.editTitle")
-									: translate("emergencyContact.addTitle")}
-							</ThemedText>
-						</View>
-
-						{/* Form fields */}
-						<View className="px-6 gap-6 pt-20">
-							<View className="gap-2">
-								<ThemedText className="text-base font-nunito-semibold">
-									{translate("emergencyContact.name")}
+								<IconSymbol name="chevron.left" size={18} color={theme.text} />
+								<ThemedText className="text-base font-nunito">
+									{translate("onboarding.back")}
 								</ThemedText>
-								<AuthFormInput
-									control={control}
-									name="name"
-									autoCapitalize="words"
-								/>
+							</TouchableOpacity>
+
+							{/* Title */}
+							<View className="px-6 pt-2 pb-10 items-center">
+								<ThemedText className="font-nunito-bold text-[#111] text-center" style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}>
+									{isEditing
+										? translate("emergencyContact.editTitle")
+										: translate("emergencyContact.addTitle")}
+								</ThemedText>
 							</View>
 
-							<View className="gap-2">
-								<ThemedText className="text-base font-nunito-semibold">
-									{translate("emergencyContact.phoneNumber")}
-								</ThemedText>
-								<AuthFormInput
-									control={control}
-									name="phone_number"
-									keyboardType="phone-pad"
-									autoCapitalize="none"
-								/>
+							{/* Form fields */}
+							<View className="px-6 gap-8">
+								<View className="gap-1">
+									<ThemedText className="font-nunito-semibold text-base text-[#111]">
+										{translate("childProfile.firstName")}
+									</ThemedText>
+									<TextInput
+										className="border border-[#E5E7EB] rounded-[10px] px-4 py-[14px] bg-white text-base font-nunito text-[#11181C]"
+										value={firstName}
+										onChangeText={setFirstName}
+										autoCapitalize="words"
+										placeholderTextColor={AppColors.placeholderText}
+									/>
+								</View>
+
+								<View className="gap-1">
+									<ThemedText className="font-nunito-semibold text-base text-[#111]">
+										{translate("childProfile.lastName")}
+									</ThemedText>
+									<TextInput
+										className="border border-[#E5E7EB] rounded-[10px] px-4 py-[14px] bg-white text-base font-nunito text-[#11181C]"
+										value={lastName}
+										onChangeText={setLastName}
+										autoCapitalize="words"
+										placeholderTextColor={AppColors.placeholderText}
+									/>
+								</View>
+
+								<View className="gap-1">
+									<ThemedText className="font-nunito-semibold text-base text-[#111]">
+										{translate("emergencyContact.phoneNumber")}
+									</ThemedText>
+									<TextInput
+										className="border border-[#E5E7EB] rounded-[10px] px-4 py-[14px] bg-white text-base font-nunito text-[#11181C]"
+										value={phoneNumber}
+										onChangeText={setPhoneNumber}
+										keyboardType="phone-pad"
+										autoCapitalize="none"
+										placeholderTextColor={AppColors.placeholderText}
+									/>
+								</View>
 							</View>
-						</View>
+						</Pressable>
 					</ScrollView>
 				</KeyboardAvoidingView>
 
 				{/* Buttons pinned to bottom */}
 				<View
 					className="items-center px-6 pt-4"
-					style={{ paddingBottom: insets.bottom + 56 }}
+					style={{ paddingBottom: insets.bottom + 16 }}
 				>
 					<Button
 						label={
@@ -231,18 +228,17 @@ export default function ManageEmergencyContactScreen() {
 								? translate("emergencyContact.saving")
 								: isEditing
 									? translate("emergencyContact.saveChanges")
-									: translate("emergencyContact.addContact")
+									: translate("onboarding.continue", { defaultValue: "Continue" })
 						}
 						onPress={handleSave}
 						disabled={isSubmitting}
 					/>
 					{isEditing && (
-						<View className="mt-3">
-							<PageRedirectButton
-								label={translate("emergencyContact.deleteContact")}
-								onPress={handleDelete}
-							/>
-						</View>
+						<TouchableOpacity className="mt-4" onPress={handleDelete}>
+							<ThemedText className="font-nunito-semibold text-[#EF4444]">
+								{translate("emergencyContact.deleteContact")}
+							</ThemedText>
+						</TouchableOpacity>
 					)}
 				</View>
 			</View>

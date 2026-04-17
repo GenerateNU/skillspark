@@ -10,6 +10,7 @@ export default function AddChildLayout() {
 			<Stack>
 				<Stack.Screen name="index" options={{ headerShown: false }} />
 				<Stack.Screen name="add-child" options={{ headerShown: false }} />
+				<Stack.Screen name="edit-pic" options={{ headerShown: false }} />
 				<Stack.Screen name="avatar-picker" options={{ headerShown: false }} />
 			</Stack>
 			<StatusBar style="auto" />

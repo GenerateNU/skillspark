@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { FontSizes } from "@/constants/theme";
 import { View } from "react-native";
 import { AuthBackground } from "@/components/AuthBackground";
 import { SvgXml } from "react-native-svg";
@@ -33,8 +34,8 @@ export default function AllSetScreen() {
 				{/* Title */}
 				<View className="items-center px-6 pt-10 pb-5">
 					<ThemedText
-						className="font-nunito-bold text-[30px] leading-[38px] text-[#111] text-center"
-						style={{ letterSpacing: -0.5 }}
+						className="font-nunito-bold text-[#111] text-center"
+						style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}
 						numberOfLines={1}
 						adjustsFontSizeToFit
 					>

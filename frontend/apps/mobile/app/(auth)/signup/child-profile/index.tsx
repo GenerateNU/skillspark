@@ -2,7 +2,7 @@ import { Button } from "@/components/Button";
 import { AuthBackground } from "@/components/AuthBackground";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors } from "@/constants/theme";
+import { AppColors, FontSizes } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
@@ -38,8 +38,8 @@ export default function ChildProfileScreen() {
 			{/* Title */}
 			<View className="px-6 pt-2 pb-6 items-center">
 				<ThemedText
-					className="font-nunito-bold leading-10 text-[#111] text-[30px] text-center"
-					style={{ letterSpacing: -0.5 }}
+					className="font-nunito-bold text-[#111] text-center"
+					style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}
 				>
 					{translate("onboarding.setUpChild")}
 				</ThemedText>
