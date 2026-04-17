@@ -276,7 +276,7 @@ export default function HomeScreen() {
               events={
                 allLocalizedOccurrences.length > 0
                   ? allLocalizedOccurrences.map((o) => o.event)
-                  : allEvents.slice(0, 5)
+                  : allOccurrences.slice(0, 5).map((o) => o.event)
               }
               width={width}
               height={height}
