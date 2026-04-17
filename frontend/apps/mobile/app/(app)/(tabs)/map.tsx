@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Linking, Button, ActivityIndicator, View } from "react-native";
 import * as Location from "expo-location";
-import {
-  useListOrganizations,
-  useGetAllLocations,
-} from "@skillspark/api-client";
-import type {
-  Organization,
-  Location as OrgLocation,
-} from "@skillspark/api-client";
+import { useListOrganizations } from "@skillspark/api-client";
+import type { Organization } from "@skillspark/api-client";
 import { ThemedView } from "@/components/themed-view";
 import { ThemedText } from "@/components/themed-text";
 import { SkillSparkMap } from "@/components/SkillSparkMap";
@@ -32,37 +26,28 @@ export default function MapScreen() {
     data: orgsData,
     isLoading: isOrgsLoading,
     error,
-  } = useListOrganizations();
-  const { data: locsData, isLoading: isLocsLoading } = useGetAllLocations();
+  } = useListOrganizations({ page: 1, page_size: 100 });
 
   const organizations: Organization[] =
     orgsData?.status === 200 ? orgsData.data : [];
-  const locations: OrgLocation[] =
-    locsData?.status === 200 ? locsData.data : [];
 
-  const isApiLoading = isOrgsLoading || isLocsLoading;
+  const isApiLoading = isOrgsLoading;
 
   const mapLocations: LocationPin[] = useMemo(() => {
-    if (!Array.isArray(organizations)) return [];
-
     return organizations
-      .map((org) => {
-        const location = locations.find((l) => l.id === org.location_id);
-        if (!location) return null;
-        return {
-          id: org.id,
-          title: org.name,
-          description: "",
-          latitude: location.latitude,
-          longitude: location.longitude,
-          rating: org.review_summary?.average_rating ?? 0,
-          members: 0,
-          image: org.presigned_url,
-          district: location.district,
-        };
-      })
-      .filter(Boolean) as LocationPin[];
-  }, [organizations, locations]);
+      .filter((org) => org.latitude != null && org.longitude != null)
+      .map((org) => ({
+        id: org.id,
+        title: org.name,
+        description: "",
+        latitude: org.latitude!,
+        longitude: org.longitude!,
+        rating: org.review_summary?.average_rating ?? 0,
+        members: 0,
+        image: org.presigned_url,
+        district: org.district,
+      }));
+  }, [organizations]);
 
   const [userLocation, setUserLocation] =
     useState<Location.LocationObject | null>(null);

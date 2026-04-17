@@ -275,9 +275,12 @@ export interface Organization {
   about?: string;
   active: boolean;
   created_at: string;
+  district?: string;
   id: string;
+  latitude?: number;
   links: OrgLink[];
   location_id?: string;
+  longitude?: number;
   name: string;
   pfp_s3_key?: string;
   presigned_url?: string;

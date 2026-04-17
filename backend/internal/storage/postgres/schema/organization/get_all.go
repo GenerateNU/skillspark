@@ -38,6 +38,8 @@ func scanOrganizationFactory(AcceptLanguage string) func(pgx.CollectableRow) (mo
 	return func(row pgx.CollectableRow) (models.Organization, error) {
 		var org models.Organization
 		var aboutEN, aboutTH *string
+		var lat, lng *float64
+		var district *string
 		err := row.Scan(
 			&org.ID,
 			&org.Name,
@@ -50,11 +52,17 @@ func scanOrganizationFactory(AcceptLanguage string) func(pgx.CollectableRow) (mo
 			&org.StripeAccountActivated,
 			&org.CreatedAt,
 			&org.UpdatedAt,
+			&lat,
+			&lng,
+			&district,
 		)
 		if err != nil {
 			return org, err
 		}
 		org.About = pickAbout(AcceptLanguage, aboutEN, aboutTH)
+		org.Latitude = lat
+		org.Longitude = lng
+		org.District = district
 		return org, nil
 	}
 }
