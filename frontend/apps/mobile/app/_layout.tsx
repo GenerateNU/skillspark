@@ -14,6 +14,13 @@ import {
   NunitoSans_600SemiBold,
   NunitoSans_700Bold,
 } from "@expo-google-fonts/nunito-sans";
+import {
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+} from "@expo-google-fonts/plus-jakarta-sans";
 import { AuthProvider } from "@/contexts/auth-context";
 import { LoginRedirect } from "@/components/LoginRedirect";
 import { setCurrentLanguage } from "@skillspark/api-client";
@@ -38,9 +45,11 @@ export default function RootLayout() {
     NunitoSans_500Medium,
     NunitoSans_600SemiBold,
     NunitoSans_700Bold,
-    MuseoModerno_700Bold: {
-      uri: "https://fonts.gstatic.com/s/museomoderno/v21/zrf30VXsoJQLfl-LiGQLaGoBRhuRKNR8m3k.woff2",
-    },
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
   });
 
   useEffect(() => {
