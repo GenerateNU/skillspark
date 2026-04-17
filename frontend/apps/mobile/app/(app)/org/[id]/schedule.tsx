@@ -11,9 +11,12 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   getGetReviewAggregateQueryOptions,
   useGetEventOccurrencesByOrganizationId,
+  useGetRegistrationsByGuardianId,
   type EventOccurrence,
+  type Registration,
 } from "@skillspark/api-client";
 import { useQueries, type UseQueryOptions } from "@tanstack/react-query";
+import { useAuthContext } from "@/hooks/use-auth-context";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -28,6 +31,7 @@ export default function OrgScheduleScreen() {
     filterClass?: string;
   }>();
   const router = useRouter();
+  const { guardianId } = useAuthContext();
   const { t: translate } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
   const borderColor = useThemeColor({}, "borderColor");
@@ -42,6 +46,25 @@ export default function OrgScheduleScreen() {
 
   const { data: occurrencesResp, isLoading: occurrencesLoading } =
     useGetEventOccurrencesByOrganizationId(id);
+
+  const { data: registrationsResp } = useGetRegistrationsByGuardianId(
+    guardianId!,
+    { query: { enabled: !!guardianId } },
+  );
+
+  const registeredOccurrenceMap = useMemo(() => {
+    const d = registrationsResp as unknown as
+      | { data: { registrations: Registration[] } }
+      | undefined;
+    const map: Record<string, string[]> = {};
+    (d?.data?.registrations ?? [])
+      .filter((r) => r.status === "registered")
+      .forEach((r) => {
+        if (!map[r.event_occurrence_id]) map[r.event_occurrence_id] = [];
+        map[r.event_occurrence_id].push(r.id);
+      });
+    return map;
+  }, [registrationsResp]);
 
   const occurrences = useMemo(() => {
     const d = occurrencesResp as unknown as
@@ -256,6 +279,7 @@ export default function OrgScheduleScreen() {
                   key={occ.id}
                   occurrence={occ}
                   avgRating={ratingsMap.get(occ.event.id) ?? null}
+                  registrationIds={registeredOccurrenceMap[occ.id]}
                 />
               ))}
             </View>

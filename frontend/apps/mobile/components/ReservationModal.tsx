@@ -13,11 +13,13 @@ import { ReservationSuccessModal } from "./ReservationSuccessModal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   createRegistrationResponseError,
+  getGetRegistrationsByGuardianIdQueryKey,
   useCreateRegistration,
   useGetChildrenByGuardianId,
   type Child,
   type EventOccurrence,
 } from "@skillspark/api-client";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
@@ -39,6 +41,7 @@ export function ReservationModal({
   const insets = useSafeAreaInsets();
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
+  const queryClient = useQueryClient();
 
   const isSuccessTransition = useRef(false);
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
@@ -70,12 +73,14 @@ export function ReservationModal({
           child_id: selectedChildId,
           event_occurrence_id: occurrence.id,
           guardian_id: guardianId,
-          payment_method_id: "",
           status: "registered",
         },
       },
       {
         onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: getGetRegistrationsByGuardianIdQueryKey(guardianId!),
+          });
           isSuccessTransition.current = true;
           setShowSuccessModal(true);
           onClose();

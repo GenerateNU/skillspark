@@ -483,6 +483,7 @@
     "smiles": "/ 5 รอยยิ้ม",
     "learnMore": "เรียนรู้เพิ่มเติม",
     "reserve": "จอง",
+    "cancel": "ยกเลิกการจอง",
     "ages": "อายุ {{min}} ปี",
     "agesOpen": "อายุ {{min}}+ ปี",
     "agesRange": "อายุ {{min}} - {{max}} ปี",

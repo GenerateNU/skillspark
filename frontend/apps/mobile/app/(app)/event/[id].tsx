@@ -64,6 +64,7 @@ function EventOccurrenceDetail({
   const aggregate = aggregateResp?.status === 200 ? aggregateResp.data : null;
   const avgRating = aggregate?.average_rating ?? 0;
   const totalReviews = aggregate?.total_reviews ?? 0;
+  const ratingOption = getRatingOption(avgRating);
   const ratingMatch = RATING_OPTIONS.find(
     (r) => r.rating === Math.round(avgRating)
   );
