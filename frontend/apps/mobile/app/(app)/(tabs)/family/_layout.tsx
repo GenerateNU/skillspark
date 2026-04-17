@@ -1,9 +1,11 @@
 import { Stack } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Colors, FontFamilies } from "@/constants/theme";
 
 export default function FamilyLayout() {
   const theme = Colors.light;
+  const { t: translate } = useTranslation();
 
   return (
     <Stack
@@ -27,7 +29,7 @@ export default function FamilyLayout() {
       <Stack.Screen
         name="manage"
         options={{
-          title: "Manage Child",
+          title: translate("nav.manageChild"),
           headerShown: false,
         }}
       />

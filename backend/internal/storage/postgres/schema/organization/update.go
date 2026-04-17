@@ -7,16 +7,22 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, error) {
+func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationDBInput, PfpS3Key *string) (*models.Organization, error) {
 	query, err := schema.ReadSQLBaseScript("update.sql", SqlOrganizationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
 		return nil, &errr
 	}
 
-	existing, httpErr := r.GetOrganizationByID(ctx, input.ID)
+	existing, httpErr := r.GetOrganizationByID(ctx, input.ID, input.AcceptLanguage)
 	if httpErr != nil {
 		return nil, httpErr
+	}
+
+	existingAboutEN, existingAboutTH, err := r.getAboutColumns(ctx, input.ID)
+	if err != nil {
+		errr := errs.InternalServerError("Failed to load existing about columns: ", err.Error())
+		return nil, &errr
 	}
 
 	if input.Body.Name != nil {
@@ -34,8 +40,11 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 	if input.Body.Links != nil {
 		existing.Links = *input.Body.Links
 	}
-	if input.Body.About != nil {
-		existing.About = input.Body.About
+	if input.Body.AboutEN != nil {
+		existingAboutEN = input.Body.AboutEN
+	}
+	if input.Body.AboutTH != nil {
+		existingAboutTH = input.Body.AboutTH
 	}
 
 	jsonLinks, err := byteSliceLinks(existing.Links)
@@ -50,18 +59,21 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 		existing.PfpS3Key,
 		existing.LocationID,
 		jsonLinks,
-		existing.About,
+		existingAboutEN,
+		existingAboutTH,
 		input.ID,
 	)
 
 	var updatedOrganization models.Organization
+	var aboutEN, aboutTH *string
 
 	var rawLinks []byte
 	err = row.Scan(
 		&updatedOrganization.ID,
 		&updatedOrganization.Name,
 		&updatedOrganization.Active,
-		&updatedOrganization.About,
+		&aboutEN,
+		&aboutTH,
 		&updatedOrganization.PfpS3Key,
 		&updatedOrganization.LocationID,
 		&rawLinks,
@@ -78,6 +90,8 @@ func (r *OrganizationRepository) UpdateOrganization(ctx context.Context, input *
 		errr := errs.InternalServerError("Failed to update organization: ", err.Error())
 		return nil, &errr
 	}
+
+	updatedOrganization.About = pickAbout(input.AcceptLanguage, aboutEN, aboutTH)
 
 	updatedOrganization.Links, err = scanLinks(rawLinks)
 	if err != nil {

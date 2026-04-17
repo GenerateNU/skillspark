@@ -77,7 +77,7 @@ func TestCreatePaymentIntentsJob_Success(t *testing.T) {
 			Event:     models.Event{OrganizationID: orgID},
 		}, nil)
 
-	mockOrgRepo.On("GetOrganizationByID", mock.Anything, orgID).
+	mockOrgRepo.On("GetOrganizationByID", mock.Anything, orgID, mock.Anything).
 		Return(&models.Organization{ID: orgID, StripeAccountID: &accountID}, nil)
 
 	mockStripeClient.On("CreatePaymentIntent", mock.Anything, mock.MatchedBy(func(input *models.CreatePaymentIntentInput) bool {
@@ -253,7 +253,7 @@ func TestCreatePaymentIntentsJob_SkipsOrgWithNoStripeAccount(t *testing.T) {
 			Event: models.Event{OrganizationID: orgID},
 		}, nil)
 
-	mockOrgRepo.On("GetOrganizationByID", mock.Anything, orgID).
+	mockOrgRepo.On("GetOrganizationByID", mock.Anything, orgID, mock.Anything).
 		Return(&models.Organization{ID: orgID, StripeAccountID: nil}, nil)
 
 	scheduler.CreatePaymentIntentsJob()
@@ -299,7 +299,7 @@ func TestCreatePaymentIntentsJob_StripeCreateFailure(t *testing.T) {
 			Event: models.Event{OrganizationID: orgID},
 		}, nil)
 
-	mockOrgRepo.On("GetOrganizationByID", mock.Anything, orgID).
+	mockOrgRepo.On("GetOrganizationByID", mock.Anything, orgID, mock.Anything).
 		Return(&models.Organization{ID: orgID, StripeAccountID: &accountID}, nil)
 
 	mockStripeClient.On("CreatePaymentIntent", mock.Anything, mock.AnythingOfType("*models.CreatePaymentIntentInput")).
@@ -356,7 +356,7 @@ func TestCreatePaymentIntentsJob_ContinuesAfterSingleFailure(t *testing.T) {
 			Event: models.Event{OrganizationID: orgID},
 		}, nil)
 
-	mockOrgRepo.On("GetOrganizationByID", mock.Anything, orgID).
+	mockOrgRepo.On("GetOrganizationByID", mock.Anything, orgID, mock.Anything).
 		Return(&models.Organization{ID: orgID, StripeAccountID: &accountID}, nil)
 
 	mockStripeClient.On("CreatePaymentIntent", mock.Anything, mock.AnythingOfType("*models.CreatePaymentIntentInput")).

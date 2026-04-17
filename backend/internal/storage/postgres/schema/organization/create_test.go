@@ -21,13 +21,14 @@ func TestCreateOrganization(t *testing.T) {
 	active := true
 	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 
-	input := func() *models.CreateOrganizationInput {
-		i := &models.CreateOrganizationInput{}
-		i.Body.Name = "Test Corp"
-		i.Body.Active = &active
-		i.Body.LocationID = &locationID
-		return i
-	}()
+	input := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Test Corp",
+			Active:     &active,
+			LocationID: &locationID,
+		},
+	}
 
 	created, err := repo.CreateOrganization(ctx, input, nil)
 	require.Nil(t, err)
@@ -51,13 +52,14 @@ func TestCreateOrganization_WithLocation(t *testing.T) {
 	active := true
 	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 
-	input := func() *models.CreateOrganizationInput {
-		i := &models.CreateOrganizationInput{}
-		i.Body.Name = "Test Corp with Location"
-		i.Body.Active = &active
-		i.Body.LocationID = &locationID
-		return i
-	}()
+	input := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Test Corp with Location",
+			Active:     &active,
+			LocationID: &locationID,
+		},
+	}
 
 	created, err := repo.CreateOrganization(ctx, input, nil)
 	require.Nil(t, err)
@@ -80,13 +82,14 @@ func TestCreateOrganization_WithPfp(t *testing.T) {
 	pfpKey := "orgs/test_corp.jpg"
 	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 
-	input := func() *models.CreateOrganizationInput {
-		i := &models.CreateOrganizationInput{}
-		i.Body.Name = "Test Corp with Profile"
-		i.Body.Active = &active
-		i.Body.LocationID = &locationID
-		return i
-	}()
+	input := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Test Corp with Profile",
+			Active:     &active,
+			LocationID: &locationID,
+		},
+	}
 
 	created, err := repo.CreateOrganization(ctx, input, &pfpKey)
 	require.Nil(t, err)
@@ -106,13 +109,14 @@ func TestCreateOrganization_Inactive(t *testing.T) {
 	active := false
 	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 
-	input := func() *models.CreateOrganizationInput {
-		i := &models.CreateOrganizationInput{}
-		i.Body.Name = "Inactive Corp"
-		i.Body.Active = &active
-		i.Body.LocationID = &locationID
-		return i
-	}()
+	input := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Inactive Corp",
+			Active:     &active,
+			LocationID: &locationID,
+		},
+	}
 
 	created, err := repo.CreateOrganization(ctx, input, nil)
 	require.Nil(t, err)
@@ -133,13 +137,14 @@ func TestCreateOrganization_FullDetails(t *testing.T) {
 	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 	pfpKey := "orgs/full_corp.jpg"
 
-	input := func() *models.CreateOrganizationInput {
-		i := &models.CreateOrganizationInput{}
-		i.Body.Name = "Full Details Corp"
-		i.Body.Active = &active
-		i.Body.LocationID = &locationID
-		return i
-	}()
+	input := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Full Details Corp",
+			Active:     &active,
+			LocationID: &locationID,
+		},
+	}
 
 	created, err := repo.CreateOrganization(ctx, input, &pfpKey)
 	require.Nil(t, err)
@@ -151,4 +156,39 @@ func TestCreateOrganization_FullDetails(t *testing.T) {
 	assert.Equal(t, locationID, *created.LocationID)
 	assert.Nil(t, created.StripeAccountID)
 	assert.False(t, created.StripeAccountActivated)
+}
+
+func TestCreateOrganization_BilingualAbout(t *testing.T) {
+	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
+	ctx := context.Background()
+	t.Parallel()
+
+	active := true
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
+	aboutEN := "A leading tech company"
+	aboutTH := "บริษัทเทคโนโลยีชั้นนำ"
+
+	input := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Bilingual Corp",
+			Active:     &active,
+			LocationID: &locationID,
+			AboutEN:    &aboutEN,
+			AboutTH:    &aboutTH,
+		},
+	}
+
+	created, err := repo.CreateOrganization(ctx, input, nil)
+	require.Nil(t, err)
+	require.NotNil(t, created)
+	require.NotNil(t, created.About)
+	assert.Equal(t, aboutEN, *created.About)
+
+	// Same row, fetched as Thai
+	fetched, err := repo.GetOrganizationByID(ctx, created.ID, "th-TH")
+	require.Nil(t, err)
+	require.NotNil(t, fetched.About)
+	assert.Equal(t, aboutTH, *fetched.About)
 }

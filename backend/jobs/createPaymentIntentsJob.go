@@ -57,7 +57,7 @@ func (j *JobScheduler) CreatePaymentIntentsJob() {
 			continue
 		}
 
-		org, err := j.repo.Organization.GetOrganizationByID(ctx, eventOccurrence.Event.OrganizationID)
+		org, err := j.repo.Organization.GetOrganizationByID(ctx, eventOccurrence.Event.OrganizationID, "en-US")
 		if err != nil {
 			log.Printf("CreatePaymentIntentsJob: failed to get organization for registration %s: %v", reg.ID, err)
 			continue

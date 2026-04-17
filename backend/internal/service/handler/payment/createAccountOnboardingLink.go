@@ -8,7 +8,7 @@ import (
 
 func (h *Handler) CreateAccountOnboardingLink(ctx context.Context, input *models.CreateStripeOnboardingLinkInput) (*models.CreateStripeOnboardingLinkOutput, error) {
 
-	org, err := h.OrganizationRepository.GetOrganizationByID(ctx, input.OrganizationID)
+	org, err := h.OrganizationRepository.GetOrganizationByID(ctx, input.OrganizationID, "en-US")
 
 	if err != nil {
 		return nil, err

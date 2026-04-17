@@ -18,7 +18,7 @@ func TestGetById(t *testing.T) {
 
 	testorg := CreateTestOrganization(t, ctx, testDB)
 
-	org, err := repo.GetOrganizationByID(ctx, testorg.ID)
+	org, err := repo.GetOrganizationByID(ctx, testorg.ID, "en-US")
 
 	require.Nil(t, err)
 	require.NotNil(t, org)
@@ -35,7 +35,7 @@ func TestExecute_NotFound(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
 
-	org, err := repo.GetOrganizationByID(ctx, uuid.New())
+	org, err := repo.GetOrganizationByID(ctx, uuid.New(), "en-US")
 
 	require.Error(t, err)
 	assert.Nil(t, org)

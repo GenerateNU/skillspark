@@ -751,14 +751,6 @@ paths:
       responses:
         "200":
           description: OK
-          headers:
-            Accept-Language:
-              schema:
-                type: string
-                default: en-US
-                enum:
-                  - en-US
-                  - th-TH
           content:
             application/json:
               schema:
@@ -1329,6 +1321,14 @@ paths:
       description: Returns a paginated list of organizations
       operationId: list-organizations
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: page
           in: query
           description: Page number (starts at 1)
@@ -1372,6 +1372,15 @@ paths:
       summary: Create a new organization
       description: Creates a new organization with the provided information
       operationId: create-organization
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
       requestBody:
         content:
           multipart/form-data:
@@ -1430,6 +1439,14 @@ paths:
       description: Returns a single organization by their ID
       operationId: get-organization
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: Organization ID
@@ -1458,6 +1475,14 @@ paths:
       description: Deletes an organization by ID
       operationId: delete-organization
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: Organization ID
@@ -1487,6 +1512,14 @@ paths:
       description: Updates an existing organization with the provided fields (partial update)
       operationId: update-organization
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           required: true
@@ -1852,49 +1885,6 @@ paths:
               schema:
                 description: The updated registration with full details
                 $ref: '#/components/schemas/Registration'
-        default:
-          description: Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorModel'
-  /api/v1/registrations/{registration_id}/payment:
-    post:
-      tags:
-        - Registrations
-      summary: Create a payment intent for a registration
-      description: Creates a Stripe payment intent and stores the payment record for an existing registration
-      operationId: create-payment-intent
-      parameters:
-        - name: Accept-Language
-          in: header
-          schema:
-            type: string
-            default: en-US
-            enum:
-              - en-US
-              - th-TH
-        - name: registration_id
-          in: path
-          description: Registration ID to attach a payment to
-          required: true
-          schema:
-            type: string
-            description: Registration ID to attach a payment to
-            format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreatePaymentForRegistrationInputBody'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreatePaymentForRegistrationOutputBody'
         default:
           description: Error
           content:
@@ -3185,65 +3175,6 @@ components:
           $ref: '#/components/schemas/Organization'
       required:
         - account
-    CreatePaymentForRegistrationInputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/CreatePaymentForRegistrationInputBody.json
-          readOnly: true
-        payment_method_id:
-          type: string
-          description: Stripe payment method ID to charge
-      required:
-        - payment_method_id
-    CreatePaymentForRegistrationOutputBody:
-      type: object
-      additionalProperties: false
-      properties:
-        $schema:
-          type: string
-          description: A URL to the JSON Schema for this object.
-          format: uri
-          examples:
-            - http://localhost:8080/schemas/CreatePaymentForRegistrationOutputBody.json
-          readOnly: true
-        client_secret:
-          type: string
-          description: Client secret for frontend to confirm payment
-        currency:
-          type: string
-          description: Currency code
-        payment_intent_id:
-          type: string
-          description: Stripe payment intent ID
-        platform_fee_amount:
-          type: integer
-          description: Platform fee in cents
-          format: int64
-        provider_amount:
-          type: integer
-          description: Amount provider receives in cents
-          format: int64
-        status:
-          type: string
-          description: Payment intent status
-        total_amount:
-          type: integer
-          description: Total amount in cents
-          format: int64
-      required:
-        - payment_intent_id
-        - client_secret
-        - status
-        - total_amount
-        - provider_amount
-        - platform_fee_amount
-        - currency
     CreateRegistrationInputBody:
       type: object
       additionalProperties: false
