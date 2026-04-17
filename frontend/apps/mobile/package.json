@@ -9,27 +9,28 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@expo-google-fonts/archivo": "^0.4.2",
     "@expo-google-fonts/nunito-sans": "^0.4.2",
+    "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
     "@expo/ngrok": "^4.1.3",
     "@expo/vector-icons": "^15.0.3",
     "@gorhom/bottom-sheet": "^5.2.8",
-    "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
     "@skillspark/api-client": "workspace:*",
-    "@stripe/stripe-react-native": "^0.62.0",
+    "@stripe/stripe-react-native": "0.50.3",
     "expo": "^54.0.33",
+    "expo-clipboard": "~8.0.8",
     "expo-constants": "~18.0.13",
     "expo-font": "^14.0.11",
     "expo-haptics": "~15.0.8",
     "expo-image": "~3.0.11",
-    "expo-image-picker": "^55.0.16",
+    "expo-image-picker": "~17.0.10",
     "expo-linking": "~8.0.11",
     "expo-location": "~19.0.8",
     "expo-router": "~6.0.21",
-    "expo-secure-store": "^55.0.8",
+    "expo-secure-store": "~15.0.8",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
     "expo-symbols": "~1.0.8",
@@ -67,7 +68,7 @@
     "typescript": "~5.9.2"
   },
   "peerDependencies": {
-    "react": "^19.1.0"
+    "react": "19.1.0"
   },
   "private": true,
   "main": "expo-router/entry"

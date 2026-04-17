@@ -16,6 +16,7 @@ export interface LocationPin {
   rating: number;
   members: number;
   image?: string;
+  district?: string;
 }
 
 interface SkillSparkMapProps {
@@ -61,8 +62,9 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
           </Marker>
         ))}
       </MapView>
+
       {selectedPin ? (
-        <OrgMapCard pin={selectedPin} />
+        <OrgMapCard pin={selectedPin} userLocation={userLocation} />
       ) : (
         <OrgListSheet locations={locations} userLocation={userLocation} />
       )}

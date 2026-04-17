@@ -7,6 +7,7 @@ import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 export default function TermsAndConditionsScreen() {
   const router = useRouter();
@@ -31,7 +32,8 @@ export default function TermsAndConditionsScreen() {
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        className="px-5 pt-2 pb-10"
+        className="px-5 pt-2"
+        contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
       >
         <ThemedText
           className="text-[15px] font-nunito italic mb-4"

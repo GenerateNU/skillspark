@@ -1,5 +1,4 @@
 import { Image } from "expo-image";
-import { useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -8,36 +7,56 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import * as Linking from "expo-linking";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   useGetEventOccurrencesByEventId,
+  useGetOrganization,
   useGetReviewAggregate,
 } from "@skillspark/api-client";
-import type { EventOccurrence } from "@skillspark/api-client";
+import type { EventOccurrence, Organization } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors } from "@/constants/theme";
 import { RATING_OPTIONS } from "@/constants/ratings";
+import { AppColors, Shadows } from "@/constants/theme";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { useTranslation } from "react-i18next";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { AboutPage } from "@/components/AboutPage";
+import { ShareModal } from "@/components/ShareModal";
 import { formatLocation } from "@/utils/format";
+import { getRatingOption } from "@/utils/ratings";
+import { EventImage } from "@/components/EventImage";
+import { ExpandableText } from "@/components/ExpandableText";
+import { ErrorScreen } from "@/components/ErrorScreen";
+import { useState } from "react";
 
 function EventOccurrenceDetail({
   occurrence,
+  org,
 }: {
   occurrence: EventOccurrence;
+  org: Organization | null;
 }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
+  const [shareVisible, setShareVisible] = useState(false);
+  const handleBack = () => router.back();
   const { openLink, hasLinks } = useOrgLinks(occurrence.org_links ?? []);
-  const [aboutExpanded, setAboutExpanded] = useState(false);
-  const [aboutTruncated, setAboutTruncated] = useState(false);
 
   const location = formatLocation(occurrence);
-  const categories = occurrence.event.category?.join(" / ") ?? "";
+  const categories = (occurrence.event.category || [])
+    .map((elem) =>
+      //Capitalize the first char of every word
+      elem
+        .toLowerCase()
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" "),
+    )
+    .join(" / ");
   const orgId = occurrence.event.organization_id;
+  const orgName = org?.name ?? "";
 
   const { data: aggregateResp } = useGetReviewAggregate(occurrence.event.id, {
     query: { enabled: !!occurrence.event.id },
@@ -65,7 +84,7 @@ function EventOccurrenceDetail({
         style={{ borderBottomColor: AppColors.divider }}
       >
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={handleBack}
           activeOpacity={0.7}
           className="h-8 w-8 items-center justify-center"
         >
@@ -90,17 +109,11 @@ function EventOccurrenceDetail({
         contentContainerStyle={{ paddingBottom: 24 }}
       >
         {/* Hero image */}
-        <View
-          className="h-[250px]"
-          style={{ backgroundColor: AppColors.imagePlaceholder }}
-        >
-          {occurrence.event.presigned_url ? (
-            <Image
-              source={{ uri: occurrence.event.presigned_url }}
-              style={{ width: "100%", height: "100%" }}
-              contentFit="cover"
-            />
-          ) : null}
+        <View className="h-[250px]">
+          <EventImage
+            uri={occurrence.event.presigned_url}
+            style={{ width: "100%", height: "100%" }}
+          />
         </View>
 
         {/* White content card overlapping image */}
@@ -111,24 +124,32 @@ function EventOccurrenceDetail({
             style={{ backgroundColor: AppColors.borderLight }}
           />
 
-          {/* Title row with bookmark */}
-          <View className="flex-row items-start justify-between mb-3">
+          {/* Title row with bookmark + share */}
+          <View className="mb-1">
+            <View className="absolute top-0 right-0 items-center z-10">
+              <TouchableOpacity
+                onPress={() => setShareVisible(true)}
+                activeOpacity={0.7}
+              >
+                <IconSymbol
+                  name="square.and.arrow.up"
+                  size={28}
+                  color={AppColors.primaryText}
+                />
+              </TouchableOpacity>
+              <BookmarkButton eventId={occurrence.event.id} />
+            </View>
             <Text
-              className="flex-1 mr-3 text-[26px] font-nunito-bold leading-8"
+              className="mr-10 text-[26px] font-nunito-bold leading-8"
               style={{ color: AppColors.primaryText }}
             >
               {occurrence.event.title}
             </Text>
-            <BookmarkButton eventId={occurrence.event.id} />
           </View>
 
           {/* Location */}
-          <View className="flex-row items-center gap-1.5 mb-2">
-            <MaterialIcons
-              name="location-on"
-              size={16}
-              color={AppColors.mutedText}
-            />
+          <View className="flex-row items-center gap-1 mb-2">
+            <IconSymbol name="location" size={22} color={AppColors.mutedText} />
             <Text
               className="text-[14px] font-nunito"
               style={{ color: AppColors.mutedText }}
@@ -139,12 +160,38 @@ function EventOccurrenceDetail({
 
           {/* Category */}
           {!!categories && (
-            <Text
-              className="text-[14px] font-nunito mb-2"
-              style={{ color: AppColors.mutedText }}
+            <View className="flex-row gap-1">
+              <IconSymbol
+                name="star.fill"
+                size={22}
+                color={AppColors.mutedText}
+              />
+              <Text
+                className="text-[14px] font-nunito mb-2"
+                style={{ color: AppColors.mutedText }}
+              >
+                {categories}
+              </Text>
+            </View>
+          )}
+
+          {!!orgId && (
+            <TouchableOpacity
+              onPress={() => router.push(`../org/${orgId}`)}
+              className="flex-row items-center gap-1 mb-2"
             >
-              {categories}
-            </Text>
+              <IconSymbol
+                name="person.fill"
+                size={22}
+                color={AppColors.mutedText}
+              />
+              <Text
+                className="text-[14px] font-nunito underline"
+                style={{ color: AppColors.mutedText }}
+              >
+                {orgName}
+              </Text>
+            </TouchableOpacity>
           )}
 
           {/* Bookings this week */}
@@ -157,58 +204,14 @@ function EventOccurrenceDetail({
         </View>
 
         {/* About card */}
-        <View className="mx-4 mb-4 rounded-2xl bg-white p-5" style={cardShadow}>
-          <Text
-            className="mb-2.5 text-[18px] font-nunito-bold"
-            style={{ color: AppColors.primaryText }}
-          >
-            {translate("event.about")}
-          </Text>
-          <Text
-            numberOfLines={aboutExpanded ? undefined : 4}
-            onTextLayout={(e) => {
-              if (!aboutExpanded)
-                setAboutTruncated(e.nativeEvent.lines.length >= 4);
-            }}
-            className={`text-sm leading-[22px] font-nunito ${aboutTruncated ? "mb-1" : "mb-4"}`}
-            style={{ color: AppColors.secondaryText }}
-          >
-            {occurrence.event.description}
-          </Text>
-          {aboutTruncated && (
-            <Pressable
-              onPress={() => setAboutExpanded((prev) => !prev)}
-              className="mb-4"
-            >
-              <Text
-                className="text-[13px] font-semibold"
-                style={{ color: AppColors.primaryText }}
-              >
-                {aboutExpanded
-                  ? translate("event.seeLess")
-                  : translate("event.seeMore")}
-              </Text>
-            </Pressable>
-          )}
-          {hasLinks && (
-            <View className="flex-row flex-wrap gap-2.5">
-              {occurrence.org_links.map((link, index) => (
-                <Pressable
-                  key={index}
-                  onPress={() => openLink(link.href)}
-                  className="rounded-full px-5 py-2.5 items-center"
-                  style={{ backgroundColor: AppColors.borderLight }}
-                >
-                  <Text
-                    className="text-[13px] font-semibold"
-                    style={{ color: AppColors.primaryText }}
-                  >
-                    {link.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
+        <View
+          className="mx-4 mb-4 rounded-2xl bg-white p-5"
+          style={Shadows.card}
+        >
+          <AboutPage
+            description={occurrence.event.description}
+            links={occurrence.org_links ?? []}
+          />
         </View>
 
         {/* Reviews card */}
@@ -230,9 +233,8 @@ function EventOccurrenceDetail({
         >
           <View
             className="mx-4 mb-4 rounded-2xl bg-white p-5"
-            style={cardShadow}
+            style={Shadows.card}
           >
-            {/* Title */}
             <Text
               className="mb-3 font-nunito-bold text-[18px]"
               style={{ color: AppColors.primaryText }}
@@ -241,17 +243,17 @@ function EventOccurrenceDetail({
             </Text>
 
             {/* Aggregate rating */}
-            {totalReviews > 0 && ratingMatch ? (
+            {totalReviews > 0 ? (
               <View className="flex-row items-center gap-2">
                 <Image
-                  source={ratingMatch.image}
+                  source={ratingOption.image}
                   style={{ width: 22, height: 22 }}
                 />
                 <Text
                   className="text-[15px] font-nunito-bold"
                   style={{ color: AppColors.primaryText }}
                 >
-                  {translate(ratingMatch.labelKey!)}
+                  {translate(ratingOption.labelKey!)}
                 </Text>
                 <Text
                   className="text-[13px] font-nunito"
@@ -268,8 +270,6 @@ function EventOccurrenceDetail({
                 {translate("review.noReviews")}
               </Text>
             )}
-
-            {/* See more */}
             <View className="mt-4 items-center">
               <Text
                 className="text-[13px] font-nunito underline"
@@ -302,6 +302,17 @@ function EventOccurrenceDetail({
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <ShareModal
+        visible={shareVisible}
+        onClose={() => setShareVisible(false)}
+        name={occurrence.event.title}
+        imageUrl={occurrence.event.presigned_url ?? undefined}
+        shareUrl={Linking.createURL(`event/${occurrence.event.id}`)}
+        message={translate("share.defaultMessage", {
+          name: occurrence.event.title,
+        })}
+      />
     </SafeAreaView>
   );
 }
@@ -315,7 +326,16 @@ export default function EventOccurrenceScreen() {
   } = useGetEventOccurrencesByEventId(id);
   const { t: translate } = useTranslation();
 
-  if (isLoading) {
+  const occurrence = response?.status === 200 ? response.data[0] : null;
+  const orgId = occurrence?.event.organization_id;
+
+  const { data: orgResp, isLoading: orgLoading } = useGetOrganization(
+    orgId ?? "",
+    { query: { enabled: !!orgId } },
+  );
+  const org = orgResp?.status === 200 ? orgResp.data : null;
+
+  if (isLoading || orgLoading) {
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
@@ -327,19 +347,11 @@ export default function EventOccurrenceScreen() {
     error ||
     !response ||
     response.status !== 200 ||
-    response.data.length === 0
+    response.data.length === 0 ||
+    !occurrence
   ) {
-    return (
-      <View className="flex-1 items-center justify-center p-6">
-        <Text
-          className="text-base font-semibold"
-          style={{ color: AppColors.danger }}
-        >
-          {translate("event.notFound")}
-        </Text>
-      </View>
-    );
+    return <ErrorScreen message={translate("event.notFound")} />;
   }
 
-  return <EventOccurrenceDetail occurrence={response.data[0]} />;
+  return <EventOccurrenceDetail occurrence={occurrence} org={org} />;
 }

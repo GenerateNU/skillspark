@@ -1,1 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
+
+@theme {
+  --color-text: #19191f;
+  --color-background: #ffffff;
+  --color-primary: #99c0ee;
+  --color-plum: #e69bf0;
+  --color-rating-1: #f09b9e;
+  --color-rating-2: #f0cf9b;
+  --color-rating-3: #f1ee9b;
+  --color-rating-4: #b0f19b;
+  --color-rating-5: #63c643;
+  --font-family-sans: "Nunito Sans", sans-serif;
+  --font-family-display: "Plus Jakarta Sans", sans-serif;
+}
+
+@layer base {
+  body {
+    color: #19191f;
+    background-color: #ffffff;
+    font-family: "Nunito Sans", sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+}

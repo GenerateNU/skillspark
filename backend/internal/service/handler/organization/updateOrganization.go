@@ -14,18 +14,24 @@ func (h *Handler) UpdateOrganization(ctx context.Context, input *models.UpdateOr
 		}
 	}
 
+	aboutEN, aboutTH, err := h.translateAbout(ctx, input.Body.About, input.AcceptLanguage)
+	if err != nil {
+		return nil, errs.InternalServerError("Translation failed: ", err.Error())
+	}
+
+	dbInput := buildUpdateOrgDBInput(input, aboutEN, aboutTH)
+
 	var key *string
 	var url *string
 
 	if image_data != nil {
-		var err error
 		url, key, err = h.UpdateOrgS3Helper(ctx, s3Client, input, image_data)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	organization, updateErr := h.OrganizationRepository.UpdateOrganization(ctx, input, key)
+	organization, updateErr := h.OrganizationRepository.UpdateOrganization(ctx, dbInput, key)
 	if updateErr != nil {
 		return nil, updateErr
 	}

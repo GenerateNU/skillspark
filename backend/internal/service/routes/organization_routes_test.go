@@ -15,6 +15,7 @@ import (
 	s3mocks "skillspark/internal/s3_client/mocks"
 	"skillspark/internal/storage"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	translateMocks "skillspark/internal/translation/mocks"
 	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -79,7 +80,10 @@ func setupOrganizationTestAPI(
 		Location:     locationRepo,
 		Review:       reviewRepo,
 	}
-	SetupOrganizationRoutes(api, repo, s3Client)
+	translateClient := new(translateMocks.TranslateMock)
+	translateClient.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).
+		Return(map[string]*string{}, nil).Maybe()
+	SetupOrganizationRoutes(api, repo, s3Client, translateClient)
 	return app, api
 }
 
@@ -104,6 +108,7 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 					"GetOrganizationByID",
 					mock.Anything,
 					uuid.MustParse("40000000-0000-0000-0000-000000000001"),
+					mock.Anything,
 				).Return(&models.Organization{
 					ID:         uuid.MustParse("40000000-0000-0000-0000-000000000001"),
 					Name:       "Science Academy Bangkok",
@@ -140,6 +145,7 @@ func TestHumaValidation_GetOrganizationById(t *testing.T) {
 					"GetOrganizationByID",
 					mock.Anything,
 					uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+					mock.Anything,
 				).Return(nil, &errs.HTTPError{
 					Code:    errs.NotFound("Organization", "id", "00000000-0000-0000-0000-000000000000").GetStatus(),
 					Message: "Not found",
@@ -213,7 +219,7 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 				m.On(
 					"CreateOrganization",
 					mock.Anything,
-					mock.AnythingOfType("*models.CreateOrganizationInput"),
+					mock.AnythingOfType("*models.CreateOrganizationDBInput"),
 					mock.Anything,
 				).Return(&models.Organization{
 					ID:         uuid.New(),
@@ -227,7 +233,7 @@ func TestHumaValidation_CreateOrganization(t *testing.T) {
 				m.On(
 					"UpdateOrganization",
 					mock.Anything,
-					mock.AnythingOfType("*models.UpdateOrganizationInput"),
+					mock.AnythingOfType("*models.UpdateOrganizationDBInput"),
 					mock.Anything,
 				).Return(&models.Organization{
 					ID:         uuid.New(),
@@ -326,6 +332,7 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 					"GetAllOrganizations",
 					mock.Anything,
 					mock.AnythingOfType("utils.Pagination"),
+					mock.Anything,
 				).Return([]models.Organization{
 					{ID: uuid.New(), Name: "Org 1", Active: true, LocationID: &testLocationID},
 					{ID: uuid.New(), Name: "Org 2", Active: true, LocationID: &testLocationID},
@@ -350,6 +357,7 @@ func TestHumaValidation_GetAllOrganizations(t *testing.T) {
 					"GetAllOrganizations",
 					mock.Anything,
 					utils.Pagination{Page: 2, Limit: 5},
+					mock.Anything,
 				).Return([]models.Organization{
 					{ID: uuid.New(), Name: "Org 3", Active: true, LocationID: &testLocationID},
 				}, nil)
@@ -448,7 +456,7 @@ func TestHumaValidation_UpdateOrganization(t *testing.T) {
 				m.On(
 					"UpdateOrganization",
 					mock.Anything,
-					mock.AnythingOfType("*models.UpdateOrganizationInput"),
+					mock.AnythingOfType("*models.UpdateOrganizationDBInput"),
 					mock.Anything,
 				).Return(&models.Organization{
 					ID:         orgID,
@@ -545,6 +553,7 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 					"DeleteOrganization",
 					mock.Anything,
 					orgID,
+					mock.Anything,
 				).Return(&models.Organization{
 					ID:         orgID,
 					Name:       "Deleted Org",
@@ -571,6 +580,7 @@ func TestHumaValidation_DeleteOrganization(t *testing.T) {
 					"DeleteOrganization",
 					mock.Anything,
 					uuid.MustParse("00000000-0000-0000-0000-000000000000"),
+					mock.Anything,
 				).Return(nil, &errs.HTTPError{
 					Code:    errs.NotFound("Organization", "id", "00000000-0000-0000-0000-000000000000").GetStatus(),
 					Message: "Not found",
@@ -757,31 +767,94 @@ func TestHumaValidation_Organization_InvalidAcceptLanguage(t *testing.T) {
 		{name: "random string", lang: "invalid"},
 	}
 
-	for _, tt := range invalidLangs {
-		tt := tt
-		t.Run("GetEventOccurrencesByOrganizationId/"+tt.name, func(t *testing.T) {
-			t.Parallel()
+	type endpoint struct {
+		label string
+		build func() (*http.Request, error)
+	}
 
-			mockRepo := new(repomocks.MockOrganizationRepository)
-			mockLocationRepo := new(repomocks.MockLocationRepository)
-			mockReviewRepo := new(repomocks.MockReviewRepository)
-			mockS3 := new(s3mocks.S3ClientMock)
-			app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo, mockReviewRepo, mockS3)
+	orgID := "40000000-0000-0000-0000-000000000001"
+	endpoints := []endpoint{
+		{
+			label: "GetOrganizationById",
+			build: func() (*http.Request, error) {
+				return http.NewRequest(http.MethodGet, "/api/v1/organizations/"+orgID, nil)
+			},
+		},
+		{
+			label: "GetAllOrganizations",
+			build: func() (*http.Request, error) {
+				return http.NewRequest(http.MethodGet, "/api/v1/organizations", nil)
+			},
+		},
+		{
+			label: "DeleteOrganization",
+			build: func() (*http.Request, error) {
+				return http.NewRequest(http.MethodDelete, "/api/v1/organizations/"+orgID, nil)
+			},
+		},
+		{
+			label: "GetEventOccurrencesByOrganizationId",
+			build: func() (*http.Request, error) {
+				return http.NewRequest(http.MethodGet,
+					"/api/v1/organizations/"+orgID+"/event-occurrences/", nil)
+			},
+		},
+		{
+			label: "CreateOrganization",
+			build: func() (*http.Request, error) {
+				body, contentType := createMultipartForm(map[string]string{
+					"name":        "Tech Innovations",
+					"active":      "true",
+					"location_id": testLocationID.String(),
+				}, true, "profile_image")
+				req, err := http.NewRequest(http.MethodPost, "/api/v1/organizations", body)
+				if err != nil {
+					return nil, err
+				}
+				req.Header.Set("Content-Type", contentType)
+				return req, nil
+			},
+		},
+		{
+			label: "UpdateOrganization",
+			build: func() (*http.Request, error) {
+				body, contentType := createMultipartForm(map[string]string{
+					"name": "Tech Innovations",
+				}, true, "profile_image")
+				req, err := http.NewRequest(http.MethodPatch, "/api/v1/organizations/"+orgID, body)
+				if err != nil {
+					return nil, err
+				}
+				req.Header.Set("Content-Type", contentType)
+				return req, nil
+			},
+		},
+	}
 
-			req, err := http.NewRequest(
-				http.MethodGet,
-				"/api/v1/organizations/40000000-0000-0000-0000-000000000001/event-occurrences/",
-				nil,
-			)
-			assert.NoError(t, err)
-			req.Header.Set("Accept-Language", tt.lang)
+	for _, ep := range endpoints {
+		ep := ep
+		for _, tt := range invalidLangs {
+			tt := tt
+			t.Run(ep.label+"/"+tt.name, func(t *testing.T) {
+				t.Parallel()
 
-			resp, err := app.Test(req)
-			assert.NoError(t, err)
-			defer func() { _ = resp.Body.Close() }()
+				mockRepo := new(repomocks.MockOrganizationRepository)
+				mockLocationRepo := new(repomocks.MockLocationRepository)
+				mockReviewRepo := new(repomocks.MockReviewRepository)
+				mockS3 := new(s3mocks.S3ClientMock)
+				app, _ := setupOrganizationTestAPI(mockRepo, mockLocationRepo, mockReviewRepo, mockS3)
 
-			assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
-				"expected 422 for invalid Accept-Language %q on GET /api/v1/organizations/{id}/event-occurrences/", tt.lang)
-		})
+				req, err := ep.build()
+				assert.NoError(t, err)
+				req.Header.Set("Accept-Language", tt.lang)
+
+				resp, err := app.Test(req)
+				assert.NoError(t, err)
+				defer func() { _ = resp.Body.Close() }()
+
+				assert.Equal(t, http.StatusUnprocessableEntity, resp.StatusCode,
+					"expected 422 for invalid Accept-Language %q on %s", tt.lang, ep.label)
+			})
+		}
 	}
 }

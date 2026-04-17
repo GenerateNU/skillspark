@@ -35,7 +35,8 @@ function formatMinutes(totalMinutes: number): string {
 function timeRangeLabel(lo: number, hi: number, t: TFunction): string {
   if (lo === 0 && hi >= START_TIME_MAX) return t("filters.any");
   if (lo === 0) return t("filters.upTo", { value: formatMinutes(hi) });
-  if (hi >= START_TIME_MAX) return t("filters.orMore", { value: formatMinutes(lo) });
+  if (hi >= START_TIME_MAX)
+    return t("filters.orMore", { value: formatMinutes(lo) });
   return `${formatMinutes(lo)} – ${formatMinutes(hi)}`;
 }
 
@@ -49,7 +50,8 @@ function durationLabel(min: number) {
 
 function durationRangeLabel(lo: number, hi: number, t: TFunction) {
   if (lo === 0 && hi >= DURATION_MAX) return t("filters.any");
-  if (hi >= DURATION_MAX) return t("filters.orMore", { value: durationLabel(lo) });
+  if (hi >= DURATION_MAX)
+    return t("filters.orMore", { value: durationLabel(lo) });
   if (lo === 0) return t("filters.upTo", { value: durationLabel(hi) });
   return `${durationLabel(lo)} – ${durationLabel(hi)}`;
 }
@@ -170,8 +172,7 @@ export default function OrgScheduleFiltersScreen() {
           onValueChange={(val) =>
             setFilters({
               ...filters,
-              min_start_minutes:
-                val[0] > 0 ? Math.round(val[0]) : undefined,
+              min_start_minutes: val[0] > 0 ? Math.round(val[0]) : undefined,
               max_start_minutes:
                 val[1] < START_TIME_MAX ? Math.round(val[1]) : undefined,
             })
@@ -214,15 +215,14 @@ export default function OrgScheduleFiltersScreen() {
             setFilters({
               ...filters,
               min_price: val[0] > 0 ? Math.round(val[0]) : undefined,
-              max_price:
-                val[1] < PRICE_MAX ? Math.round(val[1]) : undefined,
+              max_price: val[1] < PRICE_MAX ? Math.round(val[1]) : undefined,
             })
           }
           min={0}
           max={PRICE_MAX}
           step={5000}
-          minLabel="$0"
-          maxLabel={`$${PRICE_MAX / 100}+`}
+          minLabel={priceLabel(0)}
+          maxLabel={`${priceLabel(PRICE_MAX)}+`}
         />
 
         <View className="h-4" />
@@ -302,8 +302,7 @@ export default function OrgScheduleFiltersScreen() {
             onPress={() =>
               setFilters({
                 ...filters,
-                class_name:
-                  filters.class_name === name ? undefined : name,
+                class_name: filters.class_name === name ? undefined : name,
               })
             }
             activeOpacity={0.7}

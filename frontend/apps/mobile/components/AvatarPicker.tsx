@@ -3,7 +3,6 @@ import { View, TouchableOpacity } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { ThemedText } from "@/components/themed-text";
 import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useTranslation } from "react-i18next";
 import {
   UNIQUE_AVATAR_FACES,
@@ -75,9 +74,7 @@ export function AvatarPicker({
   childInitials = "?",
 }: AvatarPickerProps) {
   const [activeTab, setActiveTab] = useState<Tab>("Colors");
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
-  const isDark = colorScheme === "dark";
+  const theme = Colors["light"];
   const { t: translate } = useTranslation();
 
   const TAB_LABELS: Record<Tab, string> = {
@@ -102,7 +99,7 @@ export function AvatarPicker({
       {/* Tab switcher */}
       <View
         className="flex-row p-1.5 gap-1.5"
-        style={{ backgroundColor: isDark ? "#1c1c1e" : "#F3F4F6" }}
+        style={{ backgroundColor: "#F3F4F6" }}
       >
         {(["Colors", "Avatar"] as Tab[]).map((tab) => (
           <TouchableOpacity
@@ -124,10 +121,7 @@ export function AvatarPicker({
       </View>
 
       {/* Grid */}
-      <View
-        className="px-4 pt-3 pb-4"
-        style={{ backgroundColor: isDark ? "#1c1c1e" : "#fff" }}
-      >
+      <View className="px-4 pt-3 pb-4" style={{ backgroundColor: "#fff" }}>
         {activeTab === "Colors"
           ? colorRows.map((row, ri) => (
               <View

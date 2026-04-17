@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *OrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error) {
+func (r *OrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.Organization, error) {
 	query, err := schema.ReadSQLBaseScript("delete.sql", SqlOrganizationFiles)
 	if err != nil {
 		errr := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -19,12 +19,14 @@ func (r *OrganizationRepository) DeleteOrganization(ctx context.Context, id uuid
 	row := r.db.QueryRow(ctx, query, id)
 
 	var deletedOrganization models.Organization
+	var aboutEN, aboutTH *string
 
 	err = row.Scan(
 		&deletedOrganization.ID,
 		&deletedOrganization.Name,
 		&deletedOrganization.Active,
-		&deletedOrganization.About,
+		&aboutEN,
+		&aboutTH,
 		&deletedOrganization.PfpS3Key,
 		&deletedOrganization.LocationID,
 		&deletedOrganization.StripeAccountID,
@@ -40,6 +42,8 @@ func (r *OrganizationRepository) DeleteOrganization(ctx context.Context, id uuid
 		errr := errs.InternalServerError("Failed to delete organization: ", err.Error())
 		return nil, &errr
 	}
+
+	deletedOrganization.About = pickAbout(AcceptLanguage, aboutEN, aboutTH)
 
 	return &deletedOrganization, nil
 }

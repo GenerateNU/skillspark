@@ -29,7 +29,7 @@ func TestSetStripeAccountActivated(t *testing.T) {
 	assert.Equal(t, stripeAccountID, *updated.StripeAccountID)
 	assert.True(t, updated.StripeAccountActivated)
 
-	fetched, err := repo.GetOrganizationByID(ctx, testOrg.ID)
+	fetched, err := repo.GetOrganizationByID(ctx, testOrg.ID, "en-US")
 	require.NoError(t, err)
 	assert.True(t, fetched.StripeAccountActivated)
 }

@@ -9,6 +9,7 @@ import (
 	"skillspark/internal/errs"
 	"skillspark/internal/geocoding"
 	"skillspark/internal/notification"
+	"skillspark/internal/opensearch"
 	"skillspark/internal/s3_client"
 	"skillspark/internal/service/routes"
 	"skillspark/internal/sqs_client"
@@ -71,7 +72,13 @@ func InitApp(config config.Config) (*App, error) {
 	jobScheduler.Start()
 	defer jobScheduler.Stop()
 
-	app, humaAPI, err := SetupApp(config, repo, s3Client, translateClient, newStripeClient, *notifService)
+	osClient, err := opensearch.NewClient(config.OpenSearch)
+	if err != nil {
+		return nil, err
+	}
+	// osClient is nil when OPENSEARCH_URL is not set (local dev without OpenSearch)
+
+	app, humaAPI, err := SetupApp(config, repo, s3Client, translateClient, newStripeClient, *notifService, osClient)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +92,7 @@ func InitApp(config config.Config) (*App, error) {
 }
 
 // Setup the fiber app with the specified configuration and database.
-func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, translateClient *translations.TranslateClient, newStripeClient stripeClient.StripeClientInterface, notifService notification.Service) (*fiber.App, huma.API, error) {
+func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_client.Client, translateClient *translations.TranslateClient, newStripeClient stripeClient.StripeClientInterface, notifService notification.Service, osClient *opensearch.Client) (*fiber.App, huma.API, error) {
 	app := fiber.New(fiber.Config{
 		JSONEncoder:  go_json.Marshal,
 		JSONDecoder:  go_json.Unmarshal,
@@ -125,7 +132,6 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	// Register public routes BEFORE auth middleware
 	routes.SetupAuthRoutes(humaAPI, repo, config)
-	routes.SetupOrganizationRoutes(humaAPI, repo, s3Client)
 	routes.SetupManagerRoutes(humaAPI, repo, config)
 	routes.SetupUserRoutes(humaAPI, repo)
 
@@ -143,7 +149,7 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 	})
 
 	// Register protected Huma endpoints
-	if err := setupProtectedHumaRoutes(humaAPI, repo, config, s3Client, translateClient, newStripeClient, notifService); err != nil {
+	if err := setupProtectedHumaRoutes(humaAPI, repo, config, s3Client, translateClient, newStripeClient, notifService, osClient); err != nil {
 		return nil, nil, err
 	}
 
@@ -157,7 +163,7 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 }
 
 // Setup protected Huma routes (behind auth middleware)
-func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface, notifService notification.Service) error {
+func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config config.Config, s3Client *s3_client.Client, translateClient *translations.TranslateClient, sc stripeClient.StripeClientInterface, notifService notification.Service, osClient *opensearch.Client) error {
 	geocodingClient, err := geocoding.NewClient()
 	if err != nil {
 		return err
@@ -166,7 +172,7 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo, geocodingService)
-	routes.SetupOrganizationRoutes(api, repo, s3Client)
+	routes.SetupOrganizationRoutes(api, repo, s3Client, translateClient)
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
 	routes.SetupManagerRoutes(api, repo, config)
@@ -176,9 +182,10 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetupEventOccurrencesRoutes(api, repo, s3Client, sc)
 	routes.SetUpReviewRoutes(api, repo, translateClient)
 	routes.SetupPaymentRoutes(api, repo, sc)
-	routes.SetUpSavedRoutes(api, repo)
+	routes.SetUpSavedRoutes(api, repo, s3Client)
 	routes.SetupGeocodingRoutes(api, geocodingService)
 	routes.SetupEmergencyContactRoutes(api, repo)
 	routes.SetupRecommendationRoutes(api, repo, s3Client)
+	routes.SetupSearchRoutes(api, osClient, s3Client, repo.Event)
 	return nil
 }

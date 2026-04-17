@@ -11,7 +11,7 @@ func (h *Handler) CreateOrgStripeAccount(
 	input *models.CreateOrgStripeAccountInput,
 ) (*models.CreateOrgStripeAccountOutput, error) {
 
-	org, orgErr := h.OrganizationRepository.GetOrganizationByID(ctx, input.OrganizationID)
+	org, orgErr := h.OrganizationRepository.GetOrganizationByID(ctx, input.OrganizationID, "en-US")
 
 	if orgErr != nil {
 		return nil, orgErr

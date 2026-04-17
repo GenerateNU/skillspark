@@ -648,6 +648,88 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
   /api/v1/events:
+    get:
+      tags:
+        - Events
+      summary: Get all events
+      description: Returns a paginated list of all events
+      operationId: get-all-events
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of items per page
+            format: int64
+            default: 100
+            minimum: 1
+            maximum: 100
+        - name: search
+          in: query
+          description: Search by title or description
+          explode: false
+          schema:
+            type: string
+            description: Search by title or description
+        - name: category
+          in: query
+          description: Comma-separated list of category values
+          explode: false
+          schema:
+            type: string
+            description: Comma-separated list of category values
+        - name: min_age
+          in: query
+          description: Minimum age for the event
+          explode: false
+          schema:
+            type: integer
+            description: Minimum age for the event
+            format: int64
+        - name: max_age
+          in: query
+          description: Maximum age for the event
+          explode: false
+          schema:
+            type: integer
+            description: Maximum age for the event
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of all events in the database
+                items:
+                  $ref: '#/components/schemas/Event'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
     post:
       tags:
         - Events
@@ -751,14 +833,6 @@ paths:
       responses:
         "200":
           description: OK
-          headers:
-            Accept-Language:
-              schema:
-                type: string
-                default: en-US
-                enum:
-                  - en-US
-                  - th-TH
           content:
             application/json:
               schema:
@@ -1329,6 +1403,14 @@ paths:
       description: Returns a paginated list of organizations
       operationId: list-organizations
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: page
           in: query
           description: Page number (starts at 1)
@@ -1372,6 +1454,15 @@ paths:
       summary: Create a new organization
       description: Creates a new organization with the provided information
       operationId: create-organization
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
       requestBody:
         content:
           multipart/form-data:
@@ -1430,6 +1521,14 @@ paths:
       description: Returns a single organization by their ID
       operationId: get-organization
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: Organization ID
@@ -1458,6 +1557,14 @@ paths:
       description: Deletes an organization by ID
       operationId: delete-organization
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: Organization ID
@@ -1487,6 +1594,14 @@ paths:
       description: Updates an existing organization with the provided fields (partial update)
       operationId: update-organization
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           required: true
@@ -2429,6 +2544,66 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/search/events:
+    get:
+      tags:
+        - Search
+      summary: Fuzzy search events
+      description: Returns events matching the search query using fuzzy full-text search
+      operationId: search-events
+      parameters:
+        - name: q
+          in: query
+          description: Search query string
+          explode: false
+          schema:
+            type: string
+            description: Search query string
+            minLength: 1
+        - name: page
+          in: query
+          description: Page number (starts at 1)
+          explode: false
+          schema:
+            type: integer
+            description: Page number (starts at 1)
+            format: int64
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Number of results per page
+          explode: false
+          schema:
+            type: integer
+            description: Number of results per page
+            format: int64
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/stripe/attach-pm/{guardian_id}:
     post:
       tags:
@@ -3105,9 +3280,6 @@ components:
           type: string
           description: ID of the guardian registering the child
           format: uuid
-        payment_method_id:
-          type: string
-          description: Stripe payment method ID to use
         status:
           type: string
           description: Initial status of the registration
@@ -3119,7 +3291,6 @@ components:
         - child_id
         - guardian_id
         - event_occurrence_id
-        - payment_method_id
         - status
     CreateReviewInputBody:
       type: object
@@ -4027,14 +4198,22 @@ components:
         created_at:
           type: string
           format: date-time
+        district:
+          type: string
         id:
           type: string
+        latitude:
+          type: number
+          format: double
         links:
           type: array
           items:
             $ref: '#/components/schemas/OrgLink'
         location_id:
           type: string
+        longitude:
+          type: number
+          format: double
         name:
           type: string
         pfp_s3_key:
@@ -4505,7 +4684,7 @@ components:
           maximum: 100
         price:
           type: integer
-          description: Price in lowest denomination of currency
+          description: Price in cents.
           format: int64
           minimum: 0
         start_time:

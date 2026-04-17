@@ -1,7 +1,14 @@
+import { CATEGORY_KEYS } from "@/constants/eventCategories";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { useFilters } from "@/hooks/use-filters";
 import { useRouter } from "expo-router";
-import { Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { SliderCard } from "@/components/filters/SliderCard";
@@ -10,13 +17,11 @@ import { CategoryPicker } from "@/components/filters/CategoryPicker";
 import { SoldOutToggle } from "@/components/filters/SoldOutToggle";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import { CATEGORY_KEYS } from "@/constants/eventCategories";
 
 const DISTANCE_MAX = 50;
 const DURATION_MAX = 180; // minutes
-const PRICE_MAX = 2000;
+const PRICE_MAX = 200000; // 2000 in cents, since backend is in cents
 const AGE_MAX = 18;
-
 
 function distanceLabel(km: number) {
   return km >= DISTANCE_MAX ? `${DISTANCE_MAX}+ km` : `${km} km`;
@@ -32,14 +37,21 @@ function durationLabel(min: number) {
 
 function durationRangeLabel(lo: number, hi: number, t: TFunction) {
   if (lo === 0 && hi >= DURATION_MAX) return t("filters.any");
-  if (hi >= DURATION_MAX) return t("filters.orMore", { value: durationLabel(lo) });
+  if (hi >= DURATION_MAX)
+    return t("filters.orMore", { value: durationLabel(lo) });
   if (lo === 0) return t("filters.upTo", { value: durationLabel(hi) });
   return `${durationLabel(lo)} – ${durationLabel(hi)}`;
 }
 
+function priceLabel(cents: number): string {
+  const amount = cents / 100;
+  return `$${amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2)}`;
+}
+
 function priceRangeLabel(lo: number, hi: number, t: TFunction) {
   if (lo === 0 && hi >= PRICE_MAX) return t("filters.any");
-  if (hi >= PRICE_MAX) return t("filters.orMore", { value: `฿${lo.toLocaleString()}` });
+  if (hi >= PRICE_MAX)
+    return t("filters.orMore", { value: `฿${lo.toLocaleString()}` });
   if (lo === 0) return t("filters.upTo", { value: `฿${hi.toLocaleString()}` });
   return `฿${lo.toLocaleString()} – ฿${hi.toLocaleString()}`;
 }
@@ -57,13 +69,26 @@ export default function FiltersScreen() {
   const { filters, setFilters, clearFilters } = useFilters();
   const { t } = useTranslation();
 
-  const categoryLabels: string[] = t("filters.categories", { returnObjects: true }) as string[];
+  const categoryLabels: string[] = t("filters.categories", {
+    returnObjects: true,
+  }) as string[];
 
-  const categoryIdx = filters.category ? CATEGORY_KEYS.indexOf(filters.category) : -1;
+  const categoryIdx = filters.category
+    ? CATEGORY_KEYS.indexOf(filters.category)
+    : -1;
   const distanceKm = filters.radius_km ?? DISTANCE_MAX;
-  const durationRange: [number, number] = [filters.min_duration ?? 0, filters.max_duration ?? DURATION_MAX];
-  const priceRange: [number, number] = [filters.min_price ?? 0, filters.max_price ?? PRICE_MAX];
-  const ageRange: [number, number] = [filters.min_age ?? 0, filters.max_age ?? AGE_MAX];
+  const durationRange: [number, number] = [
+    filters.min_duration ?? 0,
+    filters.max_duration ?? DURATION_MAX,
+  ];
+  const priceRange: [number, number] = [
+    filters.min_price ?? 0,
+    filters.max_price ?? PRICE_MAX,
+  ];
+  const ageRange: [number, number] = [
+    filters.min_age ?? 0,
+    filters.max_age ?? AGE_MAX,
+  ];
   const soldOut = filters.soldout ?? false;
   const startDate = filters.min_date ? new Date(filters.min_date) : undefined;
   const endDate = filters.max_date ? new Date(filters.max_date) : undefined;
@@ -74,19 +99,45 @@ export default function FiltersScreen() {
         className="flex-row items-center justify-between px-5 py-4"
         style={{ borderBottomWidth: 1, borderBottomColor: AppColors.divider }}
       >
-        <Pressable onPress={() => router.back()} hitSlop={12} className="flex-row items-center gap-1">
-          <IconSymbol name="chevron.left" size={20} color={AppColors.primaryText} />
-          <Text style={{ fontFamily: FontFamilies.semiBold, fontSize: FontSizes.base, color: AppColors.primaryText }}>
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          className="flex-row items-center gap-1"
+        >
+          <IconSymbol
+            name="chevron.left"
+            size={20}
+            color={AppColors.primaryText}
+          />
+          <Text
+            style={{
+              fontFamily: FontFamilies.semiBold,
+              fontSize: FontSizes.base,
+              color: AppColors.primaryText,
+            }}
+          >
             {t("filters.back")}
           </Text>
         </Pressable>
 
-        <Text style={{ fontFamily: FontFamilies.bold, fontSize: FontSizes.lg, color: AppColors.primaryText }}>
+        <Text
+          style={{
+            fontFamily: FontFamilies.bold,
+            fontSize: FontSizes.lg,
+            color: AppColors.primaryText,
+          }}
+        >
           {t("filters.title")}
         </Text>
 
         <Pressable onPress={clearFilters} hitSlop={12}>
-          <Text style={{ fontFamily: FontFamilies.semiBold, fontSize: FontSizes.base, color: AppColors.primaryBlue }}>
+          <Text
+            style={{
+              fontFamily: FontFamilies.semiBold,
+              fontSize: FontSizes.base,
+              color: AppColors.primaryBlue,
+            }}
+          >
             {t("filters.reset")}
           </Text>
         </Pressable>
@@ -110,17 +161,20 @@ export default function FiltersScreen() {
           }
         />
 
-         <View
-         className="my-5 h-px"
-         style={{ backgroundColor: AppColors.divider }}
-         />
+        <View
+          className="my-5 h-px"
+          style={{ backgroundColor: AppColors.divider }}
+        />
 
         <SliderCard
           label={t("filters.distance")}
           valueLabel={distanceLabel(distanceKm)}
           value={distanceKm}
           onValueChange={(val) =>
-            setFilters({ ...filters, radius_km: val[0] < DISTANCE_MAX ? val[0] : undefined })
+            setFilters({
+              ...filters,
+              radius_km: val[0] < DISTANCE_MAX ? val[0] : undefined,
+            })
           }
           min={0}
           max={DISTANCE_MAX}
@@ -139,7 +193,8 @@ export default function FiltersScreen() {
             setFilters({
               ...filters,
               min_duration: val[0] > 0 ? Math.round(val[0]) : undefined,
-              max_duration: val[1] < DURATION_MAX ? Math.round(val[1]) : undefined,
+              max_duration:
+                val[1] < DURATION_MAX ? Math.round(val[1]) : undefined,
             })
           }
           min={0}
@@ -165,8 +220,8 @@ export default function FiltersScreen() {
           min={0}
           max={PRICE_MAX}
           step={100}
-          minLabel="฿0"
-          maxLabel={`฿${PRICE_MAX.toLocaleString()}+`}
+          minLabel={priceLabel(0)}
+          maxLabel={`${priceLabel(PRICE_MAX)}+`}
         />
 
         <View className="h-4" />
@@ -189,28 +244,34 @@ export default function FiltersScreen() {
           maxLabel={`${AGE_MAX}+`}
         />
 
-         <View
-      className="my-5 h-px"
-      style={{ backgroundColor: AppColors.divider }}
-    />
+        <View
+          className="my-5 h-px"
+          style={{ backgroundColor: AppColors.divider }}
+        />
 
         <DateRangePicker
           startDate={startDate}
           endDate={endDate}
           onChange={(start, end) =>
-            setFilters({ ...filters, min_date: start?.toISOString(), max_date: end?.toISOString() })
+            setFilters({
+              ...filters,
+              min_date: start?.toISOString(),
+              max_date: end?.toISOString(),
+            })
           }
         />
 
-         <View
-      className="my-5 h-px"
-      style={{ backgroundColor: AppColors.divider }}
-    />
+        <View
+          className="my-5 h-px"
+          style={{ backgroundColor: AppColors.divider }}
+        />
 
         <SoldOutToggle
           label={t("filters.showSoldOut")}
           value={soldOut}
-          onToggle={() => setFilters({ ...filters, soldout: soldOut ? undefined : true })}
+          onToggle={() =>
+            setFilters({ ...filters, soldout: soldOut ? undefined : true })
+          }
         />
       </ScrollView>
 

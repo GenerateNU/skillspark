@@ -98,15 +98,16 @@ type CreateCustomerPaymentMethodOutput struct {
 
 type CreatePaymentIntentInput struct {
 	Body struct {
-		RegistrationID   uuid.UUID `json:"registration_id" doc:"Registration/booking ID"`
-		GuardianID       uuid.UUID `json:"guardian_id" doc:"Guardian ID"`
-		ProviderOrgID    uuid.UUID `json:"provider_org_id" doc:"Provider organization ID"`
-		Amount           int64     `json:"amount" doc:"Total amount in cents" minimum:"1"` // Stripe requires int64
-		Currency         string    `json:"currency" doc:"Currency code (e.g., thb, usd)" pattern:"^[a-z]{3}$"`
-		EventDate        time.Time `json:"event_date" doc:"Event date and time"`
-		PaymentMethodID  string    `json:"payment_method_id,omitempty" doc:"Stripe payment method ID (required for bookings)"`
-		GuardianStripeID string
-		OrgStripeID      string
+		RegistrationID        uuid.UUID `json:"registration_id" doc:"Registration/booking ID"`
+		GuardianID            uuid.UUID `json:"guardian_id" doc:"Guardian ID"`
+		ProviderOrgID         uuid.UUID `json:"provider_org_id" doc:"Provider organization ID"`
+		Amount                int64     `json:"amount" doc:"Total amount in cents" minimum:"1"` // Stripe requires int64
+		Currency              string    `json:"currency" doc:"Currency code (e.g., thb, usd)" pattern:"^[a-z]{3}$"`
+		EventDate             time.Time `json:"event_date" doc:"Event date and time"`
+		PaymentMethodID       string    `json:"payment_method_id,omitempty" doc:"Stripe payment method ID (required for bookings)"`
+		PlatformFeePercentage int       `json:"platform_fee_percentage" doc:"Platform fee as a percentage of the total amount (e.g. 10 for 10%)"`
+		GuardianStripeID      string
+		OrgStripeID           string
 	}
 }
 
@@ -146,6 +147,41 @@ type CapturePaymentIntentOutput struct {
 		Amount          int64  `json:"amount" doc:"Amount captured in cents"`
 		Currency        string `json:"currency" doc:"Currency code"`
 	} `json:"body" doc:"Capture result"`
+}
+
+// CreatePaymentData is the internal storage input for creating a payment record
+// linked to an existing registration.
+type CreatePaymentData struct {
+	RegistrationID        uuid.UUID
+	StripePaymentIntentID string
+	StripeCustomerID      string
+	OrgStripeAccountID    string
+	StripePaymentMethodID string
+	TotalAmount           int
+	ProviderAmount        int
+	PlatformFeeAmount     int
+	Currency              string
+	PaymentIntentStatus   string
+}
+
+type CreatePaymentForRegistrationInput struct {
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	RegistrationID uuid.UUID `path:"registration_id" format:"uuid" doc:"Registration ID to attach a payment to"`
+	Body           struct {
+		PaymentMethodID string `json:"payment_method_id" doc:"Stripe payment method ID to charge" required:"true"`
+	} `json:"body"`
+}
+
+type CreatePaymentForRegistrationOutput struct {
+	Body struct {
+		PaymentIntentID   string `json:"payment_intent_id" doc:"Stripe payment intent ID"`
+		ClientSecret      string `json:"client_secret" doc:"Client secret for frontend to confirm payment"`
+		Status            string `json:"status" doc:"Payment intent status"`
+		TotalAmount       int    `json:"total_amount" doc:"Total amount in cents"`
+		ProviderAmount    int    `json:"provider_amount" doc:"Amount provider receives in cents"`
+		PlatformFeeAmount int    `json:"platform_fee_amount" doc:"Platform fee in cents"`
+		Currency          string `json:"currency" doc:"Currency code"`
+	} `json:"body"`
 }
 
 type CancelRegistrationWithPaymentInput struct {

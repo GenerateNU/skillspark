@@ -1,10 +1,14 @@
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors } from "@/constants/theme";
+import { AppColors, Shadows } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
 import { Image, TouchableOpacity, View } from "react-native";
-import { type RegistrationCardProps, formatTime } from "@/components/RegistrationCard.types";
+import {
+  type RegistrationCardProps,
+  formatTime,
+} from "@/components/RegistrationCard.types";
 import { ChildAvatar } from "@/components/ChildAvatar";
+import { ChildAvatarGroup } from "@/components/ChildAvatarGroup";
 
 export function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
   const { t } = useTranslation();
@@ -16,11 +20,7 @@ export function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
       style={{
         borderColor: AppColors.borderLight,
         backgroundColor: AppColors.white,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.06,
-        shadowRadius: 4,
-        elevation: 2,
+        ...Shadows.sm,
       }}
     >
       <Image
@@ -48,23 +48,20 @@ export function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
               ? "0" + data.start_time.getDate().toString()
               : data.start_time.getDate().toString()}
           </ThemedText>
-          <ThemedText type="subtitle" className=" font-semibold tracking-widest ">
+          <ThemedText
+            type="subtitle"
+            className=" font-semibold tracking-widest "
+          >
             {data.start_time.toLocaleString("default", { month: "short" })}
           </ThemedText>
         </View>
       </View>
       <View className="flex flex-row justify-between items-center px-4 py-3">
-        <View className="flex flex-row gap-2">
-          {children.map((child) => (
-            <ChildAvatar
-              key={child.id}
-              name={child.name}
-              avatarFace={child.avatar_face}
-              avatarBackground={child.avatar_background}
-              size={32}
-            />
-          ))}
-        </View>
+        <ChildAvatarGroup
+          children={children}
+          size={32}
+          style={{ gap: 8, flexWrap: "nowrap" }}
+        />
         <TouchableOpacity
           onPress={data.onClickRemove}
           className="px-6 py-2 rounded-full bg-black"

@@ -5,7 +5,14 @@
     "activity": "กิจกรรม",
     "profile": "โปรไฟล์",
     "events": "กิจกรรม",
-    "about": "เกี่ยวกับ"
+    "about": "เกี่ยวกับ",
+    "manageChild": "จัดการเด็ก"
+  },
+  "eventCategories": {
+    "noEventsFound": "ไม่พบกิจกรรมในหมวดหมู่นี้",
+    "ages": "อายุ",
+    "noCategorySupplied": "ไม่สามารถโหลดได้: ไม่มีหมวดหมู่",
+    "noLocationFound": "ไม่สามารถโหลดได้: ไม่พบตำแหน่ง"
   },
   "common": {
     "submit": "ส่ง",
@@ -29,7 +36,8 @@
     "noEmergencyContactsAdded": "ยังไม่มีผู้ติดต่อฉุกเฉิน",
     "error": "ข้อผิดพลาด",
     "locationDenied": "การเข้าถึงตำแหน่งที่ตั้งถูกปฏิเสธ กรุณาเปิดใช้งานในการตั้งค่า",
-    "openSettings": "เปิดการตั้งค่า"
+    "openSettings": "เปิดการตั้งค่า",
+    "save": "บันทึก"
   },
   "home": {
     "title": "ยินดีต้อนรับ",
@@ -38,19 +46,29 @@
   "dashboard": {
     "title": "แดชบอร์ดของฉัน",
     "searchPlaceholder": "ค้นหาคลาส",
+    "greeting": "สวัสดี, {{name}}",
     "discoverWeekly": "ค้นพบประจำสัปดาห์",
     "forYou": "สำหรับคุณ",
+    "forChild": "สำหรับ {{name}}",
+    "trendingRightNow": "✦ กำลังมาแรงตอนนี้...",
     "basedOn": "ตามจาก",
     "upcomingEvents": "กิจกรรมที่จะมาถึง",
     "reserved": "จองแล้ว",
     "learnMore": "ดูเพิ่มเติม",
     "members": "สมาชิก",
+    "upcomingClasses": "คลาสที่กำลังจะมาถึง",
+    "trendingInYourArea": "กำลังมาแรงในพื้นที่ของคุณ",
+    "recommendedFor": "แนะนำสำหรับ...",
+    "exploreByCategory": "สำรวจตามหมวดหมู่",
     "categories": {
-      "technology": "เทคโนโลยี",
-      "art": "ศิลปะ",
-      "music": "ดนตรี",
+      "technology": "เทคโนโลยีและนวัตกรรม",
+      "art": "ศิลปะและการแสดงออกเชิงสร้างสรรค์",
+      "music": "ดนตรีและการแสดง",
       "math": "คณิตศาสตร์",
-      "sports": "กีฬา"
+      "sports": "กีฬาและกิจกรรมทางกาย",
+      "languages": "ภาษา",
+      "academics": "วิชาการ",
+      "lifeSkills": "การพัฒนาตนเองและทักษะชีวิต"
     }
   },
   "profile": {
@@ -142,7 +160,11 @@
       "description": "คุณแน่ใจหรือไม่ว่าต้องการลบวิธีการชำระเงินนี้?",
       "confirm": "ยืนยัน",
       "deleting": "กำลังลบ..."
-    }
+    },
+    "cardNumber": "หมายเลขบัตร",
+    "cvv": "CVV",
+    "zipCode": "รหัสไปรษณีย์",
+    "finish": "เสร็จสิ้น"
   },
   "familyInformation": {
     "title": "ข้อมูลครอบครัว",
@@ -173,7 +195,21 @@
     "deleteError": "ลบไม่สำเร็จ",
     "changeProfilePicture": "เปลี่ยนรูปโปรไฟล์",
     "avatarTabColors": "สี",
-    "avatarTabAvatar": "อวตาร"
+    "avatarTabAvatar": "อวตาร",
+    "addInterestsHint": "เพิ่มความสนใจบางอย่าง คุณสามารถเปลี่ยนได้ภายหลัง",
+    "birthMonth": "เดือนเกิด",
+    "birthYear": "ปีเกิด",
+    "interests": {
+      "sports": "กีฬา/ร่างกาย",
+      "music": "ดนตรีและการแสดง",
+      "language": "ภาษา",
+      "other": "ทักษะชีวิตส่วนตัว",
+      "math": "วิชาการ",
+      "technology": "เทคโนโลยีและนวัตกรรม",
+      "science": "การเรียนพิเศษกลุ่มเล็ก",
+      "art": "ศิลปะ/การแสดงออกเชิงสร้างสรรค์"
+    },
+    "setProfilePicture": "ตั้งรูปโปรไฟล์ให้บุตรหลานของคุณ"
   },
   "saved": {
     "title": "ที่บันทึกไว้",
@@ -287,7 +323,12 @@
     "sortBy": "เรียงตาม",
     "filter": "กรอง",
     "km": "กม.",
-    "stars": "ดาว"
+    "mi": "ไมล์",
+    "distanceAway": "ห่างออกไป {{distance}} กม.",
+    "stars": "ดาว",
+    "smiles": "/ 5 ยิ้ม",
+    "learnMore": "เรียนรู้เพิ่มเติม",
+    "members": "สมาชิก"
   },
   "org": {
     "about": "เกี่ยวกับ",
@@ -422,13 +463,34 @@
     "changeImage": "เปลี่ยนรูปภาพ",
     "saveChanges": "บันทึกการเปลี่ยนแปลง"
   },
+  "share": {
+    "copyLink": "คัดลอกลิงก์",
+    "share": "แชร์",
+    "limitationsApply": "มีเงื่อนไข ดูรายละเอียดที่แนบมา",
+    "starsRating": "4.5 ดาว (140)",
+    "defaultMessage": "ไปดู {{name}} บน SkillSpark เลย!",
+    "apps": {
+      "messages": "ข้อความ",
+      "messenger": "Messenger",
+      "line": "Line",
+      "whatsapp": "WhatsApp"
+    }
+  },
   "occurrence": {
     "smiles": "/ 5 รอยยิ้ม",
     "learnMore": "เรียนรู้เพิ่มเติม",
     "reserve": "จอง",
     "ages": "อายุ {{min}} ปี",
+    "agesOpen": "อายุ {{min}}+ ปี",
     "agesRange": "อายุ {{min}} - {{max}} ปี",
     "classTime": "คลาส {{time}}"
+  },
+  "errorScreen": {
+    "title": "อุ๊ย!",
+    "subtitle": "เกิดข้อผิดพลาดขึ้น",
+    "backToSafety": "กลับสู่หน้าหลัก",
+    "showDetails": "แสดงรายละเอียด",
+    "hideDetails": "ซ่อนรายละเอียด"
   },
   "reservation": {
     "paymentFailed": "ชำระเงินไม่สำเร็จ กรุณาลองอีกครั้งหรือติดต่อฝ่ายสนับสนุน",
@@ -440,5 +502,97 @@
     "payAndReserve": "ชำระเงินและจอง",
     "termsAgree": "ฉันยอมรับข้อกำหนดและเงื่อนไข",
     "seeYouSoon": "พบกันเร็วๆ นี้!"
+  },
+  "onboarding": {
+    "welcome": "ยินดีต้อนรับสู่ SkillSpark!",
+    "chooseLanguage": "เลือกภาษาของคุณ",
+    "back": "ย้อนกลับ",
+    "continue": "ดำเนินการต่อ",
+    "makeAccount": "สร้างบัญชีของคุณ",
+    "email": "อีเมล",
+    "emailOrUsername": "อีเมล/ชื่อผู้ใช้",
+    "forgotPassword": "ลืมรหัสผ่าน?",
+    "password": "รหัสผ่าน",
+    "confirmPassword": "ยืนยันรหัสผ่าน",
+    "createAccount": "สร้างบัญชี",
+    "alreadyHaveAccount": "มีบัญชีอยู่แล้วใช่ไหม? เข้าสู่ระบบ",
+    "signIn": "เข้าสู่ระบบ",
+    "dontHaveAccount": "ยังไม่มีบัญชีใช่ไหม? สมัครสมาชิก",
+    "enterPhoneNumber": "กรอกหมายเลขโทรศัพท์ของคุณ",
+    "cellPhone": "โทรศัพท์มือถือ",
+    "whatName": "คุณชื่ออะไร?",
+    "name": "ชื่อ",
+    "username": "ชื่อผู้ใช้",
+    "cropAndSubmit": "ครอบตัดและส่งรูปภาพของคุณ",
+    "addPhoto": "เพิ่มรูปโปรไฟล์ของคุณ",
+    "choosePhoto": "เลือกรูปภาพ",
+    "personalize": "อัปโหลดรูปภาพเพื่อปรับแต่งโปรไฟล์ของคุณ",
+    "skip": "ข้ามไปก่อน",
+    "cancel": "ยกเลิก",
+    "save": "บันทึก",
+    "setUpChild": "ตั้งค่าโปรไฟล์สำหรับบุตรหลาน",
+    "addNewChild": "เพิ่มโปรไฟล์บุตรหลานใหม่",
+    "addEmergencyContact": "เพิ่มผู้ติดต่อฉุกเฉิน",
+    "contactNumber": "เบอร์ติดต่อ",
+    "paymentInformation": "ข้อมูลการชำระเงิน",
+    "cardNumber": "หมายเลขบัตร",
+    "cvv": "CVV",
+    "zipCode": "รหัสไปรษณีย์",
+    "finish": "เสร็จสิ้น",
+    "allSet": "ทุกอย่างเรียบร้อยแล้ว!",
+    "settingUp": "กำลังตั้งค่าโปรไฟล์ของคุณ...",
+    "passwordMismatch": "รหัสผ่านทั้งสองต้องตรงกัน",
+    "passwordInvalid": "รหัสผ่านไม่ตรงตามข้อกำหนด",
+    "passwordReqLength": "อย่างน้อย 8 ตัวอักษร",
+    "passwordReqUppercase": "อย่างน้อยหนึ่งตัวพิมพ์ใหญ่",
+    "passwordReqLowercase": "อย่างน้อยหนึ่งตัวพิมพ์เล็ก",
+    "passwordReqNumber": "อย่างน้อยหนึ่งตัวเลข",
+    "passwordReqSpecial": "อย่างน้อยหนึ่งอักขระพิเศษ",
+    "signUp": "สมัครสมาชิก"
+  },
+  "auth": {
+    "logIn": "เข้าสู่ระบบ",
+    "signUp": "สมัครสมาชิก",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน",
+    "fullName": "ชื่อ-นามสกุล",
+    "username": "ชื่อผู้ใช้",
+    "selectLanguage": "เลือกภาษา...",
+    "languageEnglish": "อังกฤษ",
+    "languageThai": "ไทย",
+    "dontHaveAccount": "ยังไม่มีบัญชี? สมัครสมาชิก",
+    "alreadyHaveAccount": "มีบัญชีแล้ว? เข้าสู่ระบบ",
+    "missingEmailOrPassword": "กรุณากรอกอีเมลและรหัสผ่าน",
+    "missingRequiredField": "กรุณากรอกข้อมูลที่จำเป็น",
+    "usernameTaken": "ชื่อผู้ใช้นี้ถูกใช้ไปแล้ว",
+    "unexpectedError": "เกิดข้อผิดพลาดที่ไม่คาดคิด"
+  },
+  "search": {
+    "placeholder": "ค้นหากิจกรรม...",
+    "noResults": "ไม่พบผลลัพธ์",
+    "tryDifferent": "ลองค้นหาด้วยคำอื่นหรือปรับตัวกรอง"
+  },
+  "months": {
+    "january": "มกราคม",
+    "february": "กุมภาพันธ์",
+    "march": "มีนาคม",
+    "april": "เมษายน",
+    "may": "พฤษภาคม",
+    "june": "มิถุนายน",
+    "july": "กรกฎาคม",
+    "august": "สิงหาคม",
+    "september": "กันยายน",
+    "october": "ตุลาคม",
+    "november": "พฤศจิกายน",
+    "december": "ธันวาคม"
+  },
+  "payment_errors": {
+    "failedToFetch": "ไม่สามารถดึงข้อมูลวิธีการชำระเงินได้",
+    "failedToDelete": "ไม่สามารถลบวิธีการชำระเงินได้",
+    "notAuthenticated": "ยังไม่ได้เข้าสู่ระบบ",
+    "failedToCreateIntent": "ไม่สามารถสร้าง setup intent ได้",
+    "failedToConfirm": "ยืนยันวิธีการชำระเงินไม่สำเร็จ กรุณาลองอีกครั้ง",
+    "stripeNotAvailable": "Stripe ไม่พร้อมใช้งานใน Expo Go กรุณาใช้ development build เพื่อจัดการวิธีการชำระเงิน",
+    "unexpectedError": "เกิดข้อผิดพลาดที่ไม่คาดคิด"
   }
 }
