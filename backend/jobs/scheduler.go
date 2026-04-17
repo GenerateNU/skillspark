@@ -53,9 +53,9 @@ func (j *JobScheduler) Start() {
 	j.cron.Start()
 	log.Println("Cron jobs started")
 
-	go j.CapturePaymentsJob()
-	go j.SendScheduledNotificationsJob()
-	go j.CreatePaymentIntentsJob()
+	j.CapturePaymentsJob()
+	j.SendScheduledNotificationsJob()
+	j.CreatePaymentIntentsJob()
 }
 
 func (j *JobScheduler) Stop() {

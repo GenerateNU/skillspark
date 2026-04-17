@@ -20,6 +20,9 @@ func (h *Handler) CreatePaymentIntent(ctx context.Context, input *models.CreateP
 	if err != nil {
 		return nil, err
 	}
+	if guardian == nil {
+		return nil, errors.New("guardian not found")
+	}
 	if guardian.StripeCustomerID == nil {
 		return nil, errors.New("guardian must have a Stripe Customer ID before creating a payment")
 	}
@@ -28,10 +31,19 @@ func (h *Handler) CreatePaymentIntent(ctx context.Context, input *models.CreateP
 	if err != nil {
 		return nil, err
 	}
+	if eventOccurrence == nil {
+		return nil, errors.New("event occurrence not found")
+	}
 
 	org, err := h.OrganizationRepository.GetOrganizationByID(ctx, eventOccurrence.Event.OrganizationID)
 	if err != nil {
 		return nil, err
+	}
+	if org == nil {
+		return nil, errors.New("organization not found")
+	}
+	if org.StripeAccountID == nil {
+		return nil, errors.New("organization must have a Stripe account ID before creating a payment")
 	}
 
 	piInput := models.CreatePaymentIntentInput{}
@@ -46,6 +58,9 @@ func (h *Handler) CreatePaymentIntent(ctx context.Context, input *models.CreateP
 	paymentIntent, err := h.StripeClient.CreatePaymentIntent(ctx, &piInput)
 	if err != nil {
 		return nil, err
+	}
+	if paymentIntent == nil {
+		return nil, errors.New("nil response from Stripe when creating payment intent")
 	}
 
 	paymentData := &models.CreatePaymentData{
