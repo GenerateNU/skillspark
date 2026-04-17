@@ -16,7 +16,6 @@ import {
   useGetReviewAggregate,
 } from "@skillspark/api-client";
 import type { EventOccurrence, Organization } from "@skillspark/api-client";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { RATING_OPTIONS } from "@/constants/ratings";
 import { AppColors, Shadows } from "@/constants/theme";
@@ -140,8 +139,8 @@ function EventOccurrenceDetail({
 
           {/* Location */}
           <View className="flex-row items-center gap-1 mb-2">
-            <MaterialIcons
-              name="location-on"
+            <IconSymbol
+              name="location"
               size={22}
               color={AppColors.mutedText}
             />
