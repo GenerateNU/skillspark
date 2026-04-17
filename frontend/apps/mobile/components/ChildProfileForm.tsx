@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors, TAG_COLORS, Colors } from "@/constants/theme";
+import { AppColors, Colors } from "@/constants/theme";
 import { SchoolPicker } from "@/components/SchoolPicker";
 import { useTranslation } from "react-i18next";
 import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
@@ -357,31 +357,23 @@ export function ChildProfileForm({
           className="mb-3"
           contentContainerStyle={{ gap: 8, paddingRight: 4 }}
         >
-          {interests.map((tag, idx) => {
-            const color = TAG_COLORS[idx % TAG_COLORS.length];
-            return (
-              <TouchableOpacity
-                key={tag}
-                className="flex-row items-center px-2 py-1 rounded-full border gap-1"
-                style={{ backgroundColor: color.bg, borderColor: color.border }}
-                onPress={() => removeInterest(tag)}
+          {interests.map((tag) => (
+            <TouchableOpacity
+              key={tag}
+              className="px-3 py-1 rounded-full"
+              style={{ backgroundColor: AppColors.primaryPlum }}
+              onPress={() => removeInterest(tag)}
+            >
+              <ThemedText
+                className="text-xs font-nunito-medium"
+                style={{ color: AppColors.primaryText }}
               >
-                <IconSymbol
-                  name="camera.filters"
-                  size={13}
-                  color={color.border}
-                />
-                <ThemedText
-                  className="text-xs font-nunito-medium"
-                  style={{ color: color.text }}
-                >
-                  {translate(`interests.${tag}`, {
-                    defaultValue: capitalize(tag),
-                  })}
-                </ThemedText>
-              </TouchableOpacity>
-            );
-          })}
+                {translate(`interests.${tag}`, {
+                  defaultValue: capitalize(tag),
+                })}
+              </ThemedText>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       )}
 
