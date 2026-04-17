@@ -87,6 +87,7 @@ func TestStripeClient_CreateOrganizationAccount(t *testing.T) {
 }
 
 func getTestStripeAPIKey(t *testing.T) string {
+	t.Helper()
 	_ = godotenv.Load("../../.env")
 
 	apiKey := os.Getenv("STRIPE_SECRET_TEST_KEY")
@@ -94,4 +95,18 @@ func getTestStripeAPIKey(t *testing.T) string {
 		t.Skip("STRIPE_SECRET_TEST_KEY not set, skipping Stripe integration tests")
 	}
 	return apiKey
+}
+
+// getSeededOrgStripeAccountID returns the Stripe account ID for the seeded
+// Science Academy Bangkok org (40000000-0000-0000-0000-000000000001).
+func getSeededOrgStripeAccountID(t *testing.T) string {
+	t.Helper()
+	return "acct_1TN24T2SjsZwI0Mj"
+}
+
+// getSeededGuardianStripeCustomerID returns the Stripe customer ID for the
+// seeded guardian (53bf6072-c99c-49b8-85ec-da9e86e40c1b).
+func getSeededGuardianStripeCustomerID(t *testing.T) string {
+	t.Helper()
+	return "cus_UKrJ4ZB6z2i5f1"
 }

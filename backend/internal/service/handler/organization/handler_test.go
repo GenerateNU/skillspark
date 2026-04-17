@@ -8,6 +8,7 @@ import (
 	"skillspark/internal/models"
 	s3mocks "skillspark/internal/s3_client/mocks"
 	repomocks "skillspark/internal/storage/repo-mocks"
+	translateMocks "skillspark/internal/translation/mocks"
 	"skillspark/internal/utils"
 	"strings"
 	"testing"
@@ -23,6 +24,15 @@ import (
 // createMockS3Client creates a mock S3 client for testing
 func createMockS3Client() *s3mocks.S3ClientMock {
 	return new(s3mocks.S3ClientMock)
+}
+
+// newTranslateMock returns a permissive translate mock that satisfies any
+// CallTranslateAPI invocation with an empty translation map.
+func newTranslateMock() *translateMocks.TranslateMock {
+	m := new(translateMocks.TranslateMock)
+	m.On("CallTranslateAPI", mock.Anything, mock.Anything, mock.Anything).
+		Return(map[string]*string{}, nil).Maybe()
+	return m
 }
 
 var testLocationID = uuid.MustParse("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
@@ -43,7 +53,7 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
 				pfpKey := "orgs/profile.jpg"
-				orgRepo.On("GetOrganizationByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.Organization{
+				orgRepo.On("GetOrganizationByID", mock.Anything, mock.AnythingOfType("uuid.UUID"), mock.Anything).Return(&models.Organization{
 					ID:         uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 					Name:       "Babel Street",
 					Active:     true,
@@ -70,7 +80,7 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 			name: "organization not found",
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19",
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(nil, &errs.HTTPError{
+				orgRepo.On("GetOrganizationByID", mock.Anything, mock.AnythingOfType("uuid.UUID"), mock.Anything).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Internal server error").Code,
 					Message: "Internal server error",
 				})
@@ -101,7 +111,7 @@ func TestHandler_GetOrganizationById(t *testing.T) {
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3, newTranslateMock())
 			app.Get("/organizations/:id", func(c *fiber.Ctx) error {
 				output, err := handler.GetOrganizationById(c.Context(), &models.GetOrganizationByIDInput{
 					ID: uuid.MustParse(c.Params("id")),
@@ -157,7 +167,7 @@ func TestHandler_CreateOrganization(t *testing.T) {
 				locRepo.On("GetLocationByID", mock.Anything, testLocationID).Return(&models.Location{
 					ID: testLocationID,
 				}, nil)
-				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput"), mock.Anything).Return(&models.Organization{
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationDBInput"), mock.Anything).Return(&models.Organization{
 					ID:         uuid.New(),
 					Name:       "Tech Corp",
 					Active:     true,
@@ -187,7 +197,7 @@ func TestHandler_CreateOrganization(t *testing.T) {
 				locRepo.On("GetLocationByID", mock.Anything, testLocationID).Return(&models.Location{
 					ID: testLocationID,
 				}, nil)
-				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput"), mock.Anything).Return(&models.Organization{
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationDBInput"), mock.Anything).Return(&models.Organization{
 					ID:         orgID,
 					Name:       "Tech Corp",
 					Active:     true,
@@ -195,7 +205,7 @@ func TestHandler_CreateOrganization(t *testing.T) {
 					CreatedAt:  time.Now(),
 					UpdatedAt:  time.Now(),
 				}, nil)
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), mock.Anything).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationDBInput"), mock.Anything).Return(&models.Organization{
 					ID:         orgID,
 					Name:       "Tech Corp",
 					Active:     true,
@@ -228,7 +238,7 @@ func TestHandler_CreateOrganization(t *testing.T) {
 				locRepo.On("GetLocationByID", mock.Anything, testLocationID).Return(&models.Location{
 					ID: testLocationID,
 				}, nil)
-				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput"), mock.Anything).Return(&models.Organization{
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationDBInput"), mock.Anything).Return(&models.Organization{
 					ID:         uuid.New(),
 					Name:       "Tech Corp",
 					About:      &about,
@@ -278,7 +288,7 @@ func TestHandler_CreateOrganization(t *testing.T) {
 				locRepo.On("GetLocationByID", mock.Anything, testLocationID).Return(&models.Location{
 					ID: testLocationID,
 				}, nil)
-				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationInput"), mock.Anything).Return(nil, &errs.HTTPError{
+				orgRepo.On("CreateOrganization", mock.Anything, mock.AnythingOfType("*models.CreateOrganizationDBInput"), mock.Anything).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Database error").Code,
 					Message: "Database error",
 				})
@@ -302,7 +312,7 @@ func TestHandler_CreateOrganization(t *testing.T) {
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3, newTranslateMock())
 			output, err := handler.CreateOrganization(context.TODO(), tt.input, tt.updateBody, tt.imageData, mockS3)
 
 			if tt.wantErr {
@@ -364,7 +374,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			imageData: nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationDBInput"), (*string)(nil)).Return(&models.Organization{
 					ID:         existingID,
 					Name:       "Updated Name",
 					Active:     true,
@@ -390,7 +400,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			imageData: nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationDBInput"), (*string)(nil)).Return(&models.Organization{
 					ID:         existingID,
 					Name:       "Updated Name",
 					Active:     false,
@@ -415,7 +425,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			imageData: &dummyImageData,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), mock.Anything).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationDBInput"), mock.Anything).Return(&models.Organization{
 					ID:         existingID,
 					Name:       "Updated Name",
 					Active:     true,
@@ -442,7 +452,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			imageData: &dummyImageData,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), mock.Anything).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationDBInput"), mock.Anything).Return(&models.Organization{
 					ID:         existingID,
 					Name:       "Updated Name",
 					Active:     true,
@@ -470,7 +480,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			imageData: nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
 				about := "Updated description"
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(&models.Organization{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationDBInput"), (*string)(nil)).Return(&models.Organization{
 					ID:         existingID,
 					Name:       "Existing Name",
 					About:      &about,
@@ -494,7 +504,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			},
 			imageData: nil,
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationInput"), (*string)(nil)).Return(nil, &errs.HTTPError{
+				orgRepo.On("UpdateOrganization", mock.Anything, mock.AnythingOfType("*models.UpdateOrganizationDBInput"), (*string)(nil)).Return(nil, &errs.HTTPError{
 					Code:    errs.NotFound("Organization", "id", existingID.String()).Code,
 					Message: "Organization not found",
 				})
@@ -539,7 +549,7 @@ func TestHandler_UpdateOrganization(t *testing.T) {
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3, newTranslateMock())
 			output, err := handler.UpdateOrganization(context.TODO(), tt.input, tt.imageData, mockS3)
 
 			if tt.wantErr {
@@ -580,7 +590,7 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 			name: "successful delete",
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("DeleteOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.Organization{
+				orgRepo.On("DeleteOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID"), mock.Anything).Return(&models.Organization{
 					ID:         uuid.MustParse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
 					Name:       "Deleted Org",
 					Active:     true,
@@ -595,7 +605,7 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 			name: "organization not found",
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19",
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("DeleteOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(nil, &errs.HTTPError{
+				orgRepo.On("DeleteOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID"), mock.Anything).Return(nil, &errs.HTTPError{
 					Code:    errs.NotFound("Organization", "id", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19").Code,
 					Message: "Organization not found",
 				})
@@ -613,7 +623,7 @@ func TestHandler_DeleteOrganization(t *testing.T) {
 
 			mockS3 := createMockS3Client()
 			mockReviewRepo := new(repomocks.MockReviewRepository)
-			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3, newTranslateMock())
 			output, err := handler.DeleteOrganization(context.TODO(), &models.DeleteOrganizationInput{
 				ID: uuid.MustParse(tt.id),
 			})
@@ -649,7 +659,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 					{ID: uuid.New(), Name: "Org 1", Active: true, LocationID: &testLocationID},
 					{ID: uuid.New(), Name: "Org 2", Active: true, LocationID: &testLocationID},
 				}
-				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(orgs, nil)
+				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination"), mock.Anything).Return(orgs, nil)
 			},
 			mockReviewSetup: func(reviewRepo *repomocks.MockReviewRepository) {
 				reviewRepo.On("GetAggregateReviewsForOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.ReviewAggregate{
@@ -671,7 +681,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 				orgs := []models.Organization{
 					{ID: uuid.New(), Name: "Org 3", Active: true, LocationID: &testLocationID},
 				}
-				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(orgs, nil)
+				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination"), mock.Anything).Return(orgs, nil)
 			},
 			mockReviewSetup: func(reviewRepo *repomocks.MockReviewRepository) {
 				reviewRepo.On("GetAggregateReviewsForOrganization", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(&models.ReviewAggregate{
@@ -690,7 +700,7 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			name:       "database error",
 			pagination: utils.Pagination{Page: 1, Limit: 20},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, locRepo *repomocks.MockLocationRepository) {
-				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination")).Return(nil, &errs.HTTPError{
+				orgRepo.On("GetAllOrganizations", mock.Anything, mock.AnythingOfType("utils.Pagination"), mock.Anything).Return(nil, &errs.HTTPError{
 					Code:    errs.InternalServerError("Database error").Code,
 					Message: "Database error",
 				})
@@ -718,8 +728,8 @@ func TestHandler_GetAllOrganizations(t *testing.T) {
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
 
-			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3)
-			output, err := handler.GetAllOrganizations(context.TODO(), tt.pagination, mockS3)
+			handler := NewHandler(mockOrgRepo, mockLocRepo, mockReviewRepo, mockS3, newTranslateMock())
+			output, err := handler.GetAllOrganizations(context.TODO(), tt.pagination, "en-US", mockS3)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -857,7 +867,7 @@ func TestHandler_GetEventOccurrencesByOrganizationId(t *testing.T) {
 
 			mockS3 := createMockS3Client()
 			tt.mockS3Setup(mockS3)
-			handler := NewHandler(mockRepo, mockLocationRepo, mockReviewRepo, mockS3)
+			handler := NewHandler(mockRepo, mockLocationRepo, mockReviewRepo, mockS3, newTranslateMock())
 			ctx := context.Background()
 
 			input := &models.GetEventOccurrencesByOrganizationIDInput{

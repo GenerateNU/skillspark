@@ -8,6 +8,7 @@ import (
 	"skillspark/internal/s3_client"
 	"skillspark/internal/service/handler/organization"
 	"skillspark/internal/storage"
+	translations "skillspark/internal/translation"
 	"skillspark/internal/utils"
 
 	"encoding/json"
@@ -15,8 +16,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface) {
-	orgHandler := organization.NewHandler(repo.Organization, repo.Location, repo.Review, s3Client)
+func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface, translateClient translations.TranslationInterface) {
+	orgHandler := organization.NewHandler(repo.Organization, repo.Location, repo.Review, s3Client, translateClient)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "create-organization",
@@ -51,7 +52,8 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 		}
 
 		organizationModel := models.CreateOrganizationInput{
-			Body: organizationBody,
+			AcceptLanguage: input.AcceptLanguage,
+			Body:           organizationBody,
 		}
 
 		updateBody := models.UpdateOrganizationBody{
@@ -124,7 +126,7 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 			Limit: limit,
 		}
 
-		organizations, err := orgHandler.GetAllOrganizations(ctx, pagination, s3Client)
+		organizations, err := orgHandler.GetAllOrganizations(ctx, pagination, input.AcceptLanguage, s3Client)
 		if err != nil {
 			return nil, err
 		}
@@ -166,8 +168,9 @@ func SetupOrganizationRoutes(api huma.API, repo *storage.Repository, s3Client s3
 		}
 
 		organizationModel := models.UpdateOrganizationInput{
-			Body: organizationBody,
-			ID:   input.ID,
+			AcceptLanguage: input.AcceptLanguage,
+			Body:           organizationBody,
+			ID:             input.ID,
 		}
 
 		var image_data []byte

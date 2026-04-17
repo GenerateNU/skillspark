@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDebounce } from "use-debounce";
+import { useTranslation } from "react-i18next";
+import { SearchResultCard } from "@/components/home/SearchResultCard";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
@@ -19,6 +21,8 @@ export default function SearchScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { q } = useLocalSearchParams<{ q?: string }>();
+  const { filters } = useFilters();
+  const { t: translate } = useTranslation();
 
   const [searchText, setSearchText] = useState(q ?? "");
   const [debouncedSearch] = useDebounce(searchText.toLowerCase(), 300);
@@ -55,7 +59,7 @@ export default function SearchScreen() {
           />
           <TextInput
             className="flex-1 font-nunito text-sm text-[#111]"
-            placeholder="Search activities..."
+            placeholder={translate("search.placeholder")}
             placeholderTextColor={AppColors.placeholderText}
             value={searchText}
             onChangeText={setSearchText}
@@ -74,10 +78,10 @@ export default function SearchScreen() {
       ) : results.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-2">
           <Text className="font-nunito-bold text-[15px] text-[#111]">
-            No results found
+            {translate("search.noResults")}
           </Text>
           <Text className="font-nunito text-sm text-[#6B7280]">
-            Try a different search or adjust your filters
+            {translate("search.tryDifferent")}
           </Text>
         </View>
       ) : (

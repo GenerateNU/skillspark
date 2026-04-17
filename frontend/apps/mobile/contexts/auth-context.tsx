@@ -17,6 +17,7 @@ import {
 } from "@skillspark/api-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
+import * as Linking from "expo-linking";
 import * as SecureStore from "expo-secure-store";
 import { createContext, ReactNode, useEffect, useState } from "react";
 
@@ -129,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };
-          onError(fail.data?.message ?? "An unexpected error occurred");
+          onError(fail.data?.message ?? i18n.t("auth.unexpectedError"));
         },
       },
     );
@@ -168,7 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };
-          onError(fail.data?.message ?? "An unexpected error occurred");
+          onError(fail.data?.message ?? i18n.t("auth.unexpectedError"));
         },
       },
     );
@@ -221,7 +222,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };
-          onError(fail.data?.message ?? "An unexpected error occurred");
+          onError(fail.data?.message ?? i18n.t("auth.unexpectedError"));
         },
       },
     );
@@ -235,13 +236,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const resp = await checkUsernameExists(username);
       const data = resp.data as UsernameExistsOutputBody;
       if (data.exists) {
-        onError("Username is taken.");
+        onError(i18n.t("auth.usernameTaken"));
         return false;
       }
       return true;
     } catch (err) {
       const typedErr = err as usernameExistsResponseError;
-      onError(typedErr.data?.detail ?? "An unexpected error occurred.");
+      onError(typedErr.data?.detail ?? i18n.t("auth.unexpectedError"));
       return false;
     }
   };

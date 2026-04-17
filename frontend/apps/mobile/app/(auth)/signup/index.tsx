@@ -10,6 +10,7 @@ import {
   TextInputChangeEvent,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { Controller, useForm } from "react-hook-form";
 import { ErrorMessage } from "@/components/ErrorMessage";
@@ -31,6 +32,7 @@ export default function SignupScreen() {
   const [errorText, setErrorText] = useState("");
   const [cannotSubmit, setCannotSubmit] = useState(false);
   const { signup, usernameExists } = useAuthContext();
+  const { t: translate } = useTranslation();
   const {
     control,
     handleSubmit,
@@ -57,7 +59,7 @@ export default function SignupScreen() {
       formData.password === "" ||
       formData.language_preference === ""
     ) {
-      setErrorText("Missing a required field");
+      setErrorText(translate("auth.missingRequiredField"));
     } else {
       signup(
         formData.name,
@@ -82,7 +84,7 @@ export default function SignupScreen() {
     if (!result) {
       setError("username", {
         type: "manual",
-        message: "Username is taken.",
+        message: translate("auth.usernameTaken"),
       });
       setCannotSubmit(true);
     } else {
@@ -108,20 +110,20 @@ export default function SignupScreen() {
         >
           <View className="flex-1 items-center justify-center px-6 gap-4">
             <ThemedText type="title" className="text-3xl font-bold mb-8">
-              Sign Up
+              {translate("auth.signUp")}
             </ThemedText>
             <AuthFormInput
               control={control}
               name="name"
               error={errors.name}
-              placeholder="Full Name"
+              placeholder={translate("auth.fullName")}
               autoCapitalize="none"
             />
             <AuthFormInput
               control={control}
               name="email"
               error={errors.email}
-              placeholder="Email"
+              placeholder={translate("auth.email")}
               keyboardType="email-address"
               autoCapitalize="none"
             />
@@ -129,7 +131,7 @@ export default function SignupScreen() {
               control={control}
               name="username"
               error={errors.username}
-              placeholder="Username"
+              placeholder={translate("auth.username")}
               autoCapitalize="none"
               onBlur={(e) => onClickOut()}
             />
@@ -137,7 +139,7 @@ export default function SignupScreen() {
               control={control}
               name="password"
               error={errors.password}
-              placeholder="Password"
+              placeholder={translate("auth.password")}
               secureTextEntry={true}
             />
             <Controller
@@ -148,20 +150,20 @@ export default function SignupScreen() {
                   value={value}
                   onChange={onChange}
                   options={[
-                    { label: "English", value: "en" },
-                    { label: "Thai", value: "th" },
+                    { label: translate("auth.languageEnglish"), value: "en" },
+                    { label: translate("auth.languageThai"), value: "th" },
                   ]}
-                  placeholder="Select a language..."
+                  placeholder={translate("auth.selectLanguage")}
                 />
               )}
             />
             <Button
-              label="Sign Up"
+              label={translate("auth.signUp")}
               onPress={handleSubmit(onSubmit)}
               disabled={cannotSubmit}
             />
             <PageRedirectButton
-              label="Already have an account? Log in"
+              label={translate("auth.alreadyHaveAccount")}
               onPress={handleGoToLogIn}
             />
             <ErrorMessage message={errorText} />

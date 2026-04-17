@@ -10,23 +10,22 @@ import (
 )
 
 func TestStripeClient_CancelPaymentIntent_RequiresCapture(t *testing.T) {
-
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test")
 	}
 
 	apiKey := getTestStripeAPIKey(t)
+	stripeAccountID := getSeededOrgStripeAccountID(t)
+	stripeCustomerID := getSeededGuardianStripeCustomerID(t)
 	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
-
-	paymentMethodID := "pm_card_visa"
 
 	createPIInput := &models.CreatePaymentIntentInput{}
 	createPIInput.Body.Amount = 10000
 	createPIInput.Body.Currency = "usd"
-	createPIInput.Body.GuardianStripeID = testStripeCustomerID
-	createPIInput.Body.OrgStripeID = testStripeAccountID
-	createPIInput.Body.PaymentMethodID = paymentMethodID
+	createPIInput.Body.GuardianStripeID = stripeCustomerID
+	createPIInput.Body.OrgStripeID = stripeAccountID
+	createPIInput.Body.PaymentMethodID = "pm_card_visa"
 
 	createdPI, err := client.CreatePaymentIntent(ctx, createPIInput)
 	require.NoError(t, err)
@@ -52,15 +51,16 @@ func TestStripeClient_CancelPaymentIntent_Succeeded(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
+	stripeAccountID := getSeededOrgStripeAccountID(t)
+	stripeCustomerID := getSeededGuardianStripeCustomerID(t)
 	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
-	// create and capture a payment intent first
 	createPIInput := &models.CreatePaymentIntentInput{}
 	createPIInput.Body.Amount = 10000
 	createPIInput.Body.Currency = "usd"
-	createPIInput.Body.GuardianStripeID = testStripeCustomerID
-	createPIInput.Body.OrgStripeID = testStripeAccountID
+	createPIInput.Body.GuardianStripeID = stripeCustomerID
+	createPIInput.Body.OrgStripeID = stripeAccountID
 	createPIInput.Body.PaymentMethodID = "pm_card_visa"
 
 	createdPI, err := client.CreatePaymentIntent(ctx, createPIInput)
@@ -101,23 +101,22 @@ func TestStripeClient_CancelPaymentIntent_InvalidID(t *testing.T) {
 }
 
 func TestStripeClient_CancelPaymentIntent_AlreadyCanceled(t *testing.T) {
-
 	if testing.Short() {
 		t.Skip("Skipping Stripe integration test")
 	}
 
 	apiKey := getTestStripeAPIKey(t)
+	stripeAccountID := getSeededOrgStripeAccountID(t)
+	stripeCustomerID := getSeededGuardianStripeCustomerID(t)
 	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
-
-	paymentMethodID := "pm_card_visa"
 
 	createPIInput := &models.CreatePaymentIntentInput{}
 	createPIInput.Body.Amount = 10000
 	createPIInput.Body.Currency = "usd"
-	createPIInput.Body.GuardianStripeID = testStripeCustomerID
-	createPIInput.Body.OrgStripeID = testStripeAccountID
-	createPIInput.Body.PaymentMethodID = paymentMethodID
+	createPIInput.Body.GuardianStripeID = stripeCustomerID
+	createPIInput.Body.OrgStripeID = stripeAccountID
+	createPIInput.Body.PaymentMethodID = "pm_card_visa"
 
 	createdPI, err := client.CreatePaymentIntent(ctx, createPIInput)
 	require.NoError(t, err)

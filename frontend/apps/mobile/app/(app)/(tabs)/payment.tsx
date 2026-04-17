@@ -49,7 +49,7 @@ export default function PaymentScreen() {
       setPaymentMethods(methods ? methods : []);
       setError(null);
     } catch (e) {
-      setError("Failed to fetch payment methods");
+      setError(translate("payment_errors.failedToFetch"));
     } finally {
       setLoading(false);
     }
@@ -113,7 +113,7 @@ export default function PaymentScreen() {
         prev.filter((pm) => pm.id !== pendingDeleteId),
       );
     } catch (e) {
-      setError("Failed to delete payment method");
+      setError(translate("payment_errors.failedToDelete"));
     } finally {
       setDeleting(false);
       setPendingDeleteId(null);

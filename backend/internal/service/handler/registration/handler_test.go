@@ -357,9 +357,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 	guardianID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 	eventOccurrenceID := uuid.MustParse("70000000-0000-0000-0000-000000000001")
 	organizationID := uuid.MustParse("10000000-0000-0000-0000-000000000001")
-	stripeAccountID := "acct_test_123"
 	stripeCustomerID := "cus_test_123"
-	paymentMethodID := "pm_test_123"
 
 	invalidChildID := uuid.New()
 	invalidGuardianID := uuid.New()
@@ -390,11 +388,6 @@ func TestHandler_CreateRegistration(t *testing.T) {
 		GuardianID: guardianID,
 	}
 
-	validOrg := &models.Organization{
-		ID:              organizationID,
-		StripeAccountID: &stripeAccountID,
-	}
-
 	tests := []struct {
 		name      string
 		input     *models.CreateRegistrationInput
@@ -410,63 +403,30 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
 				i.Body.Status = models.RegistrationStatusRegistered
-				i.Body.PaymentMethodID = &paymentMethodID
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
-				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
-					Return(validGuardian, nil)
-
 				childRepo.On("GetChildByID", mock.Anything, childID).
 					Return(validChild, nil)
 
-				orgRepo.On("GetOrganizationByID", mock.Anything, organizationID).
-					Return(validOrg, nil)
+				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
+					Return(validGuardian, nil)
 
-				sc.On("CreatePaymentIntent", mock.Anything, mock.AnythingOfType("*models.CreatePaymentIntentInput")).
-					Return(&models.CreatePaymentIntentOutput{
-						Body: struct {
-							PaymentIntentID   string `json:"payment_intent_id" doc:"Stripe payment intent ID"`
-							ClientSecret      string `json:"client_secret" doc:"Client secret for frontend to confirm payment"`
-							Status            string `json:"status" doc:"Payment intent status"`
-							TotalAmount       int    `json:"total_amount" doc:"Total amount in cents"`
-							ProviderAmount    int    `json:"provider_amount" doc:"Amount provider receives in cents"`
-							PlatformFeeAmount int    `json:"platform_fee_amount" doc:"Platform fee in cents"`
-							Currency          string `json:"currency" doc:"Currency code"`
-						}{
-							PaymentIntentID:   "pi_test_123",
-							TotalAmount:       10000,
-							ProviderAmount:    8500,
-							PlatformFeeAmount: 1500,
-							Currency:          "thb",
-							Status:            "requires_capture",
-						},
-					}, nil)
-
-				regRepo.On("CreateRegistration", mock.Anything, mock.AnythingOfType("*models.CreateRegistrationWithPaymentData")).
+				regRepo.On("CreateRegistration", mock.Anything, mock.AnythingOfType("*models.CreateRegistrationData")).
 					Return(&models.CreateRegistrationOutput{
 						Body: models.Registration{
-							ID:                    uuid.New(),
-							ChildID:               childID,
-							GuardianID:            guardianID,
-							EventOccurrenceID:     eventOccurrenceID,
-							Status:                models.RegistrationStatusRegistered,
-							EventName:             "STEM Club",
-							OccurrenceStartTime:   time.Now(),
-							CreatedAt:             time.Now(),
-							UpdatedAt:             time.Now(),
-							StripePaymentIntentID: "pi_test_123",
-							StripeCustomerID:      stripeCustomerID,
-							OrgStripeAccountID:    stripeAccountID,
-							StripePaymentMethodID: paymentMethodID,
-							TotalAmount:           10000,
-							ProviderAmount:        8500,
-							PlatformFeeAmount:     1500,
-							Currency:              "thb",
-							PaymentIntentStatus:   "requires_capture",
+							ID:                  uuid.New(),
+							ChildID:             childID,
+							GuardianID:          guardianID,
+							EventOccurrenceID:   eventOccurrenceID,
+							Status:              models.RegistrationStatusRegistered,
+							EventName:           "STEM Club",
+							OccurrenceStartTime: time.Now(),
+							CreatedAt:           time.Now(),
+							UpdatedAt:           time.Now(),
 						},
 					}, nil)
 
@@ -510,11 +470,9 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
-				guardianRepo.On("GetGuardianByID", mock.Anything, invalidGuardianID).
-					Return(nil, &errs.HTTPError{
-						Code:    errs.NotFound("Guardian", "id", invalidGuardianID.String()).Code,
-						Message: "Guardian not found",
-					})
+				// child belongs to guardianID, not invalidGuardianID — fails the belonging check
+				childRepo.On("GetChildByID", mock.Anything, childID).
+					Return(validChild, nil)
 			},
 			wantErr: true,
 		},
@@ -532,9 +490,6 @@ func TestHandler_CreateRegistration(t *testing.T) {
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
-
-				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
-					Return(validGuardian, nil)
 
 				childRepo.On("GetChildByID", mock.Anything, invalidChildID).
 					Return(nil, &errs.HTTPError{
@@ -559,6 +514,9 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
 
+				childRepo.On("GetChildByID", mock.Anything, childID).
+					Return(validChild, nil)
+
 				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
 					Return(&models.Guardian{ID: guardianID, StripeCustomerID: nil}, nil)
 			},
@@ -573,15 +531,11 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
 				i.Body.Status = models.RegistrationStatusRegistered
-				i.Body.PaymentMethodID = &paymentMethodID
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceID, mock.Anything).
 					Return(validEventOccurrence, nil)
-
-				guardianRepo.On("GetGuardianByID", mock.Anything, guardianID).
-					Return(validGuardian, nil)
 
 				childRepo.On("GetChildByID", mock.Anything, childID).
 					Return(&models.Child{ID: childID, GuardianID: uuid.New()}, nil)
@@ -597,7 +551,6 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
 				i.Body.Status = models.RegistrationStatusRegistered
-				i.Body.PaymentMethodID = &paymentMethodID
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
@@ -627,7 +580,6 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				i.Body.GuardianID = guardianID
 				i.Body.EventOccurrenceID = eventOccurrenceID
 				i.Body.Status = models.RegistrationStatusRegistered
-				i.Body.PaymentMethodID = &paymentMethodID
 				return i
 			}(),
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient, ns *notificationmocks.MockNotificationService) {
