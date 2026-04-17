@@ -14,7 +14,7 @@ func (h *Handler) DeleteOrganization(ctx context.Context, input *models.DeleteOr
 		return nil, errs.BadRequest("Invalid ID format")
 	}
 
-	deleted, httpErr := h.OrganizationRepository.DeleteOrganization(ctx, id)
+	deleted, httpErr := h.OrganizationRepository.DeleteOrganization(ctx, id, input.AcceptLanguage)
 	if httpErr != nil {
 		return nil, httpErr
 	}

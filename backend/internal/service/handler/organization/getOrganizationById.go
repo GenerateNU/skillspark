@@ -16,7 +16,7 @@ func (h *Handler) GetOrganizationById(ctx context.Context, input *models.GetOrga
 		return nil, errs.BadRequest("Invalid ID format")
 	}
 
-	organization, httpErr := h.OrganizationRepository.GetOrganizationByID(ctx, id)
+	organization, httpErr := h.OrganizationRepository.GetOrganizationByID(ctx, id, input.AcceptLanguage)
 	if httpErr != nil {
 		return nil, httpErr
 	}

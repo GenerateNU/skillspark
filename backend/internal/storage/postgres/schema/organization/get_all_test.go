@@ -17,7 +17,7 @@ func TestGetAllOrganizations_BasicPagination(t *testing.T) {
 	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 10}
-	orgs, err := repo.GetAllOrganizations(ctx, pagination)
+	orgs, err := repo.GetAllOrganizations(ctx, pagination, "en-US")
 
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
@@ -37,12 +37,12 @@ func TestGetAllOrganizations_SecondPage(t *testing.T) {
 	t.Parallel()
 
 	firstPage := utils.Pagination{Page: 1, Limit: 2}
-	firstPageOrgs, err := repo.GetAllOrganizations(ctx, firstPage)
+	firstPageOrgs, err := repo.GetAllOrganizations(ctx, firstPage, "en-US")
 	require.Nil(t, err)
 	assert.Equal(t, 2, len(firstPageOrgs))
 
 	secondPage := utils.Pagination{Page: 2, Limit: 2}
-	secondPageOrgs, err := repo.GetAllOrganizations(ctx, secondPage)
+	secondPageOrgs, err := repo.GetAllOrganizations(ctx, secondPage, "en-US")
 
 	require.Nil(t, err)
 	require.NotNil(t, secondPageOrgs)
@@ -61,7 +61,7 @@ func TestGetAllOrganizations_SmallPageSize(t *testing.T) {
 	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 2}
-	orgs, err := repo.GetAllOrganizations(ctx, pagination)
+	orgs, err := repo.GetAllOrganizations(ctx, pagination, "en-US")
 
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
@@ -79,7 +79,7 @@ func TestGetAllOrganizations_SingleItemPerPage(t *testing.T) {
 	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 1}
-	orgs, err := repo.GetAllOrganizations(ctx, pagination)
+	orgs, err := repo.GetAllOrganizations(ctx, pagination, "en-US")
 
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
@@ -96,7 +96,7 @@ func TestGetAllOrganizations_PageBeyondData(t *testing.T) {
 	t.Parallel()
 
 	pagination := utils.Pagination{Page: 100, Limit: 10}
-	orgs, err := repo.GetAllOrganizations(ctx, pagination)
+	orgs, err := repo.GetAllOrganizations(ctx, pagination, "en-US")
 
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
@@ -110,7 +110,7 @@ func TestGetAllOrganizations_AllDataOnePage(t *testing.T) {
 	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 100}
-	orgs, err := repo.GetAllOrganizations(ctx, pagination)
+	orgs, err := repo.GetAllOrganizations(ctx, pagination, "en-US")
 
 	require.Nil(t, err)
 	require.NotNil(t, orgs)
@@ -128,7 +128,7 @@ func TestGetAllOrganizations_OrderByCreatedAt(t *testing.T) {
 	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 10}
-	orgs, err := repo.GetAllOrganizations(ctx, pagination)
+	orgs, err := repo.GetAllOrganizations(ctx, pagination, "en-US")
 
 	require.Nil(t, err)
 	assert.GreaterOrEqual(t, len(orgs), 2)
@@ -149,7 +149,7 @@ func TestGetAllOrganizations_ZeroOffset(t *testing.T) {
 	t.Parallel()
 
 	pagination := utils.Pagination{Page: 1, Limit: 3}
-	orgs, err := repo.GetAllOrganizations(ctx, pagination)
+	orgs, err := repo.GetAllOrganizations(ctx, pagination, "en-US")
 
 	require.Nil(t, err)
 	require.NotNil(t, orgs)

@@ -423,7 +423,7 @@ func TestHandler_CreateRegistration(t *testing.T) {
 				childRepo.On("GetChildByID", mock.Anything, childID).
 					Return(validChild, nil)
 
-				orgRepo.On("GetOrganizationByID", mock.Anything, organizationID).
+				orgRepo.On("GetOrganizationByID", mock.Anything, organizationID, mock.Anything).
 					Return(validOrg, nil)
 
 				sc.On("CreatePaymentIntent", mock.Anything, mock.AnythingOfType("*models.CreatePaymentIntentInput")).

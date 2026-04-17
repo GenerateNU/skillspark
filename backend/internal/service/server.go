@@ -131,7 +131,7 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	// Register public routes BEFORE auth middleware
 	routes.SetupAuthRoutes(humaAPI, repo, config)
-	routes.SetupOrganizationRoutes(humaAPI, repo, s3Client)
+	routes.SetupOrganizationRoutes(humaAPI, repo, s3Client, translateClient)
 	routes.SetupManagerRoutes(humaAPI, repo, config)
 	routes.SetupUserRoutes(humaAPI, repo)
 
@@ -172,7 +172,7 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 
 	routes.SetupBaseRoutes(api)
 	routes.SetupLocationsRoutes(api, repo, geocodingService)
-	routes.SetupOrganizationRoutes(api, repo, s3Client)
+	routes.SetupOrganizationRoutes(api, repo, s3Client, translateClient)
 	routes.SetupSchoolsRoutes(api, repo)
 	routes.SetupEventRoutes(api, repo, s3Client, translateClient)
 	routes.SetupManagerRoutes(api, repo, config)

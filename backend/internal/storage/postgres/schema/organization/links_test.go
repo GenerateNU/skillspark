@@ -24,11 +24,15 @@ func TestCreateOrganization_WithLinks(t *testing.T) {
 		{Href: "https://example.com", Label: "Website"},
 		{Href: "https://instagram.com/test", Label: "Instagram"},
 	}
-	input := &models.CreateOrganizationInput{}
-	input.Body.Name = "Links Corp"
-	input.Body.Active = &active
-	input.Body.LocationID = &locationID
-	input.Body.Links = links
+	input := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Links Corp",
+			Active:     &active,
+			LocationID: &locationID,
+			Links:      links,
+		},
+	}
 
 	created, err := repo.CreateOrganization(ctx, input, nil)
 
@@ -47,10 +51,14 @@ func TestCreateOrganization_DefaultsToEmptyLinks(t *testing.T) {
 
 	active := true
 	locationID := location.CreateTestLocation(t, ctx, testDB).ID
-	input := &models.CreateOrganizationInput{}
-	input.Body.Name = "No Links Corp"
-	input.Body.Active = &active
-	input.Body.LocationID = &locationID
+	input := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "No Links Corp",
+			Active:     &active,
+			LocationID: &locationID,
+		},
+	}
 
 	created, err := repo.CreateOrganization(ctx, input, nil)
 
@@ -71,16 +79,20 @@ func TestGetOrganizationByID_ReturnsLinks(t *testing.T) {
 	links := []models.OrgLink{
 		{Href: "https://example.com", Label: "Website"},
 	}
-	input := &models.CreateOrganizationInput{}
-	input.Body.Name = "Get Links Corp"
-	input.Body.Active = &active
-	input.Body.LocationID = &locationID
-	input.Body.Links = links
+	input := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Get Links Corp",
+			Active:     &active,
+			LocationID: &locationID,
+			Links:      links,
+		},
+	}
 
 	created, err := repo.CreateOrganization(ctx, input, nil)
 	require.Nil(t, err)
 
-	fetched, err := repo.GetOrganizationByID(ctx, created.ID)
+	fetched, err := repo.GetOrganizationByID(ctx, created.ID, "en-US")
 
 	require.Nil(t, err)
 	require.NotNil(t, fetched)
@@ -99,9 +111,13 @@ func TestUpdateOrganization_UpdatesLinks(t *testing.T) {
 	newLinks := []models.OrgLink{
 		{Href: "https://new.com", Label: "New Site"},
 	}
-	input := &models.UpdateOrganizationInput{}
-	input.ID = org.ID
-	input.Body.Links = &newLinks
+	input := &models.UpdateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		ID:             org.ID,
+		Body: models.UpdateOrgDBBody{
+			Links: &newLinks,
+		},
+	}
 
 	updated, err := repo.UpdateOrganization(ctx, input, nil)
 
@@ -124,9 +140,13 @@ func TestGetEventOccurrencesByOrganizationID_IncludesLinks(t *testing.T) {
 	links := []models.OrgLink{
 		{Href: "https://scienceacademy.com", Label: "Website"},
 	}
-	input := &models.UpdateOrganizationInput{}
-	input.ID = orgID
-	input.Body.Links = &links
+	input := &models.UpdateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		ID:             orgID,
+		Body: models.UpdateOrgDBBody{
+			Links: &links,
+		},
+	}
 	_, err := repo.UpdateOrganization(ctx, input, nil)
 	require.Nil(t, err)
 

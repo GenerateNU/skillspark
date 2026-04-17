@@ -74,7 +74,7 @@ func TestHandler_CreateOrgStripeAccount(t *testing.T) {
 			name:  "successfully creates stripe account",
 			input: &models.CreateOrgStripeAccountInput{OrganizationID: testOrgID},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, managerRepo *repomocks.MockManagerRepository, locationRepo *repomocks.MockLocationRepository, sc *stripemocks.MockStripeClient) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID).Return(validOrg, nil)
+				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID, mock.Anything).Return(validOrg, nil)
 				managerRepo.On("GetManagerByOrgID", mock.Anything, testOrgID).Return(validManager, nil)
 				locationRepo.On("GetLocationByOrganizationID", mock.Anything, testOrgID).Return(validLocation, nil)
 				sc.On("CreateOrganizationAccount", mock.Anything, validOrg.Name, validManager.Email, "TH").
@@ -87,7 +87,7 @@ func TestHandler_CreateOrgStripeAccount(t *testing.T) {
 			name:  "fails when org already has stripe account",
 			input: &models.CreateOrgStripeAccountInput{OrganizationID: testOrgID},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, managerRepo *repomocks.MockManagerRepository, locationRepo *repomocks.MockLocationRepository, sc *stripemocks.MockStripeClient) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID).Return(orgWithStripe, nil)
+				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID, mock.Anything).Return(orgWithStripe, nil)
 			},
 			wantErr: true,
 		},
@@ -95,7 +95,7 @@ func TestHandler_CreateOrgStripeAccount(t *testing.T) {
 			name:  "fails when org not found",
 			input: &models.CreateOrgStripeAccountInput{OrganizationID: testOrgID},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, managerRepo *repomocks.MockManagerRepository, locationRepo *repomocks.MockLocationRepository, sc *stripemocks.MockStripeClient) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID).Return(nil, errors.New("not found"))
+				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID, mock.Anything).Return(nil, errors.New("not found"))
 			},
 			wantErr: true,
 		},
@@ -103,7 +103,7 @@ func TestHandler_CreateOrgStripeAccount(t *testing.T) {
 			name:  "fails when manager not found",
 			input: &models.CreateOrgStripeAccountInput{OrganizationID: testOrgID},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, managerRepo *repomocks.MockManagerRepository, locationRepo *repomocks.MockLocationRepository, sc *stripemocks.MockStripeClient) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID).Return(validOrg, nil)
+				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID, mock.Anything).Return(validOrg, nil)
 				managerRepo.On("GetManagerByOrgID", mock.Anything, testOrgID).Return(nil, errors.New("not found"))
 			},
 			wantErr: true,
@@ -112,7 +112,7 @@ func TestHandler_CreateOrgStripeAccount(t *testing.T) {
 			name:  "fails when location not found",
 			input: &models.CreateOrgStripeAccountInput{OrganizationID: testOrgID},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, managerRepo *repomocks.MockManagerRepository, locationRepo *repomocks.MockLocationRepository, sc *stripemocks.MockStripeClient) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID).Return(validOrg, nil)
+				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID, mock.Anything).Return(validOrg, nil)
 				managerRepo.On("GetManagerByOrgID", mock.Anything, testOrgID).Return(validManager, nil)
 				locationRepo.On("GetLocationByOrganizationID", mock.Anything, testOrgID).Return(nil, errors.New("not found"))
 			},
@@ -122,7 +122,7 @@ func TestHandler_CreateOrgStripeAccount(t *testing.T) {
 			name:  "fails when stripe account creation fails",
 			input: &models.CreateOrgStripeAccountInput{OrganizationID: testOrgID},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, managerRepo *repomocks.MockManagerRepository, locationRepo *repomocks.MockLocationRepository, sc *stripemocks.MockStripeClient) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID).Return(validOrg, nil)
+				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID, mock.Anything).Return(validOrg, nil)
 				managerRepo.On("GetManagerByOrgID", mock.Anything, testOrgID).Return(validManager, nil)
 				locationRepo.On("GetLocationByOrganizationID", mock.Anything, testOrgID).Return(validLocation, nil)
 				sc.On("CreateOrganizationAccount", mock.Anything, validOrg.Name, validManager.Email, "TH").
@@ -177,7 +177,7 @@ func TestHandler_CreateOrgLoginLink(t *testing.T) {
 			name:  "successfully creates login link",
 			input: &models.CreateOrgLoginLinkInput{OrganizationID: testOrgID},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID).Return(orgWithStripe, nil)
+				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID, mock.Anything).Return(orgWithStripe, nil)
 				sc.On("CreateLoginLink", mock.Anything, stripeAccountID).Return(loginURL, nil)
 			},
 			wantErr: false,
@@ -186,7 +186,7 @@ func TestHandler_CreateOrgLoginLink(t *testing.T) {
 			name:  "fails when org not found",
 			input: &models.CreateOrgLoginLinkInput{OrganizationID: testOrgID},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID).Return(nil, errors.New("not found"))
+				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID, mock.Anything).Return(nil, errors.New("not found"))
 			},
 			wantErr: true,
 		},
@@ -194,7 +194,7 @@ func TestHandler_CreateOrgLoginLink(t *testing.T) {
 			name:  "fails when org has no stripe account",
 			input: &models.CreateOrgLoginLinkInput{OrganizationID: testOrgID},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID).Return(validOrg, nil)
+				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID, mock.Anything).Return(validOrg, nil)
 			},
 			wantErr: true,
 		},
@@ -202,7 +202,7 @@ func TestHandler_CreateOrgLoginLink(t *testing.T) {
 			name:  "fails when stripe returns error",
 			input: &models.CreateOrgLoginLinkInput{OrganizationID: testOrgID},
 			mockSetup: func(orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
-				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID).Return(orgWithStripe, nil)
+				orgRepo.On("GetOrganizationByID", mock.Anything, testOrgID, mock.Anything).Return(orgWithStripe, nil)
 				sc.On("CreateLoginLink", mock.Anything, stripeAccountID).Return("", errors.New("stripe error"))
 			},
 			wantErr: true,

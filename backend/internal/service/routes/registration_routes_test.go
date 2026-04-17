@@ -422,7 +422,7 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 						GuardianID: guardianIDEx,
 					}, nil)
 
-				orgRepo.On("GetOrganizationByID", mock.Anything, organizationID).
+				orgRepo.On("GetOrganizationByID", mock.Anything, organizationID, mock.Anything).
 					Return(&models.Organization{
 						ID:              organizationID,
 						StripeAccountID: &stripeAccountID,
