@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { OrgLink } from "@skillspark/api-client";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
 import { useTranslation } from "react-i18next";
+import { AppColors } from "@/constants/theme";
 
 interface AboutPageProps {
   description: string;
@@ -17,6 +18,12 @@ export function AboutPage({ description, links }: AboutPageProps) {
 
   return (
     <View>
+      <Text
+        className="mb-2.5 text-[18px] font-nunito-bold"
+        style={{ color: AppColors.primaryText }}
+      >
+        {translate("event.about")}
+      </Text>
       <Text
         numberOfLines={expanded ? undefined : 4}
         onTextLayout={(e) => {

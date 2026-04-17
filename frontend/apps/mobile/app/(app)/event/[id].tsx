@@ -203,12 +203,6 @@ function EventOccurrenceDetail({
           className="mx-4 mb-4 rounded-2xl bg-white p-5"
           style={Shadows.card}
         >
-          <Text
-            className="mb-2.5 text-[18px] font-nunito-bold"
-            style={{ color: AppColors.primaryText }}
-          >
-            {translate("event.about")}
-          </Text>
           <AboutPage
             description={occurrence.event.description}
             links={occurrence.org_links ?? []}

@@ -47,46 +47,6 @@ async function openMessenger(url: string) {
   }
 }
 
-function makeAppIcons(text: string, url: string) {
-  return [
-    {
-      name: "Messages",
-      bg: "#34C759",
-      onPress: () => {
-        const smsUrl =
-          Platform.OS === "ios"
-            ? `sms:&body=${encodeURIComponent(text)}`
-            : `sms:?body=${encodeURIComponent(text)}`;
-        Linking.openURL(smsUrl).catch(() => {});
-      },
-      render: () => <IconSymbol name="message.fill" size={22} color="#fff" />,
-    },
-    {
-      name: "Messenger",
-      bg: "#0084FF",
-      onPress: () => openMessenger(url),
-      render: () => (
-        <FontAwesome5 name="facebook-messenger" size={20} color="#fff" />
-      ),
-    },
-    {
-      name: "Line",
-      bg: "#00B900",
-      onPress: () =>
-        Linking.openURL(
-          `https://line.me/R/msg/text/?${encodeURIComponent(text)}`,
-        ),
-      render: () => <FontAwesome5 name="line" size={20} color="#fff" />,
-    },
-    {
-      name: "WhatsApp",
-      bg: "#25D366",
-      onPress: () =>
-        Linking.openURL(`https://wa.me/?text=${encodeURIComponent(text)}`),
-      render: () => <FontAwesome5 name="whatsapp" size={20} color="#fff" />,
-    },
-  ];
-}
 
 interface ShareModalProps {
   visible: boolean;
@@ -109,7 +69,44 @@ export function ShareModal({
   const { t } = useTranslation();
   const shareMessage = message ?? t("share.defaultMessage", { name });
   const fullText = `${shareMessage}\n${shareUrl}`;
-  const appIcons = makeAppIcons(fullText, shareUrl);
+  const appIcons = [
+    {
+      name: t("share.apps.messages"),
+      bg: "#34C759",
+      onPress: () => {
+        const smsUrl =
+          Platform.OS === "ios"
+            ? `sms:&body=${encodeURIComponent(fullText)}`
+            : `sms:?body=${encodeURIComponent(fullText)}`;
+        Linking.openURL(smsUrl).catch(() => {});
+      },
+      render: () => <IconSymbol name="message.fill" size={22} color="#fff" />,
+    },
+    {
+      name: t("share.apps.messenger"),
+      bg: "#0084FF",
+      onPress: () => openMessenger(shareUrl),
+      render: () => (
+        <FontAwesome5 name="facebook-messenger" size={20} color="#fff" />
+      ),
+    },
+    {
+      name: t("share.apps.line"),
+      bg: "#00B900",
+      onPress: () =>
+        Linking.openURL(
+          `https://line.me/R/msg/text/?${encodeURIComponent(fullText)}`,
+        ),
+      render: () => <FontAwesome5 name="line" size={20} color="#fff" />,
+    },
+    {
+      name: t("share.apps.whatsapp"),
+      bg: "#25D366",
+      onPress: () =>
+        Linking.openURL(`https://wa.me/?text=${encodeURIComponent(fullText)}`),
+      render: () => <FontAwesome5 name="whatsapp" size={20} color="#fff" />,
+    },
+  ];
   const translateY = useSharedValue(0);
 
   useEffect(() => {

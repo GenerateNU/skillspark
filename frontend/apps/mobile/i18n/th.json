@@ -448,7 +448,13 @@
     "share": "แชร์",
     "limitationsApply": "มีเงื่อนไข ดูรายละเอียดที่แนบมา",
     "starsRating": "4.5 ดาว (140)",
-    "defaultMessage": "ไปดู {{name}} บน SkillSpark เลย!"
+    "defaultMessage": "ไปดู {{name}} บน SkillSpark เลย!",
+    "apps": {
+      "messages": "ข้อความ",
+      "messenger": "Messenger",
+      "line": "Line",
+      "whatsapp": "WhatsApp"
+    }
   },
   "occurrence": {
     "smiles": "/ 5 รอยยิ้ม",
