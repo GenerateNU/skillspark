@@ -26,6 +26,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="search" options={{ headerShown: false }} />
+          <Stack.Screen name="map-filters" options={{ headerShown: false }} />
           <Stack.Screen name="event" options={{ headerShown: false }} />
           <Stack.Screen name="org" options={{ headerShown: false }} />
           <Stack.Screen
