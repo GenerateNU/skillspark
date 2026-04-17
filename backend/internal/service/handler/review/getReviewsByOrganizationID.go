@@ -11,7 +11,7 @@ import (
 
 func (h *Handler) GetReviewsByOrganizationID(ctx context.Context, id uuid.UUID, AcceptLanguage string, pagination utils.Pagination) ([]models.Review, error) {
 
-	if _, err := h.OrganizationRepository.GetOrganizationByID(ctx, id); err != nil {
+	if _, err := h.OrganizationRepository.GetOrganizationByID(ctx, id, "en-US"); err != nil {
 		return nil, errs.BadRequest("Invalid organization_id: organization does not exist" + err.Error())
 	}
 

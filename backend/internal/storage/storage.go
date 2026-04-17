@@ -41,11 +41,11 @@ type SchoolRepository interface {
 }
 
 type OrganizationRepository interface {
-	CreateOrganization(ctx context.Context, org *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, error)
-	GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, error)
-	GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, error)
-	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, error)
-	DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error)
+	CreateOrganization(ctx context.Context, org *models.CreateOrganizationDBInput, PfpS3Key *string) (*models.Organization, error)
+	GetOrganizationByID(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.Organization, error)
+	GetAllOrganizations(ctx context.Context, pagination utils.Pagination, AcceptLanguage string) ([]models.Organization, error)
+	UpdateOrganization(ctx context.Context, org *models.UpdateOrganizationDBInput, PfpS3Key *string) (*models.Organization, error)
+	DeleteOrganization(ctx context.Context, id uuid.UUID, AcceptLanguage string) (*models.Organization, error)
 	GetEventOccurrencesByOrganizationID(ctx context.Context, organization_id uuid.UUID, AcceptLanguage string) ([]models.EventOccurrence, error)
 	SetStripeAccountID(ctx context.Context, orgID uuid.UUID, stripeAccountID string) (*models.Organization, error)
 	SetStripeAccountStatus(ctx context.Context, stripeAccountID string, activated bool) (*models.Organization, error)

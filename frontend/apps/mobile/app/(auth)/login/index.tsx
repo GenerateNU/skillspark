@@ -3,6 +3,7 @@ import { ThemedView } from "@/components/themed-view";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@/components/ErrorMessage";
@@ -18,6 +19,7 @@ type LoginFormData = {
 export default function LoginScreen() {
   const [errorText, setErrorText] = useState("");
   const { login } = useAuthContext();
+  const { t: translate } = useTranslation();
 
   const {
     control,
@@ -32,7 +34,7 @@ export default function LoginScreen() {
 
   const onSubmit = (formData: LoginFormData) => {
     if (formData.email === "" || formData.password === "") {
-      setErrorText("Missing email or password");
+      setErrorText(translate("auth.missingEmailOrPassword"));
     } else {
       login(formData.email, formData.password, setErrorText);
     }
@@ -45,7 +47,7 @@ export default function LoginScreen() {
   return (
     <ThemedView className="flex-1 items-center justify-center">
       <ThemedText type="title" className="text-3xl font-bold mb-8">
-        Log In
+        {translate("auth.logIn")}
       </ThemedText>
 
       <View className="w-full px-6 gap-4 items-center">
@@ -53,7 +55,7 @@ export default function LoginScreen() {
           control={control}
           name="email"
           error={errors.email}
-          placeholder="Email"
+          placeholder={translate("auth.email")}
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -61,12 +63,15 @@ export default function LoginScreen() {
           control={control}
           name="password"
           error={errors.password}
-          placeholder="Password"
+          placeholder={translate("auth.password")}
           secureTextEntry={true}
         />
-        <Button label="Log In" onPress={handleSubmit(onSubmit)} />
+        <Button
+          label={translate("auth.logIn")}
+          onPress={handleSubmit(onSubmit)}
+        />
         <PageRedirectButton
-          label="Don't have an account? Sign up"
+          label={translate("auth.dontHaveAccount")}
           onPress={handleGoToSignUp}
         />
         <ErrorMessage message={errorText} />

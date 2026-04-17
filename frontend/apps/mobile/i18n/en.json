@@ -5,7 +5,8 @@
     "activity": "Activity",
     "profile": "Profile",
     "events": "Events",
-    "about": "About"
+    "about": "About",
+    "manageChild": "Manage Child"
   },
   "eventCategories": {
     "noEventsFound": "No events found for this category.",
@@ -481,5 +482,36 @@
     "terms": "Terms & Conditions",
     "payAndReserve": "Pay Now & Reserve",
     "seeYouSoon": "See you soon!"
+  },
+  "auth": {
+    "logIn": "Log In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "username": "Username",
+    "selectLanguage": "Select a language...",
+    "languageEnglish": "English",
+    "languageThai": "Thai",
+    "dontHaveAccount": "Don't have an account? Sign up",
+    "alreadyHaveAccount": "Already have an account? Log in",
+    "missingEmailOrPassword": "Missing email or password",
+    "missingRequiredField": "Missing a required field",
+    "usernameTaken": "Username is taken.",
+    "unexpectedError": "An unexpected error occurred"
+  },
+  "search": {
+    "placeholder": "Search activities...",
+    "noResults": "No results found",
+    "tryDifferent": "Try a different search or adjust your filters"
+  },
+  "payment_errors": {
+    "failedToFetch": "Failed to fetch payment methods",
+    "failedToDelete": "Failed to delete payment method",
+    "notAuthenticated": "No user is authenticated",
+    "failedToCreateIntent": "Failed to create setup intent",
+    "failedToConfirm": "Failed to confirm payment method, please try again.",
+    "stripeNotAvailable": "Stripe is not available in Expo Go. Use a development build to manage payment methods.",
+    "unexpectedError": "An unexpected error occurred"
   }
 }

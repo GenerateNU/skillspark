@@ -35,7 +35,7 @@ func (h *Handler) CreatePaymentIntent(ctx context.Context, input *models.CreateP
 		return nil, errors.New("event occurrence not found")
 	}
 
-	org, err := h.OrganizationRepository.GetOrganizationByID(ctx, eventOccurrence.Event.OrganizationID)
+	org, err := h.OrganizationRepository.GetOrganizationByID(ctx, eventOccurrence.Event.OrganizationID, "en-US")
 	if err != nil {
 		return nil, err
 	}
