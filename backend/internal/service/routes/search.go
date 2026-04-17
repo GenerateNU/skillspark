@@ -7,13 +7,14 @@ import (
 	"skillspark/internal/opensearch"
 	"skillspark/internal/s3_client"
 	searchHandler "skillspark/internal/service/handler/search"
+	"skillspark/internal/storage"
 	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetupSearchRoutes(api huma.API, osClient *opensearch.Client, s3 s3_client.S3Interface) {
-	handler := searchHandler.NewHandler(osClient, s3)
+func SetupSearchRoutes(api huma.API, osClient *opensearch.Client, s3 s3_client.S3Interface, eventRepo storage.EventRepository) {
+	handler := searchHandler.NewHandler(osClient, s3, eventRepo)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "search-events",

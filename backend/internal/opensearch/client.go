@@ -20,6 +20,9 @@ type Client struct {
 }
 
 func NewClient(cfg config.OpenSearch) (*Client, error) {
+	if cfg.URL == "" {
+		return nil, nil
+	}
 	client, err := opensearchapi.NewClient(opensearchapi.Config{
 		Client: opensearch.Config{
 			Addresses: []string{cfg.URL},

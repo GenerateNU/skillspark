@@ -1,8 +1,6 @@
 import * as Haptics from "expo-haptics";
 import { useEffect, useRef } from "react";
 import Animated, {
-  FadeIn,
-  FadeOut,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -144,28 +142,26 @@ export function FloatingTabBar({ state, descriptors, navigation }: Props) {
               accessibilityRole="button"
               accessibilityState={isFocused ? { selected: true } : {}}
               accessibilityLabel={label}
-              className="flex-col items-center justify-center gap-[3px]"
-              style={{ width: TAB_WIDTH, height: TAB_HEIGHT }}
+              className="flex-col items-center justify-center"
+              style={{ width: TAB_WIDTH, height: TAB_HEIGHT, gap: 3 }}
             >
               <IconSymbol
                 name={iconName}
                 size={20}
                 color={isFocused ? "#1a1a1a" : "rgba(255,255,255,0.6)"}
               />
-              {isFocused && (
-                <Animated.Text
-                  entering={FadeIn.duration(200)}
-                  exiting={FadeOut.duration(120)}
-                  style={{
-                    fontSize: 13,
-                    fontWeight: "600",
-                    color: "#1a1a1a",
-                    letterSpacing: 0.1,
-                  }}
-                >
-                  {label}
-                </Animated.Text>
-              )}
+              {/* Always rendered so icon position stays consistent across all tabs */}
+              <Animated.Text
+                style={{
+                  fontSize: 13,
+                  fontWeight: "600",
+                  color: "#1a1a1a",
+                  letterSpacing: 0.1,
+                  opacity: isFocused ? 1 : 0,
+                }}
+              >
+                {label}
+              </Animated.Text>
             </Pressable>
           );
         })}

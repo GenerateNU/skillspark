@@ -76,6 +76,7 @@ func InitApp(config config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	// osClient is nil when OPENSEARCH_URL is not set (local dev without OpenSearch)
 
 	app, humaAPI, err := SetupApp(config, repo, s3Client, translateClient, newStripeClient, *notifService, osClient)
 	if err != nil {
@@ -131,7 +132,6 @@ func SetupApp(config config.Config, repo *storage.Repository, s3Client *s3_clien
 
 	// Register public routes BEFORE auth middleware
 	routes.SetupAuthRoutes(humaAPI, repo, config)
-	routes.SetupOrganizationRoutes(humaAPI, repo, s3Client, translateClient)
 	routes.SetupManagerRoutes(humaAPI, repo, config)
 	routes.SetupUserRoutes(humaAPI, repo)
 
@@ -186,6 +186,6 @@ func setupProtectedHumaRoutes(api huma.API, repo *storage.Repository, config con
 	routes.SetupGeocodingRoutes(api, geocodingService)
 	routes.SetupEmergencyContactRoutes(api, repo)
 	routes.SetupRecommendationRoutes(api, repo, s3Client)
-	routes.SetupSearchRoutes(api, osClient, s3Client)
+	routes.SetupSearchRoutes(api, osClient, s3Client, repo.Event)
 	return nil
 }

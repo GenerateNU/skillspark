@@ -3,15 +3,14 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
+import { Saved, useDeleteSaved } from "@skillspark/api-client";
 import {
-  getGetSavedByGuardianIdQueryKey,
-  Saved,
-  useDeleteSaved,
-  useGetSavedByGuardianId,
-} from "@skillspark/api-client";
+  useInfiniteSavedByGuardianId,
+  infiniteSavedQueryKey,
+} from "@/hooks/use-infinite-saved";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -23,6 +22,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { useTranslation } from "react-i18next";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 export default function SavedScreen() {
   const insets = useSafeAreaInsets();
@@ -33,13 +33,23 @@ export default function SavedScreen() {
   const { t: translate } = useTranslation();
 
   const {
-    data: response,
+    data,
     isLoading,
     error,
-  } = useGetSavedByGuardianId(guardianId!, undefined, {
-    query: { enabled: !!guardianId },
-  });
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteSavedByGuardianId(guardianId ?? undefined);
+
   const deleteSavedMutation = useDeleteSaved();
+
+  const savedEvents: Saved[] = useMemo(
+    () =>
+      data?.pages.flatMap((page) =>
+        Array.isArray(page.data) ? (page.data as Saved[]) : [],
+      ) ?? [],
+    [data],
+  );
 
   if (!guardianId) {
     return <ErrorScreen message={translate("common.noGuardianId")} />;
@@ -57,23 +67,13 @@ export default function SavedScreen() {
   if (error) {
     return (
       <ErrorScreen
-        message={error.detail || translate("common.errorOccurred")}
+        message={
+          (error as { detail?: string }).detail ??
+          translate("common.errorOccurred")
+        }
       />
     );
   }
-
-  if (!response || !Array.isArray(response.data)) {
-    return (
-      <View className="flex-1 items-center justify-center p-4">
-        <ThemedText>{translate("common.noEventsAvailable")}</ThemedText>
-      </View>
-    );
-  }
-
-  const savedEvents: Saved[] =
-    response.status === 200 && Array.isArray(response.data)
-      ? response.data
-      : [];
 
   const handleDeleteSaved = (savedId: string) => {
     Alert.alert(
@@ -90,7 +90,7 @@ export default function SavedScreen() {
               {
                 onSuccess: () => {
                   queryClient.invalidateQueries({
-                    queryKey: getGetSavedByGuardianIdQueryKey(guardianId),
+                    queryKey: infiniteSavedQueryKey(guardianId),
                   });
                 },
                 onError: (err) =>
@@ -135,8 +135,21 @@ export default function SavedScreen() {
                 onBookmarkPress={() => handleDeleteSaved(item.id)}
               />
             )}
-            contentContainerStyle={{ paddingTop: 10, paddingBottom: 20 }}
+            contentContainerStyle={{ paddingTop: 10, paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
             showsVerticalScrollIndicator={false}
+            onEndReached={() => {
+              if (hasNextPage && !isFetchingNextPage) {
+                fetchNextPage();
+              }
+            }}
+            onEndReachedThreshold={0.3}
+            ListFooterComponent={
+              isFetchingNextPage ? (
+                <View className="py-4 items-center">
+                  <ActivityIndicator size="small" />
+                </View>
+              ) : null
+            }
           />
         )}
       </ThemedView>
