@@ -109,7 +109,7 @@ function EventOccurrenceDetail({
           style={{ color: AppColors.primaryText }}
           numberOfLines={1}
         >
-          {translate("org.class")}
+          {occurrence.event.title}
         </Text>
         <View className="w-8" />
       </View>
