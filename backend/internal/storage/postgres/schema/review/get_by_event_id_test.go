@@ -28,23 +28,12 @@ func TestGetReviewsByEventID(t *testing.T) {
 	child := child.CreateTestChild(t, ctx, testDB)
 	eo := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 
-	input := func() *models.CreateRegistrationWithPaymentData {
-		i := &models.CreateRegistrationWithPaymentData{}
-		i.ChildID = child.ID
-		i.GuardianID = child.GuardianID
-		i.EventOccurrenceID = eo.ID
-		i.Status = models.RegistrationStatusRegistered
-		i.StripePaymentIntentID = "pi_test_123"
-		i.StripeCustomerID = "cus_test_123"
-		i.OrgStripeAccountID = "acct_test_123"
-		i.StripePaymentMethodID = "pm_test_123"
-		i.TotalAmount = 10000
-		i.ProviderAmount = 8500
-		i.PlatformFeeAmount = 1500
-		i.Currency = "thb"
-		i.PaymentIntentStatus = "requires_capture"
-		return i
-	}()
+	input := &models.CreateRegistrationData{
+		ChildID:           child.ID,
+		GuardianID:        child.GuardianID,
+		EventOccurrenceID: eo.ID,
+		Status:            models.RegistrationStatusRegistered,
+	}
 
 	regoutput, _ := regRepo.CreateRegistration(ctx, input)
 

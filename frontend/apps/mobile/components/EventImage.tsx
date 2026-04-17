@@ -10,9 +10,15 @@ interface EventImageProps {
 }
 
 /** Renders an event image from a presigned URL, falling back to a placeholder background. */
-export function EventImage({ uri, style, contentFit = "cover" }: EventImageProps) {
+export function EventImage({
+  uri,
+  style,
+  contentFit = "cover",
+}: EventImageProps) {
   if (uri) {
     return <Image source={{ uri }} style={style} contentFit={contentFit} />;
   }
-  return <View style={[{ backgroundColor: AppColors.imagePlaceholder }, style]} />;
+  return (
+    <View style={[{ backgroundColor: AppColors.imagePlaceholder }, style]} />
+  );
 }

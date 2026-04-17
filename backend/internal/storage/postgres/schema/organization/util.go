@@ -26,11 +26,15 @@ func CreateTestOrganization(
 	testLocation := location.CreateTestLocation(t, ctx, db)
 
 	active := true
-	i := &models.CreateOrganizationInput{}
-	i.Body.Name = "Test Corp"
-	i.Body.Active = &active
 	locationID := testLocation.ID
-	i.Body.LocationID = &locationID
+	i := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Test Corp",
+			Active:     &active,
+			LocationID: &locationID,
+		},
+	}
 
 	organization, err := repo.CreateOrganization(ctx, i, nil)
 	require.NoError(t, err)
@@ -55,4 +59,21 @@ func byteSliceLinks(links []models.OrgLink) ([]byte, error) {
 		return []byte("[]"), nil
 	}
 	return json.Marshal(links)
+}
+
+// pickAbout returns the about column matching AcceptLanguage, falling back
+// to the other column if the requested one is NULL. Returns nil if both are NULL.
+func pickAbout(AcceptLanguage string, aboutEN, aboutTH *string) *string {
+	switch AcceptLanguage {
+	case "th-TH":
+		if aboutTH != nil {
+			return aboutTH
+		}
+		return aboutEN
+	default:
+		if aboutEN != nil {
+			return aboutEN
+		}
+		return aboutTH
+	}
 }

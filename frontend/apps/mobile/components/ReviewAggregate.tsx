@@ -30,7 +30,7 @@ export function RatingAggregateCard({
         ) : (
           (() => {
             const match = RATING_OPTIONS.find(
-              (r) => r.rating === Math.round(avg)
+              (r) => r.rating === Math.round(avg),
             );
             return (
               <View className="flex-row items-center gap-3 mb-1">
@@ -55,37 +55,39 @@ export function RatingAggregateCard({
       />
       <View className="gap-3">
         {total > 0 &&
-          RATING_OPTIONS.filter((r) => r.rating !== null).map(({ rating, image, labelKey }) => {
-            const count =
-              aggregate.breakdown?.find((b) => b.rating === rating)
-                ?.review_count ?? 0;
-            const pct = total > 0 ? (count / total) * 100 : 0;
-            return (
-              <View key={rating} className="gap-1">
-                <View className="flex-row items-center gap-2">
-                  <Image source={image} className="w-4 h-4" />
-                  <Text
-                    className="text-xs"
-                    style={{ color: AppColors.secondaryText }}
-                  >
-                    {translate(labelKey ?? "")}
-                  </Text>
-                </View>
-                <View
-                  className="w-full h-2 rounded-full overflow-hidden"
-                  style={{ backgroundColor: AppColors.borderLight }}
-                >
+          RATING_OPTIONS.filter((r) => r.rating !== null).map(
+            ({ rating, image, labelKey }) => {
+              const count =
+                aggregate.breakdown?.find((b) => b.rating === rating)
+                  ?.review_count ?? 0;
+              const pct = total > 0 ? (count / total) * 100 : 0;
+              return (
+                <View key={rating} className="gap-1">
+                  <View className="flex-row items-center gap-2">
+                    <Image source={image} className="w-4 h-4" />
+                    <Text
+                      className="text-xs"
+                      style={{ color: AppColors.secondaryText }}
+                    >
+                      {translate(labelKey ?? "")}
+                    </Text>
+                  </View>
                   <View
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${pct}%`,
-                      backgroundColor: AppColors.primaryText,
-                    }}
-                  />
+                    className="w-full h-2 rounded-full overflow-hidden"
+                    style={{ backgroundColor: AppColors.borderLight }}
+                  >
+                    <View
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${pct}%`,
+                        backgroundColor: AppColors.primaryText,
+                      }}
+                    />
+                  </View>
                 </View>
-              </View>
-            );
-          })}
+              );
+            },
+          )}
       </View>
     </View>
   );

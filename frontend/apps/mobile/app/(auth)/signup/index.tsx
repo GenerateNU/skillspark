@@ -46,7 +46,11 @@ export default function WelcomeScreen() {
 				<View className="items-center px-6 pt-10 pb-5">
 					<ThemedText
 						className="font-nunito-bold text-[#111] text-center"
-						style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}
+						style={{
+							fontSize: FontSizes.hero,
+							lineHeight: FontSizes.hero + 8,
+							letterSpacing: -0.5,
+						}}
 						numberOfLines={1}
 						adjustsFontSizeToFit
 					>

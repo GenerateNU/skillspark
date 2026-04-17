@@ -21,7 +21,12 @@ import {
 } from "@skillspark/api-client";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors } from "@/constants/theme";
-import { formatAgeRange, filterFutureOccurrences, extractResponseData, formatAddress } from "@/utils/format";
+import {
+  formatAgeRange,
+  filterFutureOccurrences,
+  extractResponseData,
+  formatAddress,
+} from "@/utils/format";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 import { TrendingCard } from "@/components/home/TrendingCard";
@@ -71,8 +76,7 @@ export default function ForChildScreen() {
     [trendingResp],
   );
 
-  const featuredOccurrence =
-    trendingEvents[0] ?? futureOccurrences[0] ?? null;
+  const featuredOccurrence = trendingEvents[0] ?? futureOccurrences[0] ?? null;
 
   const orgId = featuredOccurrence?.event.organization_id;
   const { data: orgResp } = useGetOrganization(orgId!, {
@@ -98,7 +102,9 @@ export default function ForChildScreen() {
     query: { enabled: !!id },
   });
   const child = (childResp as unknown as { data: Child } | undefined)?.data;
-  const childInterests: string[] = Array.isArray(child?.interests) ? child.interests : [];
+  const childInterests: string[] = Array.isArray(child?.interests)
+    ? child.interests
+    : [];
 
   const matchedCategories = useMemo(() => {
     const matched = categories.filter((cat) => childInterests.includes(cat));
@@ -118,10 +124,15 @@ export default function ForChildScreen() {
     [filteredOccurrences, matchedEventIds],
   );
 
-  const featuredAddress = featuredOccurrence ? formatAddress(featuredOccurrence) || null : null;
+  const featuredAddress = featuredOccurrence
+    ? formatAddress(featuredOccurrence) || null
+    : null;
 
   const featuredAgeLabel = featuredOccurrence
-    ? formatAgeRange(featuredOccurrence.event.age_range_min, featuredOccurrence.event.age_range_max) || null
+    ? formatAgeRange(
+        featuredOccurrence.event.age_range_min,
+        featuredOccurrence.event.age_range_max,
+      ) || null
     : null;
 
   return (
@@ -134,7 +145,10 @@ export default function ForChildScreen() {
             color={AppColors.primaryText}
           />
         </TouchableOpacity>
-        <Text className="font-nunito-bold text-[22px]" style={{ color: AppColors.primaryText }}>
+        <Text
+          className="font-nunito-bold text-[22px]"
+          style={{ color: AppColors.primaryText }}
+        >
           {translate("dashboard.forChild", { name })}
         </Text>
       </View>
@@ -151,7 +165,9 @@ export default function ForChildScreen() {
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
+          contentContainerStyle={{
+            paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+          }}
         >
           {featuredOccurrence && (
             <FeaturedOccurrenceCard
@@ -165,8 +181,10 @@ export default function ForChildScreen() {
           )}
           {matchedCategories.map((cat) => (
             <View key={cat} className="mb-5">
-              <Text className="font-nunito-bold px-5 mb-2 text-xl"
-                style={{ color: AppColors.primaryText }}>
+              <Text
+                className="font-nunito-bold px-5 mb-2 text-xl"
+                style={{ color: AppColors.primaryText }}
+              >
                 {cat.charAt(0).toUpperCase() + cat.slice(1)}
               </Text>
               <ScrollView
@@ -178,8 +196,12 @@ export default function ForChildScreen() {
                   <TrendingCard
                     key={o.id}
                     occurrence={o}
-                    userLat={geoLocationLat ? Number(geoLocationLat) : undefined}
-                    userLng={geoLocationLng ? Number(geoLocationLng) : undefined}
+                    userLat={
+                      geoLocationLat ? Number(geoLocationLat) : undefined
+                    }
+                    userLng={
+                      geoLocationLng ? Number(geoLocationLng) : undefined
+                    }
                     style={{ marginRight: 14 }}
                   />
                 ))}
@@ -188,8 +210,10 @@ export default function ForChildScreen() {
           ))}
           {otherEvents.length > 0 && (
             <View className="mb-5">
-              <Text className="font-nunito-bold px-5 mb-2 text-xl"
-                style={{ color: AppColors.primaryText }}>
+              <Text
+                className="font-nunito-bold px-5 mb-2 text-xl"
+                style={{ color: AppColors.primaryText }}
+              >
                 Other Events
               </Text>
               <View className="px-5">
@@ -197,11 +221,14 @@ export default function ForChildScreen() {
                   <TrendingCard
                     key={o.id}
                     occurrence={o}
-                    userLat={geoLocationLat ? Number(geoLocationLat) : undefined}
-                    userLng={geoLocationLng ? Number(geoLocationLng) : undefined}
+                    userLat={
+                      geoLocationLat ? Number(geoLocationLat) : undefined
+                    }
+                    userLng={
+                      geoLocationLng ? Number(geoLocationLng) : undefined
+                    }
                     width="100%"
                   />
-
                 ))}
               </View>
             </View>

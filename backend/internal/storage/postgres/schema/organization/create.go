@@ -7,7 +7,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, error) {
+func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationDBInput, PfpS3Key *string) (*models.Organization, error) {
 
 	query, err := schema.ReadSQLBaseScript("create.sql", SqlOrganizationFiles)
 	if err != nil {
@@ -27,16 +27,19 @@ func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *
 		PfpS3Key,
 		input.Body.LocationID,
 		jsonLinks,
-		input.Body.About,
+		input.Body.AboutEN,
+		input.Body.AboutTH,
 	)
 
 	var createdOrganization models.Organization
+	var aboutEN, aboutTH *string
 	var rawLinks []byte
 	err = row.Scan(
 		&createdOrganization.ID,
 		&createdOrganization.Name,
 		&createdOrganization.Active,
-		&createdOrganization.About,
+		&aboutEN,
+		&aboutTH,
 		&createdOrganization.PfpS3Key,
 		&createdOrganization.LocationID,
 		&rawLinks,
@@ -48,6 +51,8 @@ func (r *OrganizationRepository) CreateOrganization(ctx context.Context, input *
 	if err != nil {
 		return nil, err
 	}
+
+	createdOrganization.About = pickAbout(input.AcceptLanguage, aboutEN, aboutTH)
 
 	createdOrganization.Links, err = scanLinks(rawLinks)
 	if err != nil {

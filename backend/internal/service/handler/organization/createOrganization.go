@@ -15,17 +15,23 @@ func (h *Handler) CreateOrganization(ctx context.Context, input *models.CreateOr
 		return nil, errs.BadRequest("Invalid location_id: location does not exist")
 	}
 
+	aboutEN, aboutTH, err := h.translateAbout(ctx, input.Body.About, input.AcceptLanguage)
+	if err != nil {
+		return nil, errs.InternalServerError("Translation failed: ", err.Error())
+	}
+
+	dbInput := buildCreateOrgDBInput(input, aboutEN, aboutTH)
+
 	var key *string
 	var url *string
 
-	organization, err := h.OrganizationRepository.CreateOrganization(ctx, input, key)
+	organization, err := h.OrganizationRepository.CreateOrganization(ctx, dbInput, key)
 	if err != nil {
 		return nil, err
 	}
 
 	if image_data != nil {
-
-		url, err = h.CreateOrgS3Helper(ctx, s3Client, organization, updateBody, image_data)
+		url, err = h.CreateOrgS3Helper(ctx, s3Client, organization, updateBody, image_data, input.AcceptLanguage)
 		if err != nil {
 			return nil, err
 		}
@@ -37,7 +43,7 @@ func (h *Handler) CreateOrganization(ctx context.Context, input *models.CreateOr
 }
 
 func (h *Handler) CreateOrgS3Helper(ctx context.Context, s3Client s3_client.S3Interface, organization *models.Organization,
-	updateBody *models.UpdateOrganizationBody, image_data *[]byte) (*string, error) {
+	updateBody *models.UpdateOrganizationBody, image_data *[]byte, acceptLanguage string) (*string, error) {
 
 	key, err := h.generateS3Key(organization.ID)
 	if err != nil {
@@ -45,11 +51,17 @@ func (h *Handler) CreateOrgS3Helper(ctx context.Context, s3Client s3_client.S3In
 	}
 	url, errr := s3Client.UploadImage(ctx, key, *image_data)
 
-	updateInput := &models.UpdateOrganizationInput{
-		ID:   organization.ID,
-		Body: *updateBody,
+	dbUpdate := &models.UpdateOrganizationDBInput{
+		AcceptLanguage: acceptLanguage,
+		ID:             organization.ID,
+		Body: models.UpdateOrgDBBody{
+			Name:       updateBody.Name,
+			Active:     updateBody.Active,
+			LocationID: updateBody.LocationID,
+			Links:      updateBody.Links,
+		},
 	}
-	updateKeyValue, err := h.OrganizationRepository.UpdateOrganization(ctx, updateInput, key)
+	updateKeyValue, err := h.OrganizationRepository.UpdateOrganization(ctx, dbUpdate, key)
 	if err != nil {
 		return nil, nil
 	}
@@ -59,5 +71,4 @@ func (h *Handler) CreateOrgS3Helper(ctx context.Context, s3Client s3_client.S3In
 	}
 
 	return url, nil
-
 }

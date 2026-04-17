@@ -89,7 +89,11 @@ export default function LoginScreen() {
 						<View className="px-6 pt-2 items-center">
 							<ThemedText
 								className="font-nunito-bold text-[#111] text-center"
-								style={{ fontSize: FontSizes.hero, lineHeight: FontSizes.hero + 8, letterSpacing: -0.5 }}
+								style={{
+									fontSize: FontSizes.hero,
+									lineHeight: FontSizes.hero + 8,
+									letterSpacing: -0.5,
+								}}
 							>
 								{translate("onboarding.signIn")}
 							</ThemedText>

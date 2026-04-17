@@ -751,14 +751,6 @@ paths:
       responses:
         "200":
           description: OK
-          headers:
-            Accept-Language:
-              schema:
-                type: string
-                default: en-US
-                enum:
-                  - en-US
-                  - th-TH
           content:
             application/json:
               schema:
@@ -1329,6 +1321,14 @@ paths:
       description: Returns a paginated list of organizations
       operationId: list-organizations
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: page
           in: query
           description: Page number (starts at 1)
@@ -1372,6 +1372,15 @@ paths:
       summary: Create a new organization
       description: Creates a new organization with the provided information
       operationId: create-organization
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
       requestBody:
         content:
           multipart/form-data:
@@ -1430,6 +1439,14 @@ paths:
       description: Returns a single organization by their ID
       operationId: get-organization
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: Organization ID
@@ -1458,6 +1475,14 @@ paths:
       description: Deletes an organization by ID
       operationId: delete-organization
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           description: Organization ID
@@ -1487,6 +1512,14 @@ paths:
       description: Updates an existing organization with the provided fields (partial update)
       operationId: update-organization
       parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
         - name: id
           in: path
           required: true
@@ -3165,9 +3198,6 @@ components:
           type: string
           description: ID of the guardian registering the child
           format: uuid
-        payment_method_id:
-          type: string
-          description: Stripe payment method ID to use
         status:
           type: string
           description: Initial status of the registration
@@ -3179,7 +3209,6 @@ components:
         - child_id
         - guardian_id
         - event_occurrence_id
-        - payment_method_id
         - status
     CreateReviewInputBody:
       type: object

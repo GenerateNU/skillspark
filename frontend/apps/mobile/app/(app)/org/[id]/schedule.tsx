@@ -13,7 +13,7 @@ import {
   useGetEventOccurrencesByOrganizationId,
   type EventOccurrence,
 } from "@skillspark/api-client";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, type UseQueryOptions } from "@tanstack/react-query";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -105,7 +105,7 @@ export default function OrgScheduleScreen() {
   const reviewResults = useQueries({
     queries: uniqueEventIds.map((eventId) =>
       getGetReviewAggregateQueryOptions(eventId),
-    ),
+    ) as UseQueryOptions[],
   });
 
   const ratingsMap = useMemo(() => {

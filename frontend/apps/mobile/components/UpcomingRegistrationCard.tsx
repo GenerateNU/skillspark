@@ -57,7 +57,11 @@ export function UpcomingRegistrationCard({ data }: RegistrationCardProps) {
         </View>
       </View>
       <View className="flex flex-row justify-between items-center px-4 py-3">
-        <ChildAvatarGroup children={children} size={32} style={{ gap: 8, flexWrap: "nowrap" }} />
+        <ChildAvatarGroup
+          children={children}
+          size={32}
+          style={{ gap: 8, flexWrap: "nowrap" }}
+        />
         <TouchableOpacity
           onPress={data.onClickRemove}
           className="px-6 py-2 rounded-full bg-black"

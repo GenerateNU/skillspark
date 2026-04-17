@@ -1,9 +1,6 @@
-import {
-  useGetAllEventOccurrences,
-  type EventOccurrence,
-} from "@skillspark/api-client";
+import { useSearchEvents, type Event } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -14,9 +11,9 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDebounce } from "use-debounce";
+import { useTranslation } from "react-i18next";
 import { SearchResultCard } from "@/components/home/SearchResultCard";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useFilters } from "@/hooks/use-filters";
 import { AppColors } from "@/constants/theme";
 import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
@@ -25,19 +22,22 @@ export default function SearchScreen() {
   const insets = useSafeAreaInsets();
   const { q } = useLocalSearchParams<{ q?: string }>();
   const { filters } = useFilters();
+  const { t: translate } = useTranslation();
 
   const [searchText, setSearchText] = useState(q ?? "");
-  const [debouncedSearch] = useDebounce(searchText, 300);
+  const [debouncedSearch] = useDebounce(searchText.toLowerCase(), 300);
 
-  const { data: resp, isLoading } = useGetAllEventOccurrences({
-    ...filters,
-    search: debouncedSearch || undefined,
-  });
 
-  const results: EventOccurrence[] = useMemo(() => {
-    const d = resp as unknown as { data: EventOccurrence[] } | undefined;
+  const { data: resp, isLoading, error } = useSearchEvents(
+    { q: debouncedSearch, limit: 5 },
+    { query: { enabled: !!debouncedSearch } }
+  );
+
+  const results: Event[] = useMemo(() => {
+    const d = resp as unknown as { data: Event[] } | undefined;
     return Array.isArray(d?.data) ? d.data : [];
   }, [resp]);
+
 
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
@@ -59,7 +59,7 @@ export default function SearchScreen() {
           />
           <TextInput
             className="flex-1 font-nunito text-sm text-[#111]"
-            placeholder="Search activities..."
+            placeholder={translate("search.placeholder")}
             placeholderTextColor={AppColors.placeholderText}
             value={searchText}
             onChangeText={setSearchText}
@@ -78,10 +78,10 @@ export default function SearchScreen() {
       ) : results.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-2">
           <Text className="font-nunito-bold text-[15px] text-[#111]">
-            No results found
+            {translate("search.noResults")}
           </Text>
           <Text className="font-nunito text-sm text-[#6B7280]">
-            Try a different search or adjust your filters
+            {translate("search.tryDifferent")}
           </Text>
         </View>
       ) : (
@@ -94,7 +94,12 @@ export default function SearchScreen() {
             paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
             gap: 12,
           }}
-          renderItem={({ item }) => <SearchResultCard occurrence={item} />}
+          // placeholder - we will change the SearchCard to accomodate event data instead
+          renderItem={({ item }) => (
+            <Text className="font-nunito text-sm text-[#111] p-3">
+              {item.title}
+            </Text>
+          )}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         />

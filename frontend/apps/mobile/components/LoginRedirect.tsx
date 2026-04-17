@@ -1,30 +1,32 @@
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { Stack, router } from "expo-router";
-import { useEffect } from "react";
+import { Redirect, Stack } from "expo-router";
+import { useEffect, useState } from "react";
+import * as Linking from "expo-linking";
 
 export const LoginRedirect = () => {
-	const { isAuthenticated, isLoading, hasAccount, inOnboarding, logout } =
-		useAuthContext();
+	const { isAuthenticated, isLoading } = useAuthContext();
+	const [initialUrl, setInitialUrl] = useState<string | null | undefined>(
+		undefined,
+	);
 
 	useEffect(() => {
-		if (isLoading) return;
-		if (inOnboarding) return;
+		Linking.getInitialURL()
+			.then((url) => setInitialUrl(url ?? null))
+			.catch(() => setInitialUrl(null));
+	}, []);
 
-		if (isAuthenticated && hasAccount) {
-			router.replace("/(app)/(tabs)");
-		} else if (!isAuthenticated && hasAccount) {
-			router.replace("/(auth)/login");
-		} else if (!isAuthenticated && !hasAccount) {
-			router.replace("/(auth)/signup");
-		} else {
-			logout();
-		}
-	}, [isAuthenticated, isLoading, hasAccount, inOnboarding]);
+	if (isLoading || initialUrl === undefined) {
+		return <Stack />;
+	}
 
 	return (
-		<Stack>
-			<Stack.Screen name="(auth)" options={{ headerShown: false }} />
-			<Stack.Screen name="(app)" options={{ headerShown: false }} />
-		</Stack>
+		<>
+			<Stack>
+				<Stack.Screen name="(auth)" options={{ headerShown: false }} />
+				<Stack.Screen name="(app)" options={{ headerShown: false }} />
+			</Stack>
+			{!isAuthenticated && <Redirect href="/(auth)/login" />}
+			{isAuthenticated && !initialUrl && <Redirect href="/(app)/(tabs)" />}
+		</>
 	);
 };

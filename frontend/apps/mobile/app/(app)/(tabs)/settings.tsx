@@ -55,7 +55,7 @@ export default function SettingsScreen() {
       guardian.profile_picture_s3_key,
       guardian.expo_push_token,
       value,
-      emailEnabled
+      emailEnabled,
     );
   };
 
@@ -73,7 +73,7 @@ export default function SettingsScreen() {
       guardian.profile_picture_s3_key,
       guardian.expo_push_token,
       pushEnabled,
-      value
+      value,
     );
   };
 

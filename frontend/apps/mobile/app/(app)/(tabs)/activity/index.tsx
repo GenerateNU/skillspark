@@ -301,7 +301,7 @@ export default function ActivityScreen() {
 
   return (
     <ThemedView className="w-full flex-1" style={{ paddingTop: insets.top }}>
-      <LogoBgWrapper>
+      <LogoBgWrapper className="flex-1">
         <View className="w-full flex items-center">
           <ThemedText className="py-3">{t("nav.activity")}</ThemedText>
         </View>

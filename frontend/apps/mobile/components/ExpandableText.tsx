@@ -27,8 +27,14 @@ export function ExpandableText({ text, maxLines = 4 }: ExpandableTextProps) {
         {text}
       </Text>
       {truncated && (
-        <Pressable onPress={() => setExpanded((prev) => !prev)} className="mb-4">
-          <Text className="text-[13px] font-semibold" style={{ color: AppColors.primaryText }}>
+        <Pressable
+          onPress={() => setExpanded((prev) => !prev)}
+          className="mb-4"
+        >
+          <Text
+            className="text-[13px] font-semibold"
+            style={{ color: AppColors.primaryText }}
+          >
             {expanded ? t("event.seeLess") : t("event.seeMore")}
           </Text>
         </Pressable>

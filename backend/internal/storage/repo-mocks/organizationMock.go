@@ -13,7 +13,7 @@ type MockOrganizationRepository struct {
 	mock.Mock
 }
 
-func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationInput, PfpS3Key *string) (*models.Organization, error) {
+func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, input *models.CreateOrganizationDBInput, PfpS3Key *string) (*models.Organization, error) {
 	args := m.Called(ctx, input, PfpS3Key)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
@@ -24,8 +24,8 @@ func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, inp
 	return args.Get(0).(*models.Organization), nil
 }
 
-func (m *MockOrganizationRepository) GetOrganizationByID(ctx context.Context, id uuid.UUID) (*models.Organization, error) {
-	args := m.Called(ctx, id)
+func (m *MockOrganizationRepository) GetOrganizationByID(ctx context.Context, id uuid.UUID, acceptLanguage string) (*models.Organization, error) {
+	args := m.Called(ctx, id, acceptLanguage)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil
@@ -35,8 +35,8 @@ func (m *MockOrganizationRepository) GetOrganizationByID(ctx context.Context, id
 	return args.Get(0).(*models.Organization), nil
 }
 
-func (m *MockOrganizationRepository) GetAllOrganizations(ctx context.Context, pagination utils.Pagination) ([]models.Organization, error) {
-	args := m.Called(ctx, pagination)
+func (m *MockOrganizationRepository) GetAllOrganizations(ctx context.Context, pagination utils.Pagination, acceptLanguage string) ([]models.Organization, error) {
+	args := m.Called(ctx, pagination, acceptLanguage)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil
@@ -46,7 +46,7 @@ func (m *MockOrganizationRepository) GetAllOrganizations(ctx context.Context, pa
 	return args.Get(0).([]models.Organization), nil
 }
 
-func (m *MockOrganizationRepository) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationInput, PfpS3Key *string) (*models.Organization, error) {
+func (m *MockOrganizationRepository) UpdateOrganization(ctx context.Context, input *models.UpdateOrganizationDBInput, PfpS3Key *string) (*models.Organization, error) {
 	args := m.Called(ctx, input, PfpS3Key)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
@@ -57,8 +57,8 @@ func (m *MockOrganizationRepository) UpdateOrganization(ctx context.Context, inp
 	return args.Get(0).(*models.Organization), nil
 }
 
-func (m *MockOrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID) (*models.Organization, error) {
-	args := m.Called(ctx, id)
+func (m *MockOrganizationRepository) DeleteOrganization(ctx context.Context, id uuid.UUID, acceptLanguage string) (*models.Organization, error) {
+	args := m.Called(ctx, id, acceptLanguage)
 	if args.Get(0) == nil {
 		if args.Get(1) == nil {
 			return nil, nil

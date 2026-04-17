@@ -10,9 +10,7 @@ import (
 
 func (sc *StripeClient) CreatePaymentIntent(ctx context.Context, input *models.CreatePaymentIntentInput) (*models.CreatePaymentIntentOutput, error) {
 
-	const applicationFeePercentage = 10 // CHANGE THIS TO BE THE APPLICATION FEE PERCENTAGE
-
-	applicationFeeTotal := (input.Body.Amount * int64(applicationFeePercentage)) / 100
+	applicationFeeTotal := (input.Body.Amount * int64(input.Body.PlatformFeePercentage)) / 100
 
 	params := &stripe.PaymentIntentCreateParams{
 		Amount:               stripe.Int64(input.Body.Amount),

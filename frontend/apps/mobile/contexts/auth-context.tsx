@@ -273,7 +273,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				},
 				onError: (err) => {
 					const fail = err as unknown as { data?: { message?: string } };
-					onError(fail.data?.message ?? "An unexpected error occurred");
+					onError(fail.data?.message ?? i18n.t("auth.unexpectedError"));
 				},
 			},
 		);
