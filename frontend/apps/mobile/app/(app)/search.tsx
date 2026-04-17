@@ -1,7 +1,4 @@
-import {
-  useGetAllEventOccurrences,
-  type EventOccurrence,
-} from "@skillspark/api-client";
+import { useGetAllEvents, type Event } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
@@ -31,13 +28,15 @@ export default function SearchScreen() {
   const [searchText, setSearchText] = useState(q ?? "");
   const [debouncedSearch] = useDebounce(searchText, 300);
 
-  const { data: resp, isLoading } = useGetAllEventOccurrences({
-    ...filters,
+  const { data: resp, isLoading } = useGetAllEvents({
     search: debouncedSearch || undefined,
+    category: filters.category,
+    min_age: filters.min_age,
+    max_age: filters.max_age,
   });
 
-  const results: EventOccurrence[] = useMemo(() => {
-    const d = resp as unknown as { data: EventOccurrence[] } | undefined;
+  const results: Event[] = useMemo(() => {
+    const d = resp as unknown as { data: Event[] } | undefined;
     return Array.isArray(d?.data) ? d.data : [];
   }, [resp]);
 
@@ -96,7 +95,7 @@ export default function SearchScreen() {
             paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
             gap: 12,
           }}
-          renderItem={({ item }) => <SearchResultCard occurrence={item} />}
+          renderItem={({ item }) => <SearchResultCard event={item} />}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         />

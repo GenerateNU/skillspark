@@ -202,26 +202,7 @@ function EventOccurrenceDetail({
             description={occurrence.event.description}
             links={occurrence.org_links ?? []}
           />
-          <ExpandableText text={occurrence.event.description ?? ""} />
-          {hasLinks && (
-            <View className="flex-row flex-wrap gap-2.5">
-              {occurrence.org_links.map((link, index) => (
-                <Pressable
-                  key={index}
-                  onPress={() => openLink(link.href)}
-                  className="rounded-full px-5 py-2.5 items-center"
-                  style={{ backgroundColor: AppColors.borderLight }}
-                >
-                  <Text
-                    className="text-[13px] font-semibold"
-                    style={{ color: AppColors.primaryText }}
-                  >
-                    {link.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
+          
         </View>
 
         {/* Reviews card */}
