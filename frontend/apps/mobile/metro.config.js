@@ -35,8 +35,6 @@ const nativeWindConfig = withNativeWind(config, { input: "./global.css" });
 const DEDUPLICATED_PACKAGES = [
 	"react",
 	"react-native",
-	"expo-router",
-	"expo-clipboard",
 	"react-native-css-interop",
 	"react-native-safe-area-context",
 	"react-native-screens",
