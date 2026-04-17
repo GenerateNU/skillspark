@@ -65,6 +65,17 @@ function EventOccurrenceDetail({
   const avgRating = aggregate?.average_rating ?? 0;
   const totalReviews = aggregate?.total_reviews ?? 0;
   const ratingOption = getRatingOption(avgRating);
+  const ratingMatch = RATING_OPTIONS.find(
+    (r) => r.rating === Math.round(avgRating)
+  );
+
+  const cardShadow = {
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
@@ -275,8 +286,7 @@ function EventOccurrenceDetail({
         <View className="px-4 pb-2 pt-1">
           <TouchableOpacity
             activeOpacity={0.85}
-            className="w-full items-center rounded-full py-4"
-            style={{ backgroundColor: AppColors.checkboxSelected }}
+            className="w-full items-center rounded-full py-4 bg-black"
             onPress={() =>
               router.push({
                 pathname: "/org/[id]/schedule",
