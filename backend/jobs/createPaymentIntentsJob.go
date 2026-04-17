@@ -25,54 +25,54 @@ func (j *JobScheduler) CreatePaymentIntentsJob() {
 		guardian, err := j.repo.Guardian.GetGuardianByID(ctx, reg.GuardianID)
 		if err != nil {
 			log.Printf("CreatePaymentIntentsJob: failed to get guardian %s for registration %s: %v", reg.GuardianID, reg.ID, err)
-			continue
+			return
 		}
 		if guardian == nil {
 			log.Printf("CreatePaymentIntentsJob: nil guardian for registration %s, skipping", reg.ID)
-			continue
+			return
 		}
 		if guardian.StripeCustomerID == nil {
 			log.Printf("CreatePaymentIntentsJob: guardian %s has no Stripe customer ID, skipping registration %s", reg.GuardianID, reg.ID)
-			continue
+			return
 		}
 
 		paymentMethods, err := j.stripeClient.GetPaymentMethodsByCustomerID(ctx, *guardian.StripeCustomerID)
 		if err != nil {
 			log.Printf("CreatePaymentIntentsJob: failed to get payment methods for guardian %s: %v", reg.GuardianID, err)
-			continue
+			return
 		}
 		if paymentMethods == nil {
 			log.Printf("CreatePaymentIntentsJob: nil payment methods response for guardian %s, skipping registration %s", reg.GuardianID, reg.ID)
-			continue
+			return
 		}
 		if len(paymentMethods.Body.PaymentMethods) == 0 {
 			log.Printf("CreatePaymentIntentsJob: guardian %s has no payment methods, skipping registration %s", reg.GuardianID, reg.ID)
-			continue
+			return
 		}
 		paymentMethodID := paymentMethods.Body.PaymentMethods[0].ID
 
 		eventOccurrence, err := j.repo.EventOccurrence.GetEventOccurrenceByID(ctx, reg.EventOccurrenceID, "en-US")
 		if err != nil {
 			log.Printf("CreatePaymentIntentsJob: failed to get event occurrence %s for registration %s: %v", reg.EventOccurrenceID, reg.ID, err)
-			continue
+			return
 		}
 		if eventOccurrence == nil {
 			log.Printf("CreatePaymentIntentsJob: nil event occurrence %s for registration %s, skipping", reg.EventOccurrenceID, reg.ID)
-			continue
+			return
 		}
 
 		org, err := j.repo.Organization.GetOrganizationByID(ctx, eventOccurrence.Event.OrganizationID)
 		if err != nil {
 			log.Printf("CreatePaymentIntentsJob: failed to get organization for registration %s: %v", reg.ID, err)
-			continue
+			return
 		}
 		if org == nil {
 			log.Printf("CreatePaymentIntentsJob: nil organization for registration %s, skipping", reg.ID)
-			continue
+			return
 		}
 		if org.StripeAccountID == nil {
 			log.Printf("CreatePaymentIntentsJob: organization %s has no Stripe account ID, skipping registration %s", eventOccurrence.Event.OrganizationID, reg.ID)
-			continue
+			return
 		}
 
 		piInput := models.CreatePaymentIntentInput{}
@@ -87,11 +87,11 @@ func (j *JobScheduler) CreatePaymentIntentsJob() {
 		paymentIntent, err := j.stripeClient.CreatePaymentIntent(ctx, &piInput)
 		if err != nil {
 			log.Printf("CreatePaymentIntentsJob: failed to create payment intent for registration %s: %v", reg.ID, err)
-			continue
+			return
 		}
 		if paymentIntent == nil {
 			log.Printf("CreatePaymentIntentsJob: nil payment intent response for registration %s, skipping", reg.ID)
-			continue
+			return
 		}
 
 		paymentData := &models.CreatePaymentData{
@@ -109,7 +109,7 @@ func (j *JobScheduler) CreatePaymentIntentsJob() {
 
 		if err := j.repo.Registration.CreatePayment(ctx, paymentData); err != nil {
 			log.Printf("CreatePaymentIntentsJob: failed to store payment for registration %s: %v", reg.ID, err)
-			continue
+			return
 		}
 
 		log.Printf("CreatePaymentIntentsJob: created payment intent %s for registration %s", paymentIntent.Body.PaymentIntentID, reg.ID)
