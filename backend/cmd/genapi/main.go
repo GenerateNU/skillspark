@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"skillspark/internal/config"
 	notifications "skillspark/internal/notification"
+	"skillspark/internal/opensearch"
 	"skillspark/internal/s3_client"
 	"skillspark/internal/service"
 	"skillspark/internal/storage"
@@ -46,8 +47,13 @@ func main() {
 		}
 	}
 
+	osClient, err := opensearch.NewClient(cfg.OpenSearch)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to create OpenSearch Client: %v\n", err)
+	}
+
 	// Initialize app to get Huma API
-	_, humaAPI, err := service.SetupApp(cfg, repo, s3Client, translateClient, newStripeClient, *notificationsService)
+	_, humaAPI, err := service.SetupApp(cfg, repo, s3Client, translateClient, newStripeClient, *notificationsService, osClient)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to setup app: %v\n", err)
 		os.Exit(1)

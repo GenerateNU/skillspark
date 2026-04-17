@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"skillspark/internal/models"
+	"skillspark/internal/s3_client"
 	"skillspark/internal/service/handler/saved"
 	"skillspark/internal/storage"
 	"skillspark/internal/utils"
@@ -11,9 +12,9 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-func SetUpSavedRoutes(api huma.API, repo *storage.Repository) {
+func SetUpSavedRoutes(api huma.API, repo *storage.Repository, s3Client s3_client.S3Interface) {
 
-	savedHandler := saved.NewHandler(repo.Saved, repo.Guardian)
+	savedHandler := saved.NewHandler(repo.Saved, repo.Guardian, s3Client)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "get-saved-by-guardian-id",
@@ -38,7 +39,7 @@ func SetUpSavedRoutes(api huma.API, repo *storage.Repository) {
 			Limit: limit,
 		}
 
-		saveds, err := savedHandler.SavedRepository.GetByGuardianID(ctx, input.ID, pagination, input.AcceptLanguage)
+		saveds, err := savedHandler.GetByGuardianID(ctx, input.ID, pagination, input.AcceptLanguage)
 		if err != nil {
 			return nil, err
 		}

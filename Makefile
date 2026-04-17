@@ -252,7 +252,7 @@ setup-hooks:
 
 
 generate-api:
-	cd frontend/packages/api-client && bun run generate
+	cd frontend/packages/api-client && bun run generate && cd ../../.. && make format-frontend
 
 clean-node-modules:
 	@echo "$(BOLD)Searching for and removing all node_modules folders...$(NC)"

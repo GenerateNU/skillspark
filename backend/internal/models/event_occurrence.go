@@ -128,7 +128,7 @@ type UpdateEventOccurrenceInput struct {
 		MaxAttendees *int       `json:"max_attendees,omitempty" doc:"Maximum number of attendees" minimum:"1" maximum:"100"`
 		Language     *string    `json:"language,omitempty" doc:"Primary language used for the event occurrence" minLength:"2" maxLength:"30"`
 		CurrEnrolled *int       `json:"curr_enrolled,omitempty" doc:"Number of students currently enrolled in the event occurrence" minimum:"0" maximum:"100"`
-		Price        *int       `json:"price,omitempty" doc:"Price in lowest denomination of currency" minimum:"0"`
+		Price        *int       `json:"price,omitempty" doc:"Price in cents." minimum:"0"`
 		Currency     *string    `json:"currency,omitempty" doc:"Currency code" minLength:"3" maxLength:"3"`
 	} `json:"body" doc:"Event occurrence fields to update"`
 }
