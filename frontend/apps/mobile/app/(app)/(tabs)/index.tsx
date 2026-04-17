@@ -240,7 +240,7 @@ export default function HomeScreen() {
               className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              Your Upcoming Classes
+              {translate("dashboard.upcomingClasses")}
             </Text>
             <ScrollView
               horizontal
@@ -290,7 +290,7 @@ export default function HomeScreen() {
               className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              Trending in Your Area
+              {translate("dashboard.trendingInYourArea")}
             </Text>
             <ScrollView
               horizontal
@@ -311,7 +311,7 @@ export default function HomeScreen() {
               className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              Recommended for...
+              {translate("dashboard.recommendedFor")}
             </Text>
             <ScrollView
               horizontal
@@ -336,7 +336,7 @@ export default function HomeScreen() {
               className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              Explore by Category
+              {translate("dashboard.exploreByCategory")}
             </Text>
             <View className="px-[15px]">
               {categoryPairs.map((pair, idx) => (

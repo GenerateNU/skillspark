@@ -53,6 +53,10 @@
     "upcomingEvents": "upcoming events",
     "reserved": "Reserved",
     "members": "members",
+    "upcomingClasses": "Your Upcoming Classes",
+    "trendingInYourArea": "Trending in Your Area",
+    "recommendedFor": "Recommended for...",
+    "exploreByCategory": "Explore by Category",
     "categories": {
       "technology": "Tech & Innovation",
       "art": "Arts & Creative Expression",

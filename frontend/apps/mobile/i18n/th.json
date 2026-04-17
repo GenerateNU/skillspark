@@ -54,6 +54,10 @@
     "reserved": "จองแล้ว",
     "learnMore": "ดูเพิ่มเติม",
     "members": "สมาชิก",
+    "upcomingClasses": "คลาสที่กำลังจะมาถึง",
+    "trendingInYourArea": "กำลังมาแรงในพื้นที่ของคุณ",
+    "recommendedFor": "แนะนำสำหรับ...",
+    "exploreByCategory": "สำรวจตามหมวดหมู่",
     "categories": {
       "technology": "เทคโนโลยีและนวัตกรรม",
       "art": "ศิลปะและการแสดงออกเชิงสร้างสรรค์",
