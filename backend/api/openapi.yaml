@@ -1858,6 +1858,49 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorModel'
+  /api/v1/registrations/{registration_id}/payment:
+    post:
+      tags:
+        - Registrations
+      summary: Create a payment intent for a registration
+      description: Creates a Stripe payment intent and stores the payment record for an existing registration
+      operationId: create-payment-intent
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+            default: en-US
+            enum:
+              - en-US
+              - th-TH
+        - name: registration_id
+          in: path
+          description: Registration ID to attach a payment to
+          required: true
+          schema:
+            type: string
+            description: Registration ID to attach a payment to
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentForRegistrationInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePaymentForRegistrationOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/registrations/child/{child_id}:
     get:
       tags:
@@ -3082,6 +3125,65 @@ components:
           $ref: '#/components/schemas/Organization'
       required:
         - account
+    CreatePaymentForRegistrationInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreatePaymentForRegistrationInputBody.json
+          readOnly: true
+        payment_method_id:
+          type: string
+          description: Stripe payment method ID to charge
+      required:
+        - payment_method_id
+    CreatePaymentForRegistrationOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/CreatePaymentForRegistrationOutputBody.json
+          readOnly: true
+        client_secret:
+          type: string
+          description: Client secret for frontend to confirm payment
+        currency:
+          type: string
+          description: Currency code
+        payment_intent_id:
+          type: string
+          description: Stripe payment intent ID
+        platform_fee_amount:
+          type: integer
+          description: Platform fee in cents
+          format: int64
+        provider_amount:
+          type: integer
+          description: Amount provider receives in cents
+          format: int64
+        status:
+          type: string
+          description: Payment intent status
+        total_amount:
+          type: integer
+          description: Total amount in cents
+          format: int64
+      required:
+        - payment_intent_id
+        - client_secret
+        - status
+        - total_amount
+        - provider_amount
+        - platform_fee_amount
+        - currency
     CreateRegistrationInputBody:
       type: object
       additionalProperties: false
@@ -3105,9 +3207,6 @@ components:
           type: string
           description: ID of the guardian registering the child
           format: uuid
-        payment_method_id:
-          type: string
-          description: Stripe payment method ID to use
         status:
           type: string
           description: Initial status of the registration
@@ -3119,7 +3218,6 @@ components:
         - child_id
         - guardian_id
         - event_occurrence_id
-        - payment_method_id
         - status
     CreateReviewInputBody:
       type: object
