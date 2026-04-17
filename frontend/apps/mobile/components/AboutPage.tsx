@@ -15,6 +15,7 @@ export function AboutPage({ description, links }: AboutPageProps) {
   const { t: translate } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [truncated, setTruncated] = useState(false);
+  const [measured, setMeasured] = useState(false);
 
   return (
     <View>
@@ -25,10 +26,14 @@ export function AboutPage({ description, links }: AboutPageProps) {
         {translate("event.about")}
       </Text>
       <Text
-        numberOfLines={expanded ? undefined : 4}
+        numberOfLines={!measured ? undefined : expanded ? undefined : 4}
         onTextLayout={(e) => {
-          if (!expanded) setTruncated(e.nativeEvent.lines.length >= 4);
+          if (!measured) {
+            setMeasured(true);
+            setTruncated(e.nativeEvent.lines.length > 4);
+          }
         }}
+        style={{ opacity: measured ? 1 : 0 }}
         className="text-sm text-gray-500 leading-relaxed mb-1"
       >
         {description}

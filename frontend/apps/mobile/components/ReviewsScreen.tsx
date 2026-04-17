@@ -9,19 +9,20 @@ import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, Colors } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import { useInfiniteReviewsByEventId } from "@/hooks/use-infinite-reviews";
 import {
   Review,
   ReviewAggregate,
   useGetRegistrationsByGuardianId,
   useGetReviewByGuardianId,
-  useGetReviewByEventId,
+  GetReviewByEventIdSortBy,
 } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  ScrollView,
+  FlatList,
   Text,
   TouchableOpacity,
   View,
@@ -60,20 +61,14 @@ export default function ReviewsScreen<
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const theme = Colors.light;
-
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [initialRating, setInitialRating] = useState<number | undefined>(
-    undefined,
-  );
-
-  const [sortBy, setSortBy] = useState<"most_recent" | "highest" | "lowest">(
-    "most_recent",
-  );
+  const [initialRating, setInitialRating] = useState<number | undefined>(undefined);
+  const [sortBy, setSortBy] = useState<GetReviewByEventIdSortBy>("most_recent");
 
   const {
     data: aggregateResponse,
@@ -81,9 +76,22 @@ export default function ReviewsScreen<
     error: aggregateError,
   } = useGetAggregate(id ?? "");
 
-  const reviewParams = useMemo(() => ({ sort_by: sortBy }), [sortBy]);
+  const {
+    data: reviewsData,
+    isLoading: reviewsIsLoading,
+    error: reviewsError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteReviewsByEventId(id, sortBy);
 
-  const reviewsQuery = useGetReviewByEventId(id ?? "", reviewParams);
+  const reviews: Review[] = useMemo(
+    () =>
+      reviewsData?.pages.flatMap((page) =>
+        Array.isArray(page.data) ? (page.data as Review[]) : [],
+      ) ?? [],
+    [reviewsData],
+  );
 
   const { data: registrationsResp } = useGetRegistrationsByGuardianId(
     guardianId ?? "",
@@ -119,7 +127,7 @@ export default function ReviewsScreen<
     return <ErrorScreen message={translate("common.noEventId")} />;
   }
 
-  if (aggregateIsLoading || reviewsQuery.isLoading) {
+  if (aggregateIsLoading || reviewsIsLoading) {
     return (
       <View className="flex-1 items-center justify-center gap-2">
         <ActivityIndicator size="large" />
@@ -128,7 +136,7 @@ export default function ReviewsScreen<
     );
   }
 
-  if (aggregateError || reviewsQuery.error) {
+  if (aggregateError || reviewsError) {
     return <ErrorScreen message={translate("common.errorOccurred")} />;
   }
 
@@ -140,16 +148,70 @@ export default function ReviewsScreen<
     );
   }
 
-  if (!reviewsQuery.data || reviewsQuery.data.status !== 200) {
-    return (
-      <View className="flex-1 items-center justify-center p-4">
-        <ThemedText>{translate("common.noReviewsAvailable")}</ThemedText>
-      </View>
-    );
-  }
-
   const aggregate = aggregateResponse.data as ReviewAggregate;
-  const reviews = reviewsQuery.data.data as Review[];
+
+  const ListHeader = (
+    <>
+      <RatingAggregateCard aggregate={aggregate} />
+
+      {showReviewCTA && (
+        <View
+          className="mx-5 mt-4 p-4 rounded-2xl border"
+          style={{ borderColor: AppColors.borderLight }}
+        >
+          <ThemedText className="text-lg mb-4 text-center">
+            {aggregate.total_reviews > 0
+              ? translate("review.tapToReview")
+              : translate("review.noReviews")}
+          </ThemedText>
+          <RatingSmileys
+            onSelect={(r) => {
+              setInitialRating(r);
+              setModalVisible(true);
+            }}
+          />
+          <TouchableOpacity
+            className="mt-4 py-4 rounded-2xl items-center"
+            style={{ backgroundColor: AppColors.primaryText }}
+            onPress={() => {
+              setInitialRating(undefined);
+              setModalVisible(true);
+            }}
+          >
+            <Text className="text-white text-base">
+              {translate("review.writeReview")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {showReviewCTA && guardianId && (
+        <LeaveReviewModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          eventId={id}
+          eventName={eventName}
+          eventLocation={eventLocation}
+          eventImageUrl={eventImageUrl}
+          registrationId={registration!.id}
+          guardianId={guardianId}
+          initialRating={initialRating}
+        />
+      )}
+
+      {aggregate.total_reviews > 0 && (
+        <FilterTabs
+          value={sortBy}
+          options={[
+            { label: translate("review.mostRecent"), value: "most_recent" },
+            { label: translate("review.highest"), value: "highest" },
+            { label: translate("review.lowest"), value: "lowest" },
+          ]}
+          onChange={(value) => setSortBy(value as GetReviewByEventIdSortBy)}
+        />
+      )}
+    </>
+  );
 
   return (
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
@@ -167,83 +229,37 @@ export default function ReviewsScreen<
         <View className="w-5" />
       </View>
 
-      <ScrollView
+      <FlatList
+        data={reviews}
+        keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
-      >
-        <RatingAggregateCard aggregate={aggregate} />
-
-        {showReviewCTA && (
-          <View
-            className="mx-5 mt-4 p-4 rounded-2xl border"
-            style={{ borderColor: AppColors.borderLight }}
-          >
-            <ThemedText className="text-lg mb-4 text-center">
-              {aggregate.total_reviews > 0
-                ? translate("review.tapToReview")
-                : translate("review.firstReview")}
-            </ThemedText>
-            <RatingSmileys
-              onSelect={(r) => {
-                setInitialRating(r);
-                setModalVisible(true);
-              }}
-            />
-            <TouchableOpacity
-              className="mt-4 py-4 rounded-2xl items-center"
-              style={{ backgroundColor: AppColors.primaryText }}
-              onPress={() => {
-                setInitialRating(undefined);
-                setModalVisible(true);
-              }}
-            >
-              <Text className="text-white text-base">
-                {translate("review.writeReview")}
-              </Text>
-            </TouchableOpacity>
+        ListHeaderComponent={ListHeader}
+        renderItem={({ item, index }) => (
+          <View className="px-5">
+            <ReviewCard review={item} />
+            {index < reviews.length - 1 && (
+              <View
+                style={{ backgroundColor: AppColors.borderLight }}
+                className="my-3 h-px"
+              />
+            )}
           </View>
         )}
-
-        {showReviewCTA && guardianId && (
-          <LeaveReviewModal
-            visible={modalVisible}
-            onClose={() => setModalVisible(false)}
-            eventId={id}
-            eventName={eventName}
-            eventLocation={eventLocation}
-            eventImageUrl={eventImageUrl}
-            registrationId={registration!.id}
-            guardianId={guardianId}
-            initialRating={initialRating}
-          />
-        )}
-
-        {aggregate.total_reviews > 0 && (
-          <FilterTabs
-            value={sortBy}
-            options={[
-              { label: translate("review.mostRecent"), value: "most_recent" },
-              { label: translate("review.highest"), value: "highest" },
-              { label: translate("review.lowest"), value: "lowest" },
-            ]}
-            onChange={setSortBy}
-          />
-        )}
-
-        <View className="gap-0 px-5 mt-4">
-          {reviews.map((review, index) => (
-            <View key={review.id}>
-              <ReviewCard review={review} />
-              {index < reviews.length - 1 && (
-                <View
-                  style={{ backgroundColor: AppColors.borderLight }}
-                  className="my-3 h-px"
-                />
-              )}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View className="py-4 items-center">
+              <ActivityIndicator size="small" />
             </View>
-          ))}
-        </View>
-      </ScrollView>
+          ) : null
+        }
+      />
     </ThemedView>
   );
 }

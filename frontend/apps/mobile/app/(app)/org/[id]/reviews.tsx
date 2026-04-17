@@ -5,23 +5,24 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
+import { useInfiniteEventReviewsForOrganization } from "@/hooks/use-infinite-reviews";
 import {
-  useGetEventReviewsForOrganization,
   useGetReviewAggregateOrganization,
   type ReviewAggregate,
+  type GetEventReviewsForOrganizationSortBy,
 } from "@skillspark/api-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type SortValue = "most_rated" | "highest" | "lowest";
+type SortValue = GetEventReviewsForOrganizationSortBy;
 
 export default function OrgReviewsPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -36,12 +37,21 @@ export default function OrgReviewsPage() {
       query: { enabled: !!id },
     });
 
-  const { data: eventReviewsResp, isLoading: eventReviewsLoading } =
-    useGetEventReviewsForOrganization(
-      id ?? "",
-      { sort_by: sortBy },
-      { query: { enabled: !!id } },
-    );
+  const {
+    data: eventReviewsData,
+    isLoading: eventReviewsLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteEventReviewsForOrganization(id, sortBy);
+
+  const items = useMemo(
+    () =>
+      eventReviewsData?.pages.flatMap((page) =>
+        Array.isArray(page.data) ? page.data : [],
+      ) ?? [],
+    [eventReviewsData],
+  );
 
   if (orgAggLoading || eventReviewsLoading) {
     return (
@@ -56,7 +66,20 @@ export default function OrgReviewsPage() {
       ? (orgAggregateResp.data as ReviewAggregate)
       : null;
 
-  const items = eventReviewsResp?.status === 200 ? eventReviewsResp.data : [];
+  const ListHeader = (
+    <>
+      {orgAggregate && <RatingAggregateCard aggregate={orgAggregate} />}
+      <FilterTabs
+        value={sortBy}
+        options={[
+          { label: translate("review.mostRated"), value: "most_rated" },
+          { label: translate("review.highest"), value: "highest" },
+          { label: translate("review.lowest"), value: "lowest" },
+        ]}
+        onChange={(value) => setSortBy(value as SortValue)}
+      />
+    </>
+  );
 
   return (
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>
@@ -74,26 +97,15 @@ export default function OrgReviewsPage() {
         <View className="w-5" />
       </View>
 
-      <ScrollView
+      <FlatList
+        data={items}
+        keyExtractor={(item) => item.event_id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 32 }}
-      >
-        {orgAggregate && <RatingAggregateCard aggregate={orgAggregate} />}
-
-        <FilterTabs
-          value={sortBy}
-          options={[
-            { label: translate("review.mostRated"), value: "most_rated" },
-            { label: translate("review.highest"), value: "highest" },
-            { label: translate("review.lowest"), value: "lowest" },
-          ]}
-          onChange={(value) => setSortBy(value as SortValue)}
-        />
-
-        <View className="px-5 gap-3 mt-2">
-          {items.map((item) => (
+        contentContainerStyle={{ paddingBottom: 32, paddingHorizontal: 20 }}
+        ListHeaderComponent={ListHeader}
+        renderItem={({ item }) => (
+          <View className="gap-3 mt-2">
             <EventRatingCard
-              key={item.event_id}
               event={item.event}
               aggregate={item}
               onPress={() =>
@@ -107,9 +119,22 @@ export default function OrgReviewsPage() {
                 })
               }
             />
-          ))}
-        </View>
-      </ScrollView>
+          </View>
+        )}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View className="py-4 items-center">
+              <ActivityIndicator size="small" />
+            </View>
+          ) : null
+        }
+      />
     </ThemedView>
   );
 }

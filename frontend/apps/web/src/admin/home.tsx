@@ -2,14 +2,20 @@ import { Link } from "react-router-dom";
 import { IconBuilding, IconPlus } from "../components/icons";
 import { listOrganizations } from "@skillspark/api-client";
 import type { Organization } from "@skillspark/api-client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { CreateModal } from "../components/admin_createModal";
+
+const PAGE_SIZE = 10;
 
 export default function HomePage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(false);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [showCreate, setShowCreate] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [isFetchingMore, setIsFetchingMore] = useState<boolean>(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const fmtDate = (iso: string): string =>
     new Date(iso).toLocaleDateString("en-US", {
@@ -18,24 +24,56 @@ export default function HomePage() {
       year: "numeric",
     });
 
-  useEffect(function () {
-    async function getOrgs(): Promise<void> {
-      try {
-        const orgResponse = await listOrganizations();
-        if (orgResponse.status !== 200) {
-          setIsError(true);
-          setLoading(false);
-          return;
-        }
-        setOrganizations(orgResponse.data);
-        setLoading(false);
-      } catch {
+  const fetchPage = useCallback(async (pageNum: number, replace: boolean) => {
+    setIsError(false);
+    if (replace) {
+      setLoading(true);
+    } else {
+      setIsFetchingMore(true);
+    }
+    try {
+      const res = await listOrganizations({ page: pageNum, page_size: PAGE_SIZE });
+      if (res.status !== 200) {
         setIsError(true);
+        return;
+      }
+      const items = res.data;
+      setOrganizations((prev) => (replace ? items : [...prev, ...items]));
+      setHasMore(items.length === PAGE_SIZE);
+    } catch {
+      setIsError(true);
+    } finally {
+      if (replace) {
         setLoading(false);
+      } else {
+        setIsFetchingMore(false);
       }
     }
-    getOrgs();
   }, []);
+
+  useEffect(() => {
+    fetchPage(1, true);
+  }, [fetchPage]);
+
+  useEffect(() => {
+    if (page === 1) return;
+    fetchPage(page, false);
+  }, [page, fetchPage]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasMore && !isFetchingMore && !loading && !isError) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, isFetchingMore, loading, isError]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -51,6 +89,7 @@ export default function HomePage() {
           </p>
         </div>
         <button
+          type="button"
           onClick={function () {
             setShowCreate(true);
           }}
@@ -86,45 +125,56 @@ export default function HomePage() {
             </p>
           </div>
         )}
-        {!loading && organizations.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {organizations.map(function (org: Organization) {
-              return (
-                <Link
-                  key={org.id}
-                  to={"/admin/organization/"}
-                  state={{ org }}
-                  className="group bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-9 h-9 rounded-md bg-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
-                      {org.name.charAt(0).toUpperCase()}
+        {!loading && !isError && organizations.length > 0 && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {organizations.map(function (org: Organization) {
+                return (
+                  <Link
+                    key={org.id}
+                    to={"/admin/organization/"}
+                    state={{ org }}
+                    className="group bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all"
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-9 h-9 rounded-md bg-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                        {org.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 truncate">
+                          {org.name}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {org.active ? "Active" : "Inactive"}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 truncate">
-                        {org.name}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {org.active ? "Active" : "Inactive"}
-                      </p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span
+                        className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded ring-1 ${org.stripe_account_activated ? "bg-green-50 text-green-700 ring-green-200" : "bg-yellow-50 text-yellow-700 ring-yellow-200"}`}
+                      >
+                        {org.stripe_account_activated
+                          ? "Stripe connected"
+                          : "Stripe pending"}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {fmtDate(org.created_at)}
+                      </span>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span
-                      className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded ring-1 ${org.stripe_account_activated ? "bg-green-50 text-green-700 ring-green-200" : "bg-yellow-50 text-yellow-700 ring-yellow-200"}`}
-                    >
-                      {org.stripe_account_activated
-                        ? "Stripe connected"
-                        : "Stripe pending"}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {fmtDate(org.created_at)}
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div
+              ref={sentinelRef}
+              className="h-8 mt-4 flex items-center justify-center"
+            >
+              {isFetchingMore && (
+                <p className="text-sm text-gray-400">Loading more…</p>
+              )}
+            </div>
+          </>
         )}
       </div>
 

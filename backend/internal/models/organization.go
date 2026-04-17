@@ -21,6 +21,9 @@ type Organization struct {
 	PfpS3Key               *string           `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
 	PresignedURL           *string           `json:"presigned_url,omitempty"`
 	LocationID             *uuid.UUID        `json:"location_id,omitempty" db:"location_id"`
+	Latitude               *float64          `json:"latitude,omitempty"`
+	Longitude              *float64          `json:"longitude,omitempty"`
+	District               *string           `json:"district,omitempty"`
 	CreatedAt              time.Time         `json:"created_at" db:"created_at"`
 	UpdatedAt              time.Time         `json:"updated_at" db:"updated_at"`
 	StripeAccountID        *string           `json:"stripe_account_id,omitempty" db:"stripe_account_id"`

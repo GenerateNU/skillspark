@@ -11,18 +11,16 @@ import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useFilters } from "@/hooks/use-filters";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import {
-  extractResponseData,
-  filterFutureOccurrences,
-  isWithinNext7Days,
-} from "@/utils/format";
+import { extractResponseData, isWithinNext7Days } from "@/utils/format";
 import {
   useGetAllEventOccurrences,
+  useGetAllEvents,
   useGetChildrenByGuardianId,
   useGetGuardianById,
   useGetRegistrationsByGuardianId,
   useGetTrendingEventOccurrences,
   type Child,
+  type Event,
   type EventOccurrence,
   type Guardian,
   type Registration,
@@ -42,7 +40,7 @@ import {
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
-  const { filters, hasActiveFilters } = useFilters();
+  const { hasActiveFilters } = useFilters();
   const router = useRouter();
   const { width, height } = useWindowDimensions();
 
@@ -65,7 +63,15 @@ export default function HomeScreen() {
   const guardian = (guardianResp as unknown as { data: Guardian } | undefined)
     ?.data;
 
-  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences({});
+  // Events (templates) — used for carousel and recommendations
+  const { data: eventsResp, isLoading } = useGetAllEvents();
+  const allEvents: Event[] = useMemo(
+    () => extractResponseData<Event>(eventsResp),
+    [eventsResp],
+  );
+
+  // Occurrences — kept only for matching upcoming registered classes
+  const { data: occurrencesResp } = useGetAllEventOccurrences({});
   const allOccurrences: EventOccurrence[] = useMemo(
     () => extractResponseData<EventOccurrence>(occurrencesResp),
     [occurrencesResp],
@@ -124,22 +130,17 @@ export default function HomeScreen() {
     return allOccurrences.filter((o) => upcomingIds.has(o.id));
   }, [registrations, allOccurrences]);
 
-  const futureOccurrences = useMemo(
-    () => filterFutureOccurrences(allOccurrences),
-    [allOccurrences],
-  );
-
   const childRecommendations = useMemo(() => {
-    const shuffled = [...futureOccurrences].sort(() => Math.random() - 0.5);
+    const shuffled = [...allEvents].sort(() => Math.random() - 0.5);
     return children
       .map((child, i) => {
         const start = i * 3;
         const slice = shuffled.slice(start, start + 3);
-        const occurrences = slice.length > 0 ? slice : shuffled.slice(0, 3);
-        return { child, occurrences };
+        const events = slice.length > 0 ? slice : shuffled.slice(0, 3);
+        return { child, events };
       })
-      .filter((r) => r.occurrences.length > 0);
-  }, [children, futureOccurrences]);
+      .filter((r) => r.events.length > 0);
+  }, [children, allEvents]);
 
   const categories = [
     "Sports & Physical Activities",
@@ -255,7 +256,7 @@ export default function HomeScreen() {
         )}
 
         {/* Discover Weekly */}
-        {futureOccurrences.length > 0 && (
+        {allEvents.length > 0 && (
           <View className="mb-6">
             <View className="flex-row items-center px-5 mb-3">
               <Text
@@ -274,8 +275,8 @@ export default function HomeScreen() {
             <CarouselCard
               events={
                 allLocalizedOccurrences.length > 0
-                  ? allLocalizedOccurrences
-                  : futureOccurrences.slice(0, 5)
+                  ? allLocalizedOccurrences.map((o) => o.event)
+                  : allEvents.slice(0, 5)
               }
               width={width}
               height={height}
@@ -318,12 +319,8 @@ export default function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 20 }}
             >
-              {childRecommendations.map(({ child, occurrences }) => (
-                <RecommendedCard
-                  key={child.id}
-                  child={child}
-                  occurrences={occurrences}
-                />
+              {childRecommendations.map(({ child, events }) => (
+                <RecommendedCard key={child.id} child={child} events={events} />
               ))}
             </ScrollView>
           </View>
