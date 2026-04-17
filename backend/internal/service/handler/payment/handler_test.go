@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	testOrgID      = uuid.MustParse("10000000-0000-0000-0000-000000000001")
+	testOrgID      = uuid.MustParse("40000000-0000-0000-0000-000000000001")
 	testGuardianID = uuid.MustParse("11111111-1111-1111-1111-111111111111")
 
 	stripeAccountID  = "acct_test_123"

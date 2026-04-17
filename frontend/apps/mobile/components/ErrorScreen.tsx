@@ -51,7 +51,9 @@ export const ErrorScreen = ({ message }: ErrorScreenProps) => {
             className="flex-row items-center justify-center gap-1"
           >
             <Text className="text-gray-500 text-sm">
-              {expanded ? translate("errorScreen.hideDetails") : translate("errorScreen.showDetails")}
+              {expanded
+                ? translate("errorScreen.hideDetails")
+                : translate("errorScreen.showDetails")}
             </Text>
             <IconSymbol
               name={expanded ? "chevron.up" : "chevron.down"}

@@ -53,8 +53,12 @@
     "basedOn": "Based on",
     "upcomingEvents": "upcoming events",
     "reserved": "Reserved",
-    "learnMore": "Learn More",
+    "learnMore": "Learn more",
     "members": "members",
+    "upcomingClasses": "Your Upcoming Classes",
+    "trendingInYourArea": "Trending in Your Area",
+    "recommendedFor": "Recommended for...",
+    "exploreByCategory": "Explore by Category",
     "categories": {
       "technology": "Tech & Innovation",
       "art": "Arts & Creative Expression",
@@ -439,6 +443,19 @@
     "username": "Username",
     "changeImage": "Change Image",
     "saveChanges": "Save Changes"
+  },
+  "share": {
+    "copyLink": "Copy link",
+    "share": "Share",
+    "limitationsApply": "Limitations apply, see attached",
+    "starsRating": "4.5 Stars (140)",
+    "defaultMessage": "Check out {{name}} on SkillSpark!",
+    "apps": {
+      "messages": "Messages",
+      "messenger": "Messenger",
+      "line": "Line",
+      "whatsapp": "WhatsApp"
+    }
   },
   "occurrence": {
     "smiles": "/ 5 Smiles",

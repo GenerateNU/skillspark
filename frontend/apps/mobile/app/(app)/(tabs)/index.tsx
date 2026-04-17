@@ -11,7 +11,11 @@ import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useFilters } from "@/hooks/use-filters";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import { extractResponseData, filterFutureOccurrences, isWithinNext7Days } from "@/utils/format";
+import {
+  extractResponseData,
+  filterFutureOccurrences,
+  isWithinNext7Days,
+} from "@/utils/format";
 import {
   useGetAllEventOccurrences,
   useGetChildrenByGuardianId,
@@ -71,7 +75,7 @@ export default function HomeScreen() {
     guardianId!,
     {
       query: { enabled: !!guardianId },
-    }
+    },
   );
   const registrations: Registration[] = useMemo(() => {
     const d = registrationsResp as unknown as
@@ -99,7 +103,7 @@ export default function HomeScreen() {
       query: {
         enabled: !!geoLocationLat && !!geoLocationLong,
       },
-    }
+    },
   );
 
   const trendingEvents: EventOccurrence[] = useMemo(
@@ -113,9 +117,9 @@ export default function HomeScreen() {
         .filter(
           (r) =>
             r.status === "registered" &&
-            isWithinNext7Days(r.occurrence_start_time)
+            isWithinNext7Days(r.occurrence_start_time),
         )
-        .map((r) => r.event_occurrence_id)
+        .map((r) => r.event_occurrence_id),
     );
     return allOccurrences.filter((o) => upcomingIds.has(o.id));
   }, [registrations, allOccurrences]);
@@ -236,7 +240,7 @@ export default function HomeScreen() {
               className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              Your Upcoming Classes
+              {translate("dashboard.upcomingClasses")}
             </Text>
             <ScrollView
               horizontal
@@ -286,7 +290,7 @@ export default function HomeScreen() {
               className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              Trending in Your Area
+              {translate("dashboard.trendingInYourArea")}
             </Text>
             <ScrollView
               horizontal
@@ -307,7 +311,7 @@ export default function HomeScreen() {
               className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              Recommended for...
+              {translate("dashboard.recommendedFor")}
             </Text>
             <ScrollView
               horizontal
@@ -325,26 +329,27 @@ export default function HomeScreen() {
           </View>
         )}
 
-      {/* Explore by Category */}
-      {categories.length > 0 && (
-        <View className="mb-6">
-          <Text
-            className="font-nunito-bold px-5 mb-3"
-            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-          >
-            Explore by Category
-          </Text>
-          <View className="px-[15px]">
-            {categoryPairs.map((pair, idx) => (
-              <View key={idx} className="flex-row">
-                {pair.map((cat) => (
-                  <CategoryCard key={cat} category={cat} />
-                ))}
-                {pair.length === 1 && <View className="flex-1 m-[5px]" />}
-              </View>
-            ))}
+        {/* Explore by Category */}
+        {categories.length > 0 && (
+          <View className="mb-6">
+            <Text
+              className="font-nunito-bold px-5 mb-3"
+              style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+            >
+              {translate("dashboard.exploreByCategory")}
+            </Text>
+            <View className="px-[15px]">
+              {categoryPairs.map((pair, idx) => (
+                <View key={idx} className="flex-row">
+                  {pair.map((cat) => (
+                    <CategoryCard key={cat} category={cat} />
+                  ))}
+                  {pair.length === 1 && <View className="flex-1 m-[5px]" />}
+                </View>
+              ))}
+            </View>
           </View>
-        </View>)}
+        )}
       </LogoBgWrapper>
     </ScrollView>
   );

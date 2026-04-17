@@ -14,15 +14,16 @@ func TestStripeClient_DetachPaymentMethod(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
+	stripeCustomerID := getSeededGuardianStripeCustomerID(t)
 	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("successfully detaches an attached payment method", func(t *testing.T) {
-		err := client.AttachPaymentMethod(ctx, "pm_card_visa", testStripeCustomerID)
+		err := client.AttachPaymentMethod(ctx, "pm_card_visa", stripeCustomerID)
 		require.NoError(t, err)
 
 		// get the attached payment method ID
-		pms, err := client.GetPaymentMethodsByCustomerID(ctx, testStripeCustomerID)
+		pms, err := client.GetPaymentMethodsByCustomerID(ctx, stripeCustomerID)
 		require.NoError(t, err)
 		require.NotEmpty(t, pms.Body.PaymentMethods)
 
@@ -33,7 +34,7 @@ func TestStripeClient_DetachPaymentMethod(t *testing.T) {
 		assert.NoError(t, err)
 
 		// verify it's gone
-		pmsAfter, err := client.GetPaymentMethodsByCustomerID(ctx, testStripeCustomerID)
+		pmsAfter, err := client.GetPaymentMethodsByCustomerID(ctx, stripeCustomerID)
 		require.NoError(t, err)
 		for _, pm := range pmsAfter.Body.PaymentMethods {
 			assert.NotEqual(t, pmID, pm.ID)

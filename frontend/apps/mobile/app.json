@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "SkillSpark needs your location to show events and activities near you.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationQueriesSchemes": ["fb-messenger", "line", "whatsapp"]
       },
       "config": {},
       "bundleIdentifier": "com.skillspark.app"

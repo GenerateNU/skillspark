@@ -44,7 +44,7 @@ const DEDUPLICATED_PACKAGES = [
 
 function getDeduplicatedPackage(moduleName) {
   return DEDUPLICATED_PACKAGES.find(
-    (pkg) => moduleName === pkg || moduleName.startsWith(pkg + "/")
+    (pkg) => moduleName === pkg || moduleName.startsWith(pkg + "/"),
   );
 }
 

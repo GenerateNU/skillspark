@@ -24,10 +24,13 @@ export function useDraggableBottomSheet(onDismiss: () => void) {
         if (gs.dy > 100) {
           onDismissRef.current();
         } else {
-          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
+          Animated.spring(translateY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
         }
       },
-    })
+    }),
   ).current;
 
   const reset = () => translateY.setValue(0);

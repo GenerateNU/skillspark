@@ -14,12 +14,17 @@ type MockRegistrationRepository struct {
 	mock.Mock
 }
 
-func (m *MockRegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error) {
+func (m *MockRegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationData) (*models.CreateRegistrationOutput, error) {
 	args := m.Called(ctx, input)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
 	return args.Get(0).(*models.CreateRegistrationOutput), args.Error(1)
+}
+
+func (m *MockRegistrationRepository) CreatePayment(ctx context.Context, input *models.CreatePaymentData) error {
+	args := m.Called(ctx, input)
+	return args.Error(0)
 }
 
 func (m *MockRegistrationRepository) GetRegistrationByID(ctx context.Context, input *models.GetRegistrationByIDInput, tx *pgx.Tx) (*models.GetRegistrationByIDOutput, error) {
@@ -92,6 +97,14 @@ func (m *MockEventOccurrenceRepository) DeleteEventOccurrence(
 ) error {
 	args := m.Called(ctx, id)
 	return args.Error(0)
+}
+
+func (m *MockRegistrationRepository) GetRegistrationsForPaymentCreation(ctx context.Context) ([]models.RegistrationForPayment, error) {
+	args := m.Called(ctx)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.RegistrationForPayment), args.Error(1)
 }
 
 func (m *MockRegistrationRepository) GetRegistrationByPaymentIntentID(ctx context.Context, paymentIntentID string, acceptLanguage string) (*models.Registration, error) {

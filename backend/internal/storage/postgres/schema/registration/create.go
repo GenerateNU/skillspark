@@ -8,7 +8,7 @@ import (
 	"skillspark/internal/storage/postgres/schema"
 )
 
-func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationWithPaymentData) (*models.CreateRegistrationOutput, error) {
+func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *models.CreateRegistrationData) (*models.CreateRegistrationOutput, error) {
 	tx, err := r.db.Begin(ctx)
 
 	var titleEN string
@@ -32,15 +32,7 @@ func (r *RegistrationRepository) CreateRegistration(ctx context.Context, input *
 		input.GuardianID,
 		input.EventOccurrenceID,
 		input.Status,
-		input.StripePaymentIntentID,
-		input.StripeCustomerID,
-		input.OrgStripeAccountID,
-		input.StripePaymentMethodID,
-		input.TotalAmount,
-		input.ProviderAmount,
-		input.PlatformFeeAmount,
-		input.Currency,
-		input.PaymentIntentStatus)
+	)
 
 	var createdRegistration models.CreateRegistrationOutput
 

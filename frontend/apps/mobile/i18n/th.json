@@ -55,6 +55,10 @@
     "reserved": "จองแล้ว",
     "learnMore": "ดูเพิ่มเติม",
     "members": "สมาชิก",
+    "upcomingClasses": "คลาสที่กำลังจะมาถึง",
+    "trendingInYourArea": "กำลังมาแรงในพื้นที่ของคุณ",
+    "recommendedFor": "แนะนำสำหรับ...",
+    "exploreByCategory": "สำรวจตามหมวดหมู่",
     "categories": {
       "technology": "เทคโนโลยีและนวัตกรรม",
       "art": "ศิลปะและการแสดงออกเชิงสร้างสรรค์",
@@ -439,6 +443,19 @@
     "username": "ชื่อผู้ใช้",
     "changeImage": "เปลี่ยนรูปภาพ",
     "saveChanges": "บันทึกการเปลี่ยนแปลง"
+  },
+  "share": {
+    "copyLink": "คัดลอกลิงก์",
+    "share": "แชร์",
+    "limitationsApply": "มีเงื่อนไข ดูรายละเอียดที่แนบมา",
+    "starsRating": "4.5 ดาว (140)",
+    "defaultMessage": "ไปดู {{name}} บน SkillSpark เลย!",
+    "apps": {
+      "messages": "ข้อความ",
+      "messenger": "Messenger",
+      "line": "Line",
+      "whatsapp": "WhatsApp"
+    }
   },
   "occurrence": {
     "smiles": "/ 5 รอยยิ้ม",
