@@ -5,34 +5,6 @@
  * API for the SkillSpark application
  * OpenAPI spec version: 1.0.0
  */
-export interface ForgotPasswordInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** Email address to send reset instructions to */
-  email: string;
-}
-
-export interface ForgotPasswordOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  message: string;
-}
-
-export interface ResetPasswordInputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  /** Access token from password reset email */
-  access_token: string;
-  /** New password */
-  new_password: string;
-}
-
-export interface ResetPasswordOutputBody {
-  /** A URL to the JSON Schema for this object. */
-  readonly $schema?: string;
-  message: string;
-}
-
 export interface AttachPaymentMethodInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -536,6 +508,19 @@ export interface EventOccurrence {
   updated_at: string;
 }
 
+export interface ForgotPasswordInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Email address to send reset instructions to */
+  email: string;
+}
+
+export interface ForgotPasswordOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  message: string;
+}
+
 export interface GeocodeAddressInputBody {
   /** A URL to the JSON Schema for this object. */
   readonly $schema?: string;
@@ -728,6 +713,21 @@ export interface PatchManagerInputBody {
   role?: string;
   /** Username of the guardian */
   username?: string;
+}
+
+export interface ResetPasswordInputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  /** Access token from password reset email */
+  access_token: string;
+  /** New password */
+  new_password: string;
+}
+
+export interface ResetPasswordOutputBody {
+  /** A URL to the JSON Schema for this object. */
+  readonly $schema?: string;
+  message: string;
 }
 
 export interface Review {

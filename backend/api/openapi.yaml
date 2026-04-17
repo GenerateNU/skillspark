@@ -9,6 +9,32 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 paths:
+  /api/v1/auth/forgot-password:
+    post:
+      tags:
+        - Auth
+      summary: Request password reset
+      description: Sends a password reset email if the address is registered
+      operationId: forgot-password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPasswordOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
   /api/v1/auth/login/guardian:
     post:
       tags:
@@ -63,6 +89,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ManagerLoginOutputBody'
+        default:
+          description: Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /api/v1/auth/reset-password:
+    post:
+      tags:
+        - Auth
+      summary: Reset password
+      description: Updates the user's password using the access token from the reset email
+      operationId: reset-password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordInputBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPasswordOutputBody'
         default:
           description: Error
           content:
@@ -3693,6 +3745,37 @@ components:
         - created_at
         - updated_at
         - status
+    ForgotPasswordInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ForgotPasswordInputBody.json
+          readOnly: true
+        email:
+          type: string
+          description: Email address to send reset instructions to
+      required:
+        - email
+    ForgotPasswordOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ForgotPasswordOutputBody.json
+          readOnly: true
+        message:
+          type: string
+      required:
+        - message
     GeocodeAddressInputBody:
       type: object
       additionalProperties: false
@@ -4409,6 +4492,41 @@ components:
         - updated_at
         - event_name
         - occurrence_start_time
+    ResetPasswordInputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ResetPasswordInputBody.json
+          readOnly: true
+        access_token:
+          type: string
+          description: Access token from password reset email
+        new_password:
+          type: string
+          description: New password
+      required:
+        - access_token
+        - new_password
+    ResetPasswordOutputBody:
+      type: object
+      additionalProperties: false
+      properties:
+        $schema:
+          type: string
+          description: A URL to the JSON Schema for this object.
+          format: uri
+          examples:
+            - http://localhost:8080/schemas/ResetPasswordOutputBody.json
+          readOnly: true
+        message:
+          type: string
+      required:
+        - message
     Review:
       type: object
       additionalProperties: false

@@ -36,7 +36,9 @@ export function ChildListItem({ child, onPress }: ChildListItemProps) {
           className="text-[13px] font-nunito"
           style={{ color: AppColors.mutedText }}
         >
-          {child.birth_month ? `${translate("months." + MONTHS[child.birth_month - 1])} ` : ""}
+          {child.birth_month
+            ? `${translate("months." + MONTHS[child.birth_month - 1])} `
+            : ""}
           {child.birth_year}
         </ThemedText>
         {child.interests && (

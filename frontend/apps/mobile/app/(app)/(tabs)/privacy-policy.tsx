@@ -33,7 +33,9 @@ export default function PrivacyPolicyScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         className="px-5 pt-2"
-        contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
+        contentContainerStyle={{
+          paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+        }}
       >
         <ThemedText
           className="text-[15px] font-nunito italic mb-4"

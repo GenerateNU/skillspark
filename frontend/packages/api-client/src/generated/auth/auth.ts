@@ -103,6 +103,113 @@ export type HTTPStatusCodes =
   | HTTPStatusCode5xx;
 
 /**
+ * Sends a password reset email if the address is registered
+ * @summary Request password reset
+ */
+export type forgotPasswordResponse200 = {
+  data: ForgotPasswordOutputBody;
+  status: 200;
+};
+
+export type forgotPasswordResponseDefault = {
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type forgotPasswordResponseSuccess = forgotPasswordResponse200 & {
+  headers: Headers;
+};
+export type forgotPasswordResponseError = forgotPasswordResponseDefault & {
+  headers: Headers;
+};
+
+export type forgotPasswordResponse =
+  | forgotPasswordResponseSuccess
+  | forgotPasswordResponseError;
+
+export const getForgotPasswordUrl = () => {
+  return `/api/v1/auth/forgot-password`;
+};
+
+export const forgotPassword = async (
+  forgotPasswordInputBody: NonReadonly<ForgotPasswordInputBody>,
+  options?: RequestInit,
+): Promise<forgotPasswordResponse> => {
+  return customInstance<forgotPasswordResponse>(getForgotPasswordUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(forgotPasswordInputBody),
+  });
+};
+
+export const getForgotPasswordMutationOptions = <
+  TError = ErrorModel,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof forgotPassword>>,
+    TError,
+    { data: NonReadonly<ForgotPasswordInputBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof forgotPassword>>,
+  TError,
+  { data: NonReadonly<ForgotPasswordInputBody> },
+  TContext
+> => {
+  const mutationKey = ["forgotPassword"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof forgotPassword>>,
+    { data: NonReadonly<ForgotPasswordInputBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return forgotPassword(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ForgotPasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof forgotPassword>>
+>;
+export type ForgotPasswordMutationBody = NonReadonly<ForgotPasswordInputBody>;
+export type ForgotPasswordMutationError = ErrorModel;
+
+/**
+ * @summary Request password reset
+ */
+export const useForgotPassword = <TError = ErrorModel, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof forgotPassword>>,
+      TError,
+      { data: NonReadonly<ForgotPasswordInputBody> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof forgotPassword>>,
+  TError,
+  { data: NonReadonly<ForgotPasswordInputBody> },
+  TContext
+> => {
+  return useMutation(getForgotPasswordMutationOptions(options), queryClient);
+};
+/**
  * Logs in a guardian
  * @summary Login a guardian
  */
@@ -317,6 +424,113 @@ export const useLoginManager = <TError = ErrorModel, TContext = unknown>(
   return useMutation(getLoginManagerMutationOptions(options), queryClient);
 };
 /**
+ * Updates the user's password using the access token from the reset email
+ * @summary Reset password
+ */
+export type resetPasswordResponse200 = {
+  data: ResetPasswordOutputBody;
+  status: 200;
+};
+
+export type resetPasswordResponseDefault = {
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type resetPasswordResponseSuccess = resetPasswordResponse200 & {
+  headers: Headers;
+};
+export type resetPasswordResponseError = resetPasswordResponseDefault & {
+  headers: Headers;
+};
+
+export type resetPasswordResponse =
+  | resetPasswordResponseSuccess
+  | resetPasswordResponseError;
+
+export const getResetPasswordUrl = () => {
+  return `/api/v1/auth/reset-password`;
+};
+
+export const resetPassword = async (
+  resetPasswordInputBody: NonReadonly<ResetPasswordInputBody>,
+  options?: RequestInit,
+): Promise<resetPasswordResponse> => {
+  return customInstance<resetPasswordResponse>(getResetPasswordUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(resetPasswordInputBody),
+  });
+};
+
+export const getResetPasswordMutationOptions = <
+  TError = ErrorModel,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resetPassword>>,
+    TError,
+    { data: NonReadonly<ResetPasswordInputBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resetPassword>>,
+  TError,
+  { data: NonReadonly<ResetPasswordInputBody> },
+  TContext
+> => {
+  const mutationKey = ["resetPassword"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resetPassword>>,
+    { data: NonReadonly<ResetPasswordInputBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return resetPassword(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResetPasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof resetPassword>>
+>;
+export type ResetPasswordMutationBody = NonReadonly<ResetPasswordInputBody>;
+export type ResetPasswordMutationError = ErrorModel;
+
+/**
+ * @summary Reset password
+ */
+export const useResetPassword = <TError = ErrorModel, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof resetPassword>>,
+      TError,
+      { data: NonReadonly<ResetPasswordInputBody> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof resetPassword>>,
+  TError,
+  { data: NonReadonly<ResetPasswordInputBody> },
+  TContext
+> => {
+  return useMutation(getResetPasswordMutationOptions(options), queryClient);
+};
+/**
  * Registers a guardian
  * @summary Register a guardian
  */
@@ -529,216 +743,4 @@ export const useSignupManager = <TError = ErrorModel, TContext = unknown>(
   TContext
 > => {
   return useMutation(getSignupManagerMutationOptions(options), queryClient);
-};
-/**
- * Sends a password reset email
- * @summary Request password reset
- */
-export type forgotPasswordResponse200 = {
-  data: ForgotPasswordOutputBody;
-  status: 200;
-};
-
-export type forgotPasswordResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type forgotPasswordResponseSuccess = forgotPasswordResponse200 & {
-  headers: Headers;
-};
-export type forgotPasswordResponseError = forgotPasswordResponseDefault & {
-  headers: Headers;
-};
-
-export type forgotPasswordResponse =
-  | forgotPasswordResponseSuccess
-  | forgotPasswordResponseError;
-
-export const getForgotPasswordUrl = () => {
-  return `/api/v1/auth/forgot-password`;
-};
-
-export const forgotPassword = async (
-  forgotPasswordInputBody: NonReadonly<ForgotPasswordInputBody>,
-  options?: RequestInit,
-): Promise<forgotPasswordResponse> => {
-  return customInstance<forgotPasswordResponse>(getForgotPasswordUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(forgotPasswordInputBody),
-  });
-};
-
-export const getForgotPasswordMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof forgotPassword>>,
-    TError,
-    { data: NonReadonly<ForgotPasswordInputBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof forgotPassword>>,
-  TError,
-  { data: NonReadonly<ForgotPasswordInputBody> },
-  TContext
-> => {
-  const mutationKey = ["forgotPassword"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof forgotPassword>>,
-    { data: NonReadonly<ForgotPasswordInputBody> }
-  > = (props) => {
-    const { data } = props ?? {};
-    return forgotPassword(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type ForgotPasswordMutationResult = NonNullable<
-  Awaited<ReturnType<typeof forgotPassword>>
->;
-export type ForgotPasswordMutationBody = NonReadonly<ForgotPasswordInputBody>;
-export type ForgotPasswordMutationError = ErrorModel;
-
-/**
- * @summary Request password reset
- */
-export const useForgotPassword = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof forgotPassword>>,
-      TError,
-      { data: NonReadonly<ForgotPasswordInputBody> },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof forgotPassword>>,
-  TError,
-  { data: NonReadonly<ForgotPasswordInputBody> },
-  TContext
-> => {
-  return useMutation(getForgotPasswordMutationOptions(options), queryClient);
-};
-/**
- * Resets user's password using access token from reset email
- * @summary Reset password
- */
-export type resetPasswordResponse200 = {
-  data: ResetPasswordOutputBody;
-  status: 200;
-};
-
-export type resetPasswordResponseDefault = {
-  data: ErrorModel;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type resetPasswordResponseSuccess = resetPasswordResponse200 & {
-  headers: Headers;
-};
-export type resetPasswordResponseError = resetPasswordResponseDefault & {
-  headers: Headers;
-};
-
-export type resetPasswordResponse =
-  | resetPasswordResponseSuccess
-  | resetPasswordResponseError;
-
-export const getResetPasswordUrl = () => {
-  return `/api/v1/auth/reset-password`;
-};
-
-export const resetPassword = async (
-  resetPasswordInputBody: NonReadonly<ResetPasswordInputBody>,
-  options?: RequestInit,
-): Promise<resetPasswordResponse> => {
-  return customInstance<resetPasswordResponse>(getResetPasswordUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(resetPasswordInputBody),
-  });
-};
-
-export const getResetPasswordMutationOptions = <
-  TError = ErrorModel,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof resetPassword>>,
-    TError,
-    { data: NonReadonly<ResetPasswordInputBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof resetPassword>>,
-  TError,
-  { data: NonReadonly<ResetPasswordInputBody> },
-  TContext
-> => {
-  const mutationKey = ["resetPassword"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof resetPassword>>,
-    { data: NonReadonly<ResetPasswordInputBody> }
-  > = (props) => {
-    const { data } = props ?? {};
-    return resetPassword(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type ResetPasswordMutationResult = NonNullable<
-  Awaited<ReturnType<typeof resetPassword>>
->;
-export type ResetPasswordMutationBody = NonReadonly<ResetPasswordInputBody>;
-export type ResetPasswordMutationError = ErrorModel;
-
-/**
- * @summary Reset password
- */
-export const useResetPassword = <TError = ErrorModel, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof resetPassword>>,
-      TError,
-      { data: NonReadonly<ResetPasswordInputBody> },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof resetPassword>>,
-  TError,
-  { data: NonReadonly<ResetPasswordInputBody> },
-  TContext
-> => {
-  return useMutation(getResetPasswordMutationOptions(options), queryClient);
 };

@@ -67,7 +67,9 @@ export default function ReviewsScreen<
   const { guardianId } = useAuthContext();
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [initialRating, setInitialRating] = useState<number | undefined>(undefined);
+  const [initialRating, setInitialRating] = useState<number | undefined>(
+    undefined,
+  );
   const [sortBy, setSortBy] = useState<GetReviewByEventIdSortBy>("most_recent");
 
   const {

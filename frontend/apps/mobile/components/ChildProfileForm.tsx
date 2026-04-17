@@ -110,7 +110,9 @@ function DropdownModal({
                   onClose();
                 }}
               >
-                <ThemedText>{displayOption ? displayOption(opt) : opt}</ThemedText>
+                <ThemedText>
+                  {displayOption ? displayOption(opt) : opt}
+                </ThemedText>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -293,7 +295,9 @@ export function ChildProfileForm({
               <ThemedText
                 className={birthMonth ? "" : "font-nunito text-[#9CA3AF]"}
               >
-                {birthMonth ? translate("months." + birthMonth) : translate("childProfile.month")}
+                {birthMonth
+                  ? translate("months." + birthMonth)
+                  : translate("childProfile.month")}
               </ThemedText>
               <IconSymbol
                 name="chevron.down"

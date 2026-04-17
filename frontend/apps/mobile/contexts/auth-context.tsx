@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setGuardianId(null);
     await SecureStore.deleteItemAsync("language_preference");
     setLangPref(null);
-   };
+  };
 
   useEffect(() => {
     const checkAlreadyAuth = async () => {

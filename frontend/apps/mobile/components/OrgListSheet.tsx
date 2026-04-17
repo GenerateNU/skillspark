@@ -39,9 +39,7 @@ export function OrgListSheet({ locations, userLocation }: OrgListSheetProps) {
         <FilterPill label={`${translate("map.filterDistance")} ▾`} />
         <FilterPill label={`${translate("map.sortBy")} ▾`} />
         <View className="flex-1" />
-        <TouchableOpacity
-          className="rounded-full bg-[#1C1C1E] px-4 py-2"
-        >
+        <TouchableOpacity className="rounded-full bg-[#1C1C1E] px-4 py-2">
           <Text className="font-nunito-semibold text-sm text-white">
             {translate("map.filter")}
           </Text>

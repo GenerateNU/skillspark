@@ -98,7 +98,9 @@ export default function ChildProfileScreen() {
               </ThemedText>
               <ThemedText className="text-[10px] font-nunito text-[#6B7280]">
                 {[
-                  child.birth_month ? translate("months." + MONTHS[child.birth_month - 1]) : null,
+                  child.birth_month
+                    ? translate("months." + MONTHS[child.birth_month - 1])
+                    : null,
                   child.birth_year,
                 ]
                   .filter(Boolean)

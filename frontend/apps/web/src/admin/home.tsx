@@ -32,7 +32,10 @@ export default function HomePage() {
       setIsFetchingMore(true);
     }
     try {
-      const res = await listOrganizations({ page: pageNum, page_size: PAGE_SIZE });
+      const res = await listOrganizations({
+        page: pageNum,
+        page_size: PAGE_SIZE,
+      });
       if (res.status !== 200) {
         setIsError(true);
         return;
@@ -65,7 +68,13 @@ export default function HomePage() {
     if (!sentinel) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasMore && !isFetchingMore && !loading && !isError) {
+        if (
+          entry.isIntersecting &&
+          hasMore &&
+          !isFetchingMore &&
+          !loading &&
+          !isError
+        ) {
           setPage((prev) => prev + 1);
         }
       },

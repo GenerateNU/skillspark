@@ -9,11 +9,31 @@ type ResetPasswordFormData = {
 };
 
 const PASSWORD_RULES = [
-  { key: "length", check: (p: string) => p.length >= 8, label: "At least 8 characters" },
-  { key: "upper", check: (p: string) => /[A-Z]/.test(p), label: "At least one uppercase letter" },
-  { key: "lower", check: (p: string) => /[a-z]/.test(p), label: "At least one lowercase letter" },
-  { key: "number", check: (p: string) => /[0-9]/.test(p), label: "At least one number" },
-  { key: "special", check: (p: string) => /[!@#~$%^&*()+|_.,;<>?/{}\\-]/.test(p), label: "At least one special character" },
+  {
+    key: "length",
+    check: (p: string) => p.length >= 8,
+    label: "At least 8 characters",
+  },
+  {
+    key: "upper",
+    check: (p: string) => /[A-Z]/.test(p),
+    label: "At least one uppercase letter",
+  },
+  {
+    key: "lower",
+    check: (p: string) => /[a-z]/.test(p),
+    label: "At least one lowercase letter",
+  },
+  {
+    key: "number",
+    check: (p: string) => /[0-9]/.test(p),
+    label: "At least one number",
+  },
+  {
+    key: "special",
+    check: (p: string) => /[!@#~$%^&*()+|_.,;<>?/{}\\-]/.test(p),
+    label: "At least one special character",
+  },
 ];
 
 export default function ResetPassword() {
@@ -75,7 +95,9 @@ export default function ResetPassword() {
         onSuccess: () => setSuccess(true),
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };
-          setErrorText(fail.data?.message ?? "Failed to reset password. Please try again.");
+          setErrorText(
+            fail.data?.message ?? "Failed to reset password. Please try again.",
+          );
         },
       },
     );
@@ -137,7 +159,9 @@ export default function ResetPassword() {
           className="w-full"
         />
         {errorText && (
-          <p className="text-red-500 text-sm whitespace-pre-line">{errorText}</p>
+          <p className="text-red-500 text-sm whitespace-pre-line">
+            {errorText}
+          </p>
         )}
         <button
           type="submit"

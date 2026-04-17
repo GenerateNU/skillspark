@@ -93,7 +93,9 @@ function DropdownModal({
                   onClose();
                 }}
               >
-                <ThemedText>{displayOption ? displayOption(opt) : opt}</ThemedText>
+                <ThemedText>
+                  {displayOption ? displayOption(opt) : opt}
+                </ThemedText>
               </TouchableOpacity>
             ))}
           </ScrollView>
