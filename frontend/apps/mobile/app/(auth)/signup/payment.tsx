@@ -67,9 +67,7 @@ export default function PaymentScreen() {
                   letterSpacing: -0.5,
                 }}
               >
-                {translate("payment.title", {
-                  defaultValue: "Payment Information",
-                })}
+                {translate("payment.title")}
               </ThemedText>
             </View>
 
@@ -77,9 +75,7 @@ export default function PaymentScreen() {
             <View className="px-6 gap-8">
               <View className="gap-1">
                 <ThemedText className="font-nunito-semibold text-base text-[#111]">
-                  {translate("payment.cardNumber", {
-                    defaultValue: "Card Number",
-                  })}
+                  {translate("payment.cardNumber")}
                 </ThemedText>
                 <TextInput
                   className="border border-[#E5E7EB] rounded-[10px] px-4 py-[14px] bg-white text-base font-nunito text-[#11181C]"
@@ -93,7 +89,7 @@ export default function PaymentScreen() {
               <View className="flex-row gap-3">
                 <View className="flex-1 gap-1">
                   <ThemedText className="font-nunito-semibold text-base text-[#111]">
-                    {translate("payment.cvv", { defaultValue: "CVV" })}
+                    {translate("payment.cvv")}
                   </ThemedText>
                   <TextInput
                     className="border border-[#E5E7EB] rounded-[10px] px-4 py-[14px] bg-white text-base font-nunito text-[#11181C]"
@@ -106,7 +102,7 @@ export default function PaymentScreen() {
 
                 <View className="flex-1 gap-1">
                   <ThemedText className="font-nunito-semibold text-base text-[#111]">
-                    {translate("payment.zipCode", { defaultValue: "Zip Code" })}
+                    {translate("payment.zipCode")}
                   </ThemedText>
                   <TextInput
                     className="border border-[#E5E7EB] rounded-[10px] px-4 py-[14px] bg-white text-base font-nunito text-[#11181C]"
@@ -128,7 +124,7 @@ export default function PaymentScreen() {
         style={{ paddingBottom: insets.bottom + 16 }}
       >
         <Button
-          label={translate("payment.finish", { defaultValue: "Finish" })}
+          label={translate("payment.finish")}
           onPress={handleFinish}
           disabled={false}
         />

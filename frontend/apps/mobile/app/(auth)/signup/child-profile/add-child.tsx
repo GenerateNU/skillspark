@@ -52,12 +52,14 @@ function DropdownModal({
   layout,
   options,
   onSelect,
+  displayOption,
 }: {
   visible: boolean;
   onClose: () => void;
   layout: DropdownLayout | null;
   options: string[];
   onSelect: (v: string) => void;
+  displayOption?: (opt: string) => string;
 }) {
   if (!layout) return null;
   return (
@@ -91,7 +93,7 @@ function DropdownModal({
                   onClose();
                 }}
               >
-                <ThemedText>{opt}</ThemedText>
+                <ThemedText>{displayOption ? displayOption(opt) : opt}</ThemedText>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -164,7 +166,7 @@ export default function AddChildScreen() {
   const deleteChildMutation = useDeleteChild();
 
   if (!guardianId) {
-    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+    return <ErrorScreen message={translate("common.noGuardianId")} />;
   }
 
   const openMonthDrop = () => {
@@ -367,9 +369,7 @@ export default function AddChildScreen() {
             <View className="flex-row gap-3 mb-4">
               <View className="flex-1">
                 <ThemedText className="font-nunito-semibold text-base text-[#111] mb-1">
-                  {translate("childProfile.birthMonth", {
-                    defaultValue: "Birth Month",
-                  })}
+                  {translate("childProfile.birthMonth")}
                 </ThemedText>
                 <View ref={monthTriggerRef}>
                   <TouchableOpacity
@@ -380,16 +380,14 @@ export default function AddChildScreen() {
                       className="text-base font-nunito"
                       style={{ color: theme.text }}
                     >
-                      {birthMonth}
+                      {birthMonth ? translate("months." + birthMonth) : ""}
                     </ThemedText>
                   </TouchableOpacity>
                 </View>
               </View>
               <View className="flex-1">
                 <ThemedText className="font-nunito-semibold text-base text-[#111] mb-1">
-                  {translate("childProfile.birthYear", {
-                    defaultValue: "Birth Year",
-                  })}
+                  {translate("childProfile.birthYear")}
                 </ThemedText>
                 <View ref={yearTriggerRef}>
                   <TouchableOpacity
@@ -409,9 +407,7 @@ export default function AddChildScreen() {
 
             {/* School */}
             <ThemedText className="font-nunito-semibold text-base text-[#111] mb-1">
-              {translate("childProfile.selectSchool", {
-                defaultValue: "School",
-              })}
+              {translate("childProfile.selectSchool")}
             </ThemedText>
             <View ref={schoolTriggerRef} className="mb-8">
               <TouchableOpacity
@@ -441,10 +437,7 @@ export default function AddChildScreen() {
 
             {/* Interests */}
             <ThemedText className="font-nunito text-base text-center text-[#111] leading-6 mb-5">
-              {translate("childProfile.addInterestsHint", {
-                defaultValue:
-                  "Add some interests. You can always change these later.",
-              })}
+              {translate("childProfile.addInterestsHint")}
             </ThemedText>
             <View className="gap-2 mb-8">
               {INTEREST_ROWS.map((row, rowIndex) => (
@@ -476,7 +469,7 @@ export default function AddChildScreen() {
                 label={
                   isSubmitting
                     ? translate("childProfile.saving")
-                    : translate("onboarding.submit", { defaultValue: "Submit" })
+                    : translate("common.submit")
                 }
                 onPress={handleSave}
                 disabled={isSubmitting}
@@ -492,6 +485,7 @@ export default function AddChildScreen() {
         layout={monthDropLayout}
         options={MONTHS}
         onSelect={setBirthMonth}
+        displayOption={(k) => translate("months." + k)}
       />
       <DropdownModal
         visible={showYearDrop}

@@ -65,9 +65,7 @@ export default function AvatarPickerScreen() {
             letterSpacing: -0.5,
           }}
         >
-          {translate("childProfile.setProfilePicture", {
-            defaultValue: "Set your child's profile picture",
-          })}
+          {translate("childProfile.setProfilePicture")}
         </ThemedText>
       </View>
 
@@ -106,7 +104,7 @@ export default function AvatarPickerScreen() {
           width="48%"
         />
         <Button
-          label={translate("common.save", { defaultValue: "Save" })}
+          label={translate("common.save")}
           onPress={handleSave}
           disabled={false}
           bgColor="#1B1B1B"

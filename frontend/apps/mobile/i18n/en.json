@@ -36,7 +36,8 @@
     "noEmergencyContactsAdded": "No emergency contacts added",
     "error": "Error",
     "locationDenied": "Permission to access location was denied. Please enable it in settings.",
-    "openSettings": "Open Settings"
+    "openSettings": "Open Settings",
+    "save": "Save"
   },
   "home": {
     "title": "Welcome",
@@ -159,7 +160,11 @@
       "description": "Are you sure you want to delete this payment method?",
       "confirm": "Confirm",
       "deleting": "Deleting..."
-    }
+    },
+    "cardNumber": "Card Number",
+    "cvv": "CVV",
+    "zipCode": "Zip Code",
+    "finish": "Finish"
   },
   "familyInformation": {
     "title": "Family Information",
@@ -203,7 +208,8 @@
       "technology": "Tech & Innovation",
       "science": "Small Group Tutoring",
       "art": "Art/Creative Expression"
-    }
+    },
+    "setProfilePicture": "Set Your Child's Profile Picture"
   },
   "saved": {
     "title": "Saved",
@@ -558,6 +564,20 @@
     "placeholder": "Search activities...",
     "noResults": "No results found",
     "tryDifferent": "Try a different search or adjust your filters"
+  },
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
   },
   "payment_errors": {
     "failedToFetch": "Failed to fetch payment methods",

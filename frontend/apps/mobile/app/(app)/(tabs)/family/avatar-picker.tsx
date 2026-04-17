@@ -98,9 +98,7 @@ export default function AvatarPickerScreen() {
             className="text-sm font-nunito-semibold mt-2"
             style={{ color: AppColors.mutedText }}
           >
-            {translate("childProfile.changeProfilePicture", {
-              defaultValue: "Change Profile Picture",
-            })}
+            {translate("childProfile.changeProfilePicture")}
           </ThemedText>
         </View>
 
@@ -133,7 +131,7 @@ export default function AvatarPickerScreen() {
               className="text-base font-nunito-semibold"
               style={{ color: theme.background }}
             >
-              {translate("common.save", { defaultValue: "Save" })}
+              {translate("common.save")}
             </ThemedText>
           </TouchableOpacity>
         </View>

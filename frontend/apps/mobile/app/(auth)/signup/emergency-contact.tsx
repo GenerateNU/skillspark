@@ -52,7 +52,7 @@ export default function ManageEmergencyContactScreen() {
   const deleteEmergencyContactMutation = useDeleteEmergencyContact();
 
   if (!guardianId) {
-    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+    return <ErrorScreen message={translate("common.noGuardianId")} />;
   }
 
   const isValidPhoneNumber = (phone: string) => {
@@ -257,9 +257,7 @@ export default function ManageEmergencyContactScreen() {
                 ? translate("emergencyContact.saving")
                 : isEditing
                   ? translate("emergencyContact.saveChanges")
-                  : translate("onboarding.continue", {
-                      defaultValue: "Continue",
-                    })
+                  : translate("onboarding.continue")
             }
             onPress={handleSave}
             disabled={isSubmitting}

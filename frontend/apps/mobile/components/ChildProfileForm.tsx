@@ -28,18 +28,18 @@ const INTEREST_OPTIONS = [
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
 ];
 
 export const YEARS = Array.from({ length: 30 }, (_, i) =>
@@ -54,6 +54,7 @@ type DropdownModalProps = {
   layout: DropdownLayout | null;
   options: string[];
   onSelect: (value: string) => void;
+  displayOption?: (opt: string) => string;
 };
 
 function DropdownModal({
@@ -62,6 +63,7 @@ function DropdownModal({
   layout,
   options,
   onSelect,
+  displayOption,
 }: DropdownModalProps) {
   const theme = Colors.light;
   if (!layout) return null;
@@ -108,7 +110,7 @@ function DropdownModal({
                   onClose();
                 }}
               >
-                <ThemedText>{opt}</ThemedText>
+                <ThemedText>{displayOption ? displayOption(opt) : opt}</ThemedText>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -260,9 +262,7 @@ export function ChildProfileForm({
             className="text-sm font-nunito-semibold"
             style={{ color: AppColors.mutedText }}
           >
-            {translate("childProfile.changeProfilePicture", {
-              defaultValue: "Change Profile Picture",
-            })}
+            {translate("childProfile.changeProfilePicture")}
           </ThemedText>
         </TouchableOpacity>
       </View>
@@ -293,7 +293,7 @@ export function ChildProfileForm({
               <ThemedText
                 className={birthMonth ? "" : "font-nunito text-[#9CA3AF]"}
               >
-                {birthMonth || translate("childProfile.month")}
+                {birthMonth ? translate("months." + birthMonth) : translate("childProfile.month")}
               </ThemedText>
               <IconSymbol
                 name="chevron.down"
@@ -333,6 +333,7 @@ export function ChildProfileForm({
         layout={monthDropLayout}
         options={MONTHS}
         onSelect={setBirthMonth}
+        displayOption={(k) => translate("months." + k)}
       />
 
       {/* Year dropdown modal */}

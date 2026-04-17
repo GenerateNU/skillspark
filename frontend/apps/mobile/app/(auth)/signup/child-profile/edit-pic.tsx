@@ -43,7 +43,7 @@ export default function EditChildPictureScreen() {
   const updateChildMutation = useUpdateChild();
 
   if (!guardianId) {
-    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+    return <ErrorScreen message={translate("common.noGuardianId")} />;
   }
 
   const childId = params.childId as string | undefined;
@@ -118,9 +118,7 @@ export default function EditChildPictureScreen() {
             letterSpacing: -0.5,
           }}
         >
-          {translate("childProfile.setProfilePicture", {
-            defaultValue: "Set your child's profile picture",
-          })}
+          {translate("childProfile.setProfilePicture")}
         </ThemedText>
       </View>
 

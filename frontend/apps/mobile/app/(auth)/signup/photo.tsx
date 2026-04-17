@@ -35,7 +35,7 @@ export default function PhotoScreen() {
 
   const onSubmit = () => {
     if (!guardian) {
-      setErrorText("ERROR: Could not fetch guardian ID");
+      setErrorText(translate("common.noGuardianId"));
     } else {
       update(
         () => router.push("/(auth)/signup/child-profile"),
