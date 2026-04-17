@@ -64,8 +64,8 @@ export function OrgCard({ pin, distance }: OrgCardProps) {
           {pin.image ? (
             <Image
               source={{ uri: pin.image }}
-              className="h-full w-full"
               contentFit="cover"
+              style={{ width: "100%", height: "100%" }}
             />
           ) : (
             <View className="flex-1 items-center justify-center">

@@ -49,6 +49,15 @@ export default function Login() {
             placeholder="Password"
             {...register("password")}
           />
+          <div className="self-end">
+            <button
+              type="button"
+              onClick={() => navigate("/forgot-password")}
+              className="text-sm text-blue-500 hover:underline"
+            >
+              Forgot Password?
+            </button>
+          </div>
           {errorText && <p className="text-red-500 text-sm">{errorText}</p>}
           <button
             type="submit"

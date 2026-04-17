@@ -8,6 +8,9 @@ SELECT
     eo.curr_enrolled,
     eo.created_at,
     eo.updated_at,
+    eo.status,
+    eo.price,
+    eo.currency,
 
     e.id,
     e.title_en,
@@ -33,7 +36,9 @@ SELECT
     l.postal_code,
     l.country,
     l.created_at,
-    l.updated_at
+    l.updated_at,
+
+    o.links
 FROM event_occurrence eo
 JOIN event e ON e.id = eo.event_id
 JOIN organization o ON o.id = e.organization_id

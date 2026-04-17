@@ -43,7 +43,10 @@ export default function SearchScreen() {
   } = useInfiniteQuery({
     queryKey: ["search", "events", debouncedSearch],
     queryFn: ({ pageParam, signal }) =>
-      searchEvents({ q: debouncedSearch, page: pageParam, limit: PAGE_SIZE }, { signal }),
+      searchEvents(
+        { q: debouncedSearch, page: pageParam, limit: PAGE_SIZE },
+        { signal },
+      ),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const items = lastPage.data;
@@ -63,7 +66,13 @@ export default function SearchScreen() {
     hasNextPage: hasNextAll,
     isFetchingNextPage: isFetchingNextAll,
   } = useInfiniteQuery({
-    queryKey: ["events", "all", filters.category, filters.min_age, filters.max_age],
+    queryKey: [
+      "events",
+      "all",
+      filters.category,
+      filters.min_age,
+      filters.max_age,
+    ],
     queryFn: ({ pageParam, signal }) =>
       getAllEvents(
         {
@@ -89,7 +98,9 @@ export default function SearchScreen() {
   const isLoading = hasQuery ? searchLoading : allEventsLoading;
   const fetchNextPage = hasQuery ? fetchNextSearchPage : fetchNextAllPage;
   const hasNextPage = hasQuery ? hasNextSearch : hasNextAll;
-  const isFetchingNextPage = hasQuery ? isFetchingNextSearch : isFetchingNextAll;
+  const isFetchingNextPage = hasQuery
+    ? isFetchingNextSearch
+    : isFetchingNextAll;
 
   const results: Event[] = useMemo(() => {
     if (hasQuery) {

@@ -135,7 +135,10 @@ export default function SavedScreen() {
                 onBookmarkPress={() => handleDeleteSaved(item.id)}
               />
             )}
-            contentContainerStyle={{ paddingTop: 10, paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
+            contentContainerStyle={{
+              paddingTop: 10,
+              paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+            }}
             showsVerticalScrollIndicator={false}
             onEndReached={() => {
               if (hasNextPage && !isFetchingNextPage) {

@@ -136,7 +136,10 @@ export default function EventCategoryScreen() {
         </Text>
       ) : (
         <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+          }}
           showsVerticalScrollIndicator={false}
         >
           {occurrences.map((o) => (

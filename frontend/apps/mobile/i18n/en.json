@@ -552,7 +552,14 @@
     "passwordReqLowercase": "At least one lowercase letter",
     "passwordReqNumber": "At least one number",
     "passwordReqSpecial": "At least one special character",
-    "signUp": "Sign Up"
+    "signUp": "Sign Up",
+    "forgotPasswordTitle": "Forgot Password",
+    "forgotPasswordSubtitle": "Enter your email and we'll send you reset instructions.",
+    "sendResetLink": "Send Reset Link",
+    "checkYourEmail": "Check Your Email",
+    "resetEmailSent": "If that email is registered, you'll receive reset instructions shortly.",
+    "backToSignIn": "Back to Sign In",
+    "sending": "Sending..."
   },
   "auth": {
     "logIn": "Log In",

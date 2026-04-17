@@ -22,11 +22,31 @@ import { PageRedirectButton } from "@/components/PageRedirectButton";
 
 // Matches the backend validatePasswordStrength rules exactly
 const PASSWORD_RULES = [
-  { key: "length",    check: (p: string) => p.length >= 8,                          i18nKey: "onboarding.passwordReqLength" },
-  { key: "upper",     check: (p: string) => /[A-Z]/.test(p),                        i18nKey: "onboarding.passwordReqUppercase" },
-  { key: "lower",     check: (p: string) => /[a-z]/.test(p),                        i18nKey: "onboarding.passwordReqLowercase" },
-  { key: "number",    check: (p: string) => /[0-9]/.test(p),                        i18nKey: "onboarding.passwordReqNumber" },
-  { key: "special",   check: (p: string) => /[!@#~$%^&*()+|_.,;<>?/{}\\-]/.test(p), i18nKey: "onboarding.passwordReqSpecial" },
+  {
+    key: "length",
+    check: (p: string) => p.length >= 8,
+    i18nKey: "onboarding.passwordReqLength",
+  },
+  {
+    key: "upper",
+    check: (p: string) => /[A-Z]/.test(p),
+    i18nKey: "onboarding.passwordReqUppercase",
+  },
+  {
+    key: "lower",
+    check: (p: string) => /[a-z]/.test(p),
+    i18nKey: "onboarding.passwordReqLowercase",
+  },
+  {
+    key: "number",
+    check: (p: string) => /[0-9]/.test(p),
+    i18nKey: "onboarding.passwordReqNumber",
+  },
+  {
+    key: "special",
+    check: (p: string) => /[!@#~$%^&*()+|_.,;<>?/{}\\-]/.test(p),
+    i18nKey: "onboarding.passwordReqSpecial",
+  },
 ];
 
 export default function AccountScreen() {
@@ -139,9 +159,14 @@ export default function AccountScreen() {
                       {PASSWORD_RULES.map((rule) => {
                         const met = rule.check(password);
                         return (
-                          <View key={rule.key} className="flex-row items-center gap-1.5">
+                          <View
+                            key={rule.key}
+                            className="flex-row items-center gap-1.5"
+                          >
                             <IconSymbol
-                              name={met ? "checkmark.circle.fill" : "xmark.circle"}
+                              name={
+                                met ? "checkmark.circle.fill" : "xmark.circle"
+                              }
                               size={14}
                               color={met ? "#22C55E" : "#9CA3AF"}
                             />

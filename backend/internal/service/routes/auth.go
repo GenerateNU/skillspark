@@ -12,7 +12,7 @@ import (
 )
 
 func SetupAuthRoutes(api huma.API, repo *storage.Repository, config config.Config) {
-	authHandler := auth.NewHandler(config.Supabase, repo.User, repo.Guardian, repo.Manager)
+	authHandler := auth.NewHandler(config.Supabase, config.Application, repo.User, repo.Guardian, repo.Manager)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "signup-guardian",
@@ -80,6 +80,28 @@ func SetupAuthRoutes(api huma.API, repo *storage.Repository, config config.Confi
 		}
 
 		return managerRes, nil
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "forgot-password",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/auth/forgot-password",
+		Summary:     "Request password reset",
+		Description: "Sends a password reset email if the address is registered",
+		Tags:        []string{"Auth"},
+	}, func(ctx context.Context, input *models.ForgotPasswordInput) (*models.ForgotPasswordOutput, error) {
+		return authHandler.ForgotPassword(ctx, input)
+	})
+
+	huma.Register(api, huma.Operation{
+		OperationID: "reset-password",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/auth/reset-password",
+		Summary:     "Reset password",
+		Description: "Updates the user's password using the access token from the reset email",
+		Tags:        []string{"Auth"},
+	}, func(ctx context.Context, input *models.ResetPasswordInput) (*models.ResetPasswordOutput, error) {
+		return authHandler.ResetPassword(ctx, input)
 	})
 
 }

@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"encoding/json"
 	"skillspark/internal/errs"
 	"skillspark/internal/models"
 	"skillspark/internal/storage/postgres/schema"
@@ -10,10 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-var language string
-
 func (r *EventRepository) GetEventOccurrencesByEventID(ctx context.Context, event_id uuid.UUID, AcceptLanguage string) ([]models.EventOccurrence, error) {
-	language = AcceptLanguage
 	query, err := schema.ReadSQLBaseScript("get_by_event_id.sql", SqlEventFiles)
 	if err != nil {
 		err := errs.InternalServerError("Failed to read base query: ", err.Error())
@@ -27,7 +25,9 @@ func (r *EventRepository) GetEventOccurrencesByEventID(ctx context.Context, even
 	}
 	defer rows.Close()
 
-	eventOccurrences, err := pgx.CollectRows(rows, scanEventOccurrence)
+	eventOccurrences, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (models.EventOccurrence, error) {
+		return scanEventOccurrenceByEventID(row, AcceptLanguage)
+	})
 	if err != nil {
 		err := errs.InternalServerError("Failed to scan all event occurrences: ", err.Error())
 		return nil, &err
@@ -35,11 +35,11 @@ func (r *EventRepository) GetEventOccurrencesByEventID(ctx context.Context, even
 	return eventOccurrences, nil
 }
 
-func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error) {
+func scanEventOccurrenceByEventID(row pgx.CollectableRow, language string) (models.EventOccurrence, error) {
 	var createdEventOccurrence models.EventOccurrence
 	var titleEN, descriptionEN string
 	var titleTH, descriptionTH *string
-	// populate data from each row
+	var orgLinks []byte
 	err := row.Scan(
 		// event occurrence fields
 		&createdEventOccurrence.ID,
@@ -51,6 +51,9 @@ func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error)
 		&createdEventOccurrence.CurrEnrolled,
 		&createdEventOccurrence.CreatedAt,
 		&createdEventOccurrence.UpdatedAt,
+		&createdEventOccurrence.Status,
+		&createdEventOccurrence.Price,
+		&createdEventOccurrence.Currency,
 
 		// event fields
 		&createdEventOccurrence.Event.ID,
@@ -79,16 +82,37 @@ func scanEventOccurrence(row pgx.CollectableRow) (models.EventOccurrence, error)
 		&createdEventOccurrence.Location.Country,
 		&createdEventOccurrence.Location.CreatedAt,
 		&createdEventOccurrence.Location.UpdatedAt,
-	)
 
-	// Default to English
+		&orgLinks,
+	)
+	if err != nil {
+		return createdEventOccurrence, err
+	}
+
 	switch language {
 	case "th-TH":
-		createdEventOccurrence.Event.Title = *titleTH
-		createdEventOccurrence.Event.Description = *descriptionTH
-	case "en-US":
+		if titleTH != nil {
+			createdEventOccurrence.Event.Title = *titleTH
+		} else {
+			createdEventOccurrence.Event.Title = titleEN
+		}
+		if descriptionTH != nil {
+			createdEventOccurrence.Event.Description = *descriptionTH
+		} else {
+			createdEventOccurrence.Event.Description = descriptionEN
+		}
+	default:
 		createdEventOccurrence.Event.Title = titleEN
 		createdEventOccurrence.Event.Description = descriptionEN
 	}
-	return createdEventOccurrence, err
+
+	if orgLinks != nil {
+		if jsonErr := json.Unmarshal(orgLinks, &createdEventOccurrence.OrgLinks); jsonErr != nil {
+			createdEventOccurrence.OrgLinks = []models.OrgLink{}
+		}
+	} else {
+		createdEventOccurrence.OrgLinks = []models.OrgLink{}
+	}
+
+	return createdEventOccurrence, nil
 }

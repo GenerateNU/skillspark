@@ -96,7 +96,9 @@ export default function FamilyListScreen() {
       <ScrollView
         className="px-[20px] pt-[12px]"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
+        contentContainerStyle={{
+          paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
+        }}
       >
         <TouchableOpacity
           className="flex-row items-start py-4 gap-3"
