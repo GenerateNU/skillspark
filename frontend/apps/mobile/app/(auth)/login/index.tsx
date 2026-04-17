@@ -66,7 +66,10 @@ export default function LoginScreen() {
           placeholder={translate("auth.password")}
           secureTextEntry={true}
         />
-        <Button label={translate("auth.logIn")} onPress={handleSubmit(onSubmit)} />
+        <Button
+          label={translate("auth.logIn")}
+          onPress={handleSubmit(onSubmit)}
+        />
         <PageRedirectButton
           label={translate("auth.dontHaveAccount")}
           onPress={handleGoToSignUp}

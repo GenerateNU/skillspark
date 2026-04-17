@@ -62,7 +62,8 @@ const CardFormInner = ({
   async function handleSave(): Promise<void> {
     try {
       setError(null);
-      if (!guardian) throw new Error(translate("payment_errors.notAuthenticated"));
+      if (!guardian)
+        throw new Error(translate("payment_errors.notAuthenticated"));
       setSaving(true);
 
       const res = await createGuardianSetupIntent(guardian.id);
