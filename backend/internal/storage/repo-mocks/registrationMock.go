@@ -99,6 +99,14 @@ func (m *MockEventOccurrenceRepository) DeleteEventOccurrence(
 	return args.Error(0)
 }
 
+func (m *MockRegistrationRepository) GetRegistrationsForPaymentCreation(ctx context.Context) ([]models.RegistrationForPayment, error) {
+	args := m.Called(ctx)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.RegistrationForPayment), args.Error(1)
+}
+
 func (m *MockRegistrationRepository) GetRegistrationByPaymentIntentID(ctx context.Context, paymentIntentID string, acceptLanguage string) (*models.Registration, error) {
 	args := m.Called(ctx, paymentIntentID, acceptLanguage)
 	if args.Get(0) == nil {

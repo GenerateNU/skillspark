@@ -29,6 +29,12 @@ type Registration struct {
 	OccurrenceStartTime   time.Time          `json:"occurrence_start_time" db:"occurrence_start_time" doc:"Start time of the event occurrence"`
 }
 
+type RegistrationForPayment struct {
+	ID                uuid.UUID
+	GuardianID        uuid.UUID
+	EventOccurrenceID uuid.UUID
+}
+
 type RegistrationStatus string
 
 const (

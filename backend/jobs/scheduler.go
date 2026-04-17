@@ -42,11 +42,20 @@ func (j *JobScheduler) Start() {
 		log.Fatalf("Failed to schedule notification job: %v", err)
 	}
 
+	_, err = j.cron.AddFunc("0 * * * *", func() {
+		log.Println("Running payment intent creation job...")
+		j.CreatePaymentIntentsJob()
+	})
+	if err != nil {
+		log.Fatalf("Failed to schedule payment intent creation job: %v", err)
+	}
+
 	j.cron.Start()
 	log.Println("Cron jobs started")
 
 	go j.CapturePaymentsJob()
 	go j.SendScheduledNotificationsJob()
+	go j.CreatePaymentIntentsJob()
 }
 
 func (j *JobScheduler) Stop() {
