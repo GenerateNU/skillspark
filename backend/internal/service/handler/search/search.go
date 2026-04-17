@@ -8,6 +8,9 @@ import (
 )
 
 func (h *Handler) SearchEvents(ctx context.Context, query string, acceptLanguage string, pagination utils.Pagination) ([]models.Event, error) {
+	if h.OpenSearchClient == nil {
+		return h.EventRepo.GetAllEvents(ctx, pagination, acceptLanguage, models.GetAllEventsFilter{Search: &query})
+	}
 	from := (pagination.Page - 1) * pagination.Limit
 	events, err := h.OpenSearchClient.FuzzySearch(ctx, query, acceptLanguage, from, pagination.Limit)
 	if err != nil {
