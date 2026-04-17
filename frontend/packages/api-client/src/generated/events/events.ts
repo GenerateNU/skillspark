@@ -27,6 +27,7 @@ import type {
   ErrorModel,
   Event,
   EventOccurrence,
+  GetAllEventsParams,
   UpdateEventBody,
 } from "../skillSparkAPI.schemas";
 
@@ -668,3 +669,100 @@ export const useUpdateEvent = <TError = ErrorModel, TContext = unknown>(
 > => {
   return useMutation(getUpdateEventMutationOptions(options), queryClient);
 };
+
+/**
+ * Returns a paginated list of all events
+ * @summary Get all events
+ */
+export type getAllEventsResponse200 = {
+  data: Event[];
+  status: 200;
+};
+
+export type getAllEventsResponseDefault = {
+  data: ErrorModel;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getAllEventsResponse =
+  | (getAllEventsResponse200 & { headers: Headers })
+  | (getAllEventsResponseDefault & { headers: Headers });
+
+export const getGetAllEventsUrl = (params?: GetAllEventsParams) => {
+  const normalizedParams = new URLSearchParams();
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+  const stringifiedParams = normalizedParams.toString();
+  return stringifiedParams.length > 0
+    ? `/api/v1/events?${stringifiedParams}`
+    : `/api/v1/events`;
+};
+
+export const getAllEvents = async (
+  params?: GetAllEventsParams,
+  options?: RequestInit,
+): Promise<getAllEventsResponse> => {
+  return customInstance<getAllEventsResponse>(getGetAllEventsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetAllEventsQueryKey = (params?: GetAllEventsParams) => {
+  return [`/api/v1/events`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetAllEventsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAllEvents>>,
+  TError = ErrorModel,
+>(
+  params?: GetAllEventsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllEvents>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetAllEventsQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllEvents>>> = ({
+    signal,
+  }) => getAllEvents(params, { signal, ...requestOptions });
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAllEvents>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAllEventsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAllEvents>>
+>;
+export type GetAllEventsQueryError = ErrorModel;
+
+export function useGetAllEvents<
+  TData = Awaited<ReturnType<typeof getAllEvents>>,
+  TError = ErrorModel,
+>(
+  params?: GetAllEventsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllEvents>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetAllEventsQueryOptions(params, options);
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  return { ...query, queryKey: queryOptions.queryKey };
+}

@@ -1,6 +1,6 @@
 import Carousel from "react-native-reanimated-carousel";
 import { View } from "react-native";
-import { type EventOccurrence } from "@skillspark/api-client";
+import { type Event } from "@skillspark/api-client";
 import { DiscoverBanner } from "./DiscoverBanner";
 
 const CARD_PADDING = 22;
@@ -10,7 +10,7 @@ export default function CarouselCard({
   width,
   height,
 }: {
-  events: EventOccurrence[];
+  events: Event[];
   width: number;
   height: number;
 }) {

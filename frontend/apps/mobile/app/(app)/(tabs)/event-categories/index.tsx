@@ -18,6 +18,21 @@ import { useTranslation } from "react-i18next";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { EventCategoriesListItem } from "@/components/EventCategoriesListItem";
 
+const CATEGORY_DB_VALUES: Record<string, string> = {
+  "Sports & Physical Activities":
+    "sports,soccer,basketball,tennis,swimming,martial arts,yoga,fitness,running,hiking,cycling",
+  "Arts & Creative Expression":
+    "art,painting,drawing,sculpture,photography,filmmaking,graphic design,fashion,crafts,creative writing",
+  Languages: "language,language learning,linguistics",
+  Academics: "science,physics,chemistry,biology,astronomy,earth science,history",
+  "Personal Development & Life Skills": "other",
+  "Music & Performance":
+    "music,instrumental music,vocal music,theater,acting,dance,improv",
+  Math: "math",
+  "Tech & Innovation":
+    "technology,robotics,engineering,coding,data science,statistics",
+};
+
 export default function EventCategoryScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -28,9 +43,11 @@ export default function EventCategoryScreen() {
   const category = params.category as string;
   const { lat: geoLocationLat, lng: geoLocationLong } = useGeolocation();
 
+  const dbCategory = CATEGORY_DB_VALUES[category] ?? category;
+
   const { data: localizedOccurrencesResp, isLoading } =
     useGetAllEventOccurrences({
-      category,
+      category: dbCategory,
 
       lat: geoLocationLat,
       lng: geoLocationLong,
@@ -59,7 +76,8 @@ export default function EventCategoryScreen() {
             arr.findIndex((x) => x.event.id === o.event.id) === idx
         )
       : [];
-  const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
+  const displayCategory =
+    category.charAt(0).toUpperCase() + category.slice(1);
 
   return (
     <ThemedView className="flex-1" style={{ paddingTop: insets.top }}>

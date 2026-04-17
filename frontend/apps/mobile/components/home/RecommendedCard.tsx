@@ -1,26 +1,26 @@
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import { type Child, type EventOccurrence } from "@skillspark/api-client";
+import { type Child, type Event } from "@skillspark/api-client";
 import { ChildAvatar } from "@/components/ChildAvatar";
 import { AppColors } from "@/constants/theme";
 import { EventImage } from "@/components/EventImage";
 
 export function RecommendedCard({
   child,
-  occurrences,
+  events,
 }: {
   child: Child;
-  occurrences: EventOccurrence[];
+  events: Event[];
 }) {
   const router = useRouter();
   const firstName = child.name.split(" ")[0];
-  const titles = occurrences.map((o) => o.event.title);
+  const titles = events.map((e) => e.title);
   const summaryText =
     titles.length > 2
       ? `${titles[0]},\n${titles[1]},\nAnd More!`
       : titles.join(",\n");
-  const img0 = occurrences[0];
-  const img1 = occurrences[1];
+  const img0 = events[0];
+  const img1 = events[1];
 
   return (
     <Pressable
@@ -54,13 +54,13 @@ export function RecommendedCard({
         <View
           className="absolute top-[15px] left-[40px] w-[100px] h-[100px] rounded-xl overflow-hidden rotate-[20deg]"
         >
-          <EventImage uri={img1?.event.presigned_url} style={{ width: "100%", height: "100%" }} />
+          <EventImage uri={img1?.presigned_url} style={{ width: "100%", height: "100%" }} />
         </View>
         {img0 && (
           <View
             className="absolute top-0 left-0 w-[120px] h-[120px] rounded-xl overflow-hidden"
           >
-            <EventImage uri={img0.event.presigned_url} style={{ width: "100%", height: "100%" }} />
+            <EventImage uri={img0.presigned_url} style={{ width: "100%", height: "100%" }} />
           </View>
         )}
       </View>

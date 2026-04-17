@@ -899,6 +899,22 @@ export interface UsernameExistsOutputBody {
   exists: boolean;
 }
 
+export type GetAllEventsParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  search?: string;
+  category?: string;
+  min_age?: number;
+  max_age?: number;
+};
+
 export type GetAllEventOccurrencesParams = {
   /**
    * @minimum 1

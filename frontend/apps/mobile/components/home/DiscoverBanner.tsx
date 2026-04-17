@@ -2,16 +2,16 @@ import { Image } from "expo-image";
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import {
-  type EventOccurrence,
+  type Event,
   useGetReviewAggregate,
 } from "@skillspark/api-client";
 import { AppColors, FontFamilies } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { RATING_OPTIONS } from "@/constants/ratings";
 
-export function DiscoverBanner({ event }: { event: EventOccurrence }) {
+export function DiscoverBanner({ event }: { event: Event }) {
   const router = useRouter();
-  const eventId = event.event.id;
+  const eventId = event.id;
 
   const { data: aggregateResp } = useGetReviewAggregate(eventId, {
     query: {
@@ -35,9 +35,9 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
       className="flex-1 rounded-3xl overflow-hidden bg-[#1a1a1a]"
     >
       {/* Background image */}
-      {event.event.presigned_url ? (
+      {event.presigned_url ? (
         <Image
-          source={{ uri: event.event.presigned_url }}
+          source={{ uri: event.presigned_url }}
           style={{ position: "absolute", width: "100%", height: "100%" }}
           contentFit="cover"
         />
@@ -59,7 +59,7 @@ export function DiscoverBanner({ event }: { event: EventOccurrence }) {
               style={{ fontFamily: FontFamilies.bold }}
               numberOfLines={1}
             >
-              {event.event.title}
+              {event.title}
             </Text>
             {totalReviews > 0 && ratingMatch && (
               <View className="flex-row items-center gap-[5px]">
