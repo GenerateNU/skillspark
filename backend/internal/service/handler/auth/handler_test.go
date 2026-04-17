@@ -101,7 +101,6 @@ func TestHandler_GuardianLogin(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable for parallel
 		t.Run(tt.name, func(t *testing.T) {
 			// Fixup for specific tests
 			if tt.name == "successful login" {

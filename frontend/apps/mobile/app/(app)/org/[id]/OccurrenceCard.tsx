@@ -8,27 +8,56 @@ import {
 } from "react-native";
 import { useRef, useState } from "react";
 import { useRouter } from "expo-router";
-import type { EventOccurrence } from "@skillspark/api-client";
+import {
+  useCancelRegistration,
+  getGetRegistrationsByGuardianIdQueryKey,
+  type EventOccurrence,
+} from "@skillspark/api-client";
+import { useQueryClient } from "@tanstack/react-query";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
 import { ReservationModal } from "@/components/ReservationModal";
 import { RatingSmiley } from "@/components/RatingSmiley";
 import { useTranslation } from "react-i18next";
 import { formatAgeRange, formatTime, formatPrice } from "@/utils/format";
+import { useAuthContext } from "@/hooks/use-auth-context";
 
 const BUTTON_ROW_HEIGHT = 52;
 
 export function OccurrenceCard({
   occurrence,
   avgRating,
+  registrationIds,
 }: {
   occurrence: EventOccurrence;
   avgRating: number | null;
+  registrationIds?: string[];
 }) {
   const router = useRouter();
   const { t: translate } = useTranslation();
+  const { guardianId } = useAuthContext();
+  const queryClient = useQueryClient();
+  const { mutate: cancelRegistration, isPending: cancelPending } =
+    useCancelRegistration();
   const [expanded, setExpanded] = useState(false);
   const [reservationVisible, setReservationVisible] = useState(false);
+
+  const isRegistered = (registrationIds?.length ?? 0) > 0;
+
+  function handleCancel() {
+    if (!registrationIds?.length || !guardianId) return;
+    const queryKey = getGetRegistrationsByGuardianIdQueryKey(guardianId);
+    registrationIds.forEach((id) =>
+      cancelRegistration(
+        { id },
+        {
+          onSettled: () => {
+            queryClient.invalidateQueries({ queryKey });
+          },
+        },
+      ),
+    );
+  }
   const progress = useRef(new Animated.Value(0)).current;
 
   const toggle = () => {
@@ -192,22 +221,42 @@ export function OccurrenceCard({
                   {translate("occurrence.learnMore")}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setReservationVisible(true)}
-                activeOpacity={0.7}
-                className="flex-1 rounded-full py-2.5 items-center"
-                style={{ backgroundColor: AppColors.checkboxSelected }}
-              >
-                <Text
-                  style={{
-                    fontFamily: FontFamilies.semiBold,
-                    fontSize: FontSizes.base,
-                    color: "#fff",
-                  }}
+              {isRegistered ? (
+                <TouchableOpacity
+                  onPress={handleCancel}
+                  activeOpacity={0.7}
+                  disabled={cancelPending}
+                  className="flex-1 rounded-full py-2.5 items-center"
+                  style={{ backgroundColor: "#EF4444" }}
                 >
-                  {translate("occurrence.reserve")}
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontFamily: FontFamilies.semiBold,
+                      fontSize: FontSizes.base,
+                      color: "#fff",
+                    }}
+                  >
+                    {translate("occurrence.cancel")}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => setReservationVisible(true)}
+                  activeOpacity={0.7}
+                  className="flex-1 rounded-full py-2.5 items-center"
+                  style={{ backgroundColor: AppColors.checkboxSelected }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: FontFamilies.semiBold,
+                      fontSize: FontSizes.base,
+                      color: "#fff",
+                    }}
+                  >
+                    {translate("occurrence.reserve")}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </Animated.View>
 

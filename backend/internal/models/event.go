@@ -136,6 +136,27 @@ type DeleteEventOutput struct {
 	} `json:"body"`
 }
 
+type GetAllEventsInput struct {
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	Page           int    `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
+	Limit          int    `query:"limit" minimum:"1" maximum:"100" default:"100" doc:"Number of items per page"`
+	Search         string `query:"search" doc:"Search by title or description"`
+	Category       string `query:"category" doc:"Comma-separated list of category values"`
+	MinAge         int    `query:"min_age" doc:"Minimum age for the event"`
+	MaxAge         int    `query:"max_age" doc:"Maximum age for the event"`
+}
+
+type GetAllEventsFilter struct {
+	Search   *string
+	Category *string
+	MinAge   *int
+	MaxAge   *int
+}
+
+type GetAllEventsOutput struct {
+	Body []Event `json:"body" doc:"List of all events in the database"`
+}
+
 // get by event id
 type GetEventOccurrencesByEventIDInput struct {
 	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
@@ -143,6 +164,5 @@ type GetEventOccurrencesByEventIDInput struct {
 }
 
 type GetEventOccurrencesByEventIDOutput struct {
-	AcceptLanguage string            `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
-	Body           []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
+	Body []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the event ID"`
 }

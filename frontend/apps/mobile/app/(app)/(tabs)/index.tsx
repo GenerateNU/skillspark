@@ -1,46 +1,46 @@
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
+import CarouselCard from "@/components/home/CarouselCard";
+import { CategoryCard } from "@/components/home/CategoryCard";
+import { RecommendedCard } from "@/components/home/RecommendedCard";
+import { TrendingCard } from "@/components/home/TrendingCard";
+import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
+import LogoBgWrapper from "@/components/LogoBgWrapper";
+import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import {
-  ActivityIndicator,
-  View,
-  ScrollView,
-  Pressable,
-  Text,
-  useWindowDimensions,
-} from "react-native";
-import {
-  useGetAllEventOccurrences,
-  useGetGuardianById,
-  useGetRegistrationsByGuardianId,
-  useGetChildrenByGuardianId,
-  type EventOccurrence,
-  type Guardian,
-  type Registration,
-  type Child,
-  useGetTrendingEventOccurrences,
-} from "@skillspark/api-client";
-import { useMemo, useState } from "react";
 import { AppColors, FontSizes } from "@/constants/theme";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useFilters } from "@/hooks/use-filters";
-import { useRouter } from "expo-router";
-import { isWithinNext7Days } from "@/utils/format";
-import { DiscoverBanner } from "@/components/home/DiscoverBanner";
-import { UpcomingClassCard } from "@/components/home/UpcomingClassCard";
-import { RecommendedCard } from "@/components/home/RecommendedCard";
-import { CategoryCard } from "@/components/home/CategoryCard";
-import { ThemedText } from "@/components/themed-text";
-import { useTranslation } from "react-i18next";
-import { TrendingCard } from "@/components/home/TrendingCard";
-
 import { useGeolocation } from "@/hooks/use-geolocation";
-import CarouselCard from "@/components/home/CarouselCard";
-import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
-import LogoBgWrapper from "@/components/LogoBgWrapper";
+import { extractResponseData, isWithinNext7Days } from "@/utils/format";
+import {
+  useGetAllEventOccurrences,
+  useGetAllEvents,
+  useGetChildrenByGuardianId,
+  useGetGuardianById,
+  useGetRegistrationsByGuardianId,
+  useGetTrendingEventOccurrences,
+  type Child,
+  type Event,
+  type EventOccurrence,
+  type Guardian,
+  type Registration,
+} from "@skillspark/api-client";
+import { useRouter } from "expo-router";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 export default function HomeScreen() {
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
-  const { filters, hasActiveFilters } = useFilters();
+  const { hasActiveFilters } = useFilters();
   const router = useRouter();
   const { width, height } = useWindowDimensions();
 
@@ -52,12 +52,10 @@ export default function HomeScreen() {
     radius_km: 50,
     limit: 5,
   });
-  const allLocalizedOccurrences: EventOccurrence[] = useMemo(() => {
-    const d = localizedOccurrencesResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [localizedOccurrencesResp]);
+  const allLocalizedOccurrences: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(localizedOccurrencesResp),
+    [localizedOccurrencesResp],
+  );
 
   const { data: guardianResp } = useGetGuardianById(guardianId!, {
     query: { enabled: !!guardianId },
@@ -65,19 +63,25 @@ export default function HomeScreen() {
   const guardian = (guardianResp as unknown as { data: Guardian } | undefined)
     ?.data;
 
-  const { data: occurrencesResp, isLoading } = useGetAllEventOccurrences({});
-  const allOccurrences: EventOccurrence[] = useMemo(() => {
-    const d = occurrencesResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [occurrencesResp]);
+  // Events (templates) — used for carousel and recommendations
+  const { data: eventsResp, isLoading } = useGetAllEvents();
+  const allEvents: Event[] = useMemo(
+    () => extractResponseData<Event>(eventsResp),
+    [eventsResp],
+  );
+
+  // Occurrences — kept only for matching upcoming registered classes
+  const { data: occurrencesResp } = useGetAllEventOccurrences({});
+  const allOccurrences: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(occurrencesResp),
+    [occurrencesResp],
+  );
 
   const { data: registrationsResp } = useGetRegistrationsByGuardianId(
     guardianId!,
     {
       query: { enabled: !!guardianId },
-    }
+    },
   );
   const registrations: Registration[] = useMemo(() => {
     const d = registrationsResp as unknown as
@@ -89,10 +93,10 @@ export default function HomeScreen() {
   const { data: childrenResp } = useGetChildrenByGuardianId(guardianId!, {
     query: { enabled: !!guardianId },
   });
-  const children: Child[] = useMemo(() => {
-    const d = childrenResp as unknown as { data: Child[] } | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [childrenResp]);
+  const children: Child[] = useMemo(
+    () => extractResponseData<Child>(childrenResp),
+    [childrenResp],
+  );
 
   const { data: trendingResp } = useGetTrendingEventOccurrences(
     {
@@ -105,15 +109,13 @@ export default function HomeScreen() {
       query: {
         enabled: !!geoLocationLat && !!geoLocationLong,
       },
-    }
+    },
   );
 
-  const trendingEvents: EventOccurrence[] = useMemo(() => {
-    const d = trendingResp as unknown as
-      | { data: EventOccurrence[] }
-      | undefined;
-    return Array.isArray(d?.data) ? d.data : [];
-  }, [trendingResp]);
+  const trendingEvents: EventOccurrence[] = useMemo(
+    () => extractResponseData<EventOccurrence>(trendingResp),
+    [trendingResp],
+  );
 
   const upcomingClasses = useMemo(() => {
     const upcomingIds = new Set(
@@ -121,27 +123,24 @@ export default function HomeScreen() {
         .filter(
           (r) =>
             r.status === "registered" &&
-            isWithinNext7Days(r.occurrence_start_time)
+            isWithinNext7Days(r.occurrence_start_time),
         )
-        .map((r) => r.event_occurrence_id)
+        .map((r) => r.event_occurrence_id),
     );
     return allOccurrences.filter((o) => upcomingIds.has(o.id));
   }, [registrations, allOccurrences]);
 
-  const futureOccurrences = useMemo(
-    () => allOccurrences.filter((o) => new Date(o.start_time) > new Date()),
-    [allOccurrences]
-  );
-
   const childRecommendations = useMemo(() => {
-    const shuffled = [...futureOccurrences].sort(() => Math.random() - 0.5);
+    const shuffled = [...allEvents].sort(() => Math.random() - 0.5);
     return children
-      .map((child, i) => ({
-        child,
-        occurrence: shuffled[i % shuffled.length],
-      }))
-      .filter((r) => r.occurrence != null);
-  }, [children, futureOccurrences]);
+      .map((child, i) => {
+        const start = i * 3;
+        const slice = shuffled.slice(start, start + 3);
+        const events = slice.length > 0 ? slice : shuffled.slice(0, 3);
+        return { child, events };
+      })
+      .filter((r) => r.events.length > 0);
+  }, [children, allEvents]);
 
   const categories = [
     "Sports & Physical Activities",
@@ -242,7 +241,7 @@ export default function HomeScreen() {
               className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              Your Upcoming Classes
+              {translate("dashboard.upcomingClasses")}
             </Text>
             <ScrollView
               horizontal
@@ -257,7 +256,7 @@ export default function HomeScreen() {
         )}
 
         {/* Discover Weekly */}
-        {futureOccurrences.length > 0 && (
+        {allEvents.length > 0 && (
           <View className="mb-6">
             <View className="flex-row items-center px-5 mb-3">
               <Text
@@ -276,8 +275,8 @@ export default function HomeScreen() {
             <CarouselCard
               events={
                 allLocalizedOccurrences.length > 0
-                  ? allLocalizedOccurrences
-                  : futureOccurrences.slice(0, 5)
+                  ? allLocalizedOccurrences.map((o) => o.event)
+                  : allEvents.slice(0, 5)
               }
               width={width}
               height={height}
@@ -292,7 +291,7 @@ export default function HomeScreen() {
               className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              Trending in Your Area
+              {translate("dashboard.trendingInYourArea")}
             </Text>
             <ScrollView
               horizontal
@@ -313,42 +312,39 @@ export default function HomeScreen() {
               className="font-nunito-bold px-5 mb-3"
               style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
             >
-              Recommended for...
+              {translate("dashboard.recommendedFor")}
             </Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 20 }}
             >
-              {childRecommendations.map(({ child, occurrence }) => (
-                <RecommendedCard
-                  key={child.id}
-                  occurrence={occurrence}
-                  childName={child.name.split(" ")[0]}
-                />
+              {childRecommendations.map(({ child, events }) => (
+                <RecommendedCard key={child.id} child={child} events={events} />
               ))}
             </ScrollView>
           </View>
         )}
 
-      {/* Explore by Category */}
-      {categories.length > 0 && (
-        <View className="mb-6">
-          <Text
-            className="font-nunito-bold px-5 mb-3"
-            style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
-          >
-            Explore by Category
-          </Text>
-          <View className="px-[15px]">
-            {categoryPairs.map((pair, idx) => (
-              <View key={idx} className="flex-row">
-                {pair.map((cat) => (
-                  <CategoryCard key={cat} category={cat} />
-                ))}
-                {pair.length === 1 && <View className="flex-1 m-[5px]" />}
-              </View>
-            ))}
+        {/* Explore by Category */}
+        {categories.length > 0 && (
+          <View className="mb-6">
+            <Text
+              className="font-nunito-bold px-5 mb-3"
+              style={{ fontSize: FontSizes.lg, color: AppColors.primaryText }}
+            >
+              {translate("dashboard.exploreByCategory")}
+            </Text>
+            <View className="px-[15px]">
+              {categoryPairs.map((pair, idx) => (
+                <View key={idx} className="flex-row">
+                  {pair.map((cat) => (
+                    <CategoryCard key={cat} category={cat} />
+                  ))}
+                  {pair.length === 1 && <View className="flex-1 m-[5px]" />}
+                </View>
+              ))}
+            </View>
           </View>
         </View>
       )}

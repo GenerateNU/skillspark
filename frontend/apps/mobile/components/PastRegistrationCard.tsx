@@ -1,5 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+import { AppColors, Shadows } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
 import { Image, TouchableOpacity, View } from "react-native";
 import {
@@ -22,11 +22,7 @@ export function PastRegistrationCard({ data }: RegistrationCardProps) {
         borderWidth: 1,
         borderColor: AppColors.borderLight,
         backgroundColor: AppColors.white,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.06,
-        shadowRadius: 4,
-        elevation: 2,
+        ...Shadows.sm,
       }}
     >
       <View className="py-3 pl-3">

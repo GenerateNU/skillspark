@@ -1,35 +1,22 @@
-import { Image } from "expo-image";
 import { View, Text, Pressable } from "react-native";
+import { EventImage } from "@/components/EventImage";
 import { useRouter } from "expo-router";
-import { type EventOccurrence } from "@skillspark/api-client";
+import { type Event } from "@skillspark/api-client";
 import { AppColors, FontFamilies, FontSizes } from "@/constants/theme";
-import { formatEventDate } from "@/utils/format";
 
-export function SearchResultCard({
-  occurrence,
-}: {
-  occurrence: EventOccurrence;
-}) {
+export function SearchResultCard({ event }: { event: Event }) {
   const router = useRouter();
-  const location = [
-    occurrence.location?.address_line1,
-    occurrence.location?.district,
-  ]
-    .filter(Boolean)
-    .join(", ");
-  const badge = occurrence.event.category?.[0];
+  const badge = event.category?.[0];
   const ageLabel =
-    occurrence.event.age_range_min != null
-      ? `Ages ${occurrence.event.age_range_min}${
-          occurrence.event.age_range_max != null
-            ? ` – ${occurrence.event.age_range_max}`
-            : "+"
+    event.age_range_min != null
+      ? `Ages ${event.age_range_min}${
+          event.age_range_max != null ? ` – ${event.age_range_max}` : "+"
         }`
       : null;
 
   return (
     <Pressable
-      onPress={() => router.push(`/event/${occurrence.id}`)}
+      onPress={() => router.push(`/event/${event.id}`)}
       style={{
         height: 118,
         borderRadius: 12,
@@ -56,21 +43,10 @@ export function SearchResultCard({
           flexShrink: 0,
         }}
       >
-        {occurrence.event.presigned_url ? (
-          <Image
-            source={{ uri: occurrence.event.presigned_url }}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="cover"
-          />
-        ) : (
-          <View
-            style={{
-              width: 94,
-              height: 94,
-              backgroundColor: AppColors.imagePlaceholder,
-            }}
-          />
-        )}
+        <EventImage
+          uri={event.presigned_url}
+          style={{ width: "100%", height: "100%" }}
+        />
       </View>
 
       {/* Text */}
@@ -83,29 +59,8 @@ export function SearchResultCard({
           }}
           numberOfLines={2}
         >
-          {occurrence.event.title}
+          {event.title}
         </Text>
-        <Text
-          style={{
-            fontFamily: FontFamilies.regular,
-            fontSize: FontSizes.sm,
-            color: AppColors.mutedText,
-          }}
-        >
-          {formatEventDate(occurrence.start_time)}
-        </Text>
-        {!!location && (
-          <Text
-            style={{
-              fontFamily: FontFamilies.regular,
-              fontSize: FontSizes.sm,
-              color: AppColors.mutedText,
-            }}
-            numberOfLines={1}
-          >
-            {location}
-          </Text>
-        )}
         {ageLabel && (
           <Text
             style={{

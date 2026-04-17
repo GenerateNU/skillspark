@@ -25,20 +25,11 @@ func TestUpdateRegistration(t *testing.T) {
 	guardianID := child1.GuardianID
 	occurrenceID := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB).ID
 
-	createInput := &models.CreateRegistrationWithPaymentData{
-		ChildID:               childID,
-		GuardianID:            guardianID,
-		EventOccurrenceID:     occurrenceID,
-		Status:                models.RegistrationStatusRegistered,
-		StripePaymentIntentID: "pi_test_123",
-		StripeCustomerID:      "cus_test_123",
-		OrgStripeAccountID:    "acct_test_123",
-		StripePaymentMethodID: "pm_test_123",
-		TotalAmount:           10000,
-		ProviderAmount:        8500,
-		PlatformFeeAmount:     1500,
-		Currency:              "usd",
-		PaymentIntentStatus:   "requires_capture",
+	createInput := &models.CreateRegistrationData{
+		ChildID:           childID,
+		GuardianID:        guardianID,
+		EventOccurrenceID: occurrenceID,
+		Status:            models.RegistrationStatusRegistered,
 	}
 
 	created, createErr := repo.CreateRegistration(ctx, createInput)
@@ -78,34 +69,11 @@ func TestUpdateRegistration_InvalidChildID(t *testing.T) {
 	repo := NewRegistrationRepository(testDB)
 	ctx := context.Background()
 
-	child := child.CreateTestChild(t, ctx, testDB)
-	childID := child.ID
-	guardianID := child.GuardianID
-	occurrenceID1 := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB).ID
-
-	createInput := &models.CreateRegistrationWithPaymentData{
-		ChildID:               childID,
-		GuardianID:            guardianID,
-		EventOccurrenceID:     occurrenceID1,
-		Status:                models.RegistrationStatusRegistered,
-		StripePaymentIntentID: "pi_test_123",
-		StripeCustomerID:      "cus_test_123",
-		OrgStripeAccountID:    "acct_test_123",
-		StripePaymentMethodID: "pm_test_123",
-		TotalAmount:           10000,
-		ProviderAmount:        8500,
-		PlatformFeeAmount:     1500,
-		Currency:              "usd",
-		PaymentIntentStatus:   "requires_capture",
-	}
-
-	created, createErr := repo.CreateRegistration(ctx, createInput)
-	require.Nil(t, createErr)
-	require.NotNil(t, created)
+	created := CreateTestRegistration(t, ctx, testDB)
 
 	invalidChildID := uuid.New()
 	updateInput := &models.UpdateRegistrationInput{
-		ID: created.Body.ID,
+		ID: created.ID,
 	}
 	updateInput.Body.ChildID = &invalidChildID
 
@@ -144,20 +112,11 @@ func TestUpdateRegistration_DecrementsAttendeeCount(t *testing.T) {
 	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, testDB)
 	occurrenceID := occurrence.ID
 
-	createInput := &models.CreateRegistrationWithPaymentData{
-		ChildID:               childID,
-		GuardianID:            guardianID,
-		EventOccurrenceID:     occurrenceID,
-		Status:                models.RegistrationStatusRegistered,
-		StripePaymentIntentID: "pi_test_123",
-		StripeCustomerID:      "cus_test_123",
-		OrgStripeAccountID:    "acct_test_123",
-		StripePaymentMethodID: "pm_test_123",
-		TotalAmount:           10000,
-		ProviderAmount:        8500,
-		PlatformFeeAmount:     1500,
-		Currency:              "usd",
-		PaymentIntentStatus:   "requires_capture",
+	createInput := &models.CreateRegistrationData{
+		ChildID:           childID,
+		GuardianID:        guardianID,
+		EventOccurrenceID: occurrenceID,
+		Status:            models.RegistrationStatusRegistered,
 	}
 
 	created, createErr := repo.CreateRegistration(ctx, createInput)

@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AppColors, TAG_COLORS, Colors } from "@/constants/theme";
+import { AppColors, Colors } from "@/constants/theme";
 import { SchoolPicker } from "@/components/SchoolPicker";
 import { useTranslation } from "react-i18next";
 import { DEFAULT_AVATAR_COLOR } from "@/components/AvatarPicker";
@@ -28,18 +28,18 @@ const INTEREST_OPTIONS = [
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
 ];
 
 export const YEARS = Array.from({ length: 30 }, (_, i) =>
@@ -54,6 +54,7 @@ type DropdownModalProps = {
   layout: DropdownLayout | null;
   options: string[];
   onSelect: (value: string) => void;
+  displayOption?: (opt: string) => string;
 };
 
 function DropdownModal({
@@ -62,6 +63,7 @@ function DropdownModal({
   layout,
   options,
   onSelect,
+  displayOption,
 }: DropdownModalProps) {
   const theme = Colors.light;
   if (!layout) return null;
@@ -108,7 +110,7 @@ function DropdownModal({
                   onClose();
                 }}
               >
-                <ThemedText>{opt}</ThemedText>
+                <ThemedText>{displayOption ? displayOption(opt) : opt}</ThemedText>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -260,9 +262,7 @@ export function ChildProfileForm({
             className="text-sm font-nunito-semibold"
             style={{ color: AppColors.mutedText }}
           >
-            {translate("childProfile.changeProfilePicture", {
-              defaultValue: "Change Profile Picture",
-            })}
+            {translate("childProfile.changeProfilePicture")}
           </ThemedText>
         </TouchableOpacity>
       </View>
@@ -293,7 +293,7 @@ export function ChildProfileForm({
               <ThemedText
                 className={birthMonth ? "" : "font-nunito text-[#9CA3AF]"}
               >
-                {birthMonth || translate("childProfile.month")}
+                {birthMonth ? translate("months." + birthMonth) : translate("childProfile.month")}
               </ThemedText>
               <IconSymbol
                 name="chevron.down"
@@ -333,6 +333,7 @@ export function ChildProfileForm({
         layout={monthDropLayout}
         options={MONTHS}
         onSelect={setBirthMonth}
+        displayOption={(k) => translate("months." + k)}
       />
 
       {/* Year dropdown modal */}
@@ -357,31 +358,23 @@ export function ChildProfileForm({
           className="mb-3"
           contentContainerStyle={{ gap: 8, paddingRight: 4 }}
         >
-          {interests.map((tag, idx) => {
-            const color = TAG_COLORS[idx % TAG_COLORS.length];
-            return (
-              <TouchableOpacity
-                key={tag}
-                className="flex-row items-center px-2 py-1 rounded-full border gap-1"
-                style={{ backgroundColor: color.bg, borderColor: color.border }}
-                onPress={() => removeInterest(tag)}
+          {interests.map((tag) => (
+            <TouchableOpacity
+              key={tag}
+              className="px-3 py-1 rounded-full"
+              style={{ backgroundColor: AppColors.primaryPlum }}
+              onPress={() => removeInterest(tag)}
+            >
+              <ThemedText
+                className="text-xs font-nunito-medium"
+                style={{ color: AppColors.primaryText }}
               >
-                <IconSymbol
-                  name="camera.filters"
-                  size={13}
-                  color={color.border}
-                />
-                <ThemedText
-                  className="text-xs font-nunito-medium"
-                  style={{ color: color.text }}
-                >
-                  {translate(`interests.${tag}`, {
-                    defaultValue: capitalize(tag),
-                  })}
-                </ThemedText>
-              </TouchableOpacity>
-            );
-          })}
+                {translate(`interests.${tag}`, {
+                  defaultValue: capitalize(tag),
+                })}
+              </ThemedText>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       )}
 

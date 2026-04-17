@@ -374,7 +374,6 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 	eventOccurrenceIDEx := uuid.MustParse(eventOccurrenceID)
 
 	stripeCustomerID := "cus_test_123"
-	stripeAccountID := "acct_test_123"
 	paymentMethodID := "pm_test_123"
 
 	validEventOccurrence := &models.EventOccurrence{
@@ -403,18 +402,11 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 				"child_id":            childID,
 				"guardian_id":         guardianID,
 				"event_occurrence_id": eventOccurrenceID,
-				"payment_method_id":   paymentMethodID,
 				"status":              "registered",
 			},
 			mockSetup: func(regRepo *repomocks.MockRegistrationRepository, childRepo *repomocks.MockChildRepository, guardianRepo *repomocks.MockGuardianRepository, eoRepo *repomocks.MockEventOccurrenceRepository, orgRepo *repomocks.MockOrganizationRepository, sc *stripemocks.MockStripeClient) {
 				eoRepo.On("GetEventOccurrenceByID", mock.Anything, eventOccurrenceIDEx, mock.Anything).
 					Return(validEventOccurrence, nil)
-
-				guardianRepo.On("GetGuardianByID", mock.Anything, guardianIDEx).
-					Return(&models.Guardian{
-						ID:               guardianIDEx,
-						StripeCustomerID: &stripeCustomerID,
-					}, nil)
 
 				childRepo.On("GetChildByID", mock.Anything, childIDEx).
 					Return(&models.Child{
@@ -422,53 +414,24 @@ func TestHumaValidation_CreateRegistration(t *testing.T) {
 						GuardianID: guardianIDEx,
 					}, nil)
 
-				orgRepo.On("GetOrganizationByID", mock.Anything, organizationID).
-					Return(&models.Organization{
-						ID:              organizationID,
-						StripeAccountID: &stripeAccountID,
+				guardianRepo.On("GetGuardianByID", mock.Anything, guardianIDEx).
+					Return(&models.Guardian{
+						ID:               guardianIDEx,
+						StripeCustomerID: &stripeCustomerID,
 					}, nil)
 
-				sc.On("CreatePaymentIntent", mock.Anything, mock.AnythingOfType("*models.CreatePaymentIntentInput")).
-					Return(&models.CreatePaymentIntentOutput{
-						Body: struct {
-							PaymentIntentID   string `json:"payment_intent_id" doc:"Stripe payment intent ID"`
-							ClientSecret      string `json:"client_secret" doc:"Client secret for frontend to confirm payment"`
-							Status            string `json:"status" doc:"Payment intent status"`
-							TotalAmount       int    `json:"total_amount" doc:"Total amount in cents"`
-							ProviderAmount    int    `json:"provider_amount" doc:"Amount provider receives in cents"`
-							PlatformFeeAmount int    `json:"platform_fee_amount" doc:"Platform fee in cents"`
-							Currency          string `json:"currency" doc:"Currency code"`
-						}{
-							PaymentIntentID:   "pi_test_123",
-							TotalAmount:       10000,
-							ProviderAmount:    8500,
-							PlatformFeeAmount: 1500,
-							Currency:          "thb",
-							Status:            "requires_capture",
-						},
-					}, nil)
-
-				regRepo.On("CreateRegistration", mock.Anything, mock.AnythingOfType("*models.CreateRegistrationWithPaymentData")).
+				regRepo.On("CreateRegistration", mock.Anything, mock.AnythingOfType("*models.CreateRegistrationData")).
 					Return(&models.CreateRegistrationOutput{
 						Body: models.Registration{
-							ID:                    uuid.New(),
-							ChildID:               childIDEx,
-							GuardianID:            guardianIDEx,
-							EventOccurrenceID:     eventOccurrenceIDEx,
-							Status:                models.RegistrationStatusRegistered,
-							EventName:             "STEM Club",
-							OccurrenceStartTime:   time.Now(),
-							CreatedAt:             time.Now(),
-							UpdatedAt:             time.Now(),
-							StripePaymentIntentID: "pi_test_123",
-							StripeCustomerID:      stripeCustomerID,
-							OrgStripeAccountID:    stripeAccountID,
-							StripePaymentMethodID: paymentMethodID,
-							TotalAmount:           10000,
-							ProviderAmount:        8500,
-							PlatformFeeAmount:     1500,
-							Currency:              "thb",
-							PaymentIntentStatus:   "requires_capture",
+							ID:                  uuid.New(),
+							ChildID:             childIDEx,
+							GuardianID:          guardianIDEx,
+							EventOccurrenceID:   eventOccurrenceIDEx,
+							Status:              models.RegistrationStatusRegistered,
+							EventName:           "STEM Club",
+							OccurrenceStartTime: time.Now(),
+							CreatedAt:           time.Now(),
+							UpdatedAt:           time.Now(),
 						},
 					}, nil)
 			},

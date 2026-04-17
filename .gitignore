@@ -14,6 +14,7 @@ backend/.vscode/
 .next/
 
 backend/.env
+backend/internal/supabase/functions/.env
 
 backend/internal/supabase/.branches/
 backend/internal/supabase/.temp/
@@ -28,3 +29,5 @@ backend/coverage_filtered.out.local.env
 backend/coverage_filtered.out
 
 frontend/.expo
+.claude/settings.local.json
+terraform.tfvars

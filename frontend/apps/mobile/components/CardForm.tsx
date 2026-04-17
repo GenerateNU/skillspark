@@ -6,7 +6,7 @@ import {
 } from "@skillspark/api-client";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useColorScheme, View, TouchableOpacity, Text } from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
 import { ThemedText } from "./themed-text";
 import { ErrorMessage } from "./ErrorMessage";
 import { useAuthContext } from "@/hooks/use-auth-context";
@@ -28,12 +28,12 @@ export default function CardForm({
   onSave: () => void;
   onCancel: () => void;
 }) {
+  const { t: translate } = useTranslation();
   if (!useStripe || !CardField) {
     return (
       <View className="mb-8 p-4 rounded-lg bg-gray-100">
         <Text className="text-center text-gray-600">
-          Stripe is not available in Expo Go. Use a development build to manage
-          payment methods.
+          {translate("payment_errors.stripeNotAvailable")}
         </Text>
       </View>
     );
@@ -53,8 +53,7 @@ const CardFormInner = ({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { confirmSetupIntent } = useStripe();
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = Colors["light"];
   const { t: translate } = useTranslation();
   const { guardianId } = useAuthContext();
   const { guardian } = useGuardian(guardianId);
@@ -62,12 +61,13 @@ const CardFormInner = ({
   async function handleSave(): Promise<void> {
     try {
       setError(null);
-      if (!guardian) throw new Error("No user is authenticated");
+      if (!guardian)
+        throw new Error(translate("payment_errors.notAuthenticated"));
       setSaving(true);
 
       const res = await createGuardianSetupIntent(guardian.id);
       if (res.status !== 200 && res.status !== 201)
-        throw new Error("Failed to create setup intent");
+        throw new Error(translate("payment_errors.failedToCreateIntent"));
 
       const clientSecret = (res.data as CreateSetupIntentOutputBody)
         .client_secret;
@@ -75,11 +75,15 @@ const CardFormInner = ({
         paymentMethodType: "Card",
       });
       if (stripeError)
-        throw new Error("Failed to confirm payment method, please try again.");
+        throw new Error(translate("payment_errors.failedToConfirm"));
 
       onSave();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "An unexpected error occurred");
+      setError(
+        e instanceof Error
+          ? e.message
+          : translate("payment_errors.unexpectedError"),
+      );
     } finally {
       setSaving(false);
     }

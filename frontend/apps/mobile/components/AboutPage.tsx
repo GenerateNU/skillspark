@@ -2,6 +2,8 @@ import { Pressable, Text, View } from "react-native";
 import { useState } from "react";
 import type { OrgLink } from "@skillspark/api-client";
 import { useOrgLinks } from "@/hooks/useOrgLinks";
+import { useTranslation } from "react-i18next";
+import { AppColors } from "@/constants/theme";
 
 interface AboutPageProps {
   description: string;
@@ -10,18 +12,28 @@ interface AboutPageProps {
 
 export function AboutPage({ description, links }: AboutPageProps) {
   const { openLink, hasLinks } = useOrgLinks(links);
+  const { t: translate } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [truncated, setTruncated] = useState(false);
+  const [measured, setMeasured] = useState(false);
 
   return (
     <View>
-      <Text className="text-lg font-bold text-gray-900 mb-2.5">About</Text>
-
       <Text
-        numberOfLines={expanded ? undefined : 4}
+        className="mb-2.5 text-[18px] font-nunito-bold"
+        style={{ color: AppColors.primaryText }}
+      >
+        {translate("event.about")}
+      </Text>
+      <Text
+        numberOfLines={!measured ? undefined : expanded ? undefined : 4}
         onTextLayout={(e) => {
-          if (!expanded) setTruncated(e.nativeEvent.lines.length >= 4);
+          if (!measured) {
+            setMeasured(true);
+            setTruncated(e.nativeEvent.lines.length > 4);
+          }
         }}
+        style={{ opacity: measured ? 1 : 0 }}
         className="text-sm text-gray-500 leading-relaxed mb-1"
       >
         {description}
@@ -30,7 +42,7 @@ export function AboutPage({ description, links }: AboutPageProps) {
       {truncated && (
         <Pressable onPress={() => setExpanded((p) => !p)} className="mb-4">
           <Text className="text-sm text-gray-900 font-semibold">
-            {expanded ? "See less" : "See more"}
+            {expanded ? translate("event.seeLess") : translate("event.seeMore")}
           </Text>
         </Pressable>
       )}

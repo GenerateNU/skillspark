@@ -17,6 +17,23 @@ import { useGetAllEventOccurrences } from "@skillspark/api-client";
 import { useTranslation } from "react-i18next";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { EventCategoriesListItem } from "@/components/EventCategoriesListItem";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
+
+const CATEGORY_DB_VALUES: Record<string, string> = {
+  "Sports & Physical Activities":
+    "sports,soccer,basketball,tennis,swimming,martial arts,yoga,fitness,running,hiking,cycling",
+  "Arts & Creative Expression":
+    "art,painting,drawing,sculpture,photography,filmmaking,graphic design,fashion,crafts,creative writing",
+  Languages: "language,language learning,linguistics",
+  Academics:
+    "science,physics,chemistry,biology,astronomy,earth science,history",
+  "Personal Development & Life Skills": "other",
+  "Music & Performance":
+    "music,instrumental music,vocal music,theater,acting,dance,improv",
+  Math: "math",
+  "Tech & Innovation":
+    "technology,robotics,engineering,coding,data science,statistics",
+};
 
 export default function EventCategoryScreen() {
   const router = useRouter();
@@ -28,9 +45,11 @@ export default function EventCategoryScreen() {
   const category = params.category as string;
   const { lat: geoLocationLat, lng: geoLocationLong } = useGeolocation();
 
+  const dbCategory = CATEGORY_DB_VALUES[category] ?? category;
+
   const { data: localizedOccurrencesResp, isLoading } =
     useGetAllEventOccurrences({
-      category,
+      category: dbCategory,
 
       lat: geoLocationLat,
       lng: geoLocationLong,
@@ -56,7 +75,7 @@ export default function EventCategoryScreen() {
     localizedOccurrencesResp?.status === 200
       ? localizedOccurrencesResp.data.filter(
           (o, idx, arr) =>
-            arr.findIndex((x) => x.event.id === o.event.id) === idx
+            arr.findIndex((x) => x.event.id === o.event.id) === idx,
         )
       : [];
   const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
@@ -117,7 +136,7 @@ export default function EventCategoryScreen() {
         </Text>
       ) : (
         <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING }}
           showsVerticalScrollIndicator={false}
         >
           {occurrences.map((o) => (

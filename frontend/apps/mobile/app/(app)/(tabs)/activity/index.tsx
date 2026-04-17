@@ -30,6 +30,7 @@ import {
 import { ChildAvatar } from "@/components/ChildAvatar";
 import { useActivityData } from "@/hooks/use-activity-data";
 import LogoBgWrapper from "@/components/LogoBgWrapper";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 
 type toggleValue = "upcoming" | "past" | undefined;
 
@@ -107,9 +108,11 @@ export default function ActivityScreen() {
     }),
   ).current;
 
+  const resetCancelSheet = () => cancelSheetTranslateY.setValue(0);
+
   const getOnRemove = (childRegistrations: ChildRegistration[]) => () => {
     setCancelSelections(new Set(childRegistrations.map((cr) => cr.child.id)));
-    cancelSheetTranslateY.setValue(0);
+    resetCancelSheet();
     setCancelTarget(childRegistrations);
   };
 
@@ -189,7 +192,7 @@ export default function ActivityScreen() {
             title: occurrence.event.title,
             childRegistrations: child ? [{ child, registrationId: r.id }] : [],
             location: occurrence.location.address_line1,
-            price: occurrence.price,
+            price: occurrence.price / 100,
             hasReviewed: false,
             onClickRemove: () => {},
             onClickReview: () => {},
@@ -253,10 +256,12 @@ export default function ActivityScreen() {
     }),
   ).current;
 
+  const resetFilterSheet = () => sheetTranslateY.setValue(0);
+
   const openFilter = () => {
     const allIds = new Set(children.map((c) => c.id));
     setPendingFilter(activeFilter.size === 0 ? allIds : new Set(activeFilter));
-    sheetTranslateY.setValue(0);
+    resetFilterSheet();
     setFilterOpen(true);
   };
 
@@ -297,7 +302,7 @@ export default function ActivityScreen() {
 
   return (
     <ThemedView className="w-full flex-1" style={{ paddingTop: insets.top }}>
-      <LogoBgWrapper>
+      <LogoBgWrapper className="flex-1">
         <View className="w-full flex items-center">
           <ThemedText className="py-3">{t("nav.activity")}</ThemedText>
         </View>
@@ -335,7 +340,7 @@ export default function ActivityScreen() {
           contentContainerStyle={{
             alignItems: "center",
             paddingTop: 16,
-            paddingBottom: 32,
+            paddingBottom: FLOATING_TAB_BAR_SCROLL_PADDING,
           }}
           showsVerticalScrollIndicator={false}
         >

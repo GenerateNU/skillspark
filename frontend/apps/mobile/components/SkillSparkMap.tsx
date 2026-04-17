@@ -1,10 +1,12 @@
 import React, { useRef, useState } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
+import { View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { ThemedView } from "@/components/themed-view";
 import { OrgMapCard } from "@/components/OrgMapCard";
 import { OrgListSheet } from "@/components/OrgListSheet";
+import { FLOATING_TAB_BAR_SCROLL_PADDING } from "@/components/floating-tab-bar";
 import { pinSvg } from "@/constants/mapPins";
 
 export interface LocationPin {
@@ -16,6 +18,7 @@ export interface LocationPin {
   rating: number;
   members: number;
   image?: string;
+  district?: string;
 }
 
 interface SkillSparkMapProps {
@@ -61,8 +64,24 @@ export function SkillSparkMap({ locations, userLocation }: SkillSparkMapProps) {
           </Marker>
         ))}
       </MapView>
+
+      {/* Permanent white background behind the floating nav bar so the map
+          never bleeds through around the tab bar pill or safe-area zone. */}
+      <View
+        pointerEvents="none"
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: FLOATING_TAB_BAR_SCROLL_PADDING-10,
+          backgroundColor: "#fffFFF",
+          zIndex: 100,
+        }}
+      />
+
       {selectedPin ? (
-        <OrgMapCard pin={selectedPin} />
+        <OrgMapCard pin={selectedPin} userLocation={userLocation} />
       ) : (
         <OrgListSheet locations={locations} userLocation={userLocation} />
       )}

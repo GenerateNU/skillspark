@@ -15,10 +15,10 @@ import {
   usernameExistsResponseError,
   UsernameExistsOutputBody,
 } from "@skillspark/api-client";
-import { useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, useState, useEffect, ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 interface AuthContextType {
   guardianId: string | null;
@@ -26,10 +26,13 @@ interface AuthContextType {
   langPref: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  hasAccount: boolean;
+  inOnboarding: boolean;
   login: (
     email: string,
     password: string,
     onError: (msg: string) => void,
+    onSuccess: () => void,
   ) => void;
   signup: (
     name: string,
@@ -39,6 +42,7 @@ interface AuthContextType {
     language_preference: string,
     profile_picture_s3_key: string | undefined,
     onError: (msg: string) => void,
+    onSuccess: () => void,
   ) => void;
   logout: () => void;
   update: (
@@ -58,6 +62,9 @@ interface AuthContextType {
     username: string,
     onError: (msg: string) => void,
   ) => Promise<boolean>;
+  setLanguage: (language: string) => void;
+  setInOnboarding: (value: boolean) => void;
+  completeOnboarding: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -69,17 +76,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [jwt, setJWT] = useState<string | null>(null);
   const [langPref, setLangPref] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAccount, setHasAccount] = useState(false);
+  const [inOnboarding, setInOnboarding] = useState(false);
   const queryClient = useQueryClient();
   const { mutate: loginFunc } = useLoginGuardian();
   const { mutate: signupFunc } = useSignupGuardian();
   const { mutate: updateFunc } = useUpdateGuardian();
+  const { t: translate } = useTranslation();
 
-  const { guardian } = useGuardian(guardianId);
+  const { guardian, hasError } = useGuardian(guardianId);
+
+  const logout = async () => {
+    await SecureStore.deleteItemAsync("token");
+    setJWT(null);
+    await SecureStore.deleteItemAsync("guardian_id");
+    setGuardianId(null);
+    await SecureStore.deleteItemAsync("language_preference");
+    setLangPref(null);
+   };
 
   useEffect(() => {
     const checkAlreadyAuth = async () => {
-      const storedJWT = await SecureStore.getItemAsync("token");
-      const storedGuardianId = await SecureStore.getItemAsync("guardian_id");
+      if (hasError) {
+        // invalid JWT, log out old session
+        logout();
+        return;
+      }
       const storedLangPref = await SecureStore.getItemAsync(
         "language_preference",
       );
@@ -88,15 +110,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setCurrentLanguage(storedLangPref);
         queryClient.invalidateQueries({ refetchType: "all" });
       }
-      if (storedJWT && storedGuardianId) {
-        setJWT(storedJWT);
-        setGuardianId(storedGuardianId);
-        setLangPref(storedLangPref);
+      const storedHasAccount = await SecureStore.getItemAsync("has_account");
+      setHasAccount(storedHasAccount === "true");
+      if (storedHasAccount) {
+        // values set once onboarding is finished
+        const storedJWT = await SecureStore.getItemAsync("token");
+        const storedGuardianId = await SecureStore.getItemAsync("guardian_id");
+        if (storedJWT && storedGuardianId) {
+          setJWT(storedJWT);
+          setGuardianId(storedGuardianId);
+          setLangPref(storedLangPref);
+        }
       }
       setIsLoading(false);
     };
     checkAlreadyAuth();
-  }, [queryClient]);
+  }, [queryClient, hasError]);
 
   useEffect(() => {
     const getUpdatedLangPref = async () => {
@@ -115,6 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     email: string,
     password: string,
     onError: (msg: string) => void,
+    onSuccess: () => void,
   ) => {
     loginFunc(
       { data: { email, password } },
@@ -125,14 +155,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setJWT(success.token);
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
           setGuardianId(success.guardian_id);
-          router.replace("/(app)/(tabs)");
+          onSuccess();
         },
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };
-          onError(fail.data?.message ?? "An unexpected error occurred");
+          onError(fail.data?.message ?? translate("common.errorOccurred"));
         },
       },
     );
+  };
+
+  const completeOnboarding = async () => {
+    await SecureStore.setItemAsync("has_account", "true");
+    setHasAccount(true);
+    setInOnboarding(false);
   };
 
   const signup = (
@@ -143,7 +179,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     language_preference: string,
     profile_picture_s3_key: string | undefined,
     onError: (msg: string) => void,
+    onSuccess: () => void,
   ) => {
+    // entering onboarding -> no redirects until onboarding is complete
+    setInOnboarding(true);
+    // reset for each new account during onboarding
+    setHasAccount(false);
+    SecureStore.setItemAsync("has_account", "false");
     signupFunc(
       {
         data: {
@@ -163,24 +205,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await SecureStore.setItemAsync("guardian_id", success.guardian_id);
           setGuardianId(success.guardian_id);
           await createStripeCustomer(success.guardian_id);
-          router.replace("/(app)/(tabs)");
+          onSuccess();
         },
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };
-          onError(fail.data?.message ?? "An unexpected error occurred");
+          onError(fail.data?.message ?? translate("common.errorOccurred"));
         },
       },
     );
-  };
-
-  const logout = async () => {
-    router.replace("/(auth)/login");
-    await SecureStore.deleteItemAsync("token");
-    setJWT(null);
-    await SecureStore.deleteItemAsync("guardian_id");
-    setGuardianId(null);
-    await SecureStore.deleteItemAsync("language_preference");
-    setLangPref(null);
   };
 
   const update = (
@@ -220,7 +252,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         onError: (err) => {
           const fail = err as unknown as { data?: { message?: string } };
-          onError(fail.data?.message ?? "An unexpected error occurred");
+          onError(fail.data?.message ?? translate("auth.unexpectedError"));
         },
       },
     );
@@ -234,15 +266,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const resp = await checkUsernameExists(username);
       const data = resp.data as UsernameExistsOutputBody;
       if (data.exists) {
-        onError("Username is taken.");
+        onError(translate("auth.usernameTaken"));
         return false;
       }
       return true;
     } catch (err) {
       const typedErr = err as usernameExistsResponseError;
-      onError(typedErr.data?.detail ?? "An unexpected error occurred.");
+      onError(typedErr.data?.detail ?? translate("auth.unexpectedError"));
       return false;
     }
+  };
+
+  const setLanguage = async (language: string) => {
+    await i18n.changeLanguage(language);
+    setCurrentLanguage(language);
+    await SecureStore.setItemAsync("language_preference", language);
+    setLangPref(language);
+    queryClient.invalidateQueries({ refetchType: "all" });
   };
 
   return (
@@ -251,13 +291,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         guardianId,
         jwt,
         langPref,
-        isAuthenticated: !!(jwt && guardianId),
+        isAuthenticated: !!jwt && !!guardianId,
         isLoading,
+        hasAccount,
+        inOnboarding,
         login,
         signup,
         logout,
         update,
         usernameExists,
+        setLanguage,
+        setInOnboarding,
+        completeOnboarding,
       }}
     >
       {children}

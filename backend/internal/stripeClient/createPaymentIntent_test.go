@@ -19,35 +19,27 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 	}
 
 	apiKey := getTestStripeAPIKey(t)
+	stripeAccountID := getSeededOrgStripeAccountID(t)
+	stripeCustomerID := getSeededGuardianStripeCustomerID(t)
 	client, _ := NewStripeClient(apiKey)
 	ctx := context.Background()
 
 	t.Run("Successfully creates payment intent with test payment method", func(t *testing.T) {
-		customer, err := client.CreateCustomer(ctx, "paymenttest@example.com", "Payment Test User")
-		require.NoError(t, err)
-
-		paymentMethodID := "pm_card_visa"
-
 		input := &models.CreatePaymentIntentInput{}
 		input.Body.Amount = 10000
 		input.Body.Currency = "usd"
-		input.Body.GuardianStripeID = customer.ID
-		input.Body.OrgStripeID = testStripeAccountID
-		input.Body.PaymentMethodID = paymentMethodID
+		input.Body.GuardianStripeID = stripeCustomerID
+		input.Body.OrgStripeID = stripeAccountID
+		input.Body.PaymentMethodID = "pm_card_visa"
 		input.Body.EventDate = time.Now().Add(24 * time.Hour)
+		input.Body.PlatformFeePercentage = 10
 		input.Body.RegistrationID = uuid.New()
 		input.Body.GuardianID = uuid.New()
 		input.Body.ProviderOrgID = uuid.New()
 
 		output, err := client.CreatePaymentIntent(ctx, input)
 
-		if err != nil {
-			if assert.Contains(t, err.Error(), "capabilities") {
-				t.Skip("Account capabilities not active yet - this is expected for new test accounts")
-			}
-			require.NoError(t, err)
-		}
-
+		require.NoError(t, err)
 		require.NotNil(t, output)
 		assert.NotEmpty(t, output.Body.PaymentIntentID)
 		assert.NotEmpty(t, output.Body.ClientSecret)
@@ -56,24 +48,14 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 	})
 
 	t.Run("Fails when payment method is nil", func(t *testing.T) {
-		customer, err := client.CreateCustomer(ctx, "nopm@example.com", "No PM User")
-		require.NoError(t, err)
-
-		org, err := client.CreateOrganizationAccount(
-			ctx,
-			"No PM Org",
-			"nopm"+time.Now().Format("20060102150405")+"@example.com",
-			"US",
-		)
-		require.NoError(t, err)
-
 		input := &models.CreatePaymentIntentInput{}
 		input.Body.Amount = 5000
 		input.Body.Currency = "usd"
-		input.Body.GuardianStripeID = customer.ID
-		input.Body.OrgStripeID = org.Body.Account.ID
+		input.Body.GuardianStripeID = stripeCustomerID
+		input.Body.OrgStripeID = stripeAccountID
 		input.Body.PaymentMethodID = ""
 		input.Body.EventDate = time.Now().Add(24 * time.Hour)
+		input.Body.PlatformFeePercentage = 10
 		input.Body.RegistrationID = uuid.New()
 		input.Body.GuardianID = uuid.New()
 		input.Body.ProviderOrgID = uuid.New()
@@ -85,25 +67,14 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 	})
 
 	t.Run("Fails when payment method is empty string", func(t *testing.T) {
-		customer, err := client.CreateCustomer(ctx, "emptypm@example.com", "Empty PM User")
-		require.NoError(t, err)
-
-		org, err := client.CreateOrganizationAccount(
-			ctx,
-			"Empty PM Org",
-			"emptypm"+time.Now().Format("20060102150405")+"@example.com",
-			"US",
-		)
-		require.NoError(t, err)
-
-		emptyPM := ""
 		input := &models.CreatePaymentIntentInput{}
 		input.Body.Amount = 5000
 		input.Body.Currency = "usd"
-		input.Body.GuardianStripeID = customer.ID
-		input.Body.OrgStripeID = org.Body.Account.ID
-		input.Body.PaymentMethodID = emptyPM
+		input.Body.GuardianStripeID = stripeCustomerID
+		input.Body.OrgStripeID = stripeAccountID
+		input.Body.PaymentMethodID = ""
 		input.Body.EventDate = time.Now().Add(24 * time.Hour)
+		input.Body.PlatformFeePercentage = 10
 		input.Body.RegistrationID = uuid.New()
 		input.Body.GuardianID = uuid.New()
 		input.Body.ProviderOrgID = uuid.New()
@@ -115,22 +86,14 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 	})
 
 	t.Run("Fails with invalid customer ID", func(t *testing.T) {
-		org, err := client.CreateOrganizationAccount(
-			ctx,
-			"Invalid Cust Org",
-			"invalidcust"+time.Now().Format("20060102150405")+"@example.com",
-			"US",
-		)
-		require.NoError(t, err)
-
-		paymentMethodID := "pm_card_visa"
 		input := &models.CreatePaymentIntentInput{}
 		input.Body.Amount = 5000
 		input.Body.Currency = "usd"
 		input.Body.GuardianStripeID = "cus_nonexistent123"
-		input.Body.OrgStripeID = org.Body.Account.ID
-		input.Body.PaymentMethodID = paymentMethodID
+		input.Body.OrgStripeID = stripeAccountID
+		input.Body.PaymentMethodID = "pm_card_visa"
 		input.Body.EventDate = time.Now().Add(24 * time.Hour)
+		input.Body.PlatformFeePercentage = 10
 		input.Body.RegistrationID = uuid.New()
 		input.Body.GuardianID = uuid.New()
 		input.Body.ProviderOrgID = uuid.New()
@@ -143,17 +106,14 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 	})
 
 	t.Run("Fails with invalid organization account ID", func(t *testing.T) {
-		customer, err := client.CreateCustomer(ctx, "invalidorg@example.com", "Invalid Org User")
-		require.NoError(t, err)
-
-		paymentMethodID := "pm_card_visa"
 		input := &models.CreatePaymentIntentInput{}
 		input.Body.Amount = 5000
 		input.Body.Currency = "usd"
-		input.Body.GuardianStripeID = customer.ID
+		input.Body.GuardianStripeID = stripeCustomerID
 		input.Body.OrgStripeID = "acct_nonexistent123"
-		input.Body.PaymentMethodID = paymentMethodID
+		input.Body.PaymentMethodID = "pm_card_visa"
 		input.Body.EventDate = time.Now().Add(24 * time.Hour)
+		input.Body.PlatformFeePercentage = 10
 		input.Body.RegistrationID = uuid.New()
 		input.Body.GuardianID = uuid.New()
 		input.Body.ProviderOrgID = uuid.New()
@@ -166,10 +126,11 @@ func TestStripeClient_CreatePaymentIntent(t *testing.T) {
 
 	t.Run("Validates application fee calculation", func(t *testing.T) {
 		amount := int64(10000)
+		platformFeePercentage := int64(10)
 		expectedFee := int64(1000)
 		expectedOrgProfit := int64(9000)
 
-		calculatedFee := (amount * 10) / 100
+		calculatedFee := (amount * platformFeePercentage) / 100
 		calculatedProfit := amount - calculatedFee
 
 		assert.Equal(t, expectedFee, calculatedFee)

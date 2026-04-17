@@ -21,6 +21,9 @@ type Organization struct {
 	PfpS3Key               *string           `json:"pfp_s3_key,omitempty" db:"pfp_s3_key"`
 	PresignedURL           *string           `json:"presigned_url,omitempty"`
 	LocationID             *uuid.UUID        `json:"location_id,omitempty" db:"location_id"`
+	Latitude               *float64          `json:"latitude,omitempty"`
+	Longitude              *float64          `json:"longitude,omitempty"`
+	District               *string           `json:"district,omitempty"`
 	CreatedAt              time.Time         `json:"created_at" db:"created_at"`
 	UpdatedAt              time.Time         `json:"updated_at" db:"updated_at"`
 	StripeAccountID        *string           `json:"stripe_account_id,omitempty" db:"stripe_account_id"`
@@ -30,7 +33,8 @@ type Organization struct {
 
 // CreateOrganizationRouteInput is the multipart form input for creating an organization with an image
 type CreateOrganizationRouteInput struct {
-	RawBody huma.MultipartFormFiles[CreateOrganizationFormData]
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	RawBody        huma.MultipartFormFiles[CreateOrganizationFormData]
 }
 
 // CreateOrganizationFormData holds the parsed form data for creating an organization
@@ -53,8 +57,9 @@ type CreateOrganizationFormData struct {
 }
 
 type UpdateOrganizationRouteInput struct {
-	ID      uuid.UUID `path:"id"`
-	RawBody huma.MultipartFormFiles[UpdateOrganizationFormData]
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	ID             uuid.UUID `path:"id"`
+	RawBody        huma.MultipartFormFiles[UpdateOrganizationFormData]
 }
 
 type CreateOrganizationBody struct {
@@ -74,7 +79,8 @@ type UpdateOrganizationBody struct {
 }
 
 type CreateOrganizationInput struct {
-	Body CreateOrganizationBody
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	Body           CreateOrganizationBody
 }
 
 type CreateOrganizationOutput struct {
@@ -82,8 +88,9 @@ type CreateOrganizationOutput struct {
 }
 
 type UpdateOrganizationInput struct {
-	ID   uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
-	Body UpdateOrganizationBody
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	ID             uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
+	Body           UpdateOrganizationBody
 }
 
 type UpdateOrganizationOutput struct {
@@ -91,7 +98,8 @@ type UpdateOrganizationOutput struct {
 }
 
 type GetOrganizationByIDInput struct {
-	ID uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	ID             uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
 }
 
 type GetOrganizationByIDOutput struct {
@@ -99,8 +107,9 @@ type GetOrganizationByIDOutput struct {
 }
 
 type GetAllOrganizationsInput struct {
-	Page     int `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
-	PageSize int `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
+	AcceptLanguage string `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	Page           int    `query:"page" minimum:"1" default:"1" doc:"Page number (starts at 1)"`
+	PageSize       int    `query:"page_size" minimum:"1" maximum:"100" default:"10" doc:"Number of items per page"`
 }
 
 type GetAllOrganizationsOutput struct {
@@ -108,7 +117,8 @@ type GetAllOrganizationsOutput struct {
 }
 
 type DeleteOrganizationInput struct {
-	ID uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
+	AcceptLanguage string    `header:"Accept-Language" default:"en-US" enum:"en-US,th-TH"`
+	ID             uuid.UUID `path:"id" format:"uuid" doc:"Organization ID"`
 }
 
 type DeleteOrganizationOutput struct {
@@ -122,4 +132,34 @@ type GetEventOccurrencesByOrganizationIDInput struct {
 
 type GetEventOccurrencesByOrganizationIDOutput struct {
 	Body []EventOccurrence `json:"body" doc:"List of event occurrences in the database that match the organization ID"`
+}
+
+// CreateOrgDBBody / UpdateOrgDBBody hold the bilingual columns written to the DB.
+type CreateOrgDBBody struct {
+	Name       string
+	AboutEN    *string
+	AboutTH    *string
+	Active     *bool
+	LocationID *uuid.UUID
+	Links      []OrgLink
+}
+
+type UpdateOrgDBBody struct {
+	Name       *string
+	AboutEN    *string
+	AboutTH    *string
+	Active     *bool
+	LocationID *uuid.UUID
+	Links      *[]OrgLink
+}
+
+type CreateOrganizationDBInput struct {
+	AcceptLanguage string
+	Body           CreateOrgDBBody
+}
+
+type UpdateOrganizationDBInput struct {
+	AcceptLanguage string
+	ID             uuid.UUID
+	Body           UpdateOrgDBBody
 }

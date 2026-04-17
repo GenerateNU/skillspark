@@ -27,12 +27,20 @@ func CreateTestRegistration(
 	child := child.CreateTestChild(t, ctx, db)
 	occurrence := eventoccurrence.CreateTestEventOccurrence(t, ctx, db)
 
-	input := &models.CreateRegistrationWithPaymentData{
-		AcceptLanguage:        "en-US",
-		ChildID:               child.ID,
-		GuardianID:            child.GuardianID,
-		EventOccurrenceID:     occurrence.ID,
-		Status:                models.RegistrationStatusRegistered,
+	regInput := &models.CreateRegistrationData{
+		AcceptLanguage:    "en-US",
+		ChildID:           child.ID,
+		GuardianID:        child.GuardianID,
+		EventOccurrenceID: occurrence.ID,
+		Status:            models.RegistrationStatusRegistered,
+	}
+
+	registration, err := repo.CreateRegistration(ctx, regInput)
+	require.NoError(t, err)
+	require.NotNil(t, registration.Body)
+
+	paymentInput := &models.CreatePaymentData{
+		RegistrationID:        registration.Body.ID,
 		StripePaymentIntentID: "pi_test_" + child.ID.String()[:8],
 		StripeCustomerID:      "cus_test_" + child.GuardianID.String()[:8],
 		OrgStripeAccountID:    "acct_test_123",
@@ -44,10 +52,15 @@ func CreateTestRegistration(
 		PaymentIntentStatus:   "requires_capture",
 	}
 
-	registration, err := repo.CreateRegistration(ctx, input)
-
+	err = repo.CreatePayment(ctx, paymentInput)
 	require.NoError(t, err)
-	require.NotNil(t, registration.Body)
 
-	return &registration.Body
+	// Re-fetch so the returned Registration has payment fields populated from the join
+	full, err := repo.GetRegistrationByID(ctx, &models.GetRegistrationByIDInput{
+		AcceptLanguage: "en-US",
+		ID:             registration.Body.ID,
+	}, nil)
+	require.NoError(t, err)
+
+	return &full.Body
 }

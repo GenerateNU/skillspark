@@ -1,25 +1,34 @@
+import { useState } from "react";
 import { Image } from "expo-image";
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useGetLocationById, useGetOrganization } from "@skillspark/api-client";
-import type { Location, Organization } from "@skillspark/api-client";
-import { SvgXml } from "react-native-svg";
+import {
+  useGetEventReviewsForOrganization,
+  useGetLocationById,
+  useGetOrganization,
+} from "@skillspark/api-client";
+import type {
+  Location,
+  Organization,
+  SimpleReviewAggregate,
+} from "@skillspark/api-client";
+import { ErrorScreen } from "@/components/ErrorScreen";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+import { AppColors, Shadows } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useOrgLinks } from "@/hooks/useOrgLinks";
+import { AboutPage } from "@/components/AboutPage";
+import { EventRatingCard } from "@/components/EventRatingCard";
 import { useTranslation } from "react-i18next";
-import { EMPTY_FACE_SVG } from "@/constants/avatarFaces";
+import * as Linking from "expo-linking";
+import { ShareModal } from "@/components/ShareModal";
 import { RatingSmiley } from "@/components/RatingSmiley";
 import LogoBgWrapper from "@/components/LogoBgWrapper";
 
@@ -34,9 +43,20 @@ function OrgDetail({
   const { t: translate } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
   const borderColor = useThemeColor({}, "borderColor");
-  const { openLink, hasLinks } = useOrgLinks(org.links ?? []);
-  const [aboutExpanded, setAboutExpanded] = useState(false);
-  const [aboutTruncated, setAboutTruncated] = useState(false);
+  const [shareVisible, setShareVisible] = useState(false);
+
+  const totalOrgReviews = org.review_summary?.total_reviews ?? 0;
+  const { data: previewResp } = useGetEventReviewsForOrganization(
+    org.id,
+    { page: 1, page_size: 1, sort_by: "most_rated" },
+    { query: { enabled: !!org.id && totalOrgReviews > 0 } },
+  );
+  const previewEvent =
+    previewResp?.status === 200 &&
+    Array.isArray(previewResp.data) &&
+    previewResp.data.length > 0
+      ? (previewResp.data[0] as SimpleReviewAggregate)
+      : null;
 
   const cardStyle = {
     shadowColor: "#000",
@@ -95,6 +115,7 @@ function OrgDetail({
             </View>
           )}
         </View>
+
         <LogoBgWrapper>
           {/* Org info */}
           <View className="px-4 pb-4 pt-4">
@@ -113,6 +134,7 @@ function OrgDetail({
                 )}
               </View>
               <TouchableOpacity
+                onPress={() => setShareVisible(true)}
                 activeOpacity={0.7}
                 className="mt-1 h-9 w-9 items-center justify-center rounded-full border-2"
                 style={{ borderColor: AppColors.borderLight }}
@@ -128,7 +150,7 @@ function OrgDetail({
 
           {/* Divider */}
           <View
-            className="mx-4 mb-5 border-b"
+            className="mx-4 mb-5 border-b border-dashed"
             style={{ borderColor: AppColors.divider }}
           />
 
@@ -137,59 +159,13 @@ function OrgDetail({
             className="mx-4 mb-4 rounded-2xl bg-white p-5"
             style={cardStyle}
           >
-            <Text className="mb-2.5 text-[18px] font-nunito-bold">
-              {translate("org.about")}
-            </Text>
-            <Text
-              numberOfLines={aboutExpanded ? undefined : 4}
-              onTextLayout={(e) => {
-                if (!aboutExpanded)
-                  setAboutTruncated(e.nativeEvent.lines.length >= 4);
-              }}
-              className={`text-sm leading-[22px] ${
-                aboutTruncated ? "mb-1" : "mb-4"
-              }`}
-              style={{ color: AppColors.secondaryText }}
-            >
-              {org.about ?? ""}
-            </Text>
-            {aboutTruncated && (
-              <Pressable
-                onPress={() => setAboutExpanded((prev) => !prev)}
-                className="mb-4"
-              >
-                <Text
-                  className="text-[13px] font-semibold"
-                  style={{ color: AppColors.primaryText }}
-                >
-                  {aboutExpanded
-                    ? translate("event.seeLess")
-                    : translate("event.seeMore")}
-                </Text>
-              </Pressable>
-            )}
-            {hasLinks && (
-              <View className="flex-row flex-wrap gap-2.5">
-                {(org.links ?? []).map((link, index) => (
-                  <Pressable
-                    key={index}
-                    onPress={() => openLink(link.href)}
-                    className="rounded-full px-5 py-2.5 items-center"
-                    style={{ backgroundColor: AppColors.borderLight }}
-                  >
-                    <Text
-                      className="text-[13px] font-semibold"
-                      style={{ color: AppColors.primaryText }}
-                    >
-                      {link.label}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            )}
+            <AboutPage
+              description={org.about ?? ""}
+              links={org.links ?? []}
+            />
           </View>
 
-          {/* Rating card */}
+          {/* Reviews card */}
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => router.push(`/org/${org.id}/reviews`)}
@@ -198,38 +174,73 @@ function OrgDetail({
               className="mx-4 mb-4 rounded-2xl bg-white p-5"
               style={cardStyle}
             >
-              <Text className="mb-4 text-[24px] font-nunito-bold">
+              <Text
+                className="mb-4 font-nunito-bold text-[18px]"
+                style={{ color: AppColors.primaryText }}
+              >
                 {translate("org.reviews")}
               </Text>
-              {org.review_summary && org.review_summary.total_reviews > 0 ? (
-                <View className="flex-row items-center justify-center">
-                  <View className="flex-1 items-center">
-                    <RatingSmiley
-                      rating={org.review_summary.average_rating}
-                      width={80}
-                      height={80}
-                    />
-                  </View>
-                  <View className="flex-1 items-center">
-                    <Text className="text-[36px] font-nunito-bold leading-[44px]">
-                      {org.review_summary.average_rating.toFixed(1)}
-                    </Text>
+
+              {totalOrgReviews > 0 ? (
+                <View className="flex-row gap-3 items-start mb-2">
+                  {/* Left: aggregate number + smiley + count */}
+                  <View className="items-center">
                     <Text
-                      className="text-[13px] font-nunito"
+                      className="font-nunito-bold"
+                      style={{ color: AppColors.primaryText, fontSize: 40, lineHeight: 48 }}
+                    >
+                      {org.review_summary!.average_rating % 1 === 0
+                        ? org.review_summary!.average_rating.toFixed(0)
+                        : org.review_summary!.average_rating.toFixed(1)}
+                    </Text>
+                    <RatingSmiley
+                      rating={org.review_summary!.average_rating}
+                      width={44}
+                      height={44}
+                    />
+                    <Text
+                      className="text-[12px] font-nunito mt-1"
                       style={{ color: AppColors.subtleText }}
                     >
-                      ({org.review_summary.total_reviews})
+                      ({totalOrgReviews})
                     </Text>
                   </View>
+
+                  {/* Right: preview event rating card */}
+                  {previewEvent && (
+                    <View className="flex-1">
+                      <EventRatingCard
+                        event={previewEvent.event}
+                        aggregate={previewEvent}
+                        onPress={() => router.push(`/org/${org.id}/reviews`)}
+                      />
+                    </View>
+                  )}
                 </View>
               ) : (
-                <View className="flex-row items-center gap-3 py-4 justify-center">
-                  <SvgXml xml={EMPTY_FACE_SVG} width={36} height={36} />
-                  <Text className="text-[16px] font-nunito">
-                    {translate("review.firstReview")}
-                  </Text>
-                </View>
+                <Text
+                  className="text-[13px] font-nunito mb-2"
+                  style={{ color: AppColors.subtleText }}
+                >
+                  {translate("review.noReviews")}
+                </Text>
               )}
+
+              <View
+                style={{
+                  height: 0.5,
+                  backgroundColor: AppColors.borderLight,
+                }}
+                className="mt-2 mb-3"
+              />
+              <View className="items-center">
+                <Text
+                  className="text-[13px] font-nunito underline"
+                  style={{ color: AppColors.primaryText }}
+                >
+                  {translate("event.seeMoreReviews")}
+                </Text>
+              </View>
             </View>
           </TouchableOpacity>
 
@@ -246,6 +257,15 @@ function OrgDetail({
               </Text>
             </TouchableOpacity>
           </View>
+
+          <ShareModal
+            visible={shareVisible}
+            onClose={() => setShareVisible(false)}
+            name={org.name}
+            imageUrl={org.presigned_url ?? undefined}
+            shareUrl={Linking.createURL(`org/${org.id}`)}
+            message={translate("share.defaultMessage", { name: org.name })}
+          />
         </LogoBgWrapper>
       </ScrollView>
     </SafeAreaView>
@@ -274,13 +294,7 @@ export default function OrgScreen() {
   }
 
   if (error || !response || response.status !== 200) {
-    return (
-      <View className="flex-1 items-center justify-center p-6">
-        <Text className="text-base font-semibold text-red-500">
-          {translate("org.notFound")}
-        </Text>
-      </View>
-    );
+    return <ErrorScreen message={translate("org.notFound")} />;
   }
 
   return (

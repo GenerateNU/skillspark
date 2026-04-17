@@ -9,7 +9,7 @@ export default function AuthStackLayout() {
     <QueryClientProvider client={queryClient}>
       <Stack>
         <Stack.Screen name="login/index" options={{ headerShown: false }} />
-        <Stack.Screen name="signup/index" options={{ headerShown: false }} />
+        <Stack.Screen name="signup" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </QueryClientProvider>

@@ -86,7 +86,7 @@ export default function ManageChildScreen() {
   const deleteChildMutation = useDeleteChild();
 
   if (!guardianId) {
-    return <ErrorScreen message="Illegal state: no guardian ID retrieved" />;
+    return <ErrorScreen message={translate("common.noGuardianId")} />;
   }
 
   const handleSave = async () => {

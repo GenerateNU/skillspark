@@ -19,7 +19,7 @@ function timeAgo(dateStr: string, translate: (key: string) => string) {
     : `${years} ${translate("time.yearsAgo")}`;
 }
 
-export function ReviewCard({ review }: { review: Review }) {
+export function ReviewCard({ review, hideAvatar }: { review: Review; hideAvatar?: boolean }) {
   const { t: translate } = useTranslation();
   const match = RATING_OPTIONS.find((r) => r.rating === review.rating);
 
@@ -36,9 +36,11 @@ export function ReviewCard({ review }: { review: Review }) {
 
   return (
     <View className="flex-row gap-3 p-4 rounded-2xl">
-      <View className="items-center pt-1">
-        {match && <Image source={match.image} className="w-9 h-9" />}
-      </View>
+      {!hideAvatar && (
+        <View className="items-center pt-1">
+          {match && <Image source={match.image} className="w-9 h-9" />}
+        </View>
+      )}
 
       <View className="flex-1 gap-2">
         <Text

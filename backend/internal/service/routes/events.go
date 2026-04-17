@@ -10,6 +10,7 @@ import (
 	"skillspark/internal/service/handler/event"
 	"skillspark/internal/storage"
 	translations "skillspark/internal/translation"
+	"skillspark/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 )
@@ -135,6 +136,54 @@ func SetupEventRoutes(api huma.API, repo *storage.Repository, s3Client s3_client
 			}{
 				Message: msg,
 			},
+		}, nil
+	})
+
+	// GET /api/v1/events
+	huma.Register(api, huma.Operation{
+		OperationID: "get-all-events",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/events",
+		Summary:     "Get all events",
+		Description: "Returns a paginated list of all events",
+		Tags:        []string{"Events"},
+	}, func(ctx context.Context, input *models.GetAllEventsInput) (*models.GetAllEventsOutput, error) {
+		pagination := utils.Pagination{
+			Page:  input.Page,
+			Limit: input.Limit,
+		}
+		if pagination.Page < 1 {
+			pagination.Page = 1
+		}
+		if pagination.Limit < 1 {
+			pagination.Limit = 100
+		}
+
+		if input.MinAge != 0 && input.MaxAge != 0 && input.MinAge > input.MaxAge {
+			return nil, huma.Error400BadRequest("min_age cannot be larger than max_age")
+		}
+
+		var filters models.GetAllEventsFilter
+		if input.Search != "" {
+			filters.Search = &input.Search
+		}
+		if input.Category != "" {
+			filters.Category = &input.Category
+		}
+		if input.MinAge != 0 {
+			filters.MinAge = &input.MinAge
+		}
+		if input.MaxAge != 0 {
+			filters.MaxAge = &input.MaxAge
+		}
+
+		events, err := eventHandler.GetAllEvents(ctx, pagination, input.AcceptLanguage, filters)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.GetAllEventsOutput{
+			Body: events,
 		}, nil
 	})
 

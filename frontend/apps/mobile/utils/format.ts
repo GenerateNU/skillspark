@@ -53,6 +53,10 @@ export function formatSectionDate(dateStr: string): string {
   return date.toLocaleDateString("en-US", { weekday: "short", day: "numeric" });
 }
 
+export function formatSectionMonth(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString("en-US", { month: "long" });
+}
+
 export function formatTime(dateStr: string): string {
   return new Date(dateStr).toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -68,8 +72,12 @@ export function formatPrice(cents: number, currency: string): string {
   return `$${amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2)}`;
 }
 
-export function formatAgeRange(min: number, max: number): string {
+export function formatAgeRange(
+  min: number | null | undefined,
+  max: number | null | undefined,
+): string {
   if (!min && !max) return "";
+  if (!max) return i18n.t("occurrence.agesOpen", { min });
   if (min === max) return i18n.t("occurrence.ages", { min });
   return i18n.t("occurrence.agesRange", { min, max });
 }
@@ -78,4 +86,34 @@ export function formatLocation(occurrence: EventOccurrence): string {
   const loc = occurrence.location;
   const parts = [loc.district, loc.province].filter(Boolean);
   return parts.join(", ") || "Location";
+}
+
+export function formatAddress(occurrence: EventOccurrence): string {
+  const loc = occurrence.location;
+  const parts = [loc?.address_line1, loc?.address_line2, loc?.district].filter(
+    Boolean,
+  );
+  return parts.join(", ");
+}
+
+export function filterFutureOccurrences(
+  occurrences: EventOccurrence[],
+): EventOccurrence[] {
+  const now = new Date();
+  return occurrences.filter((o) => new Date(o.start_time) > now);
+}
+
+export function extractResponseData<T>(resp: unknown): T[] {
+  const d = resp as { data: T[] } | undefined;
+  return Array.isArray(d?.data) ? d!.data : [];
+}
+
+export function arrayToMap<T extends { id: string }>(
+  arr: T[],
+): Record<string, T> {
+  const map: Record<string, T> = {};
+  arr.forEach((item) => {
+    map[item.id] = item;
+  });
+  return map;
 }

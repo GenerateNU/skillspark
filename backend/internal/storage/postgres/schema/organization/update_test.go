@@ -21,13 +21,14 @@ func TestUpdateOrganization(t *testing.T) {
 	active := true
 	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 
-	createInput := func() *models.CreateOrganizationInput {
-		i := &models.CreateOrganizationInput{}
-		i.Body.Name = "Original Name"
-		i.Body.Active = &active
-		i.Body.LocationID = &locationID
-		return i
-	}()
+	createInput := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Original Name",
+			Active:     &active,
+			LocationID: &locationID,
+		},
+	}
 
 	created, createErr := repo.CreateOrganization(ctx, createInput, nil)
 	require.Nil(t, createErr)
@@ -35,9 +36,10 @@ func TestUpdateOrganization(t *testing.T) {
 
 	newName := "Updated Name"
 	newActive := false
-	updateInput := &models.UpdateOrganizationInput{
-		ID: created.ID,
-		Body: models.UpdateOrganizationBody{
+	updateInput := &models.UpdateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		ID:             created.ID,
+		Body: models.UpdateOrgDBBody{
 			Name:   &newName,
 			Active: &newActive,
 		},
@@ -51,7 +53,7 @@ func TestUpdateOrganization(t *testing.T) {
 	assert.Nil(t, updated.StripeAccountID)
 	assert.False(t, updated.StripeAccountActivated)
 
-	fetched, getErr := repo.GetOrganizationByID(ctx, created.ID)
+	fetched, getErr := repo.GetOrganizationByID(ctx, created.ID, "en-US")
 	require.Nil(t, getErr)
 	assert.Equal(t, "Updated Name", fetched.Name)
 	assert.False(t, fetched.Active)
@@ -68,13 +70,14 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 	active := true
 	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 
-	createInput := func() *models.CreateOrganizationInput {
-		i := &models.CreateOrganizationInput{}
-		i.Body.Name = "Test Org"
-		i.Body.Active = &active
-		i.Body.LocationID = &locationID
-		return i
-	}()
+	createInput := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Test Org",
+			Active:     &active,
+			LocationID: &locationID,
+		},
+	}
 
 	created, createErr := repo.CreateOrganization(ctx, createInput, nil)
 	require.Nil(t, createErr)
@@ -82,9 +85,10 @@ func TestUpdateOrganization_WithLocation(t *testing.T) {
 
 	newLocationID := location.CreateTestLocation(t, ctx, testDB).ID
 	newName := "Test Org with Location"
-	updateInput := &models.UpdateOrganizationInput{
-		ID: created.ID,
-		Body: models.UpdateOrganizationBody{
+	updateInput := &models.UpdateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		ID:             created.ID,
+		Body: models.UpdateOrgDBBody{
 			Name:       &newName,
 			LocationID: &newLocationID,
 		},
@@ -108,9 +112,10 @@ func TestUpdateOrganization_NotFound(t *testing.T) {
 
 	nonExistentID := uuid.New()
 	newName := "Does Not Exist"
-	updateInput := &models.UpdateOrganizationInput{
-		ID: nonExistentID,
-		Body: models.UpdateOrganizationBody{
+	updateInput := &models.UpdateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		ID:             nonExistentID,
+		Body: models.UpdateOrgDBBody{
 			Name: &newName,
 		},
 	}
@@ -129,21 +134,23 @@ func TestUpdateOrganization_DoesNotModifyStripeFields(t *testing.T) {
 	active := true
 	locationID := location.CreateTestLocation(t, ctx, testDB).ID
 
-	createInput := func() *models.CreateOrganizationInput {
-		i := &models.CreateOrganizationInput{}
-		i.Body.Name = "Stripe Test Org"
-		i.Body.Active = &active
-		i.Body.LocationID = &locationID
-		return i
-	}()
+	createInput := &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Stripe Test Org",
+			Active:     &active,
+			LocationID: &locationID,
+		},
+	}
 
 	created, createErr := repo.CreateOrganization(ctx, createInput, nil)
 	require.Nil(t, createErr)
 
 	newName := "Updated Stripe Org"
-	updateInput := &models.UpdateOrganizationInput{
-		ID: created.ID,
-		Body: models.UpdateOrganizationBody{
+	updateInput := &models.UpdateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		ID:             created.ID,
+		Body: models.UpdateOrgDBBody{
 			Name: &newName,
 		},
 	}
@@ -153,4 +160,46 @@ func TestUpdateOrganization_DoesNotModifyStripeFields(t *testing.T) {
 	assert.Equal(t, "Updated Stripe Org", updated.Name)
 	assert.Nil(t, updated.StripeAccountID)
 	assert.False(t, updated.StripeAccountActivated)
+}
+
+func TestUpdateOrganization_PreservesAboutWhenNotProvided(t *testing.T) {
+	testDB := testutil.SetupTestDB(t)
+	repo := NewOrganizationRepository(testDB)
+	ctx := context.Background()
+	t.Parallel()
+
+	active := true
+	locationID := location.CreateTestLocation(t, ctx, testDB).ID
+	aboutEN := "Original english"
+	aboutTH := "ข้อความไทยต้นฉบับ"
+
+	created, createErr := repo.CreateOrganization(ctx, &models.CreateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		Body: models.CreateOrgDBBody{
+			Name:       "Preserve About",
+			Active:     &active,
+			LocationID: &locationID,
+			AboutEN:    &aboutEN,
+			AboutTH:    &aboutTH,
+		},
+	}, nil)
+	require.Nil(t, createErr)
+
+	newName := "Preserve About Renamed"
+	_, updateErr := repo.UpdateOrganization(ctx, &models.UpdateOrganizationDBInput{
+		AcceptLanguage: "en-US",
+		ID:             created.ID,
+		Body: models.UpdateOrgDBBody{
+			Name: &newName,
+		},
+	}, nil)
+	require.Nil(t, updateErr)
+
+	// Both language variants should still be present
+	fetchedEN, _ := repo.GetOrganizationByID(ctx, created.ID, "en-US")
+	fetchedTH, _ := repo.GetOrganizationByID(ctx, created.ID, "th-TH")
+	require.NotNil(t, fetchedEN.About)
+	require.NotNil(t, fetchedTH.About)
+	assert.Equal(t, aboutEN, *fetchedEN.About)
+	assert.Equal(t, aboutTH, *fetchedTH.About)
 }
